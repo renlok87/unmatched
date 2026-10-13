@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+      "sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ancient-leshen-codex/design",
+    "files": [
+      "ancient-leshen-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+    "art/imagegen/concept-ancient-leshen-codex/generation-records.json",
+    "art/imagegen/concept-ancient-leshen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#inputs[0].sha256 = f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "ancient-leshen-front.png: AncientLeshen из The Witcher узнаваем по оленьему черепу, широким ветвистым рогам, вытянутому телу из переплетённых корней, длинным когтистым рукам и воронам. Руки опущены, слегка согнуты и отделены от корпуса просветами; стойка миниатюры устойчива, поза соответствует §4.4. Тонкие окончания рогов и когтей читаются; их сохранность следует контролировать на этапах 3–4.",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "ancient-leshen-front.png: рельеф коры, переплетения корней, пористый мох, костяной череп и фактура рогов дают объём и различимые материалы расписанной коллекционной миниатюры, близкие к medusa-quality-reference.png. Отдельные зоны беднее эталона: плечевые вороны и тёмные силуэты около рук имеют нечёткие края и слабо читаемое оперение; вороны на предплечьях проработаны лучше. Замечание Q из r1 закрыто частично.",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "ancient-leshen-front.png: коричневая кора, светлая кость черепа, приглушённый зелёный мох на плечах, руках и корнях, чёрные вороны соответствуют PALETTE заявки и palette.json. Все четыре якоря видимы: оленьий череп с крупными рогами, корневое тело, длинные когтистые руки и вороны. Отсутствие основного moss green, отмеченное в r1, устранено.",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "ancient-leshen-front.png",
+      "note": "Учтено в Q = 1,5: замечание r1 по плечевым воронам закрыто частично; их оперение и клювы менее отчётливы, чем детали эталона, а возле рук остаются тёмные силуэты с рваными краями."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13510-60df-7492-b3d6-13a8ba0f857c"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

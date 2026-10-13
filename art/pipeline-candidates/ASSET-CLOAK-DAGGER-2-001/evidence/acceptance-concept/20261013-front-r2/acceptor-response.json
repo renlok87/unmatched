@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CLOAK-DAGGER-2-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-CLOAK-DAGGER-2-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-cloak-dagger-2-codex/design/cloak-dagger-2-front.png",
+      "sha256": "059fc6a2840674348c9530991dd2e144ed296298646f19420422306ac52d41f8"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-cloak-dagger-2-codex/design",
+    "files": [
+      "cloak-dagger-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-cloak-dagger-2-codex/design/checks-report.json",
+    "art/imagegen/concept-cloak-dagger-2-codex/generation-records.json",
+    "art/imagegen/concept-cloak-dagger-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-cloak-dagger-2-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; checks-report.json#summary.PASS = 13; checks-report.json#inputs[0].sha256 = 059fc6a2840674348c9530991dd2e144ed296298646f19420422306ac52d41f8",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На cloak-dagger-2-front.png узнаётся Dagger из Marvel: молодая блондинка в белом с парными световыми кинжалами. Руки отделены от корпуса, оружие и тонкие световые отростки отчётливо читаются. Обе стопы стоят на подставке, локти согнуты; поза соответствует §4.4 и не является T/A-позой.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "На cloak-dagger-2-front.png выражен вид расписанной коллекционной миниатюры: проработаны глаза и губы, рельеф волос, швы и фактура костюма, поверхность каменной подставки. Исполнение в целом близко к medusa-quality-reference.png, но кисти упрощены, а грубая зернистость кожи ног уступает тонкой обработке поверхностей эталона.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "На cloak-dagger-2-front.png присутствуют белый костюм, тёплый блонд, телесный цвет и белое свечение. Замечания r1 по оттенку волос и световой природе оружия закрыты. Однако якорь white leotard with dagger cutout не восстановлен: костюм выглядит короткой туникой с ребристым подолом, а вырез разделён горизонтальными перемычками на несколько отверстий вместо единого длинного кинжала.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При G-CHECKS PASS сумма S+C+Q+P = 6.0 даёт score = 7.5 < 8.0: якорь костюма восстановлен лишь частично, отдельные зоны исполнения уступают эталону.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "cloak-dagger-2-front.png",
+      "fix": "Refine the fingers and knuckles and replace the coarse grain on the legs with controlled painted skin shading at the craftsmanship level of QUALITY_REFERENCE, preserving the miniature finish.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "cloak-dagger-2-front.png",
+      "fix": "Restore Dagger's fitted white leotard with one continuous long dagger-shaped chest cutout instead of a ribbed mini-dress with stacked openings, while retaining the warm blonde hair and glowing white light daggers.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

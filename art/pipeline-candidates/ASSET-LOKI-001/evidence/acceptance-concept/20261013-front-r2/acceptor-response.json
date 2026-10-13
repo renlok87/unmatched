@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LOKI-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-LOKI-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-loki-codex/design/loki-front.png",
+      "sha256": "37c5f61cfa038a1eba9cdc7fae5d3b5aaf1ca25833be74dd2a63de9b3b27c277"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-loki-codex/design",
+    "files": [
+      "loki-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-loki-codex/design/checks-report.json",
+    "art/imagegen/concept-loki-codex/generation-records.json",
+    "art/imagegen/concept-loki-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-loki-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#inputs[0].sha256 = 37c5f61cfa038a1eba9cdc7fae5d3b5aaf1ca25833be74dd2a63de9b3b27c277",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В loki-front.png узнаётся Loki из DESCRIPTION_EN заявки — скандинавский бог-плут Unmatched: Battle of Legends Volume Three: узкое ухмыляющееся лицо, зачёсанные тёмные волосы, рогатый обруч, зелёно-золотые одежды, изогнутый кинжал в анатомически правой руке. Рога, клинок и кисти читаются; поза не T и не A. Замечание r1 по отделению рук закрыто частично: широкие рукава остаются близко к одежде корпуса, тёмная внутренняя поверхность рукавов местами заменяет отчётливый просвет фона.",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "loki-front.png выглядит расписанной коллекционной миниатюрой: различимы кожа, волосы, металл, ткань и камень; подробно выполнены пряди, рёбра рогов, кайма и орнамент одежды. Замечание r1 по бедной детализации существенно сокращено. До medusa-quality-reference.png остаётся локальное отставание: золотой воротник имеет преимущественно зернистую поверхность вместо чёткого мелкого рельефа, пальцы свободной кисти упрощены, складки нижней одежды уступают эталону по объёмной моделировке.",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В loki-front.png присутствуют все якоря ANCHORS_EN и основные цвета palette.json: зелёная одежда, золото, чёрные волосы; кинжал находится в правой руке персонажа. Замечание r1 по коричневатым волосам закрыто. Магические ленты отчётливо видны, но имеют бирюзовый тон вместо заданного светло-зелёного #6FE07A; замечание r1 по цвету акцента сохраняется. Это видимое отклонение палитры, а не FAIL G-CHECKS.",
+      "frames": [
+        "loki-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS и все измерения не ниже 1,0, но сумма S+C+Q+P = 6,0 даёт score 7,5, ниже порога 8,0. Требуются отчётливые просветы между руками и корпусом, доработка отдельных зон детализации и восстановление заданного тона магического акцента.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "loki-front.png",
+      "fix": "Keep Loki in a natural standing miniature pose with slightly bent elbows and clear background gaps between both forearms, bell sleeves and the torso, preserving the curved dagger in his anatomical RIGHT hand without forming a T-pose or A-pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "loki-front.png",
+      "fix": "Match medusa-quality-reference.png with crisp sculpted gold relief on the collar, clearly articulated fingers on the free hand and richer three-dimensional folds in the lower robe while preserving the painted miniature finish.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "loki-front.png",
+      "fix": "Keep robe green #2F5A3A, gold #C9A24A and hair black #1E1C1E, and repaint the magic wisps clearly light green #6FE07A instead of turquoise.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "verification.json сохраняет исторические status = blocked, generation_results.design-front.selected_generation = null и утверждение об отсутствии design/loki-front.png, хотя generation-records.json уже выбирает rc1, а текущий checks-report.json содержит предъявленный sha256. В verification.json#design_source.post описана обработка фона, объясняющая различие SHA исходной генерации и design-front. Устаревшие служебные поля не образуют дополнительного гейта и не меняют G-CHECKS PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

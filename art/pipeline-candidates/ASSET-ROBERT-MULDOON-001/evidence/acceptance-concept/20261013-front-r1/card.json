@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ROBERT-MULDOON-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-robert-muldoon-codex/design/robert-muldoon-front.png",
+      "sha256": "ff87dd40c1400047cc5b5858c1d5d3dde20d4ee3d841612686b5c83200b9902a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-robert-muldoon-codex/design",
+    "files": [
+      "robert-muldoon-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+    "art/imagegen/concept-robert-muldoon-codex/generation-records.json",
+    "art/imagegen/concept-robert-muldoon-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1. Предупреждение view.single_component не является FAIL.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "На robert-muldoon-front.png силуэт ясен, руки отделены от корпуса, поза не T/A, все четыре костюмных якоря видны. Однако лицо с выраженными усами и широкими чертами изображает типового охотника и не узнаётся как Роберт Малдун из Jurassic Park: его характерное вытянутое, угловатое, чисто выбритое лицо не воспроизведено. Совпадение костюма не обеспечивает идентичность; применён якорь S=0 «не тот персонаж».",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На robert-muldoon-front.png качество соответствует расписанной коллекционной миниатюре QUALITY_REFERENCE: различимы ткань, кожа, дерево и металл; подробно выполнены складки, швы, пуговицы, патроны, шнуровка и фактура шляпы. Более простой костюм персонажа не требует орнаментальной насыщенности Медузы.",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На robert-muldoon-front.png присутствуют хаки одежды, коричневый шляпы, загорелая кожа и стальной серый оружия согласно PALETTE. Ружьё держит собственная правая рука фигуры, слева для зрителя; широкополая шляпа, рубашка сафари и пояс с патронами хорошо видны. Командного цвета и цветного кольца на подставке нет.",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "concept-sheet.md §11: S=0, то есть измерение ниже 1, требует return_to_stage_1 независимо от суммы. Костюмные якоря выполнены, но усатое лицо типового охотника не передаёт идентичность Роберта Малдуна. Дополнительно score=6.9 ниже порога 8.0.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "robert-muldoon-front.png",
+      "fix": "Replace the generic moustached hunter's face with Robert Muldoon's recognizable clean-shaven, long angular face as portrayed by Bob Peck in Jurassic Park, preserving the right-hand shotgun, wide-brimmed bush hat, khaki safari outfit, ammo belt and current front-view pose.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json#checks[11].id = view.single_component; #checks[11].result = WARN; #checks[11].value[0] = 2.282. Сегментация выделяет дополнительный компонент, но визуально второго субъекта или отдельного фантомного объекта нет; статус гейта остаётся PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134b5-3737-7182-a206-3b00733b6811"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GOLDEN-BAT-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-golden-bat-codex/design/golden-bat-front.png",
+      "sha256": "9999b8c63cdec553c7f4bee65f3e8d40c5b6e9689166e7534c386fab1d6dbb11"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-golden-bat-codex/design",
+    "files": [
+      "golden-bat-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-golden-bat-codex/design/checks-report.json",
+    "art/imagegen/concept-golden-bat-codex/generation-records.json",
+    "art/imagegen/concept-golden-bat-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-golden-bat-codex/design/checks-report.json",
+      "note": "checks-report.json: summary PASS 12 / WARN 1 / FAIL 0, verdict PASS (check_concept_views.py, код 0). WARN view.frame_top 3.177 % < 4 % (верх наконечника посоха) — не гейт, обрезки нет (view.top_margin PASS)."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "golden-bat-front.png: силуэт ясный и узнаётся как Golden Bat из Hero: золотой череп в остроконечном высоком воротнике и навершие посоха (копейный наконечник, витая гарда, зелёный камень) читаются над линией плеч. Посох в собственной ПРАВОЙ руке (слева для зрителя), кулак с посохом на фоне, а не на корпусе. Обе руки отделены от торса просветами на тёмной подкладке, локти согнуты, ноги расставлены — не T- и не A-поза. Лишних или недостающих частей нет, вид строго фронтальный, подставка edge-on. Помечено для этапов 3–4: тонкие части — древко посоха (~1 % ширины кадра), верхний наконечник и нижний шип, завитки гарды, острия воротника; нижняя половина древка проходит перед плащом (риск срастания с плащом); свисающая левая кисть у края плаща.",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "golden-bat-front.png против medusa-quality-reference.png: читается как расписанная коллекционная миниатюра на каменной подставке; материалы различимы (полированное золото тела, ткань плаща, тёмный камень). Орнамент на уровне эталона в наручах, сапогах, пряжке пояса, наплечных розетках с цепью и посохе (камни, гарда, обмотка рукояти); мускулатура проработана. Беднее эталона отдельные зоны: большой плащ без канта и орнамента, с пятнистой мазковой фактурой и розоватыми разводами, мутная подкладка; большие гладкие поверхности золотого тела; череп проработан проще лица и змей эталона.",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "golden-bat-front.png: все цвета PALETTE на месте — золото тела (медиана ~#A78241, светлые ~#C09B56 против #D4AE45, чуть коричневее), красный плащ (медиана ~#622A2C против #7A1F24: тон тот же, насыщенность ниже, в бликах уход в розово-лиловый), чёрная подкладка (~#160F0F против #1E1A1C), зелёный акцент в двух камнях посоха (~#286B41 — темнее и изумруднее #3FA74A, малая площадь). Все четыре якоря видимы (золотой череп, тёмно-красный плащ с высоким воротником, золотое тело, орнаментированный посох в правой руке); командного цвета и цветного кольца на подставке нет. Отклонение тона — 1,5. В checks-report.json palette.swatches пуст (на 1a свотчей листа нет).",
+      "frames": [
+        "golden-bat-front.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верх наконечника посоха на y = 3.177 % при рамке 1a >= 4 %; обрезки нет (view.top_margin PASS). На 1c держать верх фигуры в рамке."
+    },
+    {
+      "item": "S",
+      "frame": "golden-bat-front.png",
+      "note": "Для этапов 3–4: тонкое древко посоха, наконечник, нижний шип, завитки гарды и острия воротника проверить на целостность после Tripo/Blender; нижняя половина древка стоит перед плащом — следить, чтобы не срослась с плащом."
+    },
+    {
+      "item": "S",
+      "frame": "golden-bat-front.png",
+      "note": "В g2 эмблемы летучей мыши убраны как логотипы; узнаваемость держится на черепе, воротнике, плаще и посохе — для якорей карточки этого достаточно."
+    },
+    {
+      "item": "Q",
+      "frame": "golden-bat-front.png",
+      "note": "Плащ без канта и орнамента, с мазковой пятнистой фактурой и мутной подкладкой — самая бедная зона против эталона."
+    },
+    {
+      "item": "P",
+      "frame": "golden-bat-front.png",
+      "note": "Красный плащ приглушён и в бликах уходит в розово-лиловый; зелёные камни темнее и изумруднее #3FA74A. На 1c сверить свотчи листа с PALETTE."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-GOLDEN-BAT-001-r1"
+  },
+  "executor_session_id": "codex:01a13445-8c47-7190-a61c-23e63cd82f2b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

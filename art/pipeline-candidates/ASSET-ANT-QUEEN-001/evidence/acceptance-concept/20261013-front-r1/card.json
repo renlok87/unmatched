@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANT-QUEEN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ant-queen-codex/design/ant-queen-front.png",
+      "sha256": "28005ce49c33cfd69f9762d52184628eefa0cbee77311d91989c5abc3f82cb88"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ant-queen-codex/design",
+    "files": [
+      "ant-queen-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ant-queen-codex/design/checks-report.json",
+    "art/imagegen/concept-ant-queen-codex/generation-records.json",
+    "art/imagegen/concept-ant-queen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ant-queen-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 13; summary.WARN = 0. verification.json фиксирует exit_code = 0 для final_selected; SHA-256 выбранной генерации g2 совпадает с accepted_object.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ant-queen-front.png: персонаж AntQueen из DESCRIPTION_EN узнаваем по муравьиной голове, усикам, жвалам, раздутому сегментированному брюшку и трём различимым парам конечностей. Верхняя пара согнута и отделена от корпуса; T- или A-позы нет. Силуэт читается, но высокая многозубая корона вместо небольшого головного гребня заметно усиливает образ фэнтезийного монарха и снижает точность соответствия заданному pulp-era персонажу.",
+      "frames": [
+        "ant-queen-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ant-queen-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "ant-queen-front.png соответствует уровню medusa-quality-reference.png как расписанная коллекционная миниатюра: детализированы сегменты усиков, зубцы жвал, суставы, рельеф гребня, кромки панциря и фактура подставки. Глянцевый красный панцирь, более матовые тёмные конечности и гладкие янтарные глаза различимы; детализация присутствует внутри силуэта, а не только по контуру.",
+      "frames": [
+        "ant-queen-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "ant-queen-front.png визуально соответствует palette.json и PALETTE карточки: shell red #7A2A22 и shell dark #3A1A16 читаются в панцире, leg black #1E1A18 — в конечностях, eye amber #D9962A — в глазах. Светлые блики не заменяют основные цвета. Все пять ANCHORS_EN присутствуют: giant ant, glossy red exoskeleton, swollen abdomen, six legs, crown-like head crest; отклонение размера гребня учтено в S.",
+      "frames": [
+        "ant-queen-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "ant-queen-front.png",
+      "note": "Гребень значительно выше и крупнее указанного small crown-like head crest; отклонение видно на изображении и отмечено в verification.json#core_deviations. Учтено снижением S до 1.5."
+    },
+    {
+      "item": "S",
+      "frame": "ant-queen-front.png",
+      "note": "verification.json#core_deviations отмечает отношение ширины подставки к высоте фигуры около 0.74 вместо заданного около 0.55. Подставка визуально широкая; G-CHECKS это отклонение не проверяет. Круглую форму основания в плане по единственному фронтальному виду подтвердить нельзя."
+    },
+    {
+      "item": "S",
+      "frame": "ant-queen-front.png",
+      "note": "Тонкие усики, вершины гребня и кончики когтей читаются на концепте. Их толщину, связность и пригодность для геометрии следует проверить на этапах 3–4; на этапе 1a эти свойства не оценивались."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a3-af84-7f41-939d-03361b3f6b48"
+  },
+  "executor_session_id": "codex:01a13445-f01c-7772-a254-a983ef3c4421",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DRACULA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dracula-codex/design/dracula-front.png",
+      "sha256": "6bbaf0c48db87c41dd143bbc6ccd0ace29513ad0df46e86e134187d6d4855721"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dracula-codex/design",
+    "files": [
+      "dracula-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dracula-codex/design/checks-report.json",
+    "art/imagegen/concept-dracula-codex/generation-records.json",
+    "art/imagegen/concept-dracula-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dracula-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "dracula-front.png: высокий воротник, раскрытый плащ и обе открытые кисти с длинными пальцами читаются ясно; фигура целиком в кадре, локти согнуты, поза не T/A. Плащ заполняет промежутки между руками и корпусом, поэтому силуэт рук отделён не полностью и S = 2 не достигнут.",
+      "frames": [
+        "dracula-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "dracula-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "dracula-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Скульптурное лицо, пряди волос, суставы пальцев, рельеф жилета, орнамент плаща и медальон проработаны внутри силуэта; ткань, кожа обуви, металл и кожа персонажа различимы. Более спокойные брюки соответствуют формальному костюму и не выглядят недоработанной зоной.",
+      "frames": [
+        "dracula-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "dracula-front.png: чёрные костюм и плащ, багровая подкладка, бледная кожа и золотой медальон соответствуют PALETTE и palette.json. Все четыре якоря видимы: высокий воротник чёрного плаща с багровой подкладкой, медальон на красной ленте, зачёсанные назад чёрные волосы и бледное лицо.",
+      "frames": [
+        "dracula-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "dracula-front.png",
+      "note": "Плащ закрывает просветы между руками и корпусом; кисти выступают за его контур и читаются. Ограничение учтено в S = 1,5."
+    },
+    {
+      "item": "C",
+      "frame": "dracula-front.png",
+      "note": "Над верхним диском подставки видна узкая полоса верхней поверхности: строгое edge-on не достигнуто, что также отмечено в verification.json#limit_reached. Межвидовая согласованность на 1a не проверяется; C остаётся фиксированным."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхний отступ 3,246% при рекомендованных 4%; результат WARN, фигура не обрезана, G-CHECKS остаётся PASS."
+    },
+    {
+      "item": "S",
+      "frame": "dracula-front.png",
+      "note": "Длинные пальцы, ногти и тонкие цепочки читаются в концепте; толщину и сохранность этих деталей следует проверить на этапах 3–4. Геометрия на этапе 1a не оценивалась."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13384-3b55-79e3-ab34-3f10bb6de902"
+  },
+  "executor_session_id": "codex:01a13349-7598-7200-8f76-6418fc8b42a1",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

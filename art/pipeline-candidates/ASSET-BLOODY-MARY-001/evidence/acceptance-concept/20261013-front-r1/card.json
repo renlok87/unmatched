@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLOODY-MARY-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bloody-mary-codex/design/bloody-mary-front.png",
+      "sha256": "1b9c9f5954f0f66506d80435d986e8ff3586ae5031baf45ae268c92b2480cd89"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bloody-mary-codex/design",
+    "files": [
+      "bloody-mary-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bloody-mary-codex/design/checks-report.json",
+    "art/imagegen/concept-bloody-mary-codex/generation-records.json",
+    "art/imagegen/concept-bloody-mary-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bloody-mary-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В bloody-mary-front.png ясно читаются овальное зеркало, вуаль, длинные волосы и босые ступни. Зеркало у груди выделено орнаментальной рамой; обе кисти различимы, поза не T/A. Локти отведены, но волосы и ткань заполняют промежутки между руками и корпусом, поэтому отделение рук в силуэте неполное. Тонкие пряди и рваные полосы вуали потребуют проверки геометрии на этапах 3–4.",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В bloody-mary-front.png достигнут уровень расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо, пальцы, отдельные пряди, многослойные складки, отверстия и бахрома ткани, орнамент рамы и трещины зеркала. Кожа, волосы, матовая ткань, металлическая рама и каменная подставка различаются по материалу; детализация присутствует внутри силуэта.",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В bloody-mary-front.png присутствуют все четыре якоря и основные цвета PALETTE: призрачно-серые платье и вуаль, бледная кожа, почти чёрные волосы и кроваво-красные следы. Овальное ручное зеркало удерживается обеими руками у груди. Небольшое отклонение — тёплый бронзовый оттенок рамы зеркала вне заданной палитры.",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "bloody-mary-front.png",
+      "note": "Чистые сквозные зазоры между руками и корпусом отсутствуют: их заполняют волосы и ткань. Обязательное зеркало сохранено; противоречащий якорю запрет held object не является основанием для снижения оценки."
+    },
+    {
+      "item": "S",
+      "frame": "bloody-mary-front.png",
+      "note": "На этапах 3–4 проверить толщину, связность и читаемость тонких концов волос, вуали и рваных полос ткани; геометрия на 1a не оценивалась."
+    },
+    {
+      "item": "P",
+      "frame": "bloody-mary-front.png",
+      "note": "Рама зеркала имеет приглушённый бронзовый оттенок вне четырёх заданных цветов; основные цвета и все якоря сохранены."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 3.177% при рекомендуемом минимуме 4%. Фигура целиком в кадре; summary.FAIL = 0, гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13382-6b7d-7a93-9eeb-6f9860d53520"
+  },
+  "executor_session_id": "codex:01a13345-0e3a-7f10-8c60-b0c8ed6bec1a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

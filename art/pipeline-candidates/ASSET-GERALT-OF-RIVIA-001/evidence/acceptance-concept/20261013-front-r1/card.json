@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GERALT-OF-RIVIA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-geralt-of-rivia-codex/design/geralt-of-rivia-front.png",
+      "sha256": "e64a8dbaebba61b81e3f89fdc80df7f4f74e878bb75cdc178db5ccd5fff6fe4e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-geralt-of-rivia-codex/design",
+    "files": [
+      "geralt-of-rivia-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+    "art/imagegen/concept-geralt-of-rivia-codex/generation-records.json",
+    "art/imagegen/concept-geralt-of-rivia-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; checks-report.json#summary.PASS = 13",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "geralt-of-rivia-front.png: Геральт узнаваем по длинным белым волосам, жёлтым глазам, шраму, кожаной броне и двум рукоятям за плечами. Фигура целиком видна, конечности читаются, поза не T и не A. Руки близки к корпусу; требуемый силуэт оружия неполон: собственная правая кисть пуста, стального клинка вне корпуса нет.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "geralt-of-rivia-front.png: расписанная коллекционная миниатюра; волосы, кольчуга, кожа, пряжки и камень различимы, детализация близка к medusa-quality-reference.png. Пальцы, рельеф наручей и отделка сапог местами менее чёткие; вокруг основания заметен неровный светло-серый ореол вырезки, отсутствующий у эталона.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "geralt-of-rivia-front.png: чёрная кожа, белые волосы и серебристые металлические детали согласуются с palette.json. Рукоять за плечом присутствует. Обязательный стальной меч в собственной правой руке отсутствует; нагрудная подвеска напоминает крылатую фигуру и не читается как волчий медальон.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS пройден, но сумма S+C+Q+P = 5.5 даёт score = 6.9, ниже порога 8.0. Требуются стальной меч в собственной правой руке, узнаваемый волчий медальон и устранение отмеченных недостатков качества изображения.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Move the steel sword from the back into Geralt's own RIGHT hand (viewer-left), clearly separate the hand, guard and blade from the torso and leg, and leave only the silver sword sheathed behind the shoulder.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Remove the ragged light-grey cutout halo around the pedestal and sharpen the glove fingers, bracer relief and boot stitching to match the Medusa reference while preserving Geralt's restrained leather-and-steel design.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Replace the wing-shaped chest pendant with a clearly recognisable silver wolf-head medallion while preserving the specified black leather, white hair, steel and silver palette.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Сверка происхождения неполна: выбранная запись generation-records.json указывает concepts/geralt-of-rivia-design-front-u1.png с sha256 0321a6c845e63a007df163574a42c9bee0f4ae95ab4fc2aaafd6f8721f6fdb47, отличным от оцениваемого design-файла; связь между ними не записана. verification.json описывает прежнюю заблокированную генерацию, содержит selected.design-front = null и не подтверждает текущий кандидат. Это замечание к предусловию вызова приёмщика; статус G-CHECKS остаётся PASS по summary.FAIL = 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13486-c867-7a91-af9c-b58aab349c7b"
+  },
+  "executor_session_id": "codex:unstability.ai download (Downloads",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Концепт 1a r1 возвращён на этап 1 по делегированию; художественная приёмка не пройдена."
+}

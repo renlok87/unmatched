@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SISTER-WIFE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sister-wife-codex/design/sister-wife-front.png",
+      "sha256": "0bfdb60ff430e410b6a6fefebdcd8b8c6e21dff21509c43ec441af7add4ea961"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sister-wife-codex/design",
+    "files": [
+      "sister-wife-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sister-wife-codex/design/checks-report.json",
+    "art/imagegen/concept-sister-wife-codex/generation-records.json",
+    "art/imagegen/concept-sister-wife-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sister-wife-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "sister-wife-front.png: силуэт вампирской невесты ясный; обе руки отделены от корпуса, локти согнуты, кисти опущены в выразительной угрожающей позе. Когти различимы на фоне, длинные волосы и рваный подол читаются. Фигура и подставка целиком в кадре. Тонкие когти, корона и лоскуты отмечены для проверки на этапах 3–4.",
+      "frames": [
+        "sister-wife-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "sister-wife-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sister-wife-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Рельефный орнамент корсета, украшения с камнями, пряди волос, многослойные складки и повреждения ткани подробно проработаны внутри силуэта. Кожа, ткань, волосы и металл различаются по фактуре и бликам.",
+      "frames": [
+        "sister-wife-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "sister-wife-front.png: тёплый белый платья, почти чёрные волосы, бледная кожа и кроваво-красные акценты визуально соответствуют PALETTE и palette.json. Все четыре якоря присутствуют: струящееся белое погребальное платье с рваным подолом, когтистые кисти, длинные тёмные волосы, бледная кожа с красными губами.",
+      "frames": [
+        "sister-wife-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верхняя точка на 2.21% вместо минимум 4%. Низ подставки на 97.099% вместо целевых 93% по verification.json. Корона и подставка полностью видимы; отклонения кадрирования не меняют PASS."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.single_component: дополнительный компонент маски занимает 2.247% кадра. Визуально показана одна цельная фигура на одной двухъярусной подставке; отдельного постороннего объекта нет."
+    },
+    {
+      "item": "S",
+      "frame": "sister-wife-front.png",
+      "note": "На этапах 3–4 проверить толщину и связность когтей, зубцов короны, краёв фаты и рваных лоскутов. Концепт показывает их отчётливо; пригодность будущей геометрии здесь не оценивается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133b8-1f4c-7633-98d7-351622eee8ef"
+  },
+  "executor_session_id": "codex:01a13349-3870-7980-b854-595fad4ec646",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

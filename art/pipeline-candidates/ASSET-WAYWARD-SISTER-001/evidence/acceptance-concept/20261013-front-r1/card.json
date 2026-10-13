@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WAYWARD-SISTER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-codex/design/wayward-sister-front.png",
+      "sha256": "efe4f6bbd66cc369505038b930eedd67c85fd6ffb9f75e92ba6dca588f9ff6d1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wayward-sister-codex/design",
+    "files": [
+      "wayward-sister-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wayward-sister-codex/design/checks-report.json",
+    "art/imagegen/concept-wayward-sister-codex/generation-records.json",
+    "art/imagegen/concept-wayward-sister-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wayward-sister-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1. view.frame_top: 2.97% при целевых >= 4%; WARN не меняет статус гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "wayward-sister-front.png: силуэт пожилой ведьмы с капюшоном и кривым посохом ясный; посох в собственной правой руке, слева для зрителя. Между обоими рукавами и корпусом видны просветы, локти согнуты; поза не T и не A. Фигура и подставка целиком в кадре. Тонкие цепочки, подвески и края ткани читаются; их геометрию следует проверить на этапах 3–4.",
+      "frames": [
+        "wayward-sister-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wayward-sister-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wayward-sister-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны морщины лица, пряди и косы, плетёная древесина, истёртая ткань, кожаные ремни и окисленный железный котелок; материалы различимы, детализация сохраняется внутри силуэта.",
+      "frames": [
+        "wayward-sister-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "wayward-sister-front.png: присутствуют коричневый, почти чёрный, мшистый зелёный и фиолетовый; все четыре якоря на месте, сторона посоха верна. Фиолетовые ленты заметно приглушены до серо-сливового относительно #8A4FB8, зелёные участки смещены в оливковый; это отклонение тона при сохранении палитры и якорей.",
+      "frames": [
+        "wayward-sister-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "wayward-sister-front.png",
+      "note": "Фиолетовый акцент приглушён, зелёный имеет оливковый оттенок; точное совпадение с HEX палитры не подтверждено."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-front.png",
+      "note": "На этапах 3–4 проверить толщину и связность цепочек, ручки котелка, подвесок, отдельных пальцев и ажурных краёв ткани; текущая оценка относится только к концепту."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Верхний отступ 2.97% вместо целевых >= 4% — WARN; низ подставки 94.89% вместо целевых 93%. Обрезки нет, FAIL = 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133aa-6069-7d61-b05a-b61016721486"
+  },
+  "executor_session_id": "codex:01a1337e-9943-7d40-832d-47d34c471521",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

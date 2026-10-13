@@ -1,0 +1,84 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BEBOP-ROCKSTEADY-2-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bebop-rocksteady-2-codex/design/bebop-rocksteady-2-front.png",
+      "sha256": "090c289924e423cbcd8463fe4c9a1d21d9d52aa653b90e707dc5e61875d58312"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bebop-rocksteady-2-codex/design",
+    "files": [
+      "bebop-rocksteady-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bebop-rocksteady-2-codex/design/checks-report.json",
+    "art/imagegen/concept-bebop-rocksteady-2-codex/generation-records.json",
+    "art/imagegen/concept-bebop-rocksteady-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bebop-rocksteady-2-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL=0; checks-report.json#summary.WARN=0; checks-report.json#verdict=PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "Rocksteady узнаваем: массивный носорог, рог, армейский шлем, камуфляжный жилет и тяжёлая винтовка в собственной правой руке. Руки отделены от корпуса, поза не T/A. Однако справа для зрителя на собственном левом боку пояса видна граната: запрещённое дополнительное оружие, лишняя часть комплектации. S=0 по критерию «лишние или недостающие части» concept-sheet.md §11.",
+      "frames": [
+        "bebop-rocksteady-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bebop-rocksteady-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с эталоном Medusa: подробно проработаны складки и фактура кожи, ткань камуфляжа, швы, пряжки, патроны, оружие и шнуровка ботинок. Кожа, ткань, металл и кожаные ремни отчётливо различимы.",
+      "frames": [
+        "bebop-rocksteady-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Серая кожа, зелёный камуфляж, оливковый шлем и коричневые ремни соответствуют palette.json. Все четыре доступных с front якоря присутствуют; винтовка находится в собственной правой руке, слева для зрителя. Командной окраски на подставке нет.",
+      "frames": [
+        "bebop-rocksteady-2-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S=0 из-за запрещённого дополнительного оружия — гранаты на собственном левом боку пояса; срабатывает вето измерения <1. Дополнительно score=6.9<8.0. G-CHECKS остаётся PASS по отчёту.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "bebop-rocksteady-2-front.png",
+      "fix": "Remove the hand grenade from the figure's own left hip (viewer right), leaving the heavy rifle in the figure's RIGHT hand as the only weapon while preserving the existing pose, identity anchors, palette and miniature detail.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349c-a1ee-7be2-b9c7-3e58f46c46d0"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

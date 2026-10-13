@@ -1,0 +1,100 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-HARRY-HOUDINI-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/design/harry-houdini-front.png",
+      "sha256": "cb0bce49c150c102d932aa86e825d8abebda41a09d9e5c2de3b197ab04dbd481"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-harry-houdini-codex/design",
+    "files": [
+      "harry-houdini-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+    "art/imagegen/concept-harry-houdini-codex/generation-records.json",
+    "art/imagegen/concept-harry-houdini-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "На harry-houdini-front.png обе руки почти выпрямлены и симметрично разведены вниз по диагонали: стойка читается как A-поза. Небольшой сгиб локтей и раскрытые ладони не устраняют этот силуэт. Цепи, замок и промежутки между руками и корпусом различимы, но запрещённая A-поза требует S = 0 по §11.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На harry-houdini-front.png уровень исполнения соответствует medusa-quality-reference.png: проработаны локоны, лицо, кисти, складки и швы одежды, пуговицы, шнуровка, отдельные железные звенья и латунный замок. Ткань, кожа обуви и металлы отчётливо различаются; более простой костюм соответствует описанию персонажа.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На harry-houdini-front.png присутствуют сценический чёрный костюм, тёплая белая рубашка, серое железо и латунный акцент согласно PALETTE и palette.json. Все четыре якоря видимы: плечевые цепи, нагрудный замок, закатанные белые рукава и чёрный жилет; цепь также обвивает одно предплечье.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S = 0 из-за A-позы: срабатывает вето любого измерения ниже 1.0. Итоговый score = 6.9 также ниже порога 8.0 при PASS G-CHECKS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "harry-houdini-front.png",
+      "fix": "Replace the symmetric A-pose with a natural asymmetric escape-artist stance: visibly bend the chain-wrapped arm and raise its open palm to waist height, keep the other open hand lower beside the hip with a distinct elbow bend, and preserve clear gaps between both arms and the torso.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN: верхний отступ 3.177% меньше цели 4%; сегментация выделяет несколько компонентов, хотя визуально изображены одна фигура и одна подставка. Эти предупреждения не меняют PASS гейта или фиксированный C."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "harry-houdini-front.png",
+      "note": "Слабая неоднородность тёмно-серого фона видима и зарегистрирована в verification.json#limit_reached. Фигура и подставка полностью в кадре; незакрытый пункт checklist не является отдельным гейтом карточки."
+    },
+    {
+      "item": "S",
+      "frame": "harry-houdini-front.png",
+      "note": "На этапах 3–4 проверить геометрию свободных звеньев, обмотки предплечья и тонкой поясной цепочки; по изображению нельзя подтвердить их связность и пригодность для анимации."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13387-1ba2-70a0-9c8e-b82d06677cf8"
+  },
+  "executor_session_id": "codex:01a1334f-5f14-76a0-bdf9-8193278d0dcb",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Возврат на этап 1a по делегированию: требуется естественная поза вместо A-позы."
+}

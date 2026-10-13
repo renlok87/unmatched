@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-TITANIA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-titania-codex/design/titania-front.png",
+      "sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-titania-codex/design",
+    "files": [
+      "titania-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-titania-codex/design/checks-report.json",
+    "art/imagegen/concept-titania-codex/generation-records.json",
+    "art/imagegen/concept-titania-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-titania-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks: финальный запуск exit_code = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "titania-front.png: Титания из KEY и DESCRIPTION_EN узнаётся как величественная королева фей благодаря цветочной короне, четырём прозрачным стрекозиным крыльям, серебряным волосам и жесту со светящейся пыльцой. Контуры крыльев и платья ясные, обе руки отделены от корпуса, кисти читаются; поза асимметричная, не T и не A. Тонкие прожилки крыльев, веточки короны и подвески различимы; проверка их геометрии относится к отложенным этапам 3–4.",
+      "frames": [
+        "titania-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "titania-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "titania-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Внутри силуэта проработаны жилки листьев и лепестков, сетка крыльев, пряди волос, цветы и золотые украшения. Кожа, растительный наряд, металл, прозрачные мембраны и каменная подставка отчётливо различаются по материалу и объёму.",
+      "frames": [
+        "titania-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "titania-front.png: все пять якорей ANCHORS_EN присутствуют, основные цветовые группы и золотое свечение сохранены. Есть отклонение тона от PALETTE и palette.json: листья выглядят более оливковыми относительно #4E7A3A, лепестки — более приглушёнными и тёплыми относительно #D96A9A. Серебряные волосы и золотая пыльца читаются уверенно.",
+      "frames": [
+        "titania-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "titania-front.png",
+      "note": "Оливковый тон листьев и приглушённый тёплый розовый лепестков отклоняются от заданных цветов; все цветовые группы и якоря сохранены."
+    },
+    {
+      "item": "S",
+      "frame": "titania-front.png",
+      "note": "Тонкие мембраны и прожилки крыльев, веточки короны, подвески и отдельные частицы пыльцы требуют проверки переноса в геометрию на отложенных этапах 3–4. Вторая стопа скрыта платьем; её положение по одному фронтальному виду не подтверждается."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхний отступ 3.246% при целевом минимуме 4%; WARN, без обрезания фигуры и без FAIL гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13494-21cb-7a51-bf89-f88e33b9b981"
+  },
+  "executor_session_id": "codex:01a13460-2a80-7230-9385-a1ff60363bbc",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

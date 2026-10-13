@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png",
+      "sha256": "4a0710192b7366e7bb71e5c3555eee5a4e90ab259b60b758fb23fa29f9ce1bea"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-muhammad-ali-codex/design",
+    "files": [
+      "muhammad-ali-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-muhammad-ali-codex/design/checks-report.json",
+    "art/imagegen/concept-muhammad-ali-codex/generation-records.json",
+    "art/imagegen/concept-muhammad-ali-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-muhammad-ali-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#checks[8].id = view.frame_top; checks-report.json#checks[8].result = WARN; checks-report.json#checks[8].value = 3.384. WARN не является провалом гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На muhammad-ali-front.png молодой Мухаммед Али узнаётся по сочетанию формы глаз, носа, полных губ и коротких кудрей, а не только по экипировке. Высокая атлетическая фигура и защитная стойка читаются; предплечья отделены от корпуса, ноги раздельны, оружия нет, поза не T/A. Челюсть несколько угловата, плечевой пояс слегка массивнее характерного облика молодого Али, поэтому портретная точность не максимальна.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На muhammad-ali-front.png уровень коллекционной миниатюры сопоставим с QUALITY_REFERENCE: лицо и кудри проработаны, кожа, красная кожа перчаток, сатин шорт и белая обувь отчётливо различаются. Видны швы, сборки пояса, складки ткани, люверсы и шнуровка; детали сохраняются внутри силуэта. Более простой костюм боксёра не означает меньшую детализацию исполнения.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На muhammad-ali-front.png присутствуют цвета PALETTE: тёплый белый шорт и обуви, красный перчаток, тёмно-коричневая кожа и чёрный акцент боковых полос. Все четыре якоря видны: белые сатиновые боксёрские шорты, красные перчатки, белые боксёрки и защитная стойка. Командного цвета и цветного кольца на подставке нет.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "muhammad-ali-front.png",
+      "note": "Небольшая идеализация портрета: угловатая челюсть и усиленный плечевой пояс. Узнаваемость Мухаммеда Али сохраняется; замечание учтено в S."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "muhammad-ali-front.png",
+      "note": "Верхний отступ 3.384% вместо целевых 4%: допустимый WARN view.frame_top. Фигура и подставка видны целиком."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134db-1259-7b92-a232-5181bbe5ea8c"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

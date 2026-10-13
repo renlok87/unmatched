@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DR-SATTLER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dr-sattler-codex/design/dr-sattler-front.png",
+      "sha256": "b9636aae177d6510c1baca849ff7f1d148551b7fc7015b30d81ae8776967519f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dr-sattler-codex/design",
+    "files": [
+      "dr-sattler-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dr-sattler-codex/design/checks-report.json",
+    "art/imagegen/concept-dr-sattler-codex/generation-records.json",
+    "art/imagegen/concept-dr-sattler-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dr-sattler-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1. Предупреждение view.frame_top не меняет статус гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "dr-sattler-front.png: Элли Сэттлер из Jurassic Park узнаётся по сочетанию характерного лица, собранных светлых волос, полевого костюма с шортами, походных ботинок и поднятого фальшфейера. Фальшфейер находится в собственной правой руке, слева для зрителя; обе руки отделены от корпуса. Поза асимметричная, не T и не A; фигура и подставка полностью видны. Тонкие пряди, пальцы и окончания пламени читаются; их геометрическая пригодность относится к будущим этапам 3–4.",
+      "frames": [
+        "dr-sattler-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "dr-sattler-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "dr-sattler-front.png: уровень расписанной коллекционной миниатюры сопоставим с эталоном Medusa. Проработаны скульптура лица, отдельные локоны, складки ткани, швы, пуговицы, карманы, ремни, пряжки, шнуровка и протектор ботинок. Ткань, кожа, металл и волосы различаются по фактуре и бликам; простой полевой костюм сохраняет высокую детализацию внутри силуэта.",
+      "frames": [
+        "dr-sattler-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "dr-sattler-front.png: палитра соответствует asset-card.yaml и palette.json с учётом светотени — хаки на полевой рубашке и шортах, розовый на внутренней майке, коричневый на ботинках, красный на фальшфейере. Все четыре якоря присутствуют: фальшфейер в правой руке, рубашка хаки с закатанными рукавами, походные ботинки и светлый хвост, видимый за головой справа для зрителя.",
+      "frames": [
+        "dr-sattler-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 3.591% при рекомендуемых 4%. Обрезания нет; summary.FAIL = 0. Фиксированный C не изменяется."
+    },
+    {
+      "item": "S",
+      "frame": "dr-sattler-front.png",
+      "note": "На будущих этапах 3–4 проверить сохранность тонких прядей, пальцев свободной кисти и окончаний пламени. Здесь оценивается только читаемость концепта; геометрия не проверялась."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1348b-3068-7d91-9678-df727af698e2"
+  },
+  "executor_session_id": "codex:01a1346a-9b54-7d52-ba92-8c91ab349b6d",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

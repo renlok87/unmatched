@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CLOAK-DAGGER-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-CLOAK-DAGGER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-cloak-dagger-codex/design/cloak-dagger-front.png",
+      "sha256": "ca364fc4fc8d4acd709697bdca9187f609edc733fcddd741537c8731880a2ae0"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-cloak-dagger-codex/design",
+    "files": [
+      "cloak-dagger-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-cloak-dagger-codex/design/checks-report.json",
+    "art/imagegen/concept-cloak-dagger-codex/generation-records.json",
+    "art/imagegen/concept-cloak-dagger-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-cloak-dagger-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#inputs[0].sha256 = ca364fc4fc8d4acd709697bdca9187f609edc733fcddd741537c8731880a2ae0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "В cloak-dagger-front.png тёмнокожий молодой мужчина, огромный раскрытый плащ, капюшон и затенённое лицо позволяют узнать Marvel's Cloak из asset-card.yaml; замечание r1 к идентичности существенно исправлено. Однако отдельный зубчатый воротник не читается: вокруг шеи и плеч видны округлые складки, зубцы выражены на кромке капюшона и полах плаща. Руки и кисти полностью скрыты тканью, их отдельный контур отсутствует. Явная T/A-поза не установлена.",
+      "frames": [
+        "cloak-dagger-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "cloak-dagger-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "cloak-dagger-front.png читается как коллекционная миниатюра; кожа, серебряная застёжка и каменная подставка различимы, крупные складки объёмны. Но почти весь плащ покрыт одинаковым грубым морщинистым рельефом и сильными блестящими бликами, из-за чего ткань напоминает лакированную поверхность. Разделение фактур и нюансы росписи явно ниже medusa-quality-reference.png. Замечание r1 к качеству плаща закрыто частично; простота костюма сама по себе балл не снижает.",
+      "frames": [
+        "cloak-dagger-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "В cloak-dagger-front.png присутствуют основные цвета palette.json: синий плащ, почти чёрная внутренняя поверхность и тёмно-коричневая кожа; серебряная застёжка теперь отчётливо видна. Цветовые замечания r1 к коже и акценту закрыты. Синий на освещённых участках заметно ярче и насыщеннее заданного cloak navy #1E2A44. Огромный капюшон и лицо в тени присутствуют, но якорь jagged collar из asset-card.yaml отдельно не читается.",
+      "frames": [
+        "cloak-dagger-front.png"
+      ]
+    }
+  },
+  "score": 5.6,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но S = 1, Q = 1 и P = 1 при фиксированном C = 1,5 дают сумму 4,5 и score 5,6 < 8,0. Необходим возврат на этап 1 для читаемого воротника и рук, улучшения материала плаща и соответствия палитре.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "cloak-dagger-front.png",
+      "fix": "Preserve Marvel's Cloak as the young dark-skinned man shown, define a distinct jagged collar beneath the hood, and reveal relaxed slightly bent forearms and hands with visible gaps from the torso while retaining the huge flowing cloak and both feet planted.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "cloak-dagger-front.png",
+      "fix": "Replace the cloak's uniform coarse crumpled texture and glossy highlights with convincing matte woven fabric, varied sculpted folds, crisp edge thickness and nuanced miniature paintwork matching the quality reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "cloak-dagger-front.png",
+      "fix": "Use muted navy #1E2A44 and near-black #12161E for the cloak, preserve dark brown #5A3B2A skin and the readable silver #B8BEC4 clasp, and make the jagged collar clearly visible while keeping the face deeply shadowed.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

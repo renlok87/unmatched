@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CHUPACABRA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-chupacabra-codex/design/chupacabra-front.png",
+      "sha256": "077ae69992b66d664ebebedaa9179805d96ef5d3eae374bcca022f057f80eab7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-chupacabra-codex/design",
+    "files": [
+      "chupacabra-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-chupacabra-codex/design/checks-report.json",
+    "art/imagegen/concept-chupacabra-codex/generation-records.json",
+    "art/imagegen/concept-chupacabra-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-chupacabra-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; view.frame_top = 2.762% при рекомендуемых 4%.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "chupacabra-front.png: узнаваем Chupacabra из KEY и DESCRIPTION_EN — жилистый рептильный двуногий зверь с крупными глазами, спинным гребнем, длинными когтями и клыками. Руки отделены от корпуса, кисти и когти ясно читаются; локти слегка согнуты, кисти напряжены, стойка естественная, не техническая T- или A-поза. Голова, хвост, ноги и подставка целиком в кадре. Тонкие концы когтей и шипов требуют проверки при будущей сборке геометрии.",
+      "frames": [
+        "chupacabra-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "chupacabra-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "chupacabra-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: рельефная чешуя меняет размер по зонам тела, проработаны брюшные пластины, суставы, пасть и основания когтей. Матовая кожа, блестящие глаза, костяные когти и шероховатая каменная подставка различимы по материалу; детализация присутствует внутри силуэта.",
+      "frames": [
+        "chupacabra-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "chupacabra-front.png: все якоря и цвета palette.json присутствуют — серо-зелёная чешуя, тёмный зелёный гребень, костяные когти и клыки, тёмно-красные глаза с чёрными зрачками. Кожа груди и живота заметно светлее и теплее основного #5E6A5A; это отклонение тона, без потери палитры или идентичности.",
+      "frames": [
+        "chupacabra-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "chupacabra-front.png",
+      "note": "Освещённые грудь и живот имеют более светлый тёплый серо-оливковый тон относительно основного цвета палитры."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхнее поле 2.762% вместо рекомендуемых 4%; это WARN, обрезания фигуры нет, статус гейта PASS."
+    },
+    {
+      "item": "S",
+      "frame": "chupacabra-front.png",
+      "note": "При будущих этапах 3–4 проверить толщину и сохранность длинных когтей, клыков и вершин шипов; геометрия на этапе 1a не оценивается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13499-89e5-78f0-b28b-cbf2fc100bfc"
+  },
+  "executor_session_id": "codex:01a13454-d869-7d50-8f2d-c288247f275e",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

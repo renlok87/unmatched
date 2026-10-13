@@ -1,0 +1,101 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACK-WIDOW-001",
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+      "sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-black-widow-codex/design",
+    "files": [
+      "black-widow-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+    "art/imagegen/concept-black-widow-codex/generation-records.json",
+    "art/imagegen/concept-black-widow-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+      "note": "checks-report.json#summary = PASS 13, WARN 0, FAIL 0; #verdict = PASS; #inputs[0].sha256 = 21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7 (текущий r2 front, совпадает с accepted_object)"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "black-widow-front.png: узнаётся именно Black Widow из комиксов Marvel, а не общий архетип агента: волнистые рыжие волосы до плеч, чёрный тактический комбинезон с высоким воротом и швами, красная пряжка-песочные часы на поясе, серебряные браслеты на обоих запястьях, пистолет в собственной ПРАВОЙ руке (слева в кадре, WEAPON_HAND=right). Поза по §4.4: обе ступни на подставке, вес ровно, руки отведены примерно на 12° от вертикали, локти слегка согнуты, между предплечьями и талией/подсумками виден фон; это не T- и не A-поза. Силуэт ясный, лишних или недостающих частей нет, оружие одно. Тонкая часть помечена для этапов 3–4: пистолет почти чёрный на тёмно-сером фоне, ствол узкий, кисть плотно охватывает рукоять; читается.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "black-widow-front.png против medusa-quality-reference.png: уровень расписанной коллекционной миниатюры есть — скульптурные швы и стёганые панели комбинезона, фактура кожи, ремень с подсумками, гравированные серебряные браслеты, прописанное лицо и пряди волос, детализированный пистолет; материалы (кожа костюма, металл, кожа лица, волосы, камень) различимы. Отдельные зоны беднее эталона: голенища сапог и голени почти гладкие, перчатки простые, верхний край подставки с грубыми светлыми сколами; плотность орнамента и смена материалов ниже, чем у Medusa (золото, меандр, змеиные мотивы).",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "black-widow-front.png и checks-report.json#palette: все цвета и якоря на месте — suit black доминирует (figure_share_within_40_pct 63.89), hair red на волосах, bracelet silver на обоих браслетах (0.22), акцент hourglass red на пряжке. Отклонение тона: волосы написаны ярче и насыщеннее #A8321E (доля hair red 2.09 при площади волос заметно больше) и почти совпадают с акцентом #C8322A (1.76, в основном за счёт пикселей волос), поэтому акцент не отделён от волос по тону; блики костюма уходят в холодный сине-серый от нейтрального #18181C.",
+      "frames": [
+        "black-widow-front.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "black-widow-front.png",
+      "note": "Волосы ярко-алые, светлее и насыщеннее hair red #A8321E и почти одного тона с акцентом hourglass red #C8322A; на этапах 2–3 держать волосы в более тёмном кирпично-рыжем, чтобы пряжка оставалась единственным акцентом."
+    },
+    {
+      "item": "P",
+      "frame": "checks-report.json",
+      "note": "palette.swatches: hair red 2.09 %, hourglass red 1.76 % (в основном пиксели волос), bracelet silver 0.22 %; блики костюма холодные сине-серые против нейтрального #18181C."
+    },
+    {
+      "item": "Q",
+      "frame": "black-widow-front.png",
+      "note": "Голенища сапог, голени и перчатки беднее деталями, чем остальной костюм; верхний край подставки с грубыми светлыми сколами."
+    },
+    {
+      "item": "Q",
+      "frame": "black-widow-front.png",
+      "note": "Подставка — один толстый диск грубого камня, видна сверху, а не строго с ребра, как просит CORE-1A; учесть при генерации в Tripo и сборке H2."
+    },
+    {
+      "item": "S",
+      "frame": "black-widow-front.png",
+      "note": "Тонкая часть для этапов 3–4: пистолет почти чёрный на тёмно-сером фоне, ствол узкий, кисть плотно охватывает рукоять — проверить читаемость оружия и отделение кисти weapon.R после Tripo."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-BLACK-WIDOW-001-r2"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

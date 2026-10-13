@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACK-PANTHER-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-BLACK-PANTHER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+      "sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-black-panther-codex/design",
+    "files": [
+      "black-panther-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+    "art/imagegen/concept-black-panther-codex/generation-records.json",
+    "art/imagegen/concept-black-panther-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Узнаётся именно Black Panther: пантерная маска с острыми ушами, облегающий чёрный костюм и серебряное ожерелье. Полная фигура читается; руки и кисти отделены от корпуса, ноги разделены, тонкие выступающие детали видны. Стойка с опущенными руками не является T/A-позой. Несоответствие формы когтей учтено в P.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "Миниатюра объёмная, фактура костюма и серебряные элементы различимы, но исполнение явно ниже QUALITY_REFERENCE: сильная зернистость покрывает костюм, детали пальцев и обуви беднее, серебряное ожерелье выглядит преимущественно контурным рисунком. Замечание r1 по кистям и обуви полностью не закрыто. Слева между рукой и корпусом также виден угловатый серый фрагмент фона.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "Чёрный и тёмно-серый костюм, серебряное ожерелье, острые уши и белые глазные щели соответствуют заявке; замечание r1 по глазам закрыто. Когти теперь отчётливо видны, однако якорь finger claws передан неверно: вместо коротких когтей на кончиках пальцев изображены длинные изогнутые клинки, доходящие почти до колен и напоминающие оружие другого персонажа.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 итоговый score 6,9 ниже порога 8,0: детализация явно уступает эталону, а характерные пальцевые когти Black Panther заменены длинными клинками.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "black-panther-front.png",
+      "fix": "Render a clean premium painted-resin miniature with restrained matte suit texture, crisp sculpted glove fingers and boot seams, dimensional silver necklace details, and a uniform dark-grey background without grainy speckling or angular grey patches.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "black-panther-front.png",
+      "fix": "Replace the long Wolverine-like hand blades with short sharp silver nail claws on the fingertips of both slightly open hands, preserving Black Panther's pointed-ear mask, white eye slits, black and dark-grey suit, and silver necklace.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13509-f9f5-7792-b271-fe6ccae35b71"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

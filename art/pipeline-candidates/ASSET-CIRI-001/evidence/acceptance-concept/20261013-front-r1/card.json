@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CIRI-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ciri-codex/design/ciri-front.png",
+      "sha256": "2e82268ac14e5cae9f5796b66a85df1c1126f918703a3ae46a421269351e09f9"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ciri-codex/design",
+    "files": [
+      "ciri-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ciri-codex/design/checks-report.json",
+    "art/imagegen/concept-ciri-codex/generation-records.json",
+    "art/imagegen/concept-ciri-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ciri-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-ciri-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-ciri-codex/design/checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "ciri-front.png: фигура и отделённые от корпуса руки читаются, но главный признак Цири — меч — полностью отсутствует, обе кисти пусты. Белые волосы и одежда сохраняют часть узнаваемости, однако силуэт вооружённой Цири из DESCRIPTION_EN потерян.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "ciri-front.png: коллекционная миниатюра с проработанными прядями волос, складками, пуговицами и швами рубашки; материалы различимы, мастерство близко к QUALITY_REFERENCE. Отдельные зоны беднее: кожа брюк и сапог выглядит более гладкой, с менее выраженной фактурой и расписанными переходами.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "ciri-front.png: белая рубашка, пепельные собранные волосы и тёмная кожаная одежда соответствуют основным цветам палитры. Стальной акцент клинка отсутствует вместе с мечом; вместо узнаваемого шрама на щеке видны симметричные чёрные точки. Условие наличия всех идентификационных якорей не выполнено.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    }
+  },
+  "score": 5.6,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 возврат обязателен: S = 0,5 < 1,0 и score = 5,6 < 8,0, несмотря на G-CHECKS PASS. Требуется исправить дизайн 1a: отсутствуют меч в правой руке и узнаваемый шрам.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Add a steel #B8BEC4 sword gripped in Ciri's own RIGHT hand (viewer's LEFT), keeping the blade fully visible and separated from the torso.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Refine the trouser and boot leather with subtle grain and controlled painted highlights to match the QUALITY_REFERENCE miniature finish.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Replace the symmetric black cheek dots with a recognizable healed scar on Ciri's own LEFT cheek (viewer's RIGHT).",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "ciri-front.png",
+      "note": "На груди виден мелкий нечитаемый знак, похожий на надпись или логотип; замечание не меняет маршрут."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349a-82cc-7d42-9427-28419adb2d7b"
+  },
+  "executor_session_id": "launcher:acceptance-reverse-7795d573f6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Решение по делегированию: docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md. Концепт 1a возвращён на исправление; r1 не является последним циклом. Внешнее происхождение принято по verification.json#design_source."
+}

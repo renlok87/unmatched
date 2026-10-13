@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SHE-HULK-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-SHE-HULK-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-she-hulk-codex/design/she-hulk-front.png",
+      "sha256": "5414d855b51775fd85bd8cd72f573eeb1b00a53e954b33df5bab84feea713e0a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-she-hulk-codex/design",
+    "files": [
+      "she-hulk-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+    "art/imagegen/concept-she-hulk-codex/generation-records.json",
+    "art/imagegen/concept-she-hulk-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "she-hulk-front.png: She-Hulk узнаётся по сочетанию мощного женского телосложения, зелёной кожи, длинных волос и фиолетово-белого спортивного костюма. Руки отделены от корпуса, стопы стоят на подставке, локти согнуты; это не T/A-поза. Однако камни в обеих руках нарушают WEAPON_HAND=none и закрывают часть кистей; тяжёлое надбровье и квадратная челюсть приближают лицо к Hulk. Замечание r1 к ракурсу не закрыто: верх подставки остаётся видимым вместо строгого вида ребром. Свободное поле над волосами теперь есть.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "she-hulk-front.png: объёмная миниатюра и различия материалов читаются, но детализация явно ниже medusa-quality-reference.png. Кожу и костюм покрывает грубая зернистая фактура, волосы выполнены крупными лентами, пальцы и отделка костюма упрощены. У эталона существенно тоньше проработаны лицо, кисти и поверхности материалов. Прежнее замечание к тёмным участкам белых сапог закрыто, однако требуемый уровень отделки не достигнут.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "she-hulk-front.png: все четыре цвета и заявленные якоря присутствуют, подставка нейтральная, командного кольца нет. Замечание r1 по тону не закрыто: кожа остаётся желтовато-оливковой относительно #4E9A44, волосы уходят в холодный зелёно-бирюзовый относительно #1F4A2A. Фиолетовый и белый костюм читаются.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но S+C+Q+P = 5.5; score = 6.9 ниже порога 8.0. Требуются исправление несоответствий силуэта и ракурса, повышение детализации и уточнение палитры.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "she-hulk-front.png",
+      "fix": "Keep She-Hulk's muscular female build, give her a strong clearly female face without Hulk's exaggerated brow and square jaw, remove both rocks and all held objects, show empty hands clearly separated from the torso, and use a level strictly frontal orthographic view with the pedestal edge-on and no top surface visible.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "she-hulk-front.png",
+      "fix": "Match the Medusa reference's finely painted collectible finish with refined facial anatomy, articulated fingers, crisp suit seams, detailed hair strands, and distinct satin skin, fabric, gloves, and boots instead of coarse grain across the surfaces.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "she-hulk-front.png",
+      "fix": "Match the painted midtones to skin green #4E9A44, suit purple #5B2A7E, suit white #E6E4E0, and dark green hair #1F4A2A, removing the yellow-olive skin and teal hair shifts.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13505-50bb-7960-b8d8-8475ae7a23d0"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

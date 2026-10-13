@@ -1,0 +1,103 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-TOMOE-GOZEN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-tomoe-gozen-codex/design/tomoe-gozen-front.png",
+      "sha256": "dffd47153ec5f6f8196467b868b5f432d736a64ac9d69e20be02c50113eb1c16"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-tomoe-gozen-codex/design",
+    "files": [
+      "tomoe-gozen-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-tomoe-gozen-codex/design/checks-report.json",
+    "art/imagegen/concept-tomoe-gozen-codex/generation-records.json",
+    "art/imagegen/concept-tomoe-gozen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-tomoe-gozen-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "tomoe-gozen-front.png: TomoeGozen узнаваема по сочетанию нагинаты в собственной правой руке, красного о-ёрой, белой повязки и длинных чёрных волос. Лезвие и древко отделены от корпуса, обе кисти различимы, анатомия без лишних конечностей; естественная поза стоя, не T/A. Тонкие пряди, ленты и кисточки читаются; их толщину и соединения следует проверять на этапах 3–4.",
+      "frames": [
+        "tomoe-gozen-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "tomoe-gozen-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "tomoe-gozen-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Различимы лак, металл, ткань, волосы и каменная подставка; проработаны шнуровка, отдельные пластины, узоры ткани, золотые накладки, лицо и пальцы. Детализация сохраняется внутри силуэта.",
+      "frames": [
+        "tomoe-gozen-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "tomoe-gozen-front.png: красный лак, синие шнуры, чёрные волосы и золотая отделка присутствуют; все четыре ANCHORS_EN видимы, сторона оружия верна. Синие шнуры выглядят более приглушёнными и серыми, чем cord blue #2F4F8F; это небольшое отклонение тона при сохранении палитры.",
+      "frames": [
+        "tomoe-gozen-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "tomoe-gozen-front.png",
+      "note": "На поясе есть дополнительный меч в ножнах: verification.json#core_limitations отмечает нарушение CORE «extra weapons». Он не скрывает нагинату и не меняет узнаваемость TomoeGozen; отдельного вето для меча в ножнах предоставленная рубрика 1a не задаёт."
+    },
+    {
+      "item": "S",
+      "frame": "tomoe-gozen-front.png",
+      "note": "Двухъярусная подставка шире ориентира: verification.json оценивает отношение диаметра к высоте фигуры без оружия примерно в 0,65 вместо 0,55. Фигура и подставка целиком видимы."
+    },
+    {
+      "item": "C",
+      "frame": "tomoe-gozen-front.png",
+      "note": "Видна узкая верхняя поверхность подставки, поэтому строгая ортографичность не достигнута; это также отмечено в verification.json. На 1a согласованность видов не оценивалась, фиксированное C сохранено."
+    },
+    {
+      "item": "P",
+      "frame": "tomoe-gozen-front.png",
+      "note": "Синие шнуры несколько серее и менее насыщенны, чем заданный cord blue #2F4F8F."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхняя точка на 1,519% высоты при ориентире не менее 4%. Лезвие не обрезано; WARN не является FAIL гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1348c-ed4c-71a0-8b11-4920d8e304fc"
+  },
+  "executor_session_id": "codex:01a13461-0520-7981-965b-5175ae5fc872",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

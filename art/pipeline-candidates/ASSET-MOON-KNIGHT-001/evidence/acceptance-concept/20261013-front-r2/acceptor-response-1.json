@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MOON-KNIGHT-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-MOON-KNIGHT-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-moon-knight-codex/design/moon-knight-front.png",
+      "sha256": "c8e4546d2225c76a90949bece8913ba1bdbea28e21b2e73298d1cc2c4c2957ac"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-moon-knight-codex/design",
+    "files": [
+      "moon-knight-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-moon-knight-codex/design/checks-report.json",
+    "art/imagegen/concept-moon-knight-codex/generation-records.json",
+    "art/imagegen/concept-moon-knight-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-moon-knight-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Moon Knight из Marvel узнаётся по сочетанию белого капюшона, закрытой маски, широкого белого плаща, нагрудного полумесяца и лунных дротиков. Фигура целиком видна; стойка не T- и не A-поза. Руки остаются близко к корпусу, светлые предплечья местами сливаются с плащом, а удерживающая кисть частично скрыта перекрывающимися дротиками. Замечание r1 об отделении рук закрыто частично.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "Миниатюра читается, ткань и металл различимы. По сравнению с r1 добавлена фактура, но детализация явно ниже эталона: на груди и маске доминирует повторяющаяся зернистость, на плаще — грубый бугристый рельеф; перчатки и обувь упрощены. Тонкость складок, чистота мелких деталей и нюансы покраски уступают medusa-quality-reference.png. Прежнее замечание о качестве проработки не закрыто.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "Белый костюм, серые тени и все четыре якоря присутствуют. Замечания r1 об отсутствии дротиков и неясной форме нагрудного знака закрыты: дротики видны в руке, эмблема стала отчётливым полумесяцем. Однако эмблема и дротики преимущественно тёмно-графитовые, лишь края дают серебряные блики; светлый серебряный акцент #D0D4D8 и серебро #B8BEC4 переданы слишком тёмными.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS = PASS, но сумма S+C+Q+P = 5,5 даёт 6,875 и после округления half-up — 6,9, ниже порога 8,0. Требуются лучшее отделение кисти и дротиков, более тонкая проработка поверхностей и осветление серебряных акцентов.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "moon-knight-front.png",
+      "fix": "Keep a relaxed planted ready stance with slightly bent elbows, move both forearms and hands forward and away from the torso and cape, and separate the held crescent darts so the gripping hand and individual blades read clearly.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "moon-knight-front.png",
+      "fix": "Replace the coarse grain on the mask, suit and cape with restrained fine fabric texture, crisp tailored seams and clean layered folds, and refine the gloves and boots with subtle hand-painted white and grey shading to match the craftsmanship of the quality reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "moon-knight-front.png",
+      "fix": "Render the chest crescent in light silver #D0D4D8 and the crescent darts in silver #B8BEC4 with clearly visible silver midtones rather than predominantly charcoal surfaces, preserving the all-white #E8E6E0 costume and flowing cape.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

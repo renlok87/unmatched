@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DR-JILL-TRENT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dr-jill-trent-codex/design/dr-jill-trent-front.png",
+      "sha256": "0ef8501737ef3d7c33938bf8905f05f20101cb481213e78b0002cf396eb47883"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dr-jill-trent-codex/design",
+    "files": [
+      "dr-jill-trent-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dr-jill-trent-codex/design/checks-report.json",
+    "art/imagegen/concept-dr-jill-trent-codex/generation-records.json",
+    "art/imagegen/concept-dr-jill-trent-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dr-jill-trent-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "dr-jill-trent-front.png: персонаж и все главные признаки читаются; лучевой пистолет отчётливо отделён от корпуса и находится в собственной правой руке фигуры, слева для зрителя. Обе руки согнуты, поза не T и не A. Левая рука с планшетом близка к корпусу, планшет частично перекрывает халат и сужает просвет под локтем.",
+      "frames": [
+        "dr-jill-trent-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "dr-jill-trent-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "dr-jill-trent-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Внутри силуэта чётко проработаны пряди волос, оправа и линзы очков, устройство пистолета, пальцы, швы, пуговицы, карманы и фактура ткани. Хром, ткань, кожа обуви и каменная подставка различаются по поверхности и бликам.",
+      "frames": [
+        "dr-jill-trent-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "dr-jill-trent-front.png: белый халат, бирюзовое платье, хром оружия и очков, красная помада визуально соответствуют PALETTE и palette.json с учётом светотени. Все якоря присутствуют: лучевое изобретение в собственной правой руке, очки на голове, белый лабораторный халат и укладка victory rolls.",
+      "frames": [
+        "dr-jill-trent-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "dr-jill-trent-front.png",
+      "note": "Левая рука и планшет близки к корпусу; при последующей сборке проверить сохранение просвета под локтем и читаемость кисти."
+    },
+    {
+      "item": "S",
+      "frame": "dr-jill-trent-front.png",
+      "note": "Тонкие диски излучателя, инструменты в карманах и ремешки обуви читаются в концепте; их толщину и отсутствие слияний проверять на этапах 3–4."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133ae-fdfa-7403-9d70-1017501e32f3"
+  },
+  "executor_session_id": "codex:01a1336e-703d-7b50-9bc5-b389b2b93141",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

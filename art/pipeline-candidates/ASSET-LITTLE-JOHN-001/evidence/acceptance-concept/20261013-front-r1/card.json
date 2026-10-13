@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LITTLE-JOHN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-little-john-codex/design/little-john-front.png",
+      "sha256": "54d0129ddc8b6d35db9e03af6660402b6546c6eed6ab3d6a35fc43e72dc7d90a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-little-john-codex/design",
+    "files": [
+      "little-john-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-little-john-codex/design/checks-report.json",
+    "art/imagegen/concept-little-john-codex/generation-records.json",
+    "art/imagegen/concept-little-john-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-little-john-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "little-john-front.png: крупный широкоплечий бородатый мужчина уверенно читается; вертикальный посох отделён от корпуса и находится в собственной правой руке, слева для зрителя. Предплечья и свободная кисть отделены от одежды просветами фона; анатомия без лишних частей, поза естественная, не T и не A. Посох, пальцы свободной кисти и концы верёвочного пояса различимы; их разделение следует сохранить на этапах 3–4.",
+      "frames": [
+        "little-john-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "little-john-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "little-john-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: отчётливо различаются грубая шерсть, мягкая ткань капюшона, потёртая кожа, древесина, скрученная верёвка и латунь. Пряди бороды, черты лица, швы, шнуровка, пряжки и древесные сучки подробно проработаны внутри силуэта; простой костюм сохраняет сопоставимое качество детализации.",
+      "frames": [
+        "little-john-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "little-john-front.png: коричневая туника, зелёный капюшон, дубовый посох и латунный акцент присутствуют. Все якоря сохранены: посох вертикально в собственной правой руке, полная коричневая борода, капюшон спущен на плечи, верёвочный пояс. Зелёный ткани выглядит более приглушённым и оливковым относительно forest green #3E6B2F; это отклонение тона без потери основного цвета.",
+      "frames": [
+        "little-john-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "little-john-front.png",
+      "note": "Зелёный капюшон и плащ имеют более приглушённый оливковый тон относительно заданного #3E6B2F."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхний отступ 3,66% при рекомендованных 4%; статус WARN. Посох целиком виден, предупреждение не меняет PASS гейта и фиксированный C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1336f-bad4-7023-881c-7c04dc492a40"
+  },
+  "executor_session_id": "codex:01a13330-6401-7893-9532-d0df75a67c38",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WILLOW-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-WILLOW-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-willow-codex/design/willow-front.png",
+      "sha256": "bed9369db14e7edb6346961e86b947a476506b6792acdcd4940223f41228ec17"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-willow-codex/design",
+    "files": [
+      "willow-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-willow-codex/design/checks-report.json",
+    "art/imagegen/concept-willow-codex/generation-records.json",
+    "art/imagegen/concept-willow-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-willow-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "willow-front.png: силуэт ясен, руки отделены от корпуса, кисти читаются, поза не T/A; оружия нет, анатомия гуманоидная. Все четыре костюмных якоря присутствуют. Однако вытянутое идеализированное лицо с узким подбородком и прямым тонким носом не передаёт узнаваемый образ Уиллоу Розенберг из Buffy: фигура читается как обобщённая рыжеволосая ведьма в богемной одежде. По требованию узнаваемости именно указанного персонажа применяется S=0 «не тот персонаж».",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "willow-front.png: уровень расписанной коллекционной миниатюры сопоставим с QUALITY_REFERENCE Medusa. Различимы вязка кардигана, рельефная цветочная вышивка, фактура и многослойные складки юбки, пряди волос, шнуровка кожаных ботинок и мелкие украшения; материалы и детали внутри силуэта проработаны.",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "willow-front.png: длинные красные волосы, многослойный зелёный кардиган, длинная фиолетовая юбка и голубое заклинание в поднятой руке присутствуют. Есть отклонение тона: кардиган преимущественно оливковый относительно #5E8A4A, юбка менее холодная и менее насыщенно-фиолетовая относительно #6A4A8A, волосы уходят в светлый медно-рыжий относительно #A8321E. Бледно-голубой акцент соответствует назначению #B8E0FF.",
+      "frames": [
+        "willow-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "concept-sheet.md §11: S=0 ниже обязательного минимума 1, поскольку узнаваемость именно Уиллоу Розенберг не достигнута; дополнительно score=6.3 ниже порога 8.0. G-CHECKS=PASS не отменяет эти условия возврата. Цикл r2 требует return_to_stage_1.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "willow-front.png",
+      "fix": "Give the miniature recognisable Buffy-era Willow Rosenberg facial likeness (Alyson Hannigan), with fuller cheeks, a softer jaw, a rounded nose tip and a wider expressive mouth, preserving all four identity anchors and the separated casting pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "willow-front.png",
+      "fix": "Match the material base colours to deeper red hair #A8321E, green cardigan #5E8A4A and cooler violet skirt #6A4A8A, retaining pale-blue spell highlights #B8E0FF and natural material shading.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Подставка полностью в кадре; measurements.front.mask.bottom_pct=95.235 и base_center_x_pct=49.862 немного отличаются от целевых 93% и 50%, отмеченных в verification.json. Это остаточные композиционные замечания, а не FAIL гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134ae-3fd5-75b2-8241-b3b0fd1f3168"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

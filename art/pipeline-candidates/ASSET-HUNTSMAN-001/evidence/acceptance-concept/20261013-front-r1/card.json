@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-HUNTSMAN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-huntsman-codex/design/huntsman-front.png",
+      "sha256": "cb371ceaeadd9455f249578baeeaa3b9829099f206a76aed21382ef94f571204"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-huntsman-codex/design",
+    "files": [
+      "huntsman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-huntsman-codex/design/checks-report.json",
+    "art/imagegen/concept-huntsman-codex/generation-records.json",
+    "art/imagegen/concept-huntsman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-huntsman-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; verification.json#checks[3].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "huntsman-front.png: ясный силуэт бородатого охотника; топор вынесен за корпус, меховая шапка и рог отчётливо читаются. Между руками и корпусом видны просветы, локти согнуты в естественной предметной позе, T/A-позы нет. Пальцы, ремни и бахрома различимы; тонкие элементы требуют проверки сохранности на этапах 3–4.",
+      "frames": [
+        "huntsman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "huntsman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "huntsman-front.png соответствует уровню medusa-quality-reference.png: расписанная коллекционная миниатюра с проработанным лицом, скульптурными прядями бороды и меха, складками ткани, швами и шнуровкой кожи, рельефным орнаментом топора и рога. Ткань, кожа, мех, сталь и слоновая кость отчётливо различаются; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "huntsman-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "huntsman-front.png: охотничья зелень одежды, коричневая кожа, серый мех и акцент слоновой кости рога соответствуют PALETTE и palette.json с учётом освещения. Все якоря присутствуют: топор в собственной правой руке героя слева для зрителя, рог на собственном левом бедре справа для зрителя, шапка с меховой отделкой.",
+      "frames": [
+        "huntsman-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "huntsman-front.png",
+      "note": "На этапах 3–4 проверить сохранность тонких ремней рога, бахромы и пальцев, а также раздельность нижнего топорища и края пальто; по концепту дефект геометрии не установлен."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1338f-0bf4-7b30-a7a0-9c83afd1f184"
+  },
+  "executor_session_id": "codex:01a1336a-6ce5-7b22-a04c-331e6aebe9b9",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

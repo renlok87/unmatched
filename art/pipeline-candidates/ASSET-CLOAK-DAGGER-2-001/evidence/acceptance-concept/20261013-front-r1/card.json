@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CLOAK-DAGGER-2-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-cloak-dagger-2-codex/design/cloak-dagger-2-front.png",
+      "sha256": "3fa666fc7b3bd1b9dd809cc380b0dc081d3bd147a09dd2cc7940194d1f5be89a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-cloak-dagger-2-codex/design",
+    "files": [
+      "cloak-dagger-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-cloak-dagger-2-codex/design/checks-report.json",
+    "art/imagegen/concept-cloak-dagger-2-codex/generation-records.json",
+    "art/imagegen/concept-cloak-dagger-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-cloak-dagger-2-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Dagger узнаётся по светлым волосам, белому купальнику и парным светлым клинкам. Руки и оружие отделены от корпуса, тонкие клинки читаются полностью, крупных анатомических ошибок нет. Расслабленная стойка с опущенными руками соответствует ready pose, не является запрещённой T/A-позой.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "Фигура читается как миниатюра, материалы кожи, костюма, волос и камня различимы. Однако крупные гладкие пряди, упрощённые кисти и плоские клинки заметно уступают QUALITY_REFERENCE по тонкости скульпта и проработке поверхности.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "Белый костюм, светлая кожа и светлые волосы присутствуют, но волосы отклоняются от тёплого #D9B86A к лимонно-жёлтому. Характерный dagger-shaped cutout заменён коротким округлым вырезом на груди. Клинки выглядят преимущественно как сплошные белые мечи с крестовинами; световая природа выражена слабым голубоватым краем.",
+      "frames": [
+        "cloak-dagger-2-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При PASS гейта сумма S+C+Q+P = 5.5 даёт score = 6.9 < 8.0: детализация явно ниже эталона, характерный вырез костюма потерян, световые кинжалы недостаточно убедительны.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "cloak-dagger-2-front.png",
+      "fix": "Refine the sculpted hair strands, facial features, fingers and toes, distinguish the skin and white leotard finishes, and give the blades dimensional form at the painted collectible miniature craftsmanship level of QUALITY_REFERENCE.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "cloak-dagger-2-front.png",
+      "fix": "Restore Dagger's characteristic long dagger-shaped chest cutout, shift the hair to warm blonde near #D9B86A, and make both weapons read as glowing white light daggers with a soft #F2F6FF halo rather than solid crossguard swords.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a6-8c33-7b20-9141-ce8142b5e7b3"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

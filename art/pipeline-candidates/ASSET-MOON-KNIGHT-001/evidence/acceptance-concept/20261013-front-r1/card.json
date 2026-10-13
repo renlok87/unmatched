@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MOON-KNIGHT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-moon-knight-codex/design/moon-knight-front.png",
+      "sha256": "8d1627bd7d21e95075732e87a485336123e5a8d979b3d2aa729bcf577e052efd"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-moon-knight-codex/design",
+    "files": [
+      "moon-knight-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-moon-knight-codex/design/checks-report.json",
+    "art/imagegen/concept-moon-knight-codex/generation-records.json",
+    "art/imagegen/concept-moon-knight-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-moon-knight-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#summary.FAIL = 0. WARN не является FAIL.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Лунный Рыцарь узнаётся по белому капюшону, закрытой маске, широкому плащу и лунным застёжкам. Фигура целиком видна, основные части на месте. Руки близко к корпусу и местами сливаются с белым плащом. Это расслабленная готовая стойка, не запрещённая T/A-поза.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "Миниатюра читается; серебряные детали отличаются от белых поверхностей. Однако костюм выглядит гладкой анатомической отливкой: ткань, перчатки, обувь и маска проработаны заметно беднее эталона мастерства. Складки плаща крупные, тонкая детализация и нюансы покраски ограничены.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "Белая основа, серые тени и серебряные элементы соответствуют палитре; капюшон и струящийся плащ присутствуют. Обе кисти пусты: обязательных crescent darts нет. Центральная нагрудная эмблема выглядит кольцевым знаком, а не ясным серебряным полумесяцем; полумесяцы читаются только на застёжках плаща.",
+      "frames": [
+        "moon-knight-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS = PASS, но сумма S+C+Q+P = 5,0 даёт 6,3 после ROUND_HALF_UP, ниже порога 8,0. Требуются повышение детализации, восстановление якорей и улучшение отделения рук от плаща.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "moon-knight-front.png",
+      "fix": "Maintain a relaxed ready stance with bent elbows and move the forearms and hands slightly forward so they read separately from the torso and cape.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "moon-knight-front.png",
+      "fix": "Increase painted miniature craftsmanship with believable fabric folds and seams, restrained anatomical relief beneath the suit, crisp hood and mask edges, refined glove and boot details, and subtle white shading.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "moon-knight-front.png",
+      "fix": "Add clearly visible silver crescent darts held in one hand and replace the central chest symbol with an unmistakable silver crescent moon, preserving the all-white hooded suit and flowing white cape.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a0-e258-76f3-b9f5-64df3b55f8c0"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

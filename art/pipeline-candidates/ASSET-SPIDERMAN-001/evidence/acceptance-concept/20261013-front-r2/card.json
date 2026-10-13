@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SPIDERMAN-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-SPIDERMAN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-spiderman-codex/design/spiderman-front.png",
+      "sha256": "b81399553a61878bb64dbefdc5e3bc77c5557fd9bbf82f0375c13201782251fb"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-spiderman-codex/design",
+    "files": [
+      "spiderman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+    "art/imagegen/concept-spiderman-codex/generation-records.json",
+    "art/imagegen/concept-spiderman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-spiderman-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-spiderman-codex/design/checks-report.json#summary.PASS = 13; art/imagegen/concept-spiderman-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-spiderman-codex/design/checks-report.json#inputs[0].sha256 = b81399553a61878bb64dbefdc5e3bc77c5557fd9bbf82f0375c13201782251fb",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В spiderman-front.png однозначно узнаётся Spider-Man из Marvel, указанный в DESCRIPTION_EN: характерная маска с большими линзами, паутина и нагрудный паук. Силуэт ясен: обе руки отделены от корпуса, кисти и выступающие пальцы читаются, обе стопы стоят на подставке; фигура полностью в кадре. Заявленная crouched ready pose показана, это не T- и не A-поза. Замечание r1 по стойке закрыто; тонкие пальцы требуют сохранения на этапах 3–4.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В spiderman-front.png различимы объём расписанной миниатюры, линзы, рисунок костюма и каменная подставка, но качество исполнения явно ниже medusa-quality-reference.png. Красные участки покрыты грубой зернистостью, на синих ногах и ботинках видны крупные пятнистые высветления; пальцы и сгибы костюма проработаны грубо. Сохраняются артефакты отделения от фона: прямоугольный серый участок в просвете под поднятой рукой слева в кадре и светлая кайма по части контура. Замечание r1 по Q закрыто лишь частично: светлая полоса слева от подставки больше не видна, но уровень эталона и чистота контура не достигнуты.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В spiderman-front.png присутствуют все цвета и якоря ANCHORS_EN: красно-синий костюм с чёрной паутиной, чёрный нагрудный паук, белые линзы и поднятая кисть в узнаваемом жесте выпуска паутины. Отсутствовавший в r1 жест появился. Однако красный на маске, плечах и перчатках заметно ярче заданного приглушённого #B3202A из palette.json; все якоря есть, но тон палитры отклоняется.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но S+C+Q+P = 2+1,5+1+1,5 = 6; score = 7,5 ниже порога 8,0. Поза и жест из замечаний r1 исправлены, однако детализация явно ниже эталона, сохраняются артефакты фона и отклонение красного тона.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "spiderman-front.png",
+      "fix": "Render a finely hand-painted collectible miniature with subtle suit texture, controlled highlights, crisp web lines, clearly resolved fingers and refined folds, replacing coarse grain and blotchy blue highlights and removing the rectangular background patch beneath the raised arm and all contour halos.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "spiderman-front.png",
+      "fix": "Match the muted paint palette with suit red #B3202A, suit blue #1F3E8A, web black #151518 and lens white #EDEDED, reducing the overly bright red while preserving the chest spider emblem, web pattern, crouched pose and raised web-shooting hand.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Исторические поля verification.json остаются несогласованными с r2: status = blocked, selected.design-front = null и successful_generations_per_view.design-front = 0, хотя generation-records.json содержит выбранную rc1, а verification.json#checks содержит финальную rc1 с exit_code = 0. Это замечание к служебным записям; статус G-CHECKS определяется текущим checks-report.json."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13507-cdd9-7070-867e-8f3fc1633807"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BIGFOOT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bigfoot-codex/design/bigfoot-front.png",
+      "sha256": "303886f1404a81b14c43483050894774c37129585ac8e1754054a1a9a64e9c31"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bigfoot-codex/design",
+    "files": [
+      "bigfoot-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bigfoot-codex/design/checks-report.json",
+    "art/imagegen/concept-bigfoot-codex/generation-records.json",
+    "art/imagegen/concept-bigfoot-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bigfoot-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "bigfoot-front.png: ясный силуэт массивного прямоходящего существа; длинные руки отделены от корпуса, кисти и большие плоские стопы читаются. Одна голова, две руки и две ноги, оружия нет. Опущенные руки, слегка согнутые локти и расслабленные пальцы образуют естественную нейтральную стойку, без T- или A-позы. Фигура и подставка целиком в кадре.",
+      "frames": [
+        "bigfoot-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bigfoot-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "bigfoot-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Многослойные пряди шерсти проработаны внутри силуэта на груди, животе и конечностях; различимы складки кожи лица и кистей, ногти, пальцы стоп, фактура мха и каменной подставки. Материалы убедительно различаются, детализация сохраняется по всей фигуре.",
+      "frames": [
+        "bigfoot-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "bigfoot-front.png: коричневая шерсть с тёмно-коричневыми углублениями, серая кожа лица, кистей и стоп и мшисто-зелёные акценты соответствуют PALETTE и palette.json с учётом освещения. Все четыре якоря присутствуют: лохматая тёмно-коричневая шерсть, длинные отделённые от тела руки, большие плоские стопы и тяжёлые надбровные дуги.",
+      "frames": [
+        "bigfoot-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верхняя точка находится на 2,831% высоты вместо рекомендованных 4%. Голова не обрезана; предупреждение не меняет статус гейта."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "bigfoot-front.png",
+      "note": "WARN view.single_component: дополнительная компонента маски занимает 0,678% кадра. При осмотре видна одна фигура на одной двухъярусной подставке; отдельного постороннего объекта нет. Предупреждение сегментации не меняет статус гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133b0-88d8-7aa1-ab80-bb401b37ae58"
+  },
+  "executor_session_id": "codex:01a13373-5950-7d93-83a7-8b1102118510",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

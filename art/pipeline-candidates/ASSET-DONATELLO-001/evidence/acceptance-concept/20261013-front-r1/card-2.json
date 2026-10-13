@@ -1,0 +1,99 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DONATELLO-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-donatello-codex/design/donatello-front.png",
+      "sha256": "b714a97000e6f6427df483b133b5dd7c3507da628beb5209b480c66fcd4fa8a7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-donatello-codex/design",
+    "files": [
+      "donatello-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-donatello-codex/design/checks-report.json",
+    "art/imagegen/concept-donatello-codex/generation-records.json",
+    "art/imagegen/concept-donatello-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-donatello-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL=0; #verdict=PASS; #summary.WARN=1 (view.single_component, прочие компоненты 1.725 %)"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "donatello-front.png: однозначно Donatello из Hero.name — зелёная черепаха-ниндзя, фиолетовая маска с двумя хвостами, коричневый панцирь за плечами и по бокам, пояс с подсумками, наколенники, длинный деревянный бо в обеих руках; посох (главный признак) концами далеко выходит за силуэт и читается, маска и хвосты читаются. Поза не T и не A, обе ноги на подставке, одна фигура. Исчерпанный пункт CHECKLIST «No weapon or held object» противоречит DESCRIPTION_EN/ANCHORS_EN: посох обязателен для идентичности и не штрафуется. Не 2: поза не по §4.4 (humanoid) — руки сильно согнуты и держат посох поперёк корпуса, правая кисть фигуры у плеча на фоне панциря (слева в кадре просвет рука–корпус не читается), левая кисть перед бедром; древко проходит перед пластроном и поясом — мелкие слияния кисти с оружием, руки близко к корпусу. Тонкие части для этапов 3–4: хвосты маски, отлетающие вправо, и древко.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "donatello-front.png против medusa-quality-reference.png: уровень расписанной коллекционной миниатюры — чешуйчатая фактура кожи и мускулатура, потёртая кожа ремня, перевязи и подсумков с латунными пряжками и заклёпками, обмотки на запястьях, лодыжках и рукоятях посоха, наколенники с заклёпками и царапинами, трещиноватая фактура пластрона, волокно дерева посоха, ткань маски. Материалы (кожа тела, кожаные ремни, латунь, дерево, ткань, камень подставки) различимы, детали внутри силуэта. Орнамента меньше, чем у Medusa, но это следует из дизайна персонажа, а не из бедности проработки; подставка простая, как у эталона. Мелочь: пальцы кисти у плеча слегка размыты.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "donatello-front.png: все цвета PALETTE и видимые якоря на месте — фиолетовая маска близка к mask purple #6A3FA0 (оттенок ~270°), коричневый панцирь и ремни ~#694E35 против shell brown #6E5236, дерево посоха ~#8F6644 против акцента staff wood #9B7448; командного цвета и цветного кольца на подставке нет. Отклонение тона: освещённая кожа оливково-жёлтая (медиана оттенка ~68°, среднее ~#717745) против skin green #4E8A3A (105°); светло-охристый пластрон — цвет вне PALETTE (канонический для персонажа). Задние якоря (панцирь целиком) с front не требуются.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "donatello-front.png",
+      "note": "Поза отступает от §4.4 humanoid: обе кисти держат бо поперёк корпуса (правая кисть фигуры у плеча на фоне панциря, левая перед бедром), просвет рука–корпус слева в кадре не читается, древко проходит перед пластроном и поясом — на этапе 2 проверить слияние посоха и кистей с корпусом, на этапе 3 — rest-позу рига."
+    },
+    {
+      "item": "S",
+      "frame": "donatello-front.png",
+      "note": "asset-card.yaml WEAPON_HAND: none противоречит DESCRIPTION_EN/ANCHORS_EN (бо в обеих руках): исчерпанный пункт CHECKLIST «No weapon or held object» вызван картой, а не изображением; до 1c и рига запускающему нужно решение по стороне оружия (двуручный посох)."
+    },
+    {
+      "item": "S",
+      "frame": "donatello-front.png",
+      "note": "Тонкие части для этапов 3–4: два хвоста маски, отлетающие вправо от головы, и длинное древко посоха."
+    },
+    {
+      "item": "P",
+      "frame": "donatello-front.png",
+      "note": "Кожа оливково-жёлтая (оттенок ~68°) против skin green #4E8A3A (105°); светло-охристый пластрон вне PALETTE. При 1c держать кожу ближе к #4E8A3A."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.single_component (прочие компоненты 1.725 %): визуально одна фигура на одной подставке, видимого последствия нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-DONATELLO-001-r1"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

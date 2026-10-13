@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WILLIAM-SHAKESPEARE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+      "sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-william-shakespeare-codex/design",
+    "files": [
+      "william-shakespeare-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-william-shakespeare-codex/design/checks-report.json",
+    "art/imagegen/concept-william-shakespeare-codex/generation-records.json",
+    "art/imagegen/concept-william-shakespeare-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-william-shakespeare-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "william-shakespeare-front.png: персонаж узнаваем; перо и раскрытая книга выступают за корпус и ясно читаются, кисти различимы, локти согнуты, поза не T/A. До 2 не дотягивает отделение рук: книга и плащ закрывают фоновый просвет у собственной левой руки, рука с пером также частично читается на фоне плаща. Это ограничение разделения силуэта, без потери главных признаков.",
+      "frames": [
+        "william-shakespeare-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "william-shakespeare-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "william-shakespeare-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны жаккард камзола, вышивка плаща, кружево воротника и манжет, пряди волос и бороды, бородки пера, страницы и рельеф обложки. Ткань, кожа, металл и бумага различаются по фактуре и бликам; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "william-shakespeare-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "william-shakespeare-front.png: основные цвета соответствуют PALETTE — тёплый чёрный камзол, белый воротник, пергаментные страницы и красное перо. Приглушённая бронзовая отделка подчинена основной гамме. Все четыре якоря видны: перо в собственной правой руке слева для зрителя, раскрытая книга в левой, остроконечная борода и белый отложной воротник.",
+      "frames": [
+        "william-shakespeare-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "william-shakespeare-front.png",
+      "note": "Два ясных фоновых просвета между руками и корпусом не подтверждаются; особенно слева у фигуры просвет закрывают книга и плащ. Это согласуется с verification.json#limit_reached и учтено в S = 1.5; самостоятельным FAIL гейта не является."
+    },
+    {
+      "item": "S",
+      "frame": "william-shakespeare-front.png",
+      "note": "Плащ достигает колен и заметно длиннее short cape из DESCRIPTION_EN. Отклонение принято по делегированию: оно не скрывает перо, книгу и остальные якоря."
+    },
+    {
+      "item": "S",
+      "frame": "william-shakespeare-front.png",
+      "note": "Тонкий стержень пера и его бородки читаются в концепте; толщину и сохранность этих частей в геометрии следует проверить на этапах 3–4."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13399-396e-7442-bb9d-713232640590"
+  },
+  "executor_session_id": "codex:01a13361-7457-7382-bea9-44dd20fce40a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

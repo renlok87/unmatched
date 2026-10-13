@@ -1,0 +1,103 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LEONARDO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-leonardo-codex/design/leonardo-front.png",
+      "sha256": "41cdd7e26c2b8e42b6489fa326893d75daf3e0068a67388389bbbceb099685e3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-leonardo-codex/design",
+    "files": [
+      "leonardo-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+    "art/imagegen/concept-leonardo-codex/generation-records.json",
+    "art/imagegen/concept-leonardo-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; checks-report.json#summary.PASS = 13",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "leonardo-front.png: узнаётся именно Leonardo из TMNT — черепашья голова и корпус, синяя маска с двумя хвостами, панцирь и две катаны. Кисти и оружие отделены от корпуса, между ногами есть просвет; локти согнуты, поза не T и не A. Обе катаны целиком читаются. Тонкие концы клинков и хвосты маски требуют проверки геометрии на этапах 3–4.",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "leonardo-front.png: убедительная расписанная коллекционная миниатюра; различимы кожа, панцирь, кожаные ремни, синяя ткань и стальные клинки. Есть швы, пряжки, обмотка рукоятей и износ. По сравнению с medusa-quality-reference.png края маски и складки наколенников мягче, а зернистая фактура кожи и ткани менее дифференцирована; отдельные зоны уступают тонкости эталона.",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "leonardo-front.png: все ANCHORS_EN присутствуют там, где видимы спереди: по катане в каждой руке, синяя маска с хвостами, коричневый край спинного панциря, пояс и наколенники. Стальной акцент сохранён. Кожа выглядит более светлой и оливковой, чем #4E8A3A; точное совпадение палитры не подтверждено свотчами. Катаны расходятся наружу, вместо пересечения из DESCRIPTION_EN, при сохранении обоих оружейных якорей.",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "leonardo-front.png",
+      "note": "Маска и наколенники имеют более мягкие детали, чем эталон; местами сходная зернистость кожи и ткани ослабляет различие материалов."
+    },
+    {
+      "item": "P",
+      "frame": "leonardo-front.png",
+      "note": "Зелёный тон кожи смещён в светлый оливковый; катаны не скрещены, как указано в DESCRIPTION_EN."
+    },
+    {
+      "item": "P",
+      "frame": "leonardo-front.png",
+      "note": "На круглой синей пряжке есть рельефная эмблема; однозначная буква L не читается. Отмеченное в verification.json нарушение запрета логотипов остаётся замечанием, а не дополнительным гейтом."
+    },
+    {
+      "item": "P",
+      "frame": "leonardo-front.png",
+      "note": "Пункт verification.json «No weapon or held object» противоречит DESCRIPTION_EN и ANCHORS_EN, требующим две катаны. Оружие сохранено как признак Leonardo; этот конфликт не меняет G-CHECKS."
+    },
+    {
+      "item": "S",
+      "frame": "leonardo-front.png",
+      "note": "На этапах 3–4 проверить толщину и сохранность концов катан и свободных хвостов маски; геометрия на этапе 1a не оценивается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13484-39df-75c3-b3b9-852ed12b4232"
+  },
+  "executor_session_id": "codex:01a13427-4d62-7323-9fc1-3bf8be6055f2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md); score 8.1 находится в полосе 8.0–8.4 и требует второго независимого приёмщика другого профиля для устойчивого pass согласно concept-sheet.md §11."
+}

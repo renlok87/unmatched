@@ -1,0 +1,114 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ELEKTRA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+      "sha256": "30dbe8062f91ccaeccdd88f633be4097ae01ab96d632c12671a9970919a1b125"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-elektra-codex/design",
+    "files": [
+      "elektra-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-elektra-codex/design/checks-report.json",
+    "art/imagegen/concept-elektra-codex/generation-records.json",
+    "art/imagegen/concept-elektra-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-elektra-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-elektra-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "elektra-front.png: фигура целиком видна, руки слегка отделены, поза не T и не A. Красный костюм, тёмные волосы и повязка намекают на Elektra, однако её главный отличительный признак отсутствует: в обеих руках длинные мечевидные клинки без боковых зубцов саев. Силуэт читается как обобщённая красная воительница, узнаваемость именно Elektra недостаточна.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "elektra-front.png: объёмная коллекционная фигурка, волосы, кожа, красный костюм и металл различимы. Против medusa-quality-reference.png лицо заметно более кукольное, проработка кистей, швов и поверхностей проще; на груди два нерегулярных светлых дефекта. Справа от подставки виден серый участок с резким краем после обработки фона. Детализация и завершённость явно ниже эталона.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "elektra-front.png: основные красные, чёрные и стальные цвета соответствуют palette.json; длинный конец красной повязки присутствует. Якорь «сай в каждой руке» потерян: изображены длинные клинки без характерных боковых зубцов. Красный пояс есть, но длинный конец sash не показан.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S = 0,5 < 1,0: отсутствует характерный силуэт парных саев Elektra; также score = 5,0 < 8,0. PASS технического гейта не отменяет художественный возврат.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "elektra-front.png",
+      "fix": "Replace both sword-length blades with Elektra's short steel sai, each featuring a straight central spike and two clearly separated curved side prongs, with both grips visible away from the torso.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "elektra-front.png",
+      "fix": "Use a strict frontal orthographic view with a level camera and an edge-on pedestal whose top surface is hidden, preserving the relaxed non-T/non-A ready pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "elektra-front.png",
+      "fix": "Remove the two irregular pale chest marks and refine facial anatomy, glove grips, garment seams and material microtexture to match the painted collectible finish of medusa-quality-reference.png.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "elektra-front.png",
+      "fix": "Remove the gray patch and cutout halos around the pedestal so the entire background is uniformly flat neutral dark gray.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "elektra-front.png",
+      "fix": "Add a long clearly visible hanging red sash tail while preserving the long headband tail, #A3242A outfit, #1A1719 hair, #B8BEC4 sai steel and #C8322A sash accent.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "summary.FAIL = 0 подтверждает технический PASS; видимый серый участок внутри кадра, ракурс подставки и неверная форма оружия этим результатом не исключаются."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134df-18f4-7240-b372-1528dc50dd73"
+  },
+  "executor_session_id": "history:ASSET-ELEKTRA-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественно не принято, по делегированию; возврат на этап 1a. Нулевой лимит генераций сохранён."
+}

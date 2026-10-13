@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLOB-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-blob-codex/design/blob-front.png",
+      "sha256": "4390e0f2d7ec71e9b9e721cbc027e4e24d1d80776f41d60c658dbee5dff983b6"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-blob-codex/design",
+    "files": [
+      "blob-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-blob-codex/design/checks-report.json",
+    "art/imagegen/concept-blob-codex/generation-records.json",
+    "art/imagegen/concept-blob-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-blob-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В blob-front.png узнаётся Blob по KEY и DESCRIPTION_EN: бугристая аморфная масса с поглощёнными предметами, без отдельного лица и оружия. Боковые отростки отделены просветами, согнуты и свисают; T- или A-позы нет. Максимальный балл ограничивают широкая подставка и слитная нижняя опора без двух различимых стоп при заявленной ANATOMY: humanoid.",
+      "frames": [
+        "blob-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "blob-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В blob-front.png детализация соответствует уровню medusa-quality-reference.png: объёмные наплывы и капли, прозрачная глубина желе, проработанные фары, решётка автомобиля, спицы колеса, зубы черепа и фактура дерева. Желе, металл, кость, дерево и матовая подставка различимы; образ читается как коллекционная миниатюра.",
+      "frames": [
+        "blob-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В blob-front.png визуально представлены все цвета PALETTE и palette.json: красное желе, розовые наплывы, тёмный бордовый центр и белые блики. Все три якоря видимы: аморфный глянцевый холм, розово-красная полупрозрачность и поглощённые предметы внутри.",
+      "frames": [
+        "blob-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "blob-front.png",
+      "note": "verification.json фиксирует отношение диаметра подставки к высоте фигуры около 0.814 при целевом 0.55; визуально подставка заметно шире заданной пропорции."
+    },
+    {
+      "item": "S",
+      "frame": "blob-front.png",
+      "note": "Две отдельные стопы не выделены: нижние лопасти желе образуют сплошную опору. Это соответствует аморфному описанию Blob, но оставляет расхождение с заявленной humanoid-анатомией и требованием двух стоп из verification.json."
+    },
+    {
+      "item": "S",
+      "frame": "blob-front.png",
+      "note": "Тонкие свисающие капли и спицы читаются в концепте; их толщину и сохранение читаемости потребуется проверить на этапах 3–4. Геометрия здесь не оценивалась."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a1-a7eb-7ec0-a509-8822afac8ee5"
+  },
+  "executor_session_id": "codex:01a13447-bbb5-7f33-9ed7-28af74884846",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

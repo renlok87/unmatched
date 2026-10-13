@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MOTHMAN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-mothman-codex/design/mothman-front.png",
+      "sha256": "06c9a9caf078eb0d9c377465e9cabefd03c62995e25e2b387092a4c103960ad9"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-mothman-codex/design",
+    "files": [
+      "mothman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-mothman-codex/design/checks-report.json",
+    "art/imagegen/concept-mothman-codex/generation-records.json",
+    "art/imagegen/concept-mothman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-mothman-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-mothman-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "mothman-front.png: узнаётся именно Mothman благодаря сочетанию огромных расправленных крыльев мотылька, ярких красных глаз и высокого мохнатого гуманоидного тела с тонкими когтистыми конечностями. Руки отделены от корпуса, ноги и когти читаются; свободно опущенные кисти и слегка согнутые локти образуют нейтральную стойку, без T- или A-позы. Фигура и подставка целиком в кадре. Для этапов 3–4 отмечены тонкие усики, их ответвления и кончики когтей: необходимо сохранить их читаемость.",
+      "frames": [
+        "mothman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "mothman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "mothman-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Внутри силуэта проработаны многослойное опушение, рисунок и рельеф крыльев, сегменты усиков, суставы пальцев и когти. Матовые поверхности тела и крыльев, гладкие красные глаза и шероховатая подставка различимы; детализация сохраняется по всей фигуре.",
+      "frames": [
+        "mothman-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "mothman-front.png: серо-коричневое опушение, коричневые крылья с тёмными пятнами и яркий красный акцент глаз присутствуют; все четыре якоря видимы. Есть небольшое тональное отклонение: освещённые участки крыльев теплее и светлее заданного wing brown #5A4636. Подставка нейтральная, без командного цвета.",
+      "frames": [
+        "mothman-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 3.315% при целевом минимуме 4%. Крылья не обрезаны; предупреждение не меняет PASS гейта или фиксированное C."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "mothman-front.png",
+      "note": "Фон слегка темнеет книзу и не является строго плоским, как отмечено в verification.json. Визуально это слабое нейтральное изменение без посторонних объектов; для художественной приёмки допустимо."
+    },
+    {
+      "item": "P",
+      "frame": "mothman-front.png",
+      "note": "Тёплые светлые участки крыльев несколько отклоняются от заданного тёмно-коричневого тона; основные цвета и якоря сохранены."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349a-39c5-7b03-9850-b7654c6145ad"
+  },
+  "executor_session_id": "history:ASSET-MOTHMAN-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

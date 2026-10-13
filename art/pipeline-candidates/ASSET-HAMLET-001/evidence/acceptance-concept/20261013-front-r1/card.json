@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-HAMLET-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-hamlet-codex/design/hamlet-front.png",
+      "sha256": "5246fbb95228a0ed2ee72e132b23308458c35d4ccde8e07189061ddcc791a59c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-hamlet-codex/design",
+    "files": [
+      "hamlet-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-hamlet-codex/design/checks-report.json",
+    "art/imagegen/concept-hamlet-codex/generation-records.json",
+    "art/imagegen/concept-hamlet-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-hamlet-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 11; checks-report.json#summary.WARN = 2",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "hamlet-front.png: персонаж узнаваем; череп и рапира хорошо отделены от корпуса, клинок полностью виден, поза асимметричная, без T/A. Небольшое слияние тёмного левого рукава с плащом снижает читаемость руки; плащ заметно длиннее указанного короткого.",
+      "frames": [
+        "hamlet-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "hamlet-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "hamlet-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны лицо, волосы, складки воротника, вышивка, цепь, пряжки, гарда и строение черепа; ткань, кожа, металл и кость отчётливо различаются.",
+      "frames": [
+        "hamlet-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "hamlet-front.png: траурный чёрный костюм, тёплый белый воротник, серебристые клинок и фурнитура, королевская синяя подкладка соответствуют palette.json. Все четыре якоря видимы: рапира в собственной правой руке, череп в левой, белый воротник и чёрный дублет.",
+      "frames": [
+        "hamlet-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "hamlet-front.png",
+      "note": "Плащ спускается до голени вместо короткого плаща из DESCRIPTION_EN; принято как допустимое художественное отклонение по делегированию, ключевые якоря сохранены."
+    },
+    {
+      "item": "S",
+      "frame": "hamlet-front.png",
+      "note": "Тонкий клинок и ажурная гарда читаются в концепте; их толщину и целостность геометрии следует проверить на этапах 3–4."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верхний отступ 3.384% вместо 4%, обрезания нет. WARN view.single_component: сегментация тёмных участков разделяет маску; визуально изображена одна целая фигура. Оба предупреждения не меняют PASS гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13385-beec-7511-a1dc-94c432474739"
+  },
+  "executor_session_id": "codex:01a1335e-df10-7010-b628-3494bc8e7737",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

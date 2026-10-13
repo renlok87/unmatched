@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DR-JEKYLL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dr-jekyll-codex/design/dr-jekyll-front.png",
+      "sha256": "32c256ae4c9736bd5e8e1aacabd242b3d1dfb54f216727231ec0ff740c19f6be"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dr-jekyll-codex/design",
+    "files": [
+      "dr-jekyll-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dr-jekyll-codex/design/checks-report.json",
+    "art/imagegen/concept-dr-jekyll-codex/generation-records.json",
+    "art/imagegen/concept-dr-jekyll-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dr-jekyll-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1; verification.json#checks: финальная проверка завершилась с exit_code = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В dr-jekyll-front.png ясно читается викторианский доктор: длинный сюртук, поднятый флакон и опущенный саквояж образуют различимый силуэт. Руки отделены от корпуса, ноги различимы; поза естественная, не T и не A. Фигура и подставка полностью видны. Горлышко флакона, ручки саквояжа и цепочка читаются.",
+      "frames": [
+        "dr-jekyll-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "dr-jekyll-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В dr-jekyll-front.png достигнут уровень расписанной коллекционной миниатюры эталона medusa-quality-reference.png: проработаны лицо, пряди волос и бакенбарды, узел и складки платка, швы и фактура ткани, кожаный саквояж с пряжками, пуговицы, цепочка и шнуровка обуви. Ткань, кожа, металл и стекло различаются; сдержанный костюм сохраняет богатую детализацию внутри силуэта.",
+      "frames": [
+        "dr-jekyll-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В dr-jekyll-front.png визуально соблюдена палитра: серый сюртук, кремовый платок, коричневая кожа саквояжа и светящееся зелёное зелье. Все четыре якоря присутствуют: флакон в анатомически ЛЕВОЙ руке, справа для зрителя; саквояж в ПРАВОЙ, слева для зрителя; серый сюртук и шейный платок. Цветного командного кольца на основании нет.",
+      "frames": [
+        "dr-jekyll-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2,97% при рекомендуемых 4%. Обрезки нет; предупреждение не меняет PASS гейта и фиксированный C."
+    },
+    {
+      "item": "P",
+      "frame": "dr-jekyll-front.png",
+      "note": "verification.json#limit_reached фиксирует противоречивый пункт «No weapon or held object»: флакон и саквояж обязательны по DESCRIPTION_EN и ANCHORS_EN. Их наличие соответствует карточке ассета и не является основанием для возврата."
+    },
+    {
+      "item": "S",
+      "frame": "dr-jekyll-front.png",
+      "note": "На этапах 3–4 проверить толщину и целостность цепочки, ручек саквояжа и горлышка флакона, а также разделение пальцев и удерживаемых предметов. По концепту эти детали читаются; геометрия здесь не оценивается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1338a-49e2-7eb3-b768-32136bc36a5c"
+  },
+  "executor_session_id": "codex:01a13354-1da4-72d0-b38c-c6d44e146ed1",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

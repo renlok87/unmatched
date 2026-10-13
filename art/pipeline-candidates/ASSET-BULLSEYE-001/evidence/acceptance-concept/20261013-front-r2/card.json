@@ -1,0 +1,108 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BULLSEYE-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-BULLSEYE-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bullseye-codex/design/bullseye-front.png",
+      "sha256": "1fe391090c00c837aa5e8dc8e3c7b41ce26e42d96efa2bba9dce083cedb63738"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bullseye-codex/design",
+    "files": [
+      "bullseye-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bullseye-codex/design/checks-report.json",
+    "art/imagegen/concept-bullseye-codex/generation-records.json",
+    "art/imagegen/concept-bullseye-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bullseye-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS; checks-report.json#inputs[0].sha256 = 1fe391090c00c837aa5e8dc8e3c7b41ce26e42d96efa2bba9dce083cedb63738",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "bullseye-front.png: замечание r1 о второй вооружённой руке закрыто — веер ножей только в собственной правой руке, левая пустая. Руки отделены, поза нейтральная, не T/A. Однако изображён обобщённый ниндзя с прицелом на груди: глухая синяя маска, плечевой шарф и многослойные расширенные манжеты заменяют узнаваемый костюм Marvel Bullseye. Характерная белая концентрическая мишень на лбу отсутствует; соответствующее замечание r1 не закрыто. Общих якорей убийцы недостаточно для идентичности именно Bullseye, что соответствует S = 0. Верх подставки по-прежнему виден.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "bullseye-front.png: ткань, перчатки, металл и каменная подставка различимы; складки и кромки клинков имеют объём. Гладкий пластиковый вид r1 устранён, но заменён крупной однообразной зернистостью на маске, рукавах и брюках, которая заглушает чистую форму и мелкие детали. Кисть с ножами и основания клинков проработаны грубее medusa-quality-reference.png; уровень скульптуры и контролируемой росписи явно ниже эталона. Прямоугольных пятен задника r1 больше не видно, однако вдоль отдельных краёв головы и ножей остаётся тонкая светлая кайма.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "bullseye-front.png: все заданные цвета и перечисленные ANCHORS_EN присутствуют — чёрно-синий костюм, белая мишень на груди, металлические ножи в правой руке. Подставка нейтральная, без командного кольца. Голубой тон r1 исправлен, но освещённые синие поверхности выглядят более серыми и менее насыщенными, чем #1F3E8A; на клинках заметен тёплый бежево-коричневый налёт вместо нейтрального #B8BEC4. Это отклонение тона при сохранённых цветах и якорях.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    }
+  },
+  "score": 5.0,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 значение S = 0 вызывает вето: текущий дизайн передаёт архетип ниндзя, но не узнаваемую идентичность Marvel Bullseye. При G-CHECKS PASS сумма S+C+Q+P = 4.0 даёт score = 5.0, что также ниже порога 8.0. Цикл r2 требует возврата на этап 1.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "bullseye-front.png",
+      "fix": "Restore Marvel Bullseye's recognizable close-fitting black cowl with a clear white concentric bullseye on the forehead and an exposed lower face, replacing the blue full-face ninja mask, shoulder scarf and flared wrist armour while preserving the chest target, knives only in his RIGHT hand and an empty LEFT hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "bullseye-front.png",
+      "fix": "Use a strictly frontal orthographic view with a horizontal camera and show the pedestal exactly edge-on with no visible top surface.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "bullseye-front.png",
+      "fix": "Match the Medusa reference's crisp miniature sculpting and controlled paint shading by removing coarse speckled texture from the mask, sleeves and trousers, clearly defining fingers and individual knife handles, and distinguishing fine fabric, leather, steel and stone surfaces.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "bullseye-front.png",
+      "fix": "Remove the pale cutout fringe around the head and knife silhouettes while preserving clean object edges against a uniform neutral dark grey background.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "bullseye-front.png",
+      "fix": "Keep costume blue at dark saturated #1F3E8A rather than slate grey and blade steel at neutral #B8BEC4 without brown rust, preserving #18181C black and #E8E8E8 target white under neutral studio lighting.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13519-a8b5-7c60-ab00-76a03e26296a"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

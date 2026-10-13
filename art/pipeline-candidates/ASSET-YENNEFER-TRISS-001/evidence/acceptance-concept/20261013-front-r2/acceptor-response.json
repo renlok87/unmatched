@@ -1,0 +1,107 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-YENNEFER-TRISS-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-YENNEFER-TRISS-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-yennefer-triss-codex/design/yennefer-triss-front.png",
+      "sha256": "b4cb4e63e70d24842d84a66c7f34c7cd5f1dbcb4c486e0386b7cac1694eff2e0"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-yennefer-triss-codex/design",
+    "files": [
+      "yennefer-triss-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json",
+    "art/imagegen/concept-yennefer-triss-codex/generation-records.json",
+    "art/imagegen/concept-yennefer-triss-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#summary.PASS = 13; art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#inputs[0].sha256 = b4cb4e63e70d24842d84a66c7f34c7cd5f1dbcb4c486e0386b7cac1694eff2e0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На yennefer-triss-front.png узнаваема Йеннифэр из The Witcher: длинные чёрные локоны, чёрно-белый костюм, чёрный чокер и фиолетовые глаза. Руки отделены от корпуса, обе стопы стоят на подставке; опущенная нейтральная поза не является T/A. Однако пальцы частично скрыты и сливаются с двумя фиолетовыми шарами, поэтому читаемость кистей ниже якоря S=2. Оба удерживаемых предмета также противоречат WEAPON_HAND: none и §4.4.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "На yennefer-triss-front.png различимы швы и рельеф корсета, складки белых рукавов и панелей, манжеты, пряди волос и шнуровка сапог. Замечание r1 о бедной детализации костюма частично закрыто. Вид коллекционной миниатюры убедителен, но лицо и кисти беднее по расписанной светотени, а чёрная юбка покрыта повторяющимся грубым рельефом. Относительно medusa-quality-reference.png это близкий уровень с более слабыми отдельными зонами, а не Q=2.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На yennefer-triss-front.png присутствуют все четыре якоря заявки и основные чёрно-белые цвета palette.json. Белые панели стали отчётливо белыми, поэтому соответствующее замечание r1 в основном закрыто. Глаза имеют более яркий розово-фиолетовый тон, чем приглушённый акцент #8A4AB3; дополнительные шары создают крупные пятна тёмного фиолетового вне заданного акцента глаз. Все цвета и якоря есть, но точное соответствие палитре не достигнуто.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 сумма S/C/Q/P = 1.5 + 1.5 + 1.5 + 1.5 = 6; score = 6 / 8 × 10 = 7.5 < 8.0, поэтому return_to_stage_1. G-CHECKS PASS, измерений ниже 1.0 нет. Цикл r2 не последний.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "yennefer-triss-front.png",
+      "fix": "Remove both purple spheres and show clearly sculpted empty hands with distinct fingers, keeping both arms slightly away from the torso and the elbows slightly bent in a neutral standing miniature pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "yennefer-triss-front.png",
+      "fix": "Refine the face and hands with subtle painted shading and replace the skirt's coarse repetitive relief with natural sculpted fabric folds and fine painted highlights matching the QUALITY_REFERENCE craftsmanship.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "yennefer-triss-front.png",
+      "fix": "Match the visible irises to muted violet #8A4AB3 without bright pink makeup or purple held objects, preserving outfit black #18181C, outfit white #E6E4E0, hair black #141216 and the black choker.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "yennefer-triss-front.png",
+      "note": "Замечание r1 о подставке сохраняется: верхняя плоскость видна, основание не показано строго edge-on. Отдельного гейта для этого нет; замечание не меняет рассчитанный маршрут."
+    },
+    {
+      "item": "S",
+      "frame": "yennefer-triss-front.png",
+      "note": "Тонкие свободные концы развевающихся локонов читаются на front; их сохранность и отделение следует проверить на этапах 3–4."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

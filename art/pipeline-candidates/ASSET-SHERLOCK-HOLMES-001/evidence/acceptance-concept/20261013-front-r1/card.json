@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+      "sha256": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sherlock-holmes-codex/design",
+    "files": [
+      "sherlock-holmes-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
+    "art/imagegen/concept-sherlock-holmes-codex/generation-records.json",
+    "art/imagegen/concept-sherlock-holmes-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1. verification.json#checks: финальная проверка exit_code = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В sherlock-holmes-front.png ясно читаются высокий худощавый детектив, deerstalker, контур Inverness, изогнутая трубка и вынесенная лупа. Лупа в собственной правой руке, слева для зрителя; локти согнуты, T/A-позы нет. Кисти различимы, но ткань плаща заполняет промежутки между руками и корпусом, поэтому полной силуэтной изоляции рук нет.",
+      "frames": [
+        "sherlock-holmes-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "sherlock-holmes-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sherlock-holmes-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо и пальцы, переплетение твида, складки и кромки плаща, пуговицы, часовая цепочка, шнуровка и кожа обуви. Ткань, кожа, дерево трубки, латунь и стекло лупы различаются; детали присутствуют внутри силуэта.",
+      "frames": [
+        "sherlock-holmes-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В sherlock-holmes-front.png представлены коричневый твид, серый плащ, тёмно-коричневая трубка и латунная оправа лупы в соответствии с PALETTE; светотень и роспись сохраняют заданные цветовые роли. Все четыре якоря видимы, лупа находится в собственной правой руке. Подставка нейтральная, без командного цвета.",
+      "frames": [
+        "sherlock-holmes-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sherlock-holmes-front.png",
+      "note": "Плащ перекрывает просветы между обеими руками и корпусом; это видимое ограничение силуэта и причина S = 1.5. verification.json#limit_reached фиксирует тот же недостаток после двух генераций; сторона лупы правильная."
+    },
+    {
+      "item": "S",
+      "frame": "sherlock-holmes-front.png",
+      "note": "Тонкие части трубки, рукоятки лупы и часовой цепочки читаются на концепте; их толщину, связность и отделение от соседних поверхностей следует проверить на этапах 3–4."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json#measurements.front.mask.top_pct = 1.934 при рекомендованном отступе 4.0%; view.frame_top = WARN. Фигура целиком в кадре; WARN не меняет PASS гейта или фиксированный C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133a6-6e37-71d3-af7f-53df781cc559"
+  },
+  "executor_session_id": "codex:01a13375-c35f-7903-9e0f-806077c08d6a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

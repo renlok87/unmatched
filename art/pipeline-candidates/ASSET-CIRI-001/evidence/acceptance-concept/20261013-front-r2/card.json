@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-CIRI-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-CIRI-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ciri-codex/design/ciri-front.png",
+      "sha256": "696d29089a0e688f37b209749dcd6a51718e4fb14f287e56023dde92c0424620"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ciri-codex/design",
+    "files": [
+      "ciri-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ciri-codex/design/checks-report.json",
+    "art/imagegen/concept-ciri-codex/generation-records.json",
+    "art/imagegen/concept-ciri-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ciri-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-ciri-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-ciri-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-ciri-codex/design/checks-report.json#summary.PASS = 13; art/imagegen/concept-ciri-codex/design/checks-report.json#inputs[0].sha256 = 696d29089a0e688f37b209749dcd6a51718e4fb14f287e56023dde92c0424620",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "ciri-front.png: пепельные собранные волосы, белая рубашка, тёмные брюки и меч сохраняют узнаваемость Цири из The Witcher. Замечание r1 о мече закрыто: он в собственной правой руке, слева для зрителя, клинок отделён от корпуса. Однако большая часть собственной левой ноги и весь левый сапог отсутствуют в изображении, заменены ровным фоном; контур второго сапога также разорван. Это якорь S = 0 — недостающие части по concept-sheet.md §11; обе стопы на подставке не показаны.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "ciri-front.png: ткань, кожа, волосы и металл различимы, вид миниатюры сохранён. Но относительно medusa-quality-reference.png фактура рубашки и брюк грубо зернистая, переходы менее контролируемые; на сапогах и подставке большие участки поверхности заменены плоскими пятнами фона. Уровень цельной расписанной коллекционной миниатюры не достигнут. Замечание r1 о качестве кожи не закрыто: зерно появилось, но тонкой фактуры и аккуратных расписанных переходов недостаточно.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "ciri-front.png: белая рубашка, пепельные волосы и тёмная кожаная одежда соответствуют основным цветам palette.json; стальной клинок и меч в правильной руке теперь присутствуют. Узнаваемый шрам на щеке не читается, поэтому один идентификационный якорь потерян и замечание r1 по шраму не закрыто. Ранее отмеченный знак на груди больше не виден.",
+      "frames": [
+        "ciri-front.png"
+      ]
+    }
+  },
+  "score": 4.4,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 возврат обязателен: S = 0 < 1,0 из-за недостающих частей ног; score = 4,4 < 8,0. G-CHECKS PASS не отменяет визуальное вето. Требуются восстановление целой фигуры, улучшение исполнения и читаемый шрам.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Restore both complete legs and boots, especially Ciri's own LEFT leg and boot (viewer's RIGHT), with continuous intact contours and both feet planted on the pedestal, preserving the sword in her own RIGHT hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Replace coarse grain and flat background-colour patches on the shirt, leather trousers, boots and stone pedestal with intact material-specific surfaces, fine sculpted detail and controlled hand-painted highlights matching the QUALITY_REFERENCE finish.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ciri-front.png",
+      "fix": "ciri-front.png: Add a clearly recognizable healed scar on Ciri's own LEFT cheek (viewer's RIGHT), preserving shirt white #E6E4E0, leather dark #2A2420, hair ash #D0D0CC and blade steel #B8BEC4.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "ciri-front.png",
+      "note": "verification.json#design_source.checklist_note заявляет full body after cleanup, однако текущий ciri-front.png не сохраняет большую часть левой ноги и левый сапог. Эта служебная запись не подтверждает визуальную целостность фигуры; дополнительный гейт не вводится."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1350b-dd8c-7470-8f42-a7c7babf8f94"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

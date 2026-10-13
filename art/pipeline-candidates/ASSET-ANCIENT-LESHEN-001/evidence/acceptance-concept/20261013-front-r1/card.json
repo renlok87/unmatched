@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+      "sha256": "00a9fabd67e2126b24aee7ec31ea19161372c2d7e3ab96cdb0939fdf1ee87ef4"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ancient-leshen-codex/design",
+    "files": [
+      "ancient-leshen-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+    "art/imagegen/concept-ancient-leshen-codex/generation-records.json",
+    "art/imagegen/concept-ancient-leshen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-ancient-leshen-codex/design/checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "ancient-leshen-front.png: AncientLeshen узнаваем по оленьему черепу с крупными разветвлёнными рогами, вытянутому корневому телу, длинным когтистым рукам и воронам. Руки отделены от корпуса просветами, локти слегка согнуты; поза соответствует спокойной стойке миниатюры. Тонкие концы рогов, когти и лапки птиц читаются; их следует контролировать на этапах 3–4.",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "ancient-leshen-front.png: фактура коры, переплетение корней, костяной череп и рога дают вид расписанной коллекционной миниатюры, близкий к QUALITY_REFERENCE. Отдельные зоны беднее эталона: у двух плечевых ворон слабо различимы слои оперения и детали клювов.",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    },
+    "P": {
+      "value": 0.5,
+      "rationale": "ancient-leshen-front.png: коричневая кора, костяные череп и рога, чёрные вороны присутствуют; все четыре идентификационных якоря видимы. Основной цвет moss green #4E5A36 визуально не представлен: корневое тело остаётся коричнево-золотистым. Это соответствует якорю «часть основных цветов не та».",
+      "frames": [
+        "ancient-leshen-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "P = 0,5 < 1,0 и score = 6,9 < 8,0: оба условия по concept-sheet.md §11 требуют return_to_stage_1 при PASS G-CHECKS. Цикл r1 не последний.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "ancient-leshen-front.png",
+      "fix": "On the front view, sculpt and paint distinct feather layers and readable beaks on the two shoulder crows to match the QUALITY_REFERENCE craftsmanship.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ancient-leshen-front.png",
+      "fix": "On the front view, restore clearly visible moss-green (#4E5A36) paint on the existing root and bark surfaces while preserving bark brown (#5A4030), bone (#D9CFB8), and crow black (#141414).",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "ancient-leshen-front.png",
+      "note": "checks-report.json#checks[8].result = WARN для view.frame_top: верхний отступ 3,188 % при рекомендации ≥ 4 %. Фигура не обрезана; WARN не меняет статус гейта или маршрут."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349f-819c-7073-acc8-d89ae4af2ee7"
+  },
+  "executor_session_id": "launcher:acceptance-reverse-7795d573f6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Независимая приёмка 1a/r1 по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Происхождение unstability.ai учтено по verification.json#design_source. Требуется CORRECTION палитры и детализации."
+}

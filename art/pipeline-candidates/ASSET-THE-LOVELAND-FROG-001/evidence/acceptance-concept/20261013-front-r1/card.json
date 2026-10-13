@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-THE-LOVELAND-FROG-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-the-loveland-frog-codex/design/the-loveland-frog-front.png",
+      "sha256": "aacb826ed2ceb4e610cee133bd464b3bb8020ba47bb9aed6e004aed86b149311"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-the-loveland-frog-codex/design",
+    "files": [
+      "the-loveland-frog-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-the-loveland-frog-codex/design/checks-report.json",
+    "art/imagegen/concept-the-loveland-frog-codex/generation-records.json",
+    "art/imagegen/concept-the-loveland-frog-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-the-loveland-frog-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На the-loveland-frog-front.png узнаётся LovelandFrog из DESCRIPTION_EN: прямоходящая человекоподобная лягушка с широкой пастью, перепончатой раскрытой кистью и искрящейся палочкой. Руки отделены от корпуса, поза асимметрична, локти согнуты; T- и A-позы нет. Палочка и голубые искры читаются отдельно от головы и плаща. Тонкие лучи искр, пальцы и края плаща отмечены для будущей проверки геометрии на этапах 3–4.",
+      "frames": [
+        "the-loveland-frog-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "the-loveland-frog-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На the-loveland-frog-front.png выдержан уровень расписанной коллекционной миниатюры, сопоставимый с medusa-quality-reference.png: проработаны бугорчатая кожа, складки горла, губы и внутренняя поверхность пасти, перепонки, слои рваного плаща, витая древесина и шнур амулета. Кожа, плащ, древесина и каменная подставка различаются по фактуре и бликам; детали сохраняются внутри силуэта. Более простой костюм соответствует персонажу и не означает недостатка детализации.",
+      "frames": [
+        "the-loveland-frog-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На the-loveland-frog-front.png присутствуют все пять якорей, зелёная кожа, бледное брюхо, тёмно-зелёные участки и голубой акцент искр. palette.json совпадает с PALETTE карточки. Окраска фигуры имеет более оливково-жёлтый тон, чем заданный skin green #4E7A3A; янтарные радужки и коричневая палочка добавляют локальные цвета вне четырёх свотчей. Основная палитра сохранена, но точного соответствия для оценки 2 нет.",
+      "frames": [
+        "the-loveland-frog-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "the-loveland-frog-front.png",
+      "note": "verification.json#limit_reached содержит запрет удерживаемого предмета, противоречащий обязательному sparking wand в DESCRIPTION_EN и ANCHORS_EN. Палочка сохраняет узнаваемость LovelandFrog; этот конфликт чек-листа не является отдельным гейтом и не снижает S."
+    },
+    {
+      "item": "S",
+      "frame": "the-loveland-frog-front.png",
+      "note": "Тонкие лучи искр, пальцы и рваные края плаща потребуют проверки толщины и связности на этапах 3–4. Растровый концепт показывает их читаемость, но не подтверждает пригодность будущей геометрии."
+    },
+    {
+      "item": "P",
+      "frame": "the-loveland-frog-front.png",
+      "note": "Принято небольшое отклонение зелёного в оливковый тон и локальные янтарные и коричневые цвета; все основные цвета и якоря сохранены."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349d-acc6-7a91-bafb-474369bfe6bd"
+  },
+  "executor_session_id": "codex:01a13452-e4af-7062-a25b-63128b00ee83",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

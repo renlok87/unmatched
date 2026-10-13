@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BUFFY-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-buffy-codex/design/buffy-front.png",
+      "sha256": "06041e7bc10895173f035992ce1e3aee7ef80057a08fdfa8d5c4f8dc8e14f8c8"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-buffy-codex/design",
+    "files": [
+      "buffy-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-buffy-codex/design/checks-report.json",
+    "art/imagegen/concept-buffy-codex/generation-records.json",
+    "art/imagegen/concept-buffy-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-buffy-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-buffy-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В buffy-front.png образ Buffy Summers узнаётся по молодому лицу, полусобранным светлым волосам, крестику, кожаной куртке и уверенному положению с колом. Индивидуальные черты лица несколько обобщены, поэтому узнаваемость именно Buffy слабее читаемости костюма. Силуэт ясный: обе руки отделены от корпуса, кол в собственной правой руке слева для зрителя, ноги разделены; поза не T и не A.",
+      "frames": [
+        "buffy-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "buffy-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В buffy-front.png выдержан уровень расписанной коллекционной миниатюры medusa-quality-reference.png: отчётливо проработаны пряди волос, лицо, зерно и складки кожи, швы, молнии, пряжки, шнуровка ботинок, ткань топа и волокна дерева. Детали присутствуют внутри силуэта; кожа, ткань, металл, волосы, дерево и каменная подставка различаются по фактуре и бликам. Более простой современный костюм не означает снижения качества относительно орнаментированного эталона.",
+      "frames": [
+        "buffy-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В buffy-front.png чёрная куртка, золотисто-светлые волосы, приглушённый красный топ и коричневый деревянный кол соответствуют PALETTE и palette.json с учётом освещения. Все три якоря видимы: светлые волосы, кожаная куртка и деревянный кол в собственной правой руке.",
+      "frames": [
+        "buffy-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "buffy-front.png",
+      "note": "Портретная индивидуальность Buffy Summers несколько обобщена; основные признаки персонажа и силуэт сохранены."
+    },
+    {
+      "item": "C",
+      "frame": "buffy-front.png",
+      "note": "Видна верхняя поверхность подставки: строгая горизонтальная ортопроекция не выдержана. Это ограничение для подготовки видов 1c; фиксированное C этапа 1a не изменяется."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json: checks[id=view.frame_top].result = WARN, value = 2.555 при limit >= 4.0 %. Фигура не обрезана; предупреждение не меняет PASS гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13480-1a35-7ff0-b265-c698cf252660"
+  },
+  "executor_session_id": "codex:01a13465-6c8c-7241-9966-9761177e0345",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

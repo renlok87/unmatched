@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANNIE-CHRISTMAS-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-annie-christmas-codex/design/annie-christmas-front.png",
+      "sha256": "1603474c0bd42190d4b95e4b56ea9b20884001571445f1e2b33a2bd2ccbc1580"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-annie-christmas-codex/design",
+    "files": [
+      "annie-christmas-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-annie-christmas-codex/design/checks-report.json",
+    "art/imagegen/concept-annie-christmas-codex/generation-records.json",
+    "art/imagegen/concept-annie-christmas-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-annie-christmas-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 13; summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "annie-christmas-front.png: высокая сильная женщина с ясным силуэтом; вертикальный шест отделён от корпуса и удерживается собственной правой рукой, слева для зрителя. Между руками и корпусом видны просветы, поза естественная и асимметричная, не T- и не A-поза. Платок, подобранная длинная юбка и обе стопы читаются; фигура и подставка целиком в кадре. Тонкие серьги, свободные пальцы и длинный шест требуют проверки геометрии на этапах 3–4.",
+      "frames": [
+        "annie-christmas-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "annie-christmas-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "annie-christmas-front.png: объёмная коллекционная миниатюра, близкая по качеству к medusa-quality-reference.png. Хорошо проработаны лицо, анатомия рук, ткань рубашки, складки юбки, древесные волокна и верёвочные обмотки; материалы различимы. Отдельные мелкие коричневые бусины и перекрестия шнуровки сапог разделены менее чётко, чем мелкие детали эталона.",
+      "frames": [
+        "annie-christmas-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "annie-christmas-front.png: визуально соблюдены river brown #6B4A30, head wrap red #B2342C, shirt cream #E0D6C0 и bead turquoise #3FA7A0 с естественными светотеневыми вариациями. Все четыре якоря присутствуют: вертикальный деревянный шест в собственной правой руке, красный головной платок, длинное многорядное ожерелье и закатанные рукава. Подставка нейтральная, без командной цветной полосы.",
+      "frames": [
+        "annie-christmas-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "annie-christmas-front.png",
+      "note": "Мелкие коричневые бусины и перекрестия шнуровки сапог местами читаются мягче деталей эталона; учтено в Q = 1.5."
+    },
+    {
+      "item": "S",
+      "frame": "annie-christmas-front.png",
+      "note": "На этапах 3–4 проверить толщину и непрерывность длинного шеста, серёг и свободных пальцев, а также контакт правой кисти с шестом. По растровому концепту геометрия не подтверждается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133aa-3131-7bf0-89b5-4e325357b12f"
+  },
+  "executor_session_id": "codex:01a1336a-438a-7bd2-bb05-1fddf78467d5",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

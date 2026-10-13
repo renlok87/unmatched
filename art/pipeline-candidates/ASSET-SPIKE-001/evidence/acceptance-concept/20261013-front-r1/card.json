@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SPIKE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-spike-codex/design/spike-front.png",
+      "sha256": "ffc10fc10ebd927b54a1ed3fb705ea96d7b7adfff199899d313c8933d8675df1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-spike-codex/design",
+    "files": [
+      "spike-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-spike-codex/design/checks-report.json",
+    "art/imagegen/concept-spike-codex/generation-records.json",
+    "art/imagegen/concept-spike-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-spike-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-spike-codex/design/checks-report.json#verdict = PASS; art/imagegen/concept-spike-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-spike-codex/design/checks-report.json#summary.PASS = 12; art/imagegen/concept-spike-codex/design/checks-report.json#summary.WARN = 1.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На spike-front.png узнаётся Spike из Buffy: угловатое лицо с выраженными скулами, прищуром и кривой усмешкой сочетается с зачёсанными платиновыми волосами и характерным длинным кожаным плащом. Силуэт ясен, обе пустые кисти отделены от корпуса, локти слегка согнуты; поза не T и не A. Все части humanoid читаются.",
+      "frames": [
+        "spike-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "spike-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "На spike-front.png качество близко к QUALITY_REFERENCE: читаются скульптурные пряди, лицо, швы и фактура плаща, пуговицы рубашки и шнуровка ботинок; сохраняется вид расписанной коллекционной миниатюры. Отдельные зоны слабее эталона: моделировка пальцев мягче, а фактура и блики джинсов недостаточно отличаются от кожи плаща.",
+      "frames": [
+        "spike-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На spike-front.png присутствуют все четыре якоря и цвета PALETTE: чёрный кожаный плащ, светлые платиновые волосы, чёрная футболка, раскрытая приглушённо-красная рубашка под плащом и тёмные холодные джинсы. Пустые руки соответствуют WEAPON_HAND=none; подставка нейтральная, без командного цвета.",
+      "frames": [
+        "spike-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "spike-front.png",
+      "note": "Учтено в Q=1.5: пальцы менее чётко моделированы, чем у QUALITY_REFERENCE; джинсы местами выглядят кожаными из-за сходных с плащом бликов и складок."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.762% при запрошенных минимум 4%. Волосы не обрезаны; WARN не проваливает гейт."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349a-a366-7581-967d-9eeb37716c53"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

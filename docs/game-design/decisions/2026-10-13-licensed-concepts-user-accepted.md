@@ -37,3 +37,10 @@ Not covered: Black Widow and Philippa (8.1) still go through the second acceptor
 Ancient Leshen passed. Alice remains without a front (all generators refuse); it needs a front supplied by the user.
 
 Local use only: these are fan figures of licensed characters for a local prototype, not for distribution.
+
+## Addendum (same day)
+
+Philippa (8.1, second acceptor pending at the time of the decision) got the Opus xhigh pair result 7.5
+`return_to_stage_1` for the same reasons (finish, palette, arms close to the body). It is the same class of figure,
+so the decision is applied to ASSET-PHILIPPA-001 as well (`user-decision.json`, «extended by Claude»).
+Black Widow's pair passed (8.1).

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PHILIPPA-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-PHILIPPA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-philippa-codex/design/philippa-front.png",
+      "sha256": "cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-philippa-codex/design",
+    "files": [
+      "philippa-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-philippa-codex/design/checks-report.json",
+    "art/imagegen/concept-philippa-codex/generation-records.json",
+    "art/imagegen/concept-philippa-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-philippa-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-philippa-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-philippa-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-philippa-codex/design/checks-report.json#inputs[0].sha256 = cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На philippa-front.png Филиппа Эйльхарт из The Witcher, указанная в asset-card.yaml, узнаётся по коротким тёмным волосам, высокому воротнику чёрно-фиолетового платья, совиной броши и поднятой колдующей ладони. Силуэт ясный, между рукавами и корпусом видны просветы; поднятые пальцы, крылья броши и края рюшей читаются. Стоящая поза с согнутой правой рукой не является T/A-позой.",
+      "frames": [
+        "philippa-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "philippa-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "На philippa-front.png вид расписанной коллекционной миниатюры убедителен: различимы пряди волос, рельеф совиных перьев, многочисленные рюши, складки рукавов и орнамент платья. Исполнение близко к medusa-quality-reference.png, однако большие поля юбки и её орнамент имеют более плоскую роспись и менее тонкую моделировку складок светом. Замечание Q из r1 закрыто частично.",
+      "frames": [
+        "philippa-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На philippa-front.png присутствуют все цвета и якоря asset-card.yaml и palette.json: чёрно-фиолетовое платье с высоким воротником, короткие тёмные волосы, совиная брошь и фиолетовая магия в поднятой правой ладони. Замечание P из r1 о положении магии закрыто. Сохраняется отклонение тона: волосы и чёрные рукава имеют заметные сине-лиловые блики, а магия выглядит светлее и более лавандовой, чем заданный magic violet.",
+      "frames": [
+        "philippa-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "philippa-front.png",
+      "note": "Замечание r1 о ракурсе подставки сохраняется: её верхняя плоскость видна, поэтому подставка показана не строго edge-on. Читаемость фигуры это не нарушает."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Выбранная запись rc1 в generation-records.json содержит sha256 исходной генерации 5dccfb231122dbb3e266835c06c5e088c0bad9288ed4cf1bfee52e8d5e0d59a4, отличающийся от текущего design-front. verification.json#design_source.post описывает выравнивание фона; текущий checks-report.json относится к принятому sha256 cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c. Дополнительного гейта это не создаёт."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1351f-5c8d-7641-80b8-9bf002cf5cf1"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

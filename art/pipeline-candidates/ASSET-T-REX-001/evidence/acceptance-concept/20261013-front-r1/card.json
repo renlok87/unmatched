@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-T-REX-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-t-rex-codex/design/t-rex-front.png",
+      "sha256": "01365a3a6383dec040b46595eb622827f208539481a24606417a92e562279d8d"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-t-rex-codex/design",
+    "files": [
+      "t-rex-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-t-rex-codex/design/checks-report.json",
+    "art/imagegen/concept-t-rex-codex/generation-records.json",
+    "art/imagegen/concept-t-rex-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-t-rex-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-t-rex-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В t-rex-front.png широкая массивная голова, тяжёлые надбровные дуги, раскрытая пасть и короткие передние лапы дают узнаваемый образ Jurassic Park TRex. Голова, ноги и хвост читаются отдельно; T- или A-позы нет. Кисть справа частично сливается с бедром, а симметричная постановка стоп передаёт устойчивую стойку слабее, чем заданный шаг.",
+      "frames": [
+        "t-rex-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "t-rex-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "t-rex-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны чешуя разных размеров, кожные складки, глаза, отдельные зубы, язык и когти. Матовые поверхности кожи и подставки отличаются от зубов, когтей и влажной пасти; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "t-rex-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В t-rex-front.png присутствуют коричневые и серые оттенки кожи, светлое бежевое брюхо и костяной акцент зубов, соответствующие PALETTE. Все четыре якоря видны: огромная голова с раскрытой пастью, маленькие передние лапы, толстый почти горизонтальный хвост и бугристая коричнево-серая кожа.",
+      "frames": [
+        "t-rex-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "t-rex-front.png",
+      "note": "Кисть справа в изображении частично перекрывает бедро; предплечье отделено от торса тёмным просветом."
+    },
+    {
+      "item": "S",
+      "frame": "t-rex-front.png",
+      "note": "Обе стопы стоят почти симметрично; заданная DESCRIPTION_EN шагающая поза выражена слабо."
+    },
+    {
+      "item": "S",
+      "frame": "t-rex-front.png",
+      "note": "verification.json отмечает ширину подставки около 0,71 высоты фигуры вместо целевых 0,55 и небольшой сдвиг подставки влево и вниз. Фигура и хвост полностью помещаются в кадре; G-CHECKS проходит."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13482-9587-7d80-abc3-dc0de2571031"
+  },
+  "executor_session_id": "codex:01a13463-72a8-7221-8ef5-fdb56b0c5dc0",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

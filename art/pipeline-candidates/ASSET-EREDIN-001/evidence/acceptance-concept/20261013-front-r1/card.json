@@ -1,0 +1,107 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-EREDIN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-eredin-codex/design/eredin-front.png",
+      "sha256": "ba8f959f87a540a529308425a5bbb90b62c761fc0b37ac7640447fcdd8dfdf0c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-eredin-codex/design",
+    "files": [
+      "eredin-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-eredin-codex/design/checks-report.json",
+    "art/imagegen/concept-eredin-codex/generation-records.json",
+    "art/imagegen/concept-eredin-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-eredin-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#summary.FAIL = 0. checks-report.json#measurements.front.mask.top_pct = 2.5: view.frame_top WARN при минимуме 4.0%; WARN не является FAIL.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Эредин узнаваем по высокому коронованному череповидному шлему, чёрным шипованным латам и тёмному меховому плащу. Шипы и меч читаются, но руки близко к корпусу, кисть с оружием и часть клинка сливаются с плащом и ногой. Расслабленная готовая поза не является T/A-позой.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "Убедительная коллекционная миниатюра: различимы металл, мех, кожа и ткань, проработаны шлем, шипы и сочленения брони. По сравнению с эталоном качества кисти и мелкий рельеф менее чёткие, отдельные поверхности заметно зернистее. Оценка относится к исполнению деталей, а не к отличиям костюма или палитры.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "P": {
+      "value": 0.5,
+      "rationale": "Чёрная броня, тёмный мех, шипы и череповидный шлем присутствуют. Основной frost blue и акцент eye blue визуально отсутствуют; checks-report.json#palette.swatches фиксирует для обоих figure_share_within_40_pct = 0.0. Меч находится справа для зрителя, то есть в анатомической ЛЕВОЙ руке персонажа, вопреки WEAPON_HAND: right.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "P = 0.5 ниже обязательного минимума 1.0; суммарный балл 6.3 также ниже 8.0. Требуются исправление стороны оружия, восстановление заданных синих цветов и доработка читаемости и деталей.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "eredin-front.png",
+      "fix": "Keep Eredin's relaxed upright ready pose with elbows near his sides, slightly separate both hands from the torso and cloak, and make the sword blade clearly distinct from the leg.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "eredin-front.png",
+      "fix": "Refine articulated glove fingers and existing armour relief, reduce coarse rendering noise, and preserve distinct metal, fur, leather and cloth materials at the quality reference's painted collectible miniature craftsmanship level.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "eredin-front.png",
+      "fix": "Place the longsword in Eredin's anatomical RIGHT hand on the viewer's left, retain black armour and dark fur, and restore visible frost-blue (#8AB0D0) accents and eye-blue (#6AB8E8) eyes.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Верхняя точка шлема находится на 2.5% высоты кадра при целевом минимуме 4.0%; это WARN, обрезания нет."
+    },
+    {
+      "item": "S",
+      "frame": "eredin-front.png",
+      "note": "Видна верхняя поверхность подставки: изображение не соответствует запрошенному в generation-records.json строго ортографическому фронту с подставкой точно с ребра."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134ac-de2e-7982-bf6b-fde07178d7bf"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DAREDEVIL-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-DAREDEVIL-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-daredevil-codex/design/daredevil-front.png",
+      "sha256": "1da54ff06ab1c95d3bf8e0b7b96b74c6763b9465937175b014be85af9010734d"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-daredevil-codex/design",
+    "files": [
+      "daredevil-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-daredevil-codex/design/checks-report.json",
+    "art/imagegen/concept-daredevil-codex/generation-records.json",
+    "art/imagegen/concept-daredevil-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-daredevil-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "В daredevil-front.png огромные боковые рога в дополнение к двум рогам на лбу, чешуйчатая броня, шипастый воротник и наручи формируют образ фэнтезийного демона-воина вместо Marvel Daredevil. Красный костюм, нагрудный знак и две дубинки сохраняют отдельные признаки заявки, но не идентичность персонажа. По якорю «не тот персонаж» S = 0. Замечание r1 по читаемости хвата и ракурсу дубинок закрыто: руки отделены, оба захвата и оружие видны. Стойка не является T- или A-позой.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В daredevil-front.png читается объёмная расписанная миниатюра; кожа, костюм, дерево дубинок и камень подставки различаются. Однако грубая повторяющаяся зернистость костюма преобладает над тонкой отделкой, а лицо, пальцы и сапоги заметно уступают QUALITY_REFERENCE по чёткости скульптуры и контролю материалов. Добавленный рельеф не закрывает замечание r1 по качеству исполнения. Сравнение касается мастерства отделки, а не количества орнамента или сложности костюма.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В daredevil-front.png присутствуют красно-бордовый костюм с рогами, красный двойной D и коричневая дубинка в каждой руке. Прежняя потеря красного акцента устранена, гантелеобразных окончаний оружия больше нет. При сохранённых якорях остаётся отклонение тона: грудь, плечи и эмблема выглядят ярче заданной приглушённой палитры, дерево дубинок светлее тёмно-коричневого #4A3226.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    }
+  },
+  "score": 5.0,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 срабатывает вето S = 0: текущий дизайн подменяет Marvel Daredevil фэнтезийным демоном. Дополнительно сумма S+C+Q+P = 4,0 даёт score = 5,0, ниже порога 8,0. G-CHECKS PASS не отменяет художественного возврата.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "daredevil-front.png",
+      "fix": "Replace the fantasy demon armor with Marvel Daredevil's fitted dark-red superhero costume and close-fitting cowl bearing exactly two small forehead horns, remove the giant side horns and all collar and gauntlet spikes, and preserve the readable two-club grip and relaxed ready stance.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "daredevil-front.png",
+      "fix": "Replace the coarse all-over scale texture with subtle fabric and leather texture, sharpen the sculpting of the exposed face, fingers and boot seams, and distinguish skin, costume, clubs and stone through restrained painted highlights at the quality-reference level.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "daredevil-front.png",
+      "fix": "Match the muted costume red #8E1C22 and dark red #5A1418, retain a clearly legible double-D chest emblem in #C8322A, and paint both billy clubs dark brown #4A3226.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

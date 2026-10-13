@@ -1,0 +1,112 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACK-WIDOW-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+      "sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-black-widow-codex/design",
+    "files": [
+      "black-widow-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+    "art/imagegen/concept-black-widow-codex/generation-records.json",
+    "art/imagegen/concept-black-widow-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-black-widow-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "black-widow-front.png: Чёрная Вдова Marvel узнаваема по сочетанию рыжего каре, чёрного тактического комбинезона, серебряных браслетов и пистолета в собственной правой руке, слева для зрителя. Руки отделены от корпуса, поза не T/A. Пистолет частично сливается с кистью и соседней кобурой; ошибочная эмблема ослабляет точность идентичности.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "black-widow-front.png: коллекционная миниатюра читается, кожа, глянцевый костюм и серебряные браслеты различимы; видны швы, молния и пряди волос. Кисти, конструкция пистолета и фактуры больших поверхностей заметно проще и мягче, чем на medusa-quality-reference.png. Светлая кайма вокруг фигуры и остаток маски слева от подставки ухудшают качество изображения.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "black-widow-front.png: основные цвета и четыре якоря присутствуют — чёрный комбинезон, красные волосы, серебряные браслеты, пистолет в правой руке. Красная пряжка изображает круг с перекрестием вместо однозначных песочных часов Black Widow: один обязательный якорь потерян. Волосы выглядят ярче и светлее заданного #A8321E.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При PASS G-CHECKS сумма S+C+Q+P = 5,0; итог 6,3 ниже порога 8,0. Детализация уступает QUALITY_REFERENCE, обязательная эмблема песочных часов отсутствует.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "black-widow-front.png",
+      "fix": "Move her anatomical right hand slightly farther from the thigh so the single downward-pointing pistol, gripping fingers and adjacent holster have clearly separate silhouettes.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "black-widow-front.png",
+      "fix": "Match the reference's painted collectible miniature finish with crisp finger anatomy, defined pistol components and fine suit surface detail, and remove the pale cutout fringe and mask residue beside the pedestal.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "black-widow-front.png",
+      "fix": "Replace the crossed-circle belt emblem with Black Widow's unmistakable red hourglass formed by two filled triangles meeting at their tips in #C8322A, and deepen the hair's base red toward #A8321E.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "black-widow-front.png",
+      "note": "Верхняя поверхность толстой подставки широко видна; строгая фронтальная ортопроекция с подставкой ребром не соблюдена."
+    },
+    {
+      "item": "Q",
+      "frame": "black-widow-front.png",
+      "note": "На фоне слева от подставки остаётся светлый фрагмент маски; технический PASS проверки границ изображения этот локальный дефект не исключает."
+    },
+    {
+      "item": "P",
+      "frame": "black-widow-front.png",
+      "note": "Красный круг с перекрестием не подтверждает обязательную эмблему песочных часов Black Widow."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134c9-dd7e-7d70-b5b9-0e90303d71bf"
+  },
+  "executor_session_id": "history:ASSET-BLACK-WIDOW-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественно не принято: требуется доработка этапа 1a. Технический гейт пройден; решение вынесено по делегированию."
+}

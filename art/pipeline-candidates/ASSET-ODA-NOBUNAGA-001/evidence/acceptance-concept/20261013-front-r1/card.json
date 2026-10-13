@@ -1,0 +1,101 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ODA-NOBUNAGA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-oda-nobunaga-codex/design/oda-nobunaga-front.png",
+      "sha256": "a85ca37d352b5d15d4fdf9c951933dfe15759d370c7ad690bc48ea6b7ccaeebc"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-oda-nobunaga-codex/design",
+    "files": [
+      "oda-nobunaga-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+    "art/imagegen/concept-oda-nobunaga-codex/generation-records.json",
+    "art/imagegen/concept-oda-nobunaga-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "На oda-nobunaga-front.png персонаж узнаваем, полумесяц и обнажённая катана читаются, анатомия без лишних конечностей, поза не T и не A. Однако на собственном левом бедре отчётливо изображены рукоять и гарда второго меча в ножнах при уже вынутой катане в правой руке. Это лишняя часть вооружения, соответствующая строке S = 0 «лишние или недостающие части»; ограничение extra weapons также зафиксировано в verification.json.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "oda-nobunaga-front.png соответствует уровню medusa-quality-reference.png: расписанная коллекционная миниатюра с различимыми лаком, металлом, тканью, шнурами и камнем. Проработаны лицо, ламеллярные пластины, заклёпки, рельефные эмблемы, узоры ткани и складки плаща; детализация присутствует внутри силуэта.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На oda-nobunaga-front.png присутствуют чёрный лак, красно-оранжевый плащ, золотой орнамент и золотой полумесяц. Все четыре якоря видимы, катана находится в собственной правой руке, ножны — на собственном левом бедре. Плащ воспринимается более приглушённым терракотовым относительно #C2462A, а полумесяц — более охристым и менее жёлтым относительно #E6C04E.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сработало вето S = 0: изображён лишний второй меч в ножнах. Дополнительно score = 6.3 ниже порога 8.0; G-CHECKS остаётся PASS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "oda-nobunaga-front.png",
+      "fix": "Remove the second sword's hilt and guard from the figure's LEFT hip, leaving an empty scabbard while preserving the single drawn katana in his RIGHT hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "oda-nobunaga-front.png",
+      "fix": "Match the cape's base colour to vermilion #C2462A and the crescent crest's gold to #E6C04E while preserving natural material shading.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.21% при рекомендации 4%; ничего не обрезано. WARN не меняет статус гейта или фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "oda-nobunaga-front.png",
+      "note": "Тонкий клинок и концы полумесяца читаются на концепте; толщину и устойчивость этих элементов следует проверить на этапах 3–4."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13397-48bb-76a2-bde8-c0f9dcafcef2"
+  },
+  "executor_session_id": "codex:01a13370-4b40-76b0-ba4f-a5c4c73d6efa",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Возвращено на этап 1a по делегированию: убрать лишний второй меч и уточнить тона палитры."
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SHE-HULK-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-she-hulk-codex/design/she-hulk-front.png",
+      "sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-she-hulk-codex/design",
+    "files": [
+      "she-hulk-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+    "art/imagegen/concept-she-hulk-codex/generation-records.json",
+    "art/imagegen/concept-she-hulk-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-she-hulk-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "she-hulk-front.png: узнаётся именно Marvel She-Hulk благодаря мощному женскому телосложению, зелёной коже, длинным тёмно-зелёным волосам и характерному фиолетово-белому костюму. Руки отделены от корпуса, оружия нет, поза естественная, не T/A. Однако строгая фронтальная ортопроекция не соблюдена: хорошо видна верхняя поверхность постамента и присутствует ракурс сверху.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "she-hulk-front.png: объёмная коллекционная фигурка читается, волосы и каменная поверхность имеют детали. По сравнению с medusa-quality-reference.png детализация явно ниже: кожа и костюм имеют близкий пластиковый блеск, кисти и пальцы упрощены, на голенищах белых сапог видны неровные тёмные участки. Не хватает тонкой проработки поверхности и убедительного разделения материалов эталона.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "she-hulk-front.png: все четыре цвета и все якоря присутствуют; постамент нейтральный, цветной командной полосы нет. Есть отклонение тона от PALETTE: кожа выглядит более яркой и желтовато-зелёной, волосы уходят в холодный зелёно-бирюзовый относительно #1F4A2A.",
+      "frames": [
+        "she-hulk-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При G-CHECKS PASS сумма S+C+Q+P = 5.5; итоговый score = 6.9 ниже обязательного порога 8.0. Требуются исправление ракурса, повышение качества деталей и уточнение палитры.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "she-hulk-front.png",
+      "fix": "Use a level, strictly frontal orthographic view with the pedestal edge-on and no top surface visible, keeping the relaxed arms separated from the torso and at least 4% clear space above the hair.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "she-hulk-front.png",
+      "fix": "Match the Medusa reference's painted collectible finish with clearly articulated fingers, clean continuous boot shafts, fine suit seams, and distinct satin skin, fabric, and boot materials.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "she-hulk-front.png",
+      "fix": "Match the painted midtones to skin #4E9A44, suit purple #5B2A7E, suit white #E6E4E0, and dark green hair #1F4A2A, removing the yellow-green skin and teal hair shifts.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.375% при рекомендации >= 4.0%. WARN не меняет PASS гейта и фиксированное C."
+    },
+    {
+      "item": "S",
+      "frame": "she-hulk-front.png",
+      "note": "Формат исходного PNG 1280×1600, то есть 4:5; verification.json фиксирует отклонение от CORE 3:4. Фигура и постамент полностью видимы."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134bd-55e6-79e2-a8f0-cade134301a5"
+  },
+  "executor_session_id": "history:ASSET-SHE-HULK-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Возврат на этап 1a по делегированию; оба изображения просмотрены в исходном разрешении. Пункты checklist с assessment=not_verified не считались доказанными визуальными дефектами."
+}

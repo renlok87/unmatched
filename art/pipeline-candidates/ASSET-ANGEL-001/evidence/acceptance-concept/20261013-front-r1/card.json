@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-angel-codex/design/angel-front.png",
+      "sha256": "8a62d7c2ddcf88b5958829f1c17f2f0b566f541b4289f2a2f8ab7f3711c05752"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-angel-codex/design",
+    "files": [
+      "angel-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-angel-codex/design/checks-report.json",
+    "art/imagegen/concept-angel-codex/generation-records.json",
+    "art/imagegen/concept-angel-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-angel-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#checks[11].id = view.single_component; checks-report.json#checks[11].result = WARN. WARN не является провалом гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "angel-front.png: Angel узнаётся по сочетанию тяжёлого нахмуренного взгляда, выраженных надбровий, короткой колючей тёмной причёски и характерного длинного кожаного пальто. Однако заострённые скулы и идеализированный портрет несколько ослабляют узнаваемость именно персонажа. Силуэт ясный, обе руки отделены от корпуса, меч полностью читается в собственной правой руке; поза не T и не A.",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "angel-front.png: качество близко к medusa-quality-reference.png — различимы кожа пальто, ткань рубашки, кожа лица и сталь; проработаны швы, пуговицы, складки, волосы, пальцы и детали меча. Локально беднее подставка: она читается одним простым диском без отчётливого второго низкого яруса, что также отмечено в verification.json.",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "angel-front.png: визуально соблюдены чёрное пальто, тёмно-серая рубашка, бледная кожа и стальной акцент клинка из карточки и palette.json. Все четыре якоря присутствуют: широкий меч в собственной правой руке, длинное чёрное кожаное пальто, колючие тёмные волосы и тёмная рубашка. Командных цветов и цветного кольца на подставке нет.",
+      "frames": [
+        "angel-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "angel-front.png",
+      "note": "Портрет несколько обобщён и идеализирован; узнаваемость Angel в лице слабее, чем в общем образе. Учтено в S."
+    },
+    {
+      "item": "Q",
+      "frame": "angel-front.png",
+      "note": "Подставка читается одним диском: требование CORE.PEDESTAL.two_low_stacked_discs не выполнено отчётливо. verification.json фиксирует исчерпание двух генераций; локальное упрощение учтено в Q."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.single_component = WARN: крупнейший дополнительный компонент маски составляет 1.361% кадра. На angel-front.png лишнего отдельного предмета или второй фигуры не видно."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13496-0806-7993-a4a4-3e8fdff24392"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

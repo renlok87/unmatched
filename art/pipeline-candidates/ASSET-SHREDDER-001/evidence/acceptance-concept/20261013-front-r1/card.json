@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SHREDDER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-shredder-codex/design/shredder-front.png",
+      "sha256": "3c3f6fb5561da265fada4d99bcbc634af81d41de4ddb08540ff2d86506bebae1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-shredder-codex/design",
+    "files": [
+      "shredder-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-shredder-codex/design/checks-report.json",
+    "art/imagegen/concept-shredder-codex/generation-records.json",
+    "art/imagegen/concept-shredder-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-shredder-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL=0; checks-report.json#verdict=PASS; checks-report.json#summary.WARN=2",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Шреддер из TMNT уверенно узнаётся по рогатому шлему с металлической маской, лезвийным наручам и наплечникам поверх фиолетового одеяния. Обе руки отделены от корпуса, кисти пустые, локти слегка согнуты: естественная стойка, не T- или A-поза. Контуры лезвий, шлема и длинного плаща читаются; фигура и подставка полностью в кадре.",
+      "frames": [
+        "shredder-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "shredder-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png: различимы фактура и складки ткани, обработанные кромки и потёртости стали, заклёпки, сочленения перчаток и анатомия открытых рук. Детали внутри силуэта резкие, материалы убедительно разделены; более простой декор соответствует костюму Шреддера.",
+      "frames": [
+        "shredder-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Палитра соблюдена: серебристая сталь, тёмно-фиолетовое одеяние, бордовый плащ и небольшой красный акцент глаз. Все четыре якоря asset-card.yaml видимы: лезвийные наручи на обоих предплечьях, рогатый шлем с маской, фиолетовое одеяние и длинный плащ. Подставка нейтральная, без командного цветового кольца.",
+      "frames": [
+        "shredder-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "shredder-front.png",
+      "note": "view.frame_top WARN: верхний отступ 2.21% при целевых 4%. Запас над центральным лезвием шлема небольшой, но оно полностью видно; читаемость сохранена."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.single_component WARN: дополнительная компонента сегментации 1.71% при пороге 0.5%. На изображении видны одна цельная фигура и одна двухъярусная подставка; отдельного лишнего объекта или оторванной части не обнаружено."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13493-8de8-7823-a110-7f5190c83a51"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

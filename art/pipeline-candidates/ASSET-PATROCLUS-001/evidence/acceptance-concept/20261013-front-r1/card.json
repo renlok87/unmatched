@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-patroclus-codex/design/patroclus-front.png",
+      "sha256": "d92f10fa66fc9d0726b79e2981b9db5fd42a66ff2aa6aca8ad1125e538fce8ee"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-patroclus-codex/design",
+    "files": [
+      "patroclus-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-patroclus-codex/design/checks-report.json",
+    "art/imagegen/concept-patroclus-codex/generation-records.json",
+    "art/imagegen/concept-patroclus-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-patroclus-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "patroclus-front.png: шлем с белым плюмажем, короткий меч и щит читаются; фигура полностью в кадре, анатомия без лишних частей, стойка с оружием не T- и не A-поза. Руки близко к корпусу; левое предплечье частично закрыто щитом, его контур тесно соседствует с плащом. Меч и плюмаж различимы; их толщину следует проверить на этапах 3–4.",
+      "frames": [
+        "patroclus-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "patroclus-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "patroclus-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Различимы фактура льна, складки синего плаща, кожа ремней, металлические кромки и патина; рельефы, заклёпки, бахрома и отдельные пряди плюмажа подробно проработаны внутри силуэта.",
+      "frames": [
+        "patroclus-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "patroclus-front.png: визуально выдержаны льняной #D9CBA6, эгейский синий #2F5B85, бронзовый #A9773A и белый плюмаж #EDEBE4 с естественными светотеневыми вариациями. Все якоря присутствуют: короткий меч в собственной правой руке персонажа, небольшой круглый щит на левой руке, синий плащ. Сторона оружия верна.",
+      "frames": [
+        "patroclus-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "patroclus-front.png",
+      "note": "За стопами видна узкая полоска верхней плоскости подставки: строгая фронтальная ортопроекция не достигнута. Это подтверждено verification.json#limit_reached; лицо и корпус фронтальны, читаемость фигуры сохранена."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 3.384 % при целевом минимуме 4 %. Плюмаж не обрезан; summary.FAIL = 0, статус гейта остаётся PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337d-b4af-7901-9403-05aca7ec3350"
+  },
+  "executor_session_id": "codex:01a1333a-564d-71a1-8bf9-1d7002be3fe1",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

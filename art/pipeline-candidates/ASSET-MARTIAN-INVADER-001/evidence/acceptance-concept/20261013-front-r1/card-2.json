@@ -1,0 +1,105 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MARTIAN-INVADER-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-martian-invader-codex/design/martian-invader-front.png",
+      "sha256": "ce294daef7cd5adeb4299b898b867c6c1ba983dbfb9e512544af6f9a1fd3ae67"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-martian-invader-codex/design",
+    "files": [
+      "martian-invader-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+    "art/imagegen/concept-martian-invader-codex/generation-records.json",
+    "art/imagegen/concept-martian-invader-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 11 / WARN 2 / FAIL 0, verdict PASS (sha256 входа ce294dae... совпадает). WARN view.frame_top (верх купола 2.762 % < 4 %) и WARN view.single_component (сегментация прозрачного купола) — не гейт."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "martian-invader-front.png: силуэт ясный — стеклянный купол, большой мозг, плечевые плавники и лучевой пистолет отделены от корпуса; пистолет в собственной ПРАВОЙ руке (слева для зрителя), обе руки с видимым зазором, не T и не A, обе ступни на подставке, персонаж Hero MartianInvader узнаётся сразу. Не 2: поза не по §4.4 — правый локоть согнут сильно, пистолет поднят к уровню головы вместо нейтральной стойки с «elbows slightly bent» (это же отклонение исполнитель записал в verification.json limitations). Для этапов 3–4: прозрачный купол (он же даёт WARN view.single_component в checks-report.json), тонкие лопасти плавников, когти левой кисти и ствол пистолета требуют толщины в геометрии.",
+      "frames": [
+        "martian-invader-front.png",
+        "checks-report.json"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "martian-invader-front.png против medusa-quality-reference.png: подача коллекционной расписанной миниатюры, материалы различимы (матовый металл скафандра, стекло купола, мозг, зелёная кожа, крашеные плавники с кантом, камень подставки); мозг, лицо-череп, воротник с решёткой, грудная решётка, пояс с заклёпками и пистолет с катушками проработаны на уровне эталона. Не 2: рукава, бёдра, голени и сапоги — гладкие панели только со швами и кольцами, плотность деталей внутри силуэта заметно ниже орнамента эталона.",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "martian-invader-front.png: все 4 цвета PALETTE и все 4 якоря на месте (ray gun в правой руке, стеклянный купол, открытый мозг, серебряный скафандр с плавниками). Серебро (освещённые зоны ≈#B4B9BB против #B8BEC4) и акцент циан (≈#5DCBD1 против #4AD9E0) совпадают. Отклонение тона: плавники тёмно-кирпичные (самые насыщенные пиксели ≈#94312A/#8B2C2B против fin red #B3202A), кожа уходит в оливково-жёлтый (≈#94A661, тон сдвинут ~19° против skin green #7AA65A). Замер — перцентили пикселей зон кадра.",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "score 7.5 < 8.0: S 1.5 + C 1.5 (фиксировано 1a) + Q 1.5 + P 1.5 = 6.0 / 8 × 10; правило §11 «score < 8.0 → return_to_stage_1». G-CHECKS PASS, вето нет.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "martian-invader-front.png",
+      "fix": "Neutral standing rest pose: lower the ray-gun arm so the right elbow is only slightly bent and the ray gun is held at hip height pointing forward-down beside the body with a clear gap to the torso; keep the left arm slightly away from the body.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "martian-invader-front.png",
+      "fix": "Raise surface detail on the plain suit zones to the Medusa reference level: add sculpted panel trims, rivet rows, ribbed seams and engraved retro-sci-fi ornament on the sleeves, thighs, shins and boots, painted like a collectible miniature.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "martian-invader-front.png",
+      "fix": "Paint all fins in fin red #B3202A (brighter crimson, not dark brick) and the head and hands in skin green #7AA65A (less olive-yellow), keeping suit silver #B8BEC4 and ray cyan #4AD9E0 unchanged.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "martian-invader-front.png",
+      "note": "Для этапов 3–4: прозрачный стеклянный купол над мозгом, тонкие лопасти плавников, когти левой кисти и ствол пистолета — риск обрыва/потери толщины в Tripo и Blender; проверить геометрию."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верх купола на 2.762 % при рамке ядра 1a ≥ 4 %; WARN view.single_component: прочие компоненты 2.664 % и 0.842 % (сегментация прозрачного купола). Не гейт, кадр не обрезан."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-MARTIAN-INVADER-001-r1"
+  },
+  "executor_session_id": "codex:01a13453-bbb0-7283-bddd-5de3df85113a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Второй независимый приёмщик (Opus xhigh, §8.5): художественно не принято, 7.5 < 8.0 — возврат на этап 1a (Codex 1a) с исправлением позы, детализации скафандра и тона плавников/кожи; решение по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)."
+}

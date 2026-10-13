@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SUN-WUKONG-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sun-wukong-codex/design/sun-wukong-front.png",
+      "sha256": "6844d6986110b9624095e261de2498f355f59c754445dfcda8e556b99a1ae729"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sun-wukong-codex/design",
+    "files": [
+      "sun-wukong-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sun-wukong-codex/design/checks-report.json",
+    "art/imagegen/concept-sun-wukong-codex/generation-records.json",
+    "art/imagegen/concept-sun-wukong-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sun-wukong-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В sun-wukong-front.png ясный силуэт обезьяньего воина: обе руки отделены от корпуса просветами, локти согнуты, стойка нейтральная, без T- или A-позы. Посох в собственной правой руке, слева для зрителя, отделён от тела; обруч и изогнутый хвост хорошо читаются. Тонкие концы лент и кисточки различимы; фигура и основание полностью в кадре.",
+      "frames": [
+        "sun-wukong-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "sun-wukong-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sun-wukong-front.png соответствует уровню эталона Медузы: расписанная коллекционная миниатюра с чётким лицом, скульптурными прядями шерсти, рельефными драконами и масками, отдельными пластинами доспеха, вышивкой облаков и глубокими складками. Металл, ткань, кожа и шерсть различаются; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "sun-wukong-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В sun-wukong-front.png присутствуют золотистая шерсть, красный и золотой доспех, синие брюки с облаками и все четыре якоря, включая правильную сторону посоха. Синий акцент заметно темнее и приглушённее заданного #5A8FC8; это отклонение тона при сохранении палитры и идентичности.",
+      "frames": [
+        "sun-wukong-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "sun-wukong-front.png",
+      "note": "Синий тон брюк темнее и менее насыщен, чем cloud blue #5A8FC8 из PALETTE; акцент остаётся отчётливо видимым."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133a6-95e8-7de0-b73d-1a4e07758eab"
+  },
+  "executor_session_id": "codex:01a1337a-7ff6-72b3-b204-9d322c1b69b9",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,104 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WAYWARD-SISTER-3-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-3-codex/design/wayward-sister-3-front.png",
+      "sha256": "3d7db902b711c0046d7172d62fad75805930c8cd09c102cf63c5f03caa986bc1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wayward-sister-3-codex/design",
+    "files": [
+      "wayward-sister-3-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wayward-sister-3-codex/design/checks-report.json",
+    "art/imagegen/concept-wayward-sister-3-codex/generation-records.json",
+    "art/imagegen/concept-wayward-sister-3-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wayward-sister-3-codex/design/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 11 / WARN 2 / FAIL 0, verdict PASS, sha256 входа совпадает с accepted_object. WARN (не гейт): view.frame_top 3.522 % < 4.0 % (верх колпака выше рамки ядра 1a); view.single_component — прочий компонент 1.99 % > 0.5 %."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "wayward-sister-3-front.png: одна фигура на подставке, поза не T и не A — обе руки согнуты и держат котелок у живота, как требует DESCRIPTION. Остроконечный капюшон с загнутым кончиком — самый сильный элемент силуэта; котелок и зелёный дым читаются контрастом тона и цвета, но лежат внутри контура корпуса (по замыслу: котелок прижат к животу). Широкие рукава плаща сливаются с массой плаща, просвета фона между руками и корпусом нет — это уровень 1,5 «руки близко к корпусу, мелкие слияния», а не слитый главный признак. Мелкие замечания: камера чуть выше уровня (видна узкая полоса верха верхнего яруса подставки); фигура читается коренастой за счёт ширины плаща, но не низкой (около 7,5 голов). Тонкие части для этапов 3–4: косы, рваные подолы с дырами, кончик капюшона, кисть верёвочного пояса, подвеска-полумесяц, струи дыма (дым — VFX, не геометрия).",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wayward-sister-3-front.png против medusa-quality-reference.png: тот же уровень расписанной коллекционной миниатюры. Детали внутри силуэта: морщинистое лицо с проработанной мимикой, седые косы, заплаты из мешковины с видимым плетением и крупными стежками, рваные края и дыры плаща, кованый котелок с кольцом и ножками, верёвочный пояс с узлами и кистью, мешочек, подвеска-полумесяц, обмотанные кожаные сапоги. Материалы ясно различимы (шерсть, мешковина, железо, верёвка, кожа, кожа лица, волосы, полупрозрачный дым). Нижняя часть подола темнее и беднее контрастом, чем лицо и грудь, но складки и рваные края там есть; эталон в этом месте тоже тёмный.",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "wayward-sister-3-front.png: все четыре якоря на месте — небольшой котелок в обеих руках, остроконечный капюшон, тёмный плащ с заплатами, зелёный дым. Все цвета PALETTE присутствуют, но с отклонением тона (замер средних по участкам): плащ тёплый угольно-коричневый ~#36302E против нейтрального почти чёрного #252225; заплаты ~#4C392E–#644D3F около #5C4632 (совпадают); железо ~#585454, нейтрально-тёплое против холодного #5C6064; дым светлее и менее насыщен (яркая четверть ~#8BB273) против #6FCF6A. Командного цвета и цветного кольца на подставке нет; свотчей на 1a нет (checks-report.json palette.path = null).",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Просвета фона между руками и корпусом нет: широкие рукава сливаются с массой плаща, котелок лежит внутри контура корпуса. На 1c вид сбоку должен показать, что котелок выступает вперёд, а предплечья отделены от живота."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Камера чуть выше уровня: видна узкая полоса верха верхнего яруса подставки (пункт verification limit_reached). На 1c держать строгую ортопроекцию."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Фигура коренастая по ширине, но не низкая (около 7,5 голов при росте до кончика капюшона); короткие пропорции «short stout» задать на 1c или масштабом помощника на этапе 3."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Тонкие части для этапов 3–4: косы, рваные подолы с дырами, кончик капюшона, кисть верёвочного пояса, подвеска-полумесяц; струи зелёного дыма — VFX или полупрозрачная карта, не цельная геометрия."
+    },
+    {
+      "item": "P",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Отклонение тона: плащ тёплый ~#36302E против #252225, железо ~#585454 против холодного #5C6064, дым ~#8BB273 бледнее #6FCF6A. Сверить со свотчами листа на 1c."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN, не FAIL: view.frame_top 3.522 % < 4.0 %; view.single_component — прочий компонент 1.99 % > 0.5 %."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-WAYWARD-SISTER-3-001-r1"
+  },
+  "executor_session_id": "codex:01a1334d-667d-7682-b86b-7fbbbda4992a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

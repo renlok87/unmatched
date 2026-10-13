@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WILLOW-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-willow-codex/design/willow-front.png",
+      "sha256": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-willow-codex/design",
+    "files": [
+      "willow-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-willow-codex/design/checks-report.json",
+    "art/imagegen/concept-willow-codex/generation-records.json",
+    "art/imagegen/concept-willow-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-willow-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-willow-codex/design/checks-report.json#verdict = PASS; art/imagegen/concept-willow-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-willow-codex/design/checks-report.json#summary.PASS = 11; art/imagegen/concept-willow-codex/design/checks-report.json#summary.WARN = 2",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "willow-front.png: силуэт ясен, руки отделены от корпуса, поза не T/A, все четыре костюмных якоря видны. Однако Willow Rosenberg не узнаётся: идеализированное типовое лицо и богато орнаментированный каскадный фэнтезийный наряд читаются как безымянная волшебница. Совпадение волос, кардигана, юбки и заклинания не обеспечивает идентичность заданного персонажа; применяется якорь §11 «не тот персонаж».",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "willow-front.png: уровень расписанной коллекционной миниатюры соответствует QUALITY_REFERENCE. Внутри силуэта читаются вязка кардигана, вышивка и складки юбки, пряди волос, кисти, шнуры и кисточки; ткань, кожа обуви, украшения и каменная подставка различимы.",
+      "frames": [
+        "willow-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "willow-front.png: все четыре якоря и основные цветовые семейства присутствуют, бледно-голубой акцент заклинания читается. Есть отклонение тона от PALETTE: волосы медно-оранжевые вместо более глубокого красного #A8321E, кардиган оливковый относительно #5E8A4A, юбка приглушённо-сливовая относительно фиолетового #6A4A8A.",
+      "frames": [
+        "willow-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "concept-sheet.md §11: S = 0 означает отсутствие узнаваемости заданного персонажа и срабатывание вето измерения < 1; дополнительно score = 6.3 < 8.0. При PASS единственного гейта на r1 требуется возврат к этапу 1a.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "willow-front.png",
+      "fix": "Make the figure recognisably Willow Rosenberg from Buffy the Vampire Slayer through her distinctive youthful facial features and contemporary bohemian cardigan-and-skirt styling, replacing the ornate fantasy-robe appearance while preserving all four identity anchors and the separated casting pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "willow-front.png",
+      "fix": "Match the palette with deeper red hair (#A8321E), a greener cardigan (#5E8A4A), a more violet skirt (#6A4A8A), and pale-blue spell highlights (#B8E0FF), retaining natural material shading.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Допустимые WARN: view.frame_top = 3.315% при ориентире >= 4%; view.single_component сообщает дополнительную компоненту маски 1.907%. Фигура, заклинание и подставка целиком видны; WARN не превращаются в FAIL."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349e-122c-7e02-87d1-9109faa74ddc"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

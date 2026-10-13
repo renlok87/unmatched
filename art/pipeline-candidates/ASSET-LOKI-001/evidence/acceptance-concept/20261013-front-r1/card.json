@@ -1,0 +1,108 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LOKI-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-loki-codex/design/loki-front.png",
+      "sha256": "447e271ac41c1c636c9f37ce363e1e0612736f40bc7f7a6e80fda48c9778741e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-loki-codex/design",
+    "files": [
+      "loki-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-loki-codex/design/checks-report.json",
+    "art/imagegen/concept-loki-codex/generation-records.json",
+    "art/imagegen/concept-loki-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-loki-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-loki-codex/design/checks-report.json#summary.FAIL = 0; summary.PASS = 13; summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В loki-front.png узнаётся Loki из KEY и DESCRIPTION_EN: стройная фигура, вытянутые золотые рога, зачёсанные тёмные волосы, зелёно-золотые одежды, улыбка, изогнутый кинжал в анатомически правой руке. Рога и клинок читаются отдельно; лишних частей тела нет, поза не T и не A. Руки близко к корпусу, предплечья недостаточно отделены от силуэта плаща, правая кисть частично закрывает гарду.",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В loki-front.png различимы металл, ткань, волосы и каменная подставка; образ читается как расписанная миниатюра. При просмотре 1:1 детализация явно ниже medusa-quality-reference.png: большие поверхности одежды, нагрудника и наручей упрощены, складки и орнамент значительно беднее, лицо с крупной равномерной улыбкой менее тонко моделировано. Это отставание затрагивает большую часть фигуры, а не отдельную зону.",
+      "frames": [
+        "loki-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В loki-front.png присутствуют зелёные одежды, золото, тёмные волосы и отдельный зелёный акцент магии; видимые якоря на месте, кинжал находится в правой руке персонажа, слева для зрителя. Есть отклонения тона: волосы коричневатые относительно #1E1C1E, магические завитки приглушённые оливково-зелёные вместо яркого #6FE07A. checks-report.json дополнительно фиксирует нулевую долю пикселей в допуске 40 для magic green; это замечание к палитре, не FAIL гейта.",
+      "frames": [
+        "loki-front.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, все измерения не ниже 1,0, но сумма S+C+Q+P = 5,5 даёт score 6,9 после округления half-up, что ниже обязательного порога 8,0. Основное отставание — детализация относительно эталона; также требуется улучшить отделение рук и соответствие палитре.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "loki-front.png",
+      "fix": "Keep Loki in a relaxed standing ready pose with slightly bent elbows and clear background gaps between both forearms and the robe, preserving the readable curved dagger in his anatomical RIGHT hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "loki-front.png",
+      "fix": "Match the Medusa reference's painted collectible miniature quality with sharper facial and hair sculpting, richer layered robe folds, subtle fabric texture and crisp Norse relief engraving on the gold armor.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "loki-front.png",
+      "fix": "Use base colors #2F5A3A for the robe, #C9A24A for gold and #1E1C1E for hair, and restore a clearly distinct #6FE07A green magic accent instead of the muted olive wisps.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "verification.json относится к раннему неудачному вызову image_gen: status = blocked, selected_generation = null, утверждается отсутствие loki-front.png. Это противоречит предъявленному изображению и более позднему checks-report.json. Расхождение служебных записей не меняет G-CHECKS PASS, определяемый строго summary.FAIL = 0."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "В generation-records.json выбран u2 с sha256 16fde4df6240d3f5110c6bef221a0e91e45f7749cc601a7c77a6540e19f636d2, а checks-report.json указывает для design/loki-front.png sha256 447e271ac41c1c636c9f37ce363e1e0612736f40bc7f7a6e80fda48c9778741e. Причина различия и переход от выбранной генерации к предъявленному файлу в прочитанных записях не описаны; это замечание к происхождению файла, не дополнительный гейт."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13481-b6e1-7430-bc36-5dfc9390e72e"
+  },
+  "executor_session_id": "codex:unstability.ai download (Downloads",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Этап 1a, r1: по делегированию возвращён на этап 1 для художественной корректировки дизайна-front; остальные этапы отложены."
+}

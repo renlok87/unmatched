@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WINTER-SOLDIER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png",
+      "sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-winter-soldier-codex/design",
+    "files": [
+      "winter-soldier-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+    "art/imagegen/concept-winter-soldier-codex/generation-records.json",
+    "art/imagegen/concept-winter-soldier-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "winter-soldier-front.png: узнаётся именно Winter Soldier — длинные тёмные волосы, нижняя маска, тактическая экипировка, серебряная рука с красной звездой и винтовка. Однако кисти и центральная часть оружия сливаются с торсом, предплечья перекрывают корпус без ясных зазоров. Поза не T и не A, но требуемого отделения рук нет; видимый верх подставки также нарушает строгую фронтальную ортопроекцию.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "winter-soldier-front.png: убедительная коллекционная миниатюра; различимы металл, ткань, ремни и перчатки, проработаны винтовка, застёжки и складки. По сравнению с medusa-quality-reference.png отдельные зоны беднее: серебряная рука выглядит преимущественно как простые накладки с зернистой поверхностью, кисти и пряди волос имеют менее тонкую скульптурную проработку.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "winter-soldier-front.png: основные чёрный, серебряный и серый цвета и красный акцент соответствуют палитре; маска, ремни и винтовка присутствуют. Критический якорь металлической ЛЕВОЙ руки нарушен: серебряная рука со звездой находится слева для зрителя, то есть анатомически справа у фигуры. Правая кисть у спусковой зоны винтовки читается, но это ошибочно металлическая рука. На противоположном рукаве есть белые буквы и эмблема, на подставке — посторонняя белая отметка.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сумма S+C+Q+P = 5,0; итог ROUND_HALF_UP(5,0/8×10, 1) = 6,3, ниже порога 8,0. Технический G-CHECKS PASS не устраняет неверную сторону металлической руки и слияние оружия и кистей с торсом.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "winter-soldier-front.png",
+      "fix": "Use a level strict front orthographic camera with the pedestal edge-on and no visible top, and separate both bent arms and the right-hand rifle from the torso with clear negative space while avoiding T- or A-pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "winter-soldier-front.png",
+      "fix": "Refine the cybernetic arm with crisp articulated metal plates and joints, sharpen finger anatomy and hair strands, and match the quality reference's painted collectible finish and internal sculpt clarity.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "winter-soldier-front.png",
+      "fix": "Place the silver metal arm and red shoulder star on the figure's LEFT side (viewer RIGHT), keep the rifle's firing grip in the figure's RIGHT hand (viewer LEFT), and remove sleeve lettering, unrelated emblems and the white pedestal marking.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2,875% при рекомендации ≥4%. Это предупреждение не меняет PASS гейта и фиксированное C = 1,5."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134cc-8182-70b0-a784-052a84b96119"
+  },
+  "executor_session_id": "history:ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественно не принято по рубрике 1a. Обе картинки просмотрены в исходном разрешении. Генерации и изменения PNG запрещены; rework_fix_list фиксирует необходимые исправления без их выполнения."
+}

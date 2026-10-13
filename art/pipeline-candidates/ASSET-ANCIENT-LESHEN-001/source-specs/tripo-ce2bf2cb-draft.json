@@ -1,0 +1,87 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-ce2bf2cb-draft",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "service": "tripo-studio",
+  "task_id": "ce2bf2cb-d276-41f6-ac6a-234a40fc5015",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/ce2bf2cb-d276-41f6-ac6a-234a40fc5015",
+  "date": "2026-10-13",
+  "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "single-image",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+        "sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4"
+      },
+      "left": null,
+      "right": null,
+      "back": null
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-ancient-leshen-codex/prompts.md",
+    "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+    "settings": {
+      "output": "Геометрия и текстура (по умолчанию формы)",
+      "generate_parts": false,
+      "parts_mode": null,
+      "ultra_mesh_quality": null,
+      "polygon_count": null,
+      "texture_8k": false,
+      "remove_lighting": null,
+      "pbr": false,
+      "privacy": true,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 21510.0,
+        "balance_after": 21480.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "draft-glb",
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/source/ancient-leshen-draft-tripo-ce2bf2cb.glb",
+      "expected_sha256": "48c3926e5ef75584b15d6f27f974ba38c9e14bffebe33368ce54cf51a23a9e7c",
+      "expected_bytes": 47291932,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+  "expectations": {
+    "draft-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1970464,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

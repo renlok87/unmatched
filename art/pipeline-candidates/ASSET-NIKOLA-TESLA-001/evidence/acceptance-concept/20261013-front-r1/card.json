@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-NIKOLA-TESLA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-nikola-tesla-codex/design/nikola-tesla-front.png",
+      "sha256": "6e89b012941b745718871b2d8eb03830d2b80f52532f18bdaf5197aabf15c956"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-nikola-tesla-codex/design",
+    "files": [
+      "nikola-tesla-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-nikola-tesla-codex/design/checks-report.json",
+    "art/imagegen/concept-nikola-tesla-codex/generation-records.json",
+    "art/imagegen/concept-nikola-tesla-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-nikola-tesla-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "nikola-tesla-front.png: ясный силуэт высокого стройного мужчины; обе руки отделены от торса, локти согнуты, поза не T и не A. Катушка в собственной правой руке, слева для зрителя, и голубые дуги отчётливо отделены от головы и корпуса. Длинное пальто, ноги и обувь читаются; фигура и подставка целиком в кадре. Тонкие ветви разрядов, цепочка и элементы катушки различимы; их геометрия требует отдельной проверки на этапах 3–4.",
+      "frames": [
+        "nikola-tesla-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "nikola-tesla-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "nikola-tesla-front.png при сравнении 1:1 с medusa-quality-reference.png близок к уровню расписанной коллекционной миниатюры: проработаны лицо, пряди волос, обмотка катушки, пуговицы, цепочка, швы и обувь; ткань, кожа и медь различимы. Нижние полы пальто и брюки беднее эталона по чёткости мелких деталей: преобладают крупные складки и повторяющаяся фактура поверхности.",
+      "frames": [
+        "nikola-tesla-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "nikola-tesla-front.png: визуально соблюдены цвета PALETTE — угольный костюм, медная катушка и фурнитура, белая рубашка, электрический голубой акцент разрядов. Все якоря на месте: катушка с голубыми дугами в собственной правой руке, центральный пробор, тонкие усы и длинное тёмное пальто. Светотеневые вариации не меняют заданную палитру; подставка без командного цвета.",
+      "frames": [
+        "nikola-tesla-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "nikola-tesla-front.png",
+      "note": "Тонкие разветвлённые дуги, цепочка и элементы катушки читаются в концепте; толщину, связность и пригодность их геометрии следует проверить отдельно на этапах 3–4."
+    },
+    {
+      "item": "Q",
+      "frame": "nikola-tesla-front.png",
+      "note": "Нижняя часть пальто и брюки уступают эталону по чёткости мелких деталей; это учтено в Q = 1.5."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13394-19d3-7773-a5ce-7915083f27f8"
+  },
+  "executor_session_id": "codex:01a1335d-44f8-7fb2-aa38-5e4774a25286",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-RAPTORS-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-RAPTORS-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-raptors-codex/design/raptors-front.png",
+      "sha256": "511c24ee71d762fe5446471f2076a2f611e0366b4dd4470c03128eda711e741e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-raptors-codex/design",
+    "files": [
+      "raptors-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-raptors-codex/design/checks-report.json",
+    "art/imagegen/concept-raptors-codex/generation-records.json",
+    "art/imagegen/concept-raptors-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-raptors-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-raptors-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "raptors-front.png: Raptors узнаётся как беспёрый велоцираптор Jurassic Park благодаря форме головы, полосатой коже, серповидным когтям и длинному хвосту. Передние конечности согнуты и отделены от корпуса, поза не T/A; хвост и когти читаются. Однако почти вертикальные шея и корпус ослабляют характерный силуэт поданного вперёд хищника, а пасть раскрыта шире заданного «slightly open».",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "raptors-front.png: уровень расписанной коллекционной миниатюры сопоставим с QUALITY_REFERENCE Medusa. Детально проработаны чешуя головы и конечностей, складки шеи, пластины брюха, зубы и когти; кожа, твёрдые когти, зубы и каменная подставка различаются по материалу. Детали сохраняются внутри силуэта, изображение не выглядит плоским или фотографией живого животного.",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "raptors-front.png: песочная кожа, тёмно-коричневые полосы, светлое брюхо и жёлтые глаза визуально соответствуют palette.json и PALETTE карточки. Все якоря присутствуют: беспёрый двуногий динозавр, пятнистая полосатая кожа, отдельный серповидный коготь на каждой стопе и длинный жёсткий полосатый хвост с непрерывно читаемым контуром.",
+      "frames": [
+        "raptors-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "raptors-front.png",
+      "note": "Корпус и шея остаются почти вертикальными, пасть раскрыта заметнее заданного небольшого раскрытия; это учтено в S = 1.5."
+    },
+    {
+      "item": "S",
+      "frame": "raptors-front.png",
+      "note": "Строгая фронтальная ортопроекция не достигнута полностью: видна узкая верхняя полоска подставки и небольшая кривизна её кромок. Ограничение подтверждено verification.json#limit_reached; отдельным гейтом оно не является."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349c-7dc1-7691-b6f7-20ca5bfd41b3"
+  },
+  "executor_session_id": "history:ASSET-RAPTORS-001-1a-design-front-g4",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-HARRY-HOUDINI-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-HARRY-HOUDINI-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/design/harry-houdini-front.png",
+      "sha256": "4575f2b099942b9358e31cf17d682c4a30ae7b8b213b0953fff0e91fcb03af14"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-harry-houdini-codex/design",
+    "files": [
+      "harry-houdini-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+    "art/imagegen/concept-harry-houdini-codex/generation-records.json",
+    "art/imagegen/concept-harry-houdini-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На harry-houdini-front.png силуэт узнаваем: плечевые цепи, нагрудный замок, обмотка предплечья и открытые кисти читаются; обе руки отделены от корпуса. Поднятая согнутая правая рука устраняет симметричную A-позу предыдущего цикла; T/A-вето отсутствует. Небольшие слияния звеньев в плотной обмотке и слабо выраженный сгиб нижнего левого локтя оставляют силуэт менее ясным, чем для S = 2.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На harry-houdini-front.png качество соответствует medusa-quality-reference.png: проработаны локоны, лицо, пальцы, складки и швы, пуговицы, шнуровка, железные звенья и рельеф латунного замка. Матовые ткани, кожа обуви и металлы различимы; объём и детализация внутри силуэта соответствуют коллекционной миниатюре. Более простой костюм следует описанию персонажа и не означает недостатка исполнения.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На harry-houdini-front.png присутствуют сценический чёрный жилет и брюки, тёплая белая рубашка, серое железо и латунный акцент замка согласно PALETTE и palette.json. Все четыре якоря отчётливо видимы: цепи поверх плеч, замок на груди, закатанные белые рукава и чёрный жилет. Цепь обвивает одно предплечье; обе ладони открыты и пусты, что соответствует WEAPON_HAND = none.",
+      "frames": [
+        "harry-houdini-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "harry-houdini-front.png",
+      "note": "CORRECTION предыдущего цикла выполнена частично: поднятая ладонь выше талии, нижний локоть почти прямой. При этом поза явно асимметрична, руки отделены от тела, запрещённая A-поза устранена."
+    },
+    {
+      "item": "C",
+      "frame": "harry-houdini-front.png",
+      "note": "Видна верхняя поверхность подставки, поэтому дизайн-front не является строгой ортопроекцией; ограничение записано в verification.json#limit_reached. На 1a согласованность видов не оценивается, C остаётся фиксированным 1.5."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верхний отступ 2.831% меньше целевых 4%. Фигура и подставка полностью в кадре; summary.FAIL = 0, статус гейта остаётся PASS."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "harry-houdini-front.png",
+      "note": "Фон имеет слабую неоднородность, отмеченную в verification.json#limit_reached. Проверки нейтральности и равномерности рамки прошли; незакрытый пункт checklist не является дополнительным гейтом."
+    },
+    {
+      "item": "S",
+      "frame": "harry-houdini-front.png",
+      "note": "На этапах 3–4 проверить отверстия и связность свободных звеньев, пересечения плотной обмотки предплечья и сохранность отдельных пальцев. Изображение показывает их дизайн, но не подтверждает геометрию будущей модели."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13394-e668-7d32-b227-a3dce347fd10"
+  },
+  "executor_session_id": "codex:01a1338a-21db-7b62-99cc-1fb45e3f3a85",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

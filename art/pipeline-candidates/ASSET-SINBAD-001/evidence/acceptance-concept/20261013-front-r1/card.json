@@ -1,0 +1,100 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SINBAD-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sinbad-codex/design",
+    "files": [
+      "sinbad-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+    "art/imagegen/concept-sinbad-codex/generation-records.json",
+    "art/imagegen/concept-sinbad-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; view.frame_top — предупреждение, не FAIL.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "sinbad-front.png: персонаж узнаваем, тюрбан и изогнутый клинок читаются, руки отделены от корпуса, поза не T и не A. Однако над ножнами на собственном левом бедре отчётливо видны отдельные навершие, рукоять и гарда второго меча при уже вынутом скимитаре в правой руке. Это лишнее оружие, также отмеченное в verification.json как CORE.FORBIDDEN.extra_weapons; применяется строка S = 0 за лишние части.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sinbad-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо и борода, складки и фактура ткани, золотой орнамент жилета, рельеф наручей, гравировка клинка и отделка обуви. Кожа, ткань, металл и камень различимы; детали сохраняются внутри силуэта.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "sinbad-front.png: парусный белый представлен тюрбаном, рубахой и шароварами, морской синий — кушаком, жилетом и обмоткой тюрбана, песочный загар — кожей, золотой акцент — отделкой. Палитра соответствует palette.json с учётом освещения. Все четыре якоря присутствуют: скимитар в собственной правой руке, белый тюрбан, широкий синий кушак и ножны на собственном левом бедре. Лишний меч учтён в S.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S = 0: в sinbad-front.png присутствует лишний второй меч в ножнах, что вызывает вето любого измерения ниже 1. Итоговый score = 6.9 также ниже порога 8.0; G-CHECKS остаётся PASS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "fix": "Remove the second sword, including its pommel, grip and guard, from the figure's LEFT-hip scabbard, leaving that scabbard visibly empty while preserving the single curved scimitar in the figure's RIGHT hand.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "checks-report.json: верхняя точка маски y = 3.522% при ориентире не менее 4%; view.frame_top имеет статус WARN и не меняет G-CHECKS или фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "verification.json: низ подставки y = 94.751% вместо ориентира CORE 93%; фигура, оружие и подставка целиком в кадре."
+    },
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "verification.json: диаметр подставки оценён примерно в 0.63 высоты фигуры при ориентире about 0.55; отдельного FAIL гейта для этого отклонения нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13371-e072-7cb3-8d24-7aced0f685f9"
+  },
+  "executor_session_id": "codex:01a13335-eb95-7933-8da5-e0ee7076f8f2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Концепт возвращён на этап 1a: требуется убрать лишний второй меч, сохранив ножны на левом бедре и скимитар в правой руке."
+}

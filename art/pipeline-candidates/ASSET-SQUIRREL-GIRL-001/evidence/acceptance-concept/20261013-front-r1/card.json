@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SQUIRREL-GIRL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-squirrel-girl-codex/design/squirrel-girl-front.png",
+      "sha256": "1b841500a736078c63391cadf04a5e80af64dad2ddf2933ac66f1fd82105817a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-squirrel-girl-codex/design",
+    "files": [
+      "squirrel-girl-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-squirrel-girl-codex/design/checks-report.json",
+    "art/imagegen/concept-squirrel-girl-codex/generation-records.json",
+    "art/imagegen/concept-squirrel-girl-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-squirrel-girl-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В squirrel-girl-front.png Squirrel Girl узнаваема по сочетанию ушек на ободке, меховой куртки, большого хвоста и белки на плече. Хвост образует отдельный контур справа, кисти отделены от куртки, ноги различимы. Спокойная готовая поза не является T/A-позой. Тонкие пальцы и лапки спутника следует сохранить раздельными на этапах 3–4.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В squirrel-girl-front.png читаются миниатюра, кожаная куртка, мех, швы и пуговицы. Однако лицо, кисти и плечевая белка имеют упрощённые гладкие формы и мало тонкой росписи; сапоги также бедны деталями поверхности. Проработка этих зон явно ниже QUALITY_REFERENCE по качеству скульптуры и отделки, независимо от различий костюма и его орнамента.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В squirrel-girl-front.png присутствуют все четыре якоря и основная коричневая гамма. Меховой воротник выглядит серовато-бежевым вместо тёплого tan #C8A07A, хвост имеет заметный красноватый оттенок относительно #8A5A36, а ушной акцент ближе к терракоте, чем к tan #D9B08A.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS = PASS, но сумма S + C + Q + P = 6; итоговый score = 7.5 ниже обязательного порога 8.0.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "squirrel-girl-front.png",
+      "fix": "Raise the sculpt and paint finish to high-end collectible-miniature quality with finer facial forms and paint transitions, clearly articulated fingers, detailed fur and paws on the shoulder squirrel, and subtle leather texture on the boots while preserving Squirrel Girl's design and anchors.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "squirrel-girl-front.png",
+      "fix": "Match the fur collar to warm tan (#C8A07A), the tail to brown (#8A5A36), and the ear accent to tan (#D9B08A), reducing the grey-beige fur and reddish ear and tail cast while preserving all four character anchors.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134aa-8acb-7792-8cea-3e8de24e90e8"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

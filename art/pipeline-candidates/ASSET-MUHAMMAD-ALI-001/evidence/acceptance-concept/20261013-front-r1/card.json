@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png",
+      "sha256": "4f3d68536aca17037bee4991d71cf653f200f905fa3f6a9e90e8073acdd44572"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-muhammad-ali-codex/design",
+    "files": [
+      "muhammad-ali-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-muhammad-ali-codex/design/checks-report.json",
+    "art/imagegen/concept-muhammad-ali-codex/generation-records.json",
+    "art/imagegen/concept-muhammad-ali-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-muhammad-ali-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "muhammad-ali-front.png: боксёрская стойка читается, руки отделены от корпуса, все костюмные якоря присутствуют. Однако именно Мухаммад Али не опознаётся: тяжёлая угловатая челюсть, резко сведённые нависающие брови и гипертрофированные плечи с трапециями создают обобщённого мускулистого боксёра. Характерное портретное сходство и более лёгкие, вытянутые атлетические пропорции Али потеряны. Совпадение экипировки не заменяет идентичность; применяется якорь S=0 «не тот персонаж» из concept-sheet.md §11.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "muhammad-ali-front.png: качество коллекционной миниатюры соответствует QUALITY_REFERENCE. Чётко проработаны волосы, анатомический рельеф, складки сатина, сборки пояса, швы перчаток и шнуровка ботинок; кожа, сатин, кожаная экипировка и каменная подставка различаются по фактуре и бликам. Простота костюма боксёра не является недостатком детализации.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "muhammad-ali-front.png: палитра карточки соблюдена — белые сатиновые шорты и ботинки, красные перчатки, тёмная коричневая кожа и чёрные боковые полосы. Все четыре якоря видны, защитная стойка сохранена; постороннего оружия, командного цвета и цветного кольца на подставке нет.",
+      "frames": [
+        "muhammad-ali-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "concept-sheet.md §11: S=0 — отсутствует уверенная узнаваемость именно Мухаммада Али, несмотря на правильную экипировку. Любое измерение ниже 1 требует return_to_stage_1 независимо от суммы; score=6.9 также ниже порога 8.0. G-CHECKS PASS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "muhammad-ali-front.png",
+      "fix": "Make the portrait unmistakably young Muhammad Ali with fuller rounded cheeks, a softer jaw, his characteristic eyes, nose and lips, and a tall lean heavyweight-boxer build with reduced deltoid and trapezius bulk; preserve the guard stance, white satin trunks with black stripes, red gloves and white boots.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.831% при целевых 4%. Фигура целиком в кадре; WARN не является проваленным гейтом и не служит причиной возврата."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134ca-be04-7c92-8bb2-8c58e0be0624"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

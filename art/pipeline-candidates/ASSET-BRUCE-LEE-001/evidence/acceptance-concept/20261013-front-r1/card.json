@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png",
+      "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bruce-lee-codex/design",
+    "files": [
+      "bruce-lee-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bruce-lee-codex/design/checks-report.json",
+    "art/imagegen/concept-bruce-lee-codex/generation-records.json",
+    "art/imagegen/concept-bruce-lee-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bruce-lee-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-bruce-lee-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В bruce-lee-front.png узнаётся Брюс Ли: характерные скулы, короткая чёрная причёска, напряжённая мимика и культовый жёлтый костюм дополняют друг друга. Мускулистая фигура в безоружной боевой стойке, обе руки отделены от корпуса, ноги и кисти читаются; поза не T и не A. Раздельные пальцы видимы, их форму необходимо сохранить на этапах 3–4.",
+      "frames": [
+        "bruce-lee-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bruce-lee-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "bruce-lee-front.png соответствует уровню расписанной коллекционной миниатюры QUALITY_REFERENCE: проработаны пряди волос, черты лица, сухожилия кистей и предплечий, фактура и складки ткани, шнуровка и подошвы обуви. Ткань, кожа, волосы, обувь и каменная подставка различаются по поверхности; простой костюм персонажа не требует орнаментальной насыщенности Медузы.",
+      "frames": [
+        "bruce-lee-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В bruce-lee-front.png присутствуют все цвета PALETTE: золотисто-жёлтый костюм, почти чёрные боковые полосы, тёплая загорелая кожа и чёрная обувь. Все якоря видимы: жёлтый комбинезон с чёрными полосами, обнажённые кисти в боевой стойке и короткие чёрные волосы; светотеневые оттенки согласованы с палитрой.",
+      "frames": [
+        "bruce-lee-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json#checks: view.frame_top = WARN, верхний отступ 3.453% при рекомендуемом минимуме 4.0%. Фигура полностью в кадре; предупреждение не меняет PASS гейта и фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13485-3d7c-7de2-b0ba-5c52656f540a"
+  },
+  "executor_session_id": "codex:01a13465-9b2c-7f91-86e0-bc9516085f9d",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

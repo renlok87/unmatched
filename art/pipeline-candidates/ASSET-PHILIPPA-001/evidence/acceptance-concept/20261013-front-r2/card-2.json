@@ -1,0 +1,94 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PHILIPPA-001",
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-PHILIPPA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-philippa-codex/design/philippa-front.png",
+      "sha256": "cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-philippa-codex/design",
+    "files": ["philippa-front.png", "checks-report.json"]
+  },
+  "reports": [
+    "art/imagegen/concept-philippa-codex/design/checks-report.json",
+    "art/imagegen/concept-philippa-codex/generation-records.json",
+    "art/imagegen/concept-philippa-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-philippa-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; #summary.WARN = 0; #summary.PASS = 13; #verdict = PASS; #inputs[0].sha256 = cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c (= accepted_object)"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "philippa-front.png: Philippa Eilhart по заявке узнаётся. Все четыре якоря ANCHORS_EN на месте: стоячий воротник с фиолетовыми рюшами, чёрно-фиолетовое платье, серебряная брошь-сова на груди, короткие тёмные кудрявые волосы, поднятая правая рука фигуры (слева в кадре) с фиолетовой магией; кисть отделена фоном от головы. Одна фигура, фронтальный вид, на подставке; поза не T и не A. Снижено до 1,5: руки не отделены от корпуса, как требует §4.4. Пышные рукава у плеч обеих рук касаются лифа без зазора фона; поднятое предплечье сложено вплотную к пышному плечу и сливается с ним в одно пятно; колоколообразный рукав опущенной левой руки (справа в кадре) лежит поверх юбки. Тонкие части для этапов 3–4: пальцы поднятой кисти, края рюш.",
+      "frames": ["philippa-front.png"]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": ["philippa-front.png"]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "philippa-front.png против medusa-quality-reference.png: вид расписанной смоляной миниатюры с матовой росписью. Материалы различимы: бархатистая чёрная ткань, фиолетовый орнамент, кожа, серебро броши, камень подставки, свечение. Лицо прописано, у броши-совы видны перья, чёткие рюши воротника, манжет и подола, завитки орнамента платья. Отдельные зоны беднее эталона: два больших чёрных рукава — тёмные массы с простыми складками и синим бликом; орнамент внизу слева на юбке мутный, размытый и синеватый; подставка — гладкий цилиндр без обработки края; нет вторичных материалов уровня эталона (металл, рельеф). Итого 1,5: близко к эталону, отдельные зоны беднее.",
+      "frames": ["philippa-front.png"]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "philippa-front.png: все цвета PALETTE и все якоря на месте. Чёрный #1C1A20 — основа платья и рукавов; фиолетовый #5B2A7E — орнамент и рюши (средний цвет фиолетовых пикселей платья около #4C2A6A); акцент #9B5FC0 — свечение магии (около #9D75BF). Отклонение тона: волосы холодные, сине-серые с сине-фиолетовым бликом (среднее около #373544) вместо тёплого #2A2224; на нижней части юбки и рукавах синие и индиговые завитки и блики (около #272740), которых в палитре нет. checks-report.json#palette.swatches[1] (gown violet).figure_share_within_40_pct = 9.35. Итого 1,5: все цвета есть, тон отклоняется.",
+      "frames": ["philippa-front.png", "checks-report.json"]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5 + C 1.5 + Q 1.5 + P 1.5 = 6.0 из 8), по правилу вердикта concept-sheet.md §11 → return_to_stage_1. Гейт G-CHECKS PASS, измерений ниже 1.0 нет.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "philippa-front.png",
+      "fix": "Keep the raised right hand with violet magic, but hold both arms clearly away from the torso: show a visible background gap between each puffed sleeve or elbow and the bodice, keep the raised forearm apart from the shoulder puff, and hold the lowered left arm and its bell sleeve slightly out from the skirt so the hand is clear.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "philippa-front.png",
+      "fix": "Bring the weaker zones up to the quality reference: sculpted folds and painted highlights on both black puffed sleeves, crisp clean ornament on the lower skirt instead of the murky blurred pattern, and a finished pedestal rim, keeping the matte hand-painted resin miniature finish.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "philippa-front.png",
+      "fix": "Match the PALETTE tones exactly: warm near-black hair #2A2224 with no blue-violet sheen, gown ornament only in violet #5B2A7E on black #1C1A20 with no blue or indigo swirls on the skirt and no blue sheen on the sleeves, and magic glow #9B5FC0.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "philippa-front.png",
+      "note": "Остаток фона после выравнивания: справа от подставки клин светлее фона (яркость около 55 против 46, x около 750–845, y около 980–1050 px); checks-report.json#measurements.front.mask.bbox_px[2] = 843 (right_pct 94.085) за краем подставки (около 755 px). Риск для Tripo: фантомный выступ подставки справа."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "sha256 выбранной генерации rc1 в generation-records.json (5dccfb23…) не совпадает с accepted_object (cd85663d…): фронт — результат выравнивания фона rebg.py (verification.json#design_source.post); checks-report.json#inputs[0].sha256 совпадает с accepted_object. Записи u1 и rc1 в verification.json#checks указывают на один checks-report.json (отчёт u1 перезаписан). Генерация — unstability.ai Recraft v4, не Codex image_gen."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-PHILIPPA-001-r2"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "возврат на этап 1 (вторая приёмка, Opus xhigh)"
+}

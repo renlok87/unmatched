@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DEADPOOL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-deadpool-codex/design/deadpool-front.png",
+      "sha256": "72cf451571e261614ae54a97c0347a4e30de93697cab37be0048051532e1ff6a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-deadpool-codex/design",
+    "files": [
+      "deadpool-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-deadpool-codex/design/checks-report.json",
+    "art/imagegen/concept-deadpool-codex/generation-records.json",
+    "art/imagegen/concept-deadpool-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-deadpool-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "deadpool-front.png: однозначно узнаваем Deadpool — характерная маска, красно-чёрный костюм, две рукояти катан и пояс с подсумками. Руки и пистолеты отделены от корпуса, ноги разделены, тонкие рукояти читаются. Расслабленная готовая стойка с естественным положением локтей соответствует допустимой позе.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "deadpool-front.png: объёмная коллекционная фигура, различимы костюм, кожаные подсумки и оружие; обмотки катан и пряжки проработаны. Однако широкие пластиковые блики доминируют на костюме, а пальцы, корпуса пистолетов и кромки снаряжения заметно уступают эталону по точности мелких форм и отделке материалов.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "deadpool-front.png: все заданные цвета и якоря присутствуют, включая пистолет в анатомически правой руке, белые глаза и рукояти катан над плечами. Красный выглядит существенно ярче и насыщеннее #B3202A, кожа подсумков — светлее и теплее #5A3B26.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Итог 7,5 ниже порога 8,0: детализация и отделка материалов заметно ниже эталона, тона красного костюма и коричневого снаряжения отклоняются от палитры.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "deadpool-front.png",
+      "fix": "Preserve Deadpool's design and pose while refining finger and pistol geometry, sharpening mask seams and equipment edges, and giving the suit, leather pouches, and metal weapons distinct painted-resin finishes with controlled highlights.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "deadpool-front.png",
+      "fix": "Match the suit's red midtones to #B3202A and the leather pouches to #5A3B26 under neutral studio lighting, preserving the black suit panels, white eyes, and all required character anchors.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "deadpool-front.png",
+      "note": "Справа от подставки виден крупный светло-серый участок фона с неровным краем; визуальная очистка фона осталась незавершённой."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a2-b18e-7473-b743-67ffb2950368"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

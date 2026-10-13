@@ -1,0 +1,89 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PANDORA-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-pandora-codex/design/pandora-front.png",
+      "sha256": "1afa4cc157ed8ee01113d15d3ec8a25fe591bbf4b32eaa0680fe4dcef654132e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-pandora-codex/design",
+    "files": [
+      "pandora-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-pandora-codex/design/checks-report.json",
+    "art/imagegen/concept-pandora-codex/generation-records.json",
+    "art/imagegen/concept-pandora-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-pandora-codex/design/checks-report.json",
+      "note": "check_concept_views.py summary PASS 12 / WARN 1 / FAIL 0, verdict PASS, sha256 of the input matches accepted_object. Single WARN view.frame_top = 2.97 % (< 4.0 %, laurel wreath top slightly above the core frame) is not a gate failure."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "pandora-front.png: the figure reads clearly as Pandora of Greek myth, not a generic costume: a young woman in a pale chiton holding an ornate bronze box with an open lid and violet smoke rising out of it. The pose is frontal and relaxed with both elbows bent forward to carry the box, so it is neither a T-pose nor an A-pose. There is one head and the anatomy is correct. Several merges keep this below 2. The upper arms hang tight against the torso and touch it in the silhouette mask, with only a thin shadow gap under the left armband. The box sits entirely inside the torso outline and reads by value and hue contrast (bronze against cream), not by silhouette. The fingers are fused onto the box sides. Fabric drapes hang from both forearms down into the skirt mass. Only the violet wisp breaks the outline, on the viewer's right. The braids and the laurel wreath read well. Notes for stages 3-4: the wisps are thin translucent smoke and should become VFX, not mesh, and the arm-to-torso and hand-to-box contacts need checking in the geometry.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "pandora-front.png against medusa-quality-reference.png: this is the same painted collectible-miniature finish under the same studio light on the same dark backdrop. Detail sits inside the silhouette throughout. Every hem carries a crisp laurel-leaf border. The box has a sun-face relief, laurel panels and a carved lid. The wrist cuffs and armband carry relief, the shoulder fibulae and earrings are modelled, the braids have gold rings, the wreath is gilded and the sandal straps carry face medallions. The face is rendered at reference level. Materials separate cleanly: cream painted cloth with a faint wash, bronze/gold metal, skin, dark hair and a stone pedestal. The large plain chiton areas follow the design brief and are no poorer in finish than Medusa's dress.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "pandora-front.png: all three ANCHORS_EN are visible. The ornate bronze box is held in both hands with its lid half open, the pale chiton has gold trim, and the dark hair is braided into two front braids. Sampled main colours match PALETTE: lit chiton is about #E1D7C9 against #E6DCC8, bronze mid-tones run about #936A4A to #CB9E65 around #A9773A, and hair is about #352D28 against #2E2420. No team colour or coloured base ring is present. The tone deviates in the accent. The wisp is a pale, desaturated lavender (median about #6C5176, most saturated about #8A6CA7) instead of the deep #7A4AB3 violet. It is also light rather than the 'faint dark wisps' of DESCRIPTION_EN. The bronze trim reads slightly gold-copper in the highlights. 1a has no sheet swatches to compare.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "pandora-front.png",
+      "note": "Upper arms are pressed to the torso, the box sits inside the torso silhouette and the fingers are fused to its sides. For stages 3-4, check the arm and torso separation and the hand-box contact in the geometry. The violet wisps are thin smoke and belong in VFX, not in the mesh."
+    },
+    {
+      "item": "P",
+      "frame": "pandora-front.png",
+      "note": "The accent wisp is a desaturated, lighter lavender (about #6C5176 to #8A6CA7) instead of #7A4AB3, and it is light rather than the 'faint dark wisps' of DESCRIPTION_EN. At 1c/VFX, keep the wisp at the deeper #7A4AB3 violet."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top = 2.97 % < 4.0 %: the wreath top sits slightly above the core frame. It is not a gate failure, but keep the 1c views framed consistently."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-PANDORA-001-r1"
+  },
+  "executor_session_id": "codex:01a13458-b65e-7ab3-ba95-6ec02b9366ea",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

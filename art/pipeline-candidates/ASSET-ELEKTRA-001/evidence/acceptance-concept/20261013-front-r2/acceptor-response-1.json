@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ELEKTRA-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-ELEKTRA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+      "sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-elektra-codex/design",
+    "files": [
+      "elektra-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-elektra-codex/design/checks-report.json",
+    "art/imagegen/concept-elektra-codex/generation-records.json",
+    "art/imagegen/concept-elektra-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-elektra-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-elektra-codex/design/checks-report.json#summary.PASS = 13; art/imagegen/concept-elektra-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-elektra-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-elektra-codex/design/checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "elektra-front.png: Электра узнаётся по сочетанию парных саев, красного костюма, длинной красной повязки и пояса, тёмных волос. В отличие от r1, центральные клинки и два боковых зубца каждого сая ясно читаются. Руки и оружие отделены от корпуса, концы повязки свободны, фигура целиком видна. Обе стопы стоят на подставке, локти слегка согнуты; поза не T и не A.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "elektra-front.png: объёмная миниатюра, кожа, волосы, ткань и металл различимы. Однако против medusa-quality-reference.png фактура красной одежды и металла чрезмерно грубая и зернистая, кисти и обмотки рукоятей проработаны проще, широкие блестящие участки одежды подавляют тонкую роспись. По контуру фигуры и подставки заметна светлая кайма. Серого участка справа от подставки, отмеченного в r1, больше нет, но общий уровень завершённости явно ниже эталона.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "elektra-front.png: все цветовые семейства и якоря присутствуют; замечание r1 об отсутствующем длинном конце пояса закрыто. Красный костюм, чёрные волосы и стальные саи различимы. При этом одежда и пояс выглядят более насыщенно малиновыми, чем заданные #A3242A и более тёплый акцент #C8322A; пояс почти повторяет тон костюма.",
+      "frames": [
+        "elektra-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 score = (2 + 1.5 + 1 + 1.5) / 8 × 10 = 7.5 < 8.0: требуется новый цикл 1a. G-CHECKS PASS; основные замечания — качество отделки ниже эталона и отклонение красных тонов палитры.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "elektra-front.png",
+      "fix": "Match medusa-quality-reference.png's painted collectible finish with finely resolved glove fingers, clean grip wraps, crisp garment folds and controlled matte shading, replacing coarse surface noise and broad glossy chest patches.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "elektra-front.png",
+      "fix": "Remove the pale contour halos around the figure, weapons and pedestal while preserving natural material highlights against a uniformly flat neutral dark gray background.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "elektra-front.png",
+      "fix": "Use muted outfit red #A3242A and a visibly warmer sash red #C8322A instead of saturated crimson, preserving black hair #1A1719, steel sai #B8BEC4 and all existing character anchors.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "elektra-front.png",
+      "note": "Замечание r1 о строго реберном ракурсе подставки не закрыто: её верхняя поверхность по-прежнему видна. Это не скрывает силуэт или якоря персонажа, но требует внимания при следующей генерации."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

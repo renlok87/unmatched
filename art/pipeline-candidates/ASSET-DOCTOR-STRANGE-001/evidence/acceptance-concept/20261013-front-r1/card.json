@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DOCTOR-STRANGE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-doctor-strange-codex/design/doctor-strange-front.png",
+      "sha256": "6a14c00f2c022333e0bcca9a658373edef0451b0e48bab5e54dbdb57c64aff20"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-doctor-strange-codex/design",
+    "files": [
+      "doctor-strange-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-doctor-strange-codex/design/checks-report.json",
+    "art/imagegen/concept-doctor-strange-codex/generation-records.json",
+    "art/imagegen/concept-doctor-strange-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-doctor-strange-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-doctor-strange-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В doctor-strange-front.png узнаётся именно комиксный Doctor Strange: характерное лицо с эспаньолкой, высокий воротник красного плаща, Eye of Agamotto и поднятая рука с мистическим жестом. Поза не T и не A; поднятая кисть читается отдельно. Опущенная левая кисть перекрывает край туники, рука близка к корпусу. Видимый верх подставки также нарушает требование строгой фронтальной ортопроекции.",
+      "frames": [
+        "doctor-strange-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "doctor-strange-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В doctor-strange-front.png различимы кожа, одежда, золотые украшения и каменная подставка, но детализация явно ниже medusa-quality-reference.png. Большие поверхности туники и плаща гладкие, складки простые, перчатки имеют округлую упрощённую лепку. Не хватает тонкой фактуры ткани, чёткой гравировки и проработанной росписи; преобладает вид гладкой фабричной фигурки.",
+      "frames": [
+        "doctor-strange-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В doctor-strange-front.png присутствуют тёмно-синяя туника, красный плащ с высоким воротником, золотой глаз-амулет, жёлтые перчатки, седина и эспаньолка. Тона расходятся с palette.json: особенно перчатки выглядят яркими лимонно-жёлтыми вместо приглушённого #D9B23A; освещённые участки плаща заметно ярче #A3242A.",
+      "frames": [
+        "doctor-strange-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS пройден, но сумма S+C+Q+P = 5.5 даёт 6.9/10, ниже порога 8.0. Требуются повышение качества детализации, отделение опущенной руки и корректировка тонов палитры.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "doctor-strange-front.png",
+      "fix": "Move Doctor Strange's lowered left forearm and hand outward to create a clear gap from the tunic while preserving the raised right-hand mystic gesture.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "doctor-strange-front.png",
+      "fix": "Use a level, strictly frontal orthographic camera and show the round pedestal edge-on with no visible top surface.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "doctor-strange-front.png",
+      "fix": "Match the Medusa quality reference with finely sculpted cloth folds and seams, subtle fabric texture, crisp amulet engraving, anatomically defined glove fingers, and detailed miniature paint shading that distinguishes cloth, leather, skin, and gold.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "doctor-strange-front.png",
+      "fix": "Match painted midtones to tunic blue #22305E, cloak red #A3242A, glove yellow #D9B23A, and amulet gold #D4AE45, replacing the neon-yellow gloves with muted ochre yellow.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134b0-3c2e-7372-8914-11d25b96e05e"
+  },
+  "executor_session_id": "history:ASSET-DOCTOR-STRANGE-001-1a-design-front-g3",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественная приёмка по делегированию: возврат на этап 1a; детализация ниже эталона и итоговый балл ниже порога."
+}

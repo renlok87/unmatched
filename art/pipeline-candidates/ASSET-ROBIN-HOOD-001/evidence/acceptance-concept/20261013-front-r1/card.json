@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ROBIN-HOOD-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-robin-hood-codex/design/robin-hood-front.png",
+      "sha256": "ec2b8b305233e11c2ff165e29476e8a999e5f68b17b2f92deb1d0086991ef19e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-robin-hood-codex/design",
+    "files": [
+      "robin-hood-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-robin-hood-codex/design/checks-report.json",
+    "art/imagegen/concept-robin-hood-codex/generation-records.json",
+    "art/imagegen/concept-robin-hood-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-robin-hood-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2; verification.json#checks[3].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "robin-hood-front.png: силуэт лучника ясен; капюшон, колчан и длинный лук читаются отдельно. Руки отведены от торса, кисти различимы, локти естественно согнуты; поза не T и не A. Фигура, оружие и подставка целиком в кадре. Тетива, древки стрел и пальцы читаются при просмотре 1:1; их толщину и разделение потребуется контролировать на этапах 3–4.",
+      "frames": [
+        "robin-hood-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "robin-hood-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "robin-hood-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны лицо и короткая борода, фактура и складки ткани, швы и потёртости кожи, шнуровка, пряжки, сумка, оперение стрел и древесина лука. Материалы убедительно различаются; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "robin-hood-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "robin-hood-front.png: присутствуют зелёная ткань, коричневая кожа, льняные рукава и красное оперение. Все четыре якоря соблюдены: лук в собственной левой руке, справа для зрителя; колчан над собственным правым плечом; капюшон поднят; поясная сумка видна. Зелёный выглядит более приглушённым и оливковым относительно #3E6B2F. Плащ длиннее указанной короткой накидки, однако якоря и основные цвета сохранены.",
+      "frames": [
+        "robin-hood-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "robin-hood-front.png",
+      "note": "Зелёный тон смещён к приглушённому оливковому; задние полотнища плаща опускаются ниже колен вместо короткой накидки из DESCRIPTION_EN. Учтено в P = 1.5."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верх лука находится на 3.453% высоты кадра при рекомендуемых 4%; обрезания нет. Статус WARN не меняет PASS гейта."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.single_component: дополнительная компонента маски 2.271%; визуально относится к единственной фигуре и её луку. Второго персонажа или лишней части тела нет."
+    },
+    {
+      "item": "S",
+      "frame": "robin-hood-front.png",
+      "note": "Круглую форму подставки в глубину нельзя подтвердить по единственному фронтальному виду ребром."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1336c-c275-76d3-bb6c-959d718a98b5"
+  },
+  "executor_session_id": "codex:01a13330-6401-7283-98dc-e1bbeb920a19",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

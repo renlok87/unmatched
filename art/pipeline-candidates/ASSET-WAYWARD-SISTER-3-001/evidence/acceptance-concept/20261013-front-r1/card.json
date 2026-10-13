@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WAYWARD-SISTER-3-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-3-codex/design/wayward-sister-3-front.png",
+      "sha256": "3d7db902b711c0046d7172d62fad75805930c8cd09c102cf63c5f03caa986bc1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wayward-sister-3-codex/design",
+    "files": [
+      "wayward-sister-3-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wayward-sister-3-codex/design/checks-report.json",
+    "art/imagegen/concept-wayward-sister-3-codex/generation-records.json",
+    "art/imagegen/concept-wayward-sister-3-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wayward-sister-3-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "wayward-sister-3-front.png: широкая приземистая фигура, острый капюшон, котелок в обеих руках и дым хорошо читаются. Кисти различимы, руки согнуты; поза не T и не A. Рукава сливаются с плащом, фоновых просветов между руками и корпусом нет, поэтому отделение рук не соответствует уровню 2.",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wayward-sister-3-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны морщины лица, пальцы и ногти, косы, плетение заплат, отдельные стежки, рваные края, верёвочный пояс и потёртое железо котелка. Ткань, кожа, волосы и металл различимы; детали присутствуют внутри силуэта.",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "wayward-sister-3-front.png: присутствуют все четыре якоря — небольшой котелок у живота в обеих руках, остроконечный капюшон, тёмный плащ с заплатами и зелёный дым. Основные цвета соответствуют палитре, но дым визуально более приглушённый и желтовато-зелёный, чем заданный акцент #6FCF6A; точное совпадение оттенка не подтверждено.",
+      "frames": [
+        "wayward-sister-3-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Рукава закрывают просветы между руками и корпусом. На этапах 3–4 проверить отделение кистей от котелка и пригодность тонких концов капюшона, дыма и рваных краёв для геометрии и анимации."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Видна узкая полоска верхней поверхности подставки: строгая фронтальная ортопроекция выполнена не полностью. Это визуальное ограничение, а не FAIL G-CHECKS."
+    },
+    {
+      "item": "P",
+      "frame": "wayward-sister-3-front.png",
+      "note": "Зелёный дым сохраняет требуемый акцент, но выглядит более приглушённым и желтоватым относительно #6FCF6A."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "summary.WARN = 2: верхний отступ 3.522% при ориентире 4%; дополнительная компонента маски 1.99%. Фигура целиком видна, постороннего предмета визуально нет. WARN не меняют PASS и фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133c0-763a-7de0-a610-147af24e9259"
+  },
+  "executor_session_id": "codex:01a1334d-667d-7682-b86b-7fbbbda4992a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

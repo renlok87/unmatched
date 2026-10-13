@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LUKE-CAGE-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-LUKE-CAGE-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-luke-cage-codex/design/luke-cage-front.png",
+      "sha256": "3ebe390f89c108e516f3c99d9fb90d24350c518e1e4f37d0f03532512e511f75"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-luke-cage-codex/design",
+    "files": [
+      "luke-cage-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-luke-cage-codex/design/checks-report.json",
+    "art/imagegen/concept-luke-cage-codex/generation-records.json",
+    "art/imagegen/concept-luke-cage-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-luke-cage-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В luke-cage-front.png узнаётся именно Люк Кейдж: мощный темнокожий мужчина с жёлтой раскрытой рубашкой, стальной повязкой, серебряными браслетами и цепным поясом. Сжатые кулаки отделены от корпуса, звенья цепи читаются. Опущенные руки и слегка согнутые локти образуют допустимую стойку готовности.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В luke-cage-front.png кожа, ткань и металл различимы, но детализация явно ниже QUALITY_REFERENCE. Замечания r1 закрыты частично: складки и пуговицы появились, однако рубашка остаётся грубой, кулаки угловатыми. На голенях и подставке большие плоские пятна с обрывами фактуры, обувь плохо определена; вокруг ног видна широкая серая область с рваным краем. Это заметно на полном росте и не соответствует цельной расписанной миниатюре эталона.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В luke-cage-front.png присутствуют все цвета и четыре якоря заявки. Замечания r1 к чёрным брюкам и цепному поясу закрыты: брюки полноразмерные, пояс состоит из различимых серебряных звеньев. Тон рубашки остаётся светлее и теплее приглушённого жёлтого #E0B830.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При G-CHECKS PASS сумма S=2, C=1.5, Q=1, P=1.5 составляет 6; score=7.5 ниже порога 8.0. Требуются цельная детализация нижней части фигуры и подставки, устранение видимых плоских пятен и серого ореола, уточнение тона рубашки.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "luke-cage-front.png",
+      "fix": "Render the entire figure and round stone base as a consistently detailed painted collectible miniature, with convincing matte cloth folds, anatomically defined fists, fully shaded trousers and visible shoes, continuous base texture, and a clean silhouette against uniform dark grey without flat patches or the ragged grey halo.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "luke-cage-front.png",
+      "fix": "Match the shirt's midtones to muted yellow #E0B830 while preserving dark skin #5A3B2A, steel #B8BEC4, full-length black trousers #1E1C1E, the open collar, steel headband, silver wristbands and clearly linked chain belt.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13531-f4db-7e51-8450-b1b468b90b3c"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

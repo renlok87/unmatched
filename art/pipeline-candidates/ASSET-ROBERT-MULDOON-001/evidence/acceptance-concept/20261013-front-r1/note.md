@@ -1,0 +1,1 @@
+Launcher preflight recovery: temporary helper initially assumed list-form manifest.files and raised TypeError (string indices must be integers). The package uses a valid path-keyed manifest; the helper now supports both forms. No acceptor was launched and no acceptance cycle was consumed by that error.

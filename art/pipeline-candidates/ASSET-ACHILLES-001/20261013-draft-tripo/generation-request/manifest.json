@@ -1,0 +1,190 @@
+{
+  "asset_id": "ASSET-ACHILLES-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "export_basename": "ASSET-ACHILLES-001_draft-glb",
+    "primary_role": "draft-glb",
+    "primary_source": "tripo-pending",
+    "triangle_loss_tolerance": 0.001
+  },
+  "created_at": "2026-10-13T15:51:05+00:00",
+  "exports": [],
+  "generation_requests": [
+    {
+      "dry_run": true,
+      "path": "generation-requests/cad781278c3c2efd.json",
+      "request_key": "cad781278c3c2efde1b83f16d515309316b557a845daea07a6a5bab8119cb609",
+      "sha256": "c16c7c59e2e1289254786d87ba0267bf375d1f10b33d0c957fac536684ac4c19",
+      "submitted": false
+    }
+  ],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "generation-request",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-2f8580c9-draft": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-draft-tripo/reports/tripo-run.json",
+          "sha256": "5a5022d35d73e99970a662f3079a4ddc8343d53603d945748e40545aebfbd0e5"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "6b050812c377c461dfc28faf4f84df9a18d83b7cfc413b08d5ef2717013077f1"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 47382644,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, unmodified",
+          "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-draft-tripo/source/achilles-draft-tripo-2f8580c9.glb",
+          "produced_by": "generate",
+          "role": "draft-glb",
+          "sha256": "c7b12d71d4d407d3a619b9f02c2a98afa48be64576c0f81d72a6859001ce3e16",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1974264
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1974264
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-achilles-codex/design/achilles-front.png",
+          "present": true,
+          "sha256": "1f2156d48e5113538642834091e1521d4be18a24f4be2db6a2fa6cfc557e1267",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 30.0
+      },
+      "registered_at": "2026-10-13T15:56:18+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-ACHILLES-001",
+        "date": "2026-10-13",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-draft-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "draft-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1974264
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 47382644,
+            "expected_sha256": "c7b12d71d4d407d3a619b9f02c2a98afa48be64576c0f81d72a6859001ce3e16",
+            "in_git": false,
+            "origin": "Studio GLB export, unmodified",
+            "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-draft-tripo/source/achilles-draft-tripo-2f8580c9.glb",
+            "produced_by": "generate",
+            "role": "draft-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-achilles-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "single-image",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": false,
+            "output": "Геометрия и текстура (по умолчанию формы)",
+            "parts_mode": null,
+            "pbr": false,
+            "polygon_count": null,
+            "privacy": true,
+            "remove_lighting": null,
+            "seed": null,
+            "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный",
+            "texture_8k": false,
+            "topology": null,
+            "ultra_mesh_quality": null
+          },
+          "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+          "views": {
+            "back": null,
+            "front": {
+              "path": "art/imagegen/concept-achilles-codex/design/achilles-front.png",
+              "sha256": "1f2156d48e5113538642834091e1521d4be18a24f4be2db6a2fa6cfc557e1267"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+        "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 21510.0,
+              "balance_before": 21540.0,
+              "observed_debit": 30.0,
+              "quoted": 30,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-draft-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+            "op": "generate"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-2f8580c9-draft",
+        "task_id": "2f8580c9-47b3-476b-8f55-5c6e546c8816",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/2f8580c9-47b3-476b-8f55-5c6e546c8816"
+      },
+      "spec_sha256": "5250a55879bd3c10290e43343fabd7a6cf0357bfdbb85680e5d4262a5c59d371"
+    }
+  },
+  "stages": {},
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

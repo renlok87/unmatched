@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-JERSEY-DEVIL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-jersey-devil-codex/design/jersey-devil-front.png",
+      "sha256": "4b1026265dba8d1cb1ca2917d348377f0464a8da0dc9bb3cb5e40cb7f97a5f16"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-jersey-devil-codex/design",
+    "files": [
+      "jersey-devil-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+    "art/imagegen/concept-jersey-devil-codex/generation-records.json",
+    "art/imagegen/concept-jersey-devil-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "jersey-devil-front.png: лошадиная голова, крылья летучей мыши, копыта и раздвоенный хвост позволяют узнать JerseyDevil. Однако обе руки почти выпрямлены и симметрично отведены вниз по диагонали: это A-поза. Небольшой изгиб локтей и загнутые когти не устраняют запрещённую постановку рук; по рубрике S = 0.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "jersey-devil-front.png: уровень коллекционной миниатюры сопоставим с QUALITY_REFERENCE. Детально проработаны морда, грива, шкура, складки и жилки перепонок, кольца рогов и раздвоенные копыта; матовые перепонки, костяные рога и гладкие когти различаются по материалу.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "jersey-devil-front.png: коричневая шкура, серые перепонки, костяные рога и красные глаза присутствуют; все группы якорей видимы. Рога заметно вытянуты и изогнуты вместо заявленных небольших, а полутона шкуры светлее и теплее основного #4E3A2E.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S = 0 из-за запрещённой A-позы: срабатывает вето измерения ниже 1,0. Итоговый score = 6,3 также ниже порога 8,0.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "jersey-devil-front.png",
+      "fix": "Replace the symmetrical straight diagonal arm placement with a natural asymmetric creature stance, clearly bending both elbows at different angles while keeping both hands separated from the torso and preserving the strict front view.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "jersey-devil-front.png",
+      "fix": "Shorten both horns into small curved horns and darken the hide midtones toward #4E3A2E while preserving the grey wing membranes, bone-coloured horns and red eyes.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2,901% при целевом минимуме 4%; низ подставки находится на 94,682% вместо целевых 93%. Обрезки нет; эти отклонения не меняют PASS гейта и фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a1-9a79-7022-8248-0ef4158f83f1"
+  },
+  "executor_session_id": "codex:01a1344d-670e-7400-bdc0-ae36e81b842b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественно не принято: исправить позу и отклонения якоря рогов и палитры, затем повторить приёмку 1a."
+}

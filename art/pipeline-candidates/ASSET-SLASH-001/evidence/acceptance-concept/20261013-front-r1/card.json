@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SLASH-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-slash-codex/design/slash-front.png",
+      "sha256": "c5b8070d86b54be39e3355e6f0d1537ea708a22cbe23ff4e33e7eae79329e4b6"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-slash-codex/design",
+    "files": [
+      "slash-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-slash-codex/design/checks-report.json",
+    "art/imagegen/concept-slash-codex/generation-records.json",
+    "art/imagegen/concept-slash-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-slash-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На slash-front.png узнаётся именно Slash из DESCRIPTION_EN: массивная мутантная черепаха с агрессивной мордой, чёрной маской, шипованным панцирем и булавой. Булава в собственной правой руке, слева для зрителя; её головка отделена от корпуса. Обе руки имеют читаемые просветы относительно корпуса, локти согнуты, поза не T и не A. Шипы, когти и хвосты маски различимы. Толщину тонких хвостов маски и рваных лоскутов потребуется проверить на геометрии этапов 3–4.",
+      "frames": [
+        "slash-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "slash-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "slash-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png при просмотре 1:1. Чётко различаются чешуйчатая кожа, пластины панциря, потёртая кожа ремней, ткань и сталь; внутри силуэта проработаны зубы, когти, заклёпки, швы, сколы и царапины. Детализация распределена по голове, корпусу, конечностям и оружию, заметно обеднённых зон нет.",
+      "frames": [
+        "slash-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На slash-front.png присутствуют зелёная кожа, чёрные панцирь и маска, стальные шипы и все три ANCHORS_EN, включая правильную сторону оружия. Кожа выглядит более оливковой, чем #2F4A2A; крупный бежевый пластрон вводит дополнительный цвет, отсутствующий в palette.json. Поэтому точного соответствия заданной палитре нет.",
+      "frames": [
+        "slash-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "slash-front.png",
+      "note": "Бежевый пластрон занимает заметную площадь и отсутствует в PALETTE; зелёная кожа имеет оливковое смещение тона. Все заданные цвета и якоря сохранены; отклонение учтено в P = 1.5."
+    },
+    {
+      "item": "S",
+      "frame": "slash-front.png",
+      "note": "Подставка читается как один диск без различимых двух ярусов; verification.json отмечает отношение диаметра к высоте фигуры около 0.72 вместо 0.55 и небольшое смещение кадрирования. Фигура целиком видна, узнаваемость Slash и читаемость оружия сохраняются."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.single_component имеет WARN: дополнительный компонент маски 1.817%. На slash-front.png видна одна фигура с удерживаемой булавой, лишнего самостоятельного предмета нет. WARN не является FAIL и не меняет фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134b1-9ad0-7f22-9401-368aeceaecac"
+  },
+  "executor_session_id": "codex:01a13444-8820-7872-985b-42486bc4f21b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-RAT-KING-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-rat-king-codex/design/rat-king-front.png",
+      "sha256": "00b2061d9dd26a9b10bc6dfe4d512f898c7ca5bdb476d763480e67c0b24ce831"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-rat-king-codex/design",
+    "files": [
+      "rat-king-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-rat-king-codex/design/checks-report.json",
+    "art/imagegen/concept-rat-king-codex/generation-records.json",
+    "art/imagegen/concept-rat-king-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-rat-king-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL=0; checks-report.json#verdict=PASS; checks-report.json#summary.WARN=1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "RatKing узнаваем по DESCRIPTION_EN: худой зловещий человек в рваных бинтах и капюшоне, две крысы на плечах и кривой посох в собственной правой руке. Посох, кисти и крысиные головы читаются отдельно от корпуса; хвосты и усы различимы. Локти согнуты, поза не T и не A. Фигура и подставка полностью в кадре.",
+      "frames": [
+        "rat-king-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "rat-king-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с эталоном Medusa: проработаны переплетение и бахрома бинтов, отверстия и фактура плаща, древесные волокна посоха, шерсть, морды и лапы крыс. Материалы различимы, объём и внутренние детали силуэта сохраняются.",
+      "frames": [
+        "rat-king-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Палитра соответствует заданной: тёплый серый бинтов, тёмный коричневый плаща, серый мех крыс и красные глаза. Все доступные с front якоря присутствуют: кривой посох справа у персонажа, рваные бинты, плащ с капюшоном и две крысы на плечах. Подставка без командной цветной полосы.",
+      "frames": [
+        "rat-king-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "rat-king-front.png",
+      "note": "Верхний отступ посоха 2,762 % вместо заданных 4 % соответствует WARN view.frame_top. Посох не обрезан, его форма и читаемость сохранены."
+    },
+    {
+      "item": "S",
+      "frame": "rat-king-front.png",
+      "note": "На посохе присутствует незаданный декоративный череп. Это подвесной предмет, а не дополнительная анатомическая голова; он не подменяет и не скрывает идентификационные признаки RatKing."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134b2-ae7d-7e10-b5e2-86749c18cc9b"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

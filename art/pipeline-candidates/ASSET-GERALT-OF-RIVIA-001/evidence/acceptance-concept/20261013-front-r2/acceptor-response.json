@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GERALT-OF-RIVIA-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-GERALT-OF-RIVIA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-geralt-of-rivia-codex/design/geralt-of-rivia-front.png",
+      "sha256": "05710a4661e2ff1c60915aada08b125bd79075e73919bb26a130b64c433f98fc"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-geralt-of-rivia-codex/design",
+    "files": [
+      "geralt-of-rivia-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+    "art/imagegen/concept-geralt-of-rivia-codex/generation-records.json",
+    "art/imagegen/concept-geralt-of-rivia-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; checks-report.json#summary.PASS = 13; checks-report.json#inputs[0].sha256 = 05710a4661e2ff1c60915aada08b125bd79075e73919bb26a130b64c433f98fc",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "geralt-of-rivia-front.png: узнаётся Геральт из The Witcher по белым волосам, жёлтым глазам, шраму, тёмной броне и двум мечам. Замечание r1 об оружии закрыто: стальной меч находится в собственной правой руке, слева для зрителя; клинок отделён от ноги, вторая рукоять видна над плечом. Поза стоячая, не T и не A. Свободная левая кисть сливается с широким чёрным рукавом: самостоятельный контур кисти не читается.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "geralt-of-rivia-front.png: лицо, волосы, ремни, пряжки и гравировка оружия проработаны; кожа и металл различимы, фигура имеет вид миниатюры. Однако относительно medusa-quality-reference.png детализация явно ниже: броню покрывает грубая зернистость, плечи, рукава, сапоги и подставка имеют рваные выеденные края, возле ног видны отдельные вертикальные штрихи. Светлый ореол подставки из r1 не виден, но замечание к чистоте исполнения не закрыто.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "geralt-of-rivia-front.png: основные цвета соответствуют palette.json — чёрная кожа, белые волосы, стальное оружие и серебристая подвеска. Меч в собственной правой руке, рукоять второго меча над плечом, длинные волосы и кожаная броня присутствуют. Замечание r1 к волчьему медальону закрыто не полностью: серебряный овальный медальон есть, но его мелкий разветвлённый рельеф не читается однозначно как волчья голова.",
+      "frames": [
+        "geralt-of-rivia-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS пройден, но S+C+Q+P = 5.0: 5.0/8×10 = 6.25, half-up = 6.3 < 8.0. Требуются читаемая свободная кисть, устранение рваных краёв и шумной проработки, однозначно узнаваемый волчий медальон.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Show Geralt's own LEFT hand as a clearly formed relaxed hand outside a fitted cuff, with a readable silhouette separated from the sleeve and torso, while keeping the steel sword in his own RIGHT hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Replace the eroded edges on the shoulders, sleeves, boots and pedestal with continuous crisp sculpted forms, remove stray vertical marks around the legs, and use restrained leather grain and clean painted highlights matching the Medusa quality reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "geralt-of-rivia-front.png",
+      "fix": "Replace the indistinct chest emblem with a clearly recognisable silver wolf-head medallion while preserving leather black #24211F, hair white #E2E0DA, steel #9AA1A7 and medallion silver #C0C6CC.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Служебные записи обновлены частично: generation-records.json содержит выбранную генерацию rc1 с sha256 cbf6294db34a6fee6d26415bd681e01465a43ae1e6b35d35a72a5652a0176fd2, отличным от текущего design-файла. verification.json#design_source.post описывает обработку фона, но явная связь исходного и итогового хешей не записана; status = blocked, selected.design-front = null и checklist_status = not_run_no_image_returned остаются от прежней попытки, хотя checks содержит финальную проверку rc1. Дополнительного гейта нет; G-CHECKS остаётся PASS по checks-report.json#summary.FAIL = 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

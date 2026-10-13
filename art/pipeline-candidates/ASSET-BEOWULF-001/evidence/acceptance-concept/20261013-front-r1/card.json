@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BEOWULF-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-beowulf-codex/design/beowulf-front.png",
+      "sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-beowulf-codex/design",
+    "files": [
+      "beowulf-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-beowulf-codex/design/checks-report.json",
+    "art/imagegen/concept-beowulf-codex/generation-records.json",
+    "art/imagegen/concept-beowulf-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-beowulf-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-beowulf-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "beowulf-front.png: массивный воин, шлем, меховая мантия, борода, меч и щит ясно читаются. Между предплечьями и корпусом видны просветы; локти согнуты, поза не T и не A. Фигура и подставка полностью в кадре. Тонкие клинок и гарда читаются; их толщину следует контролировать на этапах 3–4.",
+      "frames": [
+        "beowulf-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "beowulf-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "beowulf-front.png: образ расписанной коллекционной миниатюры; металл, мех, кожа и дерево отчётливо различимы. Лицо, плетение бороды, орнамент и отделка близки к medusa-quality-reference.png. Кольчуга уступает эталону по организации деталей: плотный контрастный узор колец хуже поддерживает крупные формы туники и лишь частично соответствует описанию крупных плоских пятен.",
+      "frames": [
+        "beowulf-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "beowulf-front.png: железно-серые доспехи, коричневый мех, выветренное дерево щита и золотой торк визуально соответствуют PALETTE. Все четыре якоря присутствуют: длинный меч в собственной правой руке, слева для зрителя; круглый деревянный щит на левой руке; меховая мантия; плетёная борода.",
+      "frames": [
+        "beowulf-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "beowulf-front.png",
+      "note": "Кольчуга показана множеством отдельных контрастных колец вместо преимущественно крупных плоских расписанных пятен из DESCRIPTION_EN. Это локальное отклонение учтено в Q; материалы и основные формы остаются читаемыми."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337f-af9d-7181-b3a2-fe1c56697ebf"
+  },
+  "executor_session_id": "codex:01a13340-d4a0-7d13-a368-098932ab806b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

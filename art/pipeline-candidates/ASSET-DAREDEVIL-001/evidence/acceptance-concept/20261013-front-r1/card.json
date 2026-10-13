@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DAREDEVIL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-daredevil-codex/design/daredevil-front.png",
+      "sha256": "7f956aa71bf85be42e0aa26f6c53fcefa169595220f94c016dd3966825f646bf"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-daredevil-codex/design",
+    "files": [
+      "daredevil-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-daredevil-codex/design/checks-report.json",
+    "art/imagegen/concept-daredevil-codex/generation-records.json",
+    "art/imagegen/concept-daredevil-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-daredevil-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В daredevil-front.png узнаётся Marvel Daredevil: красная рогатая маска, открытая нижняя часть лица, атлетическая фигура. Голова, ноги и оружие отделены в силуэте; руки близко к корпусу, хват кистей читается слабее, а направленные к камере дубинки сильно укорочены перспективой. Стойка расслабленная готовая, не запрещённая T/A-поза.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "В daredevil-front.png читается объёмная коллекционная фигурка; кожа, костюм и коричневая подставка различаются. Однако крупные пластиковые блики, упрощённая проработка лица и преимущественно гладкие поверхности костюма уступают качеству эталона по тонкости скульптуры, отделке и разделению материалов. Сравнение касается исполнения, а не сложности костюма или орнамента эталона.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "В daredevil-front.png присутствуют красно-бордовый костюм, рога и коричневое оружие в обеих руках. Но нагрудный знак выглядит как светлые зеркальные петли вместо читаемой красной двойной D; предусмотренный акцент потерян. Огромные цилиндрические окончания делают оружие похожим на гантели, поэтому якорь двух billy clubs передан недостаточно точно.",
+      "frames": [
+        "daredevil-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но сумма S+C+Q+P = 5,0; итог ROUND_HALF_UP(5,0/8×10, 1) = 6,3 ниже порога 8,0. Нужны доработка читаемости оружия, качества исполнения и нагрудного якоря.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "daredevil-front.png",
+      "fix": "Keep a relaxed ready stance with elbows near the torso, make both hand grips clearly readable, and angle the clubs outward so their full silhouettes remain visible without strong foreshortening.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "daredevil-front.png",
+      "fix": "Improve the painted resin miniature craftsmanship with finer facial sculpting, crisp glove and boot seams, subtle surface texture, controlled satin highlights, and clearly differentiated skin, costume, club and pedestal materials.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "daredevil-front.png",
+      "fix": "Replace the dumbbell-like weapons with two slim brown billy clubs and the pale mirrored-loop chest symbol with a clearly legible red double-D emblem, keeping the costume dark crimson and burgundy.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349d-425b-7be2-bc6e-15fa44820871"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-YENNEFER-TRISS-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-yennefer-triss-codex/design/yennefer-triss-front.png",
+      "sha256": "ce34231dbd0c0bf4c9c36d666cd7e95221c968388763d4354942e60e1cd6686f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-yennefer-triss-codex/design",
+    "files": [
+      "yennefer-triss-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json",
+    "art/imagegen/concept-yennefer-triss-codex/generation-records.json",
+    "art/imagegen/concept-yennefer-triss-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-yennefer-triss-codex/design/checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На yennefer-triss-front.png Йеннифэр узнаваема по длинным чёрным локонам, чёрно-белому костюму и чокеру с тёмной подвеской. Силуэт ясен, обе руки и кисти отделены от корпуса, локти слегка согнуты; опущенные руки соответствуют нейтральной позе §4.4. Тонкие пальцы и подвеску потребуется сохранить читаемыми на этапах 3–4.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "На yennefer-triss-front.png проработаны лицо и пряди волос, различимы глянцевый чёрный материал, матовая светлая ткань и камень. Однако большие панели костюма почти гладкие, складки и швы бедно разработаны, расписанная детализация внутри силуэта явно ниже QUALITY_REFERENCE. Это якорь Q=1: материалы различимы, детализация заметно ниже эталона.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На yennefer-triss-front.png присутствуют все идентификационные якоря: длинные чёрные локоны, чёрно-белый костюм, чёрный чокер и приглушённые фиолетовые глаза. Есть отклонение тона: светлые панели выглядят серебристо-серыми относительно #E6E4E0, радужки — серо-лавандовыми относительно акцента #8A4AB3.",
+      "frames": [
+        "yennefer-triss-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 score = (2 + 1.5 + 1 + 1.5) / 8 × 10 = 7.5, что ниже порога 8.0: требуется return_to_stage_1. G-CHECKS PASS; измерений ниже 1.0 нет. Цикл r1 не последний.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "yennefer-triss-front.png",
+      "fix": "In the front view, refine the existing costume's sculpted seams, natural fabric folds and painted material separation to match the QUALITY_REFERENCE collectible-miniature craftsmanship.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "yennefer-triss-front.png",
+      "fix": "In the front view, restore the existing white outfit panels to #E6E4E0 and the visible irises to violet #8A4AB3 while preserving the black outfit, black hair and black choker.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "yennefer-triss-front.png",
+      "note": "Верхняя плоскость подставки видна, поэтому основание показано не строго edge-on; это замечание не меняет маршрут по заданной рубрике."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a6-e09c-7d60-b1d4-8ab1d290bc74"
+  },
+  "executor_session_id": "launcher:acceptance-reverse-7795d573f6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Концепт 1a возвращён на коррекцию Q и P по делегированию: docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md. Происхождение unstability.ai указано в verification.json#design_source."
+}

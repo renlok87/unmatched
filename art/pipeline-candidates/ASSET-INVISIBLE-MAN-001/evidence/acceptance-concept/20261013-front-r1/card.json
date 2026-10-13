@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-INVISIBLE-MAN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-invisible-man-codex/design/invisible-man-front.png",
+      "sha256": "de86108455a88092235ad0b029135cbe106af89720a74a32ac27c3fc3ee5affa"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-invisible-man-codex/design",
+    "files": [
+      "invisible-man-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-invisible-man-codex/design/checks-report.json",
+    "art/imagegen/concept-invisible-man-codex/generation-records.json",
+    "art/imagegen/concept-invisible-man-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-invisible-man-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1. WARN view.frame_top не меняет статус гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "invisible-man-front.png: ясный фронтальный силуэт; поля шляпы, поднятый воротник, кисти и обе ноги читаются отдельно. Руки отделены от корпуса, локти слегка согнуты, пальцы расслаблены: нейтральная стойка, не T- или A-поза. Оружия и лишних частей нет; фигура и подставка целиком в кадре. Тонкие поля шляпы и пальцы потребуют проверки геометрии на этапах 3–4.",
+      "frames": [
+        "invisible-man-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "invisible-man-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "invisible-man-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны слои бинтов, оправа очков, швы и износ пальто, пуговицы жилета, складки галстука, перчаточные швы и шнуровка ботинок. Материалы бинтов, кожи и линз различимы; детализация сохраняется внутри силуэта. Более простой костюм соответствует персонажу.",
+      "frames": [
+        "invisible-man-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "invisible-man-front.png: тёплые белые бинты, коричневое пальто, почти чёрные круглые линзы и светло-коричневые перчатки соответствуют palette.json и PALETTE карточки. Все четыре якоря видимы: забинтованная голова, тёмные круглые очки, коричневое пальто с поднятым воротником и шляпа с полями. Накладной нос и пустой тёмный проём вместо шеи также присутствуют.",
+      "frames": [
+        "invisible-man-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхний отступ 2,21% при рекомендованных 4%; WARN, обрезания шляпы нет. Гейт PASS и фиксированный C не изменяются."
+    },
+    {
+      "item": "S",
+      "frame": "invisible-man-front.png",
+      "note": "На этапах 3–4 проверить толщину полей шляпы, разделение пальцев и сохранение пустого пространства вместо шеи; по растровому концепту геометрия не проверяется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13388-41df-7f92-a1fb-fb189bc1bcb7"
+  },
+  "executor_session_id": "codex:01a13364-1e79-7ef3-a66c-93d81d522762",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

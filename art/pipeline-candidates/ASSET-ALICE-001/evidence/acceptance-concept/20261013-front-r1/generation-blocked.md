@@ -1,0 +1,1 @@
+Generation run finished, but no PNG was produced: image_gen moderation_blocked on output. Acceptance cannot run without design/alice-front.png. No acceptance card or score fabricated. Original package untouched; generation log: C:/tmp/concept-wave/logs/ASSET-ALICE-001-concept.codex-last.txt.

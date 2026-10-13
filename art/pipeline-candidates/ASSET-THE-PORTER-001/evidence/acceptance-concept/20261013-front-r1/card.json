@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-THE-PORTER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-the-porter-codex/design/the-porter-front.png",
+      "sha256": "b3c26cedf761730b1600ad9fbebab3315776a8a6f969b55ac15326e8d7a37f97"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-the-porter-codex/design",
+    "files": [
+      "the-porter-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-the-porter-codex/design/checks-report.json",
+    "art/imagegen/concept-the-porter-codex/generation-records.json",
+    "art/imagegen/concept-the-porter-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-the-porter-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; verification.json#final_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "the-porter-front.png: ясный силуэт крепкого носильщика; корзина выступает над плечами и по бокам, головной платок и короткая дубинка различимы. Кисти отделены от корпуса, дубинка в собственной правой руке, слева для зрителя; естественная асимметричная стойка, не T- и не A-поза. Тонкая бахрома читается; её толщину и устойчивость следует проверить на этапах 3–4.",
+      "frames": [
+        "the-porter-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "the-porter-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "the-porter-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Чётко проработаны лицо и борода, отдельные прутья корзины, витки верёвок, швы и заплаты, складки и потёртости; дерево, плетение, ткань, кожа и тело различаются по фактуре и бликам.",
+      "frames": [
+        "the-porter-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "the-porter-front.png: коричневая туника, охристое плетение, пыльно-кремовая ткань и красный головной платок соответствуют PALETTE и palette.json с естественными светотеневыми оттенками. Все три якоря присутствуют: короткая деревянная дубинка в собственной правой руке, корзина за спиной и головной платок.",
+      "frames": [
+        "the-porter-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "the-porter-front.png",
+      "note": "Подставка шире ориентировочной пропорции: verification.json#limitations указывает диаметр около 0,67 высоты фигуры вместо около 0,55. Она целиком в кадре и не ухудшает читаемость персонажа; отдельного FAIL по этому параметру нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337a-6920-7613-8f1a-68df0d6e00c1"
+  },
+  "executor_session_id": "codex:01a13335-a8e5-7f01-8c3b-de994cec106e",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

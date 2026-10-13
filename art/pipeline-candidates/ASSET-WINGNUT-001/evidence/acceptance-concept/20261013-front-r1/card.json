@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WINGNUT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wingnut-codex/design/wingnut-front.png",
+      "sha256": "a222b437afea29fd58c0247375d4b97cf410b4d72b576f7f74403620f8fa05b1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wingnut-codex/design",
+    "files": [
+      "wingnut-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wingnut-codex/design/checks-report.json",
+    "art/imagegen/concept-wingnut-codex/generation-records.json",
+    "art/imagegen/concept-wingnut-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wingnut-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В wingnut-front.png Wingnut узнаваем по сочетанию морды летучей мыши, крупных ушей и перепончатых крыльев, лётных очков, упряжи и маленького инопланетного существа на плече, согласно KEY и DESCRIPTION_EN. Руки отделены от корпуса, локти слегка согнуты, кисти с собранными когтями читаются на фоне серых перепонок; обе стопы стоят на подставке. Это нейтральная поза миниатюры по §4.4. Тонкие кончики крыльев, когти и отростки спутника различимы; их геометрия требует отдельной проверки на этапах 3–4.",
+      "frames": [
+        "wingnut-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wingnut-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В wingnut-front.png достигнут уровень расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны направления шерсти, складки и жилки перепонок, швы и отверстия ремней, металлические пряжки, линзы, зубы и ткани спутника. Материалы отчётливо различаются, детализация присутствует внутри силуэта и сохраняется на конечностях.",
+      "frames": [
+        "wingnut-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В wingnut-front.png присутствуют все четыре якоря и все заданные цвета: коричневая шерсть, серые крылья, светло-коричневая упряжь и янтарные линзы. Шерсть и упряжь в освещённых участках выглядят теплее и светлее заданных #5A4436 и #A8865A. Командного цвета и цветного кольца на подставке нет.",
+      "frames": [
+        "wingnut-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wingnut-front.png",
+      "note": "Виден узкий участок верхней поверхности подставки: строго горизонтальная ортографическая камера не подтверждена. Фигура и подставка целиком в кадре; фон имеет мягкий градиент. Эти отклонения условий изображения сохранены в сообщении verification limit_reached; G-CHECKS остаётся PASS по summary.FAIL = 0."
+    },
+    {
+      "item": "P",
+      "frame": "wingnut-front.png",
+      "note": "Тёплые светлые участки шерсти и упряжи отклоняются от базовых тонов палитры. Составная проверка палитры отмечена в verification limit_reached; визуально основные цвета, янтарный акцент и все якоря присутствуют."
+    },
+    {
+      "item": "S",
+      "frame": "wingnut-front.png",
+      "note": "На отложенных этапах 3–4 проверить толщину кончиков крыльев, когтей и отростков спутника, а также отделение рук от перепонок в геометрии. Концепт показывает эти детали, но не подтверждает пригодность будущего меша."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134bd-805a-7913-b8fe-d37544c41199"
+  },
+  "executor_session_id": "launch:db-reverse-20261013-80ae60d9-c682-4942-986f-0c8e08b53583",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

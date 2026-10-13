@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-YENNENGA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-yennenga-codex/design/yennenga-front.png",
+      "sha256": "456b1601dfcc54ad684af4f11a143685075a0bd1e8ce78f8810f1870413adae0"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-yennenga-codex/design",
+    "files": [
+      "yennenga-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-yennenga-codex/design/checks-report.json",
+    "art/imagegen/concept-yennenga-codex/generation-records.json",
+    "art/imagegen/concept-yennenga-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-yennenga-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#final_script_exit_code = 0. Выбранная генерация g2 и дизайн имеют одинаковый SHA256 по generation-records.json и verification.json.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В yennenga-front.png читается Yennenga согласно KEY и DESCRIPTION_EN: гордая принцесса-воительница с узорчатой обёрткой, кожаной бронёй, бусами и украшенной причёской. Короткое относительно роста копьё находится в собственной правой руке, слева для зрителя; небольшой круглый щит показан под углом на левой руке. Оружие и обе руки отделены от корпуса, анатомия правдоподобна, стойка естественная, без T- или A-позы. Фигура и подставка целиком видны; тонкое древко и бахрома различимы.",
+      "frames": [
+        "yennenga-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "yennenga-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "yennenga-front.png соответствует уровню medusa-quality-reference.png как расписанная коллекционная миниатюра: подробно проработаны лицо, косы, отдельные бусины, раковины, швы и заклёпки брони, рельеф поножей, орнамент щита, складки и бахрома ткани. Кожа, ткань, дерево и металлическая фурнитура убедительно различаются; детали сохраняются внутри силуэта. Меньшая сложность костюма не означает более низкое качество исполнения.",
+      "frames": [
+        "yennenga-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В yennenga-front.png охристая обёртка, коричневая кожаная броня, тёмная кожа и красные бусины визуально соответствуют PALETTE и palette.json. Все четыре ANCHORS_EN присутствуют: короткое копьё справа у фигуры, небольшой круглый щит слева, узорчатая обёртка и украшения из бус. Светлая фурнитура и раковины остаются локальными деталями; подставка нейтральная, без командного цветного кольца.",
+      "frames": [
+        "yennenga-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 3,246% при рекомендации не менее 4%. Фигура не обрезана; summary.FAIL = 0. Предупреждение не меняет гейт и фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "yennenga-front.png",
+      "note": "При будущей сборке на этапах 3–4 проверить толщину и прочность древка, бахромы и мелких украшений, а также крепление щита к предплечью. На концепте эти детали читаются; геометрия здесь не оценивается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13495-f798-7e43-8a1c-3506218db420"
+  },
+  "executor_session_id": "codex:01a1345f-2456-7840-b8df-0d027a53380e",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

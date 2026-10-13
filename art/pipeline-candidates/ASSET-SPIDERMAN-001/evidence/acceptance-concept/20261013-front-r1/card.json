@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SPIDERMAN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-spiderman-codex/design/spiderman-front.png",
+      "sha256": "11a28670744fe717849ada6a388bd0a69eee35051870eb40975c5f6e864a8fae"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-spiderman-codex/design",
+    "files": [
+      "spiderman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+    "art/imagegen/concept-spiderman-codex/generation-records.json",
+    "art/imagegen/concept-spiderman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-spiderman-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В spiderman-front.png узнаётся именно Spider-Man из DESCRIPTION_EN: характерная маска, большие линзы и нагрудный паук читаются; голова, две руки и две ноги различимы. Предплечья отделены от корпуса, но плечи и верхние части рук близки к нему. Стойка статичная, почти прямые колени: заявленной crouched ready pose нет. Это опущенные руки в нейтральной стойке, не T-поза и не развёрнутая A-поза.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "spiderman-front.png выглядит объёмной миниатюрой: различимы линзы, эмблема, рельеф паутины и фактура подставки. Однако против medusa-quality-reference.png детализация явно ниже: костюм имеет преимущественно гладкий пластиковый блеск, линии паутины неоднородны, пальцы обеих кистей проработаны слабо. Видны артефакты отделения от фона: светлая полоса слева от подставки, прямоугольный участок за фигурой и светлая кайма контура.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "В spiderman-front.png присутствуют основные цвета PALETTE, белые линзы, чёрный нагрудный паук и рисунок паутины на красных участках. Один обязательный якорь ANCHORS_EN отсутствует: ни одна рука не поднята в узнаваемом жесте выпуска паутины; обе кисти опущены у бёдер.",
+      "frames": [
+        "spiderman-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но сумма S+C+Q+P = 5,0 даёт score 6,3 после округления half-up, ниже порога 8,0; отсутствует обязательный жест выпуска паутины, детализация явно ниже эталона.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "spiderman-front.png",
+      "fix": "Pose Spider-Man in a crouched ready stance with visibly bent knees and both arms clearly separated from the torso while keeping the entire figure and pedestal in frame.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "spiderman-front.png",
+      "fix": "Render a finely painted collectible miniature with subtle suit texture, restrained highlights, crisp web lines and individually resolved fingers, removing the pale strip left of the base, rectangular background patch and contour halos.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "spiderman-front.png",
+      "fix": "Raise one hand in Spider-Man's unmistakable web-shooting gesture with the middle and ring fingers folded into the palm and the index and little fingers extended, preserving the specified red-blue-black palette, white lenses and chest spider emblem.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13489-246f-7623-9116-3aec32d55070"
+  },
+  "executor_session_id": "codex:unstability.ai download (Downloads",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "По делегированию: концепт 1a возвращён на доработку. Отдельное замечание к предусловию вызова: verification.json описывает заблокированную попытку g1 и отсутствие выбранного изображения, тогда как generation-records.json содержит выбранную u1; SHA-256 выбранной u1 отличается от design/spiderman-front.png, связь между ними не документирована в прочитанных записях. Эти несогласованности не изменяют PASS G-CHECKS и фиксированное C."
+}

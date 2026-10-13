@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DEADPOOL-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-DEADPOOL-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-deadpool-codex/design/deadpool-front.png",
+      "sha256": "9b4a9ba741df23e750cba5fd271df3d5eb2e7c2964ba7b058466ee4c0b545d50"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-deadpool-codex/design",
+    "files": [
+      "deadpool-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-deadpool-codex/design/checks-report.json",
+    "art/imagegen/concept-deadpool-codex/generation-records.json",
+    "art/imagegen/concept-deadpool-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-deadpool-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#summary.FAIL = 0; checks-report.json#inputs[0].sha256 = 9b4a9ba741df23e750cba5fd271df3d5eb2e7c2964ba7b058466ee4c0b545d50",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "deadpool-front.png: однозначно узнаваем Deadpool из Marvel — красно-чёрная маска с белыми глазами, характерный костюм, две рукояти катан над плечами и пояс с подсумками. Один пистолет находится в анатомически правой руке, слева для зрителя. Руки отделены от корпуса, ноги разделены, обе стопы стоят на подставке; локти согнуты, поза не T/A.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "deadpool-front.png: швы маски и костюма, клапаны подсумков и обмотки катан читаются; материалы костюма, кожи и оружия различимы. Однако крупная однообразная зернистость красных и чёрных панелей, упрощённые пальцы и детали пистолета заметно уступают medusa-quality-reference.png по точности мелких форм и тонкости отделки расписанной миниатюры. Замечания r1 по отделке закрыты частично; неровный участок фона у подставки устранён.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "deadpool-front.png: все четыре цвета из palette.json и все якоря asset-card.yaml присутствуют, включая белые глаза и пистолет в правой руке. Красный сохраняет заданное семейство цвета, но коричневые подсумки выглядят заметно светлее и рыжее #5A3B26. Замечание r1 по тону кожи не закрыто.",
+      "frames": [
+        "deadpool-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сумма S/C/Q/P = 6,0 даёт score 7,5, ниже порога 8,0: детализация и отделка заметно уступают эталону, тон коричневых подсумков отклоняется от палитры.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "deadpool-front.png",
+      "fix": "Preserve Deadpool's identity and pose while replacing the coarse uniform suit grain with fine controlled texture, refining the fingers and pistol grip and trigger guard, and adding crisp sculpted edges and restrained painted highlights comparable in finish quality to the Medusa reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "deadpool-front.png",
+      "fix": "Darken and desaturate the leather pouches to match #5A3B26 under neutral studio lighting while preserving suit red #B3202A, suit black #18181C, eye white #E8E8E8, and all required character anchors.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Проверка view.single_component дала WARN: крупнейшая дополнительная компонента маски составляет 3,742%. На deadpool-front.png визуально одна фигура на подставке; WARN не меняет PASS гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

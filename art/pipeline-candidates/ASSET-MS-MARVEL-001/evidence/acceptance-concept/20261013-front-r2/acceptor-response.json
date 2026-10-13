@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MS-MARVEL-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-MS-MARVEL-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ms-marvel-codex/design/ms-marvel-front.png",
+      "sha256": "90e310a62587bd91028f6732a852a9026196034965702ca7d912357cef66fd50"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ms-marvel-codex/design",
+    "files": [
+      "ms-marvel-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ms-marvel-codex/design/checks-report.json",
+    "art/imagegen/concept-ms-marvel-codex/generation-records.json",
+    "art/imagegen/concept-ms-marvel-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ms-marvel-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ms-marvel-front.png: узнаётся Ms. Marvel — Камала Хан из Marvel, благодаря тунике с молнией, длинному шарфу, тёмным волосам и асимметрии кулаков. Фигура целиком читается, обе стопы стоят на подставке; это не T/A-поза. Однако одна рука выпрямлена над головой, другая вплотную к тунике: нейтральная стойка с небольшим сгибом локтей и видимыми зазорами по §4.4 не соблюдена.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "ms-marvel-front.png: вид расписанной объёмной миниатюры присутствует, кожа, ткань, волосы и золотая молния различимы. Но волосы собраны в грубые пряди, складки и края рукавов упрощены, поверхность одежды покрыта крупной неоднородной фактурой мазков. Тонкость скульптуры и аккуратность росписи явно ниже medusa-quality-reference.png; замечание r1 о качестве исполнения полностью не закрыто.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "ms-marvel-front.png: все заданные якоря видны — синяя туника с золотой молнией, длинный красный шарф, красные леггинсы и поднятый кулак крупнее опущенного. Замечания r1 о цвете леггинсов и одинаковом размере кистей закрыты. Цветовые семейства верны, но синий и красный заметно высветлены, а волосы имеют обширные серые высветления относительно palette.json и PALETTE в asset-card.yaml.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Гейт PASS, но сумма S+C+Q+P = 5.5; ROUND_HALF_UP(5.5/8×10, 1) = 6.9 < 8.0. Требуются нейтральная поза, более тонкое исполнение миниатюры и уточнение тонов палитры.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "ms-marvel-front.png",
+      "fix": "Lower both arms into a neutral standing miniature pose with slightly bent elbows and clear visible gaps between each arm and the tunic, keeping both feet planted, weight even and one fist visibly enlarged.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "ms-marvel-front.png",
+      "fix": "Replace coarse scratched paint textures and chunky hair clumps with fine sculpted strands, crisp fabric folds and seams, precise hand and boot details, and controlled miniature brushwork with distinct skin, textile, leather and gold finishes matching the quality reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ms-marvel-front.png",
+      "fix": "Match the painted midtones to tunic blue #1F3E8A, scarf and leggings red #B3202A, hair black #1A1719 and lightning bolt gold #E0B830 while preserving the long scarf and one visibly enlarged fist.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

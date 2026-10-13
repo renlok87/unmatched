@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-achilles-codex/design/achilles-front.png",
+      "sha256": "1f2156d48e5113538642834091e1521d4be18a24f4be2db6a2fa6cfc557e1267"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-achilles-codex/design",
+    "files": [
+      "achilles-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-achilles-codex/design/checks-report.json",
+    "art/imagegen/concept-achilles-codex/generation-records.json",
+    "art/imagegen/concept-achilles-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-achilles-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "achilles-front.png: копьё, высокий гребень, плащ и щит ясно читаются; локти согнуты, поза не T и не A. Руки отведены от корпуса, но плащ заполняет просветы, а щит скрывает левую кисть и часть предплечья. Тонкие древко и наконечники различимы; на этапах 3–4 проверить сохранение их толщины и читаемости.",
+      "frames": [
+        "achilles-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "achilles-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "achilles-front.png: рельеф щита и поножей, орнамент кирасы, заклёпки, пряжки, волосы и гребень проработаны на уровне medusa-quality-reference.png. Бронза с тёмными углублениями, ткань, кожа, кожаные ремни и каменная подставка различимы; лицо и складки соответствуют расписанной коллекционной миниатюре.",
+      "frames": [
+        "achilles-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "achilles-front.png: бронза, багряный плащ, тёплая оливковая кожа и золотая отделка гребня согласуются с palette.json. Все якоря присутствуют: вертикальное копьё в собственной правой руке, бронзовый щит на левой, высокий конский гребень и красный плащ. Круглый щит показан под углом и имеет эллиптическую проекцию.",
+      "frames": [
+        "achilles-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "achilles-front.png",
+      "note": "Левая кисть и часть предплечья скрыты щитом; плащ уменьшает отделение рук в силуэте. Главные признаки сохраняют читаемость."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.624% при целевом минимуме 4%. Наконечник полностью виден; предупреждение не меняет PASS гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337d-8019-7432-8e69-eca75407f43b"
+  },
+  "executor_session_id": "codex:01a1333b-9017-7990-aa77-277ec47df2ba",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

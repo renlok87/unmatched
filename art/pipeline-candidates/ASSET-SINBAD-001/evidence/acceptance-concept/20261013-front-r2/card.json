@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SINBAD-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-SINBAD-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+      "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sinbad-codex/design",
+    "files": [
+      "sinbad-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+    "art/imagegen/concept-sinbad-codex/generation-records.json",
+    "art/imagegen/concept-sinbad-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "sinbad-front.png: ясный силуэт взрослого морехода; тюрбан, изогнутый клинок, шаровары и загнутые туфли отчётливо читаются. Обе руки отделены от корпуса, локти согнуты, поза не T и не A. Единственный скимитар находится в собственной правой руке; ножны на левом бедре открыты и пусты, второй меч из r1 устранён. Тонкие острие клинка, гарда и пальцы читаются; их толщину и сохранность следует проверить на этапах 3–4.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sinbad-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо и борода, переплетение тюрбана, складки и фактура ткани, золотая вышивка, гравировка клинка, кожа ремней и наручей, отделка ножен и обуви. Кожа, ткань, металл и камень различимы; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "sinbad-front.png: sail white присутствует в тюрбане, рубахе и шароварах, sea blue — в жилете, широком кушаке и обмотке тюрбана, sun-bleached tan — в загорелой коже, gold trim — в орнаменте и металлической отделке. Цвета соответствуют palette.json с учётом освещения. Все четыре якоря видимы: скимитар в собственной правой руке, белый тюрбан, широкий синий кушак и ножны на собственном левом бедре.",
+      "frames": [
+        "sinbad-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "Видна узкая верхняя поверхность верхнего диска подставки: строгое требование подставки ребром не выполнено, что отражено в verification.json#limit_reached. Фигура фронтальная; ограничение не ухудшает читаемость силуэта, не является отдельным гейтом и не меняет фиксированный C на 1a."
+    },
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "checks-report.json#measurements.front.mask.bottom_pct = 95.304 вместо ориентира CORE 93%; фигура, оружие и подставка полностью в кадре, view.bottom_margin = PASS."
+    },
+    {
+      "item": "S",
+      "frame": "sinbad-front.png",
+      "note": "verification.json#limitations: диаметр подставки оценён примерно в 0.63 высоты фигуры при ориентире CORE около 0.55. Это отклонение пропорций подставки; силуэт персонажа и якоря читаются."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337a-0982-79d0-b097-f32af8c2936a"
+  },
+  "executor_session_id": "codex:01a13374-3990-78b0-97c6-e236cdc06e2c",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

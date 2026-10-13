@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LITTLE-RED-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-little-red-codex/design/little-red-front.png",
+      "sha256": "dcde1157cecf4a6d233ecbbb5bcf814f50524c5386a549609478eb28cfc2f85d"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-little-red-codex/design",
+    "files": [
+      "little-red-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-little-red-codex/design/checks-report.json",
+    "art/imagegen/concept-little-red-codex/generation-records.json",
+    "art/imagegen/concept-little-red-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-little-red-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2; verification.json#checks[selected-final].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В little-red-front.png силуэт Красной Шапочки ясный: капюшон, топор и корзина хорошо различимы, предплечья отделены от корпуса, локти согнуты, обе стопы устойчиво стоят на подставке. Поза естественная, запретных T- и A-поз нет. Фигура и принадлежности целиком в кадре. Рукоять топора и дуга ручки корзины читаются; их геометрию и соединения следует проверить на этапах 3–4.",
+      "frames": [
+        "little-red-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "little-red-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В little-red-front.png выдержан уровень расписанной коллекционной миниатюры, сопоставимый с medusa-quality-reference.png: детализированы лицо и волосы, складки и швы ткани, шнуровка и потёртости кожи, плетение корзины, древесные волокна рукояти и поверхность металлического лезвия. Материалы различимы, мелкие детали проработаны внутри силуэта; простой крестьянский костюм соответствует описанию персонажа.",
+      "frames": [
+        "little-red-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В little-red-front.png палитра визуально соответствует PALETTE и palette.json: насыщенный красный плащ, тёплый белый фартук, коричневые платье и кожа, золотистая лоза корзины. Все четыре якоря сохранены: красный капюшон с плащом, топор в собственной RIGHT руке слева для зрителя, корзина на LEFT предплечье справа для зрителя, белый фартук. Светотень сохраняет заданные цветовые отношения.",
+      "frames": [
+        "little-red-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верх маски 3,729% при ориентире ≥4%; капюшон целиком виден, обрезки нет. Предупреждение не меняет PASS гейта или фиксированный C."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.single_component: дополнительная компонента маски 1,89%. При визуальном просмотре little-red-front.png присутствует одна фигура с принадлежностями и одной подставкой; лишнего персонажа или отдельного постороннего объекта нет."
+    },
+    {
+      "item": "S",
+      "frame": "little-red-front.png",
+      "note": "На этапах 3–4 проверить объём, непрерывность и крепления ручки корзины, рукояти топора и мелкой шнуровки. По одному концепту геометрическая пригодность не подтверждается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1338c-a518-7f61-96fa-10a3a7666ea0"
+  },
+  "executor_session_id": "codex:01a13358-b930-7d33-9e57-44120ee93d75",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

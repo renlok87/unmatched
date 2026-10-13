@@ -1,0 +1,95 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLOODY-MARY-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bloody-mary-codex/design/bloody-mary-front.png",
+      "sha256": "1b9c9f5954f0f66506d80435d986e8ff3586ae5031baf45ae268c92b2480cd89"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bloody-mary-codex/design",
+    "files": [
+      "bloody-mary-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bloody-mary-codex/design/checks-report.json",
+    "art/imagegen/concept-bloody-mary-codex/generation-records.json",
+    "art/imagegen/concept-bloody-mary-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bloody-mary-codex/design/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 12 / WARN 1 / FAIL 0, verdict PASS, sha256 входа совпадает с accepted_object. WARN view.frame_top: верх фигуры 3.177 % < 4 % рамки ядра 1a. Это не гейт, на 1a уходит в фиксированный C."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "bloody-mary-front.png: силуэт сразу читается как призрак-невеста: пик фаты, длинные тёмные волосы, рваные свисающие рукава, расклёшенное платье со шлейфом на подставке. Одна голова, две руки, лишних частей нет. Поза стоячая, не T и не A, обе стопы на подставке. Почему не 2. Плечи опущены вдоль корпуса, предплечья сведены к груди, обе кисти держат ручку зеркала (так требует DESCRIPTION_EN: mirror close to her chest with both hands). Сквозного зазора фона между рукой и корпусом нет ни с одной стороны: щель заполняют волосы. Это «руки близко к корпусу» и мелкое слияние кисти с предметом, уровень 1,5. Зеркало перекрывает грудь, но по тону и форме (бронзовая рама, светлое треснувшее стекло) читается отдельно, поэтому не 1. Для этапов 3–4: риск сплавления кистей, ручки и зеркала с грудью; тонкие части (перфорированные фата и рукава, отдельные пряди волос, нитки-бретели на плечах).",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "bloody-mary-front.png против medusa-quality-reference.png: уровень расписанной коллекционной статуэтки на подставке. Внутри силуэта плотная детализация: складки и рваные края ткани с дырами, потёки крови на ткани, кистях и лице, филигранная бронзовая рама зеркала с ручкой, трещины стекла, венок из роз на фате, проработанные пальцы ног. Материалы различимы: кожа, ткань, волосы, металл, стекло, камень. Не плоско, не мультяшно, не фото. Подставка проще эталонной, но это уместно для неукрашенного образа.",
+      "frames": [
+        "bloody-mary-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "bloody-mary-front.png: все основные цвета и акцент присутствуют. Ghost grey: платье и фата по светлоте близки к #8E949A (замер ~#878082). Pale skin: бледная кожа. Ink black: волосы ~#2B2B2B. Blood red: кровь и розы. Все якоря на месте: овальное ручное зеркало в обеих руках, рваная фата, длинные тёмные волосы, босые стопы. Отклонение тона: серый платья тёплый (B−R от −5 до −14) вместо холодного #8E949A (B−R +12); кожа в свете теплее и темнее #D9D4CC (~#C0B4A8); вне палитры бронзовая рама зеркала и зелёные листья роз. Свотчей на 1a нет (palette.swatches пуст в checks-report.json).",
+      "frames": [
+        "bloody-mary-front.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-BLOODY-MARY-001-r1"
+  },
+  "executor_session_id": "codex:01a13345-0e3a-7f10-8c60-b0c8ed6bec1a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)",
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "bloody-mary-front.png",
+      "note": "Сквозного зазора фона между руками и корпусом нет: его заполняют волосы, а зеркало с обеими кистями прижато к груди (так требует DESCRIPTION_EN). На этапах 3–4 проверить, не сплавились ли кисти, ручка и рама зеркала с грудью, и отделимы ли руки при риге."
+    },
+    {
+      "item": "S",
+      "frame": "bloody-mary-front.png",
+      "note": "Тонкие и хрупкие части: перфорированные фата и рваные свисающие рукава, отдельные пряди волос по бокам, нитки-бретели на плечах. На этапе 3 записать в отчёт их читаемость после Tripo."
+    },
+    {
+      "item": "P",
+      "frame": "bloody-mary-front.png",
+      "note": "Серый платья тёплый, а #8E949A холодный; кожа теплее и темнее #D9D4CC; вне палитры бронзовая рама зеркала и зелёные листья роз. При текстурировании держать холодный ghost grey."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: верх 3.177 % < 4 % рамки ядра 1a (не FAIL, гейт PASS); на 1c сохранить верхний отступ."
+    }
+  ]
+}

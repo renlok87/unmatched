@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LUKE-CAGE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-luke-cage-codex/design/luke-cage-front.png",
+      "sha256": "65038d88842e7dfcd6d6181dc67ab291ee5fe16d46de26078b10e652a97088eb"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-luke-cage-codex/design",
+    "files": [
+      "luke-cage-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-luke-cage-codex/design/checks-report.json",
+    "art/imagegen/concept-luke-cage-codex/generation-records.json",
+    "art/imagegen/concept-luke-cage-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-luke-cage-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В luke-cage-front.png Люк Кейдж узнаётся по жёлтой раскрытой рубашке, стальной повязке, серебряным браслетам и мощной фигуре. Кулаки отделены от корпуса, ноги различимы. Опущенные плечи и согнутые локти образуют стойку готовности, соответствующую допустимой позе.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "В luke-cage-front.png читается коллекционная миниатюра: кожа и металл различимы, волосы, щетина, пуговицы и детали браслетов проработаны. Однако рубашка выглядит гладкой глянцевой оболочкой с вылепленной мускулатурой вместо убедительной ткани; кисти и переходы анатомических форм беднее по исполнению, чем в QUALITY_REFERENCE.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "В luke-cage-front.png присутствуют жёлтый, тёмная кожа и серебро; раскрытый воротник, стальная повязка и браслеты читаются. Чёрные брюки, обозначенные в PALETTE, заменены трусами и открытыми ногами. Пояс воспринимается как крупная механическая пряжка с короткими сегментированными элементами, цепной якорь недостаточно выражен. Жёлтый заметно ярче заданного #E0B830.",
+      "frames": [
+        "luke-cage-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При G-CHECKS PASS сумма S=2, C=1.5, Q=1.5, P=1 составляет 6; итоговый балл 7.5 ниже порога 8.0. Требуются восстановление чёрных брюк и цепного пояса, уточнение тона рубашки и качества её материала.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "luke-cage-front.png",
+      "fix": "Give the yellow shirt convincing cloth folds and seams with restrained painted-resin sheen, and refine the fists and anatomical transitions to match the quality reference's craftsmanship.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "luke-cage-front.png",
+      "fix": "Restore full-length black trousers, replace the oversized mechanical buckle with a clearly linked steel chain belt, and bring the shirt toward #E0B830 while preserving the steel headband and silver wristbands.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349e-e3e3-7782-9e0d-fc3b7174d37a"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

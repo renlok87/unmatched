@@ -1,0 +1,107 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-EREDIN-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-EREDIN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-eredin-codex/design/eredin-front.png",
+      "sha256": "bd5b8d23a3a180c63863094ca6a6bf14f0347e70f290e7459c01a90088f1efbe"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-eredin-codex/design",
+    "files": [
+      "eredin-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-eredin-codex/design/checks-report.json",
+    "art/imagegen/concept-eredin-codex/generation-records.json",
+    "art/imagegen/concept-eredin-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-eredin-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В eredin-front.png коронованный шлем-маска, чёрные шипованные латы, длинный меховой плащ и меч поддерживают узнаваемость Эредина, Короля Дикой Охоты. Черепная форма лица выражена слабее короны: заострённый закрытый подбородок делает маску более обобщённой. Меч и плечевые шипы отделены от корпуса, но оружейная кисть сближена с мехом, а свободная кисть скрыта плащом. Вертикальная спокойная поза не является T/A-позой.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "В eredin-front.png различимы металл, мех и поддоспешные участки; подробно выполнены орнамент нагрудника, сочленения лат и гарда. Исполнение близко к коллекционной миниатюре, но зернистая фактура металла, затемнённые детали ног и нечёткие пальцы уступают чистоте рельефа и материала эталона Medusa. Отличия персонажа, костюма и цветов эталона не учитывались.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В eredin-front.png присутствуют чёрная броня, морозно-голубые кромки и клинок, голубые глаза, шипованный череповидный шлем и меховой плащ. Меч находится в анатомической ПРАВОЙ руке, слева для зрителя. Есть отклонение тона: большие участки меха серо-коричневые, нижние пряди почти белые, а плечевые пластины заметно светлее основного armour black. Поэтому визуальное соответствие палитре неполное, несмотря на наличие всех цветов и якорей.",
+      "frames": [
+        "eredin-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При G-CHECKS PASS сумма S + C + Q + P равна 6.0; итоговый балл 7.5 ниже обязательного порога 8.0. Требуются улучшение читаемости кистей и характерной маски Эредина, чистоты исполнения деталей и соответствия тёмной палитре.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "eredin-front.png",
+      "fix": "Strengthen Eredin's distinctive crowned skull mask with readable cheekbones and a skeletal jaw, reveal the empty left hand beside the cloak, and separate the right sword grip from the fur while preserving the relaxed upright pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "eredin-front.png",
+      "fix": "Reduce granular metal noise, sharpen sculpted armour relief and articulated glove fingers, and clarify the leg plates with controlled painted highlights at the quality reference's collectible miniature craftsmanship level.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "eredin-front.png",
+      "fix": "Keep armour predominantly black (#1C1C22) and fur dark brown (#3A3430), restrict pale frost-blue (#8AB0D0) highlights to smaller accents, and preserve eye-blue (#6AB8E8) eyes and the longsword in the anatomical right hand.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "eredin-front.png",
+      "note": "Подставка выглядит как неровная каменная плита с видимой верхней поверхностью; запрошенная в записи генерации круглая подставка строго с ребра не получена."
+    },
+    {
+      "item": "S",
+      "frame": "eredin-front.png",
+      "note": "Тонкие выступы короны и ажурной гарды читаются, но потребуют проверки толщины и прочности при последующей сборке миниатюры."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "codex:01a134fc-a191-7190-865f-57358f97dfa2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

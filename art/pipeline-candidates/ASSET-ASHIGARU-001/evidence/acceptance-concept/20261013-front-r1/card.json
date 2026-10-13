@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ASHIGARU-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ashigaru-codex/design/ashigaru-front.png",
+      "sha256": "411c6a632027d4ad5bdc3387e4ab4a0d174ab4a1df0cc13cf00bda95a7ecdbbd"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ashigaru-codex/design",
+    "files": [
+      "ashigaru-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ashigaru-codex/design/checks-report.json",
+    "art/imagegen/concept-ashigaru-codex/generation-records.json",
+    "art/imagegen/concept-ashigaru-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ashigaru-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; verification.json#checks[3].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В ashigaru-front.png ясный фронтальный силуэт: jingasa, вертикальное yari и знамя различимы. Копьё в собственной правой руке фигуры, слева от зрителя; обе руки отделены от корпуса, поза нейтральная, не T/A. Лишних частей нет, фигура и подставка полностью видны. Тонкие древки и крепления читаются; их геометрию потребуется проверить на этапах 3–4.",
+      "frames": [
+        "ashigaru-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ashigaru-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В ashigaru-front.png детализация соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо, заклёпки, шнуровка, кромки пластин, складки, плетение обуви и фактура дерева. Лак, сталь, ткань, кожа и верёвки различаются по поверхности и бликам; детали сохраняются внутри силуэта.",
+      "frames": [
+        "ashigaru-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В ashigaru-front.png присутствуют все цвета PALETTE: чёрный лак шляпы и доспехов, ткань индиго, коричневое дерево и киноварное знамя. Все три якоря на месте: вертикальное yari в собственной правой руке, jingasa и знамя за плечом. Цветовые отношения соответствуют palette.json.",
+      "frames": [
+        "ashigaru-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 1,588% при целевых 4%. Наконечник полностью виден; WARN не меняет PASS гейта или фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "ashigaru-front.png",
+      "note": "Низ подставки находится на 95,58% высоты вместо целевых 93%; подставка полностью видна, читаемость силуэта сохранена."
+    },
+    {
+      "item": "S",
+      "frame": "ashigaru-front.png",
+      "note": "На этапах 3–4 проверить толщину и непрерывность древка yari, стойки и креплений знамени, а также разделение пальцев; по одному концепту геометрия не подтверждается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133ca-ea4d-7312-a997-a768674d85b1"
+  },
+  "executor_session_id": "codex:01a13357-321b-7bd0-a5e5-319e4821cbed",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

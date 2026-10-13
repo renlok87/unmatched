@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SQUIRREL-GIRL-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-SQUIRREL-GIRL-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-squirrel-girl-codex/design/squirrel-girl-front.png",
+      "sha256": "f65a6a4554ed490a0482162c24694b7e47b75ca63bae5f601cf6356c2f5eec41"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-squirrel-girl-codex/design",
+    "files": [
+      "squirrel-girl-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-squirrel-girl-codex/design/checks-report.json",
+    "art/imagegen/concept-squirrel-girl-codex/generation-records.json",
+    "art/imagegen/concept-squirrel-girl-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-squirrel-girl-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#inputs[0].sha256 = f65a6a4554ed490a0482162c24694b7e47b75ca63bae5f601cf6356c2f5eec41",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В squirrel-girl-front.png узнаётся именно Squirrel Girl из Marvel, указанная в asset-card.yaml: большой беличий хвост, коричневая куртка с меховым воротником, ободок с ушками и белка на плече читаются вместе. Хвост имеет отдельный ясный контур, обе стопы стоят на подставке; поза не T/A. Однако опущенная правая рука слева в кадре прижата к корпусу, рукав сливается с курткой без видимого просвета; разделение обеих рук, необходимое для S = 2, не достигнуто.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "В squirrel-girl-front.png видны расписанная объёмная миниатюра, фактура куртки и брюк, карманы, швы, шнуровка и мелкая шерсть плечевой белки. Замечания r1 к детализации спутника и обуви закрыты. До medusa-quality-reference.png остаётся разница в отдельных зонах: лицо и кисти имеют более сглаженные формы и простые переходы росписи, крупные повторяющиеся борозды хвоста выглядят грубее тонкой скульптурной отделки эталона. Q из r1 закрыто частично; оценка текущего изображения — близко к эталону, отдельные зоны беднее.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В squirrel-girl-front.png сохранены все четыре якоря и коричнево-песочная палитра из palette.json. Сероватый воротник из замечания r1 заменён тёплым tan. Однако куртка и хвост имеют заметный рыжевато-красный оттенок относительно jacket brown #7A5634 и tail brown #8A5A36; ушки остаются терракотовыми вместо светлого ear tan #D9B08A. Цветовое замечание r1 закрыто частично: гамма присутствует, точное соответствие тонов не достигнуто.",
+      "frames": [
+        "squirrel-girl-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS = PASS, но S + C + Q + P = 6.0; score = 6.0 / 8 × 10 = 7.5 ниже порога 8.0. По concept-sheet.md §11 концепт r2 возвращается на этап 1.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "squirrel-girl-front.png",
+      "fix": "Move the figure's right arm on the viewer's left away from the jacket to create a clear background gap, keep both elbows gently bent and both feet planted, and preserve all four Marvel Squirrel Girl anchors without using a T-pose or A-pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "squirrel-girl-front.png",
+      "fix": "Refine facial and finger sculpting with subtle painted shading and replace the coarse repetitive tail ridges with finely layered fur to match the collectible-miniature finish of medusa-quality-reference.png while preserving the detailed shoulder squirrel and sneakers.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "squirrel-girl-front.png",
+      "fix": "Match the jacket to brown #7A5634, the tail to brown #8A5A36 and the ear accent to light tan #D9B08A, removing their reddish terracotta cast while retaining the warm tan fur collar #C8A07A and all four character anchors.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "launcher:rc-reverse-r2-c887a59685",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

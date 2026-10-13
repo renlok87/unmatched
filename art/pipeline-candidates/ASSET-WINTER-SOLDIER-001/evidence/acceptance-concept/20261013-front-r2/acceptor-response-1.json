@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WINTER-SOLDIER-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-WINTER-SOLDIER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png",
+      "sha256": "243846900818a2d4b04090d4d87240a71b9ed8f8d21472358fdd5d73cdef9498"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-winter-soldier-codex/design",
+    "files": [
+      "winter-soldier-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+    "art/imagegen/concept-winter-soldier-codex/generation-records.json",
+    "art/imagegen/concept-winter-soldier-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "winter-soldier-front.png: узнаётся именно Winter Soldier благодаря длинным тёмным волосам, нижней маске, тактическим ремням и металлической руке со звездой. Стойка не T/A. Замечание r1 о перекрытии винтовкой торса в основном закрыто: оружие опущено сбоку. Однако руки остаются близко к корпусу, зазоры у локтей узкие, хват винтовки недостаточно отчётлив. Верх подставки виден: требование строгой фронтальной ортопроекции из исправления r1 не выполнено.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "winter-soldier-front.png: миниатюра убедительна, металл, ткань и ремни различимы; присутствуют пряжки, заклёпки и сочленения. Однако относительно medusa-quality-reference.png чистота детализации явно ниже: грубая зернистость покрывает металл, экипировку и волосы, ослабляя внутренний рельеф; кисти и пряди проработаны схематично. Справа от подставки видна рваная серая область вне её круглого контура. Требуемый в r1 уровень чёткого скульпта и расписанной коллекционной миниатюры не достигнут.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "winter-soldier-front.png: чёрная экипировка, серые ремни, серебряный металл и красная звезда соответствуют палитре; маска и винтовка присутствуют. Надписи и посторонняя эмблема на рукаве из r1 больше не видны. Главный незакрытый якорь — металлическая ЛЕВАЯ рука: серебряная рука со звездой находится слева для зрителя, анатомически справа у персонажа. Винтовка расположена в правильной правой руке, но эта рука ошибочно металлическая; требуемой серебряной левой руки нет.",
+      "frames": [
+        "winter-soldier-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сумма S+C+Q+P = 5,0; округление half-up для 5,0/8×10 даёт 6,3, ниже порога 8,0. G-CHECKS PASS не устраняет неверную сторону металлической руки, недостаточную детализацию и незакрытые замечания к позе и проекции.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "winter-soldier-front.png",
+      "fix": "Use a level strict front orthographic camera with an edge-on pedestal and no visible top surface, keep both elbows slightly bent with clear gaps from the torso, and give the right hand a readable rifle grip while preserving a neutral standing pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "winter-soldier-front.png",
+      "fix": "Match the quality reference's painted collectible finish with controlled material-specific texture and crisp sculpted hair, fingers, metal joints and tactical details, and render a clean round pedestal without the jagged gray extension on its viewer-right edge.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "winter-soldier-front.png",
+      "fix": "Place the silver metal arm with the red star on the figure's anatomical LEFT side (viewer RIGHT), keep the rifle in the black-gloved human RIGHT hand (viewer LEFT), and retain the specified black, silver, gray and red palette.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "Предупреждение r1 о верхнем отступе закрыто: текущий view.frame_top = PASS, отступ 4,948% при требовании ≥4%. Фиксированное C = 1,5 сохраняется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:pending"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

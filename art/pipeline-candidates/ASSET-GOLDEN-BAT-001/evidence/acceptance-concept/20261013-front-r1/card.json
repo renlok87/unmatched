@@ -1,0 +1,103 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GOLDEN-BAT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-golden-bat-codex/design/golden-bat-front.png",
+      "sha256": "9999b8c63cdec553c7f4bee65f3e8d40c5b6e9689166e7534c386fab1d6dbb11"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-golden-bat-codex/design",
+    "files": [
+      "golden-bat-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-golden-bat-codex/design/checks-report.json",
+    "art/imagegen/concept-golden-bat-codex/generation-records.json",
+    "art/imagegen/concept-golden-bat-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-golden-bat-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В golden-bat-front.png узнаётся именно GoldenBat из DESCRIPTION_EN: золотой череп, золотое атлетическое тело и тёмно-красный плащ с высоким воротником образуют характерный образ героя. Один гуманоид, обе руки отделены от торса, локти согнуты; T- и A-позы нет. Орнаментированный посох находится в собственной правой руке, слева для зрителя, и хорошо отделён от корпуса. Тонкие наконечники, древко, цепочка и ажур оружия читаются; их геометрию потребуется проверить на этапах 3–4.",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "golden-bat-front.png близок к medusa-quality-reference.png по уровню расписанной коллекционной миниатюры: различимы металлическое золото, матовая ткань, камни и каменная подставка; проработаны зубы, складки, пряжка и рельеф поножей. Однако мелкая фактура подкладки и края орнамента наручей мягче и менее подробно разработаны, чем соответствующие тканевые и металлические зоны эталона.",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В golden-bat-front.png присутствуют все основные цвета PALETTE и все четыре якоря: золотые череп и тело, тёмно-красный высокий воротник и плащ, почти чёрная подкладка, посох в правой руке. Зелёный акцент сохранён в камнях оружия, но его видимый тон более тёмный и холодный, изумрудный, чем заданный #3FA74A; это небольшое тональное отклонение.",
+      "frames": [
+        "golden-bat-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "golden-bat-front.png",
+      "note": "Микрофактура тёмной подкладки и чёткость мелкого орнамента наручей немного уступают эталону; учтено в Q."
+    },
+    {
+      "item": "P",
+      "frame": "golden-bat-front.png",
+      "note": "Камни оружия выглядят темнее и холоднее акцента #3FA74A; учтено в P."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верх посоха расположен на y=3.177% при ориентире >=4%. Это WARN, не FAIL; наконечник полностью в кадре, фиксированный C не меняется."
+    },
+    {
+      "item": "S",
+      "frame": "golden-bat-front.png",
+      "note": "Тонкие наконечники посоха, цепочка и ажурные дуги оружия требуют проверки толщины и связности геометрии на этапах 3–4; на концепте они различимы."
+    },
+    {
+      "item": "S",
+      "frame": "golden-bat-front.png",
+      "note": "verification.json отмечает ширину подставки около 0.64 роста фигуры вместо ориентира CORE около 0.55. Читаемость персонажа сохранена; глубина и круглая форма подставки одним фронтальным видом не подтверждаются."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134ae-ef49-71a2-a730-9b9768f34234"
+  },
+  "executor_session_id": "codex:01a13445-8c47-7190-a61c-23e63cd82f2b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

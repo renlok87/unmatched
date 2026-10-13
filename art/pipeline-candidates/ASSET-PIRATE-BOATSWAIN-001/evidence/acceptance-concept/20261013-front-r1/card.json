@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PIRATE-BOATSWAIN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-pirate-boatswain-codex/design/pirate-boatswain-front.png",
+      "sha256": "587b2048ac79583401ad093c49afc76a9096824e1016ead6e93c5565a633f3a3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-pirate-boatswain-codex/design",
+    "files": [
+      "pirate-boatswain-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-pirate-boatswain-codex/design/checks-report.json",
+    "art/imagegen/concept-pirate-boatswain-codex/generation-records.json",
+    "art/imagegen/concept-pirate-boatswain-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-pirate-boatswain-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1. WARN view.single_component не является FAIL; визуально изображена одна фигура.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В pirate-boatswain-front.png ясно читается полный боцман: шапка, очки и короткий тесак различимы. Обе руки отделены от корпуса, локти согнуты, поза не T и не A; тесак в собственной правой руке, слева для зрителя. Тонкие оправы, гарда и свободные пальцы читаются; их сохранность требует проверки на этапах 3–4.",
+      "frames": [
+        "pirate-boatswain-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "pirate-boatswain-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "pirate-boatswain-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо и усы, вязка шапки, плетение каната, ткань и складки, швы и износ кожи, латунная фурнитура и стальной клинок. Материалы отчётливо различимы, детализация сохраняется внутри силуэта.",
+      "frames": [
+        "pirate-boatswain-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В pirate-boatswain-front.png присутствуют все якоря и цвета palette.json: красная вязаная шапка, маленькие латунные очки, синяя полосатая рубашка, коричнево-бежевые подвёрнутые брюки и короткий тесак в собственной правой руке. Синий и цвет брюк визуально несколько приглушены и серее заданных #4A6FA5 и #A08262.",
+      "frames": [
+        "pirate-boatswain-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "pirate-boatswain-front.png",
+      "note": "Подставка шире ориентира CORE: отношение ширины к росту фигуры около 0,75 вместо 0,55, что также отмечено в verification.json#limitations. Читаемость персонажа сохранена; круглое сечение по единственному виду с ребра не подтверждается."
+    },
+    {
+      "item": "S",
+      "frame": "pirate-boatswain-front.png",
+      "note": "На этапах 3–4 проверить сохранность тонкой оправы очков, гарды тесака и разделения пальцев; геометрия и пригодность к анимации на этапе 1a не оценивались."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13398-5e03-7d92-909b-0a1a50bcfe28"
+  },
+  "executor_session_id": "codex:01a1338c-c1c7-7e72-9084-1d25cb1779f6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ODA-NOBUNAGA-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-ODA-NOBUNAGA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-oda-nobunaga-codex/design/oda-nobunaga-front.png",
+      "sha256": "8a0b6f78b7285bad02be8b7fc193868dada058db3c1f8e97b6ef596d442a1664"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-oda-nobunaga-codex/design",
+    "files": [
+      "oda-nobunaga-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+    "art/imagegen/concept-oda-nobunaga-codex/generation-records.json",
+    "art/imagegen/concept-oda-nobunaga-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1; verification.json#final_script_exit_code = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На oda-nobunaga-front.png ясно читаются силуэт самурая, полумесяц, плащ и единственная обнажённая катана. Руки опущены, слегка согнуты и отделены от торса; поза не T и не A. Катана в собственной правой руке, слева для зрителя; ножны на собственном левом бедре имеют открытое пустое устье, второй рукояти и гарды нет. Клинок и тонкие концы полумесяца различимы; их геометрическую толщину следует проверить на этапах 3–4.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "oda-nobunaga-front.png соответствует уровню medusa-quality-reference.png: расписанная коллекционная миниатюра с различимыми лаком, металлом, тканью, шнурами и камнем. Лицо, ламеллярные пластины, заклёпки, золотой рельеф, кисти шнуров и складки плаща проработаны внутри силуэта; заметно бедных зон относительно эталона нет.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На oda-nobunaga-front.png визуально соблюдена PALETTE: чёрный лак #1E1C1E, красно-оранжевый плащ #C2462A, тёплый золотой декор #B9923F и светлый золотой полумесяц #E6C04E с естественным затенением материалов. Все четыре якоря присутствуют: катана в собственной правой руке, полумесяц на кабуто, красно-оранжевый плащ и ножны на собственном левом бедре.",
+      "frames": [
+        "oda-nobunaga-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 1.657% при рекомендации 4%; полумесяц целиком в кадре. WARN не меняет PASS гейта или фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "oda-nobunaga-front.png",
+      "note": "Тонкий клинок и заострённые концы полумесяца читаются на концепте; толщину и устойчивость геометрии следует проверить на этапах 3–4."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133a2-13e3-70c2-8862-b682ab420ecc"
+  },
+  "executor_session_id": "codex:01a1339b-3abc-7262-8ef4-38b7a4f11dad",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

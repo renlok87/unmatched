@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SKUNK-APE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-skunk-ape-codex/design/skunk-ape-front.png",
+      "sha256": "e6d6afc26b5e0f176ca8bbece1f6f124b9651098ae832df91b82dbe005ce9512"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-skunk-ape-codex/design",
+    "files": [
+      "skunk-ape-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-skunk-ape-codex/design/checks-report.json",
+    "art/imagegen/concept-skunk-ape-codex/generation-records.json",
+    "art/imagegen/concept-skunk-ape-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-skunk-ape-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 2; verification.json#checks[2].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В skunk-ape-front.png узнаётся SkunkApe из DESCRIPTION_EN: высокое обезьяноподобное тело с сутулыми плечами, спутанная шерсть с болотным мхом, длинные руки и большие стопы. Руки отделены от корпуса широкими просветами, кисти пустые, конечности и голова читаются полностью. Руки естественно опущены, локти слегка согнуты; это не T- и не A-поза. Тонкие свисающие нити мха различимы; их воспроизводимость в геометрии относится к последующим этапам.",
+      "frames": [
+        "skunk-ape-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "skunk-ape-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "skunk-ape-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: многослойные скульптурные пряди шерсти, зернистый мох, морщины лица и кистей, ногти и фактура подставки подробно проработаны внутри силуэта. Шерсть, мох и открытая кожа различаются по фактуре и световым акцентам; заметно обеднённых зон нет.",
+      "frames": [
+        "skunk-ape-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В skunk-ape-front.png присутствуют все цвета palette.json и все четыре якоря: тёмно-коричневая шерсть, болотный мох, серая кожа, янтарные глаза; высокое сутулое тело, спутанная шерсть, длинные руки и большие стопы. Мох визуально несколько желтее заданного #5E6A36, кожа местами теплее #6A625A. Это небольшое отклонение тона при сохранении палитры и идентичности.",
+      "frames": [
+        "skunk-ape-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхний отступ 2.486% при ориентире 4%; низ подставки на 96.133% вместо ориентира 93%, указанного в verification.json. Фигура и подставка полностью видны, обрезки нет; гейт остаётся PASS."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.single_component: дополнительная компонента маски 1.118% при пороге WARN 0.5%. На skunk-ape-front.png второй фигуры или отдельного предмета не видно; предупреждение сегментации не является FAIL."
+    },
+    {
+      "item": "P",
+      "frame": "skunk-ape-front.png",
+      "note": "Допустимое небольшое потепление оттенков мха и открытой кожи относительно заданной палитры."
+    },
+    {
+      "item": "S",
+      "frame": "skunk-ape-front.png",
+      "note": "Тонкие свисающие нити мха выходят за основной силуэт. Их геометрическая прочность и сохранность после генерации модели по концепту не проверяются на этапе 1a."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a0-072b-7802-8ac7-ea4c4dc69d6d"
+  },
+  "executor_session_id": "codex:01a13452-2645-7b71-a93a-74e194e082ff",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

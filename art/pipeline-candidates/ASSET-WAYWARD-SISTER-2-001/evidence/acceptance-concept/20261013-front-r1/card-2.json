@@ -1,0 +1,94 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WAYWARD-SISTER-2-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-2-codex/design/wayward-sister-2-front.png",
+      "sha256": "95952c566076fa912d5362103a86d47f046c9f4b07973b03432f189271cb04aa"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wayward-sister-2-codex/design",
+    "files": [
+      "wayward-sister-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wayward-sister-2-codex/design/checks-report.json",
+    "art/imagegen/concept-wayward-sister-2-codex/generation-records.json",
+    "art/imagegen/concept-wayward-sister-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wayward-sister-2-codex/design/checks-report.json",
+      "note": "check_concept_views.py summary PASS 12 / WARN 1 / FAIL 0, verdict PASS. The only WARN is view.frame_top: mask top 3.108 % < 4 % (the staff crook nearly touches the top frame). It is not a gate failure, and on 1a C stays fixed. The input sha256 matches accepted_object."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "wayward-sister-2-front.png: one gaunt hooded witch on one stepped pedestal, with no extra heads, arms or weapons. The silhouette is clear: the hood peak, the long hooked nose, the raised clawed right hand on the viewer's left, and the gnarled staff on the viewer's right, which stays fully separate from the body from crook to pedestal. Both feet are planted and both elbows bent. This is not a T- or A-pose (§4.4). Background shows under both arms: a pixel scan finds an armpit gap at about x 380–420 px on the viewer's left, plus continuous narrow strips between the hanging bell sleeves and the robe flanks on both sides. Flags for stages 3–4: (1) the sleeve-to-robe gaps are only about 2–4 % of the frame width, so Tripo may fuse them; (2) the long clawed fingers, the thin staff, the herb sprigs, the hanging crystals and the fringe tatters are below mesh thickness and will be simplified; (3) the raised casting forearm is bent more than 'slightly' and becomes the rest pose.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wayward-sister-2-front.png compared with medusa-quality-reference.png: it reaches the reference's painted collectible-miniature level. Details: woven cloth texture with frayed and holed tatters, a stitched patch, layered violet-grey and brown underskirts, a knotted cord belt carrying lavender and dried-herb bundles and a gourd pouch, bone and skull charms, amethyst pendants, braided grey hair with beads, wrapped boots, and a twisted staff with a bird skull. Cloth, rope, wood, bone, crystal, skin and leather are clearly distinct materials, and the detail lives inside the silhouette. Only the plain stepped slab pedestal is simpler than the reference base, and the pedestal is not a figure zone.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "wayward-sister-2-front.png against PALETTE. Colours: heath brown #4E3F30 appears on the staff, cords, boots and underlayers. Bone white #D6CDB8 appears on the skull charms, the bird skull and the frayed highlights. Eerie violet #8A4FB8 is used as the accent on the amethysts and lavender. The robe grey-green is present but shifted to a desaturated olive/khaki grey: sampled patches #5A594E and #6D685A have hue about 45–70°, against about 91° for #5F6A55. Anchors: herb bundles on a cord belt are present. Tattered grey-green robes are present. For 'gnarled wand in the figure's own LEFT hand', the hand side (own LEFT, viewer's right) and the gnarled wood are correct, but the object is a full-height staff planted on the pedestal, not a wand. verification.json limit_reached confirms this: 2/2 generations failed this item. Main colours are correct and one anchor is lost, so P = 1.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "wayward-sister-2-front.png",
+      "note": "Anchor deviation: the gnarled wand is drawn as a full-height staff (crook head with a bird skull, an herb bundle and a violet crystal) planted on the pedestal. The hand side is correct. The staff will carry into 1b/1c and the model. If the short wand is a binding differentiator between the three sisters, decide before 1b. Correction line: 'Replace the full-length staff with a short gnarled wand about forearm length held in the figure's own LEFT hand; nothing touches the pedestal.'"
+    },
+    {
+      "item": "P",
+      "frame": "wayward-sister-2-front.png",
+      "note": "Robe tone: a desaturated olive/khaki grey (hue about 45–70°) instead of PALETTE robe grey-green #5F6A55 (hue about 91°). It reads grey-green on the sheet. Check the texture tint at stages 3–4."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-2-front.png",
+      "note": "For geometry checks at stages 3–4: the narrow gaps between the hanging bell sleeves and the robe flanks (about 2–4 % of frame width) risk fusing. Long clawed fingers, a thin staff, herb sprigs, hanging crystals and fringe tatters are below mesh thickness. The raised casting right forearm becomes the rest pose."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: mask top 3.108 % < 4 % (staff crook). Not a gate failure."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-WAYWARD-SISTER-2-001-r1"
+  },
+  "executor_session_id": "codex:01a1334a-038e-79c0-b947-7d03e5d7583b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

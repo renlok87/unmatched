@@ -1,0 +1,100 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-LEONARDO-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-leonardo-codex/design/leonardo-front.png",
+      "sha256": "41cdd7e26c2b8e42b6489fa326893d75daf3e0068a67388389bbbceb099685e3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-leonardo-codex/design",
+    "files": [
+      "leonardo-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+    "art/imagegen/concept-leonardo-codex/generation-records.json",
+    "art/imagegen/concept-leonardo-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0 (PASS 13, WARN 0), verdict = PASS; inputs[0].sha256 = 41cdd7e2... matches accepted_object"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "leonardo-front.png: Leonardo из TMNT узнаётся сразу: синяя маска с двумя хвостами, по катане в каждой руке, панцирь виден краем за плечами и по бокам, пластрон, пояс, синие налокотники и наколенники. Силуэт ясный: руки отведены от корпуса с видимыми зазорами, локти согнуты, кулаки сжимают рукояти (цуба над кулаком, рукоять ниже читаются раздельно), клинки выходят за контур фигуры, ноги в широкой стойке. Это боевая стойка с оружием, не T- и не A-поза. Тонкие части помечены для этапов 3–4: длинные тонкие клинки (около 1 % ширины кадра) и развевающиеся хвосты маски.",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "leonardo-front.png против medusa-quality-reference.png: тот же уровень расписанной коллекционной миниатюры. Внутри силуэта много деталей: чешуйчатая фактура и рельеф мышц кожи, пластрон с бороздами сегментов, трещинами и сколами, кожаная перевязь со строчкой и пряжками, подсумки на поясе, синий кушак с бахромой, обмотки на запястьях и стопах с потёртостями, ткань наколенников, цуба и навершие из латуни, оплётка рукоятей ромбом. Кожа, кожаные ремни, ткань, сталь и латунь чётко различаются. Голые зоны кожи канонические и с фактурой, не беднее голых рук и ног эталона. Край панциря спереди тёмный и простой, его проверить на виде сзади в 1c.",
+      "frames": [
+        "leonardo-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "leonardo-front.png: все якоря на месте: две катаны, по одной в каждой руке; синяя маска с хвостами; коричневый панцирь сзади; пояс и наколенники. Цвета замерены по пикселям: синяя маска и кушак около #2C497A, тон 218° против #2456B3 (219°), совпадает; коричневый панцирь и ремни около #5C4736 против #6E5236, близко, темнее; сталь клинков около #ABA9B0 против #C9CED3, близко. Отклонение тона у кожи: медиана освещённой кожи #798154, тон около 71° (оливково-хаки), а PALETTE skin green #4E8A3A, тон около 105°, насыщеннее. Кожа зелёная, но заметно уходит в олив. Свотчей на листе 1a нет (checks-report.json#palette.swatches пуст).",
+      "frames": [
+        "leonardo-front.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "leonardo-front.png",
+      "note": "Skin reads olive/khaki (lit median #798154, hue ~71 deg) instead of PALETTE skin green #4E8A3A (hue ~105 deg). In 1c and texturing, shift the skin toward #4E8A3A; this does not block 1a."
+    },
+    {
+      "item": "P",
+      "frame": "leonardo-front.png",
+      "note": "The round blue belt buckle carries a small relief emblem that could read as a letter. The executor flagged it against the no letters/logo item. Keep the buckle plain or decide this explicitly in 1c."
+    },
+    {
+      "item": "S",
+      "frame": "leonardo-front.png",
+      "note": "For stages 3-4: the long thin katana blades and the flying mask tails are thin parts. Check their thickness and fusion in Tripo and H2. The fists overlap the grips by design."
+    },
+    {
+      "item": "S",
+      "frame": "leonardo-front.png",
+      "note": "DESCRIPTION_EN says the katanas are crossed, but the figure holds them apart, one per hand. ANCHORS_EN (one in each hand) is satisfied, and the spread pose keeps the silhouette clear. Keep this pose for 1c."
+    },
+    {
+      "item": "S",
+      "frame": "leonardo-front.png",
+      "note": "The pedestal looks about 0.7 of the figure height wide, against 0.55 in the CORE prompt (executor estimate in verification.json#core_observations). Normalize the base at H2 assembly."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-LEONARDO-001-r1"
+  },
+  "executor_session_id": "codex:01a13427-4d62-7323-9fc1-3bf8be6055f2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

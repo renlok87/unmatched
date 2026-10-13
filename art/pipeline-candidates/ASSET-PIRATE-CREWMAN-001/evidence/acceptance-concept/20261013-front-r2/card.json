@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PIRATE-CREWMAN-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-PIRATE-CREWMAN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-pirate-crewman-codex/design/pirate-crewman-front.png",
+      "sha256": "e25806977ec4da596e18f24cd61381aa466a78cba20766349cda70a6a3bba941"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-pirate-crewman-codex/design",
+    "files": [
+      "pirate-crewman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-pirate-crewman-codex/design/checks-report.json",
+    "art/imagegen/concept-pirate-crewman-codex/generation-records.json",
+    "art/imagegen/concept-pirate-crewman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-pirate-crewman-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-pirate-crewman-codex/design/checks-report.json#summary.FAIL = 0; PASS = 13; WARN = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "pirate-crewman-front.png: ясный силуэт, обе руки отделены от корпуса, ноги и босые ступни различимы. Поза расслабленная, асимметричная, с согнутыми локтями; не T и не A. Абордажный топор отчётливо читается в собственной правой руке фигуры, слева для зрителя. Дополнительный меч, гарда и ножны отсутствуют: дефект r1 устранён. Бандана, серьга, свободные пальцы и косички бороды читаются; тонкие элементы отмечены для проверки на этапах 3–4.",
+      "frames": [
+        "pirate-crewman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "pirate-crewman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "pirate-crewman-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png при осмотре 1:1. Проработаны лицо, пряди и косички бороды, складки и бахрома ткани, швы брюк, древесина и обмотка рукояти, изношенный металл топора и латунная серьга. Материалы отчётливо различаются; детализация присутствует внутри силуэта. Простота матросского костюма не снижает качества исполнения относительно украшенного костюма эталона.",
+      "frames": [
+        "pirate-crewman-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "pirate-crewman-front.png: кремовые полосы рубахи, красная бандана, коричневые брюки и латунная серьга соответствуют PALETTE с учётом освещения и износа. Серьга ясно видна на собственном правом ухе фигуры, слева для зрителя. Все четыре якоря присутствуют: абордажный топор в собственной правой руке, бандана, повязка на глазу и полосатая рубаха. Рваные брюки и босые ноги соответствуют описанию; подставка нейтральная, без командного цвета.",
+      "frames": [
+        "pirate-crewman-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "pirate-crewman-front.png",
+      "note": "На этапах 3–4 проверить толщину и сохранность серьги, свободных пальцев, косичек бороды и рваных краёв ткани. На концепте эти элементы читаются; замечание относится к будущей проверке геометрии и не снижает балл этапа 1a."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133d9-cb7d-7260-8163-c91852b6311f"
+  },
+  "executor_session_id": "codex:01a133d0-9604-74a2-938c-b4833714ca02",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BAXTER-STOCKMAN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-baxter-stockman-codex/design/baxter-stockman-front.png",
+      "sha256": "bd905e26be655ff2dc740ce2e14de1f2a3b6bb5e06f734f9787d3e63c3a144ff"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-baxter-stockman-codex/design",
+    "files": [
+      "baxter-stockman-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-baxter-stockman-codex/design/checks-report.json",
+    "art/imagegen/concept-baxter-stockman-codex/generation-records.json",
+    "art/imagegen/concept-baxter-stockman-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-baxter-stockman-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Узнаётся именно BaxterStockman из DESCRIPTION_EN: учёный, мутировавший в гуманоидную муху, с крупными фасеточными глазами, крыльями, тонкими конечностями и рваным лабораторным халатом. Лучевой гаджет находится в собственной правой руке, слева для зрителя. Обе руки отделены от торса, поза не T и не A; крылья, когти и тонкие выступы головы различимы.",
+      "frames": [
+        "baxter-stockman-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "baxter-stockman-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с эталоном Medusa: чёткие фасетки глаз, сегментация хитина, жилки крыльев, складки и рваные края ткани, мелкие детали и потёртости гаджета. Ткань, хитин, мембраны и металл визуально различимы; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "baxter-stockman-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Основные цвета соответствуют PALETTE: белый халат, коричневый хитин, красные глаза и бирюзовый акцент гаджета. Все четыре якоря видимы: гаджет в правой руке, фасеточные глаза, полупрозрачные крылья и рваный лабораторный халат. Подставка нейтральная, без командного цветного кольца.",
+      "frames": [
+        "baxter-stockman-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "baxter-stockman-front.png",
+      "note": "Подставка шире номинального ориентира: около 0,65 высоты фигуры вместо приблизительно 0,55; её низ расположен на y94,682% вместо y93%. Эти ограничения отмечены в verification.json; обрезки нет, читаемость персонажа сохранена."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13496-8a80-7d23-92c0-5e425d437ef9"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

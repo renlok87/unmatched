@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ROBERT-MULDOON-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-ROBERT-MULDOON-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-robert-muldoon-codex/design/robert-muldoon-front.png",
+      "sha256": "b3bed1b981227bac38fc0306d3a2c59b21c992511907d425587ce310fb09c6c5"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-robert-muldoon-codex/design",
+    "files": [
+      "robert-muldoon-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+    "art/imagegen/concept-robert-muldoon-codex/generation-records.json",
+    "art/imagegen/concept-robert-muldoon-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На robert-muldoon-front.png узнаётся Роберт Малдун: длинное угловатое лицо без усов, выраженные скулы, нахмуренный взгляд и характерный костюм смотрителя Jurassic Park. Шляпа и длинное ружьё ясно читаются; оружие в собственной правой руке, слева для зрителя. Обе руки отделены от корпуса, стойка естественная, не T/A. Ремень и детали прицела читаются; их раздельность следует сохранить на этапах 3–4.",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На robert-muldoon-front.png достигнут уровень расписанной коллекционной миниатюры QUALITY_REFERENCE: проработаны лицо и кисти, швы, карманы и складки ткани, шнуровка ботинок, патроны, дерево ложи и металлические детали оружия. Ткань, кожа, дерево, сталь и камень различимы; более простой костюм не сопровождается потерей детализации внутри силуэта.",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На robert-muldoon-front.png присутствуют заданные хаки одежды, коричневый шляпы, загорелая кожа и стальной серый оружия. Все четыре якоря видны: ружьё в правой руке, широкополая bush hat, рубашка сафари и пояс с патронами. Командных цветов и цветной полосы на подставке нет.",
+      "frames": [
+        "robert-muldoon-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "robert-muldoon-front.png",
+      "note": "Подставка визуально широкая относительно фигуры. Её точный диаметр и круглый план нельзя подтвердить по единственному виду строго с ребра; читаемость фигуры это не ухудшает."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134c5-c9fd-7243-b447-a6ad3cd3d04f"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

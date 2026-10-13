@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-RAPTORS-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-raptors-codex/design/raptors-front.png",
+      "sha256": "185de7d36b74affdad0db34cefbb17e2a45b72bbfedea6a3adacfafeafefa0ae"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-raptors-codex/design",
+    "files": [
+      "raptors-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-raptors-codex/design/checks-report.json",
+    "art/imagegen/concept-raptors-codex/generation-records.json",
+    "art/imagegen/concept-raptors-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-raptors-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-raptors-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "raptors-front.png: безоперённый хищный динозавр с полосатой кожей и поднятыми серповидными когтями узнаваем как раптор Jurassic Park. Однако главный признак — длинный жёсткий хвост — скрыт корпусом и головой; его выступающий конец выглядит как рог над черепом. Массивный вертикальный корпус ослабляет требуемый стройный силуэт Raptors, пасть раскрыта шире заданного. Передние конечности отделены от корпуса и согнуты; запрещённой T- или A-позы нет.",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "raptors-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Внутри силуэта проработаны чешуя, складки кожи, зубы и ткани пасти; матовая кожа, блестящие когти и глаза различаются по материалу. Отсутствие костюмного орнамента соответствует персонажу и не снижает детализацию.",
+      "frames": [
+        "raptors-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "raptors-front.png: песочный тон кожи, тёмно-коричневые полосы, светлое брюхо и жёлтые глаза соответствуют PALETTE. Оба серповидных когтя читаются. Якорь длинного жёсткого хвоста потерян в перекрытии: отдельный полосатый конец над головой не показывает его длину и связь с тазом.",
+      "frames": [
+        "raptors-front.png"
+      ]
+    }
+  },
+  "score": 6.9,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "При PASS G-CHECKS сумма S=1, C=1.5, Q=2, P=1 даёт 6.9 < 8.0; длинный жёсткий хвост не читается, стройный силуэт Raptors требует доработки.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "raptors-front.png",
+      "fix": "Give the Jurassic Park velociraptor a lean, forward-balanced torso, flexed hind legs and only slightly open jaws, preserving bent forearms separated from the body and a strictly frontal, level camera.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "raptors-front.png",
+      "fix": "Show the long stiff striped tail extending behind the pelvis slightly to one side with a clearly readable continuous silhouette, replacing the isolated horn-like tip above the head while preserving the tan hide, brown stripes, pale belly and yellow eyes.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхняя точка 2.831% при ориентире ≥ 4%; view.single_component = WARN: дополнительный компонент маски 1.755%. При визуальном осмотре обрезки и второй фигуры нет. WARN не меняют PASS гейта и фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13486-f5c7-79e0-802e-aeae841894b0"
+  },
+  "executor_session_id": "history:ASSET-RAPTORS-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Художественно не принято; требуется доработка силуэта Raptors и читаемости длинного жёсткого хвоста на этапе 1a."
+}

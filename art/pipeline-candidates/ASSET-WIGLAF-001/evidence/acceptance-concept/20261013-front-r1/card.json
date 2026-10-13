@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WIGLAF-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wiglaf-codex/design",
+    "files": [
+      "wiglaf-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+    "art/imagegen/concept-wiglaf-codex/generation-records.json",
+    "art/imagegen/concept-wiglaf-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "wiglaf-front.png: молодой воин, конический шлем, топор и щит ясно читаются; естественная вооружённая поза не является T- или A-позой. Плащ заполняет зазор между правой рукой и корпусом, щит скрывает левое предплечье; полного разделения рук в силуэте нет.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wiglaf-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Различимы кожа со швами и ремнями, ткань с плетением и отделкой, дерево щита, потёртое железо, заклёпки и гравировка топора; детали лица, волос и кисти чёткие.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "wiglaf-front.png: коричневая кожа, зелёный плащ, серое железо и красный акцент щита присутствуют. Все якоря сохранены: топор в собственной правой руке, слева для зрителя; щит с кабаном на собственной левой стороне; конический шлем. Зелень плаща визуально оливковее заданного #4E6B3A.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wiglaf-front.png",
+      "note": "Фоновые зазоры между обеими руками и корпусом отсутствуют: справа их заполняет плащ, слева предплечье перекрыто щитом. При подготовке геометрии требуется сохранить различимость рук и принадлежность щита левой руке."
+    },
+    {
+      "item": "S",
+      "frame": "wiglaf-front.png",
+      "note": "Фронт близок к ортографическому, но видна узкая верхняя поверхность подставки, щит слегка овальный. Ограничение строгой ортопроекции из verification.json подтверждается визуально."
+    },
+    {
+      "item": "P",
+      "frame": "wiglaf-front.png",
+      "note": "Плащ имеет более оливковый тон, чем указанный в палитре moss green #4E6B3A."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = 3.66% при рекомендации >= 4.0%; это WARN, обрезки фигуры нет, статус гейта остаётся PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1337f-ea4a-75b2-b5c3-bf47a92d3f6c"
+  },
+  "executor_session_id": "codex:01a1333f-a46b-7c12-99a7-1b9a2445b577",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

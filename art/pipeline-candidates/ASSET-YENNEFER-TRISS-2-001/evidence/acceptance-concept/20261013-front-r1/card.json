@@ -1,0 +1,102 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-YENNEFER-TRISS-2-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-yennefer-triss-2-codex/design/yennefer-triss-2-front.png",
+      "sha256": "4d2c2833cea896a40bd8a771cf113d91282045fa94a899598dc6ff996010b39e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-yennefer-triss-2-codex/design",
+    "files": [
+      "yennefer-triss-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-yennefer-triss-2-codex/design/checks-report.json",
+    "art/imagegen/concept-yennefer-triss-2-codex/generation-records.json",
+    "art/imagegen/concept-yennefer-triss-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-yennefer-triss-2-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-yennefer-triss-2-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-yennefer-triss-2-codex/design/checks-report.json#verdict = PASS; art/imagegen/concept-yennefer-triss-2-codex/design/checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На yennefer-triss-2-front.png Трисс узнаваема по длинным рыжим локонам, корсету и небольшому огню над поднятой ладонью. Пламя и кисти читаются, T/A-позы нет. Верх опущенной руки близок к корпусу; узкая шаговая постановка ног с одной ногой впереди не соответствует нейтральной стойке с равномерным распределением веса по §4.4.",
+      "frames": [
+        "yennefer-triss-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "yennefer-triss-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "На yennefer-triss-2-front.png различимы материалы, локоны, лицо, швы и застёжки корсета. Однако большие поверхности зелёной одежды и сапог гладкие и однообразно глянцевые, с бедной фактурой и упрощённой росписью. Скульптурная и живописная детализация явно ниже QUALITY_REFERENCE Medusa с проработанными складками, поверхностями и отделкой внутри силуэта.",
+      "frames": [
+        "yennefer-triss-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "На yennefer-triss-2-front.png присутствуют заданные зелёный, бежевый, рыжий и оранжевый акцент; длинные вьющиеся волосы и огонь над поднятой рукой сохранены. Один идентификационный якорь потерян: вместо green and beige corset dress изображены корсет и зелёные шорты с двумя отдельными штанинами.",
+      "frames": [
+        "yennefer-triss-2-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "По concept-sheet.md §11 score < 8,0 требует return_to_stage_1: (1,5 + 1,5 + 1 + 1) / 8 × 10 = 6,25 → 6,3. G-CHECKS проходит; необходимы исправления S/Q/P. Цикл r1 не последний.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "yennefer-triss-2-front.png",
+      "fix": "In yennefer-triss-2-front.png, place both feet flat side by side with evenly distributed weight and maintain a visible gap between the lowered arm and the torso while preserving the raised fire-casting hand.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "yennefer-triss-2-front.png",
+      "fix": "In yennefer-triss-2-front.png, refine the existing garment folds, corset seams and boots with crisp sculpted relief, distinct fabric and leather textures, and layered miniature paint shading matching the quality reference.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "yennefer-triss-2-front.png",
+      "fix": "In yennefer-triss-2-front.png, replace the green shorts with the skirt of the specified green and beige corset dress while preserving the beige corset, auburn curls and small raised-hand fire spell.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "yennefer-triss-2-front.png",
+      "note": "checks-report.json#checks[8].id = view.frame_top; checks-report.json#checks[8].result = WARN; checks-report.json#measurements.front.mask.top_pct = 2.938 при checks-report.json#frame.min_top_pct = 4.0. Предупреждение не является FAIL и не меняет маршрут; C на 1a остаётся фиксированным."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a3-120f-71d3-9575-11c083b4e434"
+  },
+  "executor_session_id": "launcher:acceptance-reverse-7795d573f6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Этап 1a, цикл r1: возврат на этап 1 для CORRECTION по S/Q/P. Внешнее происхождение принято по verification.json#design_source. Решение по делегированию: docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md."
+}

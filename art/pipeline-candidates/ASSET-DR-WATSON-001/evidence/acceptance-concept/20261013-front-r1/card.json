@@ -1,0 +1,98 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dr-watson-codex/design",
+    "files": [
+      "dr-watson-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
+    "art/imagegen/concept-dr-watson-codex/generation-records.json",
+    "art/imagegen/concept-dr-watson-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-dr-watson-codex/design/checks-report.json#summary.FAIL = 0; summary.WARN = 1; art/imagegen/concept-dr-watson-codex/verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "dr-watson-front.png: котелок, усы, поднятый револьвер и медицинская сумка отчётливо читаются; оружие в собственной правой руке, сумка в левой. Поза естественная, не T и не A. Правая рука отделена от корпуса, но левый рукав сливается с контуром пальто без ясного просвета. Видна верхняя поверхность подставки, поэтому фронтальная проекция не строго ортографическая.",
+      "frames": [
+        "dr-watson-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "dr-watson-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "dr-watson-front.png: уровень расписанной коллекционной миниатюры соответствует medusa-quality-reference.png. Проработаны лицо, усы, волосы, фактура жилета, складки и швы пальто, кожаная сумка с застёжкой, обувь и механизм револьвера. Ткань, кожа и металл различимы; детализация присутствует внутри силуэта.",
+      "frames": [
+        "dr-watson-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "dr-watson-front.png: коричневое пальто, чёрный котелок, светло-коричневый жилет и золотая часовая цепочка соответствуют PALETTE и palette.json. Все четыре якоря видимы: револьвер в собственной правой руке слева для зрителя, медицинская сумка в левой, котелок и густые усы.",
+      "frames": [
+        "dr-watson-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "dr-watson-front.png",
+      "note": "Левый рукав визуально соединён с пальто; сумка и кисть различимы, но просвет между рукой и корпусом отсутствует. Учтено в S = 1.5."
+    },
+    {
+      "item": "S",
+      "frame": "dr-watson-front.png",
+      "note": "Видна верхняя поверхность подставки: строгая фронтальная ортопроекция не достигнута. Отметка verification.json#limit_reached подтверждается изображением; отдельным гейтом не является."
+    },
+    {
+      "item": "S",
+      "frame": "dr-watson-front.png",
+      "note": "Тонкие звенья часовой цепочки, ствол револьвера и ручки сумки читаются в концепте; сохранность и толщину геометрии следует проверить на этапах 3–4."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json#checks[8].result = WARN: view.frame_top, верхний отступ 3.246% при ориентире 4%. Обрезки нет; WARN не меняет PASS гейта и фиксированное C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133a2-3bd5-7570-8538-232796e8f4ee"
+  },
+  "executor_session_id": "codex:01a13365-cb17-7d02-a4e5-38b011565fb5",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANGEL-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-angel-codex/design/angel-front.png",
+      "sha256": "8a62d7c2ddcf88b5958829f1c17f2f0b566f541b4289f2a2f8ab7f3711c05752"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-angel-codex/design",
+    "files": [
+      "angel-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-angel-codex/design/checks-report.json",
+    "art/imagegen/concept-angel-codex/generation-records.json",
+    "art/imagegen/concept-angel-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-angel-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; #summary.FAIL = 0; #summary.PASS = 12; #summary.WARN = 1 (view.single_component, прочие компоненты 1.361 % > 0.5 %; WARN не гейт)"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "angel-front.png: фигура читается как Angel — торчащие тёмные волосы, бледное хмурое лицо, длинный чёрный кожаный плащ нараспашку поверх тёмной рубашки на пуговицах, широкий меч с коричневой обмотанной деревянной рукоятью в СОБСТВЕННОЙ ПРАВОЙ руке (слева для зрителя). Все четыре якоря на месте, лишних частей нет. Руки отделены: между рукавом руки с мечом и полой плаща просвет фона на высоте предплечья и локтя, левое предплечье и открытая кисть отстоят от корпуса. Поза по разделу 4.4: обе ступни на подставке, локти согнуты, не T и не A. Клинок широкий, читается, отведён от головы и корпуса; тонких частей нет. Слияние кисти с рукоятью — обычный хват. Низкий контраст чёрного плаща с фоном в тени вынесен в known_issues.",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "angel-front.png против medusa-quality-reference.png: материалы чётко различимы (кожа плаща и брюк с заломами и строчкой, хлястики на манжетах, ткань рубашки с пуговицами, сталь клинка с долом и гранёной гардой, обмотка рукояти и шар навершия, шнуровка и протектор ботинок, камень подставки); уровень скульптуры близок к эталону. Отдельные зоны беднее: задняя пола плаща между ногами — плоская тёмная масса почти без деталей, подставка — гладкий одиночный диск, кожа полуглянцевая, а лицо почти фотореалистичное вместо матовой расписанной смолы эталона.",
+      "frames": [
+        "angel-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "angel-front.png: плащ чёрный (~#211E1E–#2A2728 против coat black #1C1A1C), кожа бледная (освещённые зоны ~#BC9B87–#CCB9A9 против #D9BFA8) — верно. Отклонения тона: рубашка лилово-серая (~#433D41–#564E54) вместо нейтрального shirt grey #4A4A50; акцент blade steel темнее заявки (клинок ~#78797F–#9A9AA1 против #B8BEC4). Коричневая рукоять — по DESCRIPTION (wooden-handled). Командного цвета и цветного кольца нет. Все якоря на месте.",
+      "frames": [
+        "angel-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "angel-front.png",
+      "note": "Рубашка с лиловым оттенком (~#433D41–#564E54) вместо нейтрального #4A4A50; клинок темнее акцента (~#78797F–#9A9AA1 против #B8BEC4). На 1c держать цвета PALETTE."
+    },
+    {
+      "item": "Q",
+      "frame": "angel-front.png",
+      "note": "Подставка — один диск вместо двух низких дисков CORE (verification.json#unmet_requirements: CORE.PEDESTAL.two_low_stacked_discs, генерации запуска исчерпаны); задняя пола плаща между ногами — плоская тёмная масса."
+    },
+    {
+      "item": "S",
+      "frame": "angel-front.png",
+      "note": "Чёрный плащ в тени почти совпадает с фоном (~#2A2728 против фона #252526); силуэт держат блики кожи. Риск среза края при удалении фона в Tripo на этапе 2 (HANDBOOK §3.1)."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.single_component: прочие компоненты 1.361 % > 0.5 % — вероятно, меч с кистью отделился по тону от тёмного рукава при сегментации; гейт не снижает."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-ANGEL-001-r1"
+  },
+  "executor_session_id": "codex:01a13491-8954-7f12-8b5f-4d1f4c9e049a",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

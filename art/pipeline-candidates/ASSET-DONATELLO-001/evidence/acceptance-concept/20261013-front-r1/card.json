@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DONATELLO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-donatello-codex/design/donatello-front.png",
+      "sha256": "b714a97000e6f6427df483b133b5dd7c3507da628beb5209b480c66fcd4fa8a7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-donatello-codex/design",
+    "files": [
+      "donatello-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-donatello-codex/design/checks-report.json",
+    "art/imagegen/concept-donatello-codex/generation-records.json",
+    "art/imagegen/concept-donatello-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-donatello-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Донателло из TMNT узнаваем по черепашьей анатомии, фиолетовой маске и длинному бо-посоху в обеих руках. Главные признаки читаются, поза не T/A. Руки близко к корпусу: слева в кадре предплечье и панцирь перекрывают просвет между рукой и торсом.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png: выразительное лицо, рельеф кожи и щитков, потёртости ремней, швы, пряжки, древесные волокна и складки маски отчётливо проработаны. Материалы различимы, детализация сохраняется внутри силуэта.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "Все доступные с front якоря присутствуют: деревянный бо-посох в обеих руках, фиолетовая маска с хвостами, коричневые края спинного панциря, пояс с подсумками и наколенники. Основные цвета и древесный акцент сохранены, но зелёная кожа заметно сдвинута в приглушённый оливковый тон относительно #4E8A3A.",
+      "frames": [
+        "donatello-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "donatello-front.png",
+      "note": "Просвет между рукой и торсом слева в кадре частично перекрыт предплечьем и панцирем; учтено в S=1.5. Пункт CHECKLIST запрещает предмет в руках, тогда как DESCRIPTION_EN и ANCHORS_EN требуют посох в обеих руках; присутствие обязательного посоха не образует отдельного FAIL-гейта."
+    },
+    {
+      "item": "P",
+      "frame": "donatello-front.png",
+      "note": "Кожа выглядит более оливковой и менее насыщенно зелёной, чем основной цвет палитры #4E8A3A; учтено в P=1.5."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "checks-report.json#checks[id=view.single_component].result = WARN; визуально одна фигура, отдельные хвосты маски принадлежат персонажу. Видимых последствий, требующих дополнительного снижения баллов, нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1347f-74b6-7952-987f-0b7cfd9d86ec"
+  },
+  "executor_session_id": "codex:01a1347b-2867-7140-8e26-fb0695ade613",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

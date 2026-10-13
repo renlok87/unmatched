@@ -1,0 +1,89 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WIGLAF-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wiglaf-codex/design",
+    "files": [
+      "wiglaf-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+    "art/imagegen/concept-wiglaf-codex/generation-records.json",
+    "art/imagegen/concept-wiglaf-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 12 / WARN 1 / FAIL 0, verdict PASS (код 0). WARN view.frame_top 3.66 % < 4.0 % — не гейт. sha256 входа в отчёте совпадает с accepted_object (189ddfea…bc42)."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "wiglaf-front.png: один персонаж, одна голова, две руки; поза не T и не A (правая рука согнута, топор вынесен вбок; левая держит щит). Главные признаки читаются в силуэте: топор целиком на фоне слева для зрителя, конический шлем с наносником, круглый щит справа выступает за плащ. Не 2: раздел 4.4 требует видимого зазора между каждой рукой и корпусом — за правой рукой плащ, а не фон; левая рука и кисть полностью закрыты щитом, щит сливается с плащом у плеча. Мелко: щит слегка овальный (небольшой поворот), у подставки видна тонкая полоска верха (~10 px по центру) — строгий фронт не идеален.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wiglaf-front.png против medusa-quality-reference.png: уровень эталона — расписанная коллекционная миниатюра на каменной подставке. Материалы чётко различимы (кожа куртки со строчкой, шнуровкой и заклёпками, шерсть плаща, лён рубахи с тканой каймой, железо шлема и топора, латунь фибулы и пряжки с рельефом, доски и умбон щита, роспись кабана). Детали внутри силуэта плотные: кельтский узор на топоре, наручи с ремнями, обмотки голеней, нож на поясе. Локальный контраст на фигуре не ниже эталона (медиана std r=2: 10.8 против 6.1). Слабее всего мягкие нижние складки плаща и тёмная внутренняя тень между ногами — заметка для этапов 3–4, не провал детализации.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "wiglaf-front.png: все цвета PALETTE и все якоря есть — топор в собственной ПРАВОЙ руке (слева для зрителя), круглый щит с кабаном на ЛЕВОЙ руке, конический железный шлем. Leather совпадает (медиана куртки #634735, светлая p75 #785843 против #7A5634), iron близко (шлем #696461 против #5E6266). Отклонение тона: плащ ушёл в оливу (медиана #5A6140, оттенок ~68° против ~95° у moss green #4E6B3A), поле щита темнее и коричневее акцента (медиана #72362B, p90 #804739 против boar red #9A3428); кабан светлый кремовый на красном поле. Свотчей на 1a нет, поэтому не 2.",
+      "frames": [
+        "wiglaf-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wiglaf-front.png",
+      "note": "Arms lack a clear background gap: cloak fills the space behind the right (axe) arm, the left arm and hand are fully hidden by the shield; shield slightly turned (oval) and a thin pedestal-top sliver is visible. Carry into 1c CORRECTION / Tripo 1b check of arm separation."
+    },
+    {
+      "item": "P",
+      "frame": "wiglaf-front.png",
+      "note": "Cloak drifts to olive (~#5A6140 vs moss green #4E6B3A) and the shield field is darker/browner than boar red (~#72362B vs #9A3428); pull both toward PALETTE on the 1c views."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "WARN view.frame_top: top of helmet at 3.66 % (< 4.0 %), not a gate failure."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-WIGLAF-001-r1"
+  },
+  "executor_session_id": "codex:01a1333f-a46b-7c12-99a7-1b9a2445b577",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PANDORA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-pandora-codex/design/pandora-front.png",
+      "sha256": "1afa4cc157ed8ee01113d15d3ec8a25fe591bbf4b32eaa0680fe4dcef654132e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-pandora-codex/design",
+    "files": [
+      "pandora-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-pandora-codex/design/checks-report.json",
+    "art/imagegen/concept-pandora-codex/generation-records.json",
+    "art/imagegen/concept-pandora-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-pandora-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-pandora-codex/design/checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В pandora-front.png Пандора узнаётся по орнаментированной коробке с приоткрытой крышкой в обеих руках и выходящему дыму. Голова, обе руки и ступни читаются; поза не T/A. Просветы между руками и корпусом узкие, кисти сближены с коробкой и торсом, что соответствует уровню 1,5.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В pandora-front.png достигнут уровень расписанной коллекционной миниатюры эталона medusa-quality-reference.png: отчётливо различаются ткань, кожа, волосы, металл и камень; проработаны складки, косы, пальцы, сандалии, браслеты и рельеф коробки. Детали внутри силуэта сохраняют чёткость.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В pandora-front.png присутствуют все три якоря: бронзовая коробка в обеих руках с приоткрытой крышкой, светлый хитон с золотой каймой и тёмные косы. Основные цвета соответствуют палитре; фиолетовый акцент сохранён, но дым заметно светлее и более лиловый, чем заданный #7A4AB3 и описанные faint dark wisps.",
+      "frames": [
+        "pandora-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "pandora-front.png",
+      "note": "Руки близки к корпусу, просветы узкие. Отмеченный verification.json запрет удерживаемого предмета противоречит обязательному якорю коробки в обеих руках; наличие коробки не является дефектом идентичности или отдельным гейтом."
+    },
+    {
+      "item": "P",
+      "frame": "pandora-front.png",
+      "note": "Дым светлее и более лиловый, чем заданный фиолетовый акцент; отклонение учтено в P."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: WARN, верхний отступ 2,97% при ориентире 4%. Фигура целиком в кадре; предупреждение не меняет PASS гейта и фиксированный C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13497-83ab-7ea0-9227-66173dc7326e"
+  },
+  "executor_session_id": "codex:01a13458-b65e-7ab3-ba95-6ec02b9366ea",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

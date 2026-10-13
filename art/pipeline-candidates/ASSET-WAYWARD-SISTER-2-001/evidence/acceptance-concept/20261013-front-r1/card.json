@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WAYWARD-SISTER-2-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-2-codex/design/wayward-sister-2-front.png",
+      "sha256": "95952c566076fa912d5362103a86d47f046c9f4b07973b03432f189271cb04aa"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wayward-sister-2-codex/design",
+    "files": [
+      "wayward-sister-2-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wayward-sister-2-codex/design/checks-report.json",
+    "art/imagegen/concept-wayward-sister-2-codex/generation-records.json",
+    "art/imagegen/concept-wayward-sister-2-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wayward-sister-2-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.PASS = 12; summary.WARN = 1. WARN view.frame_top не меняет статус гейта.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На wayward-sister-2-front.png ясно читаются высокая истощённая ведьма, капюшон, жест свободной кисти и отдельный силуэт оружия. Обе руки отделены от корпуса просветами фона, локти согнуты; поза не T и не A. Фигура и подставка видны целиком. Тонкие пальцы, травы и лоскуты читаются; их воспроизводимость в геометрии следует проверить на этапах 3–4.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На wayward-sister-2-front.png уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png: проработаны морщины лица, косы, волокна и разрывы ткани, узлы пояса, травы, кора, кости и кристаллы. Материалы различимы, детали присутствуют внутри силуэта, а не только по контуру.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "На wayward-sister-2-front.png присутствуют серо-зелёная одежда, коричневые дерево и верёвки, костяной белый и фиолетовые акценты. Рваные одежды и пучки трав на верёвочном поясе соответствуют якорям; оружие находится в собственной левой руке, справа для зрителя. Однако якорь gnarled wand не выполнен: вместо палочки изображён длинный посох до подставки.",
+      "frames": [
+        "wayward-sister-2-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "wayward-sister-2-front.png",
+      "note": "Gnarled wand заменена полноразмерным посохом. Несоответствие якорю учтено в P = 1; verification.json фиксирует исчерпание лимита генераций 2/2."
+    },
+    {
+      "item": "S",
+      "frame": "wayward-sister-2-front.png",
+      "note": "На этапах 3–4 проверить сохранность тонких пальцев, трав, подвесок и рваных краёв ткани при переводе в геометрию."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верх маски 3.108% при целевом отступе не менее 4%. Обрезания нет; summary.FAIL = 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133bd-2e38-78a2-8208-3fc5fc5646f6"
+  },
+  "executor_session_id": "codex:01a1334a-038e-79c0-b947-7d03e5d7583b",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md); оценка 8.1 требует второй независимой карточки другого профиля для устойчивого pass."
+}

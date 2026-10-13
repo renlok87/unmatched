@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ROSENCRANTZ-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-rosencrantz-codex/design/rosencrantz-front.png",
+      "sha256": "7fcd77f191d21be5e54a332cf4ccf9a7d8d00f1efe51561aea103360f5d656bd"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-rosencrantz-codex/design",
+    "files": [
+      "rosencrantz-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-rosencrantz-codex/design/checks-report.json",
+    "art/imagegen/concept-rosencrantz-codex/generation-records.json",
+    "art/imagegen/concept-rosencrantz-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-rosencrantz-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks[selected_final].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "rosencrantz-front.png: ясный силуэт молодого придворного; перо, буфы рукавов, короткий плащ и единственный кинжал читаются. Кинжал в собственной правой руке, слева для зрителя; предплечья отделены от корпуса просветами, локти слегка согнуты, поза не T/A. Тонкие элементы различимы; их толщину проверить на этапах 3–4.",
+      "frames": [
+        "rosencrantz-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "rosencrantz-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "rosencrantz-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: различимы ткань, кожа сапог, металл и матовая поверхность воротника. Внутри силуэта проработаны вышивка, застёжки, брошь, складки, пряди волос, бородки пера и декор гарды; заметного провала детализации против эталона нет.",
+      "frames": [
+        "rosencrantz-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "rosencrantz-front.png: тёмно-зелёный дублет, чёрный плащ, кремово-белый воротник и золотое перо соответствуют PALETTE и palette.json с учётом освещения. Все четыре якоря присутствуют: кинжал в собственной правой руке, шапочка с пером, пышные рукава и короткий плащ до верхней части бёдер.",
+      "frames": [
+        "rosencrantz-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top — WARN: верхний отступ 3.522% при рекомендуемых 4%; перо полностью в кадре. summary.FAIL = 0, предупреждение не меняет статус гейта."
+    },
+    {
+      "item": "S",
+      "frame": "rosencrantz-front.png",
+      "note": "На этапах 3–4 проверить толщину и сохранность пера, цепочки и гарды кинжала; изображение концепта не подтверждает геометрию будущей модели."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1339a-a358-7bf3-9602-576b724dc7b7"
+  },
+  "executor_session_id": "codex:01a13393-47db-7fe0-ad43-d122dbb37bb4",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BESS-HOUDINI-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bess-houdini-codex/design/bess-houdini-front.png",
+      "sha256": "ea4d244b8260de525b7eecb7924f48623a781fba27d5d88a2cc2cdab62543eda"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bess-houdini-codex/design",
+    "files": [
+      "bess-houdini-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bess-houdini-codex/design/checks-report.json",
+    "art/imagegen/concept-bess-houdini-codex/generation-records.json",
+    "art/imagegen/concept-bess-houdini-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bess-houdini-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На bess-houdini-front.png фигура и подставка целиком видны; обе руки отделены от корпуса, поза асимметричная с согнутой правой рукой, без T- или A-позы. Крупное кольцо с ключами вынесено за корпус и ясно читается, каре и сценические туфли различимы. Тонкие ключи, бахрома и перо читаются в концепте; сохранение их геометрии требует проверки на этапах 3–4.",
+      "frames": [
+        "bess-houdini-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bess-houdini-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На bess-houdini-front.png уровень проработки соответствует medusa-quality-reference.png: расписанная коллекционная миниатюра с различимыми тканью, серебряными пайетками, латунью, кожей туфель и волосами. Отдельные пайетки, вышивка лацканов и манжет, складки юбки, бусины бахромы, пряжка и детали ключей сохраняют чёткость внутри силуэта.",
+      "frames": [
+        "bess-houdini-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На bess-houdini-front.png визуально соблюдены stage black, sequin silver, skirt plum и акцент key brass из palette.json и карточки ассета. Все четыре якоря присутствуют: крупное кольцо с ключами в собственной ПРАВОЙ руке персонажа, слева для зрителя; жакет с пайетками; короткое каре; сценические туфли на каблуках. Оружия нет, подставка нейтральная.",
+      "frames": [
+        "bess-houdini-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.624% при рекомендуемых 4%. Перо целиком в кадре; WARN не меняет PASS гейта и фиксированный C."
+    },
+    {
+      "item": "S",
+      "frame": "bess-houdini-front.png",
+      "note": "На этапах 3–4 проверить сохранность тонких ключей, кольца, бахромы и пера, а также контакт правой кисти с кольцом. Геометрия по растровому концепту не подтверждается."
+    },
+    {
+      "item": "P",
+      "frame": "bess-houdini-front.png",
+      "note": "verification.json#limit_reached отражает противоречие общего запрета «No weapon or held object» обязательному якорю ключей в правой руке. Конкретное требование DESCRIPTION_EN и ANCHORS_EN выполнено; оснований удалять ключи или снижать балл нет. Выбранная генерация g2 по generation-records.json имеет SHA256 принятого объекта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a133c6-e13e-7530-b7ee-2237a6731f14"
+  },
+  "executor_session_id": "codex:01a13352-a3ac-7822-8cd2-e90e2dd3fce7",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

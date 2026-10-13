@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MS-MARVEL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ms-marvel-codex/design/ms-marvel-front.png",
+      "sha256": "1acf63e78e849f82fc8f6770a3caf86bd64a0f77f67eaec4fa07c873ab631a6f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ms-marvel-codex/design",
+    "files": [
+      "ms-marvel-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ms-marvel-codex/design/checks-report.json",
+    "art/imagegen/concept-ms-marvel-codex/generation-records.json",
+    "art/imagegen/concept-ms-marvel-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ms-marvel-codex/design/checks-report.json",
+      "note": "checks-report.json#verdict = PASS; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ms-marvel-front.png: Камала Хан узнаётся по маске, молнии, тёмным волосам и длинному красному шарфу. Все основные части тела присутствуют; опущенные руки образуют допустимую готовую стойку, не T/A-позу. Кисти близки к тунике, а характерная асимметрия увеличенного кулака отсутствует.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "ms-marvel-front.png: объёмная коллекционная фигурка; кожа, волосы, ткань и металлические браслеты различимы. Однако крупные кукольные глаза, упрощённая скульптура волос и одежды, гладкие поверхности и сильный глянец заметно уступают QUALITY_REFERENCE по тонкости моделировки и отделки материалов.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "ms-marvel-front.png: основные цветовые семейства присутствуют — синяя туника, красный шарф, чёрные волосы и жёлто-золотая молния. Туника заметно темнее и менее насыщенна, чем #1F3E8A. Два заданных якоря отсутствуют: леггинсы тёмно-синие вместо красных, обе кисти обычного одинакового размера.",
+      "frames": [
+        "ms-marvel-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сумма S+C+Q+P = 5.0; ROUND_HALF_UP(5.0/8×10, 1) = 6.3 < 8.0. Требуются восстановление якорей и повышение качества скульптуры и отделки.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "ms-marvel-front.png",
+      "fix": "Make one clenched fist visibly oversized to establish Kamala Khan's characteristic asymmetric silhouette, and keep clear gaps between the arms and tunic in a relaxed lowered-arm ready pose.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "ms-marvel-front.png",
+      "fix": "Upgrade the painted miniature craftsmanship with natural teenage facial proportions, smaller realistic eyes, finer sculpted hair strands, sharper bracelet details, fabric seams and folds, and clearly distinct skin, textile, leather and metal finishes.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ms-marvel-front.png",
+      "fix": "Restore red leggings matching #B3202A and one clearly enlarged fist, bring the tunic toward #1F3E8A, and preserve the long red scarf, black hair #1A1719 and warm gold lightning bolt #E0B830.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134a8-9384-7913-b452-c349c7c318f5"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

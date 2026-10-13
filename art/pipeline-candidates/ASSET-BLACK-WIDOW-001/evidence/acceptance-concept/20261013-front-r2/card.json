@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACK-WIDOW-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+      "sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-black-widow-codex/design",
+    "files": [
+      "black-widow-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+    "art/imagegen/concept-black-widow-codex/generation-records.json",
+    "art/imagegen/concept-black-widow-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS; inputs[0].sha256 совпадает с accepted_object.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "black-widow-front.png: узнаётся именно Чёрная Вдова Marvel — красные волосы до плеч, чёрный тактический комбинезон, серебряные браслеты, красные песочные часы и пистолет в собственной правой руке, слева для зрителя. Обе руки отделены от корпуса, стопы стоят на подставке, поза не T/A. Замечание r1 о слиянии пистолета с бедром и кобурой закрыто; хват и контур оружия читаются. Тонкую спусковую скобу следует сохранить читаемой на этапах 3–4.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "black-widow-front.png: расписанная коллекционная миниатюра с отчётливыми прядями, швами и панелями костюма, рельефом браслетов и деталями пистолета; качество близко к medusa-quality-reference.png. По сравнению с r1 кисти и оружие значительно чётче, отдельного светлого остатка возле подставки нет. До уровня эталона не хватает более тонкой моделировки лица и пальцев; зернистая фактура местами грубее, по контуру остаётся светлая окантовка.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "black-widow-front.png: все пять якорей присутствуют и расположены правильно. Ошибочная эмблема r1 заменена однозначными красными песочными часами; чёрный костюм и серебряные браслеты различимы. Волосы остаются ярче и насыщеннее заданного приглушённого #A8321E, поэтому полное совпадение палитры не подтверждено.",
+      "frames": [
+        "black-widow-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "black-widow-front.png",
+      "note": "Тонкая светлая окантовка заметна вокруг отдельных участков волос, рук и оружия; учтена в Q."
+    },
+    {
+      "item": "P",
+      "frame": "black-widow-front.png",
+      "note": "Волосы ярче заданного #A8321E; замечание r1 о тоне закрыто частично, эмблема песочных часов исправлена."
+    },
+    {
+      "item": "S",
+      "frame": "black-widow-front.png",
+      "note": "Верхняя поверхность подставки по-прежнему видна; строгая ортопроекция с подставкой ребром этим дизайн-front не подтверждена."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1350e-42f7-77d2-88bf-a3d912827ce1"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACKBEARD-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-blackbeard-codex/design/blackbeard-front.png",
+      "sha256": "05d18b22077fb04a8da587d5637bb0917c37d8042ac495aeca282caeed2d3197"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-blackbeard-codex/design",
+    "files": [
+      "blackbeard-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-blackbeard-codex/design/checks-report.json",
+    "art/imagegen/concept-blackbeard-codex/generation-records.json",
+    "art/imagegen/concept-blackbeard-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-blackbeard-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks[1].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В blackbeard-front.png ясно читаются треуголка, массивная борода, длинный сюртук и отдельный силуэт сабли. Между руками и корпусом есть просветы; локти согнуты, поза естественная, без T- или A-позы. Сабля в собственной правой руке фигуры, слева для зрителя. Фигура и подставка полностью в кадре. Тонкий клинок, гарда и концы лент читаются; их толщину и сохранность следует проверить на этапах 3–4.",
+      "frames": [
+        "blackbeard-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "blackbeard-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "blackbeard-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: проработаны лицо, переплетения бороды, фактура и швы одежды, потёртости кожи, резьба рукоятей пистолетов и орнамент гарды. Ткань, кожа, волосы, дерево и металл различимы; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "blackbeard-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В blackbeard-front.png визуально соблюдена палитра карточки и palette.json: тёмно-красный сюртук, чёрные борода, треуголка и одежда, латунная фурнитура, алые ленты. Все четыре якоря присутствуют: сабля в собственной правой руке, заплетённая чёрная борода с лентами, треуголка и диагональная перевязь с пистолетами. Световые блики и потёртости не меняют основных цветов.",
+      "frames": [
+        "blackbeard-front.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top: верхнее поле 2.693% при рекомендованных 4%. Это WARN; шляпа не обрезана, summary.FAIL = 0."
+    },
+    {
+      "item": "S",
+      "frame": "blackbeard-front.png",
+      "note": "На этапах 3–4 проверить толщину клинка и гарды, сохранность концов лент и разделение пальцев; геометрия по концепту не проверяется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13382-4399-7822-8e27-b7faa5c3bae7"
+  },
+  "executor_session_id": "codex:01a13346-524e-7cc2-a673-bc7748451063",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

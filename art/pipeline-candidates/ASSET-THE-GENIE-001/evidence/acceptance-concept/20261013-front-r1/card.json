@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-THE-GENIE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-the-genie-codex/design/the-genie-front.png",
+      "sha256": "26e06f19fef3b4cbcd285ca337750ebe0e8f81d0fe95718a1ce3c1641c0ee86a"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-the-genie-codex/design",
+    "files": [
+      "the-genie-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-the-genie-codex/design/checks-report.json",
+    "art/imagegen/concept-the-genie-codex/generation-records.json",
+    "art/imagegen/concept-the-genie-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-the-genie-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В the-genie-front.png узнаваем TheGenie — Джинн лампы по заданной игровой идентичности: мощный синий торс, высокий пучок, золотые серьги и наручные украшения, скрещённые руки, дымовой низ из маленькой лампы. Поза не T/A; лампа, дым и тонкие детали читаются. Руки близко к корпусу, явных просветов между каждой рукой и торсом нет, что соответствует уровню 1,5.",
+      "frames": [
+        "the-genie-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "the-genie-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "the-genie-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: чёткие черты лица, пряди волос и бороды, рельефный орнамент золота и лампы, складки пояса, объёмные завитки дыма и фактура подставки. Кожа, ткань и металл различимы; детализация сохраняется внутри силуэта.",
+      "frames": [
+        "the-genie-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В the-genie-front.png присутствуют все цвета заданной палитры: синяя кожа, золото, светло-голубой дым и красный пояс. Все идентификационные якоря видимы, включая скрещённые руки и дым, выходящий из латунной лампы; светотеневые вариации не меняют заданные цветовые семейства.",
+      "frames": [
+        "the-genie-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "the-genie-front.png",
+      "note": "Нет явных просветов между обеими руками и торсом; ограничение checklist.4 подтверждено визуально и учтено снижением S до 1,5."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 1,934% при целевом минимуме 4%. Фигура полностью в кадре; WARN не меняет статус гейта или фиксированный C."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13494-6800-7401-a35d-a068ac4e3d90"
+  },
+  "executor_session_id": "codex:01a1345f-b7de-7780-8897-1413d437d536",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

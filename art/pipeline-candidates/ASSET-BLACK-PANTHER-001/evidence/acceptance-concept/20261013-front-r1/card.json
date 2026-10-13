@@ -1,0 +1,90 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BLACK-PANTHER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+      "sha256": "037d030771347aca5047dc7da04e102d199b5be446456faba6c78aff50d3a6ab"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-black-panther-codex/design",
+    "files": [
+      "black-panther-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+    "art/imagegen/concept-black-panther-codex/generation-records.json",
+    "art/imagegen/concept-black-panther-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Black Panther узнаваем по пантерной маске с острыми ушами, чёрному облегающему костюму и серебряному ожерелью. Полная фигура с корректными основными частями; руки и кисти отделены от корпуса и бёдер. Расслабленная готовая стойка с опущенными руками не является T/A-позой.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "Микрофактура костюма и металлические элементы различимы; изображение читается как коллекционная миниатюра. Качество близко к эталону, однако края серебряных деталей и мелкая пластика кистей и обуви менее чёткие, а тёмные участки ног беднее читаемым рельефом.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "Основная чёрно-серая палитра, серебряное ожерелье и маска с острыми ушами соответствуют карточке. Обязательные когти на пальцах не читаются: видимые кончики выглядят округлыми. Белые глазные щели также не выделены отчётливо внутри серебряного рисунка маски.",
+      "frames": [
+        "black-panther-front.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Итоговый балл 7,5 ниже порога 8,0: потерян якорь когтей, детализация отдельных зон уступает эталону качества.",
+  "rework_fix_list": [
+    {
+      "item": "Q",
+      "frame": "black-panther-front.png",
+      "fix": "Refine the collectible miniature finish with crisp suit texture, clean silver edges and clearer sculpted detail on the hands, lower legs and boots while preserving the costume design.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "black-panther-front.png",
+      "fix": "Add clearly visible short silver claws to the fingertips of both hands and distinct white eye slits inside the panther mask while preserving the black and dark-grey suit and silver necklace.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349b-ec77-7531-bb6f-35de0d06a52f"
+  },
+  "executor_session_id": "codex:01a13495-9111-7a81-9ce8-74b410d7f606",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

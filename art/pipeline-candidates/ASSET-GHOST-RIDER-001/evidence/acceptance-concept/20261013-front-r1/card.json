@@ -1,0 +1,93 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GHOST-RIDER-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ghost-rider-codex/design/ghost-rider-front.png",
+      "sha256": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ghost-rider-codex/design",
+    "files": [
+      "ghost-rider-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+    "art/imagegen/concept-ghost-rider-codex/generation-records.json",
+    "art/imagegen/concept-ghost-rider-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ghost-rider-front.png: узнаётся именно Marvel Ghost Rider — горящий череп, косуха с серебряными шипами и тяжёлая цепь на правом предплечье, слева для зрителя. Фигура целиком видна, низкая нейтральная поза не T/A; кисти и ноги разделены. Руки близко к корпусу, звенья обмотки местами сливаются. Видимая верхняя плоскость подставки нарушает требование строгого фронтального вида.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "ghost-rider-front.png: коллекционная миниатюра с различимыми кожей, костью, металлом и скульптурным пламенем; зубы, молнии, заклёпки и шнуровка проработаны. При просмотре обоих изображений в исходном разрешении качество близко к medusa-quality-reference.png, но пламя, перчатки и отдельные звенья цепи беднее по детализации. Светлый остаточный участок фона справа за подставкой снижает чистоту исполнения.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "ghost-rider-front.png: чёрная кожа, костяной череп, стальная цепь и оранжевое пламя соответствуют PALETTE; светлые металлические блики и жёлтые участки пламени объясняются моделировкой материалов. Все три якоря присутствуют, цепь расположена на анатомически правой руке. Командного цвета и цветного кольца подставки нет.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "ghost-rider-front.png",
+      "note": "Руки близко к корпусу; плотная обмотка цепи местами теряет раздельность звеньев. Тонкие шипы и свободную петлю цепи следует отдельно проверить на этапах 3–4."
+    },
+    {
+      "item": "S",
+      "frame": "ghost-rider-front.png",
+      "note": "Верх подставки заметно виден: требование строго фронтального вида с подставкой ребром не выполнено, что совпадает с verification.json#checklist для orthographic."
+    },
+    {
+      "item": "Q",
+      "frame": "ghost-rider-front.png",
+      "note": "Справа за подставкой остался светло-серый участок тени или обработки; фон внутри кадра неоднороден, хотя проверки рамки проходят. Совпадает с verification.json#checklist для full-frame-background."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134ea-c35b-7323-9595-ffb11182ddce"
+  },
+  "executor_session_id": "history:ASSET-GHOST-RIDER-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

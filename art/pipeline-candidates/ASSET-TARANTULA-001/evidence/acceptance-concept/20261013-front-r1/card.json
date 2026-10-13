@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-TARANTULA-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-tarantula-codex/design/tarantula-front.png",
+      "sha256": "2330b8effbf58c2486caedc0d8b95b6e794a64b684a739a5e2285f0aa39d7936"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-tarantula-codex/design",
+    "files": [
+      "tarantula-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-tarantula-codex/design/checks-report.json",
+    "art/imagegen/concept-tarantula-codex/generation-records.json",
+    "art/imagegen/concept-tarantula-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-tarantula-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-tarantula-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В tarantula-front.png узнаваем заданный Tarantula из Tales to Amaze: огромное волосатое брюшко, восемь толстых полосатых ног, блестящие чёрные глаза и выраженные клыки. Концы четырёх ног с каждой стороны различимы, но некоторые сегменты и основания перекрываются. Передняя пара отделена от корпуса просветами; человеческой T/A-позы нет. Опора на подставку показана неоднозначно.",
+      "frames": [
+        "tarantula-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "tarantula-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "tarantula-front.png соответствует уровню расписанной коллекционной миниатюры medusa-quality-reference.png: детальная скульптурная шерсть внутри силуэта, проработанные суставы, объёмные клыки и фактурная подставка. Матовая шерсть, гладкие клыки и глянцевые глаза отчётливо различаются по материалу; крупных бедных зон нет.",
+      "frames": [
+        "tarantula-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В tarantula-front.png присутствуют заданные коричневая шерсть, тёмно-коричневое тело, оранжевые полосы и чёрный акцент глаз. Светотень сохраняет палитру palette.json. Все якоря DESCRIPTION_EN и ANCHORS_EN видимы: крупный волосатый паук, восемь толстых полосатых ног, блестящие чёрные глаза и клыки.",
+      "frames": [
+        "tarantula-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "tarantula-front.png",
+      "note": "Некоторые основания и сегменты ног перекрываются; часть концов ног находится вне контура подставки либо выше её поверхности. Равномерная опора не подтверждена визуально."
+    },
+    {
+      "item": "C",
+      "frame": "tarantula-front.png",
+      "note": "Строгая фронтальная ортопроекция не достигнута: видна узкая верхняя поверхность подставки, нижняя кромка слегка выгнута. Это соответствует verification.json#checklist.front_orthographic.passed = false и limit_reached; фиксированная оценка C на 1a не изменяется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1349e-b510-7773-9192-da9527701d1e"
+  },
+  "executor_session_id": "history:ASSET-TARANTULA-001-concept-1a-design-front-g1",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

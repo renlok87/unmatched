@@ -1,0 +1,83 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-JERSEY-DEVIL-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-JERSEY-DEVIL-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-jersey-devil-codex/design/jersey-devil-front.png",
+      "sha256": "f1932f1fe778c871514668bca56c01336681641bc49304d2017ea6fd6b432467"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-jersey-devil-codex/design",
+    "files": [
+      "jersey-devil-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+    "art/imagegen/concept-jersey-devil-codex/generation-records.json",
+    "art/imagegen/concept-jersey-devil-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-jersey-devil-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "jersey-devil-front.png: узнаётся Jersey Devil из заданного описания — вытянутая лошадиная голова с небольшими рогами, сухой корпус, два перепончатых крыла, копыта и раздвоенный хвост. Кисти отделены от корпуса, локти согнуты асимметрично; T- или A-позы нет. Контуры крыльев и обе ветви хвоста читаются. Тонкие когти, концы крыльев и хвоста требуют сохранения читаемости на этапах 3–4.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "jersey-devil-front.png: близко к QUALITY_REFERENCE по виду расписанной коллекционной миниатюры; проработаны морда, грива, анатомический рельеф, рога, когти и перепонки, материалы различимы. На крупных участках перепонок мелкая фактура более однообразна и менее чётко организована, чем чешуя и скульптурный орнамент эталона Medusa.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "jersey-devil-front.png: коричневая шкура, нейтрально-серые перепонки, костяные рога и красные глаза соответствуют PALETTE с учётом освещения. Все якоря присутствуют: лошадиная голова с небольшими рогами, крылья летучей мыши, копытные ноги и раздвоенный хвост.",
+      "frames": [
+        "jersey-devil-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "Q",
+      "frame": "jersey-devil-front.png",
+      "note": "На больших участках перепонок повторяется мелкая зернистая фактура; выразительность отдельных деталей немного ниже эталона."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134b9-5386-78a3-855f-c0c0595829ea"
+  },
+  "executor_session_id": "codex:01a134a7-f594-7360-b552-f889b4f9bcc6",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

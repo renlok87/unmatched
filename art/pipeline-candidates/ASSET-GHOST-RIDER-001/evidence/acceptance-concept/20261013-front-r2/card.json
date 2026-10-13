@@ -1,0 +1,108 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-GHOST-RIDER-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-GHOST-RIDER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ghost-rider-codex/design/ghost-rider-front.png",
+      "sha256": "e122ab4e94110ef8afb188600db64b6876611151a6e6604f0c4d8bec741398bd"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ghost-rider-codex/design",
+    "files": [
+      "ghost-rider-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+    "art/imagegen/concept-ghost-rider-codex/generation-records.json",
+    "art/imagegen/concept-ghost-rider-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ghost-rider-front.png: узнаётся именно Marvel Ghost Rider по пылающему черепу, чёрной косухе с серебряными шипами и тяжёлой цепи. Низкая стоячая поза не T/A, зазоры между руками и корпусом видны. Кисть под обмоткой теряет читаемость, звенья местами сливаются — замечание r1 сохраняется. Нижняя часть фигуры сильно укорочена, стопы у подставки неразличимы. Верхняя плоскость подставки по-прежнему видна; замечание r1 о строгом фронтальном виде не закрыто.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "ghost-rider-front.png: изображена скульптурная коллекционная миниатюра; кость, кожа, металл и пламя различимы, зубы и трещины черепа проработаны. Детализация явно ниже medusa-quality-reference.png: кожа покрыта грубой однообразной зернистостью, перчатки и обмотка обобщены, геометрия звеньев неряшлива, покраска пламени имеет ограниченные тональные переходы. Замечание r1 о светлом участке фона справа за подставкой закрыто: на текущем front этот участок не виден.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    },
+    "P": {
+      "value": 1,
+      "rationale": "ghost-rider-front.png: чёрная кожа, костяной череп, стальная цепь и оранжевое пламя соответствуют семействам PALETTE; командного цвета нет. Обмотка расположена на анатомически левой руке, справа для зрителя. Обязательный якорь «цепь вокруг правой руки» не выполнен; правильная сторона, отмеченная в карточке r1, в текущем дизайне потеряна.",
+      "frames": [
+        "ghost-rider-front.png"
+      ]
+    }
+  },
+  "score": 6.3,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "G-CHECKS PASS, но сумма S+C+Q+P = 5,0 даёт 6,3 после округления half-up, ниже порога 8,0. Детализация уступает эталону, цепь находится на неверной руке; сохраняются слияния обмотки и перспективный вид подставки.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "ghost-rider-front.png",
+      "fix": "Restore full-length adult humanoid legs with clearly defined knees, shins, ankles and two distinct black biker boots planted on the pedestal, preserving the low neutral standing pose and visible gaps between both arms and the torso.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "ghost-rider-front.png",
+      "fix": "Make the chain-wrapped gloved hand anatomically readable and distinguish individual interlocking links without fusing the hand, chain or jacket.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "ghost-rider-front.png",
+      "fix": "Use a strictly frontal orthographic camera at chest height and show the round pedestal exactly edge-on with no visible top surface.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "ghost-rider-front.png",
+      "fix": "Match the Medusa quality reference with crisp sculpted leather seams, zipper teeth and stitching, precise glove details, clean steel link geometry, fine flame color transitions and controlled hand-painted highlights instead of coarse uniform grain.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "ghost-rider-front.png",
+      "fix": "Wrap the heavy steel chain around the figure's own RIGHT arm, on the viewer's LEFT in this frontal view, while retaining leather black #18181C, skull bone #E0D6C0, chain steel #9AA1A7 and flame orange #F07A1E.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1352c-2da6-71e2-b2d6-a8e9879edd2e"
+  },
+  "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

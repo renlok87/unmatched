@@ -1,0 +1,114 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BULLSEYE-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-bullseye-codex/design/bullseye-front.png",
+      "sha256": "bea7253991b97489a90cf0ff78b3facd7a49f6acdc02d7c2b4dba5367d9f42e1"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-bullseye-codex/design",
+    "files": [
+      "bullseye-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-bullseye-codex/design/checks-report.json",
+    "art/imagegen/concept-bullseye-codex/generation-records.json",
+    "art/imagegen/concept-bullseye-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-bullseye-codex/design/checks-report.json",
+      "note": "art/imagegen/concept-bullseye-codex/design/checks-report.json#summary.FAIL = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0,
+      "rationale": "bullseye-front.png: ножи присутствуют в собственной правой руке, но такой же веер есть и в левой; вторая рука с оружием прямо соответствует S = 0 по рубрике. Открытая голова со светлыми волосами и сплошной синей точкой вместо характерной маски с белой мишенью не обеспечивает узнаваемость именно Marvel Bullseye. Руки отделены от корпуса, ножи читаются. Верх подставки заметно виден, требование строгого фронтального вида не выполнено.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "Q": {
+      "value": 1,
+      "rationale": "bullseye-front.png: кожа, костюм и стальные ножи различимы, фигура выглядит миниатюрой. Однако гладкие пластиковые поверхности, упрощённые кисти и слабая детализация костюма заметно уступают чёткости скульптуры и росписи medusa-quality-reference.png. Вокруг силуэта видна светлая обводка, в зазорах между руками и корпусом остались светло-серые участки фона с прямыми границами.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "bullseye-front.png: присутствуют чёрный костюм, синие элементы, белая мишень на груди и стальные ножи в правой руке; подставка нейтральная, без командного кольца. Синий на перчатках, сапогах и груди заметно светлее и ближе к голубому, чем тёмный #1F3E8A из palette.json.",
+      "frames": [
+        "bullseye-front.png"
+      ]
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "S = 0 вызывает безусловное вето: изображена вторая рука с оружием и недостаточно передана идентичность Marvel Bullseye. Итоговый score = 5.0 также ниже порога 8.0 при G-CHECKS PASS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "bullseye-front.png",
+      "fix": "Keep the fanned throwing knives only in the character's RIGHT hand, on the viewer's left, and make his LEFT hand empty.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "bullseye-front.png",
+      "fix": "Replace the exposed blond hair and solid blue forehead dot with Marvel Bullseye's black cowl bearing a clearly readable white concentric target on the forehead.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "S",
+      "frame": "bullseye-front.png",
+      "fix": "Use a strictly frontal orthographic view with a horizontal camera and show the pedestal edge-on with no visible top surface.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "bullseye-front.png",
+      "fix": "Match the Medusa quality reference through crisp sculpted fingers, defined blade bevels, restrained costume seams and folds, and controlled miniature paint shading instead of uniformly glossy plastic surfaces.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "Q",
+      "frame": "bullseye-front.png",
+      "fix": "Remove the pale cutout halo and straight-edged gray patches between the arms and torso, restoring a uniform neutral dark gray background.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "P",
+      "frame": "bullseye-front.png",
+      "fix": "Shift the blue costume areas to dark #1F3E8A under neutral lighting while retaining #18181C black, #E8E8E8 target white, and #B8BEC4 blade steel.",
+      "tool": "Codex 1a"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a134de-efc2-75f1-b203-908154836fe3"
+  },
+  "executor_session_id": "history:ASSET-BULLSEYE-001-1a-design-front-g2",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Не принято по делегированию: требуется доработка дизайна 1a. Оценки основаны на самостоятельном осмотре обеих картинок в исходном разрешении; неподтверждённые пункты checklist не считались дефектами автоматически."
+}
