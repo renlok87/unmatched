@@ -8,7 +8,7 @@ import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { DashboardPage } from './pages/dashboard';
 import { LoginPage } from './pages/login';
 import { AdminLayout } from './components/layout/AdminLayout';
-import { HeroList, HeroCreate, HeroEdit, HeroShow } from './pages/heroes';
+import { HeroList, HeroCreate, HeroEdit, HeroShow, HeroByName } from './pages/heroes';
 import { CardList, CardCreate, CardEdit, CardShow } from './pages/cards';
 import { BoardList, BoardCreate, BoardEdit, BoardShow } from './pages/boards';
 import { UserList, UserEdit, UserShow } from './pages/users';
@@ -136,6 +136,7 @@ function App() {
           {/* Heroes Routes */}
           <Route path="heroes" element={<HeroList />} />
           <Route path="heroes/show/:id" element={<HeroShow />} />
+          <Route path="heroes/by-name/:name" element={<HeroByName />} />
           <Route path="heroes/create" element={<HeroCreate />} />
           <Route path="heroes/edit/:id" element={<HeroEdit />} />
 

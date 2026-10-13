@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { client } from '../../providers/dataProvider';
 import { gql } from 'urql';
 import { useDebounce } from '../../hooks/useDebounce';
+import { HeroArtTags, useHeroArtLinks } from './artHub';
 
 const { Text } = Typography;
 
@@ -38,6 +39,7 @@ const DELETE_HERO = gql`
 
 export const HeroList: React.FC<IResourceComponentsProps> = () => {
   const navigate = useNavigate();
+  const artLinks = useHeroArtLinks();
   const [loading, setLoading] = useState(true);
   const [heroes, setHeroes] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -184,6 +186,11 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
             )}
             sorter={true}
             sortOrder={columnSortOrder('name')}
+          />
+          <Table.Column
+            key="art"
+            title="Арт-хаб"
+            render={(_: unknown, record: any) => <HeroArtTags figures={artLinks[String(record.name).toLowerCase()]} />}
           />
           <Table.Column
             dataIndex="set"

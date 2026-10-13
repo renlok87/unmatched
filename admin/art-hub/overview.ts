@@ -31,6 +31,7 @@ import type {
   FileRef,
   LatestLayerView,
   LayerView,
+  HeroLink,
   LookdevHeroView,
   LookdevOverview,
   LookdevSheet,
@@ -45,6 +46,7 @@ import type {
 export const OVERVIEW_SOURCES = {
   planStatus: 'docs/art-pipeline/plan-status.json',
   conceptRoot: 'art/imagegen/hero-quality-v1',
+  heroLinks: 'docs/art-pipeline/hero-links.json',
   materialLibrary: 'docs/art-pipeline/material-library',
   materialPresets: 'docs/art-pipeline/material-library/um-material-presets-v1.json',
   materialSources: 'docs/art-pipeline/material-library/sources.json',
@@ -548,6 +550,18 @@ export function heroSlug(assetId: string): string {
 const UE_SHEET_RE = /^art\/pipeline-candidates\/([^/]+)\/([^/]+)\/review\/([^/]+)\/[^/]*lookdev-sheet[^/]*\.(jpg|jpeg|png)$/i;
 const BLENDER_SHEET_RE = /^art\/pipeline-candidates\/([^/]+)\/([^/]+)\/preview\/((ld_sheet|compare-ld|ld_concept_zones)[^/]*)\.(jpg|jpeg|png)$/i;
 
+/** docs/art-pipeline/hero-links.json: look-dev key → admin Hero.name + role. */
+export function readHeroLinks(h: OverviewHelpers): Map<string, HeroLink> {
+  const out = new Map<string, HeroLink>();
+  for (const [key, raw] of Object.entries(asObj(h.readJson(OVERVIEW_SOURCES.heroLinks)?.links))) {
+    const o = asObj(raw);
+    const hero = asStr(o.hero);
+    if (!hero) continue;
+    out.set(key, { hero, role: o.role === 'sidekick' ? 'sidekick' : 'hero', note: asStr(o.note) });
+  }
+  return out;
+}
+
 export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName: string }[]): LookdevOverview {
   const conceptRoot = OVERVIEW_SOURCES.conceptRoot;
   const conceptFiles = h.watched.filter((f) => f.rel.startsWith(`${conceptRoot}/`));
@@ -561,6 +575,8 @@ export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName:
       .map((f) => h.makeRef(f.rel, { role: 'эталон качества' })),
     heroes: [],
   };
+  const heroLinks = readHeroLinks(h);
+  if (heroLinks.size) view.heroLinksFile = h.makeRef(OVERVIEW_SOURCES.heroLinks, { role: 'связь фигур с Heroes' });
   const keys = new Map<string, { name: string; pageId?: string }>();
   for (const p of pages) keys.set(heroSlug(p.id), { name: p.shortName, pageId: p.id });
   for (const d of conceptDirs) if (!keys.has(d)) keys.set(d, { name: d });
@@ -615,6 +631,7 @@ export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName:
       evidenceSheets,
       conceptPackage: packages.get(key),
       acceptance: acceptance.get(assetIdOfKey(key)) ?? [],
+      heroLink: heroLinks.get(key),
     };
     const empty = !concepts.length && !hero.conceptPackage && !hero.acceptance.length && !docs.length && !hero.ueSheets.length && !hero.blenderSheets.length && !evidenceSheets.length;
     if (!empty) view.heroes.push(hero);

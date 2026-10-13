@@ -62,7 +62,8 @@ npm run art-hub:snapshot -- --out <файл>
 | `types.ts` | Модель данных, общая для агрегатора и страницы (без Node-импортов) |
 | `fs-utils.ts` | Обход каталогов (без symlink), кэши JSON/текста/sha256, CSV, разбор markdown (акты, таблицы) |
 | `path-guard.ts` | Белый список путей, защита от traversal, MIME, разбор `Range` |
-| `vite-plugin.ts` | Dev-плагин (`apply: 'serve'`): `/__art-hub/data`, `/__art-hub/file`, `/__art-hub/texture` |
+| `vite-plugin.ts` | Dev-плагин (`apply: 'serve'`): `/__art-hub/data`, `/__art-hub/file`, `/__art-hub/texture`, `/__art-hub/heroes`, `/__art-hub/hero` |
+| `lookdev-row.ts` | Превью (фронт), этап и «нужен 2-й приёмщик» фигуры — общие для таблицы look-dev, эндпоинтов героя и админки |
 | `cli.ts` | CLI снимка (`npm run art-hub:snapshot`) |
 | `__tests__/` | vitest: агрегатор на фикстуре (создаётся во временном каталоге) и на реальном репо; path-guard и эндпоинты через настоящий HTTP-сервер |
 | `../src/pages/art-hub/` | Страница (antd): навигация, вкладки, 3D-просмотр (three.js, лениво), видео, галереи |
@@ -70,6 +71,8 @@ npm run art-hub:snapshot -- --out <файл>
 ### Эндпоинты (только dev-сервер)
 
 - `GET /__art-hub/data` — свежая агрегация (`Cache-Control: no-store`).
+- `GET /__art-hub/heroes` — `Hero.name` (нижний регистр) → краткие строки связанных фигур (колонка «Арт-хаб» списка Heroes).
+- `GET /__art-hub/hero?name=<Hero.name>` — полные look-dev фигуры героя и его помощников + словарь (блок «Арт-хаб» на странице героя).
 - `GET|HEAD /__art-hub/file?path=<путь от корня репо>[&download=1]` — файл из белого списка;
   `Range` (206/416) для перемотки видео, `ETag`/304, `nosniff`, CSP `sandbox`; HTML отдаётся как текст.
 - `GET /__art-hub/texture?model=<путь модели>&name=<имя текстуры>` — текстура рядом с FBX
@@ -92,6 +95,11 @@ symlink/junction, чей реальный путь выходит из спис�
 Каталог `unreal/` не отдаётся.
 
 ## Источники данных
+
+**Связь с коллекцией Heroes** — `docs/art-pipeline/hero-links.json`: ключ look-dev → `{hero: Hero.name, role: hero|sidekick, note?}`.
+Связь по имени, а не по id: `Hero.id` — cuid и различается между базами. Фигура без записи — героя в БД нет
+(в таблице «—», фильтр «нет в Heroes»). Ссылки из арт-хаба ведут на `/heroes/by-name/<Hero.name>`, маршрут
+админки сам находит id. Новую фигуру героя из БД — дописать строку в этот файл.
 
 | Источник | Что берётся |
 | --- | --- |

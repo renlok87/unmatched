@@ -1,6 +1,7 @@
 import { Show } from '@refinedev/antd';
 import { IResourceComponentsProps, useShow } from '@refinedev/core';
 import { Typography, Space, Tag, Image, Descriptions, Divider, Card as AntCard, Row, Col } from 'antd';
+import { HeroArtHubPanel } from './artHub';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -116,6 +117,8 @@ export const HeroShow: React.FC<IResourceComponentsProps> = () => {
             {data?.updatedAt ? new Date(data.updatedAt).toLocaleString() : '-'}
           </Descriptions.Item>
         </Descriptions>
+
+        <HeroArtHubPanel heroName={data?.name} />
 
         {ability && (
           <>

@@ -1,15 +1,35 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Alert, Button, Card, Col, Collapse, Empty, Image, Input, Row, Space, Table, Tag, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { ArrowLeftOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import type { LookdevHeroView, LookdevOverview, LookdevSheet } from '../../../../art-hub/types';
+import { ArrowLeftOutlined, LeftOutlined, RightOutlined, UserOutlined } from '@ant-design/icons';
+import type { HeroLink, LookdevHeroView, LookdevOverview, LookdevSheet } from '../../../../art-hub/types';
 import { DocList } from '../components/DocList';
 import { FileActions, Gallery, useArtHubUi } from '../components/common';
 import { fileUrl } from '../api';
 import { AcceptanceCards, ChecksTag, ConceptPackage } from './ConceptPackage';
+import { lookdevStage, lookdevThumb, needsSecondAcceptor } from '../../../../art-hub/lookdev-row';
 
 const { Text } = Typography;
+
+/** Admin hero page of a linked figure; /heroes/by-name resolves Hero.name to its id. */
+export const heroPagePath = (heroName: string) => `/heroes/by-name/${encodeURIComponent(heroName)}`;
+
+export const ROLE_LABEL: Record<HeroLink['role'], string> = { hero: 'герой', sidekick: 'помощник' };
+
+export const HeroLinkButton: React.FC<{ link: HeroLink }> = ({ link }) => (
+  <Space size={4} wrap onClick={(e) => e.stopPropagation()}>
+    <Link to={heroPagePath(link.hero)} data-testid="art-hub-hero-link">
+      <UserOutlined /> {link.hero}
+    </Link>
+    {link.role === 'sidekick' ? <Tag>помощник</Tag> : null}
+    {link.note ? (
+      <Text type="secondary" style={{ fontSize: 12 }}>
+        {link.note}
+      </Text>
+    ) : null}
+  </Space>
+);
 
 /** Sheets grouped by run; the newest run is open, older ones are collapsed. */
 const SheetRuns: React.FC<{ sheets: LookdevSheet[]; size?: number; emptyText: string }> = ({ sheets, size = 300, emptyText }) => {
@@ -51,9 +71,19 @@ export const HeroLookdev: React.FC<{ hero: LookdevHeroView; showTitle?: boolean 
             <Tag>{hero.key}</Tag>
             {hero.pageId ? (
               <Button size="small" type="link" onClick={() => ui.openPage(hero.pageId!, 'lookdev')}>
-                страница героя
+                страница ассета
               </Button>
             ) : null}
+            {hero.heroLink ? (
+              <span>
+                <Text type="secondary">в админке: </Text>
+                <HeroLinkButton link={hero.heroLink} />
+              </span>
+            ) : (
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                героя в коллекции Heroes нет
+              </Text>
+            )}
           </Space>
         ) : undefined
       }
@@ -123,7 +153,7 @@ export const HeroLookdev: React.FC<{ hero: LookdevHeroView; showTitle?: boolean 
   );
 };
 
-const VERDICT_COLOR: Record<string, string> = {
+export const VERDICT_COLOR: Record<string, string> = {
   pass: 'green',
   rework: 'orange',
   rework_blender: 'orange',
@@ -145,18 +175,15 @@ interface HeroRow {
 }
 
 function toRow(hero: LookdevHeroView): HeroRow {
-  const pkg = hero.conceptPackage;
   const last = hero.acceptance[0];
-  const thumb = [pkg?.designFront, ...(pkg?.candidates.map((c) => c.file) ?? []), ...hero.concepts].find((f) => f?.servable);
-  const stage = pkg ? pkg.stage : hero.ueSheets.length ? 'look-dev UE' : 'look-dev';
   return {
     hero,
-    thumb,
-    stage,
+    thumb: lookdevThumb(hero),
+    stage: lookdevStage(hero),
     verdict: last?.verdict,
     score: last?.score,
     cards: hero.acceptance.length,
-    secondAcceptor: last?.verdict === 'pass' && last.score !== undefined && last.score < 8.5,
+    secondAcceptor: needsSecondAcceptor(hero),
   };
 }
 
@@ -191,6 +218,26 @@ const HeroTable: React.FC<{ rows: HeroRow[]; onOpen: (key: string) => void }> = 
           </Text>
         </Space>
       ),
+    },
+    {
+      title: 'Герой (админка)',
+      key: 'heroLink',
+      filters: [
+        { text: 'есть в Heroes', value: 'linked' },
+        { text: 'нет в Heroes', value: 'none' },
+        { text: 'помощник', value: 'sidekick' },
+      ],
+      onFilter: (v, r) => (v === 'linked' ? !!r.hero.heroLink : v === 'none' ? !r.hero.heroLink : r.hero.heroLink?.role === v),
+      sorter: (a, b) => (a.hero.heroLink ? (b.hero.heroLink ? a.hero.heroLink.hero.localeCompare(b.hero.heroLink.hero) : -1) : b.hero.heroLink ? 1 : 0),
+      render: (_, r) =>
+        r.hero.heroLink ? (
+          <Space size={4} wrap onClick={(e) => e.stopPropagation()}>
+            <Link to={heroPagePath(r.hero.heroLink.hero)}>{r.hero.heroLink.hero}</Link>
+            {r.hero.heroLink.role === 'sidekick' ? <Tag>помощник</Tag> : null}
+          </Space>
+        ) : (
+          <Text type="secondary">—</Text>
+        ),
     },
     {
       title: 'Этап',

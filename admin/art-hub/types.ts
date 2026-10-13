@@ -732,10 +732,34 @@ export interface LookdevHeroView {
   conceptPackage?: ConceptPackageView;
   /** acceptance cards of the asset (evidence/acceptance-concept, acceptance, acceptance-anim), newest first */
   acceptance: AcceptanceCardView[];
+  /** admin Heroes record this figure belongs to (docs/art-pipeline/hero-links.json) */
+  heroLink?: HeroLink;
+}
+
+/** Link of an art-hub figure to the admin Heroes collection, by the unique Hero.name. */
+export interface HeroLink {
+  hero: string;
+  role: 'hero' | 'sidekick';
+  note?: string;
+}
+
+/** Short row of a figure linked to an admin hero (Heroes list, hero page header). */
+export interface HeroFigureSummary {
+  key: string;
+  name: string;
+  role: HeroLink['role'];
+  note?: string;
+  stage: string;
+  verdict?: string;
+  score?: number;
+  secondAcceptor: boolean;
+  thumb?: FileRef;
 }
 
 export interface LookdevOverview {
   conceptRoot: string;
+  /** source of heroLink (docs/art-pipeline/hero-links.json) */
+  heroLinksFile?: FileRef;
   references: FileRef[];
   heroes: LookdevHeroView[];
 }

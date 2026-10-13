@@ -6,6 +6,8 @@
  *   GET /__art-hub/texture?model=<rel>&name=<file>
  *        → texture next to a model (same dir, <model>.fbm/, ../textures/, textures/);
  *          a 1×1 grey PNG with `X-Art-Hub-Missing: 1` when not found (no console noise)
+ *   GET /__art-hub/heroes                    → admin Hero.name → linked figures (short rows, docs/art-pipeline/hero-links.json)
+ *   GET /__art-hub/hero?name=<Hero.name>     → full look-dev views of one hero's figures + vocab
  *
  * `apply: 'serve'` — the plugin exists only on the dev server; production builds
  * contain no endpoint and the page shows a stub.
@@ -15,6 +17,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 import { ArtHubAggregator } from './aggregate';
+import { lookdevStage, lookdevThumb, needsSecondAcceptor } from './lookdev-row';
+import type { ArtHubData, HeroFigureSummary, HeroLink, LookdevHeroView } from './types';
 import { mimeFor, normalizeRelPath, parseRange, resolveSafePath, type GuardSuccess } from './path-guard';
 
 export const ART_HUB_PREFIX = '/__art-hub';
@@ -101,6 +105,41 @@ export function textureCandidates(modelRel: string, name: string): string[] {
   return [...new Set(out)];
 }
 
+function summarize(h: LookdevHeroView, link: HeroLink): HeroFigureSummary {
+  const last = h.acceptance[0];
+  return {
+    key: h.key,
+    name: h.name,
+    role: link.role,
+    note: link.note,
+    stage: lookdevStage(h),
+    verdict: last?.verdict,
+    score: last?.score,
+    secondAcceptor: needsSecondAcceptor(h),
+    thumb: lookdevThumb(h),
+  };
+}
+
+/** Hero.name (lower case) → linked figures; heroes first, then sidekicks. */
+export function heroLinkSummary(data: ArtHubData): { generatedAt: string; heroes: Record<string, HeroFigureSummary[]> } {
+  const heroes: Record<string, HeroFigureSummary[]> = {};
+  for (const h of data.lookdev.heroes) {
+    if (!h.heroLink) continue;
+    const k = h.heroLink.hero.toLowerCase();
+    (heroes[k] ??= []).push(summarize(h, h.heroLink));
+  }
+  for (const list of Object.values(heroes)) list.sort((a, b) => (a.role === b.role ? 0 : a.role === 'hero' ? -1 : 1));
+  return { generatedAt: data.generatedAt, heroes };
+}
+
+/** Full look-dev views of the figures linked to one admin hero (by Hero.name, case-insensitive). */
+export function heroFigures(data: ArtHubData, name: string): { vocab: ArtHubData['vocab']; figures: LookdevHeroView[]; summary: HeroFigureSummary[] } {
+  const q = name.trim().toLowerCase();
+  const figures = q ? data.lookdev.heroes.filter((h) => h.heroLink?.hero.toLowerCase() === q) : [];
+  figures.sort((a, b) => (a.heroLink!.role === b.heroLink!.role ? 0 : a.heroLink!.role === 'hero' ? -1 : 1));
+  return { vocab: data.vocab, figures, summary: figures.map((h) => summarize(h, h.heroLink!)) };
+}
+
 export interface ArtHubMiddlewareOptions {
   repoRoot: string;
   aggregator?: ArtHubAggregator;
@@ -119,7 +158,7 @@ export function createArtHubMiddleware(opts: ArtHubMiddlewareOptions) {
       return;
     }
     const route = url.pathname.replace(/^\/+/, '').replace(/\/+$/, '');
-    if (!['data', 'file', 'texture', ''].includes(route)) {
+    if (!['data', 'file', 'texture', 'heroes', 'hero', ''].includes(route)) {
       next();
       return;
     }
@@ -131,6 +170,14 @@ export function createArtHubMiddleware(opts: ArtHubMiddlewareOptions) {
     try {
       if (route === 'data' || route === '') {
         sendJson(res, 200, aggregator.get());
+        return;
+      }
+      if (route === 'heroes') {
+        sendJson(res, 200, heroLinkSummary(aggregator.get()));
+        return;
+      }
+      if (route === 'hero') {
+        sendJson(res, 200, heroFigures(aggregator.get(), url.searchParams.get('name') ?? ''));
         return;
       }
       if (route === 'file') {
