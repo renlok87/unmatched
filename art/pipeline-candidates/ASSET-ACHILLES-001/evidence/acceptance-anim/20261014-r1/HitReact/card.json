@@ -1,0 +1,133 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": "HitReact",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/export/AM_Achilles_HitReact.fbx",
+      "sha256": "4a7e134a568f0a4fd2f451a321a22427e246d6ae4bf4dde9adede482c0a9524e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim.json",
+      "sha256": "6ffd8436fbb1490a14a53f7c3771a2ffce4c6cc30906a7a66767b2b92e1b78ef"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r1/HitReact/frames",
+    "files": [
+      "Achilles-HitReact-blender-sheet.jpg",
+      "Achilles-HitReact-f02-front.jpg",
+      "Achilles-HitReact-f02-q34.jpg",
+      "Achilles-HitReact-f02-q34r.jpg",
+      "Achilles-HitReact-f00-front-ue-editor.jpg",
+      "Achilles-HitReact-f00-q34-ue-editor.jpg",
+      "Achilles-HitReact-f02-front-ue-editor.jpg",
+      "Achilles-HitReact-f02-q34-ue-editor.jpg",
+      "Achilles-HitReact-f04-front-ue-editor.jpg",
+      "Achilles-HitReact-f04-q34-ue-editor.jpg",
+      "Achilles-HitReact-f07-front-ue-editor.jpg",
+      "Achilles-HitReact-f07-q34-ue-editor.jpg",
+      "Achilles-HitReact-f10-front-ue-editor.jpg",
+      "Achilles-HitReact-f10-q34-ue-editor.jpg",
+      "Achilles-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/grip-HitReact.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_HitReact.validation.json",
+      "note": "AM_Achilles_HitReact.validation.json#result = pass; AM_Achilles_HitReact.validation.json#fails = []; AM_Achilles_HitReact.validation.json#clip_sha256 = 4a7e134a568f0a4fd2f451a321a22427e246d6ae4bf4dde9adede482c0a9524e",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/contact-HitReact.json",
+      "note": "contact-HitReact.json#result = pass; contact-HitReact.json#fails = []; contact-HitReact.json#checks[check=skin_stretch].status = warn; contact-HitReact.json#checks[check=skin_stretch].visible_torn_edges = 0",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ACH-HitReact].status = technically_imported; clip-manifest.json#clips[id=ACH-HitReact].validation.result = pass; contact-HitReact.json#result = pass; clip-manifest.json#clips[id=ACH-HitReact].ue.status = technically_imported; clip-manifest.json#clips[id=ACH-HitReact].source.files[0].sha256 = 4a7e134a568f0a4fd2f451a321a22427e246d6ae4bf4dde9adede482c0a9524e; ue-import-clips.json#fbx_sha256.AM_Achilles_HitReact = 4a7e134a568f0a4fd2f451a321a22427e246d6ae4bf4dde9adede482c0a9524e",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "Front и q34, к.0→2: корпус отклоняется назад с креном, подбородок подбрасывает вверх, щит вскинут. К.4 сохраняет остаточную отдачу, к.7→10 восстанавливается стойка: быстрый импульс и более долгий возврат различимы. Копейщик со щитом сохраняет собранный характер; спиной к камере не разворачивается.",
+      "frames": [
+        "Achilles-HitReact-blender-sheet.jpg",
+        "Achilles-HitReact-f00-front-ue-editor.jpg",
+        "Achilles-HitReact-f00-q34-ue-editor.jpg",
+        "Achilles-HitReact-f02-front-ue-editor.jpg",
+        "Achilles-HitReact-f02-q34-ue-editor.jpg",
+        "Achilles-HitReact-f04-q34-ue-editor.jpg",
+        "Achilles-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На к.2 front/q34 отдача корпуса и головы назад вместе с подъёмом щита соответствует удару спереди. При сравнении к.0, 2, 4, 7 и 10 стопы и пятка копья сохраняют места опоры на подставке; заметного скольжения, зависания или проваливания нет. Малый подгиб колен учитывается как ограничение прямоногой rest-позы; плащ не раскрывается за голенями.",
+      "frames": [
+        "Achilles-HitReact-blender-sheet.jpg",
+        "Achilles-HitReact-f02-front.jpg",
+        "Achilles-HitReact-f00-front-ue-editor.jpg",
+        "Achilles-HitReact-f02-front-ue-editor.jpg",
+        "Achilles-HitReact-f02-q34-ue-editor.jpg",
+        "Achilles-HitReact-f04-front-ue-editor.jpg",
+        "Achilles-HitReact-f07-front-ue-editor.jpg",
+        "Achilles-HitReact-f10-front-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 2,
+      "rationale": "Крупные планы к.2 front/q34/q34r: оболочка корпуса, плеч, локтей и колен цела, видимых дыр и заломов скина нет. Правая кисть охватывает прямое древко без разрыва хвата и резкого излома запястья; щит сохраняет форму. Две жёсткие части копья и крепление щита к предплечью учитываются как ограничения модели: видимого расхождения частей или разрыва здесь нет.",
+      "frames": [
+        "Achilles-HitReact-f02-front.jpg",
+        "Achilles-HitReact-f02-q34.jpg",
+        "Achilles-HitReact-f02-q34r.jpg",
+        "Achilles-HitReact-f02-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Последовательность к.2→4→7→10 показывает угасание отдачи: наклон уменьшается, щит опускается, голова возвращается. На к.7 стойка уже близка к исходной; на к.10 front и q34 совпадают с к.0 по корпусу, хвату и опоре. Между представленными ключами скачка возврата не видно; oneshot садится в rest.",
+      "frames": [
+        "Achilles-HitReact-blender-sheet.jpg",
+        "Achilles-HitReact-f04-front-ue-editor.jpg",
+        "Achilles-HitReact-f04-q34-ue-editor.jpg",
+        "Achilles-HitReact-f07-front-ue-editor.jpg",
+        "Achilles-HitReact-f07-q34-ue-editor.jpg",
+        "Achilles-HitReact-f10-front-ue-editor.jpg",
+        "Achilles-HitReact-f10-q34-ue-editor.jpg",
+        "Achilles-HitReact-f00-front-ue-editor.jpg",
+        "Achilles-HitReact-f00-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 10,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13799-bdca-7422-b564-99735d83b76f"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-achilles",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

@@ -1,0 +1,1756 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Achilles/H2LD/Meshes/SM_Achilles_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base",
+  "extra:MI_Achilles_H2LD_DebugClass": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_DebugClass",
+  "extra:MI_Achilles_H2LD_Neutral": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD",
+  "skeletal": "/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_UM_MatLUT_Achilles",
+  "texture:MatID": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "wool_coarse",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-achilles-codex/achilles-back.png",
+   "front": "art/imagegen/concept-achilles-codex/achilles-front.png",
+   "side": "art/imagegen/concept-achilles-codex/achilles-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/measure-report.json",
+  "hero": "Achilles",
+  "key_zones": [
+   "wool_coarse"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "wool_coarse",
+   "bronze",
+   "skin",
+   "leather_worn",
+   "wood",
+   "legacy_bake"
+  ],
+  "note": "3d-model-pipeline stage 7a (pilot 2026-10-14): Achilles H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the leather straps and the kilt hem), teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run 20261014-h2-lookdev-r2 as is). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = wool_coarse (the red cloak, the largest zone, as the Blender ld_measure). Metal hue matters (pilot F110/F120): bronze is judged by hue and saturation against the concept, not only luminance.",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "hue_deg": [
+     [
+      0,
+      15
+     ],
+     [
+      340,
+      360
+     ]
+    ],
+    "s_min": 0.35
+   }
+  },
+  "render_gates_note": "legacy_bake = the red horsehair crest and the golden curls (MatID 0, the dark catch-all that also takes the base top); the concept median is the red crest (hue 6.3): gate = the red cloth gate of the look-dev profile (hue 0-15 / 340-360, s >= 0.35); reported, not in tolerance_zones (class 0 decode is unreliable against the black backdrop, F90/F131)",
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ue-import-r2",
+  "side_camera": "+X",
+  "side_camera_note": "SIDE_VIEW left (asset card): on the concept side view the figure faces left -> camera at +X (Leshen precedent; Angel's -X was F98)",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "wool_coarse",
+   "linen",
+   "bronze",
+   "skin",
+   "leather_smooth",
+   "leather_worn",
+   "wood"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/Achilles/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "weapon_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 44804
+   },
+   "folder": "/Game/PipelineCandidates/Achilles/H2LD",
+   "height_uu": 54.9931,
+   "hero_root": "/Game/PipelineCandidates/Achilles",
+   "instances": {
+    "extra:MI_Achilles_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_Achilles_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 8.6256,
+      "TeamDyeGain": 22.779
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_UM_MatLUT_Achilles",
+      "TeamAccentTexture": "/Game/PipelineCandidates/Achilles/H2LD/Textures/T_Achilles_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/Achilles/Rig/SK_Achilles_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "wool_coarse",
+   "linen",
+   "bronze",
+   "skin",
+   "leather_smooth",
+   "leather_worn",
+   "wood",
+   "legacy_bake"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "ASSET-ACHILLES-001-s7",
+  "stale_taken": null,
+  "stamp": "ASSET-ACHILLES-001-s7 2026-10-13T23:07:41+00:00 ue_hero_lookdev review Achilles r2",
+  "step": "ue_hero_lookdev review Achilles r2",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-13T23:11:37+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7617,
+    0.5432,
+    0.4044
+   ],
+   "sha256": "2acc1a2891d45d0e8e23073f1822e21cebf739ff2b8c2025c39922fa089ced52",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.975,
+    0.5825,
+    0.6114
+   ],
+   "sha256": "14af682e262e7cf8e2907b9179b2e9b2d5d7ea4a336fccd4b10fac5accca0b13",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7915,
+    0.6143,
+    0.5496
+   ],
+   "sha256": "9ee03126cb4663d3cf7eda05a0a5ce17a05d1e42fdd6d3fc961a1d9cdd173258",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.9245,
+    0.6802,
+    0.5774
+   ],
+   "sha256": "b87126b32dcd4b200aaab3a6341a03e49525721698b69ee8ab54ca438f3ef27a",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5815,
+    0.4775,
+    0.3839
+   ],
+   "sha256": "611410486db1e0e91148fcae21b09dd6d06c313ed48eb7b3097fc4032ceef2b7",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "achilles-r2-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6989,
+    0.537,
+    0.4876
+   ],
+   "sha256": "107f49ac2031519a3b5f6824c96ecc2d95f39b1a368a21cb53e5adfc20debedf",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3659,
+    0.3056,
+    0.288
+   ],
+   "sha256": "169d5144b0b893d7b5538ed03d22c060a3784594a703288127339ae0782b2812",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3873,
+    0.3073,
+    0.4053
+   ],
+   "sha256": "8753e1b4b200b5748dbad8ebbfe4e1b61cff0d0e492f70b24256834e1b89cbc8",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6822,
+    0.6125,
+    0.4605
+   ],
+   "sha256": "4cb9b6d3543fa527ebea32592e48f98664c94eab5c5847369621a1f3b036f63c",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7575,
+    0.5205,
+    0.4639
+   ],
+   "sha256": "4c26817cbb197b50a6f478a669b6facd94ec6c09e51c4dffeca4450a406edae7",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.9695,
+    0.5663,
+    0.3707
+   ],
+   "sha256": "43920b9261b5c1235ca10e0087a5db62a1a97b96742ef64f68a1ad582f373137",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "achilles-r2-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.1552,
+    0.8971,
+    0.6392
+   ],
+   "sha256": "b76f4d3f784704d4b9d6d75c0d7d4d18132dccb214a6ea46ab89ef08fa926862",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6466,
+    0.5985,
+    0.4412
+   ],
+   "sha256": "760549057881196ef0a5a46745b24b758791a7d486df62780bd2ad2b75d75f31",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.8113,
+    0.4555,
+    0.4218
+   ],
+   "sha256": "c9ad0b94b4fac97a4d5a65c296c36b9256042e47386fbf9586636de092ba2ce5",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6185,
+    0.4377,
+    0.5923
+   ],
+   "sha256": "91306d52c2f1f51b0fc0cb2c35072e691ae3c0cea09d3b76c4cb396b67fc3b01",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.137,
+    0.8789,
+    0.6342
+   ],
+   "sha256": "c89019025aef53b2e2de98995916d366dd0f7aa122f5ea8f7cefc7b6183f5408",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.2209,
+    0.7394,
+    0.6516
+   ],
+   "sha256": "570e9e069a75117e752d3d7821a31744946c90b0db75643b7515a0b16facaafe",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.0293,
+    0.7294,
+    0.7444
+   ],
+   "sha256": "46786d47461c83f4ffae8035c1c2ccb7525e24bcc5d0a373fc3e537d028da367",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "achilles-r2-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.042,
+    0.6292,
+    0.564
+   ],
+   "sha256": "7bce5ed9fabc17755cee562db9b5533532569d4cb5c4410bcb57afab9030eda7",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6488,
+    0.416,
+    0.38
+   ],
+   "sha256": "73008a71c332ccb4ba34e9dbd36f934bb2a963f0cc3380213d2e9f74d3be37ed",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.8805,
+    0.5379,
+    0.4494
+   ],
+   "sha256": "17d2c75ba26424224b0d2dca81c00c1e441206f05df16a95e1390a65ec43ed8c",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.8099,
+    0.5482,
+    0.4873
+   ],
+   "sha256": "6222f1181974614438b6e83c4c259d7b096056a56318947507d2af2ad29127d6",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.8579,
+    0.62,
+    0.479
+   ],
+   "sha256": "11d91899da7007f0bf8411dd35a4a93996d04ccdfe6e7d8aa83b8ea7a4e7f8f6",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "achilles-r2-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4767,
+    0.382,
+    0.2875
+   ],
+   "sha256": "bc54618aa21594c3b9916b3184452174f5cdcace54b7608224b08e0829941275",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "achilles-r2-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Achilles/H2LD/Materials/MI_Achilles_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.735,
+    0.4951,
+    0.447
+   ],
+   "sha256": "d21bc35402a6469b5f90cf7b291684679c2b1b87f674958cc9c13da4bc66384f",
+   "subject": "Achilles (/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Achilles_H2LD_DebugClass": false,
+  "extra:MI_Achilles_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-13T23:07:42+00:00",
+ "tag": "r2",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  1.363,
+  0.9827,
+  0.6421,
+  0.6482,
+  0.4667,
+  0.3916,
+  0.3625,
+  0.3238,
+  0.4138,
+  0.3981,
+  0.3231,
+  0.4185,
+  0.3499,
+  0.3299,
+  0.3371,
+  0.3085,
+  0.4004,
+  0.3925,
+  0.31,
+  0.4066,
+  0.3442,
+  0.3192,
+  0.3238,
+  0.3117,
+  0.4072,
+  0.3887,
+  0.3078,
+  0.4036,
+  0.3437,
+  0.3217,
+  0.3263,
+  0.3019,
+  0.4067,
+  0.3901,
+  0.3096,
+  0.4048,
+  0.3447,
+  0.3194,
+  0.3262
+ ]
+}

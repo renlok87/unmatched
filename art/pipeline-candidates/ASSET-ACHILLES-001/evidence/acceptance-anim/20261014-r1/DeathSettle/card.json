@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": "DeathSettle",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/export/AM_Achilles_DeathSettle.fbx",
+      "sha256": "d2294ca0b4062c00fd9eac0b90ef5891049caa0861b4bfa9cf927953a8317bf9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim.json",
+      "sha256": "6ffd8436fbb1490a14a53f7c3771a2ffce4c6cc30906a7a66767b2b92e1b78ef"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r1/DeathSettle/frames",
+    "files": [
+      "Achilles-DeathSettle-blender-sheet.jpg",
+      "Achilles-DeathSettle-f13-left.jpg",
+      "Achilles-DeathSettle-f21-back.jpg",
+      "Achilles-DeathSettle-f21-front.jpg",
+      "Achilles-DeathSettle-f21-q34.jpg",
+      "Achilles-DeathSettle-f21-q34b.jpg",
+      "Achilles-DeathSettle-f21-q34r.jpg",
+      "Achilles-DeathSettle-f21-right.jpg",
+      "Achilles-DeathSettle-f00-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f00-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f03-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f03-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f07-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f07-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f11-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f11-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f17-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f17-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f21-q34-ue-editor.jpg",
+      "Achilles-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/grip-DeathSettle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_DeathSettle.validation.json",
+      "note": "AM_Achilles_DeathSettle.validation.json#result = pass; AM_Achilles_DeathSettle.validation.json#clip_sha256 = d2294ca0b4062c00fd9eac0b90ef5891049caa0861b4bfa9cf927953a8317bf9",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; contact-DeathSettle.json#fails = []; contact-DeathSettle.json#checks[check=skin_stretch].status = warn; contact-DeathSettle.json#checks[check=skin_stretch].visible_torn_edges = 0",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ACH-DeathSettle].status = technically_imported; clip-manifest.json#clips[id=ACH-DeathSettle].validation.result = pass; clip-manifest.json#clips[id=ACH-DeathSettle].ue.status = technically_imported; clip-manifest.json#clips[id=ACH-DeathSettle].source.files[0].sha256 = d2294ca0b4062c00fd9eac0b90ef5891049caa0861b4bfa9cf927953a8317bf9; ue-import-clips.json#fbx_sha256.AM_Achilles_DeathSettle = d2294ca0b4062c00fd9eac0b90ef5891049caa0861b4bfa9cf927953a8317bf9; contact-DeathSettle.json#result = pass",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "Blender-лист и UE front/q34: к.0 — собранная стойка, к.3 — отшатывание с поднятым подбородком, к.7–14 — последовательный наклон корпуса и опускание головы, к.17–21 — повисшая голова и удержанный поклон к копью. Оседание отличается от краткой отдачи HitReact отсутствием возврата в боевую стойку. Копьё, щит и гребень сохраняют характер Achilles; разворота спиной к камере нет.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f03-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f03-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f11-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg",
+        "Achilles-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На Blender-листе к.0–21 и UE front/q34 стопы сохраняют места на подставке, пятка копья остаётся на её верхней плоскости при наклоне древка. На f13-left и f21-q34 корпус склонён к опорной правой руке; на f21-front/right локоть раскрыт относительно rest, кисть обхватывает древко без отрыва. Колени подогнуты, падения на колени нет, щит отделён от бедра. Ограничения прямых ног rest, двух частей копья и щита на предплечье учтены; видимого нарушения опоры они здесь не дают.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f13-left.jpg",
+        "Achilles-DeathSettle-f21-q34.jpg",
+        "Achilles-DeathSettle-f21-front.jpg",
+        "Achilles-DeathSettle-f21-right.jpg",
+        "Achilles-DeathSettle-f00-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 0,
+      "rationale": "На пике, к.21, f21-q34b показывает открытый стык плаща с плечом: зубчатая кромка и выступающий рваный лоскут под правой подмышкой. На f21-right виден широкий тёмный просвет под наплечной частью плаща и открытый неровный край у руки. Это заявленная кромка модели, а не установленное растяжение клипом, однако дефект оболочки виден на крупном плане: срабатывает нижний якорь D=0. Его скрытость на обычных front/q34 не отменяет этот якорь. Хват копья сохраняется; ограничение подола и щиколоток оценку дополнительно не снижает.",
+      "frames": [
+        "Achilles-DeathSettle-f21-q34b.jpg",
+        "Achilles-DeathSettle-f21-right.jpg",
+        "Achilles-DeathSettle-f21-front.jpg",
+        "Achilles-DeathSettle-f21-q34r.jpg",
+        "Achilles-DeathSettle-f21-back.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Blender-лист к.11→14→17 показывает уменьшение изменений позы по мере оседания. UE front и q34 на к.17 и к.21 сохраняют наклон головы и корпуса, положение копья и стоп без видимого скачка или дрожи; небольшое остаточное изменение щита не ломает удержание финала. Терминальная поза остаётся поклоном на опоре, возврата в rest нет.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f17-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f17-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "§10.5: при всех гейтах PASS действует вето D=0 < 1,0 из-за открытого рваного стыка плаща на крупных планах к.21; score=7,5 < 8,0 также требует rework_blender.",
+  "rework_fix_list": [
+    {
+      "item": "D",
+      "frame": "Achilles-DeathSettle-f21-q34b.jpg",
+      "fix": "Устранить раскрытие рваного стыка плаща под правой подмышкой при выносе опорной руки на к.7–21; контроль к.21 с right и q34b. Согласовать скин кромки плаща с корпусом, сохранив опорную позу руки и хват копья, чтобы на крупном плане не оставались открытый просвет и выступающий рваный лоскут.",
+      "tool": "h2_bake профиль (веса), этап 5 модели"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13799-bdde-7fc2-818d-fad4f2171378"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-achilles",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": ""
+}

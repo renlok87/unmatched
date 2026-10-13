@@ -1,0 +1,774 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_Achilles_H2_2K_N.png",
+          "h21_sha256": "6c8deba25ebd209a0fe5a180af5cf684b913fad55b4727cab1f69b04d3baef1a",
+          "passed": true,
+          "sha256": "6c8deba25ebd209a0fe5a180af5cf684b913fad55b4727cab1f69b04d3baef1a"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SK_Achilles_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SM_Achilles_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "b14ef36ca786e3e023c626679abcc0792df61201241b36a3cf82c73a2759767c",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json",
+            "profile_id": "achilles-h2-lookdev/3",
+            "sha256": "b14ef36ca786e3e023c626679abcc0792df61201241b36a3cf82c73a2759767c"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "e465e85b037f1caeb48382a27027528fe463ba37019ef8098609c6066ce910dd",
+          "rig_passed": true,
+          "rig_report_fbx": "e465e85b037f1caeb48382a27027528fe463ba37019ef8098609c6066ce910dd",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "b14ef36ca786e3e023c626679abcc0792df61201241b36a3cf82c73a2759767c",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json",
+    "profile_id": "achilles-h2-lookdev/3",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "achilles-h2-lookdev/3",
+      "measured": {
+        "build_report": "achilles-h2-lookdev/3",
+        "textures_report": "achilles-h2-lookdev/3"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "2df7459219b63aad62e3662a6cfc2a2fb3bcbb3a7b55b63bde6673ac9680d934",
+          "report": "2df7459219b63aad62e3662a6cfc2a2fb3bcbb3a7b55b63bde6673ac9680d934",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "a6eea62d77b9b34832781efb91df7f1d650e75d6b655c8c1acf6adbc123f566f",
+          "report": "a6eea62d77b9b34832781efb91df7f1d650e75d6b655c8c1acf6adbc123f566f",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "0786875143ebcaab18ab8d319eda82499d9a54e30952048837c5cc0b756a68af",
+          "profile": "0786875143ebcaab18ab8d319eda82499d9a54e30952048837c5cc0b756a68af",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "05ac5d86348fe1406a2aa95361a3d30d7a3dba0268b26154847c61689aa4b3f5",
+          "profile": "05ac5d86348fe1406a2aa95361a3d30d7a3dba0268b26154847c61689aa4b3f5",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Achilles_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_Achilles_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -4.803,
+          0.097
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_Achilles_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Achilles_H2_Body": 43604,
+        "SK_Achilles_H2_Spear": 1200,
+        "SM_Achilles_H2_Base": 1348
+      },
+      "measured": {
+        "SK_Achilles_H2_Body": 43604,
+        "SK_Achilles_H2_Spear": 1200,
+        "SM_Achilles_H2_Base": 1348
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json": "092f8f826f9525a699213605c4463aae24a99b49b53d0d360f69b9ac3ecf9f18",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json": "b368787e8114304278376534c3ca0bc45457febd0df784630c5ed8dc8bd19f7e",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SK_Achilles_H2LD.fbx": "a6eea62d77b9b34832781efb91df7f1d650e75d6b655c8c1acf6adbc123f566f",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SM_Achilles_H2LD_Base.fbx": "2df7459219b63aad62e3662a6cfc2a2fb3bcbb3a7b55b63bde6673ac9680d934",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json": "ccd430f9c7673917bb367475bd9577b24d8b0d3dda1c4feb72de6502f25ba46c",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json": "67a04cc798a559846ac120e684c03bf585770e04eeb5e225e2959676689e14ad",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/run-manifest.json": "af7d244417162906b84b1a8837f0305f8d934c5459438795226cb7bb810f117c",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_BC.png": "2a43d86db2d62b4b9c753d7833f0b76a795ecd29373f552dc39a9fc6d296f6c1",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_Edge.png": "8b138687eb0779a0a00edbd3aa9b4a3a410736030ab700e72eff3c89ce2304b5",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_MatID.png": "de7b7a7d732d5049d7660c49e67291e63a2f4e7007e42823636ee8e4ec55ba3e",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_N.png": "6c8deba25ebd209a0fe5a180af5cf684b913fad55b4727cab1f69b04d3baef1a",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_ORM.png": "3956feceae535a2ebbd290e58c068f6576880c49fdb6b835c93f180c9f38191f",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_TeamMask.png": "84991c2a32ebdea3d68156c8701d86b24b6ecd306bb42214703fe4ccc8c84d33",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_TeamAccent_2K.png": "05ac5d86348fe1406a2aa95361a3d30d7a3dba0268b26154847c61689aa4b3f5",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Achilles_UE_r2.dds": "0786875143ebcaab18ab8d319eda82499d9a54e30952048837c5cc0b756a68af",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json": "b14ef36ca786e3e023c626679abcc0792df61201241b36a3cf82c73a2759767c"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SM_Achilles_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SK_Achilles_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json",
+    "report:build": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Achilles_UE_r2.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile achilles-h2-lookdev/3); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "achilles-h2ld-lookdev-ue-import/2",
+    "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2ld-lookdev-ue-import-r2.json",
+    "sha256": "f7b81445aa500a8b37eb098eb4a56389954ab001a17a78b710d19bd8305e0f89"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Achilles_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_Achilles_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_Achilles_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_Achilles_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_Achilles_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_Achilles_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Achilles_H2_Body": [
+                "M_Achilles_H2_Atlas"
+              ],
+              "SK_Achilles_H2_Spear": [
+                "M_Achilles_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Achilles_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            14.999,
+            14.997,
+            5.805
+          ],
+          "min": [
+            -14.971,
+            -14.971,
+            0.003
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            14.971,
+            14.971,
+            5.805
+          ],
+          "min": [
+            -14.997,
+            -14.999,
+            0.003
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            15.098,
+            8.258,
+            54.993
+          ],
+          "min": [
+            -11.583,
+            -9.642,
+            5.674
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            9.642,
+            15.098,
+            54.993
+          ],
+          "min": [
+            -8.258,
+            -11.583,
+            5.674
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            9.642,
+            11.583,
+            54.993
+          ],
+          "min": [
+            -8.258,
+            -15.098,
+            5.674
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SM_Achilles_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/export/SK_Achilles_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55,
+        "skeletal_top_m": 0.54993,
+        "top_part": "tripo_part_6"
+      },
+      "meshes_pre_export_m": {
+        "SK_Achilles_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 43604
+        },
+        "SK_Achilles_H2_Spear": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 1200
+        },
+        "SM_Achilles_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1348
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.012,
+                0.074,
+                0.345
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.015,
+                0.098,
+                0.299
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.012,
+                -0.07,
+                0.342
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.046,
+                -0.095,
+                0.336
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.005,
+                0.059,
+                0.391
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.012,
+                0.074,
+                0.345
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.005,
+                -0.049,
+                0.394
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.012,
+                -0.07,
+                0.342
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.014,
+                0.062,
+                0.086
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.06679,
+                0.07781,
+                0.04736
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.014,
+                -0.053,
+                0.086
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.06673,
+                -0.06879,
+                0.04739
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.015,
+                0.098,
+                0.299
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.04446,
+                0.1032,
+                0.24874
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.046,
+                -0.095,
+                0.336
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.07154,
+                -0.09682,
+                0.33691
+              ]
+            },
+            "head": {
+              "head_m": [
+                -0.012,
+                0.004,
+                0.422
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.00959,
+                0.004,
+                0.53411
+              ]
+            },
+            "hips": {
+              "head_m": [
+                -0.006,
+                0.004,
+                0.25
+              ],
+              "parent": "root",
+              "tail_m": [
+                -0.006,
+                0.004,
+                0.2884
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                -0.009,
+                0.05,
+                0.176
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.014,
+                0.062,
+                0.086
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.008,
+                -0.042,
+                0.176
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.014,
+                -0.053,
+                0.086
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                -0.005,
+                0.036,
+                0.252
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.009,
+                0.05,
+                0.176
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.004,
+                -0.029,
+                0.252
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.008,
+                -0.042,
+                0.176
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.2501
+              ]
+            },
+            "spine": {
+              "head_m": [
+                -0.006,
+                0.004,
+                0.3
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.006,
+                0.004,
+                0.41213
+              ]
+            },
+            "weapon.R": {
+              "head_m": [
+                0.0716,
+                -0.0952,
+                0.337
+              ],
+              "parent": "hand.R",
+              "tail_m": [
+                0.07191,
+                -0.09587,
+                0.36261
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Achilles_H2_Body": {
+              "triangles": 43604,
+              "vertices": 24218
+            },
+            "SK_Achilles_H2_Spear": {
+              "triangles": 1200,
+              "vertices": 599
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            7.16,
+            9.52,
+            33.7
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -4.803,
+            0.097
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            -1.0,
+            -0.4,
+            47.0
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

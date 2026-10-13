@@ -155,6 +155,14 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F134 | 7 | `base_seethrough` first runs at the stage-7 input check (Leshen 2.81 uu² vs 0.1: open loops at the base top rim) — a stage-3 defect found at stage 7 | run base_seethrough at stage 3 exit |
 | F135 | 7 | Bench variants: `--sidekick-name` for a sidekick without a figure would place a placeholder; numbered sidekicks in S08FighterNames only read the Harpy string | new-character-registration §5: rule + tool |
 | F136 | 7 | `h2anim_ue frames` camera crops figures taller than ~70 uu (antler tips) | tool: frame by bounds |
+| F137 | 2→6 | A Tripo part can float off the body in the rest geometry (Leshen's right-forearm crow: 2.9 cm gap at rest); model acceptance saw it only as «crows look like they hang» (known issue), clip acceptance vetoed it (D=0). No profile means to move a part | tool: opt-in `prepare.part_offsets_m` (being added); stage 3: rider-to-host gap check at rest for rigid riders; acceptance: a floating rider is F/S, not a known issue |
+| F138 | 7 | Root cause of F110/F120: the metal F0 from the look-dev preset (luminance 0.63) plus the default pale worn-edge colour renders bronze ivory in UE; tuning F0 to the concept's hue/sat/value fixed it (luminance 0.104; hue 29.1 vs concept 30.9) | HANDBOOK §4.4 / material library: metal F0 from the concept, not the preset |
+| F139 | 7 | Default cloth sheen (wool 0.35, linen 0.2) makes dark red cloth 2.4–2.7× too bright and pink in UE (F93 for cloth) | defaults: sheen ≤ 0.05, specular ~0.2 |
+| F140 | 7 | A cloth zone is a biased exposure anchor in the UE review (cloak still 1.43× skin after the sheen fix) | review: anchor on a plain diffuse class (skin) or report both |
+| F141 | 6/7 | Acceptors inconsistent on the same model limit (cloak armhole: LungeAttack D 1.5, DeathSettle D 0); the «known limit» clause does not bind them | rubric: explicit cap or routing for a model limit seen in clips |
+| F142 | 7 | Import-profile base footprint has no stated source; the bake base top is 5.805 uu, not the card's 0.06 m | ue-import-package §3.1: take it from the rig report's expected UE bounds |
+| F143 | 7 | Orchestrator's look: on a two-tier Tripo base (Achilles) the team-colour ring band on the base renders as ragged patches (white/P1/P2) — Angel's simple base is clean | base marker / `team_mask.base_band` for non-cylindrical bases, or the standard Ø0.30×0.06 base for heroes (cf. F73) |
+| F144 | 7 | Achilles base see-through 0.98 uu² (8 open loops in the base top under the sandals and the spear butt) — second hero with a stage-3 base defect found only at stage 7 (F134) | base_seethrough at stage 3 exit |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

@@ -1,0 +1,376 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "achilles-h2ld-lookdev-ue-import/2",
+  "asset_id": "ASSET-ACHILLES-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "3d-model-pipeline stage 7a (pilot 2026-10-14): UE import of the Achilles look-dev run 20261014-h2-lookdev-r2 (profile achilles-h2-lookdev/3: generic h2_bake H2 figure of the bake run 20261014-h2-bake-r2 + UV1 in metres, MatID, Edge, graded BC/ORM; TeamAccent of profile achilles-h2-lookdev-teamaccent/3 = sword-belt/pteruges leather 1.47 % + kilt hem 0.61 % = 2.23 % of the figure, below the 5-12 % range under P3-4/P3-4b) through the CLI profile skeletal-adopt (normaliser h2-lookdev/1) onto the canonical skeleton /Game/PipelineCandidates/Achilles/Rig/SK_Achilles_Skeleton. Spear in the RIGHT hand (weapon.R, UE weapon side +Y as King Arthur and Angel); the round shield on the left forearm is part of the body mesh (rigid on arm_lower.L, no bone). MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (UseTeamAccent, UseUV1Metres) with the TeamAccent mask and the look-dev LUT as is (UE look-dev iteration 0); base on M_UM_BaseMarker. Teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision 'accents + ring'). At most 'technically imported'; art acceptance of the model by delegation (stage 4 r2 pass 8.8, evidence/acceptance/20261014-r2/card.json). Rev 2 (UE look-dev r2, 2026-10-14, light mode by delegation): only the hero LUT changes (20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Achilles_UE_r2, overrides note_ue_r2): bronze F0 linear [0.343, 0.125, 0.033] (sRGB hue 27, sat 0.68; was the pale [0.9216, 0.5776, 0.2582]), worn edge [0.604, 0.296, 0.107], roughness 0.28; wool_coarse sheen 0.08 / specular 0.25; linen sheen 0.06 / specular 0.25; leather_smooth specular 0.2 / roughness 0.58; leather_worn specular 0.25 / roughness 0.55. Review r1 had bronze 4.6x and pale (hue +8.3, sat -0.36), the red cloth 2.4-2.7x and pink, the leather 1.9x relative to the skin. Re-import by references/ue-import-package.md §4.4 (assets of 20261014-h2ld-ue-import deleted by script) into run 20261014-h2ld-ue-import-r2.",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2ld-lookdev-ue-import-r3.json (skeletal-adopt h2-lookdev/1 of the pilot, weapon.R right hand, candidate.figure_top_part, M_UM_Figure_v2.1 UseTeamAccent)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r4.json (base footprint from the rig report's expected UE bounds)",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json (skeletal-adopt, normaliser h2-lookdev/1, M_UM_Figure_v2.1)",
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2ld-lookdev-ue-import.json (weapon in the right hand: weapon.R, UE weapon side +Y)",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-bake-h2-r2.json (armature, scale, axes, sockets, atlas slot M_Achilles_H2_Atlas)",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json (look-dev run: MatID classes, LUT, UV1)",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-teamaccent-r2.json (TeamAccent /3)",
+    "docs/art-pipeline/material-library/team-accent.md §1 (LDV-13: TeamDyeGain 0.8 / Y_p50, TeamDyeCeiling 0.9 / Y_p95) and section Achilles"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2",
+    "report_format": "h2-lookdev/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-lookdev-r2.json",
+    "bake_profile_id": "achilles-h2-lookdev/3",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "run_manifest": "reports/run-manifest.json",
+      "source_rig_report": "../20261014-h2-bake-r2/reports/rig-report.json",
+      "source_textures_report": "../20261014-h2-bake-r2/reports/textures-report.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_Achilles_H2LD.fbx",
+      "base": "export/SM_Achilles_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_Achilles_H2LD_2K_BC.png",
+      "N": "textures/T_Achilles_H2LD_2K_N.png",
+      "ORM": "textures/T_Achilles_H2LD_2K_ORM.png",
+      "TeamMask": "textures/T_Achilles_H2LD_2K_TeamMask.png",
+      "MatID": "textures/T_Achilles_H2LD_2K_MatID.png",
+      "Edge": "textures/T_Achilles_H2LD_2K_Edge.png"
+    },
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Achilles_UE_r2.dds",
+        "sha256": "0786875143ebcaab18ab8d319eda82499d9a54e30952048837c5cc0b756a68af",
+        "note": "UE look-dev iteration (ue_hero_lookdev.py lut --overrides art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Achilles_UE_r2.overrides.json)"
+      },
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2-lookdev-r2/textures/T_Achilles_H2LD_TeamAccent_2K.png",
+        "sha256": "05ac5d86348fe1406a2aa95361a3d30d7a3dba0268b26154847c61689aa4b3f5",
+        "note": "TeamAccent L8 linear 2048^2 (ld-team-accent-report.json outputs): sword-belt and pteruges leather (leather_smooth) 1.47 % + kilt hem (linen) 0.61 % = 2.23 % of the figure"
+      }
+    },
+    "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2 DirectX map (normaliser check normal_is_the_h21_directx_map). TeamMask is pinned but not imported (team_color_mode none)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear",
+      "MatID": "index * 16 + 8",
+      "Edge": "linear"
+    },
+    "top_part": "tripo_part_6",
+    "figure_top_part": "tripo_part_6",
+    "figure_top_part_note": "pilot fix F80 (cd3ee7fe; skeletal_adopt_formats.h2_lookdev): the figure top for figure_height_as_profile = the final top of the helmet crest tripo_part_6 in ../20261014-h2-bake-r2/reports/prepare-report.json (0.55 m; the rig-report skeletal top 54.993 uu is the crest too), not the spear tip (tripo_part_10, 0.5375 m, lower than the crest)"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      [
+        "root",
+        null
+      ],
+      [
+        "hips",
+        "root"
+      ],
+      [
+        "spine",
+        "hips"
+      ],
+      [
+        "head",
+        "spine"
+      ],
+      [
+        "arm_upper.L",
+        "spine"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L"
+      ],
+      [
+        "arm_upper.R",
+        "spine"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R"
+      ],
+      [
+        "leg_upper.L",
+        "hips"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L"
+      ],
+      [
+        "leg_upper.R",
+        "hips"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R"
+      ],
+      [
+        "weapon.R",
+        "hand.R"
+      ]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 body bones + weapon.R (spear, right hand; rig-contract characters.Achilles weapon_bone weapon.R). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (18 bones), '.' becomes '_' (weapon_R)"
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_6",
+    "note": "base bottom -> top of the helmet crest (tripo_part_6 final top 0.550 m, prepare-report) = hero budget 55 uu (asset card FIGURE_HEIGHT_M); the spear tip (tripo_part_10, 0.5375 m) is lower and not part of the height (HANDBOOK §2.10)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_Achilles_H2_Body"
+    },
+    "weapon": {
+      "object": "SK_Achilles_H2_Spear",
+      "bone": "weapon.R"
+    },
+    "base": {
+      "object": "SM_Achilles_H2_Base",
+      "footprint_m": [
+        0.29968,
+        0.2997,
+        0.05805
+      ],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "rig-report expected_ue_bounds_uu_at_import_scale_1.base [-14.997, -14.999, 0.003] .. [14.971, 14.971, 5.805] uu (the H2 bake r2 base top is 5.805 uu, not the 6.0 of card 04; base_footprint_pivot compares with 0.05 uu tolerance)"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "UM_FBX_v1 preset (ART-001); ld_fbx measured the face normal (0.6676, -0.0056, -0.0241) along +X in the export frame; right-handed spear on Blender -X -> UE +Y as King Arthur and Angel"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [
+        0,
+        0,
+        0
+      ],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the spear grip (rig-report target UE component (7.16, 9.52, 33.7) uu)"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX and the evidence capture (S08FlowGameMode DoesSocketExist Head); location = the H2 bake's UE bone-space prediction (rig-report sockets: head centre under the helmet, offset (0, -4.803, 0.097) uu)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_Achilles_H2_Body": 43604,
+      "SK_Achilles_H2_Spear": 1200,
+      "SM_Achilles_H2_Base": 1348
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the look-dev read-back (ld-fbx-report triangles_as_h21); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "GD-058 final (asset-card POLY_BUDGET: figure <= 45 000 tris, base <= 2 500), FIGURE_HEIGHT_RANGE_M [0.52, 0.56]; comparison only",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      52,
+      56
+    ],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/Achilles/H2LD",
+    "skeletal_asset": "SK_Achilles_H2LD",
+    "target_skeleton": "/Game/PipelineCandidates/Achilles/Rig/SK_Achilles_Skeleton",
+    "target_skeleton_note": "canonical hero skeleton of H2Anim (h2anim_ue.py skeleton from SK_Achilles_H2.fbx of the spec achilles-h2anim.json); the clips AM_Achilles_* are on it; the run neither creates nor deletes it",
+    "base_asset": "SM_Achilles_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "figure on M_UM_Figure_v2 (v2.1, static switch UseTeamAccent); base on M_UM_BaseMarker v1 (team side band)",
+    "figure_instance": "MI_Achilles_H2LD",
+    "base_instance": "MI_Achilles_H2LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "active C-11 palette (art/um-materials/um-masters.json c11_value_split_proposal), user decision 'accents + ring'; linear only through FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_Achilles_H2LD_{team}",
+      "base": "MI_Achilles_H2LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: dye by TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; the red cloak (wool_coarse), the kilt cloth core (linen), bronze, skin, hair/crest, the spear shaft and the stone base (main colours of the concept) are never dyed, only the leather straps and the kilt hem",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 22.779,
+      "TeamDyeCeiling": 8.6256
+    },
+    "figure_parameters_note": "team-accent.md rule LDV-13, one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.03512), TeamDyeCeiling = 0.9 / Y_p95 (0.10434) of the accent texels (20261014-h2-lookdev-r2/reports/ld-team-accent-report.json team_dye_gain.accent_Y_p50_p95; the report's own single-gain rule gives 10.5); effective min(22.779, 8.6256 / maxc(team)) = P1 10.69, P2 22.78",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_Achilles_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {
+          "TeamDye": 0.0
+        },
+        "vectors": {
+          "TeamColor": {
+            "linear": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "note": "no dye (TeamColor white, TeamDye 0): the look-dev BC as baked, for the comparison with the concept"
+      },
+      {
+        "asset": "MI_Achilles_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {
+          "DebugView": 1.0
+        },
+        "note": "MatID zone mask for the measurements (class colours in emissive, surface black)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured H2 base: team band = the side wall, flat TeamColor"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "the base FBX carries UV1_m (metres); lightmap UV generation would overwrite UV1",
+    "expect_uv_channels": 2,
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_Achilles_H2LD_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_Achilles_H2LD_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal (byte copy of the H2 map)"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_Achilles_H2LD_ORM",
+        "srgb": false,
+        "compression": "TC_Masks"
+      },
+      "TeamAccent": {
+        "file_key": "TeamAccent",
+        "asset": "T_Achilles_H2LD_TeamAccent",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1"
+      },
+      "MatID": {
+        "file_key": "MatID",
+        "asset": "T_Achilles_H2LD_MatID",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"
+      },
+      "Edge": {
+        "file_key": "Edge",
+        "asset": "T_Achilles_H2LD_Edge",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "linear edge mask (EdgeMaskTexture)"
+      },
+      "LUT": {
+        "file_key": "LUT",
+        "asset": "T_UM_MatLUT_Achilles",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "hero LUT 16 x 16 RGBA16F, Load only: HDR, point, no mips, not streamed"
+      }
+    },
+    "measure_skeletal_triangles": true
+  },
+  "history": {
+    "previous": {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2ld-lookdev-ue-import.json",
+      "sha256": "cf435111db8238ca61ea2106b4520771113fd60478737406d09977d078d4911c",
+      "run": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ue-import"
+    }
+  }
+}
