@@ -4,7 +4,7 @@ python tools/tripo-pipeline/anim/clip_manifest.py build   # пересобрат
 python tools/tripo-pipeline/anim/clip_manifest.py check   # схема + файлы + sha256 + правила статусов
 
 build собирает записи функциями slot()/medusa_draft()/tripo_test()/bvh_fixture()/glb_fixture() ниже
-(20 слотов: 4 клипа D-11 x 5 персонажей — 4 брифа 18 §4 и Angel; 19 безусловных, HAR-HitReact условен до
+(24 слота: 4 клипа D-11 x 6 персонажей — 4 брифа 18 §4, Angel и Ancient Leshen; 23 безусловных, HAR-HitReact условен до
 AD-CNF-30 — бриф 18, стр. 10) и тестовые файлы, подставляет измеренные fps/длительности и результаты
 из docs/art-pipeline/animation-library/validation/*.validation.json и считает sha256.
 
@@ -47,6 +47,9 @@ H2ANIM = {"Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/med
           "Merlin": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
           "Harpy": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
           "Angel": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json"}
+# пилот 2026-10-14, этап 6 Ancient Leshen (регистрация Р6-1 отдельными строками)
+CHARS["AncientLeshen"] = ("LESH", "ASSET-ANCIENT-LESHEN-001")
+H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json"
 VAL2 = os.path.join(LIB, "validation-h2anim")
 V2_KEY = "UM_HUMANOID_17_v2"
 NO_LICENSE = {"terms": "нет файла", "commercial_use": "n/a"}
@@ -276,7 +279,7 @@ def build():
     filled = sum(1 for c in clips if c["role"] == "production" and c["source"]["type"] != "none")
     m = {"schema": "unmatched.animation-clip-manifest/1", "revision": "h2anim-2026-09-29",
          "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
-         "notes": ["20 production-слотов = 4 клипа D-11 x 5 персонажей (бриф 18 §4 и Angel): 19 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): %d" % filled,
+         "notes": ["24 production-слота = 4 клипа D-11 x 6 персонажей (бриф 18 §4, Angel и Ancient Leshen): 23 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): %d" % filled,
                    "production-слоты — контракт v2 (v1 закрыт для новых клипов, RIG-CONTRACT §0 п.2); черновики AM_Medusa_* v1 — тестовые записи",
                    "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
                    "test-записи не могут стать artistically_accepted (правило схемы)"],

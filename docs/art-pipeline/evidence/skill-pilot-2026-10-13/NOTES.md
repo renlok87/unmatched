@@ -122,6 +122,14 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F101 | 4 | grep of events for «Failed to create unified exec process» false-positives (the rubric text contains it) | §8.4: parse `command_execution` items with `status: failed` |
 | F102 | 4 | Full schema types `verdict_reason` as string and `source_defect` as boolean → a Workflow acceptor with the full schema cannot emit null → the `"null"` strings of F6 | §8.3: give the Workflow acceptor the strict *output* schema (nullable), as now done (`model-second-acceptor` workflow) |
 | F103 | 6 | `clip_manifest.py` H2ANIM pins one spec per hero; a clip rework (new spec/run) must edit the registration line, or G-MANIFEST fails (validation sha ≠ registered run) | tool: spec override / history-aware lookup; animation-vfx-sfx §10: rework moves the registration |
+| F104 | 5 | Jagged sole rims are in the Tripo high-poly (heel 2.4 mm, base teeth interlock) — no profile route (same class as F83) | tool: closure rim-smoothing option (z-smoothing of a loop within ~2 mm); §9.3 row «Tripo shape» |
+| F105 | 5 | look-dev `bc_gate` hue ranges do not wrap 0°/360° (crest hue p50 356.9° → only 37 % in [0;15]) | tool: list of hue ranges / wrap-around |
+| F106 | 5 | Metal-mask gates are AND of boxes and half-planes only, terms shared per part (nose guard needed a 90-box ladder) | tool: OR groups or per-zone terms |
+| F107 | 5 | No profile means to repaint a visible band at a contact line (collar smears are Tripo texture, `bake.cage` cannot fix them; a hidden collar cap stretched the «trace» semantics) | tool: band repaint option with exclusion boxes; §9.3: such smears → not `bake.cage` |
+| F108 | 5 | `ta_render` (EEVEE) varies ±0.01 between identical runs on a 220 px sample; П3-4b «threshold = measured floor» trips on noise | П3-4b: margin for noise (or deterministic render) |
+| F109 | 5 | A new UV layout creates new isolated foreign-class texels; coordinate-box rules do not carry between runs | tool: auto-repaint isolated texels inside protected classes |
+| F110 | 5 | Tone is measured in Cycles with LUT roughness 0.23, acceptance frames are EEVEE with ORM roughness 0.32–0.45: matched bronze reads paler on the frames | HANDBOOK §4.4 / acceptance §3: one renderer/roughness for tone and frames |
+| F111 | 5 | `caps_hidden_at_rest` sum is brittle (unsunk collar cap 147 vs limit 147.07) | tool: relative threshold |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

@@ -68,6 +68,7 @@ HEROES = {
     "Medusa": Hero("Medusa", "MED", 56.0 / 24.0, ("AN-09", "AN-10", "AN-11", "AN-12")),
     "Harpy": Hero("Harpy", "HAR", 2.0, ("AN-13", "AN-14", "AN-15", "AN-16")),
     "Angel": Hero("Angel", "ANG", 2.5, ("AN-133", "AN-134", "AN-135", "AN-136")),
+    "AncientLeshen": Hero("AncientLeshen", "LESH", 56.0 / 24.0, ("AN-137", "AN-138", "AN-139", "AN-140")),
 }
 IDLE_EPS = 0.01
 IDLE_Q = (0, 25, 50, 75)

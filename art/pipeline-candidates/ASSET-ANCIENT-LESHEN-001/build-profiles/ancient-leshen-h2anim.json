@@ -1,0 +1,935 @@
+{
+ "schema": "unmatched.h2anim-spec/1",
+ "hero": "AncientLeshen",
+ "character": "AncientLeshen",
+ "ue_hero": "AncientLeshen",
+ "asset_id": "ASSET-ANCIENT-LESHEN-001",
+ "status": "proposed",
+ "status_note": "Этап 6 пилота 3d-model-pipeline (2026-10-14): 4 клипа D-11 на H2-меше Ancient Leshen (bake r2, принят парой 8.1). Оружия нет (WEAPON_HAND none): удар когтями правой кисти, сокет Weapon — hand.R (WEAPON_SOCKET_BONE заявки). Ног нет: низ — ствол из корней; кости ног живут внутри ствола (leg_upper берёт до 50 % половин ствола ниже 25 см, голень и стопа весов не имеют), корни у подставки держит стык roots_planted (вес root до 22 см от низа) — поэтому без шагов и без подъёма бедра: движение ствола — только поворот hips (крен/наклон/разворот ≤ 6°), без сдвига таза (hips_loc нет: у этого рига голова hips лежит точно на оси root, импорт FBX Blender делает hips connected к root и молча выбрасывает location — прогон r1 2026-10-14, readback pose_ok false), всё остальное — spine, голова и руки; IK стоп держит кости ног на месте, и они гнут середину ствола, а не отрывают корни. Рога высокие (верх bounds 73,6 uu при верхе черепа 55): руки не поднимаются над плечом рядом с рогами, поворот головы ≤ 10° к левому плечу (ворона на плече у челюсти). Три вороны жёстко на костях (левое плечо — spine, предплечья — arm_lower.L/R) и едут с ними. Движение — по образцам библиотеки D-11 без собственных видео-референсов (решение оркестратора 2026-10-14: видео SYNTX не масштабируются на ростер): Idle — Medusa (та же длина 56 к., дыхание без опоры) с тяжёлым дыханием Merlin; LungeAttack — Merlin (контакт к.8, длинная подготовка и короткий выброс руки к цели) с ударом когтями Harpy (оружия нет, кисть — ударная часть); HitReact — Medusa (отдача корпуса и головы назад, руки взлетают по инерции); DeathSettle — Medusa (поклон корпусом без падения на колени, руки повисают, ВР-14). Оси ключей: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо (левая рука + отводится наружу, правая −), Y наклон вперёд (висящая рука + уходит назад), Z поворот влево. Цель H2 зафиксирована sha256. Статус максимум «технически импортировано».",
+ "target": {
+  "sk_fbx": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx",
+  "base_fbx": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SM_AncientLeshen_H2_Base.fbx",
+  "sha256": "d1ea65ec9f73b0a3c397e08b6d6e324002377d8faa45330710fcadc3788751b5",
+  "rest_generation": "H2"
+ },
+ "meshes": {
+  "body": "SK_AncientLeshen_H2_Body",
+  "weapon": null
+ },
+ "weapon": {
+  "bone": null,
+  "side": null,
+  "note": "оружия нет: удар когтями правой кисти; сокет Weapon ставится профилем UE-импорта на hand.R (WEAPON_SOCKET_BONE заявки; у Harpy — foot.R)"
+ },
+ "run_dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim",
+ "ue": {
+  "skeleton": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton",
+  "mesh_for_preview": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen",
+  "clips_folder": "/Game/PipelineCandidates/AncientLeshen/H2Anim"
+ },
+ "fps": 24,
+ "rest_measured": {
+  "note": "замер rest headless 2026-10-14 (оси арматуры, см; C:/tmp/leshen-anim-s6/rest.json): плечи (−1,4; ±5,6–6,0; 44,0), локти z 36,2, запястья z 28,5, когти до z 13,1 и до x +6,6 перед запястьем; голова (1,4; 0; 48,8), череп до 55, рога до 73,6 (x −3,6…9,4); таз 25,0; ноги: бедро 25,0 → колено 16,5 → лодыжка 8,5 (цепь 16,72 см почти прямая: таз–лодыжка 16,70 см — подъём или вынос таза вывел бы IK за досягаемость; таз не сдвигается (hips connected к root после импорта FBX), поворот hips ≤ 6° — IK ног держит лодыжки); подставка: верх z 6,0, радиус верха 14,3; низ корней z 5,63 (в rest на 0,37 см в подставке). Рост H (габарит меша) 67,9 см: 0,5 % H = 0,34 см."
+ },
+ "clips": {
+  "Idle": {
+   "frames": 56,
+   "role": "idle",
+   "reference": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle",
+   "reference_kind": "library pattern (D-11, Medusa Idle 56 к. + тяжёлое дыхание Merlin Idle), not an Ancient Leshen video",
+   "design": "древний лесной дух в покое: медленное тяжёлое дыхание ствола (грудь вперёд-назад, пик в середине цикла), ствол чуть кренится из стороны в сторону от таза при неподвижных корнях, череп с рогами медленно обводит поле (поворот ≤ 6°) и чуть кивает, длинные руки на вдохе слегка отходят от ствола, когти медленно сжимаются и разжимаются (двойная частота); вороны едут на плече и предплечьях",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.6
+   },
+   "waves": [
+    {
+     "bone": "spine",
+     "axis": "y",
+     "amp": 2.2,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "spine",
+     "axis": "x",
+     "amp": -0.8,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "hips",
+     "axis": "x",
+     "amp": 1.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "z",
+     "amp": 6.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "y",
+     "amp": 2.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.L",
+     "axis": "x",
+     "amp": 2.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.R",
+     "axis": "x",
+     "amp": -2.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_lower.L",
+     "axis": "y",
+     "amp": -3.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_lower.R",
+     "axis": "y",
+     "amp": -3.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "hand.L",
+     "axis": "y",
+     "amp": -4.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "hand.R",
+     "axis": "y",
+     "amp": -4.0,
+     "cycles": 2,
+     "shape": "raised_cos",
+     "phase": 0.25
+    }
+   ],
+   "keys": [],
+   "key_frames": [
+    0,
+    14,
+    28,
+    42
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "LungeAttack": {
+   "frames": 14,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack",
+   "reference_kind": "library pattern (D-11, Merlin LungeAttack: контакт к.8, длинная подготовка и выброс руки к цели; удар когтями без оружия — Harpy LungeAttack art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack), not an Ancient Leshen video",
+   "design": "подготовка (к. 0–5, ~40 % клипа, как Merlin): ствол откидывается и разворачивается вправо, правая рука уходит назад, предплечье поднимается, когти отведены за правое плечо ниже рогов, левая рука выносится вперёд для равновесия, череп держит цель (к. 3–5); короткий выброс (к. 5–8): ствол бросается вперёд и разворачивается влево, правая рука выбрасывает когти вперёд к цели (+X), рука почти прямая, когти раскрыты (к. 8 = Contact, пик вылета), левая рука уходит назад, таз доворачивается вперёд (поворот hips, без сдвига); проводка когтей вниз-внутрь (к. 10), возврат в rest (к. 12–14). Корни на подставке неподвижны: ствол гнётся выше них",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+    "bones": [
+     "spine"
+    ],
+    "weight": 0.2,
+    "mirror": true
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "hips": [
+       0,
+       -1,
+       -2
+      ],
+      "spine": [
+       -1,
+       -4,
+       -8
+      ],
+      "head": [
+       0,
+       -2,
+       5
+      ],
+      "arm_upper.L": [
+       4,
+       -8,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -6,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        -0.35,
+        -0.6,
+        -0.72
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        -0.2,
+        -0.55,
+        0.4
+       ]
+      },
+      "hand.R": {
+       "to": [
+        -0.1,
+        -0.45,
+        0.85
+       ]
+      }
+     }
+    },
+    {
+     "f": 5,
+     "bones": {
+      "hips": [
+       0,
+       -2,
+       -4
+      ],
+      "spine": [
+       -2,
+       -7,
+       -14
+      ],
+      "head": [
+       0,
+       -3,
+       9
+      ],
+      "arm_upper.L": [
+       6,
+       -14,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -10,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        -0.6,
+        -0.55,
+        -0.58
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        -0.35,
+        -0.4,
+        0.85
+       ]
+      },
+      "hand.R": {
+       "to": [
+        -0.2,
+        -0.3,
+        0.93
+       ]
+      }
+     }
+    },
+    {
+     "f": 7,
+     "bones": {
+      "hips": [
+       0,
+       2,
+       3
+      ],
+      "spine": [
+       -1,
+       8,
+       6
+      ],
+      "head": [
+       0,
+       -1,
+       -4
+      ],
+      "arm_upper.L": [
+       6,
+       6,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -3,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.55,
+        -0.55,
+        -0.63
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.8,
+        -0.35,
+        0.3
+       ]
+      },
+      "hand.R": {
+       "to": [
+        0.85,
+        -0.2,
+        0.45
+       ]
+      }
+     }
+    },
+    {
+     "f": 8,
+     "bones": {
+      "hips": [
+       0,
+       3,
+       5
+      ],
+      "spine": [
+       -2,
+       14,
+       12
+      ],
+      "head": [
+       0,
+       -2,
+       -8
+      ],
+      "arm_upper.L": [
+       8,
+       14,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       0,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.8,
+        -0.3,
+        -0.52
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.97,
+        -0.05,
+        -0.2
+       ]
+      },
+      "hand.R": {
+       "to": [
+        0.93,
+        0.05,
+        -0.35
+       ]
+      }
+     }
+    },
+    {
+     "f": 10,
+     "bones": {
+      "hips": [
+       0,
+       3,
+       5
+      ],
+      "spine": [
+       -2,
+       16,
+       13
+      ],
+      "head": [
+       0,
+       -1,
+       -9
+      ],
+      "arm_upper.L": [
+       8,
+       16,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       2,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.7,
+        -0.2,
+        -0.68
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.85,
+        0.15,
+        -0.5
+       ]
+      },
+      "hand.R": {
+       "to": [
+        0.6,
+        0.3,
+        -0.74
+       ]
+      }
+     }
+    },
+    {
+     "f": 12,
+     "bones": {
+      "hips": [
+       0,
+       1,
+       1
+      ],
+      "spine": [
+       0,
+       5,
+       4
+      ],
+      "head": [
+       0,
+       -1,
+       -3
+      ],
+      "arm_upper.L": [
+       3,
+       5,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       0,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.2,
+        -0.42,
+        -0.88
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.3,
+        -0.35,
+        -0.89
+       ]
+      },
+      "hand.R": {
+       "to": [
+        0.3,
+        -0.1,
+        -0.95
+       ]
+      }
+     }
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    5,
+    7,
+    8,
+    10,
+    12,
+    14
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "HitReact": {
+   "frames": 10,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact",
+   "reference_kind": "library pattern (D-11, Medusa HitReact: удар спереди, отдача корпуса и головы назад, руки взлетают), not an Ancient Leshen video",
+   "design": "удар спереди: ствол резко отдаёт назад с доворотом (корни стоят, гнётся середина ствола), череп с рогами мотается назад, длинные руки по инерции взлетают вперёд-наружу, когти растопырены (к. 2); затухание (к. 4), лёгкий перехлёст вперёд (к. 7), rest (к. 10)",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.5
+   },
+   "keys": [
+    {
+     "f": 2,
+     "bones": {
+      "hips": [
+       0,
+       -3,
+       2
+      ],
+      "spine": [
+       3,
+       -10,
+       7
+      ],
+      "head": [
+       2,
+       -11,
+       -6
+      ],
+      "arm_upper.L": [
+       7,
+       -6,
+       0
+      ],
+      "arm_upper.R": [
+       -7,
+       -6,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -6,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -6,
+       0
+      ],
+      "hand.L": [
+       8,
+       -6,
+       0
+      ],
+      "hand.R": [
+       -8,
+       -6,
+       0
+      ]
+     }
+    },
+    {
+     "f": 4,
+     "bones": {
+      "hips": [
+       0,
+       -2,
+       1
+      ],
+      "spine": [
+       2,
+       -6,
+       4
+      ],
+      "head": [
+       1,
+       -6,
+       -4
+      ],
+      "arm_upper.L": [
+       4,
+       -4,
+       0
+      ],
+      "arm_upper.R": [
+       -4,
+       -4,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -3,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -3,
+       0
+      ],
+      "hand.L": [
+       5,
+       -3,
+       0
+      ],
+      "hand.R": [
+       -5,
+       -3,
+       0
+      ]
+     }
+    },
+    {
+     "f": 7,
+     "bones": {
+      "hips": [
+       0,
+       0.5,
+       0
+      ],
+      "spine": [
+       0,
+       2,
+       -1
+      ],
+      "head": [
+       0,
+       3,
+       1
+      ],
+      "arm_upper.L": [
+       -1,
+       2,
+       0
+      ],
+      "arm_upper.R": [
+       1,
+       2,
+       0
+      ]
+     }
+    }
+   ],
+   "key_frames": [
+    0,
+    2,
+    4,
+    7,
+    10
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "DeathSettle": {
+   "frames": 21,
+   "role": "terminal",
+   "reference": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle",
+   "reference_kind": "library pattern (D-11, Medusa DeathSettle: поклон корпусом без падения на колени, руки повисают), not an Ancient Leshen video",
+   "design": "удар и отшатывание назад, руки взлетают (к. 3); древо увядает: ствол складывается вперёд с креном вправо, корни стоят (к. 8–13), череп опускается и рога клонятся вперёд, длинные руки безвольно повисают отвесно, когти свисают (к. 13–17); финальная поза держится до растворения (к. 21). Без падения на колени (ВР-14): гнётся ствол выше корней",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.35
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "hips": [
+       0,
+       -3,
+       2
+      ],
+      "spine": [
+       3,
+       -9,
+       6
+      ],
+      "head": [
+       2,
+       -12,
+       -5
+      ],
+      "arm_upper.L": [
+       10,
+       -10,
+       0
+      ],
+      "arm_upper.R": [
+       -10,
+       -10,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -8,
+       0
+      ],
+      "hand.L": [
+       6,
+       -4,
+       0
+      ],
+      "hand.R": [
+       -6,
+       -4,
+       0
+      ]
+     }
+    },
+    {
+     "f": 8,
+     "bones": {
+      "hips": [
+       1,
+       3,
+       -2
+      ],
+      "spine": [
+       4,
+       12,
+       -4
+      ],
+      "head": [
+       1,
+       8,
+       3
+      ],
+      "arm_upper.L": [
+       2,
+       -12,
+       0
+      ],
+      "arm_upper.R": [
+       -6,
+       -12,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -4,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -4,
+       0
+      ]
+     }
+    },
+    {
+     "f": 13,
+     "bones": {
+      "hips": [
+       2,
+       5,
+       -3
+      ],
+      "spine": [
+       8,
+       28,
+       -6
+      ],
+      "head": [
+       2,
+       11,
+       5
+      ],
+      "arm_upper.L": [
+       -4,
+       -26,
+       0
+      ],
+      "arm_upper.R": [
+       -10,
+       -28,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -6,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -6,
+       0
+      ],
+      "hand.L": [
+       0,
+       -8,
+       0
+      ],
+      "hand.R": [
+       0,
+       -8,
+       0
+      ]
+     }
+    },
+    {
+     "f": 17,
+     "bones": {
+      "hips": [
+       2,
+       6,
+       -3
+      ],
+      "spine": [
+       9,
+       34,
+       -7
+      ],
+      "head": [
+       3,
+       14,
+       6
+      ],
+      "arm_upper.L": [
+       -5,
+       -32,
+       0
+      ],
+      "arm_upper.R": [
+       -11,
+       -34,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -8,
+       0
+      ],
+      "hand.L": [
+       0,
+       -10,
+       0
+      ],
+      "hand.R": [
+       0,
+       -10,
+       0
+      ]
+     }
+    },
+    {
+     "f": 21,
+     "bones": {
+      "hips": [
+       2,
+       6,
+       -3
+      ],
+      "spine": [
+       9,
+       33,
+       -7
+      ],
+      "head": [
+       3,
+       13,
+       6
+      ],
+      "arm_upper.L": [
+       -5,
+       -31,
+       0
+      ],
+      "arm_upper.R": [
+       -11,
+       -33,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -7,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -7,
+       0
+      ],
+      "hand.L": [
+       0,
+       -9,
+       0
+      ],
+      "hand.R": [
+       0,
+       -9,
+       0
+      ]
+     }
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    8,
+    13,
+    17,
+    21
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  }
+ },
+ "reference_policy": "видео-референсы SYNTX не делались (решение оркестратора 2026-10-14: «No SYNTX spend: video references do not scale to the roster; author from library patterns»); clips.*.reference — папка видео-референса клипа-образца библиотеки D-11, clips.*.reference_kind — какой образец и почему"
+}
