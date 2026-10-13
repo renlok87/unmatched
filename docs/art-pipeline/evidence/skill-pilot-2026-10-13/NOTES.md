@@ -149,6 +149,12 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F128 | 6 | A weapon planted by its butt cannot use the `weapon_tip` mode; pivot offsets by hand; a right-angle fist grip costs 40–45° wrist bend for a straight support arm | tool: pivot-around-weapon-end option in pinned-hand mode |
 | F129 | 4→6 | Stage-4 test poses never show the back/side of the torso with the arm forward: Achilles' cloak armhole edge opens as a ragged strip behind the right armpit (LungeAttack 4–10, DeathSettle 7–21) — found only at stage 6 | acceptance §3: an arm-forward pose seen from the back/side |
 | F130 | 6 | `clip_manifest.py:125` hard-codes the validation date 2026-09-29 for every H2Anim clip | tool: real date |
+| F131 | 7 | Bone as a main class (legacy_bake, class 0) is invisible to the look-dev decoder against the black backdrop; class 0 uses the v1 shader path, so the LUT cannot tune it — only import-profile MI scalars (`Saturation`, `FixClassA/FixGainA/FixSpecA`) | ue-import-package §4.3: class-0 route; tool: mask from the lit frame vs the empty plate (`bone_measure.py` prototype) |
+| F132 | 7 | `ue_hero_lookdev verify` reads a fixed scalar list without `Saturation`/Fix*; crashes on non-dict values under `verify.instances.*` | tool fix |
+| F133 | 6/7 | Stage-6 validators missed a rigid rider (crow) separating from a deforming arm (HitReact D=0 veto at clip acceptance) | clip_contact_check: rider-to-surface gap check |
+| F134 | 7 | `base_seethrough` first runs at the stage-7 input check (Leshen 2.81 uu² vs 0.1: open loops at the base top rim) — a stage-3 defect found at stage 7 | run base_seethrough at stage 3 exit |
+| F135 | 7 | Bench variants: `--sidekick-name` for a sidekick without a figure would place a placeholder; numbered sidekicks in S08FighterNames only read the Harpy string | new-character-registration §5: rule + tool |
+| F136 | 7 | `h2anim_ue frames` camera crops figures taller than ~70 uu (antler tips) | tool: frame by bounds |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

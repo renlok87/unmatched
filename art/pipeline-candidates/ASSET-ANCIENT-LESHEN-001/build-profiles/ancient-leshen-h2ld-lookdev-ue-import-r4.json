@@ -1,0 +1,369 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "ancient-leshen-h2ld-lookdev-ue-import/4",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "3d-model-pipeline stage 7a (pilot 2026-10-14): UE import of the Ancient Leshen look-dev run 20261014-h2-lookdev-r2 (profile ancient-leshen-h2-lookdev/2: generic h2_bake H2 figure of the bake run 20261014-h2-bake-r2 + UV1 in metres, MatID, Edge, graded BC/ORM; TeamAccent ribbon on the three crows 6.04 % of the figure, profile ancient-leshen-h2-lookdev-teamaccent-r2) through the CLI profile skeletal-adopt (normaliser h2-lookdev/1) onto the canonical skeleton /Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton. No weapon (WEAPON_HAND none, rig-contract AncientLeshen weapon_bone null): 16 bones, socket Weapon on hand.R (the claws, WEAPON_SOCKET_BONE of the asset card). MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (UseTeamAccent, UseUV1Metres) with the TeamAccent mask and the look-dev LUT as is (UE look-dev iteration 0); base on M_UM_BaseMarker. Teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision 'accents + ring'). At most 'technically imported'; art acceptance of the model by delegation (stage 4 r2 pass pair 8.1, evidence/acceptance/20261014-r2/final.json). Rev 2 (2026-10-14, pilot fix 3ed2d354): only axes.front_from_best_bound_fit true — the Leshen is front/back depth-symmetric within the 0.05 uu bounds tolerance (UE x [-12.7105, 12.6791]), so run 20261014-h2ld-ue-import matched the true map (front -Y -> +X, 0.0005 uu) and its mirror (-> -X, 0.0315 uu) and failed skeletal_bounds_match_build_front_unambiguous / front_axis_as_fbx_preset; independent live probe: skull-band centroid x +2.20 uu, snout to +7.33 uu (evidence/stage7a-20261014/front-probe.json). Re-import by references/ue-import-package.md §4.4 (assets of 20261014-h2ld-ue-import deleted by script) into run 20261014-h2ld-ue-import-r2. Rev 3 (UE look-dev r2, 2026-10-14, light mode by delegation): only ue.figure_parameters gain the hero-wide v1 knob Saturation 1.15 and the AN-32 Fix slot A on MatID class 0 (legacy_bake = deer skull, antlers, pale claws: the LUT cannot reach class 0, it takes the v1 path) FixClassA 0 / FixGainA 1.1 / FixSpecA 0. Reason: review r1 (wood anchor) bone (scratch measure on the beauty frames, bone-measure-r1.json: the tool decodes class 0 only on the claws over the floor) Y ratio 0.60 board / 0.79 reading, sat 0.18 / 0.25 against concept 0.367 (hue +3 deg); wood within both; crows board light. Re-import by §4.4 into run 20261014-h2ld-ue-import-r3. Rev 4 (UE look-dev r3, the last light-mode iteration): only Saturation 1.15 -> 1.22. Review r2 (wood anchor): wood within both exposures (reading sat +0.040), bone (bone-measure-r2.json) reading Y 0.929 / hue +6.9 within, sat -0.102 (tolerance 0.10), board Y 0.61 / sat -0.17; crows board light. Re-import by §4.4 into run 20261014-h2ld-ue-import-r4.",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r3.json (rev 3; everything but ue.figure_parameters.Saturation)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r2.json (rev 2; everything but ue.figure_parameters)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import.json (rev 1; everything but axes.front_from_best_bound_fit)",
+    "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2ld-lookdev-ue-import-r3.json (skeletal-adopt h2-lookdev/1 of the pilot, candidate.figure_top_part, M_UM_Figure_v2.1 UseTeamAccent)",
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3ld-lookdev-ue-import.json (no weapon bone: 16 bones, Weapon socket on a body bone)",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json (skeletal-adopt, normaliser h2-lookdev/1)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-bake-h2-r2.json (armature, scale, axes, sockets)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json (look-dev run: MatID classes wood / stone_base / legacy_bake / feathers, LUT, UV1)",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-teamaccent-r2.json (TeamAccent ribbon on the crows)",
+    "docs/art-pipeline/material-library/team-accent.md §1 (LDV-13: TeamDyeGain 0.8 / Y_p50, TeamDyeCeiling 0.9 / Y_p95)"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2",
+    "report_format": "h2-lookdev/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json",
+    "bake_profile_id": "ancient-leshen-h2-lookdev/2",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "run_manifest": "reports/run-manifest.json",
+      "source_rig_report": "../20261014-h2-bake-r2/reports/rig-report.json",
+      "source_textures_report": "../20261014-h2-bake-r2/reports/textures-report.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_AncientLeshen_H2LD.fbx",
+      "base": "export/SM_AncientLeshen_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_AncientLeshen_H2LD_2K_BC.png",
+      "N": "textures/T_AncientLeshen_H2LD_2K_N.png",
+      "ORM": "textures/T_AncientLeshen_H2LD_2K_ORM.png",
+      "TeamMask": "textures/T_AncientLeshen_H2LD_2K_TeamMask.png",
+      "MatID": "textures/T_AncientLeshen_H2LD_2K_MatID.png",
+      "Edge": "textures/T_AncientLeshen_H2LD_2K_Edge.png"
+    },
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_UM_MatLUT_AncientLeshen.dds",
+        "sha256": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664",
+        "note": "look-dev LUT as is (UE look-dev iteration 0; ld-maps-report lut.dds_sha256)"
+      },
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_TeamAccent_2K.png",
+        "sha256": "b4211429e5f5203e6fd5291dc50c09586d37fef9a55c816d0c0dfb8522e1254c",
+        "note": "TeamAccent L8 linear 2048^2 (ld-team-accent-report.json outputs): ribbon on the three crows (feathers, the hero's only teamDyeAllowed class) = 6.04 % of the figure"
+      }
+    },
+    "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2 DirectX map (normaliser check normal_is_the_h21_directx_map). TeamMask is pinned but not imported (team_color_mode none)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear",
+      "MatID": "index * 16 + 8",
+      "Edge": "linear"
+    },
+    "top_part": "tripo_part_9",
+    "figure_top_part": "tripo_part_9",
+    "figure_top_part_note": "pilot fix F80 (cd3ee7fe; skeletal_adopt_formats.h2_lookdev): the figure top for figure_height_as_profile = the final top of the deer skull tripo_part_9 in ../20261014-h2-bake-r2/reports/prepare-report.json (0.55003 m), not the skeletal top 73.56 uu (antler tips, tripo_part_2/3; asset card FIGURE_BOUNDS_TOP_M 0.7358)"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      [
+        "root",
+        null
+      ],
+      [
+        "hips",
+        "root"
+      ],
+      [
+        "spine",
+        "hips"
+      ],
+      [
+        "head",
+        "spine"
+      ],
+      [
+        "arm_upper.L",
+        "spine"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L"
+      ],
+      [
+        "arm_upper.R",
+        "spine"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R"
+      ],
+      [
+        "leg_upper.L",
+        "hips"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L"
+      ],
+      [
+        "leg_upper.R",
+        "hips"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R"
+      ]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2 without a weapon bone (rig-contract characters.AncientLeshen weapon_bone null; WEAPON_HAND none). The leg bones live inside the root trunk (no legs). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (17 bones), '.' becomes '_'"
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_9",
+    "note": "base bottom -> top of the deer skull (tripo_part_9 final top 0.55003 m, prepare-report) = hero budget 55 uu (asset card FIGURE_HEIGHT_M); the antlers are higher, skeletal top 73.56 uu (rig-report unit_scale_1_and_height), and are not part of the height (HANDBOOK §2.10, like Arthur's sword above the crown)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_AncientLeshen_H2_Body"
+    },
+    "base": {
+      "object": "SM_AncientLeshen_H2_Base",
+      "footprint_m": [
+        0.3,
+        0.3,
+        0.06
+      ],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "rig-report expected_ue_bounds_uu_at_import_scale_1.base [-14.968, -15.01, -0.027] .. [15.008, 15.007, 6.003] uu"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "expected_ue_front_source": "UM_FBX_v1 preset (ART-001); ld_fbx measured the skull face normal (0.7096, 0.0053, 0.0629) along +X in the export frame; no weapon, the weapon side is not checked",
+    "front_from_best_bound_fit": true,
+    "front_from_best_bound_fit_note": "pilot fix 3ed2d354 (opt-in): depth-symmetric figure — when the matching axis maps disagree on the front, keep only maps within 5x the best bound error (true map 0.0005 uu vs mirror 0.0315 uu in run 20261014-h2ld-ue-import)"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "hand.R",
+      "location_uu": null,
+      "purpose": "no weapon bone: the strike point = the claws of the right hand (asset card WEAPON_SOCKET_BONE hand.R; table D-1 row none; Harpy uses foot.R); location = the H2 bake's UE bone-space prediction (rig-report sockets: target (-0.132, -0.025, 0.18) m, offset (0.187, -10.763, -1.172) uu)"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX and the evidence capture (S08FlowGameMode DoesSocketExist Head); location = the H2 bake's UE bone-space prediction (skull centre)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_AncientLeshen_H2_Body": 44438,
+      "SM_AncientLeshen_H2_Base": 2268
+    },
+    "bones": 16,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the look-dev read-back (ld-fbx-report triangles_as_h21); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "GD-058 final (asset-card POLY_BUDGET: figure <= 45 000 tris, base <= 2 500), FIGURE_HEIGHT_RANGE_M [0.50, 0.55]; comparison only",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      50,
+      55
+    ],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/AncientLeshen/H2LD",
+    "skeletal_asset": "SK_AncientLeshen_H2LD",
+    "target_skeleton": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton",
+    "target_skeleton_note": "canonical hero skeleton of H2Anim (h2anim_ue.py skeleton from SK_AncientLeshen_H2.fbx of the spec); the clips AM_AncientLeshen_* are on it; the run neither creates nor deletes it",
+    "base_asset": "SM_AncientLeshen_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "figure on M_UM_Figure_v2 (v2.1, static switch UseTeamAccent); base on M_UM_BaseMarker v1 (team side band)",
+    "figure_instance": "MI_AncientLeshen_H2LD",
+    "base_instance": "MI_AncientLeshen_H2LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "active C-11 palette (art/um-materials/um-masters.json c11_value_split_proposal), user decision 'accents + ring'; linear only through FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_AncientLeshen_H2LD_{team}",
+      "base": "MI_AncientLeshen_H2LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: dye by TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; bark, bone and the stone base (main colours of the concept) are never dyed, only the crows (feathers)",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 29.282,
+      "TeamDyeCeiling": 15.0905,
+      "Saturation": 1.22,
+      "FixClassA": 0.0,
+      "FixGainA": 1.1,
+      "FixSpecA": 0.0
+    },
+    "figure_parameters_note": "team-accent.md rule LDV-13, one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.02732), TeamDyeCeiling = 0.9 / Y_p95 (0.05964) of the accent texels (20261014-h2-lookdev-r2/reports/ld-team-accent-report.json team_dye_gain.accent_Y_p50_p95; the report's own single-gain rule gives 18.5); effective min(29.282, 15.0905 / maxc(team)) = P1 18.70, P2 29.28; rev 3: Saturation 1.15 (hero-wide v1 knob, neutral 1.0; um_v2_core.hlsl:177) and Fix slot A on class 0 legacy_bake FixGainA 1.1 (AN-32, um_v2_core.hlsl:182-191; the game leaves the MI values unless a light profile heroMaterials block for AncientLeshen overrides them, S08FighterActor.cpp:1116-1127); rev 4: Saturation 1.22",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_AncientLeshen_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {
+          "TeamDye": 0.0
+        },
+        "vectors": {
+          "TeamColor": {
+            "linear": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "note": "no dye (TeamColor white, TeamDye 0): the look-dev BC as baked, for the comparison with the concept"
+      },
+      {
+        "asset": "MI_AncientLeshen_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {
+          "DebugView": 1.0
+        },
+        "note": "MatID zone mask for the measurements (class colours in emissive, surface black)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured H2 base: team band = the side wall, flat TeamColor"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "the base FBX carries UV1_m (metres); lightmap UV generation would overwrite UV1",
+    "expect_uv_channels": 2,
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_AncientLeshen_H2LD_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_AncientLeshen_H2LD_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal (byte copy of the H2 map)"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_AncientLeshen_H2LD_ORM",
+        "srgb": false,
+        "compression": "TC_Masks"
+      },
+      "TeamAccent": {
+        "file_key": "TeamAccent",
+        "asset": "T_AncientLeshen_H2LD_TeamAccent",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1"
+      },
+      "MatID": {
+        "file_key": "MatID",
+        "asset": "T_AncientLeshen_H2LD_MatID",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"
+      },
+      "Edge": {
+        "file_key": "Edge",
+        "asset": "T_AncientLeshen_H2LD_Edge",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "linear edge mask (EdgeMaskTexture)"
+      },
+      "LUT": {
+        "file_key": "LUT",
+        "asset": "T_UM_MatLUT_AncientLeshen",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "hero LUT 16 x 16 RGBA16F, Load only: HDR, point, no mips, not streamed"
+      }
+    },
+    "measure_skeletal_triangles": true
+  },
+  "history": {
+    "previous": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r3.json",
+      "sha256": "cd90c89ebb1c499164c98af69d2f086ee2c8adec777c11369b983c565d281d12",
+      "run": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2ld-ue-import-r3"
+    }
+  }
+}

@@ -1,0 +1,752 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_AncientLeshen_H2_2K_N.png",
+          "h21_sha256": "8a6b189812d06d790d278d49af02658cef7d6836e179ad7b7ef0237365733999",
+          "passed": true,
+          "sha256": "8a6b189812d06d790d278d49af02658cef7d6836e179ad7b7ef0237365733999"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SK_AncientLeshen_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SM_AncientLeshen_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "f383aa5479b0c78f8531fdb4a422a9e8cda6ddf8dbb5f8781acc692c26f799f4",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json",
+            "profile_id": "ancient-leshen-h2-lookdev/2",
+            "sha256": "f383aa5479b0c78f8531fdb4a422a9e8cda6ddf8dbb5f8781acc692c26f799f4"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "d1ea65ec9f73b0a3c397e08b6d6e324002377d8faa45330710fcadc3788751b5",
+          "rig_passed": true,
+          "rig_report_fbx": "d1ea65ec9f73b0a3c397e08b6d6e324002377d8faa45330710fcadc3788751b5",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "f383aa5479b0c78f8531fdb4a422a9e8cda6ddf8dbb5f8781acc692c26f799f4",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json",
+    "profile_id": "ancient-leshen-h2-lookdev/2",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "ancient-leshen-h2-lookdev/2",
+      "measured": {
+        "build_report": "ancient-leshen-h2-lookdev/2",
+        "textures_report": "ancient-leshen-h2-lookdev/2"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "11a086b080a54e92b901544e1a0a20473abd9b1896336043b3722d7fba798ce5",
+          "report": "11a086b080a54e92b901544e1a0a20473abd9b1896336043b3722d7fba798ce5",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "6bec2a41a63ebe70a136d83877bbe527f4df2c1c69e0ffe5658eb1713341cc4c",
+          "report": "6bec2a41a63ebe70a136d83877bbe527f4df2c1c69e0ffe5658eb1713341cc4c",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664",
+          "profile": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "b4211429e5f5203e6fd5291dc50c09586d37fef9a55c816d0c0dfb8522e1254c",
+          "profile": "b4211429e5f5203e6fd5291dc50c09586d37fef9a55c816d0c0dfb8522e1254c",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_AncientLeshen_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_AncientLeshen_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 16,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 16,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -1.908,
+          1.913
+        ],
+        "Weapon": [
+          0.187,
+          -10.763,
+          -1.172
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_AncientLeshen_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_AncientLeshen_H2_Body": 44438,
+        "SM_AncientLeshen_H2_Base": 2268
+      },
+      "measured": {
+        "SK_AncientLeshen_H2_Body": 44438,
+        "SM_AncientLeshen_H2_Base": 2268
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json": "04bd21fa0220e6f586fde42cf319e890a75d67c86d63056ef521f4faef491a4c",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json": "8c610c451611948d2463fbd3006d1000478cf368a3801f23a3a502d3605ba8bf",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SK_AncientLeshen_H2LD.fbx": "6bec2a41a63ebe70a136d83877bbe527f4df2c1c69e0ffe5658eb1713341cc4c",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SM_AncientLeshen_H2LD_Base.fbx": "11a086b080a54e92b901544e1a0a20473abd9b1896336043b3722d7fba798ce5",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json": "e51e2dbc9fd513102b37255eab8038de64a61b3f392454ee24b9aa766dc47f8e",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json": "f1d72248cb212315a30a0cd90379c87c393e2c45394ac58db33ed46ed75294d1",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/run-manifest.json": "2e63a53ddedce8ca8ac4e3049fc0db7cdd512cdd2f06e3f96b3fd26545c6d99a",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_BC.png": "9c4033d845616f2c92b88523a48f72797dd025d5f0d30e278ab9116b5d483d09",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_Edge.png": "97d941e71ac6599c8a01455b46dceaac41f797681d1ed2082f1ee501e43fe21e",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_MatID.png": "518f6c454b92cc783da71a3aab5126bed6bdccb77ed6110a2830213018a09397",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_N.png": "8a6b189812d06d790d278d49af02658cef7d6836e179ad7b7ef0237365733999",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_ORM.png": "1163d83acaf74cac3159eb5855901a2521e41c67c899a8ed23011dee5e67d914",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_TeamMask.png": "a49a0a20b8c42488b49609ee7a827971d4fe9f110619864eb0eb7f34f5951518",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_TeamAccent_2K.png": "b4211429e5f5203e6fd5291dc50c09586d37fef9a55c816d0c0dfb8522e1254c",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_UM_MatLUT_AncientLeshen.dds": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json": "f383aa5479b0c78f8531fdb4a422a9e8cda6ddf8dbb5f8781acc692c26f799f4"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SM_AncientLeshen_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SK_AncientLeshen_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-lookdev-r2.json",
+    "report:build": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/../20261014-h2-bake-r2/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_UM_MatLUT_AncientLeshen.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/textures/T_AncientLeshen_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile ancient-leshen-h2-lookdev/2); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "ancient-leshen-h2ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import.json",
+    "sha256": "25f6775ff86dd915e133228d7b9ea68d21ab7746589b8b391345143c07ce57c8"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_AncientLeshen_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_AncientLeshen_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_AncientLeshen_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_AncientLeshen_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_AncientLeshen_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_AncientLeshen_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_AncientLeshen_H2_Body": [
+                "M_AncientLeshen_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_AncientLeshen_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            15.01,
+            14.968,
+            6.003
+          ],
+          "min": [
+            -15.007,
+            -15.008,
+            -0.027
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            15.008,
+            15.007,
+            6.003
+          ],
+          "min": [
+            -14.968,
+            -15.01,
+            -0.027
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            18.493,
+            12.71,
+            73.56
+          ],
+          "min": [
+            -19.546,
+            -12.679,
+            5.634
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            12.679,
+            18.493,
+            73.56
+          ],
+          "min": [
+            -12.71,
+            -19.546,
+            5.634
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            12.679,
+            19.546,
+            73.56
+          ],
+          "min": [
+            -12.71,
+            -18.493,
+            5.634
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SM_AncientLeshen_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/export/SK_AncientLeshen_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55003,
+        "skeletal_top_m": 0.7356,
+        "top_part": "tripo_part_9"
+      },
+      "meshes_pre_export_m": {
+        "SK_AncientLeshen_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 44438
+        },
+        "SM_AncientLeshen_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 2268
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.012,
+                0.096,
+                0.362
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                -0.003,
+                0.128,
+                0.284
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.012,
+                -0.095,
+                0.362
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                -0.001,
+                -0.127,
+                0.285
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.014,
+                0.06,
+                0.44
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.012,
+                0.096,
+                0.362
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.014,
+                -0.056,
+                0.44
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.012,
+                -0.095,
+                0.362
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                0.0,
+                0.056,
+                0.085
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.07098,
+                0.07374,
+                0.04951
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                0.0,
+                -0.056,
+                0.085
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.07098,
+                -0.07374,
+                0.04951
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                -0.003,
+                0.128,
+                0.284
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.01033,
+                0.13333,
+                0.20044
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                -0.001,
+                -0.127,
+                0.285
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.01037,
+                -0.13312,
+                0.20189
+              ]
+            },
+            "head": {
+              "head_m": [
+                0.014,
+                0.0,
+                0.488
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.03001,
+                0.0,
+                0.64205
+              ]
+            },
+            "hips": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.25
+              ],
+              "parent": "root",
+              "tail_m": [
+                0.0,
+                0.0,
+                0.29
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                0.004,
+                0.042,
+                0.165
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                0.0,
+                0.056,
+                0.085
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                0.004,
+                -0.042,
+                0.165
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                0.0,
+                -0.056,
+                0.085
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                -0.0,
+                0.03,
+                0.25
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.004,
+                0.042,
+                0.165
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                0.0,
+                -0.03,
+                0.25
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.004,
+                -0.042,
+                0.165
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.25
+              ]
+            },
+            "spine": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.31
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.0,
+                0.0,
+                0.46488
+              ]
+            }
+          },
+          "meshes": {
+            "SK_AncientLeshen_H2_Body": {
+              "triangles": 44438,
+              "vertices": 23446
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "hand.R",
+          "location_uu_for_ue": [
+            0.187,
+            -10.763,
+            -1.172
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            2.5,
+            13.2,
+            18.0
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -1.908,
+            1.913
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            3.5,
+            -0.0,
+            50.5
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

@@ -1,0 +1,1740 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SM_AncientLeshen_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+  "extra:MI_AncientLeshen_H2LD_DebugClass": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass",
+  "extra:MI_AncientLeshen_H2LD_Neutral": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+  "skeletal": "/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_UM_MatLUT_AncientLeshen",
+  "texture:MatID": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "wood",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png",
+   "front": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+   "side": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r2/reports/measure-report.json",
+  "hero": "AncientLeshen",
+  "key_zones": [
+   "wood"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "wood",
+   "legacy_bake"
+  ],
+  "note": "3d-model-pipeline stage 7a (pilot 2026-10-14): Ancient Leshen H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the three crows), teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run 20261014-h2-lookdev-r2 as is). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = wood (bark: trunk and arms, the largest zone, as the Blender ld_measure); hue is not checked below concept saturation 0.1 (the crows are near-black grey).",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "hue_deg": [
+     [
+      15,
+      60
+     ]
+    ],
+    "s_max": 0.5,
+    "v_min": 0.4
+   }
+  },
+  "render_gates_note": "legacy_bake = bone (deer skull, antlers, pale claws; MatID 0 = the dark catch-all that also takes the base top): the same HSV gate as the concept side (ancient-leshen-h2-lookdev-r2.json measure.concept_gates.legacy_bake: hue 15-60, s <= 0.5, v >= 0.4)",
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2ld-ue-import-r2",
+  "side_camera": "+X",
+  "side_camera_note": "SIDE_VIEW left (asset card): on the concept side view the skull faces the LEFT of the frame (the figure's left side and the shoulder crow face the camera) -> camera at +X looking -X (ue_hero_lookdev.views, Medusa convention); Angel used -X against his concept (pilot F98)",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "wood",
+   "legacy_bake",
+   "feathers"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/AncientLeshen/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 17,
+    "clips": 4,
+    "triangles": 44438
+   },
+   "folder": "/Game/PipelineCandidates/AncientLeshen/H2LD",
+   "height_uu": 73.5601,
+   "height_uu_note": "skill decision (ue-import-package §3.2): top of the mesh bounds from ue-import-report.json (antler tips 73.5601 uu; skull top 55.003 uu)",
+   "hero_root": "/Game/PipelineCandidates/AncientLeshen",
+   "instances": {
+    "extra:MI_AncientLeshen_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_AncientLeshen_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 15.0905,
+      "TeamDyeGain": 29.282
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_UM_MatLUT_AncientLeshen",
+      "TeamAccentTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "wood",
+   "legacy_bake",
+   "feathers"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "ASSET-ANCIENT-LESHEN-001-s7a",
+  "stale_taken": null,
+  "stamp": "ASSET-ANCIENT-LESHEN-001-s7a 2026-10-13T22:10:38+00:00 ue_hero_lookdev review AncientLeshen r1",
+  "step": "ue_hero_lookdev review AncientLeshen r1",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-13T22:14:30+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.4068,
+    1.4032,
+    1.3475
+   ],
+   "sha256": "b2ac37ca5f67e727d20cfb8e078bea0237529e9b9e196854a13120256a323eaf",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.9826,
+    1.8576,
+    2.0087
+   ],
+   "sha256": "fecda06aa19e6fdf7a9e5005141faa03c5e71c26af48c92ad79b572e0b07af5c",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8843,
+    2.0209,
+    2.0242
+   ],
+   "sha256": "74ec4a988c6f9e2eeda914e25b021214a71d4f6f60ee207f26b77e6b80382d27",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.0572,
+    2.0498,
+    2.0418
+   ],
+   "sha256": "21cde6ee25088b0d043d5c6782055fb1147a98852294d3807806c757bbbd6111",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.3848,
+    1.3542,
+    1.3338
+   ],
+   "sha256": "3d1edd8ab3256a1a3e8a37b7cbd45fa2ef0f04770f5da8b6dd0ed722e8f72eb7",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "ancientleshen-r1-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.7349,
+    1.856,
+    1.8506
+   ],
+   "sha256": "9728c7cffae15d28cf6dd6b7a10c1d38a9c3c642e4a8c780bedf8986cac84263",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.638,
+    2.2012,
+    1.9426
+   ],
+   "sha256": "548b82b06273d0bd4427cec41925e9c580caa014efc591a33d970ba7dd453299",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.5458,
+    2.2816,
+    2.4659
+   ],
+   "sha256": "88fa198dc734e3e3dfe1cf7f04c0f0d9793e8b8e840ff86ac78aec15d35a6692",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.3354,
+    2.4674,
+    2.3692
+   ],
+   "sha256": "51af3fadc4418b85872131062a456525c99dceec559c0c416303f435f24c5959",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.5161,
+    2.3969,
+    2.8694
+   ],
+   "sha256": "f5cb3b1844808209ef5518443bda1ca0de2995287aa8c69a5e281971d310c14e",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8587,
+    1.6113,
+    2.3318
+   ],
+   "sha256": "eece38790257ba6e714dafc35681ae1d4dd46fd5aa20a6f2ae2345c57f5167b0",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "ancientleshen-r1-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.1625,
+    2.2887,
+    2.183
+   ],
+   "sha256": "bc04c4dcbb34aa8ed3111694d0aa36931919cbf257776482e8242c5b9e709e89",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.6213,
+    1.549,
+    1.4562
+   ],
+   "sha256": "191b1c0da3506843588b65836dae8b21f393bb966d1d2d8a484a24ba322a2397",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.764,
+    1.4606,
+    1.4989
+   ],
+   "sha256": "7a50d87da28b2614588f93862c3a7481a517370eaf8f18e0358158887e053c98",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.5893,
+    1.488,
+    1.52
+   ],
+   "sha256": "099b378459c8c88a802a675786e0a550f97c600fc78112f9c8fb7bdbc8186e1c",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2568,
+    2.2599,
+    2.2283
+   ],
+   "sha256": "dc90b8c237b0ef7c2aa6c010fde24d5bc45c617dce62e5114ea3122c6a4e1893",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2778,
+    2.2303,
+    2.2587
+   ],
+   "sha256": "f56add4632a37e01be9cc1dc0bef862ec712468b68e397d685583a4570c32b33",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2597,
+    2.2619,
+    2.1184
+   ],
+   "sha256": "02c5820d3c389e8df23e51aebac3da1b36d1a40aafe06207e17126254e35903b",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "ancientleshen-r1-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.0267,
+    1.9781,
+    2.017
+   ],
+   "sha256": "d7a31a89b08426991898ab670f5c85e6f7379719b0309272bb9197fe2d2eba7a",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.4244,
+    1.637,
+    1.5268
+   ],
+   "sha256": "b5978669f8d5755b497a848f89e65a52d3d90409b090135b43295caf7660f3ca",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.7905,
+    1.7676,
+    1.8202
+   ],
+   "sha256": "3116f8c01a833e3fb01ae759b582aa8d1d4ea69065009bece7ac5caf9bc654f2",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.7625,
+    1.8095,
+    1.8921
+   ],
+   "sha256": "e29ad241952d9e1f3516b46c070d27227f8cd390e7278a19a22efcc5a0384c43",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8504,
+    1.918,
+    2.1264
+   ],
+   "sha256": "409ff2d58eb1d5c71a2d95a198a0ea1210f5cf947d86d3c54fbc7dcea143405b",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "ancientleshen-r1-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.3193,
+    1.3833,
+    1.5818
+   ],
+   "sha256": "bf0cb7214c6293a53001641dffc0cd8f0232e22b08394f283e0f587eaee18e97",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "ancientleshen-r1-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.6393,
+    1.6974,
+    1.7491
+   ],
+   "sha256": "889ef714a8b52681f6d429e0c4be6b9d0899cc28921c16053a34f43b22c84948",
+   "subject": "AncientLeshen (/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_AncientLeshen_H2LD_DebugClass": false,
+  "extra:MI_AncientLeshen_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-13T22:10:39+00:00",
+ "tag": "r1",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  2.5457,
+  2.5809,
+  2.3341,
+  2.4679,
+  2.3635,
+  2.8603,
+  2.6343,
+  2.4684,
+  2.5271,
+  2.5445,
+  2.2925,
+  2.4645,
+  2.3425,
+  2.8295,
+  2.6144,
+  2.4653,
+  2.5136,
+  2.5795,
+  2.3115,
+  2.4839,
+  2.3786,
+  2.8258,
+  2.6461,
+  2.4796,
+  2.5275,
+  2.5691,
+  2.3127,
+  2.4892,
+  2.3518,
+  2.8373,
+  2.644,
+  2.4944,
+  2.5288,
+  2.5824,
+  2.3251,
+  2.4594,
+  2.3554,
+  2.8486,
+  2.6144
+ ]
+}

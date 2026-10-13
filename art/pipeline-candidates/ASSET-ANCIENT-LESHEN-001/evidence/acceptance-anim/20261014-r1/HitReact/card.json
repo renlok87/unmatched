@@ -1,0 +1,147 @@
+{
+ "schema": "unmatched.anim-acceptance/1",
+ "kind": "anim",
+ "asset_id": "ASSET-ANCIENT-LESHEN-001",
+ "clip": "HitReact",
+ "cycle": "r1",
+ "date": "2026-10-14",
+ "previous_card": null,
+ "accepted_object": [
+  {
+   "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/export/AM_AncientLeshen_HitReact.fbx",
+   "sha256": "0c3976a6db941c8bfd66126d5b7e0566aac66800299070f2adb1f0534076e904"
+  },
+  {
+   "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json",
+   "sha256": "0443032fa68dac48abfde878ddc4fc701c2f9951f8ebb23b26136fda8cddfe8f"
+  }
+ ],
+ "frames": {
+  "dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-anim/20261014-r1/HitReact/frames",
+  "files": [
+   "AncientLeshen-HitReact-blender-sheet.jpg",
+   "AncientLeshen-HitReact-f02-front.jpg",
+   "AncientLeshen-HitReact-f02-left.jpg",
+   "AncientLeshen-HitReact-f02-q34.jpg",
+   "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+   "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+   "AncientLeshen-HitReact-f02-front-ue-editor.jpg",
+   "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+   "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+   "AncientLeshen-HitReact-f04-q34-ue-editor.jpg",
+   "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+   "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+   "AncientLeshen-HitReact-f10-front-ue-editor.jpg",
+   "AncientLeshen-HitReact-f10-q34-ue-editor.jpg",
+   "AncientLeshen-H2Anim-ue-sheet.jpg"
+  ]
+ },
+ "reports": [
+  "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+  "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/contact-HitReact.json",
+  "docs/art-pipeline/animation-library/clip-manifest.json",
+  "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-import-clips.json",
+  "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-measure-clips.json",
+  "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/roots-planted.json"
+ ],
+ "gates": {
+  "G-VALIDATE": {
+   "status": "PASS",
+   "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+   "note": "AM_AncientLeshen_HitReact.validation.json#result = pass; AM_AncientLeshen_HitReact.validation.json#fails = []; AM_AncientLeshen_HitReact.validation.json#clip_sha256 = 0c3976a6db941c8bfd66126d5b7e0566aac66800299070f2adb1f0534076e904",
+   "source_defect": null
+  },
+  "G-CONTACT": {
+   "status": "PASS",
+   "source": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/contact-HitReact.json",
+   "note": "contact-HitReact.json#result = pass; contact-HitReact.json#fails = []; contact-HitReact.json#checks[check=foot_slide_L].foot_vertices = 0; contact-HitReact.json#checks[check=foot_slide_R].foot_vertices = 0; справочно: roots-planted.json#clips.HitReact.r_gt_6_cm = 0.127",
+   "source_defect": null
+  },
+  "G-MANIFEST": {
+   "status": "PASS",
+   "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+   "note": "clip-manifest.json#clips[id=LESH-HitReact].status = technically_imported; clip-manifest.json#clips[id=LESH-HitReact].validation.result = pass; contact-HitReact.json#result = pass; clip-manifest.json#clips[id=LESH-HitReact].source.files[0].sha256 = 0c3976a6db941c8bfd66126d5b7e0566aac66800299070f2adb1f0534076e904; ue-import-clips.json#fbx_sha256.AM_AncientLeshen_HitReact = 0c3976a6db941c8bfd66126d5b7e0566aac66800299070f2adb1f0534076e904; ue-import-clips.json#clips[name=AM_AncientLeshen_HitReact].imported_object_paths[0] = /Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_HitReact.AM_AncientLeshen_HitReact",
+   "source_defect": null
+  }
+ },
+ "scores": {
+  "R": {
+   "value": 2,
+   "rationale": "На Blender-листе и UE front/q34 переход к.0→2 ясно меняет силуэт: череп с рогами откидывается, ствол разворачивается, руки поднимаются наружу. На к.4 реакция затухает, к.7 даёт небольшой перехлёст, к.10 возвращает rest. Корневой ствол и длинные когти сохраняют характер героя; спиной к камере он не поворачивается.",
+   "frames": [
+    "AncientLeshen-HitReact-blender-sheet.jpg",
+    "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f02-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f04-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f10-q34-ue-editor.jpg"
+   ]
+  },
+  "C": {
+   "value": 2,
+   "rationale": "На Blender-листе в left к.2 верх ствола и череп уходят назад относительно неподвижного основания, руки выносятся вперёд: направление соответствует удару спереди. На UE к.0/2/4/7/10 front и q34 внешние корни сохраняют посадку на подставке без видимого отрыва или скольжения. Ног у фигуры нет; опора оценена по корням, а не по костям стоп или формальному foot_slide.",
+   "frames": [
+    "AncientLeshen-HitReact-blender-sheet.jpg",
+    "AncientLeshen-HitReact-f02-left.jpg",
+    "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f10-q34-ue-editor.jpg"
+   ]
+  },
+  "D": {
+   "value": 0,
+   "rationale": "На крупных планах к.2 left и q34 ворона на правом предплечье, слева в изображении, полностью отделена от поверхности руки видимым просветом фона: посадка разорвана, птица висит рядом с предплечьем. Ствол, шея и плечи сохраняют оболочку, руки не входят в рога, но видимый отрыв детали определяет нижний якорь D=0. Жёсткий поворот вороны вместе с костью допустим; потеря контакта с местом посадки этим ограничением не покрывается.",
+   "frames": [
+    "AncientLeshen-HitReact-f02-left.jpg",
+    "AncientLeshen-HitReact-f02-q34.jpg",
+    "AncientLeshen-HitReact-f02-front.jpg"
+   ]
+  },
+  "L": {
+   "value": 2,
+   "rationale": "На Blender-листе и UE front/q34 амплитуда уменьшается от к.2 к к.4; на к.7 руки и голова уже около rest с небольшим перехлёстом. Переход к.7→10 мал, финальные контуры головы, кистей и ствола совпадают с к.0. По представленным ключевым кадрам oneshot мягко садится в исходную позу без видимого скачка финала.",
+   "frames": [
+    "AncientLeshen-HitReact-blender-sheet.jpg",
+    "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f10-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+    "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+    "AncientLeshen-HitReact-f10-q34-ue-editor.jpg"
+   ]
+  }
+ },
+ "score": 7.5,
+ "verdict": "rework_blender",
+ "verdict_reason": "§10.5: сработали вето D=0 < 1,0 из-за видимого отрыва вороны от правого предплечья на крупных планах к.2 и порог score=7,5 < 8,0. Все три технических гейта PASS.",
+ "rework_fix_list": [
+  {
+   "item": "D",
+   "frame": "AncientLeshen-HitReact-f02-q34.jpg",
+   "fix": "Устранить разрыв посадки вороны на правом предплечье: согласовать следование птицы и поверхности её опоры, чтобы на к.2 в left и q34 между ними не появлялся сквозной просвет. Сохранить жёсткость птицы и проверить посадку на к.0/2/4/7/10.",
+   "tool": "h2_bake профиль (веса), этап 5 модели"
+  }
+ ],
+ "known_issues": [
+  {
+   "item": "C",
+   "frame": "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+   "note": "foot_slide не проверяет эту анатомию: foot_vertices=0. Отдельный замер roots-planted.json для HitReact даёт внешний сдвиг корней r>6 см 0,127 см при допуске 0,34 см; в игровых кадрах этапа 7 сохранять проверку опоры по видимым корням."
+  },
+  {
+   "item": "R",
+   "frame": "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+   "note": "Верх рогов обрезан рамкой диагностической UE-камеры; это не дефект клипа и балл не снижает. Листы K1/K2 этапа 7 должны показывать полный силуэт на обеих реальных досках."
+  }
+ ],
+ "acceptor": {
+  "profile": "Sol 6.1 xhigh",
+  "session_id": "codex:01a1376b-d013-74c1-870e-b2bb10fcdce3"
+ },
+ "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-leshen",
+ "decided_by": "delegated (ВР-реестр 2026-10-06)",
+ "status_note": ""
+}
