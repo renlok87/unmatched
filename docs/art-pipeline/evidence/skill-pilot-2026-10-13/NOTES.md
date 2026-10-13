@@ -139,6 +139,9 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F118 | 4 r2 | Executor free-form («bronze may read paler») passed with the per-item status leaked into the acceptor's T rationale (§1 п.3) | §8.2: per-item status only «closed / not closed» |
 | F119 | 4 | Card `ACCEPTOR_PROFILE: opus-xhigh` while r1/r2 were judged by Sol; §1 п.4 requires the same profile per cycle | launcher writes the profile actually used into the card |
 | F120 | 4 r2 | Orchestrator's own look: Achilles bronze on the acceptance frames reads pale/silvery vs the concept's warm gold, though tone `t_cap` 2.0 and T 2.0 (F110: Cycles tone vs EEVEE frames) | stage 7a UE look-dev must judge metal hue, not only luminance; tone table to include hue/chroma for metal classes |
+| F121 | 7 | A minimized GUI editor cannot take console focus (`py_file` times out); the working setup is a hidden editor with `-RenderOffScreen` + `console_drop.py` (`UE_CONSOLE_DROP`), not described in the skill | ue-import-package §1 / HANDBOOK §0.2: launch recipe for the agent's own editor |
+| F122 | 6 | Angel's H2 skin limits (right arm): elbow extension FAIL > ~141°, forearm twist > ~20°; rest grip puts the blade ~100° to the forearm, so a forward chop with the sword fixed in the fist needs shoulder raise + upper-arm rotation (Arthur's accepted clip rotated the sword in hand instead) | animation-vfx-sfx §6.2: measure skin limits first; grip/wrist/elbow check in clip_contact_check (prototype `C:/tmp/angel-anim-r2/grip_check.py`) |
+| F123 | 6 | The «new run per rework» rule conflicts with §10.6, which edits the clip spec in place | animation-vfx-sfx §10.6: one rule |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

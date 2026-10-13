@@ -1,0 +1,690 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.02608
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000174,
+      "frame": 44,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 878
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000223,
+      "frame": 15,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 933
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 13,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.298,
+      "max_growth_of_height": 0.00293,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004953,
+      "max_penetration_of_height": 0.004953,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.698
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.003196,
+      "max_penetration_of_height": 0.00323,
+      "frame": 1,
+      "warn_above": 0.005196,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 0.000136,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/preview/Angel-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.27432
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000355,
+      "frame": 8,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 878
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000449,
+      "frame": 7,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 933
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       6,
+       7,
+       8,
+       9
+      ],
+      "frame": 8,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 2,
+      "warn_regions": {
+       "arm_lower.R|arm_upper.R": 2
+      },
+      "warn_z_of_height": 0.699,
+      "max_ratio": 3.52,
+      "max_growth_of_height": 0.02848,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004953,
+      "max_penetration_of_height": 0.004953,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.698
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.003196,
+      "max_penetration_of_height": 0.003196,
+      "frame": 0,
+      "warn_above": 0.005196,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/preview/Angel-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.18984
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000148,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 878
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000193,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 933
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 3,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 2.149,
+      "max_growth_of_height": 0.01938,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004953,
+      "max_penetration_of_height": 0.004953,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.698
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.003196,
+      "max_penetration_of_height": 0.003198,
+      "frame": 7,
+      "warn_above": 0.005196,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/preview/Angel-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.28812
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000392,
+      "frame": 13,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 878
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000517,
+      "frame": 12,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 933
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "warn",
+      "rest_regions": {},
+      "max_pairs": 2,
+      "frame": 20,
+      "regions": {
+       "spine": 2
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [
+       {
+        "f": 15,
+        "bone": "spine",
+        "pairs": 1,
+        "rest_pairs": 0
+       },
+       {
+        "f": 16,
+        "bone": "spine",
+        "pairs": 1,
+        "rest_pairs": 0
+       },
+       {
+        "f": 17,
+        "bone": "spine",
+        "pairs": 1,
+        "rest_pairs": 0
+       },
+       {
+        "f": 18,
+        "bone": "spine",
+        "pairs": 1,
+        "rest_pairs": 0
+       },
+       {
+        "f": 19,
+        "bone": "spine",
+        "pairs": 1,
+        "rest_pairs": 0
+       },
+       {
+        "f": 20,
+        "bone": "spine",
+        "pairs": 2,
+        "rest_pairs": 0
+       }
+      ],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "frame": 17,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 85,
+      "warn_regions": {
+       "head|spine": 53,
+       "head|head": 17,
+       "arm_lower.R|arm_upper.R": 11,
+       "spine|spine": 4
+      },
+      "warn_z_of_height": 0.852,
+      "max_ratio": 5.193,
+      "max_growth_of_height": 0.03258,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "pass",
+      "frames": [
+       13,
+       21
+      ],
+      "max_r_of_base": 0.9192,
+      "max_abs_dz_of_height": 3.5e-05,
+      "tol_dz_of_height": 0.002,
+      "violations": [],
+      "note": "острие в круге подставки (r ≤ радиуса) на уровне её верха: опора на оружие"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004953,
+      "max_penetration_of_height": 0.004953,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.698
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.003196,
+      "max_penetration_of_height": 0.003272,
+      "frame": 3,
+      "warn_above": 0.005196,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/preview/Angel-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 3.7,
+  "lines": [
+   "CLIP_AUTHOR OK Idle art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_Idle.fbx rest 1.24e-05 pose 2.1e-05 unreached []",
+   "CLIP_AUTHOR OK LungeAttack art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_LungeAttack.fbx rest 1.24e-05 pose 3.2e-05 unreached []",
+   "CLIP_AUTHOR OK HitReact art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_HitReact.fbx rest 1.24e-05 pose 2.3e-05 unreached []",
+   "CLIP_AUTHOR OK DeathSettle art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_DeathSettle.fbx rest 1.24e-05 pose 2.7e-05 unreached []"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json"
+}

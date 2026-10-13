@@ -3,7 +3,7 @@
  "revision": "h2anim-2026-09-29",
  "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
  "notes": [
-  "20 production-слотов = 4 клипа D-11 x 5 персонажей (бриф 18 §4 и Angel): 19 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): 20",
+  "24 production-слота = 4 клипа D-11 x 6 персонажей (бриф 18 §4, Angel и Ancient Leshen): 23 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): 24",
   "production-слоты — контракт v2 (v1 закрыт для новых клипов, RIG-CONTRACT §0 п.2); черновики AM_Medusa_* v1 — тестовые записи",
   "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
   "test-записи не могут стать artistically_accepted (правило схемы)"
@@ -955,10 +955,10 @@
    "source": {
     "type": "blender_keyframed",
     "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
-    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
     "files": [
      {
-      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_Idle.fbx",
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_Idle.fbx",
       "exists": true,
       "format": "fbx",
       "sha256": "28ff7a6eb418717233e1bac973b30787bc703d59e7feff5e10dafc0f4c16d1c0"
@@ -988,7 +988,7 @@
    "ue": {
     "target_path": "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_Idle",
     "status": "technically_imported",
-    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json"
+    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json"
    },
    "status": "technically_imported",
    "validation": {
@@ -1013,13 +1013,13 @@
    "source": {
     "type": "blender_keyframed",
     "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
-    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
     "files": [
      {
-      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_LungeAttack.fbx",
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_LungeAttack.fbx",
       "exists": true,
       "format": "fbx",
-      "sha256": "64eaf1afefb51387e7e32595939088a903d887e7a8297bff5a6cafc493bf5a08"
+      "sha256": "1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0"
      }
     ]
    },
@@ -1046,7 +1046,7 @@
    "ue": {
     "target_path": "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_LungeAttack",
     "status": "technically_imported",
-    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json"
+    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json"
    },
    "status": "technically_imported",
    "validation": {
@@ -1056,7 +1056,7 @@
     "warnings": [],
     "date": "2026-09-29"
    },
-   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake/export/SK_Angel_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton; художественно не принят"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake/export/SK_Angel_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton; художественно не принят"
   },
   {
    "id": "ANG-HitReact",
@@ -1071,10 +1071,10 @@
    "source": {
     "type": "blender_keyframed",
     "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
-    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
     "files": [
      {
-      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_HitReact.fbx",
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_HitReact.fbx",
       "exists": true,
       "format": "fbx",
       "sha256": "6a66844d1cb7dd07873a9a4e0219f2c761aed4040ffebcc7117809669e46c7a0"
@@ -1104,7 +1104,7 @@
    "ue": {
     "target_path": "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_HitReact",
     "status": "technically_imported",
-    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json"
+    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json"
    },
    "status": "technically_imported",
    "validation": {
@@ -1129,13 +1129,13 @@
    "source": {
     "type": "blender_keyframed",
     "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
-    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+    "reference": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
     "files": [
      {
-      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_DeathSettle.fbx",
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_DeathSettle.fbx",
       "exists": true,
       "format": "fbx",
-      "sha256": "26b8d28a609011facb6a57d2ee143cb32c1ec8a0ce804f13c5d3db02380ad287"
+      "sha256": "f307445b030ec63705c903f44d66faba5c05adcb5b25762a153de07056ef4841"
      }
     ]
    },
@@ -1162,7 +1162,7 @@
    "ue": {
     "target_path": "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_DeathSettle",
     "status": "technically_imported",
-    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json"
+    "evidence": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json"
    },
    "status": "technically_imported",
    "validation": {
@@ -1173,6 +1173,239 @@
     "date": "2026-09-29"
    },
    "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake/export/SK_Angel_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle; контакты (clip_contact_check): PASS (WARN: limb_body_L, skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton; художественно не принят"
+  },
+  {
+   "id": "LESH-Idle",
+   "character": "AncientLeshen",
+   "asset_id": "ASSET-ANCIENT-LESHEN-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/export/AM_AncientLeshen_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "2c0220bc9bc26ae7ed0b183cb348ca4e54dbd529281fb3ee588fbb12f097b0a4"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": 2.3333
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-13"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_Idle",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-Idle; контакты (clip_contact_check): PASS; UE: не импортирован на канонический скелет /Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton; художественно не принят"
+  },
+  {
+   "id": "LESH-LungeAttack",
+   "character": "AncientLeshen",
+   "asset_id": "ASSET-ANCIENT-LESHEN-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/export/AM_AncientLeshen_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "ece1098eaf1c38fe29513ffcb1980c695c4e10fedbb5265340c4b574731057fc"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": 0.5833
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-13"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_LungeAttack",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: не импортирован на канонический скелет /Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton; художественно не принят"
+  },
+  {
+   "id": "LESH-HitReact",
+   "character": "AncientLeshen",
+   "asset_id": "ASSET-ANCIENT-LESHEN-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/export/AM_AncientLeshen_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "0c3976a6db941c8bfd66126d5b7e0566aac66800299070f2adb1f0534076e904"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": 0.4167
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-13"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_HitReact",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-HitReact; контакты (clip_contact_check): PASS; UE: не импортирован на канонический скелет /Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton; художественно не принят"
+  },
+  {
+   "id": "LESH-DeathSettle",
+   "character": "AncientLeshen",
+   "asset_id": "ASSET-ANCIENT-LESHEN-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/export/AM_AncientLeshen_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "af07ad0cffdd74a485b70075f9f174e00ef0be79dc23004c4956953305aeca98"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": 0.875
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-13"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_DeathSettle",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle; контакты (clip_contact_check): PASS; UE: не импортирован на канонический скелет /Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton; художественно не принят"
   },
   {
    "id": "MED-Idle-draft",

@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": "LungeAttack",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r1/LungeAttack/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_LungeAttack.fbx",
+      "sha256": "1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
+      "sha256": "73d705b3931de589424b63d2f0aac26cf318e2eb1b104f1512e5c5a7e7d35731"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r2/LungeAttack/frames",
+    "files": [
+      "Angel-LungeAttack-blender-sheet.jpg",
+      "Angel-LungeAttack-f00-front-ue-editor.jpg",
+      "Angel-LungeAttack-f00-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f02-front-ue-editor.jpg",
+      "Angel-LungeAttack-f02-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f04-front-ue-editor.jpg",
+      "Angel-LungeAttack-f04-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f07-front-ue-editor.jpg",
+      "Angel-LungeAttack-f07-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f09-front-ue-editor.jpg",
+      "Angel-LungeAttack-f09-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f12-front-ue-editor.jpg",
+      "Angel-LungeAttack-f12-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f14-front-ue-editor.jpg",
+      "Angel-LungeAttack-f14-q34-ue-editor.jpg",
+      "Angel-LungeAttack-f05-front-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f05-q34-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f06-front-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f06-q34-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f07-front-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f08-front-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f08-q34-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f09-front-closeup-ue-editor.jpg",
+      "Angel-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+      "Angel-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_LungeAttack.validation.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-LungeAttack.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-measure-clips.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_LungeAttack.validation.json",
+      "note": "AM_Angel_LungeAttack.validation.json#result = pass; AM_Angel_LungeAttack.validation.json#clip_sha256 = 1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-LungeAttack.json",
+      "note": "contact-LungeAttack.json#result = pass; contact-LungeAttack.json#fails = []",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ANG-LungeAttack].status = technically_imported; clip-manifest.json#clips[id=ANG-LungeAttack].validation.result = pass; contact-LungeAttack.json#result = pass; clip-manifest.json#clips[id=ANG-LungeAttack].ue.status = technically_imported; clip-manifest.json#clips[id=ANG-LungeAttack].source.files[0].sha256 = 1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0; ue-import-clips.json#fbx_sha256.AM_Angel_LungeAttack = 1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "На f02–f04 подготовка различима по развороту и отклонению корпуса, особенно с q34; Blender-лист в виде left показывает клинок вверх-назад. Однако с front кисть и вертикальный силуэт меча остаются близкими к rest: замечание R из r1 закрыто частично. На f07 рубящая диагональ, на f09 проводка, на f12–f14 возврат читаются с front и q34. Собранный характер Angel сохраняется, спиной к камере он не становится. На f12 q34 клинок частично перекрывает лицо. Это ясное действие с небольшими огрехами читаемости, а не отсутствие замаха.",
+      "frames": [
+        "Angel-LungeAttack-blender-sheet.jpg",
+        "Angel-LungeAttack-f00-front-ue-editor.jpg",
+        "Angel-LungeAttack-f02-front-ue-editor.jpg",
+        "Angel-LungeAttack-f02-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f04-front-ue-editor.jpg",
+        "Angel-LungeAttack-f04-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f07-front-ue-editor.jpg",
+        "Angel-LungeAttack-f07-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f09-front-ue-editor.jpg",
+        "Angel-LungeAttack-f09-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f12-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f14-front-ue-editor.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На f06 q34 клинок ещё направлен вперёд-вверх, на f07 front/q34 проходит в рубящей диагонали вперёд-вниз одновременно с наклоном и доворотом корпуса; f08–f09 показывают продолжение дуги. Ударная фаза приходится на к.7. Правое плечо и предплечье ведут меч, кулак сохраняет хват, левая рука отведена для равновесия: замечание C из r1 закрыто. Стопы на f00, f04, f07 и f09 сохраняют положение на подставке, подол не проваливается. Прямые ноги, отсутствие приседа и малый ход таза учитываются как заданные ограничения исходника.",
+      "frames": [
+        "Angel-LungeAttack-blender-sheet.jpg",
+        "Angel-LungeAttack-f00-front-ue-editor.jpg",
+        "Angel-LungeAttack-f04-front-ue-editor.jpg",
+        "Angel-LungeAttack-f06-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f07-front-ue-editor.jpg",
+        "Angel-LungeAttack-f07-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f08-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f09-front-ue-editor.jpg",
+        "Angel-LungeAttack-f09-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "На крупных планах f05–f09 front/q34 рукоять остаётся внутри закрытого кулака, кисть и гарда движутся согласованно; прежняя дыра и потеря хвата из r1 не видны, пункт D закрыт. На f06–f08 front заметно лёгкое уплощение и растяжение поверхности правого рукава у локтя, но оболочка и контур непрерывны, открытого края или разрыва нет: якорь «следы без разрывов». На общих f07–f09 область левого бедра остаётся закрытой, гранёная крышка контакта брюк не открывается. Пределы разгибания и скрутки правой руки H2 учтены как ограничения, полного выпрямления локтя не требуется.",
+      "frames": [
+        "Angel-LungeAttack-f05-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f05-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f06-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f06-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f07-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f08-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f08-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f09-front-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+        "Angel-LungeAttack-f07-front-ue-editor.jpg",
+        "Angel-LungeAttack-f09-front-ue-editor.jpg",
+        "Angel-LungeAttack-f09-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "В последовательности f09 → f12 → f14 front/q34 корпус выпрямляется, правая рука опускается, меч возвращается вверх, левая рука садится в исходное положение. К f12 основная часть возврата завершена, остаточное движение к f14 меньше; финальная поза f14 совпадает с f00 по корпусу, хвату и стопам. На Blender-листе и строке LungeAttack UE-листа финального скачка или смены опоры не видно: oneshot мягко садится в rest.",
+      "frames": [
+        "Angel-LungeAttack-f09-front-ue-editor.jpg",
+        "Angel-LungeAttack-f09-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f12-front-ue-editor.jpg",
+        "Angel-LungeAttack-f12-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f14-front-ue-editor.jpg",
+        "Angel-LungeAttack-f14-q34-ue-editor.jpg",
+        "Angel-LungeAttack-f00-front-ue-editor.jpg",
+        "Angel-LungeAttack-f00-q34-ue-editor.jpg",
+        "Angel-LungeAttack-blender-sheet.jpg",
+        "Angel-H2Anim-ue-sheet.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "Angel-LungeAttack-f04-front-ue-editor.jpg",
+      "note": "Замах различим по корпусу, но силуэт кисти и меча с front близок к rest. Учтено в R=1,5; проверить отделение подготовки от покоя на игровых листах K1/K2 этапа 7."
+    },
+    {
+      "item": "R",
+      "frame": "Angel-LungeAttack-f12-q34-ue-editor.jpg",
+      "note": "На возврате к.12 клинок частично перекрывает лицо с q34. Учтено в R; проверить читаемость с игровой камеры этапа 7."
+    },
+    {
+      "item": "D",
+      "frame": "Angel-LungeAttack-f08-front-closeup-ue-editor.jpg",
+      "note": "У правого локтя видны лёгкие следы уплощения и растяжения рукава при целой оболочке. Учтено в D=1,5; проверить с look-dev материалами на этапе 7."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1373a-78ab-7933-820b-a470a3faa691"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-angel-r2-rework",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

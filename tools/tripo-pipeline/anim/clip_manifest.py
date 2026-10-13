@@ -46,7 +46,7 @@ H2ANIM = {"Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/med
           "Arthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
           "Merlin": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
           "Harpy": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
-          "Angel": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json"}
+          "Angel": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json"}
 # пилот 2026-10-14, этап 6 Ancient Leshen (регистрация Р6-1 отдельными строками)
 CHARS["AncientLeshen"] = ("LESH", "ASSET-ANCIENT-LESHEN-001")
 H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json"

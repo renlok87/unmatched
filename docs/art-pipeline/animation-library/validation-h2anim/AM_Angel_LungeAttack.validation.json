@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.clip-validation/2",
- "clip": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_LungeAttack.fbx",
+ "clip": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_LungeAttack.fbx",
  "clip_bytes": 1644444,
- "clip_sha256": "64eaf1afefb51387e7e32595939088a903d887e7a8297bff5a6cafc493bf5a08",
+ "clip_sha256": "1dd49a628f90ee9233d2149daa8602f7a8d108a44d8a982558dbe5e7f40cd2d0",
  "contract": "docs/art-pipeline/rig/rig-contract.json",
  "contract_revision": "v2-2026-10-13",
  "skeleton": "UM_HUMANOID_17_v2",
@@ -93,16 +93,20 @@
    "moving_bones": 14,
    "top": [
     [
-     "weapon.R",
-     120.316
-    ],
-    [
      "arm_upper.R",
-     35.314
+     109.618
     ],
     [
      "spine",
-     24.254
+     35.739
+    ],
+    [
+     "hand.R",
+     31.016
+    ],
+    [
+     "head",
+     24.326
     ],
     [
      "arm_upper.L",
@@ -110,11 +114,7 @@
     ],
     [
      "arm_lower.R",
-     14.355
-    ],
-    [
-     "head",
-     14.141
+     16.409
     ],
     [
      "leg_lower.L",
@@ -165,11 +165,11 @@
   {
    "check": "visible_pose_change",
    "status": "pass",
-   "peak_max_joint_shift_of_height": 0.29601,
-   "peak_mean_joint_shift_of_height": 0.08443,
+   "peak_max_joint_shift_of_height": 0.27432,
+   "peak_mean_joint_shift_of_height": 0.08281,
    "min": 0.02,
    "mode": "warn",
-   "peak_frame": 10,
+   "peak_frame": 9,
    "note": "макс. сдвиг головы/хвоста кости относительно первого кадра, доля высоты фигуры; порог — предложение, до калибровки по визуальному просмотру ниже порога = WARN"
   },
   {
@@ -188,16 +188,16 @@
    "max_loc": 0.76158
   },
   "spine": {
-   "max_rot_deg": 24.254,
+   "max_rot_deg": 35.739,
    "max_loc": 1e-05
   },
   "head": {
-   "max_rot_deg": 14.141,
+   "max_rot_deg": 24.326,
    "max_loc": 1e-05
   },
   "arm_upper.L": {
    "max_rot_deg": 24.209,
-   "max_loc": 1e-05
+   "max_loc": 0.0
   },
   "arm_lower.L": {
    "max_rot_deg": 4.0,
@@ -208,23 +208,23 @@
    "max_loc": 0.0
   },
   "arm_upper.R": {
-   "max_rot_deg": 35.314,
+   "max_rot_deg": 109.618,
    "max_loc": 1e-05
   },
   "arm_lower.R": {
-   "max_rot_deg": 14.355,
+   "max_rot_deg": 16.409,
    "max_loc": 0.0
   },
   "hand.R": {
-   "max_rot_deg": 0.0,
+   "max_rot_deg": 31.016,
    "max_loc": 0.0
   },
   "weapon.R": {
-   "max_rot_deg": 120.316,
-   "max_loc": 1e-05
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
   },
   "leg_upper.L": {
-   "max_rot_deg": 8.641,
+   "max_rot_deg": 8.716,
    "max_loc": 0.0
   },
   "leg_lower.L": {

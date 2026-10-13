@@ -1,0 +1,143 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": "DeathSettle",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r1/DeathSettle/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/export/AM_Angel_DeathSettle.fbx",
+      "sha256": "f307445b030ec63705c903f44d66faba5c05adcb5b25762a153de07056ef4841"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json",
+      "sha256": "73d705b3931de589424b63d2f0aac26cf318e2eb1b104f1512e5c5a7e7d35731"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r2/DeathSettle/frames",
+    "files": [
+      "Angel-DeathSettle-blender-sheet.jpg",
+      "Angel-DeathSettle-f00-front-ue-editor.jpg",
+      "Angel-DeathSettle-f00-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f03-front-ue-editor.jpg",
+      "Angel-DeathSettle-f03-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f06-front-ue-editor.jpg",
+      "Angel-DeathSettle-f06-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f09-front-ue-editor.jpg",
+      "Angel-DeathSettle-f09-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f13-front-ue-editor.jpg",
+      "Angel-DeathSettle-f13-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f16-front-ue-editor.jpg",
+      "Angel-DeathSettle-f16-q34-ue-editor.jpg",
+      "Angel-DeathSettle-f21-front-ue-editor.jpg",
+      "Angel-DeathSettle-f21-q34-ue-editor.jpg",
+      "Angel-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/ue-measure-clips.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_DeathSettle.validation.json",
+      "note": "AM_Angel_DeathSettle.validation.json#result = pass; AM_Angel_DeathSettle.validation.json#clip_sha256 = f307445b030ec63705c903f44d66faba5c05adcb5b25762a153de07056ef4841",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim-r2/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; contact-DeathSettle.json#fails = []; contact-DeathSettle.json#checks[check=weapon_tip].status = pass; contact-DeathSettle.json#checks[check=limb_body_L].status = warn; contact-DeathSettle.json#checks[check=skin_stretch].status = warn",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ANG-DeathSettle].status = technically_imported; clip-manifest.json#clips[id=ANG-DeathSettle].validation.result = pass; contact-DeathSettle.json#result = pass; clip-manifest.json#clips[id=ANG-DeathSettle].source.files[0].sha256 = f307445b030ec63705c903f44d66faba5c05adcb5b25762a153de07056ef4841; ue-import-clips.json#fbx_sha256.AM_Angel_DeathSettle = f307445b030ec63705c903f44d66faba5c05adcb5b25762a153de07056ef4841; ue-import-clips.json#clips[name=AM_Angel_DeathSettle].imported_object_paths[0] = /Game/PipelineCandidates/Angel/H2Anim/AM_Angel_DeathSettle.AM_Angel_DeathSettle",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "На f03 front/q34 отшатывание головы и корпуса читается, но его акцент небольшой относительно движения меча. На f06–09 ясно виден разворот клинка остриём вниз; на f13–21 — поклон, падение головы и остановка с опорой. На Angel-H2Anim-ue-sheet финал отличается от HitReact. Широкий меч в правой руке, длинное раскрытое пальто и волосы сохраняют характер Angel; спиной к камере он не поворачивается. Отведение левой руки наружу учитывается как ограничение широкого пальто, без отдельного штрафа.",
+      "frames": [
+        "Angel-DeathSettle-f03-front-ue-editor.jpg",
+        "Angel-DeathSettle-f03-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f06-front-ue-editor.jpg",
+        "Angel-DeathSettle-f06-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f09-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f21-q34-ue-editor.jpg",
+        "Angel-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На f13 front/q34 острие стоит на верхе подставки перед правым ботинком и сохраняет эту точку на f16/f21. Стопы не смещаются, подол не проваливается; на f06–09 клинок проходит снаружи корпуса. На f13–21 плечо остаётся выше локтя и кисти, рука направлена вниз к рукояти, наклон корпуса читается как нагрузка на меч. Blender-лист подтверждает направление опоры в видах left/q34. Пункт C списка доработки r1 закрыт. Остаточный сгиб локтя учитывается как заявленный предел скина правого рукава: полного разгибания не требуется.",
+      "frames": [
+        "Angel-DeathSettle-blender-sheet.jpg",
+        "Angel-DeathSettle-f06-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f09-front-ue-editor.jpg",
+        "Angel-DeathSettle-f13-front-ue-editor.jpg",
+        "Angel-DeathSettle-f13-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f16-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f21-front-ue-editor.jpg",
+        "Angel-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "При сравнении f00 q34 с f16/f21 q34 виден лёгкий след вытягивания задней части воротника к затылку при падении головы. Оболочка остаётся целой: у шеи, плеч, правого локтя и хвата нет видимых дыр или разрывов; заметного залома на пике нет. На f13–21 front и Blender-листе ноги остаются почти прямыми, левое бедро не поднимается и плоская крышка контакта брюк не открывается. Ограничения скина пальто и правой руки учтены; отсутствие приседа отдельно не штрафуется.",
+      "frames": [
+        "Angel-DeathSettle-f00-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f09-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f13-front-ue-editor.jpg",
+        "Angel-DeathSettle-f16-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f21-q34-ue-editor.jpg",
+        "Angel-DeathSettle-blender-sheet.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Последовательность f13 → f16 → f21 front/q34 показывает небольшое доседание головы и корпуса с сохранением опоры. Между f16 и f21 нет видимого рывка, обратного выпрямления или смещения острия и стоп; поклон и опущенная голова сохраняются. Финал соответствует terminal, возврат в rest не требуется; признаков дрожи по представленным кадрам нет.",
+      "frames": [
+        "Angel-DeathSettle-f13-front-ue-editor.jpg",
+        "Angel-DeathSettle-f13-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f16-front-ue-editor.jpg",
+        "Angel-DeathSettle-f16-q34-ue-editor.jpg",
+        "Angel-DeathSettle-f21-front-ue-editor.jpg",
+        "Angel-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "Angel-DeathSettle-f03-q34-ue-editor.jpg",
+      "note": "Начальное отшатывание слабее акцента разворота меча; учтено в R=1,5. На листе K1/K2 проверить читаемость этой реакции в игровом масштабе."
+    },
+    {
+      "item": "D",
+      "frame": "Angel-DeathSettle-f16-q34-ue-editor.jpg",
+      "note": "Лёгкое вытягивание воротника к затылку при опущенной голове, без видимого разрыва; учтено в D=1,5. Проверить на листе K2 с look-dev материалами."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a1373a-7f04-75d3-816a-2c3ac08edac6"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-angel-r2-rework",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}
