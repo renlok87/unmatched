@@ -1,0 +1,132 @@
+{
+  "schema": "unmatched.acceptance-tone/1",
+  "rule": {
+    "main_share_min": 0.1,
+    "y_ratio_ok": [
+      0.8,
+      1.25
+    ],
+    "hue_abs_max_deg": 15.0,
+    "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по построению, его яркость проверяет только y_ratio_loo",
+    "family": "same | changed: обе медианы хроматические (sat >= 0.15) и |dHue| > 30 deg, либо переход нейтральный <-> хроматический с |dSat| >= 0.20 — смена семейства (S); светлота и насыщенность внутри семейства — тон (T)",
+    "cap": "1.0 — основной класс вне допуска; 1.5 — только второстепенные; 2.0 — все в допуске; status floor (ld-maps-report grade.median_floor_applied) T не снижает"
+  },
+  "framing": "concept",
+  "exposure_k_concept_over_ld": 1.0674,
+  "exposure": {
+    "class": "skin",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по коже (лицо и кисти: средний тон, однозначный цвет); самая большая зона (чёрная кожа пальто) почти у пола альбедо — отношение по ней шумит"
+  },
+  "anchor_class": "skin",
+  "classes": [
+    {
+      "class": "leather_smooth",
+      "pixels_ld": 905189,
+      "y_ratio": 1.93,
+      "d_hue_deg": -15.0,
+      "d_sat": -0.001,
+      "share": 0.6552,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "leather_worn",
+      "pixels_ld": 38694,
+      "y_ratio": 2.768,
+      "d_hue_deg": 0.0,
+      "d_sat": 0.019,
+      "share": 0.028,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "legacy_bake",
+      "pixels_ld": 29666,
+      "y_ratio": 1.425,
+      "d_hue_deg": -4.5,
+      "d_sat": -0.063,
+      "share": 0.0215,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "out"
+    },
+    {
+      "class": "metal_forged",
+      "pixels_ld": 59133,
+      "y_ratio": 1.224,
+      "d_hue_deg": -114.3,
+      "d_sat": 0.023,
+      "share": 0.0428,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "out"
+    },
+    {
+      "class": "silk",
+      "pixels_ld": 25893,
+      "y_ratio": 2.089,
+      "d_hue_deg": 12.0,
+      "d_sat": -0.018,
+      "share": 0.0187,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "out"
+    },
+    {
+      "class": "skin",
+      "pixels_ld": 46438,
+      "y_ratio": 1.0,
+      "d_hue_deg": -2.0,
+      "d_sat": -0.046,
+      "share": 0.0336,
+      "role": "secondary",
+      "anchor": true,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "stone_base",
+      "pixels_ld": 276488,
+      "y_ratio": 1.64,
+      "d_hue_deg": 0.0,
+      "d_sat": -0.029,
+      "share": 0.2001,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "floor"
+    }
+  ],
+  "t_cap": 1.5,
+  "out_of_tolerance": [
+    "legacy_bake",
+    "metal_forged",
+    "silk"
+  ],
+  "floor_limited": [
+    "leather_smooth",
+    "leather_worn",
+    "stone_base"
+  ],
+  "family_changed_main": [],
+  "warnings": [],
+  "sources": {
+    "measure_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/measure-report.json",
+    "maps_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-maps-report.json"
+  }
+}
