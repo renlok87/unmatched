@@ -309,6 +309,13 @@ P1 9,51 (было 12,32), P2 18,85 (было 19,90). Подробно — king-a
   `reports/ld-team-accent-report.json` → `team_dye_gain` и `mi_parameters`.
 - Кадры: `20261013-h2-lookdev-2/preview/ld_team_k2_5x_cobble.jpg`, `ld_team_k2_1p6_cobble.jpg`, `ld_team_id_k2.jpg`, атлас
   маски — `ld_teamaccent_1K.png`.
+- **Доработка r2 (этап 5, приёмка `evidence/acceptance/20261014-r1`, 2026-10-14):** профиль
+  `build-profiles/achilles-h2-lookdev-teamaccent-r2.json` (`/3`, копия `/2b` с пинами look-dev r2), прогон
+  `20261014-h2-lookdev-r2/` (на bake `20261014-h2-bake-r2`). Компоненты и классы те же: кайма 0,61 %, кожа 1,47 %,
+  **итого 2,23 %**; ядро ткани юбки с акцентом 18,5 % (≤ 20 %); экран K2 5× спереди 4,12 %, сзади 0; ΔE ≥ 36,2 / 29,7;
+  `TeamDyeGain` 10,5. По П3-4b `dress_unchanged_share_min` **0,86 → 0,78**: ткань юбки вне акцента на K2 5× спереди —
+  220 px, три рендера `ta_render` одного профиля дали P2 0,8136 / 0,8045 / 0,8091 (P1 0,83–0,84; EEVEE не повторяется
+  побайтно), пол 0,80 минус шум повтора 0,02. `ld-team-report` passed true.
 
 ### 5c-B0 (2026-09-30): параметры MI после правок BC
 
