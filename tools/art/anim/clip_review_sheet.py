@@ -67,6 +67,7 @@ HEROES = {
     "Merlin": Hero("Merlin", "MER", 3.0, ("AN-05", "AN-06", "AN-07", "AN-08")),
     "Medusa": Hero("Medusa", "MED", 56.0 / 24.0, ("AN-09", "AN-10", "AN-11", "AN-12")),
     "Harpy": Hero("Harpy", "HAR", 2.0, ("AN-13", "AN-14", "AN-15", "AN-16")),
+    "Angel": Hero("Angel", "ANG", 2.5, ("AN-133", "AN-134", "AN-135", "AN-136")),
 }
 IDLE_EPS = 0.01
 IDLE_Q = (0, 25, 50, 75)
@@ -587,7 +588,8 @@ def _synthetic(root: Path, fighters: dict | None = None, heroes: list[str] | Non
     (hero key, Idle length, (x, y)); heroes: the launches in run order (the first one also shoots K1); fixture: the
     -BenchFixture file name written to cmdline.txt; toks: the K1 pose list (default the AN-17 union)."""
     fighters = fighters or SYNTH_FIGHTERS
-    heroes = heroes or list(HEROES)
+    # only heroes that have a synthetic fighter: a new HEROES record (pilot 2026-10-13, Angel) must not break --check
+    heroes = heroes or [h for h in HEROES if any(v[0] == h for v in fighters.values())]
     toks = toks or union_tokens()
     lens = {"LungeAttack": 0.583, "HitReact": 0.417, "DeathSettle": 0.875}
     for map_key in MAPS:

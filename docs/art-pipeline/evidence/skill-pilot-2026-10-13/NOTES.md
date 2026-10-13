@@ -54,6 +54,21 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F33 | 3 | `--compare-with` writes the determinism report into the repro run, not the production run | HANDBOOK §4.3: rerun `--stages manifest --compare-with <repro>` on the production run |
 | F34 | 3 | Blade class: Arthur's `steel_polished` rendered Angel's matte blade near-black (`metal_forged` used); `ld_measure` gains push a dark costume onto the class floor (shirt merged with coat) | HANDBOOK §4.4 / material library: class by the concept's finish; keep contrast between classes |
 | F35 | 3 | Angel's coat came as a closed shell (no back faces); the loop inventory of `close` tells single sheet from shell | П3-3: check the inventory before the cloth-shell key |
+| F36 | 4 | Sol acceptor sandbox (codex-cli 0.162.0-alpha.17.2): PowerShell in Constrained Language Mode outputs the OEM codepage, Cyrillic rubric arrives garbled, all exit codes 0 — the first Angel acceptance read garbage | acceptance §8.2/§8.4: read with `Get-Content <f> -Raw -Encoding OEM` or `cmd /c type <f>`; stage-0 exec probe reads a Cyrillic file; garbled = environment failure |
+| F37 | 4 | codex exe moved to `bin/2e5e00daee91c61d` (alpha.17.2); the docs pin `9691020b…`/alpha.2 | SKILL §4, §8.4: glob, no pinned hash/version |
+| F38 | 4 | A TeamAccent rerun in its own run dir (`-teamaccent-b`) has no slot in the acceptor prompt; the stale `passed:false` report stays in the look-dev run | §8.2: `{{TA}}` placeholder; the latest TeamAccent run decides |
+| F39 | 4 | Card has `ANCHORS_EN` (not `ANCHORS`), no `ACCEPTOR_PROFILE`; `UE_NAMES.textures` patterns lack `_2K_` | §2.2/§7.2: accept `ANCHORS_EN`; G-NAMES against shipped 2K names |
+| F40 | 4 | No `executor_session_id` format for a subagent executor | §1 п.2: `claude-code:<uuid>/agent:<name>` |
+| F41 | 4 | G-NAMES height: `scale.figure_top_m` is the blade tip for a raised weapon (55.9 uu, +1.6 %), HANDBOOK §2.10 measures without the weapon | take the head top from `ld-fbx-report#…SK_<Key>_H2_Body.bounds_m.max` |
+| F42 | 4 | Main class at tone `floor` is exempt from T: Angel's coat reads grey-brown vs the near-black concept, T still 1.5 | §5.3: a main class at `floor` → known_issues + stage-7 UE tone check (recorded this time) |
+| F43 | 6 | Clip gate G-MANIFEST needs `technically_imported` (UE import), but stage 6 runs before stage 7; `validate_card` allows no `n/a` for clips — a card now would burn a clip cycle | animation-vfx-sfx §10 / SKILL §2: clip acceptance after the 7a import (pilot: prompts prepared, r1 after import) |
+| F44 | 6 | §6.1 SYNTX video refs: ~4 × 6–10 tokens per hero vs 48 left in the visual cap — do not scale to the roster | make them optional; default = library patterns of a hero with the same weapon (Angel ← Arthur's sword clips); SYNTX only for unusual motion |
+| F45 | 6 | `clip_review_sheet.py --check` crashed (StopIteration) for any new HEROES record: the self-test made launches for every HEROES key but SYNTH_FIGHTERS has 4 MVP heroes | **fixed** (self-test uses heroes with a synthetic fighter) |
+| F46 | 6 | Д-3 `--check` also asserts a fixed AN-17 union size (31) | new-character-registration §2: card frame numbers inside the union |
+| F47 | 6 | `h2anim_run.py` crashes on cp1251 stdout printing «×» before the run report | animation-vfx-sfx §6.3: run with `PYTHONIOENCODING=utf-8` |
+| F48 | 6 | Arthur's hand-target offsets do not carry over; straight legs at rest → foot slide on any hips turn (fixed by a 0.4 cm hips drop) | §6.2: measure rest bones/footprint/base first, read the IK log; HANDBOOK §4.5: drop the hips 0.3–0.5 cm when they move |
+| F49 | 6 | Card template has no stage-6 block; a second `decided_by:` silently overrides the first | SKILL §7.2: stage-6 fields, extend the existing `decided_by` |
+| F50 | 6 | `clip_manifest.py` note says «по видео-референсу <reference>» even for a library pattern | `reference_kind` field or reworded note |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

@@ -1,0 +1,925 @@
+{
+ "schema": "unmatched.h2anim-spec/1",
+ "hero": "Angel",
+ "character": "Angel",
+ "ue_hero": "Angel",
+ "asset_id": "ASSET-ANGEL-001",
+ "status": "proposed",
+ "status_note": "Этап 6 пилота 3d-model-pipeline (2026-10-14): 4 клипа D-11 на H2-меше Angel (меч в правой руке, длинное кожаное пальто нараспашку). Движение — по образцам библиотеки D-11: клипы меча King Arthur (king-arthur-h2anim.json, его видео-референсы ARTH-*), тайминг — Medusa/Merlin; собственные видео-референсы SYNTX не делались (решение оркестратора 2026-10-14: лимит визуала SYNTX 54 не покрывает даже трёх героев пилота). Пальто скинено на hips/spine и до 0,55 на бёдра к подолу (профиль h2-bake), поэтому без приседа и без подъёма бедра (приёмка этапа 4 r1: подъём левого бедра открывает гранёную крышку контакта брюк). Оси ключей: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо, Y наклон вперёд, Z поворот влево. Цель H2 зафиксирована sha256. Статус максимум «технически импортировано».",
+ "target": {
+  "sk_fbx": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake/export/SK_Angel_H2.fbx",
+  "base_fbx": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake/export/SM_Angel_H2_Base.fbx",
+  "sha256": "cf22e78fc03730499299d2fa125195fbbdd395cd6fd7cd577bd906e89f11d7f5",
+  "rest_generation": "H2"
+ },
+ "meshes": {
+  "body": "SK_Angel_H2_Body",
+  "weapon": "SK_Angel_H2_Sword"
+ },
+ "weapon": {
+  "bone": "weapon.R",
+  "side": "R",
+  "note": "меч в правой руке остриём вверх, клинок наклонён наружу-вперёд (ось кости weapon.R (0,18; −0,18; 0,97)); голова кости на оси рукояти в кулаке (6,1; −12,1; 33,4 см), острие (10,6; −16,3; 55,9); рукоять и навершие — часть меша тела, жёстко на weapon.R (П3-1)"
+ },
+ "run_dir": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim",
+ "ue": {
+  "skeleton": "/Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton",
+  "mesh_for_preview": "/Game/PipelineCandidates/Angel/Rig/SK_Angel",
+  "clips_folder": "/Game/PipelineCandidates/Angel/H2Anim"
+ },
+ "fps": 24,
+ "amplitude_scale": {
+  "arm_upper.L": 0.8
+ },
+ "clips": {
+  "Idle": {
+   "frames": 60,
+   "role": "idle",
+   "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle",
+   "design": "мрачная собранность: медленное глубокое дыхание (грудь и плечи поднимаются вместе), голова чуть опущена и медленно обводит поле, меч держится вертикально в правой руке и едва покачивается, вес переносится с ноги на ногу без отрыва стоп; пальто идёт с тазом",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.8
+   },
+   "waves": [
+    {
+     "bone": "spine",
+     "axis": "y",
+     "amp": 1.8,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "spine",
+     "axis": "x",
+     "amp": 1.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "z",
+     "amp": -6.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "y",
+     "amp": 2.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.R",
+     "axis": "x",
+     "amp": -1.5,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_lower.R",
+     "axis": "y",
+     "amp": -2.5,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "weapon.R",
+     "axis": "x",
+     "amp": 2.5,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "arm_upper.L",
+     "axis": "y",
+     "amp": -3.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_lower.L",
+     "axis": "y",
+     "amp": -4.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    }
+   ],
+   "keys": [
+    {
+     "f": 15,
+     "hips_loc": [
+      0.0,
+      -0.25,
+      -0.1
+     ]
+    },
+    {
+     "f": 45,
+     "hips_loc": [
+      0.0,
+      0.25,
+      -0.1
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    15,
+    30,
+    45
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "reference_kind": "library pattern (D-11, King Arthur sword clip), not an Angel video"
+  },
+  "LungeAttack": {
+   "frames": 14,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack",
+   "design": "замах: кисть с мечом у правого бока (hand_follow anchor к spine, IK, локоть вниз у корпуса), меч остриём вверх-назад над правым плечом (aim, keep_weapon_world), корпус разворачивается вправо и откидывается (к. 2–4); рубящий удар по диагонали вперёд-вниз (+X) с наклоном корпуса и выносом таза вперёд (к. 7 = Contact); проводка (к. 9), возврат в rest (к. 12–14); левая рука уравновешивает, отведена наружу (к. 7–9); стопы на месте, бедро не поднимается (крышка контакта брюк), пальто идёт с тазом",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+    "bones": [
+     "spine"
+    ],
+    "weight": 0.3,
+    "mirror": true
+   },
+   "keys": [
+    {
+     "f": 2,
+     "aim": {
+      "weapon.R": {
+       "to": [
+        0.15,
+        -0.3,
+        0.94
+       ]
+      }
+     }
+    },
+    {
+     "f": 4,
+     "bones": {
+      "spine": [
+       3,
+       -8,
+       -22
+      ],
+      "head": [
+       0,
+       2,
+       14
+      ],
+      "arm_upper.L": [
+       10,
+       -6,
+       0
+      ]
+     },
+     "aim": {
+      "weapon.R": {
+       "to": [
+        -0.1,
+        -0.5,
+        0.86
+       ]
+      }
+     },
+     "hips_loc": [
+      -0.4,
+      0.0,
+      -0.1
+     ]
+    },
+    {
+     "f": 7,
+     "bones": {
+      "spine": [
+       -2,
+       14,
+       12
+      ],
+      "head": [
+       0,
+       -6,
+       -10
+      ],
+      "arm_upper.L": [
+       30,
+       4,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       4,
+       0
+      ],
+      "hips": [
+       0,
+       0,
+       6
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.35,
+        -0.45,
+        -0.82
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.95,
+        0.15,
+        -0.25
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.85,
+        0.3,
+        -0.35
+       ]
+      }
+     },
+     "hips_loc": [
+      0.6,
+      0.0,
+      -0.3
+     ]
+    },
+    {
+     "f": 9,
+     "bones": {
+      "spine": [
+       -2,
+       16,
+       14
+      ],
+      "head": [
+       0,
+       -6,
+       -12
+      ],
+      "arm_upper.L": [
+       28,
+       4,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       3,
+       0
+      ],
+      "hips": [
+       0,
+       0,
+       6
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.35,
+        -0.3,
+        -0.89
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.8,
+        0.45,
+        -0.4
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.55,
+        0.65,
+        -0.45
+       ]
+      }
+     },
+     "hips_loc": [
+      0.7,
+      0.0,
+      -0.3
+     ]
+    },
+    {
+     "f": 12,
+     "bones": {
+      "spine": [
+       0,
+       5,
+       6
+      ],
+      "head": [
+       0,
+       -2,
+       -3
+      ],
+      "arm_upper.L": [
+       8,
+       2,
+       0
+      ]
+     },
+     "aim": {
+      "weapon.R": {
+       "to": [
+        0.2,
+        0.1,
+        1.0
+       ]
+      }
+     },
+     "hips_loc": [
+      0.2,
+      0.0,
+      -0.1
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    2,
+    4,
+    7,
+    9,
+    12,
+    14
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "hand_follow": {
+    "side": "R",
+    "mode": "anchor",
+    "anchor_bone": "spine",
+    "anchor_offset": [
+     5.0,
+     -12.0,
+     0.0
+    ],
+    "hand_rot": "forearm",
+    "keep_weapon_world": "weapon.R",
+    "pole": [
+     -0.3,
+     -0.3,
+     -1.0
+    ],
+    "weight": [
+     [
+      0,
+      0.0
+     ],
+     [
+      1,
+      0.3
+     ],
+     [
+      2,
+      0.8
+     ],
+     [
+      4,
+      1.0
+     ],
+     [
+      5,
+      0.6
+     ],
+     [
+      6,
+      0.0
+     ]
+    ],
+    "note": "замах: кисть правой у правого бока (IK от spine, локоть вниз), меч сохраняет поворот aim в кулаке; смещение (5; −12; 0) см от головы spine: образец Arthur (4; −14; −4) на руке Angel не достижим (дефицит 1,6 см, кисть в 5–7 см от цели на к.1–5, прогон r1 2026-10-14)"
+   },
+   "reference_kind": "library pattern (D-11, King Arthur sword clip), not an Angel video"
+  },
+  "HitReact": {
+   "frames": 10,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact",
+   "design": "отдача корпуса назад с доворотом, голова мотнулась, меч откачнулся и вернулся, левая рука отлетает назад; стопы на месте, без приседа",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.6
+   },
+   "keys": [
+    {
+     "f": 2,
+     "bones": {
+      "spine": [
+       -4,
+       -11,
+       -9
+      ],
+      "head": [
+       -3,
+       -12,
+       10
+      ],
+      "weapon.R": [
+       8,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -10,
+       0
+      ],
+      "arm_upper.L": [
+       8,
+       -12,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.6,
+      0.0,
+      -0.15
+     ]
+    },
+    {
+     "f": 4,
+     "bones": {
+      "spine": [
+       -3,
+       -8,
+       -6
+      ],
+      "head": [
+       -2,
+       -7,
+       7
+      ],
+      "weapon.R": [
+       4,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       0,
+       -5,
+       0
+      ],
+      "arm_upper.L": [
+       5,
+       -8,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -5,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.45,
+      0.0,
+      -0.1
+     ]
+    },
+    {
+     "f": 7,
+     "bones": {
+      "spine": [
+       0,
+       2,
+       1
+      ],
+      "head": [
+       0,
+       2,
+       -1
+      ],
+      "weapon.R": [
+       -1,
+       0,
+       0
+      ],
+      "arm_upper.L": [
+       0,
+       1,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.05,
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    2,
+    4,
+    7,
+    10
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "reference_kind": "library pattern (D-11, King Arthur sword clip), not an Angel video"
+  },
+  "DeathSettle": {
+   "frames": 21,
+   "role": "terminal",
+   "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle",
+   "design": "удар и отшатывание (к. 3); правая рука выносит меч вперёд-вправо и разворачивает его в кулаке остриём вниз (к. 6–9, навершие уходит от корпуса); острие опускается на верх подставки перед правым ботинком (к. 13, hand_follow weapon_tip: (8,5; −10,5; 6,0) см — снаружи носка правого ботинка, r 13,5 из 15 см радиуса подставки), Angel клонится вперёд и вправо и держится на мече прямой правой рукой, голова падает, левая рука повисает (к. 13–21). Ноги прямые: без приседа и без подъёма бедра",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.4
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "hips": [
+       0,
+       0,
+       0
+      ],
+      "spine": [
+       -3,
+       -8,
+       -6
+      ],
+      "head": [
+       -2,
+       -10,
+       6
+      ],
+      "arm_upper.L": [
+       6,
+       0,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.3,
+      0,
+      0
+     ],
+     "aim": {}
+    },
+    {
+     "f": 6,
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.4,
+        -0.35,
+        -0.85
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.95,
+        0.1,
+        0.0
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.1,
+        -0.95,
+        0.2
+       ]
+      }
+     },
+     "bones": {
+      "spine": [
+       -1,
+       4,
+       -4
+      ]
+     },
+     "hips_loc": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "f": 7,
+     "bones": {
+      "hips": [
+       0,
+       0,
+       0
+      ],
+      "spine": [
+       -2,
+       8,
+       -3
+      ],
+      "head": [
+       0,
+       4,
+       2
+      ],
+      "arm_upper.L": [
+       4,
+       -6,
+       0
+      ]
+     },
+     "aim": {},
+     "hips_loc": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "f": 9,
+     "bones": {
+      "hips": [
+       0,
+       0,
+       0
+      ],
+      "spine": [
+       6,
+       10,
+       -4
+      ],
+      "head": [
+       -1,
+       10,
+       3
+      ],
+      "arm_upper.L": [
+       4,
+       -10,
+       0
+      ]
+     },
+     "aim": {
+      "arm_upper.R": {
+       "to": [
+        0.4,
+        -0.4,
+        -0.82
+       ]
+      },
+      "arm_lower.R": {
+       "to": [
+        0.9,
+        0.1,
+        -0.35
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.15,
+        -0.4,
+        -0.9
+       ]
+      }
+     },
+     "hips_loc": [
+      0,
+      0,
+      -0.1
+     ]
+    },
+    {
+     "f": 12,
+     "bones": {
+      "hips": [
+       0,
+       -2,
+       -3.4
+      ],
+      "spine": [
+       21.2,
+       11.0,
+       -5
+      ],
+      "head": [
+       -2,
+       14,
+       4
+      ],
+      "arm_upper.L": [
+       4,
+       -16,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -6,
+       0
+      ]
+     },
+     "aim": {
+      "weapon.R": {
+       "to": [
+        -0.05,
+        -0.08,
+        -1.0
+       ]
+      }
+     },
+     "hips_loc": [
+      0,
+      0.0,
+      -0.4
+     ]
+    },
+    {
+     "f": 16,
+     "bones": {
+      "hips": [
+       0,
+       -2,
+       -4.0
+      ],
+      "spine": [
+       25.0,
+       13.0,
+       -5
+      ],
+      "head": [
+       -3,
+       22,
+       5
+      ],
+      "arm_upper.L": [
+       3,
+       -20,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ]
+     },
+     "aim": {
+      "weapon.R": {
+       "to": [
+        -0.05,
+        -0.08,
+        -1.0
+       ]
+      }
+     },
+     "hips_loc": [
+      0,
+      0.0,
+      -0.4
+     ]
+    },
+    {
+     "f": 21,
+     "bones": {
+      "hips": [
+       0,
+       -2,
+       -3.9
+      ],
+      "spine": [
+       24.2,
+       12.6,
+       -5
+      ],
+      "head": [
+       -3,
+       21,
+       5
+      ],
+      "arm_upper.L": [
+       3,
+       -19,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -7,
+       0
+      ]
+     },
+     "aim": {
+      "weapon.R": {
+       "to": [
+        -0.05,
+        -0.08,
+        -1.0
+       ]
+      }
+     },
+     "hips_loc": [
+      0,
+      0.0,
+      -0.4
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    6,
+    9,
+    13,
+    16,
+    21
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "hand_follow": {
+    "side": "R",
+    "mode": "weapon_tip",
+    "tip_target": [
+     8.5,
+     -10.5,
+     6.0
+    ],
+    "weight": [
+     [
+      0,
+      0.0
+     ],
+     [
+      9,
+      0.0
+     ],
+     [
+      13,
+      1.0
+     ],
+     [
+      21,
+      1.0
+     ]
+    ],
+    "pole": [
+     -0.7,
+     -0.7,
+     -0.2
+    ],
+    "note": "опора на меч: острие в верх подставки (z 6,0 см) перед правым ботинком (носок x 6,2, край y −9,8), рука доводится IK (полюс локтя наружу-назад, кисть продолжает предплечье, меч поворачивается в кулаке и сохраняет направление aim)"
+   },
+   "contact": {
+    "weapon_tip_frames": [
+     [
+      13,
+      21
+     ]
+    ]
+   },
+   "reference_kind": "library pattern (D-11, King Arthur sword clip), not an Angel video"
+  }
+ },
+ "reference_policy": "видео-референсы SYNTX не делались (оркестратор 2026-10-14: «skip the SYNTX video references for Angel (no spend, no art/animation-refs writes)»); clips.*.reference — образец библиотеки D-11 (видео-референс King Arthur того же клипа: тот же тип оружия — меч в правой руке)"
+}

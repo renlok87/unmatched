@@ -35,6 +35,8 @@ decided_by:
   CLIP_PREFIX: "delegated (П3-5)"
   AUDIO_KEY: "delegated (П3-5)"
   HIT_TYPE: "delegated (SKILL.md §7.1): меч → BLADE"
+  STAGE6_SLOTS: "delegated (ВР-реестр 2026-10-06; SKILL.md §7.1 «Слоты этапа 6», animation-vfx-sfx.md §8–§9): смерть DTH-TEMPLATE, FX и звук способности и VO — нет"
+  ACCEPTOR_PROFILE: "оркестратор пилота 2026-10-13/14: Sol 6.1 xhigh по явному выбору (этапы 4 и 6)"
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
 # --- поля этапа 3 (П3-5, дописаны исполнителем этапа 3 2026-10-13) ---
 CHARACTER: "Angel"
@@ -76,3 +78,14 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-122"
+# --- поля этапа 6 (дописаны исполнителем этапа 6 2026-10-14) ---
+ACCEPTOR_PROFILE: "sol-6.1-xhigh"
+STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+STAGE6:
+  run: "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim"
+  spec: "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json"
+  clip_cards: ["AN-133", "AN-134", "AN-135", "AN-136"]
+  video_refs: "нет: SYNTX не тратился (оркестратор 2026-10-14 — лимит визуала 54 не покрывает пилот); образец библиотеки D-11 — клипы меча King Arthur"
+  vfx: "CUE-011 звезда и вспышка — работают сразу (вспышка через MI героя на M_UM_Figure_v2, этап 7); CUE-012 — сразу; CUE-013 пепел — MIC растворения de011 (этап 7); CUE-014 способность — нет, фолбэк «иконка способности в HUD без VFX и звука»; полевые FX — сразу"
+  sfx: "HIT_TYPE BLADE — готовые банки CMB-HIT-BLADE и CMB-LUNGE-BLADE (03-sound-registry.csv); смерть — DTH-TEMPLATE (банка DTH-ANGEL нет); новых аудиофайлов нет; CharacterKey ANGEL и HitType BLADE в S08AudioBank.cpp — правка C++ этапа 7 (Р7-5); прослушивание пользователем не проводилось, принято по делегированию"
+  acceptance: "карточки kind anim не писались: G-MANIFEST требует UE-импорт (решение оркестратора 2026-10-14); промпты приёмщика — evidence/acceptance-anim-prompts/"
