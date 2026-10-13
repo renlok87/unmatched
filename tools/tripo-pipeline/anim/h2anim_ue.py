@@ -201,7 +201,18 @@ def cmd_frames(a):
     out.mkdir(parents=True, exist_ok=True)
     tmp = out / "_task.json"
     ue = Ue()
-    light = json.loads(PROFILES_JSON.read_text(encoding="utf-8"))["lightProfiles"]["cobble-probe"]
+    profiles = json.loads(PROFILES_JSON.read_text(encoding="utf-8"))["lightProfiles"]
+    if "cobble-probe" in profiles:
+        light, light_source = profiles["cobble-probe"], "cobble-probe (S08ArtBoardProfiles.json)"
+    elif a.light_pinned:
+        # 2026-10-04 (real boards only, ND-5): cobble-probe left S08ArtBoardProfiles.json; the same light is the data
+        # recorded in a review report of ue_hero_lookdev.py (its config key light_profile_pinned does the same)
+        pinned = Path(a.light_pinned).resolve()
+        light = json.loads(pinned.read_text(encoding="utf-8"))["light_profile"]["data"]
+        light_source = "%s light_profile.data (pinned: cobble-probe removed from S08ArtBoardProfiles.json by ND-5)" % pinned
+    else:
+        raise SystemExit("light profile cobble-probe is not in %s (removed by ND-5, 2026-10-04): pass --light-pinned "
+                         "<ue_hero_lookdev review report with light_profile.data>" % PROFILES_JSON)
     mesh = spec["ue"]["mesh_for_preview"]
     original = ue.call("scene", "get_current_level", record=False)
     if ue.call("asset", "is_dirty", {"asset_path": original}, record=False):
@@ -213,7 +224,7 @@ def cmd_frames(a):
     state_before = editor_state(ue)
     sg_before = {n: cvar_value(ue, n) for n in SG}
     report = {"schema": "unmatched.h2anim-ue-frames/1", "spec": spec["_path"], "mesh": mesh, "base": a.base,
-              "level": LEVEL, "original_level": original, "light_profile": "cobble-probe (S08ArtBoardProfiles.json)",
+              "level": LEVEL, "original_level": original, "light_profile": light_source,
               "kind": "EDITOR frames (live UnrealEditor via MCP CaptureViewport); diagnostic, not K1/K2 acceptance, no "
                       "RENDER fingerprint", "scalability_before": sg_before, "frames": {},
               "dirty_content_before": state_before["dirty_content"]}
@@ -441,6 +452,7 @@ def main():
             p.add_argument("--closeup", action="store_true")
             p.add_argument("--eye-dist", type=float, default=100.0)
             p.add_argument("--eye-z", type=float, default=40.0)
+            p.add_argument("--light-pinned", help="review report json with light_profile.data (cobble-probe removed by ND-5)")
     a = ap.parse_args()
     {"state": cmd_state, "skeleton": cmd_skeleton, "import": cmd_import, "measure": cmd_measure,
      "frames": cmd_frames, "sheet": cmd_sheet}[a.cmd](a)
