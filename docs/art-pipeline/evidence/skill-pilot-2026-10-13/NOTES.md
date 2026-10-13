@@ -130,6 +130,15 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F109 | 5 | A new UV layout creates new isolated foreign-class texels; coordinate-box rules do not carry between runs | tool: auto-repaint isolated texels inside protected classes |
 | F110 | 5 | Tone is measured in Cycles with LUT roughness 0.23, acceptance frames are EEVEE with ORM roughness 0.32–0.45: matched bronze reads paler on the frames | HANDBOOK §4.4 / acceptance §3: one renderer/roughness for tone and frames |
 | F111 | 5 | `caps_hidden_at_rest` sum is brittle (unsunk collar cap 147 vs limit 147.07) | tool: relative threshold |
+| F112 | 6 | On a rig where `hips` sits on the `root` axis (Leshen 0,0,25) Blender's FBX import connects `hips` and drops every `hips_loc` → author readback fails | tool: un-connect on import, or HANDBOOK §2.6 rule for hips placement |
+| F113 | 6 | Legless figure: the foot-slide check passes with zero foot vertices (verifies nothing); planted roots measured separately (`roots-planted.json`) | clip_contact_check: planted bones / low z-band option |
+| F114 | 6 | «Read the IK log for unreached frames» misfires on a straight unweighted leg chain (≤ 0.1 cm short) | §6.2: unreached frames matter only when the leg carries weight |
+| F115 | 6 | Rigid riders on arm bones (crows) flip head-down when the arm is raised | stage 3 records it; acceptor prompts get a known-limit line |
+| F116 | 6 | `clip_author.py --check-only` exits without flushing output (piped output empty) | tool: flush |
+| F117 | 6 | `clip_manifest.py build` regenerates everything and captures other agents' half-finished reworks (last builder wins) | orchestration: one builder at a time; commit the manifest after reworks |
+| F118 | 4 r2 | Executor free-form («bronze may read paler») passed with the per-item status leaked into the acceptor's T rationale (§1 п.3) | §8.2: per-item status only «closed / not closed» |
+| F119 | 4 | Card `ACCEPTOR_PROFILE: opus-xhigh` while r1/r2 were judged by Sol; §1 п.4 requires the same profile per cycle | launcher writes the profile actually used into the card |
+| F120 | 4 r2 | Orchestrator's own look: Achilles bronze on the acceptance frames reads pale/silvery vs the concept's warm gold, though tone `t_cap` 2.0 and T 2.0 (F110: Cycles tone vs EEVEE frames) | stage 7a UE look-dev must judge metal hue, not only luminance; tone table to include hue/chroma for metal classes |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 
