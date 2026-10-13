@@ -1,0 +1,155 @@
+{
+ "source": "<run>/work/sk_authored.blend",
+ "label": "ancient-leshen-h2-blend",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.67948,
+ "bbox_min": [
+  -0.1955,
+  -0.1268,
+  0.0563
+ ],
+ "bbox_max": [
+  0.1849,
+  0.1271,
+  0.7358
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 4234,
+   "centroid_z_norm": 0.757,
+   "centroid_x_norm": 0.031,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.1979
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 15713,
+   "centroid_z_norm": 0.522,
+   "centroid_x_norm": 0.039,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.7344
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 3693,
+   "centroid_z_norm": 0.373,
+   "centroid_x_norm": 0.636,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.1726
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 4034,
+   "centroid_z_norm": 0.373,
+   "centroid_x_norm": -0.582,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.1885
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2696,
+   "centroid_z_norm": 0.325,
+   "centroid_x_norm": 0.714,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.126
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 1187,
+   "centroid_z_norm": 0.07,
+   "centroid_x_norm": 0.199,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.0555
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 1096,
+   "centroid_z_norm": 0.073,
+   "centroid_x_norm": -0.14,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_AncientLeshen_H2_Body",
+     0.0512
+    ]
+   ]
+  }
+ ]
+}

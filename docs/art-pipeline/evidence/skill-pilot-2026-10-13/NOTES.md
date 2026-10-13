@@ -69,6 +69,18 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F48 | 6 | Arthur's hand-target offsets do not carry over; straight legs at rest → foot slide on any hips turn (fixed by a 0.4 cm hips drop) | §6.2: measure rest bones/footprint/base first, read the IK log; HANDBOOK §4.5: drop the hips 0.3–0.5 cm when they move |
 | F49 | 6 | Card template has no stage-6 block; a second `decided_by:` silently overrides the first | SKILL §7.2: stage-6 fields, extend the existing `decided_by` |
 | F50 | 6 | `clip_manifest.py` note says «по видео-референсу <reference>» even for a library pattern | `reference_kind` field or reworded note |
+| F51 | 3 | A hero without metal: the metal pass crashes, and without it look-dev lacks `metal_mask.npy` (Leshen: zero mask written by hand) | tool: textures stage writes a zero mask |
+| F52 | 3 | `team_mask_cloth_share` needs a «cloth» part even when the hero has none (Leshen: crows used) | tool: skip when `cloth_parts` is empty |
+| F53 | 3 | Legless trunk: thigh weights grow downward and lift the roots (blobs 130–446 px); worked around with a junction to the base + a `root` rule for the base — legs bend only the middle of the trunk | HANDBOOK §4.2: document the trunk pattern (or a «trunk» weight kind); stage 6 must know |
+| F54 | 3 | No `horn_claw` hero slot in the generic look-dev: skull, antlers, claws fall back to `legacy_bake` | HANDBOOK §4.4 / look-dev: add the slot |
+| F55 | 3 | seams ray grid uses rest bounds + 0.1 m margin: raised long arms start rays inside the hand (false blobs 295/92 px); margin 0.2 used | tool: grid from posed bounds |
+| F56 | 3 | uv charts checked for overlap at 512 px, gate is 0 px at 4K: slivers (11–17 px) get through (also Angel F30) | tool: check at atlas resolution |
+| F57 | 3 | seams flags rays skimming flat ground at base level (rows of 9–14 px) | tool: ignore near-parallel hits |
+| F58 | 3 | figure top = highest non-base vertex (antlers): skull height for `Specs()` measured by hand (budget 55 uu, bounds top 73.58 uu) | `scale.figure_top_part` key; HANDBOOK §2.10; card rule for head ornaments above the body |
+| F59 | 3 | Probe height thresholds normalised by the full height incl. antlers: arm raises 0.373 vs 0.35, forearm 0.325 vs 0.30 | probes: normalise by body height |
+| F60 | 3 | `compose.py` crashes on empty `preview.closeups`; TeamAccent manifest refuses a profile outside the repo | tool fixes |
+| F61 | 3 | Caps on saddle-shaped shoulder openings fail hidden-at-rest (216 px); junction weights work | HANDBOOK closure table: junction weights as the alternative |
+| F62 | 3 | Preview transparency bounce limit turns stacked culled layers black (false artefact in `roots_base` close-up) | tool: raise the bounce limit |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

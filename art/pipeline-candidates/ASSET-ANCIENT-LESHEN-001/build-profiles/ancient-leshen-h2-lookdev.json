@@ -1,0 +1,238 @@
+{
+  "schema": "unmatched.h2-lookdev-profile/1",
+  "profile_id": "ancient-leshen-h2-lookdev/1",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "status": "предложено",
+  "status_note": "Look-dev v2 Ancient Leshen (пилот 3d-model-pipeline 2026-10-13): игровая модель H2 без изменений геометрии и рига + библиотека материалов v1: MatID (кора/дерево, кость-рог, перья, камень), LUT героя, UV1 в метрах, маска рёбер, подгонка тонов классов к концепту по ld_measure. Не художественная приёмка.",
+  "source": {
+    "profile": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-bake-h2.json",
+    "run": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-bake",
+    "prefix": "T_AncientLeshen_H2",
+    "files": {
+      "BC": "textures/T_AncientLeshen_H2_BC.png",
+      "ORM": "textures/T_AncientLeshen_H2_ORM.png",
+      "TeamMask": "textures/T_AncientLeshen_H2_TeamMask.png",
+      "N": "textures/T_AncientLeshen_H2_N.png",
+      "N_OpenGL": "textures/T_AncientLeshen_H2_N_OpenGL.png",
+      "2K_N": "textures/T_AncientLeshen_H2_2K_N.png",
+      "2K_N_OpenGL": "textures/T_AncientLeshen_H2_2K_N_OpenGL.png",
+      "baseline_BC": "textures/T_AncientLeshen_H2_BC.png",
+      "baseline_ORM": "textures/T_AncientLeshen_H2_ORM.png",
+      "part_ids": "work/uv/part_ids.npy",
+      "metal_mask": "work/uv/metal_mask.npy",
+      "position": "work/uv/position.npy",
+      "island_ids": "work/uv/island_ids.npy",
+      "sk_authored": "work/sk_authored.blend",
+      "skeletal_fbx": "export/SK_AncientLeshen_H2.fbx",
+      "base_fbx": "export/SM_AncientLeshen_H2_Base.fbx"
+    },
+    "sha256": {
+      "BC": "5d5f867e6b584f5d761498ff0838c85c3fed69f469c2c5588df9525d32a0ad49",
+      "ORM": "48835b091291365ce40c91364eb0ae1603e9d4bc42fca3c67501419820fd0881",
+      "TeamMask": "e57391936427ac8ecf8eeef091778d2477ab7226f2688985bfe7dc78922b6ed4",
+      "N": "0a05d085dee0ceb6a29c3cae09d979d3ad90bff3151f6b8be14d8949c83c031e",
+      "N_OpenGL": "ebe605b52fb5b628fa2178eb580f369a93657fbdfa9ed703268a95510dc371fb",
+      "2K_N": "3f14973a56c072b6396fe4a7c31fb5f31074de27f177c5bdcb3f12a8eaf9c993",
+      "2K_N_OpenGL": "79e8843524da62e7dc080efef7778b74f4985748a6a98d868e7424db8eacd109",
+      "baseline_BC": "5d5f867e6b584f5d761498ff0838c85c3fed69f469c2c5588df9525d32a0ad49",
+      "baseline_ORM": "48835b091291365ce40c91364eb0ae1603e9d4bc42fca3c67501419820fd0881",
+      "part_ids": "a6e0e9232b371f50ce2e107d8f94d88f34b2f6e0915957e268f67260c1d412f3",
+      "metal_mask": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39",
+      "position": "c6f912479e93352fa6230394b56409e5c0803d41fd3d9845d787d0017b613806",
+      "island_ids": "13e173fb528153119d874c918a7087ffd5b7621735355e2865b11362f84109e6",
+      "sk_authored": "e6071daf02cb6a5b452a70ecdbc63955ad2058f1ffd7398b3da5797705139997",
+      "skeletal_fbx": "a84ec24271c32c1f894bbc790634330c6f086f0a83e47ff19f82e5d14c2a9f1a",
+      "base_fbx": "2ff855abf49544bd25d48424e55e80b2151244718c9be8427142ba3f9abfa533"
+    },
+    "note": "baseline_BC/ORM = текстуры H2 этого же прогона (прохода материалов H2.1 нет, reclass_from_baseline не используется); metal_mask — нулевая маска (металла у героя нет): textures без textures.materials её не пишет, look-dev требует файл (lookdev.py:328) — work/uv/metal_mask.npy = zeros(4096, 4096) float32, записан исполнителем этапа 3 (np.save), см. отчёт этапа"
+  },
+  "prefix": "T_AncientLeshen_H2LD",
+  "lut_name": "T_UM_MatLUT_AncientLeshen",
+  "lut_hero": "AncientLeshen",
+  "gutter_px": 16,
+  "exports": {
+    "skeletal_fbx": "SK_AncientLeshen_H2LD.fbx",
+    "base_fbx": "SM_AncientLeshen_H2LD_Base.fbx"
+  },
+  "uv1": {
+    "layer_name": "UV1_m",
+    "method": "per UV0 island: UV1 = (UV0 - centre of the island bbox) x s, s = sqrt(area3D / areaUV0) (metres per UV unit); no rotation, no mirror — the UV1 tangent basis equals UV0 (the v2 master builds its own cotangent frame anyway); centred: |UV1| small for UE half-float UVs",
+    "density_tolerance": 0.02
+  },
+  "team_dye_classes": [
+    "feathers"
+  ],
+  "classes": {
+    "note": "классы библиотеки v1 по частям H2 (роли проверены цветным рендером частей) + HSV запечённого BC: ствол, руки, кисти и запястье — кора (wood, класс посоха/лука: кора и корни, мох остаётся в коре); череп и рога — кость: класса кости в v1 нет, horn_claw — класс расширения (слот героя, только драйвер h2_bake_harpy), генерический look-dev его не знает → legacy_bake (запечённые BC/ORM как есть, MatID 0; не красится); светлые костяные когти кистей — тоже legacy_bake по цвету; три вороны — перья (feathers, единственный класс героя с teamDyeAllowed); подставка — камень",
+    "part_default": {
+      "0": "wood",
+      "1": "stone_base",
+      "2": "legacy_bake",
+      "3": "legacy_bake",
+      "4": "wood",
+      "5": "wood",
+      "6": "wood",
+      "7": "wood",
+      "8": "feathers",
+      "9": "legacy_bake",
+      "10": "feathers",
+      "11": "feathers",
+      "12": "wood"
+    },
+    "rules": [
+      {
+        "name": "bone_claws_by_colour",
+        "parts": [
+          4,
+          5
+        ],
+        "hsv": {
+          "v_min": 0.55,
+          "s_max": 0.4,
+          "hue_deg": [
+            15,
+            50
+          ]
+        },
+        "class": "legacy_bake",
+        "note": "светлые костяные когти и пальцы кистей (в концепте кость #D9CFB8 на концах когтей); кора кисти темнее"
+      }
+    ],
+    "min_component_px": 48,
+    "protect_classes": [],
+    "reclass_from_baseline": []
+  },
+  "edge": {
+    "curvature_per_m": [
+      150,
+      600
+    ],
+    "smooth_px": 3,
+    "note": "как у Medusa: выпуклость рельефа из нормали high-poly; радиус 6,7 мм -> 0, 1,7 мм -> 1"
+  },
+  "grade": {
+    "blur_px": 2,
+    "median_floor": 1.2,
+    "note": "линейные множители BC класса = (концепт / k) / кадр H2LD (ld_measure, экспозиция по коре — самая большая зона); iter1 — замер прогона без множителей (C:/tmp/leshen-scout), применён один раз",
+    "gains": {
+      "feathers": {
+        "rgb": [
+          0.6335,
+          0.6335,
+          0.6176
+        ],
+        "iter1": [
+          0.6335,
+          0.6335,
+          0.6176
+        ],
+        "note": "вороны: в концепте почти чёрные (#141414)"
+      },
+      "legacy_bake": {
+        "rgb": [
+          1.626,
+          1.626,
+          1.626
+        ],
+        "iter1_per_channel": [
+          1.8625,
+          1.5612,
+          1.234
+        ],
+        "y_ratio_iter0": 0.615,
+        "note": "кость (череп, рога, светлые когти): равномерный множитель = 1 / Y-отношение ld_measure iter0 (0,615 при экспозиции по коре k 0,516), цветность Tripo сохранена — поканальный iter1 (1,86/1,56/1,23) сдвигал кость в персиковый (лист compare-ld iter1 разведки); p95 Y 0,52 → 0,85 ≤ 0,9; как равномерный final_gains_r3 Medusa"
+      },
+      "stone_base": {
+        "rgb": [
+          1.0319,
+          1.0741,
+          1.0833
+        ],
+        "iter1": [
+          1.0319,
+          1.0741,
+          1.0833
+        ]
+      },
+      "wood": {
+        "rgb": [
+          1.0464,
+          0.9908,
+          0.8431
+        ],
+        "iter1": [
+          1.0464,
+          0.9908,
+          0.8431
+        ]
+      }
+    }
+  },
+  "lut_overrides": {},
+  "concepts": {
+    "front": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+    "side": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+    "back": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png"
+  },
+  "measure": {
+    "erode_px": 4,
+    "min_px": 200,
+    "metal_max_channel": 0.92,
+    "exposure": {
+      "mode": "anchor_class",
+      "class": "wood",
+      "note": "экспозиция концепт/кадр Blender — по коре (ствол и руки, самая большая зона)"
+    },
+    "concept_gates": {
+      "note": "цветовые ворота пикселей концепта (HSV, sRGB) по палитре листа: кора #5A4030 (h 22, s 0,47, v 0,35), кость #D9CFB8 (h 43, s 0,15, v 0,85), мох #4E5A36 (h 80), вороны #141414",
+      "wood": {
+        "mask_px": -4,
+        "hue_deg": [
+          [
+            5,
+            95
+          ]
+        ],
+        "s_min": 0.12,
+        "v_max": 0.6
+      },
+      "legacy_bake": {
+        "mask_px": -2,
+        "hue_deg": [
+          [
+            15,
+            60
+          ]
+        ],
+        "s_max": 0.5,
+        "v_min": 0.4,
+        "render_gate": true,
+        "note": "кость (череп, рога, когти): ворота с обеих сторон"
+      },
+      "feathers": {
+        "mask_px": -2,
+        "v_max": 0.3
+      },
+      "stone_base": {
+        "mask_px": -4,
+        "s_max": 0.35,
+        "v_max": 0.5
+      }
+    }
+  },
+  "preview": {
+    "samples": 64,
+    "closeups": [
+      "skull_front",
+      "antlers",
+      "hand_r_claws",
+      "crow_shoulder",
+      "roots_base"
+    ],
+    "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+  },
+  "frame": {
+    "checks_report": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+    "side": "left"
+  }
+}

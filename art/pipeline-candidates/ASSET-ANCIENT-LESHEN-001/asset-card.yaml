@@ -28,3 +28,59 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-38"
+# --- Поля этапа 3 (решение пилота П3-5, docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md;
+#     записаны исполнителем этапа 3 2026-10-13; основания — decided_by_stage3 ниже)
+CHARACTER: "AncientLeshen"          # rig-contract.json skeletons.UM_HUMANOID_17_v2.characters (revision v2-2026-10-13)
+FIGHTER_NAME: "Ancient Leshen"      # scraped-data/api/heroes/ancient-leshen.json (id 58, attack range, move 1, health 13)
+FIGHTER_NAME_RU: "Древний леший"
+HERO_SLUG: "ancient-leshen"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: null                   # контракт AncientLeshen weapon_bone null
+WEAPON_SOCKET_BONE: "hand.R"        # сокет Weapon = когти правой кисти (таблица Д-1, строка none)
+FIGURE_HEIGHT_M: 0.55               # верх ЧЕРЕПА (бюджет героя 55 uu, как Arthur/Medusa) = Specs().BudgetUU и FigureTopUU
+FIGURE_BOUNDS_TOP_M: 0.7358         # кончики рогов (rig-report: 0,73581; scale.figure_top_m 0,7356) — верх bounds, как меч Arthur 60,06
+FIGURE_HEIGHT_RANGE_M: [0.50, 0.55] # герой дальнего боя (attack range) — как Medusa
+IDLE_SECONDS: 2.3333                # ближайший герой той же роли (дальний бой) — Medusa 56/24
+LUNGE_CONTACT_FRAME: 8              # Medusa (дальний бой)
+HIT_TYPE: "MAGIC"                   # дальняя атака без оружия (сила леса); из BLADE|CLAW|ARROW|MAGIC
+CLIP_PREFIX: "LESH"
+AUDIO_KEY: "ANCIENTLESHEN"
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_AncientLeshen_H2LD"
+  base: "SM_AncientLeshen_H2LD_Base"
+  materials:
+    - "MI_AncientLeshen_H2LD"
+    - "MI_AncientLeshen_H2LD_Base"
+    - "MI_AncientLeshen_H2LD_P1"
+    - "MI_AncientLeshen_H2LD_P2"
+    - "MI_AncientLeshen_H2LD_Base_P1"
+    - "MI_AncientLeshen_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_AncientLeshen_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton"
+  clips: "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_AncientLeshen_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_AncientLeshen_H2LD_Edge"
+    - "T_UM_MatLUT_AncientLeshen"
+  prop_name: null
+STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+ACCEPTOR_PROFILE: "opus-xhigh"
+decided_by_stage3:
+  CHARACTER: "delegated (П3-5): PascalCase ключа контента = имя в rig-contract"
+  FIGHTER_NAME: "delegated (П3-5): имя бойца из scraped-data/эталонной БД"
+  FIGHTER_NAME_RU: "delegated (ВР-реестр 2026-10-06): русское имя из локализации The Witcher"
+  WEAPON_SOCKET_BONE: "delegated (ВР-реестр 2026-10-06): удар когтями правой кисти (у Harpy — foot.R)"
+  FIGURE_HEIGHT_M: >-
+    delegated (П3-5, «рост по пропорциям концепта»): замер листа 1c — высота фигуры от низа подставки до кончиков рогов
+    2,6 диаметра подставки (≈ 0,78 м при подставке 0,30 м); верх черепа на 0,725 высоты фигуры над подставкой (Tripo H2:
+    0,6773 / 0,9338). Решение: верх черепа = бюджет героя 0,55 м (как корона Arthur, «как человек»), рога выше, как меч
+    Arthur над короной: scale.figure_top_m 0,7356 (кончики рогов; в 6 % от пропорции концепта 0,78), измерено prepare:
+    верх черепа 0,55003 м. В Specs(): BudgetUU 55, FigureTopUU 55,0 (череп), BoundsTopUU 73,58 (рога, rig-report 0,73581 м).
+  FIGURE_HEIGHT_RANGE_M: "delegated (§7.1 «Рост»): ближайший по роли — Medusa (дальний бой) 50–55"
+  IDLE_SECONDS: "delegated (§7.1): как Medusa (дальний бой); совпадение Idle допустимо (Д-3)"
+  LUNGE_CONTACT_FRAME: "delegated (§7.1): как Medusa (дальний бой)"
+  HIT_TYPE: "delegated (§7.1): атака range без оружия — MAGIC"
+  CLIP_PREFIX: "delegated (§7.2): 4 заглавные от CHARACTER, не MED|HAR|ARTH|MER"
+  AUDIO_KEY: "delegated (§7.2): CHARACTER заглавными"
+  UE_NAMES: "delegated (§7.2): из KEY и поколения H2"

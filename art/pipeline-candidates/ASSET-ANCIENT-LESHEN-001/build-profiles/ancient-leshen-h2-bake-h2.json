@@ -1,0 +1,1163 @@
+{
+  "schema": "unmatched.h2-bake-profile/1",
+  "profile_id": "ancient-leshen-h2-bake/1",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "status": "предложено",
+  "status_note": "Этап 3 скилла 3d-model-pipeline (пилот 2026-10-13): игровая модель Ancient Leshen из high-poly Tripo fd1d4e21 (по частям, 13 частей, 1 859 010 tris) и его 8K/PBR-двойника генерическим h2_bake по образцу medusa-h2-bake-h2.json: ретопология по частям, атлас 4K мастер + 2K рантайм, запекание N/AO/BC/RM, риг UM_HUMANOID_17_v2 без оружия (WEAPON_HAND none), UM_FBX_v1. Ног нет: низ — единый ствол из корней, кости ног живут внутри ствола (веса половин ствола). Не художественная приёмка и не бюджет.",
+  "expected_part_count": 13,
+  "sources": {
+    "source_spec": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/source-specs/tripo-fd1d4e21-h2.json",
+    "parts_glb": {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-parts13.glb",
+      "sha256": "5c7f53b47a873cf5362eb47f2f174db5a33f91f9acb23d41f2ac9b24fd0da6b9",
+      "bytes": 44684548
+    },
+    "tex_glb": {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-tex8k-pbr.glb",
+      "sha256": "47e6123a4ec3d3b47e5e3b9efd4e8b50b6c29b672e27e91ced1886d44e7ff444",
+      "bytes": 76323864
+    }
+  },
+  "parts": {
+    "tripo_part_0": {
+      "mesh": "body",
+      "role": "ствол из скрученных корней (вместо ног) и корпус"
+    },
+    "tripo_part_1": {
+      "mesh": "base",
+      "role": "подставка"
+    },
+    "tripo_part_2": {
+      "mesh": "body",
+      "role": "левый рог (+X)"
+    },
+    "tripo_part_3": {
+      "mesh": "body",
+      "role": "правый рог (−X)"
+    },
+    "tripo_part_4": {
+      "mesh": "body",
+      "role": "левая кисть-когти (+X)"
+    },
+    "tripo_part_5": {
+      "mesh": "body",
+      "role": "правая кисть-когти (−X)"
+    },
+    "tripo_part_6": {
+      "mesh": "body",
+      "role": "правая рука (−X)"
+    },
+    "tripo_part_7": {
+      "mesh": "body",
+      "role": "левая рука (+X)"
+    },
+    "tripo_part_8": {
+      "mesh": "body",
+      "role": "ворона на правой руке (−X, спереди)"
+    },
+    "tripo_part_9": {
+      "mesh": "body",
+      "role": "череп оленя (голова)"
+    },
+    "tripo_part_10": {
+      "mesh": "body",
+      "role": "ворона на левом плече (+X)"
+    },
+    "tripo_part_11": {
+      "mesh": "body",
+      "role": "ворона на левом предплечье (+X, сзади)"
+    },
+    "tripo_part_12": {
+      "mesh": "body",
+      "role": "запястье правой руки с побегом (−X): кольцо между предплечьем (часть 6) и кистью (часть 5) — петли инвентаря close на обеих"
+    }
+  },
+  "scale": {
+    "figure_top_m": 0.7356,
+    "base_diameter_m": 0.3,
+    "base_height_m": 0.06
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "samples_per_part": 4000,
+    "seed": 0,
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [],
+    "min_score_after_fix": 0.5
+  },
+  "retopo": {
+    "method": "decimate-collapse",
+    "seed": 0,
+    "deviation_samples": 40000,
+    "target_tris": {
+      "tripo_part_0": 14000,
+      "tripo_part_1": 1200,
+      "tripo_part_2": 3000,
+      "tripo_part_3": 3000,
+      "tripo_part_4": 2000,
+      "tripo_part_5": 2000,
+      "tripo_part_6": 3600,
+      "tripo_part_7": 3600,
+      "tripo_part_8": 1600,
+      "tripo_part_9": 3000,
+      "tripo_part_10": 1400,
+      "tripo_part_11": 1600,
+      "tripo_part_12": 400
+    },
+    "dense_regions": [
+      {
+        "part": "tripo_part_9",
+        "name": "face",
+        "box_m": [
+          [
+            -0.031,
+            -0.07,
+            0.455
+          ],
+          [
+            0.032,
+            -0.024,
+            0.552
+          ]
+        ],
+        "target_tris": 1800,
+        "note": "морда черепа спереди (глазницы, носовая щель, зубы): плотность выше затылка; часть 9 — череп оленя (проверено цветным рендером частей разведки); «лицо» черепа смотрит в −Y"
+      }
+    ],
+    "cleanup": {
+      "merge_distance_m": 1e-06,
+      "degenerate_distance_m": 1e-07,
+      "tiny_island_area_m2": 2e-07,
+      "degenerate_area_m2": 1e-10
+    },
+    "caps": []
+  },
+  "closure": {
+    "note": "контактные крышки (verify 2026-09-29): сегментация Tripo «по частям» режет каждую часть по линии контакта с соседом; в позе сосед уходит и открывается сквозная дыра. Каждая петля закрывается отдельной крышкой по самой петле (вершины петли продублированы, те же позиционные веса), высота по нормали Ньюэлла: гармоническая или по форме окружающей поверхности (fit), bulge < 0 — внутрь части",
+    "spacing_m": 0.006,
+    "bulge_m": -0.001,
+    "ring_m": 0.008,
+    "min_perimeter_cm": 3.0,
+    "max_median_mm": 1.0,
+    "inventory_min_perimeter_cm": 1.0,
+    "degenerate_area_m2": 1e-10,
+    "texel_priority": 0.7,
+    "rest_visibility": {
+      "pitch_m": 0.001,
+      "max_covers_front_share": 0.0001,
+      "note": "17 ортоганальных ray-cast видов (raycam.DEFAULT_VIEWS: 8 по кругу, 4 сверху 35°, K2 55°, 4 снизу −25°), шаг 1 мм; крышка не должна закрывать лицевую поверхность, видимую в покое",
+      "max_covers_front_blob_px": 9
+    },
+    "rim_sample_fraction": 0.35,
+    "texel_note": "тексели крышек не запекаются, а заполняются стадией textures от кромки: вершина крышки = линейная комбинация отсчётов граней кромки (граница) или гармонические веса границы (внутри); N — плоская (0,5; 0,5; 1); texel_priority — множитель плотности островов крышек",
+    "footprint_note": "repaint_footprint: грани части у закрытой петли, скрытые в покое под покрывающей частью (лучи из центра грани по полусфере нормали, 64 направления Фибоначчи с d·n > 0,2, против всей фигуры: ≤ 10 % уходят наружу и ≥ 40 % упираются в покрывающую часть), получают BC/RM/AO от видимой поверхности вокруг (нормали остаются запечёнными): Tripo текстурировал невидимую зону цветом соседа (светлое пятно на поясе, где был кулак — кадр пробы arm_r_raise)",
+    "rim_ring_note": "rim_ring_m [d_in, d_out, k]: граничные вершины крышки берут отсчёты у k ближайших вершин части на расстоянии d_in..d_out от петли, а не у самой кромки — текстура Tripo прямо на линии контакта несёт цвет соседа (пояс под кулаком телесный: кадр пробы arm_r_raise)",
+    "contact_caps": [
+      {
+        "name": "shoulder_top_r",
+        "part": "tripo_part_6",
+        "covered_by": "tripo_part_0",
+        "note": "верх правой руки у ствола (16,3 см, 0,17 мм): стык закрыт весами, но петли расходятся на миллиметры (arm_r_raise: пятно 12–15 px у плеча)",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "roots_floor",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_1",
+        "max_median_mm": 16.0,
+        "bulge_m": 0.0,
+        "spacing_m": 0.008,
+        "note": "низ ствола (корни) на подставке (81,6 см, медиана 12,9 мм до подставки): виден снизу, когда половина ствола идёт за бедром (thigh_*_flex)",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      }
+    ],
+    "rebuild_retopo_caps": [
+      {
+        "name": "base_hole",
+        "part": "tripo_part_1",
+        "z_band_m": [
+          0.05,
+          0.0605
+        ],
+        "expect": 1,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "min_perimeter_cm": 1.0,
+        "spacing_m": 0.012,
+        "note": "верх подставки вырезан под корнями (петля 89 см, z ≈ 5,75 см): крышка по точной кромке"
+      }
+    ],
+    "not_capped_note": "плечи (ствол ↔ рука, петли 22,8/24,9 и 15,9/16,3 см) и шея (ствол ↔ череп, 10,3/11,3 см) закрыты весами (rig.junctions: полоса ствола у петли берёт веса соседа — цепочки руки или head), а не крышкой: крышки плеч на стволе по седловым петлям выходили перед корой в покое (разведка: armhole_l 216 px, пятно 29 px > 9), крышка armhole_r давала перекрытие UV 11–17 px; верх правой руки закрыт крышкой shoulder_top_r (0 px в покое). Рога ↔ череп (всё жёстко head), запястья (позиционные веса цепочек рук; часть 12 — кольцо запястья), лапы вороны на левом плече ↔ ствол (ворона жёстко spine, как ствол под ней) не расходятся — проверено seams. Крышки запястий (разведка) не нужны: пятна кистей в arm_*_raise были стартом лучей внутри поднятой кисти (seams.raycast.margin_m)"
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "runtime_px": 2048,
+    "min_gap_px": 8,
+    "pack_margin_fraction": 0.0013,
+    "max_overlap_px": 0,
+    "charts": {
+      "unwrap_method": "MINIMUM_STRETCH",
+      "normal_penalty": 3.0,
+      "max_rounds": 6,
+      "max_overlap_share": 0.0,
+      "max_stretch_log_p95": 0.5,
+      "chart_area_cm2": {
+        "default": 18,
+        "tripo_part_0": 60,
+        "tripo_part_1": 180,
+        "tripo_part_9": 9,
+        "tripo_part_8": 9,
+        "tripo_part_10": 9,
+        "tripo_part_11": 9
+      },
+      "regions": [
+        {
+          "part": "tripo_part_9",
+          "name": "face",
+          "box_m": [
+            [
+              -0.031,
+              -0.07,
+              0.455
+            ],
+            [
+              0.032,
+              -0.024,
+              0.552
+            ]
+          ],
+          "chart_area_cm2": 40
+        },
+        {
+          "part": "tripo_part_0",
+          "name": "roots_back_fold",
+          "box_m": [
+            [
+              -0.045,
+              0.045,
+              0.058
+            ],
+            [
+              -0.015,
+              0.075,
+              0.085
+            ]
+          ],
+          "chart_area_cm2": 3,
+          "note": "складка корней сзади у подставки: две соседние грани (центры (−0,028; 0,058; 0,070) и (−0,032; 0,061; 0,068)) перекрывались в UV на 11–15 px 4K внутри одной карты (проверка карт ловит перекрытие на растре 512 px) — мелкие карты в этой коробке"
+        }
+      ],
+      "note": "как у Medusa: карты Вороного + MINIMUM_STRETCH; ствол крупными картами, череп спереди одной картой",
+      "stretch_min_faces": 12,
+      "smooth_iterations": 4
+    },
+    "texel_priority": {
+      "default": 1.0,
+      "parts": {
+        "tripo_part_1": 0.45,
+        "tripo_part_4": 1.5,
+        "tripo_part_5": 1.5,
+        "tripo_part_9": 1.5,
+        "tripo_part_8": 1.25,
+        "tripo_part_10": 1.25,
+        "tripo_part_11": 1.25
+      },
+      "regions": [
+        {
+          "part": "tripo_part_9",
+          "name": "face",
+          "box_m": [
+            [
+              -0.031,
+              -0.07,
+              0.455
+            ],
+            [
+              0.032,
+              -0.024,
+              0.552
+            ]
+          ],
+          "factor": 2.0
+        }
+      ]
+    },
+    "priority_note": "множитель линейной тексельной плотности: морда черепа ×2 (проверка priority_face_denser_than_body против ствола — uv.density_reference_part tripo_part_0), череп ×1,5, кисти-когти ×1,5, вороны ×1,25, подставка ×0,45",
+    "density_reference_part": "tripo_part_0"
+  },
+  "bake": {
+    "device": "GPU",
+    "resolution": 4096,
+    "ao": {
+      "samples": 128,
+      "distance_m": 0.044,
+      "seed": 0,
+      "note": "0,08 × 0,55 м — по росту тела до верха черепа (как Medusa/Arthur), не по кончикам рогов: рога торчат над телом и почти не затеняют; весь high-poly — окклюдер"
+    },
+    "normal": {
+      "space": "TANGENT",
+      "include_tripo_normal_map": true,
+      "samples": 1
+    },
+    "emission": {
+      "samples": 1
+    },
+    "cage": {
+      "extrusion_from": "retopo lo_to_hi p99 и hi_to_lo p99 части",
+      "factor": 1.5,
+      "min_m": 0.0006,
+      "max_m": 0.004,
+      "max_ray_factor": 2.5
+    },
+    "hit_check": {
+      "max_miss_share_warn": 0.01
+    },
+    "ao_exclusions": []
+  },
+  "textures": {
+    "prefix": "T_AncientLeshen_H2",
+    "pad_fill": "8-neighbour dilation edge_extend_px, then pull-push pyramid",
+    "maps": {
+      "BC": "sRGB RGB 8 бит (BaseColor Tripo, освещение удалено Tripo)",
+      "N": "DirectX (G инвертирован) для UE",
+      "N_OpenGL": "OpenGL для Blender",
+      "ORM": "R = AO (Cycles), G = Roughness, B = Metallic (из PBR Tripo; металла у героя нет)",
+      "TeamMask": "RGBA: R = перья ворон (deprecated W4-B, TeamAccent — look-dev), G = подставка, B = 0, A = 255"
+    },
+    "ao_gate": {
+      "min_range_p1_p99": 32,
+      "min_occluded_fraction": 0.02,
+      "occluded_below": 250
+    },
+    "team_mask": {
+      "cloth_parts": [
+        "tripo_part_8",
+        "tripo_part_10",
+        "tripo_part_11"
+      ],
+      "cloth_hsv": {
+        "v_max": 0.4,
+        "s_max": 0.6,
+        "ramp": 0.04,
+        "note": "ткани нет: R старой маски — тёмные перья трёх ворон (как маховые Harpy W4-B)"
+      },
+      "base_band": {
+        "part": "tripo_part_1",
+        "normal_z_abs_max": 0.35
+      },
+      "blur": 3,
+      "note": "предложено: формат маски волны 4 = TeamMask.R (deprecated; TeamAccent — look-dev)"
+    },
+    "edge_extend_px": 16,
+    "materials_note": "прохода металла H2.1 нет: у героя нет металла (кора, кость, перья, камень); ключ textures.materials не задан — metallic/roughness из PBR Tripo, look-dev обнуляет metallic диэлектрических классов"
+  },
+  "rig": {
+    "skeleton": "UM_HUMANOID_17_v2",
+    "armature_object": "SKEL_UM_Humanoid",
+    "character": "AncientLeshen",
+    "weapon_bone": null,
+    "max_influences": 4,
+    "clean_below": 0.01,
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.045
+        ]
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0.0,
+          0.25
+        ],
+        [
+          0,
+          0.0,
+          0.31
+        ]
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0.0,
+          0.31
+        ],
+        [
+          0,
+          0.0,
+          0.47
+        ]
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          -0.014,
+          0.488
+        ],
+        [
+          0,
+          -0.022,
+          0.565
+        ]
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.06,
+          0.014,
+          0.44
+        ],
+        [
+          0.096,
+          0.012,
+          0.362
+        ]
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.096,
+          0.012,
+          0.362
+        ],
+        [
+          0.128,
+          0.003,
+          0.284
+        ]
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.128,
+          0.003,
+          0.284
+        ],
+        [
+          0.134,
+          -0.012,
+          0.19
+        ]
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.056,
+          0.014,
+          0.44
+        ],
+        [
+          -0.095,
+          0.012,
+          0.362
+        ]
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.095,
+          0.012,
+          0.362
+        ],
+        [
+          -0.127,
+          0.001,
+          0.285
+        ]
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.127,
+          0.001,
+          0.285
+        ],
+        [
+          -0.134,
+          -0.012,
+          0.19
+        ]
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.03,
+          0.0,
+          0.25
+        ],
+        [
+          0.042,
+          -0.004,
+          0.165
+        ]
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.042,
+          -0.004,
+          0.165
+        ],
+        [
+          0.056,
+          0.0,
+          0.085
+        ]
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.056,
+          0.0,
+          0.085
+        ],
+        [
+          0.066,
+          -0.04,
+          0.065
+        ]
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.03,
+          0.0,
+          0.25
+        ],
+        [
+          -0.042,
+          -0.004,
+          0.165
+        ]
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.042,
+          -0.004,
+          0.165
+        ],
+        [
+          -0.056,
+          0.0,
+          0.085
+        ]
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.056,
+          0.0,
+          0.085
+        ],
+        [
+          -0.066,
+          -0.04,
+          0.065
+        ]
+      ]
+    ],
+    "bones_note": "головы/хвосты в финальных метрах (рамка: верх черепа 0,55 м, кончики рогов 0,7356 м); плечи — центры петель ствол↔рука инвентаря close, локоть — по оси руки и утолщению сечений z ≈ 0,36, запястья — петли рука↔кисть (часть 12 справа); кости ног — внутри ствола: тазобедренный 0,25 (самое узкое место ствола), колено 0,165, лодыжка 0,085 над расширением корней",
+    "weights": {
+      "tripo_part_0": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.29,
+          0.34
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.25,
+        "leg_full_z": 0.1,
+        "leg_max": 0.5,
+        "side_band_m": 0.05,
+        "note": "ствол без ног: hips, выше талии spine; ниже 0,25 м половины ствола по стороне x плавно до 50 % на бедро своей стороны (leg_upper), полоса середины ±5 см (правило cloth, как платье Medusa; голень/стопа весов не получают — правила с двумя цепочками ног нет). Низ ствола у подставки держит стык roots_planted (rig.junctions → root): корни стоят, ствол гнётся выше. Разведка: leg_max 0,6/0,45/0,3 без стыка — пятна изнанки низа ствола 130–446 px в thigh_*_flex"
+      },
+      "tripo_part_2": {
+        "kind": "rigid",
+        "bone": "head"
+      },
+      "tripo_part_3": {
+        "kind": "rigid",
+        "bone": "head"
+      },
+      "tripo_part_9": {
+        "kind": "rigid",
+        "bone": "head"
+      },
+      "tripo_part_4": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_7": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_5": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_6": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_12": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_8": {
+        "kind": "rigid",
+        "bone": "arm_lower.R"
+      },
+      "tripo_part_10": {
+        "kind": "rigid",
+        "bone": "spine"
+      },
+      "tripo_part_11": {
+        "kind": "rigid",
+        "bone": "arm_lower.L"
+      },
+      "tripo_part_1": {
+        "kind": "rigid",
+        "bone": "root",
+        "note": "подставка не скинится (отдельный FBX); правило нужно только стыку roots_planted (rig.junctions): корни у подставки берут веса root — стоят на месте"
+      }
+    },
+    "weights_note": "веса — функция положения; вороны жёстко на кости, на которой сидят: на левом плече — spine (лапы стоят на плече ствола выше сустава руки), на правом и левом предплечьях — arm_lower; рога и череп — жёстко head",
+    "seam_radius_m": 0.001,
+    "seam_pairs": [
+      [
+        "tripo_part_6",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_7",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_9",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_4",
+        "tripo_part_7"
+      ],
+      [
+        "tripo_part_5",
+        "tripo_part_12"
+      ],
+      [
+        "tripo_part_6",
+        "tripo_part_12"
+      ],
+      [
+        "tripo_part_2",
+        "tripo_part_9"
+      ],
+      [
+        "tripo_part_3",
+        "tripo_part_9"
+      ],
+      [
+        "tripo_part_10",
+        "tripo_part_0"
+      ]
+    ],
+    "continuity_radius_m": 0.0015,
+    "junctions": [
+      {
+        "part": "tripo_part_0",
+        "with": "tripo_part_9",
+        "band_m": 0.012,
+        "max_distance_mm": 1.0,
+        "note": "шея: полоса ствола 1,2 см у петли черепа берёт веса черепа (head) — стык не открывается при повороте головы; череп — кость, его веса не смешиваются"
+      },
+      {
+        "part": "tripo_part_0",
+        "with": "tripo_part_7",
+        "band_m": 0.025,
+        "max_distance_mm": 1.0,
+        "note": "левое плечо: полоса ствола 2,5 см у петли руки берёт веса цепочки левой руки (spine → arm_upper.L) — ствол врастает в руку, стык не открывается (вместо крышек)"
+      },
+      {
+        "part": "tripo_part_0",
+        "with": "tripo_part_6",
+        "band_m": 0.025,
+        "max_distance_mm": 1.0,
+        "note": "правое плечо: то же для цепочки правой руки (разведка: полоса 1,5 см складывала грани нижней стороны плеча ствола у петли — пятно 13 px в arm_r_raise сверху; 2,5 см — без пятен)"
+      },
+      {
+        "part": "tripo_part_0",
+        "with": "tripo_part_1",
+        "band_m": 0.22,
+        "max_distance_mm": 25.0,
+        "note": "roots_planted: ствол в пределах 22 см от нижней петли (корни у верха подставки, медиана 12,9 мм) плавно (smoothstep 1 − d/0,22) берёт веса правила подставки (root): корни и «земля» между ними вросли в подставку и не отрываются, ствол гнётся за бёдрами выше (у бедра 0,25 м — 5 % root, на 0,15 м — 62 %). Разведка: без стыка половина низа поднималась за бедром — изнанка низа Tripo 130–446 px; полоса 3,5/7/8/12/18 см — горизонтальная «земля» между корнями (z 0,058–0,059, грани 100–170 мм²) наклонялась на доли мм и лучи вида сбоку задевали её изнанку (строки 8–14 px); 22 см — пятно ≤ 5 px. Правило подставки tripo_part_1 нужно только этому стыку (подставка не скинится)"
+      }
+    ]
+  },
+  "seams": {
+    "note": "пробы seams по позам st_seams.TESTS; кадры — стыки Ancient Leshen (плечи ствола, шея, корни на подставке, запястье)",
+    "exposure_threshold_mm": 1.5,
+    "max_open_share": 0.05,
+    "loop_min_perimeter_cm": 1.0,
+    "raycast": {
+      "pitch_m": 0.0015,
+      "margin_m": 0.2,
+      "note": "margin 0,2 м (Medusa 0,1): сетка лучей = габарит покоя + margin; длинная рука Лешего в arm_*_raise выходит за 0,1 м, лучи стартовали внутри поднятой кисти — ложные пятна 295/92 px (разведка, трассировка лучей)"
+    },
+    "frames_label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+    "frames": [
+      {
+        "name": "shoulder_r",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.058,
+          0.014,
+          0.44
+        ],
+        "dir": [
+          -1,
+          -0.3,
+          0.3
+        ],
+        "ortho_m": 0.16
+      },
+      {
+        "name": "shoulder_l",
+        "pose": "arm_l_raise",
+        "target_m": [
+          0.06,
+          0.014,
+          0.44
+        ],
+        "dir": [
+          1,
+          -0.3,
+          0.3
+        ],
+        "ortho_m": 0.16
+      },
+      {
+        "name": "neck_front",
+        "pose": "head_turn",
+        "target_m": [
+          0.0,
+          -0.02,
+          0.5
+        ],
+        "dir": [
+          0.3,
+          -1,
+          0.3
+        ],
+        "ortho_m": 0.14
+      },
+      {
+        "name": "neck_back",
+        "pose": "head_turn",
+        "target_m": [
+          0.0,
+          0.0,
+          0.5
+        ],
+        "dir": [
+          0.2,
+          1,
+          0.5
+        ],
+        "ortho_m": 0.14
+      },
+      {
+        "name": "roots_l",
+        "pose": "thigh_l_flex",
+        "target_m": [
+          0.05,
+          -0.02,
+          0.13
+        ],
+        "dir": [
+          0.6,
+          -1,
+          0.1
+        ],
+        "ortho_m": 0.3
+      },
+      {
+        "name": "roots_r",
+        "pose": "thigh_r_flex",
+        "target_m": [
+          -0.05,
+          -0.02,
+          0.13
+        ],
+        "dir": [
+          -0.6,
+          -1,
+          0.1
+        ],
+        "ortho_m": 0.3
+      },
+      {
+        "name": "wrist_l",
+        "pose": "forearm_l_bend",
+        "target_m": [
+          0.12,
+          0.0,
+          0.28
+        ],
+        "dir": [
+          0.6,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.22
+      },
+      {
+        "name": "spine_side",
+        "pose": "spine_bend_fwd",
+        "target_m": [
+          0.0,
+          0.0,
+          0.38
+        ],
+        "dir": [
+          1,
+          -0.3,
+          0.2
+        ],
+        "ortho_m": 0.82
+      }
+    ],
+    "k2_frames": [
+      "arm_r_raise",
+      "arm_l_raise",
+      "head_turn",
+      "thigh_r_flex",
+      "thigh_l_flex",
+      "spine_bend_fwd"
+    ],
+    "max_new_blob_px": 8
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "hand.R",
+      "target_m": [
+        -0.132,
+        -0.025,
+        0.18
+      ],
+      "location_uu": null,
+      "note": "оружия нет (WEAPON_HAND none, контракт AncientLeshen weapon_bone null): точка удара — когти правой кисти (таблица Д-1, строка none: своя кость персонажа; WEAPON_SOCKET_BONE hand.R)"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "target_m": [
+        0.0,
+        -0.035,
+        0.505
+      ],
+      "location_uu": null,
+      "note": "центр черепа; смещение — прогноз в UE bone space (x, −y, z), живой замер — задача UE-этапа"
+    }
+  ],
+  "exports": {
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "skeletal_fbx": "SK_AncientLeshen_H2.fbx",
+    "base_fbx": "SM_AncientLeshen_H2_Base.fbx"
+  },
+  "meshes": {
+    "body": "SK_AncientLeshen_H2_Body",
+    "base": "SM_AncientLeshen_H2_Base"
+  },
+  "materials": {
+    "atlas": "M_AncientLeshen_H2_Atlas",
+    "slots_note": "один слот на фигуре (тело, без оружия) и один на подставке — тот же атлас; ≤ 2 слота"
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_bow_side": null,
+    "expected_ue_front": "+X",
+    "expected_ue_bow_side": null,
+    "note": "оружия нет (WEAPON_HAND none, контракт AncientLeshen weapon_bone null): сторона оружия не проверяется"
+  },
+  "preview": {
+    "concepts": {
+      "front": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+      "side": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+      "back": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png"
+    },
+    "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+    "k2": {
+      "fov_deg_horizontal": 35,
+      "pitch_deg": -55,
+      "distances_uu": {
+        "k2-5x": 386.0,
+        "k2-1p6": 1207.0
+      },
+      "focus_z_m": 0.36,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/frames/p17-k2-5x-medusa-ue-editor.evidence.json, p17-k2-1p6-medusa-ue-editor.evidence.json",
+      "focus_note": "фигура выше Medusa (кончики рогов 0,7356 м): фокус K2 — середина роста, иначе рога вне кропа"
+    },
+    "samples": 64,
+    "label": "blender (Cycles), не игровой свет; у H2 задние грани отсечены (как UE one-sided)",
+    "closeups": [
+      {
+        "name": "skull_front",
+        "target_m": [
+          0.0,
+          -0.04,
+          0.5
+        ],
+        "dir": [
+          0,
+          -1,
+          0.05
+        ],
+        "ortho_m": 0.11
+      },
+      {
+        "name": "skull_3q",
+        "target_m": [
+          0.0,
+          -0.035,
+          0.5
+        ],
+        "dir": [
+          -0.6,
+          -0.8,
+          0.1
+        ],
+        "ortho_m": 0.12
+      },
+      {
+        "name": "antlers",
+        "target_m": [
+          0.0,
+          -0.03,
+          0.63
+        ],
+        "dir": [
+          0,
+          -1,
+          0.1
+        ],
+        "ortho_m": 0.3
+      },
+      {
+        "name": "hand_r_claws",
+        "target_m": [
+          -0.128,
+          -0.02,
+          0.21
+        ],
+        "dir": [
+          -0.3,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.18
+      },
+      {
+        "name": "hand_l_claws",
+        "target_m": [
+          0.128,
+          -0.02,
+          0.21
+        ],
+        "dir": [
+          0.3,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.18
+      },
+      {
+        "name": "crow_shoulder",
+        "target_m": [
+          0.09,
+          0.03,
+          0.47
+        ],
+        "dir": [
+          0.6,
+          -0.8,
+          0.3
+        ],
+        "ortho_m": 0.12
+      },
+      {
+        "name": "crow_r_wrist",
+        "target_m": [
+          -0.15,
+          -0.055,
+          0.29
+        ],
+        "dir": [
+          -0.4,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.12
+      },
+      {
+        "name": "roots_base",
+        "target_m": [
+          0.0,
+          -0.05,
+          0.1
+        ],
+        "dir": [
+          0,
+          -1,
+          0.4
+        ],
+        "ortho_m": 0.3
+      }
+    ],
+    "backface_culling": true,
+    "pose_closeups": [],
+    "channel_views": [
+      {
+        "name": "metallic",
+        "channel": "Blue",
+        "view": "front"
+      },
+      {
+        "name": "metallic",
+        "channel": "Blue",
+        "view": "back"
+      },
+      {
+        "name": "roughness",
+        "channel": "Green",
+        "view": "front"
+      }
+    ],
+    "frame": {
+      "checks_report": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "side": "left"
+    }
+  },
+  "proposed_budget": {
+    "status": "предложено",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "harpy_triangles": [
+      20000,
+      30000
+    ],
+    "atlas_master_px": 4096,
+    "atlas_runtime_px": 2048,
+    "material_slots_max": 2,
+    "source": "ориентир задания оркестратора H2; обоснование — замеры кадра K2 в отчёте medusa-h2-report"
+  },
+  "history": {
+    "previous_profiles": [],
+    "note": "первый профиль Ancient Leshen; образец — art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json (HANDBOOK §4.2): preview.previous_candidate и preview.baseline удалены (SKILL.md этап 3 п.2); решения пилота П3-1…П3-5 (docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md)"
+  }
+}

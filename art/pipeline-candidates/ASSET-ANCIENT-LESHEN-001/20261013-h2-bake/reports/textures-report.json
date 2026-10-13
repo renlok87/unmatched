@@ -1,0 +1,223 @@
+{
+  "bc_mean_srgb_in_islands": [
+    113.1,
+    92.25,
+    71.99
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 493528,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 3196,
+        "cap_vertices": 1876,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 493528,
+        "rim_samples": 9074
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.001118,
+        "BC": 0.001118,
+        "NORMAL": 0.001118,
+        "RM": 0.001118
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0002,
+        "p99.9_abs_dev": 0.0054
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0002,
+        "p99.9_abs_dev": 0.0052
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.8409,
+        "p1": 34.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.9542,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "outputs": {
+    "T_AncientLeshen_H2_2K_BC.png": {
+      "bytes": 5838468,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "af3ee3b36d58b4fc9044823e26afc477c0f0c2fd7db207d3db2a46d26d4a6127"
+    },
+    "T_AncientLeshen_H2_2K_N.png": {
+      "bytes": 4933946,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3f14973a56c072b6396fe4a7c31fb5f31074de27f177c5bdcb3f12a8eaf9c993"
+    },
+    "T_AncientLeshen_H2_2K_N_OpenGL.png": {
+      "bytes": 4934102,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "79e8843524da62e7dc080efef7778b74f4985748a6a98d868e7424db8eacd109"
+    },
+    "T_AncientLeshen_H2_2K_ORM.png": {
+      "bytes": 3827119,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "12fd92a25a9124f22592729266433bae98d9f14d2f2595c2c5dbaf175887f2b7"
+    },
+    "T_AncientLeshen_H2_2K_TeamMask.png": {
+      "bytes": 239346,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "b0bf35d3b1e8dc0d2f77f6db065130f14d1b6615d5c788426963d4252a4c50a3"
+    },
+    "T_AncientLeshen_H2_BC.png": {
+      "bytes": 18916675,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "5d5f867e6b584f5d761498ff0838c85c3fed69f469c2c5588df9525d32a0ad49"
+    },
+    "T_AncientLeshen_H2_N.png": {
+      "bytes": 14624018,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "0a05d085dee0ceb6a29c3cae09d979d3ad90bff3151f6b8be14d8949c83c031e"
+    },
+    "T_AncientLeshen_H2_N_OpenGL.png": {
+      "bytes": 14626325,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "ebe605b52fb5b628fa2178eb580f369a93657fbdfa9ed703268a95510dc371fb"
+    },
+    "T_AncientLeshen_H2_ORM.png": {
+      "bytes": 11708370,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "48835b091291365ce40c91364eb0ae1603e9d4bc42fca3c67501419820fd0881"
+    },
+    "T_AncientLeshen_H2_TeamMask.png": {
+      "bytes": 650664,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "e57391936427ac8ecf8eeef091778d2477ab7226f2688985bfe7dc78922b6ed4"
+    }
+  },
+  "passed": true,
+  "prefix": "T_AncientLeshen_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7405147,
+      "BC": 7405147,
+      "HIT": 7405147,
+      "NORMAL": 7405147,
+      "RM": 7405147
+    },
+    "caps": {
+      "cap_texels": 493528,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 3196,
+      "cap_vertices": 1876,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 493528,
+      "rim_samples": 9074
+    },
+    "footprints": null,
+    "in_island_unbaked_texels": {
+      "AO": 388540,
+      "BC": 388540,
+      "HIT": 388540,
+      "NORMAL": 388540,
+      "RM": 388540
+    },
+    "size": 4096,
+    "uv_texels": 7793687
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 113902,
+    "cloth_parts": [
+      "tripo_part_8",
+      "tripo_part_10",
+      "tripo_part_11"
+    ],
+    "cloth_share_of_cloth_texels": 0.9542,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "ткани нет: R старой маски — тёмные перья трёх ворон (как маховые Harpy W4-B)",
+      "ramp": 0.04,
+      "s_max": 0.6,
+      "v_max": 0.4
+    }
+  }
+}
