@@ -1,0 +1,561 @@
+{
+  "checks": {
+    "dielectric_bc_in_class_luminance_range": {
+      "expected": "<= 5 % of a class outside the preset luminance range (the v2 shader clamps the rest)",
+      "measured": {
+        "feathers": {
+          "Y_p5_p95": [
+            0.021,
+            0.0596
+          ],
+          "range": [
+            0.02,
+            0.7
+          ],
+          "share_outside": 0.0
+        },
+        "stone_base": {
+          "Y_p5_p95": [
+            0.0238,
+            0.1204
+          ],
+          "range": [
+            0.02,
+            0.12
+          ],
+          "share_outside": 0.0
+        },
+        "wood": {
+          "Y_p5_p95": [
+            0.0251,
+            0.2846
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        }
+      },
+      "passed": true
+    },
+    "lut_dds_read_back": {
+      "measured": {
+        "dds_sha256": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664"
+      },
+      "passed": true
+    },
+    "lut_metal_f0_plausible": {
+      "expected": "metal classes used by the hero: Y(F0) >= 0.45, channels <= 1 (library rule; oxide films excepted)",
+      "measured": {},
+      "passed": true
+    },
+    "matid_decodes_to_labels_4k": {
+      "expected": "floor(v / 16) == class index on every island texel",
+      "passed": true
+    },
+    "matid_values_valid": {
+      "expected": "index * 16 + 8",
+      "measured": [
+        8,
+        200,
+        232,
+        248
+      ],
+      "passed": true
+    },
+    "orm_metallic_binary_per_class_4k": {
+      "expected": "ORM.B = 0 in dielectric classes, 255 in metal classes (4K; 2K = box average)",
+      "passed": true
+    },
+    "team_mask_only_on_cloth_classes": {
+      "measured": 0,
+      "passed": true
+    }
+  },
+  "classes": {
+    "feathers": {
+      "Y_p5_p50_p95": [
+        0.021,
+        0.0273,
+        0.0596
+      ],
+      "bc_linear_median": [
+        0.0273,
+        0.0273,
+        0.0284
+      ],
+      "bc_linear_median_before_grade": [
+        0.0319,
+        0.0319,
+        0.0343
+      ],
+      "edge_mask_mean": 0.2007,
+      "share_of_islands": 0.0676,
+      "team_r_mean": 0.9541,
+      "texels_4k": 518381,
+      "ymedClassHero": 0.02732
+    },
+    "legacy_bake": {
+      "Y_p5_p50_p95": [
+        0.1026,
+        0.5858,
+        0.9827
+      ],
+      "bc_linear_median": [
+        0.8388,
+        0.5395,
+        0.3185
+      ],
+      "bc_linear_median_before_grade": [
+        0.3916,
+        0.2542,
+        0.15
+      ],
+      "edge_mask_mean": 0.0988,
+      "share_of_islands": 0.2746,
+      "team_r_mean": 0.0,
+      "texels_4k": 2105424,
+      "ymedClassHero": 0.58579
+    },
+    "stone_base": {
+      "Y_p5_p50_p95": [
+        0.0238,
+        0.083,
+        0.1204
+      ],
+      "bc_linear_median": [
+        0.1195,
+        0.0742,
+        0.0545
+      ],
+      "bc_linear_median_before_grade": [
+        0.117,
+        0.0685,
+        0.0513
+      ],
+      "edge_mask_mean": 0.0156,
+      "share_of_islands": 0.0603,
+      "team_r_mean": 0.0,
+      "texels_4k": 462484,
+      "ymedClassHero": 0.08299
+    },
+    "wood": {
+      "Y_p5_p50_p95": [
+        0.0251,
+        0.0906,
+        0.2846
+      ],
+      "bc_linear_median": [
+        0.1329,
+        0.0823,
+        0.0356
+      ],
+      "bc_linear_median_before_grade": [
+        0.1274,
+        0.0823,
+        0.0423
+      ],
+      "edge_mask_mean": 0.0766,
+      "share_of_islands": 0.5974,
+      "team_r_mean": 0.0,
+      "texels_4k": 4579723,
+      "ymedClassHero": 0.09056
+    }
+  },
+  "classify_steps": [
+    "part_default",
+    {
+      "rule": "bone_claws_by_colour",
+      "texels": 729067
+    }
+  ],
+  "edge_mask": {
+    "config": {
+      "curvature_per_m": [
+        150,
+        600
+      ],
+      "note": "как у Medusa: выпуклость рельефа из нормали high-poly; радиус 6,7 мм -> 0, 1,7 мм -> 1",
+      "smooth_px": 3
+    },
+    "curvature_p50_p90_p99_per_m": [
+      0.0,
+      321.7,
+      836.7
+    ],
+    "edge_share_ge_0.5": 0.0779,
+    "metres_per_texel_4k_median": 0.0002795
+  },
+  "edge_texture": "T_AncientLeshen_H2LD_{,2K_}Edge.png: R8 (L), маска рёбер для EdgeMaskTexture v2 (линейная, sRGB выкл.)",
+  "grade": {
+    "blur_px": 2,
+    "gains": {
+      "feathers": {
+        "iter1": [
+          0.6335,
+          0.6335,
+          0.6176
+        ],
+        "note": "вороны: в концепте почти чёрные (#141414)",
+        "rgb": [
+          0.6335,
+          0.6335,
+          0.6176
+        ]
+      },
+      "legacy_bake": {
+        "iter1_per_channel": [
+          1.8625,
+          1.5612,
+          1.234
+        ],
+        "note": "r2 (п.3 rework_fix_list r1, close-head.jpg): равномерный множитель кости 1,626 → 2,2 — цветность Tripo сохранена (поканальный gain_suggestion r1 [2,48; 2,00; 1,53] сдвигал рога в персиковый). r1: tone.json y_ratio 0,775 / y_ratio_loo 0,783 (вне 0,80–1,25). Пробы на прогоне 20261014-h2-bake-r2 (ld_maps → ld_preview → ld_measure, C:/tmp/leshen-r2-ldtry, _tone.tone_table): 2,0 → y_ratio 0,827 / loo 0,840, dSat −0,181; 2,2 → 0,856 / 0,869, dSat −0,188, семейство same (насыщенность рендера 0,179 ≥ 0,15), t_cap 2,0. Выбрано 2,2 (запас по яркости); клип каналов > 1 у светлых текселей (p95 Y BC 0,98) — череп сливочный, рисунок трещин читается (closeup-skull_front). Прежняя заметка r1: кость (череп, рога, светлые когти): равномерный множитель = 1 / Y-отношение ld_measure iter0 (0,615 при экспозиции по коре k 0,516), цветность Tripo сохранена — поканальный iter1 (1,86/1,56/1,23) сдвигал кость в персиковый (лист compare-ld iter1 разведки); p95 Y 0,52 → 0,85 ≤ 0,9; как равномерный final_gains_r3 Medusa",
+        "r1_rgb": [
+          1.626,
+          1.626,
+          1.626
+        ],
+        "rgb": [
+          2.2,
+          2.2,
+          2.2
+        ],
+        "y_ratio_iter0": 0.615
+      },
+      "stone_base": {
+        "iter1": [
+          1.0319,
+          1.0741,
+          1.0833
+        ],
+        "rgb": [
+          1.0319,
+          1.0741,
+          1.0833
+        ]
+      },
+      "wood": {
+        "iter1": [
+          1.0464,
+          0.9908,
+          0.8431
+        ],
+        "rgb": [
+          1.0464,
+          0.9908,
+          0.8431
+        ]
+      }
+    },
+    "luminance_clamp": {
+      "feathers": {
+        "in_toe_below_2lo": 0.8403,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.3383
+      },
+      "stone_base": {
+        "in_toe_below_2lo": 0.2674,
+        "lowered_above_max": 0.2092,
+        "raised_below_min": 0.0627
+      },
+      "wood": {
+        "in_toe_below_2lo": 0.1941,
+        "lowered_above_max": 0.0071,
+        "raised_below_min": 0.0462
+      }
+    },
+    "median_floor": 1.2,
+    "median_floor_applied": {
+      "feathers": {
+        "gain_used": [
+          0.7518,
+          0.7518,
+          0.7329
+        ],
+        "median_Y_with_profile_gain": 0.02022,
+        "raised_to": 0.024
+      }
+    },
+    "note": "линейные множители BC класса = (концепт / k) / кадр H2LD (ld_measure, экспозиция по коре — самая большая зона); iter1 — замер прогона без множителей (C:/tmp/leshen-scout), применён один раз"
+  },
+  "lut": {
+    "applied": [
+      {
+        "class": "feathers",
+        "field": "bc",
+        "value": [
+          0.0273,
+          0.0273,
+          0.0284
+        ]
+      },
+      {
+        "class": "feathers",
+        "field": "ymedClassHero",
+        "value": 0.02732
+      },
+      {
+        "class": "stone_base",
+        "field": "bc",
+        "value": [
+          0.1195,
+          0.0742,
+          0.0545
+        ]
+      },
+      {
+        "class": "stone_base",
+        "field": "ymedClassHero",
+        "value": 0.08299
+      },
+      {
+        "class": "wood",
+        "field": "bc",
+        "value": [
+          0.1329,
+          0.0823,
+          0.0356
+        ]
+      },
+      {
+        "class": "wood",
+        "field": "ymedClassHero",
+        "value": 0.09056
+      }
+    ],
+    "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
+    "dds": "T_UM_MatLUT_AncientLeshen.dds",
+    "dds_sha256": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664",
+    "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index",
+    "overrides_json": "T_UM_MatLUT_AncientLeshen.overrides.json",
+    "overrides_sha256": "7835277b5c21259b150e653d8bb53a501d89d2edb71c30fd03922b37a34fffa4",
+    "read_back_equals_half": true
+  },
+  "matid": {
+    "downsample": "2x2 majority",
+    "encoding": "R8 unorm, index * 16 + 8, decode floor(v * 255 / 16)",
+    "gutter_px_4k": 16,
+    "master_px": 4096,
+    "runtime_px": 2048
+  },
+  "outputs": {
+    "T_AncientLeshen_H2LD_2K_BC.png": {
+      "bytes": 6121490,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "9c4033d845616f2c92b88523a48f72797dd025d5f0d30e278ab9116b5d483d09"
+    },
+    "T_AncientLeshen_H2LD_2K_Edge.png": {
+      "bytes": 979809,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "97d941e71ac6599c8a01455b46dceaac41f797681d1ed2082f1ee501e43fe21e"
+    },
+    "T_AncientLeshen_H2LD_2K_MatID.png": {
+      "bytes": 106405,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "518f6c454b92cc783da71a3aab5126bed6bdccb77ed6110a2830213018a09397"
+    },
+    "T_AncientLeshen_H2LD_2K_N.png": {
+      "bytes": 4915254,
+      "copied_from": "T_AncientLeshen_H2_2K_N.png",
+      "sha256": "8a6b189812d06d790d278d49af02658cef7d6836e179ad7b7ef0237365733999"
+    },
+    "T_AncientLeshen_H2LD_2K_N_OpenGL.png": {
+      "bytes": 4915728,
+      "copied_from": "T_AncientLeshen_H2_2K_N_OpenGL.png",
+      "sha256": "beb575505e88543fd9bc019ac4e49e293db8861116c571d23e5cdc4db5ff42c3"
+    },
+    "T_AncientLeshen_H2LD_2K_ORM.png": {
+      "bytes": 3625982,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "1163d83acaf74cac3159eb5855901a2521e41c67c899a8ed23011dee5e67d914"
+    },
+    "T_AncientLeshen_H2LD_2K_TeamMask.png": {
+      "bytes": 235022,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "a49a0a20b8c42488b49609ee7a827971d4fe9f110619864eb0eb7f34f5951518"
+    },
+    "T_AncientLeshen_H2LD_BC.png": {
+      "bytes": 19880371,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a5420a52ce4a19cc19ea8b791a0eb2cff924e721bdf0328d40be9fa122b441b8"
+    },
+    "T_AncientLeshen_H2LD_Edge.png": {
+      "bytes": 2668774,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "c5aa8a9bed52207a9a6d81e806d5bd991538f7d027cb4e2758a425ba277db8c6"
+    },
+    "T_AncientLeshen_H2LD_MatID.png": {
+      "bytes": 251065,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a18a96a96ac07674fc170c944882356ad43246f3743e735f52d6a76d1ed85e64"
+    },
+    "T_AncientLeshen_H2LD_N.png": {
+      "bytes": 14581017,
+      "copied_from": "T_AncientLeshen_H2_N.png",
+      "sha256": "73422831d5cd1643e7607ec268c76d2ceba7954f7f842ba2dbcdd88db730b786"
+    },
+    "T_AncientLeshen_H2LD_N_OpenGL.png": {
+      "bytes": 14583046,
+      "copied_from": "T_AncientLeshen_H2_N_OpenGL.png",
+      "sha256": "790f833a81f7477a3b18cde70b36acb50b805a691f0f4e6adecbde97df6cddfa"
+    },
+    "T_AncientLeshen_H2LD_ORM.png": {
+      "bytes": 10898955,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "3f235fe57769961c136c7204313a006830f4369b2c4cbcdf2f68417a9094777a"
+    },
+    "T_AncientLeshen_H2LD_TeamMask.png": {
+      "bytes": 639160,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "166d9c86cbbe5acbbabdf5725a374c855b1877fabf75a4b3d42a42b2e9b064b1"
+    },
+    "T_UM_MatLUT_AncientLeshen.dds": {
+      "bytes": 2196,
+      "sha256": "07bc71eeb60d17017ab5f79997479de85012202dd5895b8ab4d28d753b5e0664"
+    },
+    "T_UM_MatLUT_AncientLeshen.overrides.json": {
+      "bytes": 874,
+      "sha256": "7835277b5c21259b150e653d8bb53a501d89d2edb71c30fd03922b37a34fffa4"
+    }
+  },
+  "passed": true,
+  "pins": {
+    "2K_N": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_2K_N.png",
+      "pinned": true,
+      "sha256": "8a6b189812d06d790d278d49af02658cef7d6836e179ad7b7ef0237365733999"
+    },
+    "2K_N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_2K_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "beb575505e88543fd9bc019ac4e49e293db8861116c571d23e5cdc4db5ff42c3"
+    },
+    "BC": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_BC.png",
+      "pinned": true,
+      "sha256": "26509e6e1c2aad8980e4a8d9492956a1a5704afa10b69c6e4242141f5f545689"
+    },
+    "N": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_N.png",
+      "pinned": true,
+      "sha256": "73422831d5cd1643e7607ec268c76d2ceba7954f7f842ba2dbcdd88db730b786"
+    },
+    "N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "790f833a81f7477a3b18cde70b36acb50b805a691f0f4e6adecbde97df6cddfa"
+    },
+    "ORM": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_ORM.png",
+      "pinned": true,
+      "sha256": "22b746e33181c70cc0618de8d4333f97ba3a19400bb3b774ca46e6ed17c0f328"
+    },
+    "TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_TeamMask.png",
+      "pinned": true,
+      "sha256": "c606e396801e9e8d614c852bf47b819a92ad7c471a6c78757b658142b9f6ab8e"
+    },
+    "base_fbx": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SM_AncientLeshen_H2_Base.fbx",
+      "pinned": true,
+      "sha256": "32418ed9f525e9647338f82be56d2cd32bb2dda801990411dd1bd805bee99547"
+    },
+    "baseline_BC": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_BC.png",
+      "pinned": true,
+      "sha256": "26509e6e1c2aad8980e4a8d9492956a1a5704afa10b69c6e4242141f5f545689"
+    },
+    "baseline_ORM": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/textures/T_AncientLeshen_H2_ORM.png",
+      "pinned": true,
+      "sha256": "22b746e33181c70cc0618de8d4333f97ba3a19400bb3b774ca46e6ed17c0f328"
+    },
+    "island_ids": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/work/uv/island_ids.npy",
+      "pinned": true,
+      "sha256": "e93dcf424ff1bcfa50af23a4a8bb37bed0c6d7c0a52b772a297f927c4c35dabe"
+    },
+    "metal_mask": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/work/uv/metal_mask.npy",
+      "pinned": true,
+      "sha256": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39"
+    },
+    "part_ids": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/work/uv/part_ids.npy",
+      "pinned": true,
+      "sha256": "cd99fcb1557be5867a58325994dc942aff0da4ce003298d4e65be87830b73bc9"
+    },
+    "position": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/work/uv/position.npy",
+      "pinned": true,
+      "sha256": "287d2267fcb44210e743cca2f2a8d3f3e5ef87e9348a25dfe62a573e13c3c642"
+    },
+    "sk_authored": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/work/sk_authored.blend",
+      "pinned": true,
+      "sha256": "0c4168f264546acfa30e5a1a02caf7377110be823b187639a07e4a61b8022745"
+    },
+    "skeletal_fbx": {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-bake-r2/export/SK_AncientLeshen_H2.fbx",
+      "pinned": true,
+      "sha256": "d1ea65ec9f73b0a3c397e08b6d6e324002377d8faa45330710fcadc3788751b5"
+    }
+  },
+  "prefix": "T_AncientLeshen_H2LD",
+  "reclass_from_baseline_texels": 0,
+  "small_components_relabelled": {
+    "feathers": 0,
+    "legacy_bake": 17377,
+    "stone_base": 0,
+    "wood": 13716
+  },
+  "stage": "ld_maps",
+  "status": "измерено",
+  "team_mask": {
+    "A": 255,
+    "B": "0 (без изменений)",
+    "G": "полоса подставки (без изменений)",
+    "R": "одежда (TeamColor) только в классах ['feathers']"
+  }
+}

@@ -1,0 +1,812 @@
+{
+  "Y_ratio_concept_over_ld_per_class": {
+    "feathers": 0.37,
+    "stone_base": 0.535,
+    "wood": 0.502
+  },
+  "exposure": {
+    "class": "wood",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по коре (ствол и руки, самая большая зона)"
+  },
+  "exposure_k_concept_over_ld": 0.5017,
+  "exposure_k_weighted_geomean_all_classes": 0.4977,
+  "framing": {
+    "frame": {
+      "checks_report": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "side": "left"
+    },
+    "note": "орто-кадры по кадрированию концепта (framing.py); tone.json приёмки годится как потолок T только при такой рамке",
+    "views": {
+      "back": {
+        "aspect_rel_diff": 0.0,
+        "class_pass_px": [
+          1086,
+          1448
+        ],
+        "concept_px": [
+          1086,
+          1448
+        ]
+      },
+      "front": {
+        "aspect_rel_diff": 0.0,
+        "class_pass_px": [
+          1086,
+          1448
+        ],
+        "concept_px": [
+          1086,
+          1448
+        ]
+      },
+      "side": {
+        "aspect_rel_diff": 0.0,
+        "class_pass_px": [
+          1086,
+          1448
+        ],
+        "concept_px": [
+          1086,
+          1448
+        ]
+      }
+    }
+  },
+  "gain_suggestion": {
+    "feathers": {
+      "current_gain": [
+        0.6335,
+        0.6335,
+        0.6176
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.724,
+        0.743,
+        0.743
+      ],
+      "suggested_gain": [
+        0.4585,
+        0.471,
+        0.4592
+      ]
+    },
+    "legacy_bake": {
+      "current_gain": [
+        2.2,
+        2.2,
+        2.2
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.433,
+        1.099,
+        0.822
+      ],
+      "suggested_gain": [
+        3.1521,
+        2.4167,
+        1.8092
+      ]
+    },
+    "stone_base": {
+      "current_gain": [
+        1.0319,
+        1.0741,
+        1.0833
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.041,
+        1.08,
+        1.06
+      ],
+      "suggested_gain": [
+        1.0739,
+        1.1598,
+        1.1478
+      ]
+    },
+    "wood": {
+      "current_gain": [
+        1.0464,
+        0.9908,
+        0.8431
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.023,
+        0.993,
+        0.958
+      ],
+      "suggested_gain": [
+        1.07,
+        0.9837,
+        0.8077
+      ]
+    }
+  },
+  "gates": {
+    "feathers": {
+      "mask_px": -2,
+      "v_max": 0.3
+    },
+    "legacy_bake": {
+      "hue_deg": [
+        [
+          15,
+          60
+        ]
+      ],
+      "mask_px": -2,
+      "note": "кость (череп, рога, когти): ворота с обеих сторон",
+      "render_gate": true,
+      "s_max": 0.5,
+      "v_min": 0.4
+    },
+    "note": "цветовые ворота пикселей концепта (HSV, sRGB) по палитре листа: кора #5A4030 (h 22, s 0,47, v 0,35), кость #D9CFB8 (h 43, s 0,15, v 0,85), мох #4E5A36 (h 80), вороны #141414",
+    "stone_base": {
+      "mask_px": -4,
+      "s_max": 0.35,
+      "v_max": 0.5
+    },
+    "wood": {
+      "hue_deg": [
+        [
+          5,
+          95
+        ]
+      ],
+      "mask_px": -4,
+      "s_min": 0.12,
+      "v_max": 0.6
+    }
+  },
+  "label": "blender (Cycles, AgX), студийный свет — не игровой; концепт — imagegen (свой свет)",
+  "method": "зоны = проход ID классов H2LD в орто-кадрах, выровненных по концептам; концепт: маска класса (дилатация/эрозия mask_px) И цветовые ворота класса (measure.concept_gates), рендер: точная маска класса (эрозия 1 px); медианы sRGB по пикселям зоны, три вида вместе; экспозиция k — взвешенное по пикселям геометрическое среднее Y(концепт)/Y(H2LD) по классам библиотеки",
+  "stage": "ld_measure",
+  "status": "измерено",
+  "views": {
+    "back": {
+      "feathers": {
+        "concept": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0254,
+          "median_srgb": [
+            45.0,
+            44.0,
+            44.0
+          ],
+          "sat": 0.022,
+          "value": 0.176
+        },
+        "h21": {
+          "hue_deg": 240.0,
+          "luma_Y_linear": 0.0383,
+          "median_srgb": [
+            55.0,
+            55.0,
+            56.0
+          ],
+          "sat": 0.018,
+          "value": 0.22
+        },
+        "ld": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0426,
+          "median_srgb": [
+            59.0,
+            58.0,
+            58.0
+          ],
+          "sat": 0.017,
+          "value": 0.231
+        },
+        "pixels_concept": 10972,
+        "pixels_render": 17801
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 27.1,
+          "luma_Y_linear": 0.2443,
+          "median_srgb": [
+            163.0,
+            129.0,
+            101.0
+          ],
+          "sat": 0.38,
+          "value": 0.639
+        },
+        "h21": {
+          "hue_deg": 25.7,
+          "luma_Y_linear": 0.2721,
+          "median_srgb": [
+            162.0,
+            138.0,
+            120.0
+          ],
+          "sat": 0.259,
+          "value": 0.635
+        },
+        "ld": {
+          "hue_deg": 27.4,
+          "luma_Y_linear": 0.4244,
+          "median_srgb": [
+            190.0,
+            171.0,
+            155.0
+          ],
+          "sat": 0.184,
+          "value": 0.745
+        },
+        "pixels_concept": 29661,
+        "pixels_render": 53694
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 22.1,
+          "luma_Y_linear": 0.06,
+          "median_srgb": [
+            79.0,
+            67.0,
+            60.0
+          ],
+          "sat": 0.241,
+          "value": 0.31
+        },
+        "h21": {
+          "hue_deg": 18.0,
+          "luma_Y_linear": 0.0628,
+          "median_srgb": [
+            82.0,
+            68.0,
+            62.0
+          ],
+          "sat": 0.244,
+          "value": 0.322
+        },
+        "ld": {
+          "hue_deg": 18.0,
+          "luma_Y_linear": 0.072,
+          "median_srgb": [
+            87.0,
+            73.0,
+            67.0
+          ],
+          "sat": 0.23,
+          "value": 0.341
+        },
+        "pixels_concept": 25204,
+        "pixels_render": 48130
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 33.3,
+          "luma_Y_linear": 0.0834,
+          "median_srgb": [
+            95.0,
+            79.0,
+            59.0
+          ],
+          "sat": 0.379,
+          "value": 0.373
+        },
+        "h21": {
+          "hue_deg": 34.1,
+          "luma_Y_linear": 0.1009,
+          "median_srgb": [
+            103.0,
+            87.0,
+            66.0
+          ],
+          "sat": 0.359,
+          "value": 0.404
+        },
+        "ld": {
+          "hue_deg": 34.9,
+          "luma_Y_linear": 0.1188,
+          "median_srgb": [
+            112.0,
+            94.0,
+            69.0
+          ],
+          "sat": 0.384,
+          "value": 0.439
+        },
+        "pixels_concept": 125501,
+        "pixels_render": 174592
+      }
+    },
+    "front": {
+      "feathers": {
+        "concept": {
+          "hue_deg": 60.0,
+          "luma_Y_linear": 0.0262,
+          "median_srgb": [
+            45.0,
+            45.0,
+            44.0
+          ],
+          "sat": 0.022,
+          "value": 0.176
+        },
+        "h21": {
+          "hue_deg": 240.0,
+          "luma_Y_linear": 0.0631,
+          "median_srgb": [
+            71.0,
+            71.0,
+            72.0
+          ],
+          "sat": 0.014,
+          "value": 0.282
+        },
+        "ld": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0782,
+          "median_srgb": [
+            79.0,
+            79.0,
+            79.0
+          ],
+          "sat": 0.0,
+          "value": 0.31
+        },
+        "pixels_concept": 13732,
+        "pixels_render": 17959
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 27.2,
+          "luma_Y_linear": 0.2989,
+          "median_srgb": [
+            177.0,
+            142.0,
+            113.0
+          ],
+          "sat": 0.362,
+          "value": 0.694
+        },
+        "h21": {
+          "hue_deg": 25.7,
+          "luma_Y_linear": 0.3435,
+          "median_srgb": [
+            178.0,
+            154.0,
+            136.0
+          ],
+          "sat": 0.236,
+          "value": 0.698
+        },
+        "ld": {
+          "hue_deg": 27.3,
+          "luma_Y_linear": 0.509,
+          "median_srgb": [
+            204.0,
+            186.0,
+            171.0
+          ],
+          "sat": 0.162,
+          "value": 0.8
+        },
+        "pixels_concept": 34071,
+        "pixels_render": 58291
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 20.0,
+          "luma_Y_linear": 0.0584,
+          "median_srgb": [
+            78.0,
+            66.0,
+            60.0
+          ],
+          "sat": 0.231,
+          "value": 0.306
+        },
+        "h21": {
+          "hue_deg": 16.2,
+          "luma_Y_linear": 0.1247,
+          "median_srgb": [
+            114.0,
+            95.0,
+            88.0
+          ],
+          "sat": 0.228,
+          "value": 0.447
+        },
+        "ld": {
+          "hue_deg": 17.5,
+          "luma_Y_linear": 0.1397,
+          "median_srgb": [
+            118.0,
+            101.0,
+            94.0
+          ],
+          "sat": 0.203,
+          "value": 0.463
+        },
+        "pixels_concept": 21911,
+        "pixels_render": 48514
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 30.8,
+          "luma_Y_linear": 0.0764,
+          "median_srgb": [
+            93.0,
+            75.0,
+            56.0
+          ],
+          "sat": 0.398,
+          "value": 0.365
+        },
+        "h21": {
+          "hue_deg": 32.6,
+          "luma_Y_linear": 0.1791,
+          "median_srgb": [
+            135.0,
+            114.0,
+            89.0
+          ],
+          "sat": 0.341,
+          "value": 0.529
+        },
+        "ld": {
+          "hue_deg": 31.2,
+          "luma_Y_linear": 0.2045,
+          "median_srgb": [
+            144.0,
+            121.0,
+            96.0
+          ],
+          "sat": 0.333,
+          "value": 0.565
+        },
+        "pixels_concept": 117173,
+        "pixels_render": 173688
+      }
+    },
+    "side": {
+      "feathers": {
+        "concept": {
+          "hue_deg": 20.0,
+          "luma_Y_linear": 0.0288,
+          "median_srgb": [
+            49.0,
+            47.0,
+            46.0
+          ],
+          "sat": 0.061,
+          "value": 0.192
+        },
+        "h21": {
+          "hue_deg": 240.0,
+          "luma_Y_linear": 0.0783,
+          "median_srgb": [
+            79.0,
+            79.0,
+            80.0
+          ],
+          "sat": 0.012,
+          "value": 0.314
+        },
+        "ld": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0958,
+          "median_srgb": [
+            88.0,
+            87.0,
+            87.0
+          ],
+          "sat": 0.011,
+          "value": 0.345
+        },
+        "pixels_concept": 6427,
+        "pixels_render": 11871
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 26.6,
+          "luma_Y_linear": 0.2603,
+          "median_srgb": [
+            167.0,
+            133.0,
+            106.0
+          ],
+          "sat": 0.365,
+          "value": 0.655
+        },
+        "h21": {
+          "hue_deg": 25.9,
+          "luma_Y_linear": 0.2771,
+          "median_srgb": [
+            164.0,
+            139.0,
+            120.0
+          ],
+          "sat": 0.268,
+          "value": 0.643
+        },
+        "ld": {
+          "hue_deg": 27.6,
+          "luma_Y_linear": 0.4362,
+          "median_srgb": [
+            193.0,
+            173.0,
+            156.0
+          ],
+          "sat": 0.192,
+          "value": 0.757
+        },
+        "pixels_concept": 18589,
+        "pixels_render": 32738
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 20.0,
+          "luma_Y_linear": 0.0496,
+          "median_srgb": [
+            71.0,
+            61.0,
+            56.0
+          ],
+          "sat": 0.211,
+          "value": 0.278
+        },
+        "h21": {
+          "hue_deg": 18.3,
+          "luma_Y_linear": 0.0828,
+          "median_srgb": [
+            94.0,
+            78.0,
+            71.0
+          ],
+          "sat": 0.245,
+          "value": 0.369
+        },
+        "ld": {
+          "hue_deg": 19.1,
+          "luma_Y_linear": 0.1046,
+          "median_srgb": [
+            103.0,
+            88.0,
+            81.0
+          ],
+          "sat": 0.214,
+          "value": 0.404
+        },
+        "pixels_concept": 25982,
+        "pixels_render": 48143
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 32.7,
+          "luma_Y_linear": 0.0656,
+          "median_srgb": [
+            85.0,
+            70.0,
+            52.0
+          ],
+          "sat": 0.388,
+          "value": 0.333
+        },
+        "h21": {
+          "hue_deg": 33.0,
+          "luma_Y_linear": 0.1141,
+          "median_srgb": [
+            110.0,
+            92.0,
+            70.0
+          ],
+          "sat": 0.364,
+          "value": 0.431
+        },
+        "ld": {
+          "hue_deg": 32.9,
+          "luma_Y_linear": 0.1385,
+          "median_srgb": [
+            120.0,
+            101.0,
+            78.0
+          ],
+          "sat": 0.35,
+          "value": 0.471
+        },
+        "pixels_concept": 76270,
+        "pixels_render": 109780
+      }
+    }
+  },
+  "zones": {
+    "feathers": {
+      "concept": {
+        "hue_deg": 0.0,
+        "luma_Y_linear": 0.0262,
+        "median_srgb": [
+          45.0,
+          45.0,
+          45.0
+        ],
+        "sat": 0.0,
+        "value": 0.176
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.116,
+        "dHue_deg": -60.0,
+        "dSat": 0.014
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.356,
+        "dHue_deg": 0.0,
+        "dSat": 0.013
+      },
+      "h21": {
+        "hue_deg": 300.0,
+        "luma_Y_linear": 0.0583,
+        "median_srgb": [
+          69.0,
+          68.0,
+          69.0
+        ],
+        "sat": 0.014,
+        "value": 0.271
+      },
+      "ld": {
+        "hue_deg": 0.0,
+        "luma_Y_linear": 0.0708,
+        "median_srgb": [
+          76.0,
+          75.0,
+          75.0
+        ],
+        "sat": 0.013,
+        "value": 0.298
+      },
+      "pixels_concept": 31131,
+      "pixels_h21": 47631,
+      "pixels_ld": 47631
+    },
+    "legacy_bake": {
+      "concept": {
+        "hue_deg": 27.1,
+        "luma_Y_linear": 0.2682,
+        "median_srgb": [
+          169.0,
+          135.0,
+          107.0
+        ],
+        "sat": 0.367,
+        "value": 0.663
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.565,
+        "dHue_deg": -0.6,
+        "dSat": -0.113
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.856,
+        "dHue_deg": 0.3,
+        "dSat": -0.188
+      },
+      "h21": {
+        "hue_deg": 26.5,
+        "luma_Y_linear": 0.3019,
+        "median_srgb": [
+          169.0,
+          145.0,
+          126.0
+        ],
+        "sat": 0.254,
+        "value": 0.663
+      },
+      "ld": {
+        "hue_deg": 27.4,
+        "luma_Y_linear": 0.4575,
+        "median_srgb": [
+          196.0,
+          177.0,
+          161.0
+        ],
+        "sat": 0.179,
+        "value": 0.769
+      },
+      "pixels_concept": 82321,
+      "pixels_h21": 144723,
+      "pixels_ld": 144723
+    },
+    "stone_base": {
+      "concept": {
+        "hue_deg": 21.2,
+        "luma_Y_linear": 0.0563,
+        "median_srgb": [
+          76.0,
+          65.0,
+          59.0
+        ],
+        "sat": 0.224,
+        "value": 0.298
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.796,
+        "dHue_deg": -4.8,
+        "dSat": 0.003
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.937,
+        "dHue_deg": -2.9,
+        "dSat": -0.003
+      },
+      "h21": {
+        "hue_deg": 16.4,
+        "luma_Y_linear": 0.0893,
+        "median_srgb": [
+          97.0,
+          81.0,
+          75.0
+        ],
+        "sat": 0.227,
+        "value": 0.38
+      },
+      "ld": {
+        "hue_deg": 18.3,
+        "luma_Y_linear": 0.1052,
+        "median_srgb": [
+          104.0,
+          88.0,
+          81.0
+        ],
+        "sat": 0.221,
+        "value": 0.408
+      },
+      "pixels_concept": 73097,
+      "pixels_h21": 144787,
+      "pixels_ld": 144787
+    },
+    "wood": {
+      "concept": {
+        "hue_deg": 31.7,
+        "luma_Y_linear": 0.0759,
+        "median_srgb": [
+          92.0,
+          75.0,
+          56.0
+        ],
+        "sat": 0.391,
+        "value": 0.361
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.844,
+        "dHue_deg": 0.5,
+        "dSat": -0.038
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.0,
+        "dHue_deg": 0.3,
+        "dSat": -0.034
+      },
+      "h21": {
+        "hue_deg": 32.2,
+        "luma_Y_linear": 0.1277,
+        "median_srgb": [
+          116.0,
+          97.0,
+          75.0
+        ],
+        "sat": 0.353,
+        "value": 0.455
+      },
+      "ld": {
+        "hue_deg": 32.0,
+        "luma_Y_linear": 0.1513,
+        "median_srgb": [
+          126.0,
+          105.0,
+          81.0
+        ],
+        "sat": 0.357,
+        "value": 0.494
+      },
+      "pixels_concept": 318944,
+      "pixels_h21": 458060,
+      "pixels_ld": 458060
+    }
+  }
+}

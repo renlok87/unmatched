@@ -98,6 +98,9 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F77 | 4 | pose-04 (left thigh raise) is shot from the left, where the shield hides hip and kilt: the П3-3 cloth shell went unjudged | capture: second angle for pose-04 away from the shield (like pose-03b) |
 | F78 | 4 | G-NAMES «figure top» undefined when a crest/headgear rises above the head (card vs launcher lesson disagreed) | rubric: defer to the card's height field, body mesh without the weapon |
 | F79 | 4 | Tone-related rework items both heroes also include stage-3 artefacts the stage-3 agents did not see (Achilles: brown spear tip, skin-coloured nose guard, collar smears, elbow pinch; Leshen: faceted claws/antler tines) | stage 3 exit: executor checks the same close-ups the acceptor uses (`capture_acceptance_set.py` dry run) before handing over |
+| F80 | 7 | UE import check `figure_height_as_profile` took the figure top from the whole skeletal mesh (Angel's sword tip 55.909 uu vs head 55.000) — false FAIL for any raised weapon or antlers | **fixed** `cd3ee7fe`: optional `candidate.figure_top_part` in the import profile |
+| F81 | 7 | `h2anim_ue.py frames` read the removed `lightProfiles.cobble-probe` (ND-5, 2026-10-04) → KeyError; stage-6 UE frames impossible for every new hero | **fixed** `22c19667`: `--light-pinned <review report>` |
+| F82 | — | The Codex desktop app runs `git diff` every few seconds on the main checkout and twice left a stale `.git/index.lock` (00:12, 01:06), blocking commits | orchestration: check lock age + live git processes before removing; consider closing the app's diff view during runs |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 
