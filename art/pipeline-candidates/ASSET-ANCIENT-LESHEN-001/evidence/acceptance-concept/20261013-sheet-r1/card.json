@@ -1,0 +1,119 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+      "sha256": "fdc3d76e612c269a62f30791465f84c4a8d88ffd73da759cd394132999e2d157"
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+      "sha256": "0e5b59ee699b2c298d0804c2d27a433b0f9c016cf5e5352762a1e999361ec512"
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png",
+      "sha256": "8d72d6c7f5c23cc71d3bb395f270b081bcfbfc8d6edc462933f429b3fe532100"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ancient-leshen-codex",
+    "files": [
+      "sheet-ancient-leshen.png",
+      "ancient-leshen-front.png",
+      "ancient-leshen-side.png",
+      "ancient-leshen-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+    "art/imagegen/concept-ancient-leshen-codex/generation-records.json",
+    "art/imagegen/concept-ancient-leshen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "note": "art/imagegen/concept-ancient-leshen-codex/checks-report.json#summary.FAIL = 0; summary.WARN = 0; summary.PASS = 33; verification.json#final_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "ancient-leshen-front.png и ancient-leshen-back.png ясно показывают рога, длинные руки, отдельные когти и ворон; поза естественная, не T и не A. В ancient-leshen-side.png кисть и часть когтей накладываются на корневой корпус и читаются слабее, хотя персонаж узнаваем. Тонкие концы рогов и когтей требуют проверки толщины и читаемости на этапах 3–4.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На sheet-ancient-leshen.png согласованы рост, поза, пропорции, ветвление рогов, положение рук и трёх ворон. ancient-leshen-side.png соответствует заданному левому профилю; ancient-leshen-back.png является строгим задним видом. Различия локальны: рисунок коры и мха, приподнятые перья вороны на левом краю заднего вида и небольшие отклонения рамки от орто. Существенной смены формы или позы нет.",
+      "frames": [
+        "sheet-ancient-leshen.png",
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "ancient-leshen-front.png, ancient-leshen-side.png и ancient-leshen-back.png соответствуют уровню расписанной коллекционной миниатюры эталона: выраженный рельеф переплетённых корней, мелкие борозды коры и рогов, пористая кость, неоднородный мох и отдельные перья. Детали присутствуют внутри силуэта; материалы различимы и сохраняют объём на всех видах.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "Свотчи sheet-ancient-leshen.png соответствуют заданной PALETTE; на всех видах присутствуют коричневая кора, светлая кость, зелёный мох и чёрные вороны. Все четыре якоря сохранены. Локальное отклонение в ancient-leshen-side.png: край хвоста плечевой вороны окрашен коричневым и воспринимается как древесина, тогда как её голова, корпус и крылья остаются чёрными.",
+      "frames": [
+        "sheet-ancient-leshen.png",
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "ancient-leshen-side.png",
+      "note": "Кисть и часть длинных когтей перекрывают корневой корпус в профиле; это перекрытие уже присутствует в левом орто черновика. На этапах 3–4 проверить читаемость кистей и сохранность тонких концов когтей и рогов."
+    },
+    {
+      "item": "C",
+      "frame": "ancient-leshen-back.png",
+      "note": "У вороны на предплечье слева в изображении несколько перьев приподняты относительно более гладкого сложенного контура черновика. Положение птицы и основная поза совпадают."
+    },
+    {
+      "item": "P",
+      "frame": "ancient-leshen-side.png",
+      "note": "Кончик хвоста плечевой вороны имеет древесный коричневый цвет; локальное отклонение акцента при сохранённом якоре."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-ancient-leshen.png",
+      "note": "Рамка и фон не буквально идентичны орто: верх фронта 3.660% вместо 4.0%, низ подставок 94.130–94.199% вместо 94.0%; присутствует слабая неоднородность фона. Межвидовой масштаб согласован, обрезки нет, все проверки PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13617-3cee-7a91-9b3e-31f5d1d31080"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261013",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md); pass данной карточки со score 8.1 требует второго независимого приёмщика для устойчивого итогового pass согласно concept-sheet.md §11."
+}

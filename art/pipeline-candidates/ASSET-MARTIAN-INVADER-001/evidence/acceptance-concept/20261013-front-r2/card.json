@@ -1,0 +1,88 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MARTIAN-INVADER-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-13",
+  "previous_card": "art/pipeline-candidates/ASSET-MARTIAN-INVADER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-martian-invader-codex/design/martian-invader-front.png",
+      "sha256": "d5698b947f2bc320e4430b817a0f3c7e52088b9ab8e33f507f54c09431d07904"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-martian-invader-codex/design",
+    "files": [
+      "martian-invader-front.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+    "art/imagegen/concept-martian-invader-codex/generation-records.json",
+    "art/imagegen/concept-martian-invader-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 12; checks-report.json#summary.WARN = 1; checks-report.json#measurements.front.mask.top_pct = 2.97; checks-report.json#frame.min_top_pct = 4.0; view.frame_top = WARN.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "MartianInvader узнаваем по огромному открытому мозгу в стеклянном куполе, стройному серебряному скафандру с плавниками и лучевому пистолету. Обе руки отделены от корпуса, локти слегка согнуты, стопы стоят на подставке; поза соответствует §4.4, без T/A-позы. Пистолет в собственной правой руке, слева для зрителя, опущен рядом с бедром и не сливается с корпусом. Купол и плавники читаются целиком; их тонкие кромки следует сохранить на этапах 3–4.",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень расписанной коллекционной миниатюры сопоставим с эталоном Medusa: отчётливые извилины и сосуды мозга, проработанные глаза и лицо, заклёпки, фаски, рёбра сочленений и фактура изношенных панелей до ботинок. Металл, стекло, кожа и матовая каменная подставка убедительно различаются; детали сохраняются внутри силуэта.",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "Все основные цветовые семьи, циановый акцент и четыре якоря присутствуют: пистолет в собственной правой руке, стеклянный купол, большой открытый мозг, серебряный скафандр с плавниками. Есть тоновое отклонение: плавники выглядят теплее и ближе к кораллово-красному, чем #B3202A, а кожа имеет желтовато-оливковый оттенок относительно #7AA65A.",
+      "frames": [
+        "martian-invader-front.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "P",
+      "frame": "martian-invader-front.png",
+      "note": "Красные плавники и зелёная кожа имеют тёплое тоновое отклонение от заданной палитры; цветовые семьи и все якоря сохранены."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "view.frame_top = WARN: верхний отступ 2.97% при ориентире 4.0%. Купол целиком в кадре; summary.FAIL = 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13607-3719-7e63-bd91-9798f4eab827"
+  },
+  "executor_session_id": "codex:01a135fc-5aff-7093-b885-c121cca5f11d",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1a/r2: художественно принято, по делегированию; основание — docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md."
+}

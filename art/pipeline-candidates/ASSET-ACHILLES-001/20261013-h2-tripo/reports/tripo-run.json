@@ -1,0 +1,514 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-37",
+  "asset_id": "ASSET-ACHILLES-001",
+  "date": "2026-10-13",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (Claude, оркестратор 3d-model-pipeline) в браузере пользователя через Windows-MCP: клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "b467cd91-eeef-47f6-a0bc-2920b83799e9",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/b467cd91-eeef-47f6-a0bc-2920b83799e9"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-achilles-codex/achilles-front.png",
+        "sha256": "cf86076b5a33f69342d8e9a932e910c6fcee43b92dba761d7f0a034aaa16cf23"
+      },
+      "left": {
+        "path": "art/imagegen/concept-achilles-codex/achilles-side.png",
+        "sha256": "0bc06f2ddcd5b474f0f9c42e54df1af72cf772cb6945db1cd4aa218b18f8fd14"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-achilles-codex/achilles-back.png",
+        "sha256": "6ec8261622ec1f7f024126d69503837328f6c6db72cce64dc84d83f068ab7b33"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма уже стояла на H2-настройках (по частям Баланс, без текстуры, ультра 2M, 8K выкл., Приватный) — с предыдущего героя пилота",
+    "studio_settings_after": "не менялись: форма остаётся на H2-настройках для следующих героев пилота"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 21180.0,
+        "balance_after": 21120.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 21120.0,
+        "balance_after": 21090.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 21030.0,
+        "balance_after": 21025.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/source/achilles-h2-tripo-b467cd91-parts14.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "386c06804eebbb6c5f72f6f58989c9bb4b12419af7473d77e30122a493ee3fe7",
+      "bytes": 47499496,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 14,
+      "triangles": 1973984,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 449417
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 36873
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 49924
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 17423
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 27309
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 337537
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 223715
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 171059
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 130414
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 125122
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 109885
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 92626
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 134193
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 68487
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/source/achilles-h2-tripo-b467cd91-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "f50f50f864cadb59ddb2b99b9d9ea2f7cb7d1be8c253e78acb7c60e501941841",
+      "bytes": 77483344,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 14,
+      "triangles": 1973984,
+      "materials": 14,
+      "images": 42,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 449417
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 36873
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 49924
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 17423
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 27309
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 337537
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 223715
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 171059
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 130414
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 125122
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 109885
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 92626
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 134193
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 68487
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 449417,
+      "min": [
+        -0.2325,
+        0.1396,
+        -0.1231
+      ],
+      "max": [
+        0.1317,
+        0.7648,
+        0.0432
+      ],
+      "role": "плащ (сзади, от плеч до икр)"
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 337537,
+      "min": [
+        -0.2524,
+        0.0,
+        -0.2248
+      ],
+      "max": [
+        0.2079,
+        0.088,
+        0.2248
+      ],
+      "role": "подставка"
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 223715,
+      "min": [
+        0.1184,
+        0.3808,
+        -0.0674
+      ],
+      "max": [
+        0.2524,
+        0.6462,
+        0.1748
+      ],
+      "role": "щит (левая рука фигуры, +X)"
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 171059,
+      "min": [
+        -0.1237,
+        0.3952,
+        -0.0671
+      ],
+      "max": [
+        0.1084,
+        0.5742,
+        0.0756
+      ],
+      "role": "птеруги/юбка"
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 130414,
+      "min": [
+        -0.1729,
+        0.083,
+        -0.0681
+      ],
+      "max": [
+        -0.033,
+        0.4267,
+        0.0803
+      ],
+      "role": "правая нога (−X)"
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 125122,
+      "min": [
+        -0.0686,
+        0.7341,
+        -0.1007
+      ],
+      "max": [
+        0.0406,
+        0.9215,
+        0.0543
+      ],
+      "role": "голова/лицо"
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 109885,
+      "min": [
+        -0.0671,
+        0.737,
+        -0.1499
+      ],
+      "max": [
+        0.0204,
+        0.9799,
+        0.0498
+      ],
+      "role": "шлем с гребнем"
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 92626,
+      "min": [
+        -0.0992,
+        0.5348,
+        -0.0664
+      ],
+      "max": [
+        0.0694,
+        0.7191,
+        0.0637
+      ],
+      "role": "торс/кираса"
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 134193,
+      "min": [
+        0.0035,
+        0.0831,
+        -0.0703
+      ],
+      "max": [
+        0.1441,
+        0.4269,
+        0.0803
+      ],
+      "role": "левая нога (+X)"
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 68487,
+      "min": [
+        -0.2254,
+        0.5622,
+        -0.0591
+      ],
+      "max": [
+        -0.0834,
+        0.7209,
+        0.1495
+      ],
+      "role": "правая рука с кистью на древке (−X)"
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 36873,
+      "min": [
+        -0.2271,
+        0.6131,
+        0.1204
+      ],
+      "max": [
+        -0.1857,
+        0.9571,
+        0.147
+      ],
+      "role": "копьё: наконечник и верх древка (правая рука)"
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 49924,
+      "min": [
+        0.0596,
+        0.513,
+        -0.0617
+      ],
+      "max": [
+        0.1748,
+        0.7126,
+        0.0484
+      ],
+      "role": "левая рука (+X)"
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 17423,
+      "min": [
+        0.1408,
+        0.4653,
+        0.0157
+      ],
+      "max": [
+        0.1875,
+        0.5359,
+        0.0847
+      ],
+      "role": "левая кисть/наруч у щита"
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "meshes[13]",
+      "tris": 27309,
+      "min": [
+        -0.2031,
+        0.0835,
+        0.1117
+      ],
+      "max": [
+        -0.1684,
+        0.602,
+        0.1396
+      ],
+      "role": "копьё: низ древка"
+    }
+  ],
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-b467cd91-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/preview",
+    "out": "-render-dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-ACHILLES-001\\20261013-h2-tripo\\preview\\draft-orthos-t31t9vak --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [
+    {
+      "id": "H2-OK",
+      "note": "Превью preview/ortho_* осмотрены против видов 1c: одна фигура, одна подставка, копьё в правой руке во всех видах, щит в левой, второго оружия, лишних рук и второго лица нет; правый бок (без входного вида) чистый. Брака §5.4 нет."
+    },
+    {
+      "id": "GLB-ACCESSOR-MIN",
+      "note": "Tripo пишет в accessor POSITION min.y = 2.2e-308 (DBL_MIN); габариты частей считать по буферу вершин, не по min/max accessor."
+    },
+    {
+      "id": "PBR-TILE",
+      "note": "Текстура и PBR идут на той же задаче: плитка ассета показывает «Gerando Textura…/Генерация PBR…»; после PBR кнопка «Создать PBR 5» снова активна — второй раз не нажимать."
+    }
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "parts_note": "Роли — по габаритам вершин (glTF: Y вверх, фронт +Z, −X = правая сторона фигуры = левая по кадру фронта) и цветам сегментации Studio. Копьё разбито на 2 части (10 верх, 13 низ), оружие = WEAPON_HAND right."
+}

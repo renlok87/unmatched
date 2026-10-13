@@ -1,0 +1,115 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-angel-codex/angel-front.png",
+      "sha256": "b28cd8a1633fdb0993d9b2dbeac4857058a2289ec7af3b439236e1394dc46209"
+    },
+    {
+      "path": "art/imagegen/concept-angel-codex/angel-side.png",
+      "sha256": "965b90d0d763d964c1e1afcf37aeed62038849103fa943ca79236d17117f47ff"
+    },
+    {
+      "path": "art/imagegen/concept-angel-codex/angel-back.png",
+      "sha256": "edd8861ebcffee0065669662a7ee0fa91755e642529a57b24dbb813f9e347c4e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-angel-codex",
+    "files": [
+      "sheet-angel.png",
+      "angel-front.png",
+      "angel-side.png",
+      "angel-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-angel-codex/checks-report.json",
+    "art/imagegen/concept-angel-codex/generation-records.json",
+    "art/imagegen/concept-angel-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-angel-codex/checks-report.json",
+      "note": "checks-report.json#summary = {\"PASS\":32,\"WARN\":1,\"FAIL\":0}; verification.json#checks[4].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В angel-front.png и angel-back.png меч, причёска и длинный плащ образуют ясный силуэт, обе руки отделены от корпуса. Стойка естественная, локти слегка согнуты, обе стопы на подставке; это не T- или A-поза. В angel-side.png свободная левая кисть накладывается на плащ, как в ortho_left, поэтому её отделение слабее. Клинок и пальцы различимы; толщину тонких деталей следует контролировать на этапах 3–4.",
+      "frames": [
+        "angel-front.png",
+        "angel-side.png",
+        "angel-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "angel-front.png, angel-side.png и angel-back.png сохраняют персонажа, пропорции, стойку, длину плаща и меч в собственной правой руке. angel-side.png соответствует SIDE_VIEW left: ближняя левая кисть свободна; профиль строгий. angel-back.png показывает затылок и спину без поворота в три четверти. Есть небольшие различия складок, отделки манжет и отдельных прядей. sheet-angel.png подтверждает согласованный масштаб и линию основания. WARN view.single_component на заднем виде учтён: визуально ботинки соприкасаются с подставкой, отдельного лишнего объекта нет.",
+      "frames": [
+        "angel-front.png",
+        "angel-side.png",
+        "angel-back.png",
+        "sheet-angel.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "angel-front.png, angel-side.png и angel-back.png выглядят как расписанная коллекционная миниатюра на уровне эталона Medusa: проработаны лицо, скульптурные пряди, кожаная фактура, швы, пуговицы, шнуровка ботинок, грани и дол клинка. Кожа, одежда и металл различимы; детали читаются внутри силуэта. Более простой костюм соответствует утверждённому дизайну и не означает меньшего качества исполнения.",
+      "frames": [
+        "angel-front.png",
+        "angel-side.png",
+        "angel-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Свотчи sheet-angel.png соответствуют PALETTE: чёрный плащ #1C1A1C, серая рубашка #4A4A50, бледная кожа #D9BFA8 и стальной клинок #B8BEC4. Эти цвета присутствуют на фигуре с естественными светотеневыми вариациями. angel-front.png показывает все четыре якоря; angel-side.png и angel-back.png сохраняют видимые якоря и правильную сторону оружия. Рукоять коричневая, командных цветов на подставке нет.",
+      "frames": [
+        "sheet-angel.png",
+        "angel-front.png",
+        "angel-side.png",
+        "angel-back.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "angel-side.png",
+      "note": "Свободная левая кисть проецируется на боковину плаща; пальцы читаются по цвету и рельефу, но отдельного фонового просвета в профиль нет. Это положение уже присутствует в ortho_left."
+    },
+    {
+      "item": "C",
+      "frame": "angel-side.png",
+      "note": "Микродетали складок, манжет и прядей не образуют точной репроекции angel-front.png; расхождения небольшие, основные формы и якоря сохранены."
+    },
+    {
+      "item": "C",
+      "frame": "angel-back.png",
+      "note": "WARN view.single_component не подтверждает физического разрыва при визуальном осмотре. Ширина подставки 67,495% вместо 68,225% в черновом орто — небольшое допустимое расхождение кадрирования."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13616-b526-7550-8d7a-018ba2255176"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261013",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c: художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). G-CHECKS PASS; коэффициент 8,8."
+}

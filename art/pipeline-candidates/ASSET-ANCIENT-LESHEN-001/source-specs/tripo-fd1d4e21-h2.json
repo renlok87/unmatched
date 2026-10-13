@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-fd1d4e21-h2",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "service": "tripo-studio",
+  "task_id": "fd1d4e21-e40f-4c63-9e6d-0462b05b41c0",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/fd1d4e21-e40f-4c63-9e6d-0462b05b41c0",
+  "date": "2026-10-13",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+        "sha256": "fdc3d76e612c269a62f30791465f84c4a8d88ffd73da759cd394132999e2d157"
+      },
+      "left": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+        "sha256": "0e5b59ee699b2c298d0804c2d27a433b0f9c016cf5e5352762a1e999361ec512"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png",
+        "sha256": "8d72d6c7f5c23cc71d3bb395f270b081bcfbfc8d6edc462933f429b3fe532100"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-ancient-leshen-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20995.0,
+        "balance_after": 20935.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20935.0,
+        "balance_after": 20905.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20900.0,
+        "balance_after": 20895.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-parts13.glb",
+      "expected_sha256": "5c7f53b47a873cf5362eb47f2f174db5a33f91f9acb23d41f2ac9b24fd0da6b9",
+      "expected_bytes": 44684548,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-tex8k-pbr.glb",
+      "expected_sha256": "47e6123a4ec3d3b47e5e3b9efd4e8b50b6c29b672e27e91ced1886d44e7ff444",
+      "expected_bytes": 76323864,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 13,
+      "glb_triangles": 1859010,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 13,
+      "glb_triangles": 1859010,
+      "glb_materials": 13,
+      "glb_images": 39,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

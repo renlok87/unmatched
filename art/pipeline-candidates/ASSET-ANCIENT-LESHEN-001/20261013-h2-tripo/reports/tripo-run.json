@@ -1,0 +1,482 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-38",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "date": "2026-10-13",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (Claude, оркестратор 3d-model-pipeline) в браузере пользователя через Windows-MCP: клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "fd1d4e21-e40f-4c63-9e6d-0462b05b41c0",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/fd1d4e21-e40f-4c63-9e6d-0462b05b41c0"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+        "sha256": "fdc3d76e612c269a62f30791465f84c4a8d88ffd73da759cd394132999e2d157"
+      },
+      "left": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+        "sha256": "0e5b59ee699b2c298d0804c2d27a433b0f9c016cf5e5352762a1e999361ec512"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png",
+        "sha256": "8d72d6c7f5c23cc71d3bb395f270b081bcfbfc8d6edc462933f429b3fe532100"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма уже стояла на H2-настройках (по частям Баланс, без текстуры, ультра 2M, 8K выкл., Приватный) — с предыдущего героя пилота",
+    "studio_settings_after": "не менялись: форма остаётся на H2-настройках для следующих героев пилота"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20995.0,
+        "balance_after": 20935.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20935.0,
+        "balance_after": 20905.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20900.0,
+        "balance_after": 20895.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-parts13.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "5c7f53b47a873cf5362eb47f2f174db5a33f91f9acb23d41f2ac9b24fd0da6b9",
+      "bytes": 44684548,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 13,
+      "triangles": 1859010,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 859448
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 45364
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 39406
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 5176
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 149028
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 147360
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 144812
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 104527
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 101084
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 87396
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 83941
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 47898
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 43570
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/source/ancient-leshen-h2-tripo-fd1d4e21-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "47e6123a4ec3d3b47e5e3b9efd4e8b50b6c29b672e27e91ced1886d44e7ff444",
+      "bytes": 76323864,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 13,
+      "triangles": 1859010,
+      "materials": 13,
+      "images": 39,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 859448
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 45364
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 39406
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 5176
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 149028
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 147360
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 144812
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 104527
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 101084
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 87396
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 83941
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 47898
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 43570
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 859448,
+      "min": [
+        -0.1691,
+        0.0423,
+        -0.1758
+      ],
+      "max": [
+        0.1839,
+        0.6833,
+        0.1757
+      ],
+      "role": "тело: ствол из корней (вместо ног) и корпус"
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 149028,
+      "min": [
+        -0.1819,
+        0.0,
+        -0.1869
+      ],
+      "max": [
+        0.1968,
+        0.0471,
+        0.1869
+      ],
+      "role": "подставка"
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 147360,
+      "min": [
+        0.0171,
+        0.6917,
+        -0.0496
+      ],
+      "max": [
+        0.1974,
+        0.9792,
+        0.13
+      ],
+      "role": "левый рог (+X)"
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 144812,
+      "min": [
+        -0.1813,
+        0.6917,
+        -0.0472
+      ],
+      "max": [
+        -0.0019,
+        0.9809,
+        0.13
+      ],
+      "role": "правый рог (−X)"
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 104527,
+      "min": [
+        0.1275,
+        0.1453,
+        -0.0293
+      ],
+      "max": [
+        0.2388,
+        0.3665,
+        0.0907
+      ],
+      "role": "левая кисть-когти (+X)"
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 101084,
+      "min": [
+        -0.2214,
+        0.145,
+        -0.0289
+      ],
+      "max": [
+        -0.1111,
+        0.3677,
+        0.0878
+      ],
+      "role": "правая кисть-когти (−X)"
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 87396,
+      "min": [
+        -0.1783,
+        0.3498,
+        -0.0817
+      ],
+      "max": [
+        -0.0435,
+        0.5892,
+        0.012
+      ],
+      "role": "правое предплечье/рука (−X)"
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 83941,
+      "min": [
+        0.0668,
+        0.3487,
+        -0.0689
+      ],
+      "max": [
+        0.1963,
+        0.5891,
+        0.0185
+      ],
+      "role": "левое предплечье/рука (+X)"
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 47898,
+      "min": [
+        -0.2629,
+        0.302,
+        0.0431
+      ],
+      "max": [
+        -0.1415,
+        0.4304,
+        0.1088
+      ],
+      "role": "ворона на правой руке (−X, спереди)"
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 43570,
+      "min": [
+        -0.0317,
+        0.5964,
+        0.0093
+      ],
+      "max": [
+        0.0483,
+        0.7244,
+        0.0897
+      ],
+      "role": "череп оленя (голова)"
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 45364,
+      "min": [
+        0.0699,
+        0.5594,
+        -0.0951
+      ],
+      "max": [
+        0.1936,
+        0.6649,
+        0.02
+      ],
+      "role": "ворона на левом плече (+X)"
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 39406,
+      "min": [
+        0.1633,
+        0.3384,
+        -0.1231
+      ],
+      "max": [
+        0.2629,
+        0.4273,
+        -0.0461
+      ],
+      "role": "ворона на левом предплечье (+X, сзади)"
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 5176,
+      "min": [
+        -0.1842,
+        0.3441,
+        -0.0267
+      ],
+      "max": [
+        -0.1525,
+        0.376,
+        0.0098
+      ],
+      "role": "побег на правом предплечье (−X)"
+    }
+  ],
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-fd1d4e21-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/preview",
+    "out": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-ANCIENT-LESHEN-001\\20261013-h2-tripo\\preview\\draft-orthos-f2hrf52n --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [
+    {
+      "id": "H2-OK",
+      "note": "Превью preview/ortho_* осмотрены против видов 1c: одна фигура, одна подставка, рога, череп, три вороны, когти; лишних рук/голов нет; правый бок чистый. Брака §5.4 нет."
+    }
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "parts_note": "Роли — по габаритам вершин (glTF: Y вверх, фронт +Z, −X = правая сторона фигуры) и превью; оружия нет (WEAPON_HAND none). Ног нет: нижняя часть — единый ствол (known_issue приёмки 1c: веса leg_upper/leg_lower внутри ствола)."
+}

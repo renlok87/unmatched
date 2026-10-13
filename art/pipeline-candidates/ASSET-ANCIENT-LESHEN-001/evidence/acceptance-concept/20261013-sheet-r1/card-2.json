@@ -1,0 +1,120 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+      "sha256": "fdc3d76e612c269a62f30791465f84c4a8d88ffd73da759cd394132999e2d157"
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+      "sha256": "0e5b59ee699b2c298d0804c2d27a433b0f9c016cf5e5352762a1e999361ec512"
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png",
+      "sha256": "8d72d6c7f5c23cc71d3bb395f270b081bcfbfc8d6edc462933f429b3fe532100"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-ancient-leshen-codex",
+    "files": [
+      "sheet-ancient-leshen.png",
+      "ancient-leshen-front.png",
+      "ancient-leshen-side.png",
+      "ancient-leshen-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+    "art/imagegen/concept-ancient-leshen-codex/generation-records.json",
+    "art/imagegen/concept-ancient-leshen-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 33 / WARN 0 / FAIL 0, verdict PASS; verification.json final_exit_code 0; sha256 трёх видов в отчёте совпадают с accepted_object. Пункты CHECKLIST исполнителя framing/background (отклонения рамки 0,1–0,3 % и неоднородность фона RGB 43–45) автопроверки не нарушают и оценены в C."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "ancient-leshen-front.png и ancient-leshen-back.png: ясный силуэт — череп оленя, широкие рога с отростками, длинные руки с явным зазором до корпуса (около 20° от вертикали, локти чуть согнуты), когти-кисти и три вороны читаются отдельно; поза не T и не A, повторяет черновик 1b. ancient-leshen-side.png: строгий левый профиль, читаются череп, рог, ворона на плече, когти перед стволом; перекрытие руки и ствола в профиле естественно и совпадает с ortho_left. Тонкие части (отростки рогов, пальцы-когти, хвосты ворон, побеги на предплечье и стволе) читаются; для этапов 3–4 помечены: они и нижняя часть тела — единый ствол из корней без раздельных ног (из утверждённого дизайна и черновика), ноги рига уходят внутрь ствола.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "Поза, пропорции и рамка совпадают (checks-report.json: разброс роста 0,38 %, низ подставки 0,07 %, центр 0,18 %); профиль ancient-leshen-side.png и вид ancient-leshen-back.png строгие, сторона соблюдена: ворона на левом плече справа на front и слева на back, побег на правом предплечье слева на front и справа на back, отверстие и побег ствола на левой стороне фигуры; бусы у основания рогов на всех видах; оружия нет. Мелкие расхождения уровня hero-quality-v1: на back у вороны на плече светлый клюв и рядом лишний тёмный фрагмент пера на коре, у вороны на левом предплечье приподняты кончики крыльев; на side хвост плечевой вороны продолжен веткой цвета коры; вороны на side и back светлее (около #3E–#43), чем на front (около #27–#37); плотность мха на back выше.",
+      "frames": [
+        "ancient-leshen-back.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-front.png",
+        "sheet-ancient-leshen.png"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "ancient-leshen-front.png и ancient-leshen-side.png: читается расписанная коллекционная миниатюра — бороздки коры, зернистый мох, швы и глазницы черепа, бороздки рогов, бусы, перья ворон; деталь внутри силуэта, без мультяшности и фото. Ниже эталона medusa-quality-reference.png отдельные зоны: вороны — плоский матовый уголь почти без бликовой росписи, роспись коры ровнее, без глазури и бликов по кромкам, как у эталона; подставка — простой камень.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "Все якоря на месте на всех видимых сторонах: череп оленя с большими рогами, тело из перевитых корней, длинные руки с когтями, вороны (3 на front и back, 2 видимые на side). Все цвета PALETTE присутствуют, но с отклонением тона против свотчей sheet-ancient-leshen.png: освещённая кора около #8F755B–#B59477 светлее и теплее, чем #5A4030 (с ним совпадают только тени около #503E30); мох около #696A49 светлее и серее, чем #4E5A36; вороны угольные (около #27–#43) вместо #141414; кость черепа около #DABFA3 теплее, чем #D9CFB8. Тот же тон уже в утверждённом дизайне.",
+      "frames": [
+        "sheet-ancient-leshen.png",
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "ancient-leshen-front.png",
+      "note": "Нижняя часть тела — единый ствол из корней без раздельных ног (из утверждённого дизайна и черновика 1b): этапам 3–4 проверить скиннинг ног гуманоидного рига внутри ствола. Тонкие части (отростки рогов, пальцы-когти, хвосты ворон, побеги) проверить на читаемость после Tripo и H2."
+    },
+    {
+      "item": "C",
+      "frame": "ancient-leshen-back.png",
+      "note": "У вороны на плече светлый клюв и лишний тёмный фрагмент пера на коре у плеча; у вороны на левом предплечье приподняты кончики крыльев."
+    },
+    {
+      "item": "C",
+      "frame": "ancient-leshen-side.png",
+      "note": "Хвост плечевой вороны переходит в ветку цвета коры; вороны на side и back светлее, чем на front."
+    },
+    {
+      "item": "Q",
+      "frame": "ancient-leshen-front.png",
+      "note": "Вороны — плоский матовый уголь почти без бликовой росписи; роспись коры ровнее, чем глазурь и блики по кромкам у эталона Medusa."
+    },
+    {
+      "item": "P",
+      "frame": "sheet-ancient-leshen.png",
+      "note": "Тон отличается от свотчей: освещённая кора светлее и теплее #5A4030, мох светлее и серее #4E5A36, вороны угольные вместо #141414. Отклонение уже есть в утверждённом дизайне 1a."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor2-ASSET-ANCIENT-LESHEN-001-r1"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261013",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Лист 1c художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Второй независимый приёмщик Opus xhigh: S 2, C 1,5, Q 1,5, P 1,5 → 8,1 (полоса 8,0–8,4); итог пары считает validate_card.py --second. Замечания в known_issues."
+}

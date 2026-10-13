@@ -1,0 +1,485 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "unstability",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+      "source": "unstability.ai"
+    },
+    {
+      "view": "design-front",
+      "generation": "rc1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+      "final": true,
+      "source": "unstability.ai recraft"
+    },
+    {
+      "view": "front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/front-g1/checks-report.json"
+    },
+    {
+      "view": "front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/front-g2/checks-report.json"
+    },
+    {
+      "view": "side",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/side-g1/checks-report.json"
+    },
+    {
+      "view": "side",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/side-g2/checks-report.json"
+    },
+    {
+      "view": "back",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/back-g1/checks-report.json"
+    },
+    {
+      "view": "back",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks/back-g2/checks-report.json"
+    },
+    {
+      "view": "front,side,back",
+      "generation": {
+        "front": "g2",
+        "side": "g1",
+        "back": "g1"
+      },
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "front",
+      "item": "view_camera",
+      "passed": true,
+      "note": "Строгий фронт; камера на уровне, без текста, водяных знаков и коллажа."
+    },
+    {
+      "view": "front",
+      "item": "silhouette_pose_anatomy",
+      "passed": true,
+      "note": "Основной контур черновика, положение рогов, рук и длинных когтей сохранены; новой анатомии нет. Детали поверхности перерисованы."
+    },
+    {
+      "view": "front",
+      "item": "identity_materials_anchors",
+      "passed": true,
+      "note": "Костяной череп, рога, корни и мох читаются; все три видимые вороны чёрные."
+    },
+    {
+      "view": "front",
+      "item": "weapon_side",
+      "passed": true,
+      "note": "Оружия и предметов в руках нет."
+    },
+    {
+      "view": "front",
+      "item": "framing",
+      "passed": false,
+      "note": "Фигура и подставка целиком в кадре; центр x50.0%, ширина подставки 47.053%. Точная рамка не выдержана: верх 3.660% вместо 4.0%, верх подставки 90.262% вместо 90.0%, низ 94.199% вместо 94.0%."
+    },
+    {
+      "view": "front",
+      "item": "background",
+      "passed": false,
+      "note": "Нейтральный тёмно-серый фон; остаётся слабая неоднородность пикселей. Семплы RGB 43–45; идеально плоский RGB(46,46,46) не получен."
+    },
+    {
+      "view": "side",
+      "item": "view_camera",
+      "passed": true,
+      "note": "Строгий левый профиль; морда направлена влево, камера на уровне. Нет текста и коллажа."
+    },
+    {
+      "view": "side",
+      "item": "silhouette_pose_anatomy",
+      "passed": true,
+      "note": "g1 ближе к контуру черновика, чем g2: положение рук, когтей и рогов сохранено; g2 увеличил плечевую птицу. Новой анатомии у g1 нет."
+    },
+    {
+      "view": "side",
+      "item": "identity_materials_anchors",
+      "passed": false,
+      "note": "Череп, рога, корни, мох и чёрные вороны читаются; кончик силуэта плечевой вороны окрашен как древесина. Полная окраска этого якоря не выдержана."
+    },
+    {
+      "view": "side",
+      "item": "weapon_side",
+      "passed": true,
+      "note": "Оружия и предметов в руках нет."
+    },
+    {
+      "view": "side",
+      "item": "framing",
+      "passed": false,
+      "note": "Фигура целиком видна. Верх 3.936%, низ 94.130%, верх подставки 90.262%, центр x50.138%, ширина 46.133%; точная рамка CORE не достигнута."
+    },
+    {
+      "view": "side",
+      "item": "background",
+      "passed": false,
+      "note": "Нейтральный тёмно-серый фон, медиана рамки RGB(45,45,44), p99 отклонения 2; небольшая неоднородность остаётся."
+    },
+    {
+      "view": "back",
+      "item": "view_camera",
+      "passed": true,
+      "note": "Строгий вид сзади, лицевой части черепа нет. Камера на уровне; без текста, коллажа и водяного знака."
+    },
+    {
+      "view": "back",
+      "item": "silhouette_pose_anatomy",
+      "passed": false,
+      "note": "Основная поза и положения рук и рогов следуют черновику. У вороны на левом краю у предплечья появились приподнятые кончики крыла; точный контур этого участка не выдержан."
+    },
+    {
+      "view": "back",
+      "item": "identity_materials_anchors",
+      "passed": true,
+      "note": "Сохранены задняя часть костяного черепа, рога, корни, мох и все три чёрные вороны. У g2 две вороны на предплечьях стали древесными, поэтому выбран g1."
+    },
+    {
+      "view": "back",
+      "item": "weapon_side",
+      "passed": true,
+      "note": "Оружия и предметов в руках нет; пустое поле back в CHECKLIST трактовано по CORE как No weapon or held object."
+    },
+    {
+      "view": "back",
+      "item": "framing",
+      "passed": false,
+      "note": "Фигура и подставка видны целиком. Верх 3.936%, низ 94.130%, верх подставки 90.124%, центр x49.954%, ширина 47.053%; точная рамка CORE не достигнута."
+    },
+    {
+      "view": "back",
+      "item": "background",
+      "passed": false,
+      "note": "Тёмный нейтральный фон; медиана рамки RGB(44,43,43), p99 отклонения 2. Есть слабая неоднородность и небольшое отличие от других видов."
+    }
+  ],
+  "limit_reached": [
+    {
+      "view": "front",
+      "failed_items": [
+        "framing",
+        "background"
+      ]
+    },
+    {
+      "view": "side",
+      "failed_items": [
+        "identity_materials_anchors",
+        "framing",
+        "background"
+      ]
+    },
+    {
+      "view": "back",
+      "failed_items": [
+        "silhouette_pose_anatomy",
+        "framing",
+        "background"
+      ]
+    }
+  ],
+  "design_source": {
+    "service": "unstability.ai",
+    "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+    "by": "Claude (Windows-MCP in the user's Chrome)",
+    "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+    "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+    "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+  },
+  "stage": "1c",
+  "run_id": "ASSET-ANCIENT-LESHEN-001-concept-views-20261013",
+  "date": "2026-10-13T16:23:33+00:00",
+  "status": "предложено",
+  "source_verification": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/orthos/ortho_front.png",
+      "before_sha256": "2d3ad715cf36f77a8a2cf4a4a44dde4e42270ea6a508221ead4a6923013d31c9",
+      "after_sha256": "2d3ad715cf36f77a8a2cf4a4a44dde4e42270ea6a508221ead4a6923013d31c9",
+      "unchanged": true,
+      "bytes": 333566
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/orthos/ortho_left.png",
+      "before_sha256": "311869a488dbcc57ed7c3a682d7ec07cfe79d1270df8e0d272e0f3b9203c256e",
+      "after_sha256": "311869a488dbcc57ed7c3a682d7ec07cfe79d1270df8e0d272e0f3b9203c256e",
+      "unchanged": true,
+      "bytes": 168355
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/orthos/ortho_back.png",
+      "before_sha256": "5e07267e9cd93e01381defba1ab94e0d4f10f44803894a731fb100540b0f430f",
+      "after_sha256": "5e07267e9cd93e01381defba1ab94e0d4f10f44803894a731fb100540b0f430f",
+      "unchanged": true,
+      "bytes": 280262
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261013-draft-tripo/orthos/ortho-framing.json",
+      "before_sha256": "c614588ef70192d2f047689784de4d119e4f2dd08b3cf8a5a3c4179dde9e8bc3",
+      "after_sha256": "c614588ef70192d2f047689784de4d119e4f2dd08b3cf8a5a3c4179dde9e8bc3",
+      "unchanged": true,
+      "bytes": 3828
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+      "before_sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+      "after_sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+      "unchanged": true,
+      "bytes": 505298
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/palette.json",
+      "before_sha256": "41d1a4b66fcd6dfd428efd2c8230505b385a9f2522bedafbf7d12826e8e76f6d",
+      "after_sha256": "41d1a4b66fcd6dfd428efd2c8230505b385a9f2522bedafbf7d12826e8e76f6d",
+      "unchanged": true,
+      "bytes": 291
+    }
+  ],
+  "outside_folder_basis": "All task-managed file writes were inside the package. Built-in image_gen originals at original_path are the explicitly required tool-owned copies.",
+  "candidate_reviews": [
+    {
+      "view": "front",
+      "generation": "g1",
+      "failed_items": [
+        "identity_materials_anchors",
+        "background"
+      ],
+      "notes": "Smoky nonuniform background; image-right forearm crow painted bark brown."
+    },
+    {
+      "view": "front",
+      "generation": "g2",
+      "failed_items": [
+        "framing",
+        "background"
+      ],
+      "notes": "All three visible crows now black. Framing near draft, not exact: measured top 3.660%, base top 90.262%, bottom 94.199%. Very slight background mottling remains."
+    },
+    {
+      "view": "side",
+      "generation": "g1",
+      "failed_items": [
+        "identity_materials_anchors",
+        "framing",
+        "background"
+      ],
+      "notes": "Shoulder bird tail appears brown; base top 90.262% and bottom 94.130% drift; slight background mottling."
+    },
+    {
+      "view": "side",
+      "generation": "g2",
+      "failed_items": [
+        "silhouette_pose_anatomy",
+        "identity_materials_anchors",
+        "framing",
+        "background"
+      ],
+      "notes": "Shoulder crow is enlarged and moved toward skull; lower crow tail includes brown parts. Framing and flatness still inexact. g1 retained as closer silhouette."
+    },
+    {
+      "view": "back",
+      "generation": "g1",
+      "failed_items": [
+        "silhouette_pose_anatomy",
+        "framing",
+        "background"
+      ],
+      "notes": "Left forearm crow has raised wing tips beyond smooth folded silhouette. Slight framing and background deviations."
+    },
+    {
+      "view": "back",
+      "generation": "g2",
+      "failed_items": [
+        "identity_materials_anchors",
+        "framing",
+        "background"
+      ],
+      "notes": "Both forearm crows were painted as bark. g1 chosen because all three crows remain identifiable."
+    }
+  ],
+  "final_exit_code": 0,
+  "final_summary": {
+    "PASS": 33,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "historical_files_preserved": [
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/palette.json",
+      "before_sha256": "41d1a4b66fcd6dfd428efd2c8230505b385a9f2522bedafbf7d12826e8e76f6d",
+      "after_sha256": "41d1a4b66fcd6dfd428efd2c8230505b385a9f2522bedafbf7d12826e8e76f6d",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-design-front-rc1.png",
+      "before_sha256": "34620e349f96f67d1ae5ec19e1c01a324db3d41b125bc5576d32e00011c43382",
+      "after_sha256": "34620e349f96f67d1ae5ec19e1c01a324db3d41b125bc5576d32e00011c43382",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-design-front-u1.png",
+      "before_sha256": "9c3ec27c17618a4343c2ae46876e0cfeff3693e9ca8561d31aaa55356976a747",
+      "after_sha256": "9c3ec27c17618a4343c2ae46876e0cfeff3693e9ca8561d31aaa55356976a747",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front-raw.png",
+      "before_sha256": "45127cc0a0ce293905db0135f3cd5deaad04425a20975260a2c53dbdf93f8bc2",
+      "after_sha256": "45127cc0a0ce293905db0135f3cd5deaad04425a20975260a2c53dbdf93f8bc2",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+      "before_sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+      "after_sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+      "before_sha256": "1c17bed26bbacf8b0afadc3622586cb15bb03ac6d9a20c63c05f8de02cba792c",
+      "after_sha256": "1c17bed26bbacf8b0afadc3622586cb15bb03ac6d9a20c63c05f8de02cba792c",
+      "unchanged": true
+    }
+  ],
+  "errors": [],
+  "selected": {
+    "front": {
+      "generation": "g2",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-front-g2.png",
+      "canonical_path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png"
+    },
+    "side": {
+      "generation": "g1",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-side-g1.png",
+      "canonical_path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png"
+    },
+    "back": {
+      "generation": "g1",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-back-g1.png",
+      "canonical_path": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png"
+    }
+  },
+  "generations_per_view": {
+    "front": {
+      "this_run": 2,
+      "total_in_generation_records": 2,
+      "limit_this_run": 2,
+      "limit_total": 4
+    },
+    "side": {
+      "this_run": 2,
+      "total_in_generation_records": 2,
+      "limit_this_run": 2,
+      "limit_total": 4
+    },
+    "back": {
+      "this_run": 2,
+      "total_in_generation_records": 2,
+      "limit_this_run": 2,
+      "limit_total": 4
+    }
+  },
+  "checklist_items": {
+    "view_camera": "Exactly front, strict left profile, or strict back; level camera; no perspective, collage, text or watermark.",
+    "silhouette_pose_anatomy": "Silhouette, pose, arm and weapon positions follow draft image 1; no added anatomy or new weapon.",
+    "identity_materials_anchors": "Identity, costume, colours and materials follow approved design; all anchors visible from this side are present.",
+    "weapon_side": "No weapon or held object.",
+    "framing": "Same pedestal position and size and highest point as draft image 1; whole subject visible.",
+    "background": "Same plain flat dark gray background in all views."
+  },
+  "process_cleanup": "All started shell commands finished; no background services, clients or editors were started.",
+  "execution_notes": [
+    "openskills wrapper unavailable in npm cache (ENOTCACHED); read local skill files directly; no downloads occurred.",
+    "No image-generation blockers.",
+    "Windows rejected one oversized report-writing command before process creation (error 206); split writes into short Python calls.",
+    "All new JSON and Markdown written through Python Path.write_text with UTF-8 without BOM.",
+    "Final sheet inspected visually; source PNGs never retouched, resized, cropped, recoloured or re-encoded.",
+    "base_top_pct_est is an approximate script measurement; exact numeric framing and uniform background were conservatively left as failed checklist items."
+  ],
+  "original_copy_verification": [
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-front-g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-728ccd31-0267-47c6-85e2-3e667e040944.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-front-g1.png",
+      "sha256": "51ab1319a8527b50cc3403070fce7bdf785995b05821065a3e3fa73929a78ff2",
+      "bytes": 1748136,
+      "byte_identical": true
+    },
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-front-g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-3102d115-f84b-4108-985b-bdf31f5e3479.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-front-g2.png",
+      "sha256": "fdc3d76e612c269a62f30791465f84c4a8d88ffd73da759cd394132999e2d157",
+      "bytes": 1796073,
+      "byte_identical": true
+    },
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-side-g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-c14ea943-867d-4270-ba4b-57a8a153b91f.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-side-g1.png",
+      "sha256": "0e5b59ee699b2c298d0804c2d27a433b0f9c016cf5e5352762a1e999361ec512",
+      "bytes": 1548917,
+      "byte_identical": true
+    },
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-side-g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-a8705950-c40e-4086-b662-ae6f107a3478.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-side-g2.png",
+      "sha256": "eb5455f177bf6c3d1440d53cb6f27985550f9052b7f3342f1f60c011a7412d9e",
+      "bytes": 1537777,
+      "byte_identical": true
+    },
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-back-g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-06818725-9985-4049-b094-f179def8e918.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-back-g1.png",
+      "sha256": "8d72d6c7f5c23cc71d3bb395f270b081bcfbfc8d6edc462933f429b3fe532100",
+      "bytes": 1705758,
+      "byte_identical": true
+    },
+    {
+      "id": "ASSET-ANCIENT-LESHEN-001-1c-back-g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13606-e6c9-7cf2-9bf2-ce4b7b51980d\\exec-522688e7-63e8-437f-a5f1-94d1331ba9d5.png",
+      "saved_path": "art/imagegen/concept-ancient-leshen-codex/concepts/ancient-leshen-back-g2.png",
+      "sha256": "ddfac18ed908ec0c651a8e3085b01c28cec60ddee060dbbefdf0c6776370c1b9",
+      "bytes": 1768883,
+      "byte_identical": true
+    }
+  ],
+  "package_validation": {
+    "passed": true,
+    "new_generation_count": 6,
+    "per_view_counts": {
+      "front": 2,
+      "side": 2,
+      "back": 2
+    },
+    "candidate_report_hashes_match": true,
+    "canonical_files_byte_identical": true,
+    "cores_unchanged_on_retry": true,
+    "text_encoding": "UTF-8 without BOM",
+    "exact_prompts_recorded": 8,
+    "all_source_hashes_unchanged": true
+  }
+}

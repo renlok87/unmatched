@@ -1,0 +1,239 @@
+{
+  "schema": "martian-concept-verification/1",
+  "card_id": "ASSET-MARTIAN-INVADER-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-martian-invader-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate",
+      "output": "WARN view.frame_top         front    value=2.624 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-martian-invader-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "report_sha256": "ea64cf6791221e85a6307183f40db82d5d58fabdb7ae15f93ecd977fa147b3b1"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-martian-invader-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate",
+      "output": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nWARN view.single_component  front    value=[2.664, 0.842, 0.092, 0.008, 0.004, 0.004, 0.003, 0.003, 0.002, 0.002] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-martian-invader-codex/checks/design-front-g2/checks-report.json",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "report_sha256": "ada14de7d125a0bb2e41ab91b985edefb299df6780235c3fe890ac38c75d4c88"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+      "phase": "selected-final",
+      "output": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nWARN view.single_component  front    value=[2.664, 0.842, 0.092, 0.008, 0.004, 0.004, 0.003, 0.003, 0.002, 0.002] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "report_sha256": "b53a9dcbe60adc1ea3173cabdac08e41ac6bb57fad2a5250e0bbb08d4e536510"
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "selected_generation": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [
+    {
+      "tool": "exec_command",
+      "phase": "package documentation",
+      "code": 206,
+      "resolved": true,
+      "note": "Windows rejected an oversized command before starting a process. Package writes were split into shorter Python commands; no generation or check was repeated."
+    }
+  ],
+  "raster_processing": {
+    "retouched": false,
+    "resized": false,
+    "cropped": false,
+    "recoloured": false,
+    "reencoded": false
+  },
+  "process_cleanup": {
+    "started_long_lived_processes": [],
+    "remaining_task_processes": [],
+    "note": "Только синхронные Python-процессы; все завершились. Фоновые службы и клиенты не запускались."
+  },
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка. Коллажа, другого вида, читаемых надписей, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус фронтальны; признаков поворота в три четверти нет. Передние края подставки горизонтальны, верхняя плоскость скрыта. Оценка проекции визуальная, параметров камеры у растрового изображения нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Купол, оружие, руки, ступни и подставка полностью в кадре. Фон нейтральный тёмно-серый, без пола и падающей тени; небольшая пиксельная вариация тона не образует заметного градиента."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Пистолет слева для зрителя, в собственной правой руке фигуры. Между руками и корпусом есть видимые зазоры; поза не T и не A. Степень сгиба правого локтя отдельно отмечена в limitations."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: ray gun in the RIGHT hand; glass dome helmet; big exposed brain; silver space suit with fins;",
+      "passed": true,
+      "note": "Ясно видны лучевой пистолет, прозрачный купол, большой открытый мозг, серебряный скафандр и красные плавники."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Серебряный скафандр, зелёная кожа, красные плавники и циановый акцент пистолета присутствуют. Подставка каменная, без цветного кольца и металлического обода."
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "CORE framing: top y >= 4%",
+      "status": "WARN allowed",
+      "measured_top_pct": 2.762,
+      "requested_min_pct": 4,
+      "note": "Верх купола на y=2,762%. Изображение не обрезано; view.frame_top — допустимый WARN и не причина повторной генерации."
+    },
+    {
+      "view": "design-front",
+      "item": "view.single_component",
+      "status": "WARN allowed",
+      "note": "Сегментация отделяет части прозрачного купола и детали. При визуальном осмотре это одна фигура; дополнительных субъектов нет. Маска не доказывает физическую связность будущей 3D-модели."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE framing: pedestal bottom y93%",
+      "status": "deviation",
+      "measured_bottom_pct": 95.166,
+      "requested_bottom_pct": 93,
+      "note": "Низ подставки на y=95,166%, а не y=93%. Вся подставка в кадре; view.bottom_margin проходит."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE pedestal diameter about 0.55 of figure height",
+      "status": "deviation",
+      "estimated_ratio": 0.67,
+      "requested_ratio": 0.55,
+      "note": "По фронтальной маске ширина подставки приблизительно 812 px, высота фигуры над ней приблизительно 1210 px: отношение около 0,67. Круглая форма в плане не может быть подтверждена единственным фронтальным растром."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE pose: elbows slightly bent",
+      "status": "deviation",
+      "note": "Правая рука с оружием согнута заметнее, чем «слегка»; оба зазора с корпусом и требуемая сторона оружия соблюдены."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верхняя плоскость подставки заметно видна; верхний передний край дугообразный. Остальные якоря читаются, оружие слева для зрителя, в собственной правой руке."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов выбранного CHECKLIST визуально пройдены; сохранены предупреждения и отклонения CORE."
+    }
+  ],
+  "scope_verification": {
+    "method": "Аудит путей всех записей агента; все записи Python и --out/--set скрипта ограничены указанным пакетом. Глобальный снимок файловой системы и git не использовались; параллельные изменения других сессий не оценивались.",
+    "allowed_directory": "art/imagegen/concept-martian-invader-codex",
+    "tool_original_exception": "Собственные копии image_gen вне пакета сохранены инструментом по контракту; исходные absolute original_path перечислены в generation-records.json.",
+    "preexisting_package_files": [
+      "art/imagegen/concept-martian-invader-codex/palette.json"
+    ],
+    "preexisting_files_unchanged": true,
+    "written_paths": [
+      "art/imagegen/concept-martian-invader-codex/checks/design-front-g1/checks-report.json",
+      "art/imagegen/concept-martian-invader-codex/checks/design-front-g2/checks-report.json",
+      "art/imagegen/concept-martian-invader-codex/concepts/martian-invader-design-front-g1.png",
+      "art/imagegen/concept-martian-invader-codex/concepts/martian-invader-design-front-g2.png",
+      "art/imagegen/concept-martian-invader-codex/design/checks-report.json",
+      "art/imagegen/concept-martian-invader-codex/design/martian-invader-front.png",
+      "art/imagegen/concept-martian-invader-codex/generation-records.json",
+      "art/imagegen/concept-martian-invader-codex/prompts/concept-prompts.json",
+      "art/imagegen/concept-martian-invader-codex/prompts.md",
+      "art/imagegen/concept-martian-invader-codex/README.md",
+      "art/imagegen/concept-martian-invader-codex/source-hashes-before.json",
+      "art/imagegen/concept-martian-invader-codex/verification.json",
+      "art/imagegen/concept-martian-invader-codex/manifest-sha256.json"
+    ]
+  },
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-martian-invader-codex/palette.json",
+      "sha256_before": "f64b7fa9f52a99cef3fa6756c6f90bd798c5636f3c86f9ef806d7aca36644640",
+      "sha256_after": "f64b7fa9f52a99cef3fa6756c6f90bd798c5636f3c86f9ef806d7aca36644640",
+      "bytes_before": 293,
+      "bytes_after": 293,
+      "unchanged": true
+    }
+  ],
+  "verified_at": "2026-10-13T08:25:47+00:00",
+  "byte_for_byte_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13453-bbb0-7283-bddd-5de3df85113a\\exec-2a11ba15-f6ed-412f-8163-d759f5f48e9f.png",
+      "saved_path": "art/imagegen/concept-martian-invader-codex/concepts/martian-invader-design-front-g1.png",
+      "sha256": "1aae32f69c9c89c03225724fed6010ab89a9557144784d5e3b864e71becd8b31",
+      "equal": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13453-bbb0-7283-bddd-5de3df85113a\\exec-c70dfb0e-abd2-47cc-818d-f792c12f3f37.png",
+      "saved_path": "art/imagegen/concept-martian-invader-codex/concepts/martian-invader-design-front-g2.png",
+      "sha256": "ce294daef7cd5adeb4299b898b867c6c1ba983dbfb9e512544af6f9a1fd3ae67",
+      "equal": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-martian-invader-codex/design/martian-invader-front.png",
+    "generation": 2,
+    "sha256": "ce294daef7cd5adeb4299b898b867c6c1ba983dbfb9e512544af6f9a1fd3ae67",
+    "byte_for_byte_equal": true
+  }
+}

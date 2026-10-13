@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-13",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-achilles-codex/achilles-front.png",
+      "sha256": "cf86076b5a33f69342d8e9a932e910c6fcee43b92dba761d7f0a034aaa16cf23"
+    },
+    {
+      "path": "art/imagegen/concept-achilles-codex/achilles-side.png",
+      "sha256": "0bc06f2ddcd5b474f0f9c42e54df1af72cf772cb6945db1cd4aa218b18f8fd14"
+    },
+    {
+      "path": "art/imagegen/concept-achilles-codex/achilles-back.png",
+      "sha256": "6ec8261622ec1f7f024126d69503837328f6c6db72cce64dc84d83f068ab7b33"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-achilles-codex",
+    "files": [
+      "sheet-achilles.png",
+      "achilles-front.png",
+      "achilles-side.png",
+      "achilles-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-achilles-codex/checks-report.json",
+    "art/imagegen/concept-achilles-codex/generation-records.json",
+    "art/imagegen/concept-achilles-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-achilles-codex/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.WARN = 0; summary.PASS = 33; verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "На achilles-front.png, achilles-side.png и achilles-back.png ясно читаются воин, высокий гребень, вертикальное копьё, щит и плащ. Руки вынесены от корпуса, локти согнуты; поза не T и не A. Перекрытие руки щитом в профиле соответствует ортопроекции. Тонкие древко и наконечник различимы; фигура и подставка полностью видны.",
+      "frames": [
+        "achilles-front.png",
+        "achilles-side.png",
+        "achilles-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "achilles-front.png, achilles-side.png и achilles-back.png сохраняют персонажа, пропорции, позу и сторону оружия: копьё в собственной правой руке, щит на левой. Профиль соответствует SIDE_VIEW left; камера заднего вида соответствует орто. На заднем виде правильно показаны внутренняя поверхность щита и задние панели поножей. Есть мелкие расхождения складок, чеканки и локальных деталей креплений. sheet-achilles.png показывает небольшие отклонения рамки: разброс нижней линии базы 0,207 процентного пункта, относительный разброс высоты 0,833%; заметного изменения масштаба или обрезки нет.",
+      "frames": [
+        "achilles-front.png",
+        "achilles-side.png",
+        "achilles-back.png",
+        "sheet-achilles.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "achilles-front.png и achilles-side.png соответствуют уровню расписанной коллекционной миниатюры эталона Medusa: проработаны лицо, волосы, конский гребень, львиные рельефы, чеканка, кожа ремней и сандалий. На achilles-back.png сохраняются фактура ткани, убедительные складки и отделка внутренних поверхностей. Бронза, ткань, кожа и камень различимы; детали развивают утверждённый дизайн внутри силуэта.",
+      "frames": [
+        "achilles-front.png",
+        "achilles-side.png",
+        "achilles-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "На sheet-achilles.png свотчи соответствуют PALETTE: бронза #A9773A, crimson #8E2A23, olive skin #B98B66 и золотой акцент #E0B54A представлены на фигуре. На achilles-front.png, achilles-side.png и achilles-back.png все якоря сохранены там, где видимы: вертикальное копьё в правой руке, круглый бронзовый щит на левой, высокий конский гребень и красный плащ. Командной окраски или цветного кольца подставки нет.",
+      "frames": [
+        "sheet-achilles.png",
+        "achilles-front.png",
+        "achilles-side.png",
+        "achilles-back.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "sheet-achilles.png",
+      "note": "Мелкие различия складок плаща, чеканки шлема и деталей креплений между видами; идентичность, основные формы, поза и сторона оружия согласованы. Учтено в C = 1,5."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-achilles.png",
+      "note": "Точная рамка ортопроекций не воспроизведена: верх front/side/back — 3,867/3,315/3,522% вместо 4%; низ базы — 94,268/94,475/94,406% вместо 94%. Отклонения малы, все части видны, G-CHECKS PASS; записи CHECKLIST не образуют отдельного гейта."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13616-b494-7e03-bed4-35cf49b8ce47"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261013",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c, r1: художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). G-CHECKS PASS; S=2, C=1,5, Q=2, P=2; score=9,4."
+}

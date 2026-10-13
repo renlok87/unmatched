@@ -1,0 +1,283 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-13T16:08:02+00:00",
+  "set": "art/imagegen/concept-achilles-codex",
+  "key": "achilles",
+  "role": "hero",
+  "views": [
+    "side"
+  ],
+  "inputs": [
+    {
+      "view": "side",
+      "path": "art/imagegen/concept-achilles-codex/achilles-side.png",
+      "sha256": "f08b3ed630650d310da7b94c559badcda2b9698f84693d149c3da7ac837063a7",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "measurements": {
+    "side": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          43.0,
+          43.0,
+          43.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 0.0,
+        "luma": 43.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.93,
+          0.84,
+          0.87
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 26.242,
+        "filled_area_pct": 26.242,
+        "components_kept": 2,
+        "main_component_pct": 26.208,
+        "other_components_pct": [
+          0.034,
+          0.007,
+          0.003,
+          0.002,
+          0.002,
+          0.002,
+          0.002
+        ],
+        "bbox_px": [
+          248,
+          51,
+          839,
+          1365
+        ],
+        "top_pct": 3.522,
+        "bottom_pct": 94.268,
+        "left_pct": 22.836,
+        "right_pct": 77.256,
+        "height_pct": 90.746,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 54.42,
+        "base_top_pct_est": 86.533
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "side": [
+            1086,
+            1448
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "side": [
+          1086,
+          1448
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        43.0,
+        43.0,
+        43.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 43.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 26.242,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 3.522,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 94.268,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 22.744,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        0.034,
+        0.007,
+        0.003,
+        0.002,
+        0.002,
+        0.002,
+        0.002
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 12,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-achilles-codex/palette.json",
+    "swatches": [
+      {
+        "name": "bronze",
+        "hex": "#A9773A",
+        "role": "main",
+        "figure_share_within_40_pct": 10.46
+      },
+      {
+        "name": "crimson",
+        "hex": "#8E2A23",
+        "role": "main",
+        "figure_share_within_40_pct": 12.11
+      },
+      {
+        "name": "olive skin",
+        "hex": "#B98B66",
+        "role": "main",
+        "figure_share_within_40_pct": 6.91
+      },
+      {
+        "name": "gold crest trim",
+        "hex": "#E0B54A",
+        "role": "accent",
+        "figure_share_within_40_pct": 0.89
+      }
+    ]
+  },
+  "sheet": null
+}
