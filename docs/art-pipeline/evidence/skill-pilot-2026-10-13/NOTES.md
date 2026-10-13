@@ -142,6 +142,13 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F121 | 7 | A minimized GUI editor cannot take console focus (`py_file` times out); the working setup is a hidden editor with `-RenderOffScreen` + `console_drop.py` (`UE_CONSOLE_DROP`), not described in the skill | ue-import-package §1 / HANDBOOK §0.2: launch recipe for the agent's own editor |
 | F122 | 6 | Angel's H2 skin limits (right arm): elbow extension FAIL > ~141°, forearm twist > ~20°; rest grip puts the blade ~100° to the forearm, so a forward chop with the sword fixed in the fist needs shoulder raise + upper-arm rotation (Arthur's accepted clip rotated the sword in hand instead) | animation-vfx-sfx §6.2: measure skin limits first; grip/wrist/elbow check in clip_contact_check (prototype `C:/tmp/angel-anim-r2/grip_check.py`) |
 | F123 | 6 | The «new run per rework» rule conflicts with §10.6, which edits the clip spec in place | animation-vfx-sfx §10.6: one rule |
+| F124 | 7 | ue-import front check is ambiguous for a depth-symmetric figure (Leshen: front/back depth equal to 0.03 uu; true map 0.0005 uu vs mirror 0.0315 uu, both within tolerance) → `skeletal_bounds_match_build_front_unambiguous` FAIL | **fixed** `3ed2d354`: opt-in `axes.front_from_best_bound_fit` |
+| F125 | 7 | CLI `editor_python` typed into the Cmd box only — fails on the hidden editor of F121 | **fixed** `3ed2d354`: honours `UE_CONSOLE_DROP` like `ue_live` |
+| F126 | 6 | Pinned-hand mode: the default elbow pole is kept in spine axes and flips backward once the arm chain shortens 3 % → wrist twist 26–45°; the rest pole in armature axes fixes it (2.9°); other poles break frame 0 | animation-vfx-sfx §6.2 / tool default: rest pole |
+| F127 | 6 | `clip_contact_check` never tests the second weapon part living in the body mesh (spear butt 100 % on weapon.R): butt-vs-cloak contact unchecked | tool: weapon-weighted body vertices as weapon |
+| F128 | 6 | A weapon planted by its butt cannot use the `weapon_tip` mode; pivot offsets by hand; a right-angle fist grip costs 40–45° wrist bend for a straight support arm | tool: pivot-around-weapon-end option in pinned-hand mode |
+| F129 | 4→6 | Stage-4 test poses never show the back/side of the torso with the arm forward: Achilles' cloak armhole edge opens as a ragged strip behind the right armpit (LungeAttack 4–10, DeathSettle 7–21) — found only at stage 6 | acceptance §3: an arm-forward pose seen from the back/side |
+| F130 | 6 | `clip_manifest.py:125` hard-codes the validation date 2026-09-29 for every H2Anim clip | tool: real date |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

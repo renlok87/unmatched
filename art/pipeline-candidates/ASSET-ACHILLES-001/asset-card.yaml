@@ -64,6 +64,39 @@ UE_NAMES:
     - "T_UM_MatLUT_Achilles"
   prop_name: null
 STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+# --- Поля этапа 6 (анимация, VFX, SFX; исполнитель этапа 6, 2026-10-14; основания — decided_by_stage6 ниже)
+H2ANIM_SPEC: "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim.json"
+H2ANIM_RUN: "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim"
+CLIP_CARDS: ["AN-141", "AN-142", "AN-143", "AN-144"]   # Idle, LungeAttack, HitReact, DeathSettle (06-tasks/anim.csv)
+CLIP_PATTERNS:                      # образцы библиотеки D-11 (своих видео-референсов нет)
+  Idle: "King Arthur Idle (60 к.: дыхание, перенос веса) + Merlin Idle (hand_pin: опора-древко неподвижно)"
+  LungeAttack: "Merlin LungeAttack (подготовка ~40 %, короткий выброс древка к цели), контакт к.7 заявки (как King Arthur)"
+  HitReact: "King Arthur HitReact (отдача корпуса назад) + Merlin HitReact (hand_pin на посохе-опоре)"
+  DeathSettle: "King Arthur DeathSettle (наклон к оружию, опора почти прямой правой рукой) + Merlin DeathSettle (hand_pin на посохе)"
+STAGE6_VFX:                         # references/animation-vfx-sfx.md §8
+  hit_star_cue011: "работает сразу (world, точка контакта)"
+  flash_rim_cue011: "через MI героя на M_UM_Figure_v2 (этап 7)"
+  heal_cue012: "работает сразу (Base)"
+  ash_cue013: "MIC растворения de011.py apply (этап 7b, Р7-1/Р7-2)"
+  ability_cue014: "нет (фолбэк: иконка способности в HUD без VFX и звука); fx_ability.py не нужен"
+  field_fx: "работают сразу"
+STAGE6_SFX:                         # references/animation-vfx-sfx.md §9
+  hit_type: "BLADE"                 # = HIT_TYPE; банки CMB-LUNGE-BLADE и CMB-HIT-BLADE готовы (sfx_build.py:539, :567)
+  death: "DTH-TEMPLATE"             # своего DTH-ACHILLES нет
+  ability: "нет"
+  vo: "нет"
+  new_recipes: "нет (sfx_build.py и ue_bank.py не запускались)"
+  listening: "прослушивание пользователем не проводилось — принято по делегированию (ВР-реестр 2026-10-06)"
+  cpp_stage7: "S08AudioBank::CharacterKey подстрока «achilles» → ACHILLES, HitType → BLADE (Р7-5); подстрока не пересекается с arthur/merlin/medusa/harp"
+decided_by_stage6:
+  CLIP_PATTERNS: >-
+    delegated (ВР-реестр 2026-10-06; оркестратор 2026-10-14 — без трат SYNTX, «author from library patterns»): копьё —
+    древковое оружие-опора в правой руке, как посох Merlin (hand_pin в Idle/HitReact/DeathSettle, выброс древка к цели в
+    LungeAttack); ближний бой и кадр контакта 7 заявки — как King Arthur (Idle 60 к., отдача HitReact, смерть с опорой на оружие
+    почти прямой рукой); щит без своей кости — жёстко на arm_lower.L, кисть hand.L без ключей
+  HIT_TYPE: "delegated (ВР-реестр 2026-10-06), подтверждено этапом 6: колющий удар копьём — клинковое оружие ближнего боя, BLADE"
+  STAGE6_VFX: "delegated (§8, решение скилла): новый герой без FX способности"
+  STAGE6_SFX: "delegated (§9): готовые банки BLADE и DTH-TEMPLATE, новых звуков нет"
 ACCEPTOR_PROFILE: "opus-xhigh"
 decided_by_stage3:
   CHARACTER: "delegated (П3-5): PascalCase ключа контента = имя в rig-contract"
