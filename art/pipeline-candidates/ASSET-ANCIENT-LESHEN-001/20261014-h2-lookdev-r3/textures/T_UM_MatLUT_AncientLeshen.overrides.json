@@ -1,0 +1,37 @@
+{
+ "asset_id": "ASSET-ANCIENT-LESHEN-001",
+ "classes": {
+  "feathers": {
+   "bc": [
+    0.0273,
+    0.0273,
+    0.0284
+   ],
+   "ymedClassHero": 0.02725
+  },
+  "stone_base": {
+   "bc": [
+    0.1195,
+    0.0742,
+    0.0545
+   ],
+   "ymedClassHero": 0.08299
+  },
+  "wood": {
+   "bc": [
+    0.1329,
+    0.0823,
+    0.0356
+   ],
+   "ymedClassHero": 0.09056
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "AncientLeshen",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero AncientLeshen --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

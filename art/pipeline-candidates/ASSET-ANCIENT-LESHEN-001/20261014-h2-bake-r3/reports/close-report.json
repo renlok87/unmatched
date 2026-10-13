@@ -1,0 +1,1315 @@
+{
+  "cap_area_cm2": 520.442,
+  "cap_triangles": 2128,
+  "caps": [
+    {
+      "bulge_m": -0.001,
+      "cap_area_cm2": 13.366,
+      "cap_index": 1,
+      "centre_cm": [
+        -5.608,
+        1.398,
+        43.781
+      ],
+      "covered_by": "tripo_part_0",
+      "degenerate_triangles": 0,
+      "facing_away_area_share": 0.0,
+      "fit": null,
+      "interior_height_mm": {
+        "max": 4.17,
+        "min": -7.92,
+        "note": "along the cap normal from the rim centroid",
+        "rim_max": 6.291,
+        "rim_min": -10.473
+      },
+      "interior_vertices": 26,
+      "loop_median_to_cover_mm": 0.156,
+      "loop_vertices": 118,
+      "name": "shoulder_top_r",
+      "normal": [
+        0.3554,
+        -0.3418,
+        0.87
+      ],
+      "part": "tripo_part_6",
+      "perimeter_cm": 16.319,
+      "projected_area_cm2": 11.001,
+      "rest_visibility": {
+        "cap_backside_px": 34,
+        "cap_px": 38,
+        "covers_front_px": 0,
+        "fills_gap_px": 4,
+        "largest_covers_front_blob_px": 0,
+        "worst_view": null
+      },
+      "rim_height_range_mm": 16.764,
+      "rim_layout_untangled_vertices": 0,
+      "rim_only_triangles": 48,
+      "shape": "harmonic",
+      "spacing_m": 0.006,
+      "triangles": 168
+    },
+    {
+      "bulge_m": 0.0,
+      "cap_area_cm2": 507.076,
+      "cap_index": 1,
+      "centre_cm": [
+        -0.412,
+        -0.209,
+        5.86
+      ],
+      "covered_by": "tripo_part_1",
+      "degenerate_triangles": 0,
+      "facing_away_area_share": 0.0,
+      "fit": null,
+      "interior_height_mm": {
+        "max": 0.466,
+        "min": -1.01,
+        "note": "along the cap normal from the rim centroid",
+        "rim_max": 1.143,
+        "rim_min": -1.606
+      },
+      "interior_vertices": 853,
+      "loop_median_to_cover_mm": 12.908,
+      "loop_vertices": 256,
+      "name": "roots_floor",
+      "normal": [
+        -0.0005,
+        -0.0004,
+        -1.0
+      ],
+      "part": "tripo_part_0",
+      "perimeter_cm": 81.631,
+      "projected_area_cm2": 506.695,
+      "rest_visibility": {
+        "cap_backside_px": 3994,
+        "cap_px": 4435,
+        "covers_front_px": 1,
+        "fills_gap_px": 440,
+        "largest_covers_front_blob_px": 1,
+        "worst_view": "front_r"
+      },
+      "rim_height_range_mm": 2.749,
+      "rim_layout_untangled_vertices": 0,
+      "rim_only_triangles": 24,
+      "shape": "harmonic",
+      "spacing_m": 0.008,
+      "triangles": 1960
+    },
+    {
+      "bulge_m": 0.0,
+      "cap_area_cm2": 615.596,
+      "cap_index": 1,
+      "centre_cm": [
+        -0.039,
+        -0.194,
+        5.749
+      ],
+      "covered_by": null,
+      "degenerate_triangles": 0,
+      "facing_away_area_share": 0.0,
+      "fit": null,
+      "interior_height_mm": {
+        "max": 1.518,
+        "min": -0.977,
+        "note": "along the cap normal from the rim centroid",
+        "rim_max": 2.394,
+        "rim_min": -1.606
+      },
+      "interior_vertices": 447,
+      "loop_median_to_cover_mm": null,
+      "loop_vertices": 176,
+      "name": "base_hole_1",
+      "normal": [
+        0.001,
+        0.0007,
+        1.0
+      ],
+      "part": "tripo_part_1",
+      "perimeter_cm": 88.998,
+      "projected_area_cm2": 615.27,
+      "replaces": "retopo convex-hull fan caps (0 components, 0 faces removed)",
+      "rest_visibility": {
+        "cap_backside_px": 0,
+        "cap_px": 30220,
+        "covers_front_px": 8,
+        "fills_gap_px": 30212,
+        "largest_covers_front_blob_px": 4,
+        "worst_view": "back_r"
+      },
+      "rim_height_range_mm": 4.0,
+      "rim_layout_untangled_vertices": 0,
+      "rim_only_triangles": 7,
+      "shape": "harmonic",
+      "spacing_m": 0.012,
+      "triangles": 1068,
+      "visible_by_design": true
+    }
+  ],
+  "checks": {
+    "all_cap_loops_found_and_built": {
+      "expected": "no problems",
+      "measured": "all",
+      "passed": true
+    },
+    "caps_hidden_at_rest": {
+      "expected": "front-facing cap pixels that hide a real front face at rest: <= 0.0001 of the figure pixels and no 8-connected blob > 9 px (17 views, 1.0 mm pitch; a back-facing cap pixel is culled in UE)",
+      "measured": {
+        "covers_front_px": 1,
+        "figure_px": 1670774,
+        "largest_blob_px": 1,
+        "per_cap": {
+          "roots_floor": [
+            1,
+            1
+          ],
+          "shoulder_top_r": [
+            0,
+            0
+          ]
+        }
+      },
+      "passed": true
+    },
+    "no_degenerate_or_inverted_cap_triangles": {
+      "expected": "[0 degenerate, area share of cap triangles facing away from the cap normal <= 0.02]",
+      "measured": {
+        "base_hole_1": [
+          0,
+          0.0
+        ],
+        "roots_floor": [
+          0,
+          0.0
+        ],
+        "shoulder_top_r": [
+          0,
+          0.0
+        ]
+      },
+      "note": "triangles along rim zig-zags / local folds of the decimated Tripo loop (1-3 mm) may face away",
+      "passed": true
+    }
+  },
+  "contact_caps": 2,
+  "loops_after": {
+    "tripo_part_0": [
+      {
+        "centre_cm": [
+          -0.41,
+          -0.21,
+          5.86
+        ],
+        "closed_by_cap": "roots_floor",
+        "nearest": [
+          [
+            "tripo_part_1",
+            1.07
+          ],
+          [
+            "tripo_part_5",
+            170.99
+          ]
+        ],
+        "perimeter_cm": 81.63
+      },
+      {
+        "centre_cm": [
+          6.08,
+          1.5,
+          43.9
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_7",
+            0.13
+          ],
+          [
+            "tripo_part_10",
+            28.74
+          ]
+        ],
+        "perimeter_cm": 22.76
+      },
+      {
+        "centre_cm": [
+          -5.57,
+          1.49,
+          43.83
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_6",
+            0.11
+          ],
+          [
+            "tripo_part_9",
+            82.59
+          ]
+        ],
+        "perimeter_cm": 15.87
+      },
+      {
+        "centre_cm": [
+          0.24,
+          -1.58,
+          50.97
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.11
+          ],
+          [
+            "tripo_part_2",
+            34.29
+          ]
+        ],
+        "perimeter_cm": 10.27
+      },
+      {
+        "centre_cm": [
+          6.07,
+          1.2,
+          47.23
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_10",
+            0.14
+          ],
+          [
+            "tripo_part_7",
+            26.7
+          ]
+        ],
+        "perimeter_cm": 6.11
+      },
+      {
+        "centre_cm": [
+          7.6,
+          2.01,
+          46.55
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_10",
+            0.16
+          ],
+          [
+            "tripo_part_7",
+            13.91
+          ]
+        ],
+        "perimeter_cm": 3.47
+      }
+    ],
+    "tripo_part_1": [
+      {
+        "centre_cm": [
+          -0.04,
+          -0.19,
+          5.75
+        ],
+        "closed_by_cap": "base_hole_1",
+        "nearest": [
+          [
+            "tripo_part_0",
+            12.86
+          ],
+          [
+            "tripo_part_5",
+            186.5
+          ]
+        ],
+        "perimeter_cm": 89.0
+      }
+    ],
+    "tripo_part_10": [
+      {
+        "centre_cm": [
+          6.05,
+          1.17,
+          47.24
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.13
+          ],
+          [
+            "tripo_part_7",
+            26.88
+          ]
+        ],
+        "perimeter_cm": 6.5
+      },
+      {
+        "centre_cm": [
+          7.59,
+          2.03,
+          46.55
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.16
+          ],
+          [
+            "tripo_part_7",
+            13.94
+          ]
+        ],
+        "perimeter_cm": 3.6
+      }
+    ],
+    "tripo_part_11": [],
+    "tripo_part_12": [
+      {
+        "centre_cm": [
+          -12.74,
+          0.37,
+          28.4
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_5",
+            0.32
+          ],
+          [
+            "tripo_part_6",
+            2.33
+          ]
+        ],
+        "perimeter_cm": 13.08
+      }
+    ],
+    "tripo_part_2": [
+      {
+        "centre_cm": [
+          1.61,
+          -4.03,
+          53.83
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.09
+          ],
+          [
+            "tripo_part_3",
+            27.88
+          ]
+        ],
+        "perimeter_cm": 13.09
+      }
+    ],
+    "tripo_part_3": [
+      {
+        "centre_cm": [
+          -1.54,
+          -4.08,
+          53.76
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.09
+          ],
+          [
+            "tripo_part_2",
+            28.29
+          ]
+        ],
+        "perimeter_cm": 11.43
+      }
+    ],
+    "tripo_part_4": [
+      {
+        "centre_cm": [
+          12.84,
+          0.25,
+          28.44
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_7",
+            0.08
+          ],
+          [
+            "tripo_part_11",
+            39.1
+          ]
+        ],
+        "perimeter_cm": 14.68
+      }
+    ],
+    "tripo_part_5": [
+      {
+        "centre_cm": [
+          -12.7,
+          0.13,
+          28.06
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_12",
+            0.15
+          ],
+          [
+            "tripo_part_6",
+            5.18
+          ]
+        ],
+        "perimeter_cm": 10.29
+      }
+    ],
+    "tripo_part_6": [
+      {
+        "centre_cm": [
+          -5.61,
+          1.4,
+          43.78
+        ],
+        "closed_by_cap": "shoulder_top_r",
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.16
+          ],
+          [
+            "tripo_part_9",
+            82.07
+          ]
+        ],
+        "perimeter_cm": 16.32
+      },
+      {
+        "centre_cm": [
+          -12.67,
+          0.04,
+          28.86
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_12",
+            0.12
+          ],
+          [
+            "tripo_part_5",
+            5.64
+          ]
+        ],
+        "perimeter_cm": 9.8
+      }
+    ],
+    "tripo_part_7": [
+      {
+        "centre_cm": [
+          6.09,
+          1.52,
+          43.87
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.17
+          ],
+          [
+            "tripo_part_10",
+            28.51
+          ]
+        ],
+        "perimeter_cm": 25.16
+      },
+      {
+        "centre_cm": [
+          12.8,
+          0.29,
+          28.43
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_4",
+            0.1
+          ],
+          [
+            "tripo_part_11",
+            38.04
+          ]
+        ],
+        "perimeter_cm": 14.91
+      }
+    ],
+    "tripo_part_8": [],
+    "tripo_part_9": [
+      {
+        "centre_cm": [
+          1.63,
+          -4.12,
+          53.77
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_2",
+            0.1
+          ],
+          [
+            "tripo_part_3",
+            28.28
+          ]
+        ],
+        "perimeter_cm": 12.85
+      },
+      {
+        "centre_cm": [
+          -1.51,
+          -4.06,
+          53.81
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_3",
+            0.1
+          ],
+          [
+            "tripo_part_2",
+            27.31
+          ]
+        ],
+        "perimeter_cm": 11.56
+      },
+      {
+        "centre_cm": [
+          0.22,
+          -1.66,
+          50.85
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.14
+          ],
+          [
+            "tripo_part_2",
+            34.57
+          ]
+        ],
+        "perimeter_cm": 11.34
+      }
+    ]
+  },
+  "loops_before": {
+    "tripo_part_0": [
+      {
+        "centre_cm": [
+          -0.41,
+          -0.21,
+          5.86
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_1",
+            12.91
+          ],
+          [
+            "tripo_part_5",
+            170.99
+          ]
+        ],
+        "perimeter_cm": 81.63
+      },
+      {
+        "centre_cm": [
+          6.08,
+          1.5,
+          43.9
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_7",
+            0.13
+          ],
+          [
+            "tripo_part_10",
+            28.74
+          ]
+        ],
+        "perimeter_cm": 22.76
+      },
+      {
+        "centre_cm": [
+          -5.57,
+          1.49,
+          43.83
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_6",
+            0.12
+          ],
+          [
+            "tripo_part_9",
+            82.59
+          ]
+        ],
+        "perimeter_cm": 15.87
+      },
+      {
+        "centre_cm": [
+          0.24,
+          -1.58,
+          50.97
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.11
+          ],
+          [
+            "tripo_part_2",
+            34.29
+          ]
+        ],
+        "perimeter_cm": 10.27
+      },
+      {
+        "centre_cm": [
+          6.07,
+          1.2,
+          47.23
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_10",
+            0.14
+          ],
+          [
+            "tripo_part_7",
+            26.7
+          ]
+        ],
+        "perimeter_cm": 6.11
+      },
+      {
+        "centre_cm": [
+          7.6,
+          2.01,
+          46.55
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_10",
+            0.16
+          ],
+          [
+            "tripo_part_7",
+            13.91
+          ]
+        ],
+        "perimeter_cm": 3.47
+      }
+    ],
+    "tripo_part_1": [
+      {
+        "centre_cm": [
+          -0.04,
+          -0.19,
+          5.75
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            12.86
+          ],
+          [
+            "tripo_part_5",
+            186.5
+          ]
+        ],
+        "perimeter_cm": 89.0
+      }
+    ],
+    "tripo_part_10": [
+      {
+        "centre_cm": [
+          6.05,
+          1.17,
+          47.24
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.13
+          ],
+          [
+            "tripo_part_7",
+            26.88
+          ]
+        ],
+        "perimeter_cm": 6.5
+      },
+      {
+        "centre_cm": [
+          7.59,
+          2.03,
+          46.55
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.16
+          ],
+          [
+            "tripo_part_7",
+            13.94
+          ]
+        ],
+        "perimeter_cm": 3.6
+      }
+    ],
+    "tripo_part_11": [],
+    "tripo_part_12": [
+      {
+        "centre_cm": [
+          -12.74,
+          0.37,
+          28.4
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_5",
+            0.32
+          ],
+          [
+            "tripo_part_6",
+            2.33
+          ]
+        ],
+        "perimeter_cm": 13.08
+      }
+    ],
+    "tripo_part_2": [
+      {
+        "centre_cm": [
+          1.61,
+          -4.03,
+          53.83
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.09
+          ],
+          [
+            "tripo_part_3",
+            27.88
+          ]
+        ],
+        "perimeter_cm": 13.09
+      }
+    ],
+    "tripo_part_3": [
+      {
+        "centre_cm": [
+          -1.54,
+          -4.08,
+          53.76
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_9",
+            0.09
+          ],
+          [
+            "tripo_part_2",
+            28.29
+          ]
+        ],
+        "perimeter_cm": 11.43
+      }
+    ],
+    "tripo_part_4": [
+      {
+        "centre_cm": [
+          12.84,
+          0.25,
+          28.44
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_7",
+            0.08
+          ],
+          [
+            "tripo_part_11",
+            39.1
+          ]
+        ],
+        "perimeter_cm": 14.68
+      }
+    ],
+    "tripo_part_5": [
+      {
+        "centre_cm": [
+          -12.7,
+          0.13,
+          28.06
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_12",
+            0.15
+          ],
+          [
+            "tripo_part_6",
+            5.18
+          ]
+        ],
+        "perimeter_cm": 10.29
+      }
+    ],
+    "tripo_part_6": [
+      {
+        "centre_cm": [
+          -5.61,
+          1.4,
+          43.78
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.16
+          ],
+          [
+            "tripo_part_9",
+            82.07
+          ]
+        ],
+        "perimeter_cm": 16.32
+      },
+      {
+        "centre_cm": [
+          -12.67,
+          0.04,
+          28.86
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_12",
+            0.12
+          ],
+          [
+            "tripo_part_5",
+            5.64
+          ]
+        ],
+        "perimeter_cm": 9.8
+      }
+    ],
+    "tripo_part_7": [
+      {
+        "centre_cm": [
+          6.09,
+          1.52,
+          43.87
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.17
+          ],
+          [
+            "tripo_part_10",
+            28.51
+          ]
+        ],
+        "perimeter_cm": 25.16
+      },
+      {
+        "centre_cm": [
+          12.8,
+          0.29,
+          28.43
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_4",
+            0.1
+          ],
+          [
+            "tripo_part_11",
+            38.04
+          ]
+        ],
+        "perimeter_cm": 14.91
+      }
+    ],
+    "tripo_part_8": [],
+    "tripo_part_9": [
+      {
+        "centre_cm": [
+          1.63,
+          -4.12,
+          53.77
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_2",
+            0.1
+          ],
+          [
+            "tripo_part_3",
+            28.28
+          ]
+        ],
+        "perimeter_cm": 12.85
+      },
+      {
+        "centre_cm": [
+          -1.51,
+          -4.06,
+          53.81
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_3",
+            0.1
+          ],
+          [
+            "tripo_part_2",
+            27.31
+          ]
+        ],
+        "perimeter_cm": 11.56
+      },
+      {
+        "centre_cm": [
+          0.22,
+          -1.66,
+          50.85
+        ],
+        "closed_by_cap": null,
+        "nearest": [
+          [
+            "tripo_part_0",
+            0.14
+          ],
+          [
+            "tripo_part_2",
+            34.57
+          ]
+        ],
+        "perimeter_cm": 11.34
+      }
+    ]
+  },
+  "note": "loops_* = rim loops (perimeter >= inventory_min_perimeter_cm) of every part, nearest other part by median distance; closed_by_cap = the cap that closes the loop (cap boundaries are not rim loops); open loops left are judged in poses by the seams stage",
+  "open_loops_after": {
+    "closed_by_caps": 3,
+    "count": 18,
+    "count_before": 21
+  },
+  "passed": true,
+  "rest_visibility": {
+    "per_cap": {
+      "base_hole_1": {
+        "cap_backside_px": 0,
+        "cap_px": 30220,
+        "covers_front_px": 8,
+        "fills_gap_px": 30212,
+        "largest_covers_front_blob_px": 4,
+        "worst_view": "back_r"
+      },
+      "roots_floor": {
+        "cap_backside_px": 3994,
+        "cap_px": 4435,
+        "covers_front_px": 1,
+        "fills_gap_px": 440,
+        "largest_covers_front_blob_px": 1,
+        "worst_view": "front_r"
+      },
+      "shoulder_top_r": {
+        "cap_backside_px": 34,
+        "cap_px": 38,
+        "covers_front_px": 0,
+        "fills_gap_px": 4,
+        "largest_covers_front_blob_px": 0,
+        "worst_view": null
+      }
+    },
+    "per_view": {
+      "back": {
+        "backface_px_without_with_caps": [
+          166,
+          84
+        ],
+        "cap_backside_px": 19,
+        "cap_px": 313,
+        "covers_front_blobs_top3": [
+          1
+        ],
+        "covers_front_px": 1
+      },
+      "back_hi": {
+        "backface_px_without_with_caps": [
+          5604,
+          465
+        ],
+        "cap_backside_px": 454,
+        "cap_px": 6047,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "back_l": {
+        "backface_px_without_with_caps": [
+          242,
+          37
+        ],
+        "cap_backside_px": 11,
+        "cap_px": 259,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "back_lo": {
+        "backface_px_without_with_caps": [
+          23,
+          32
+        ],
+        "cap_backside_px": 9,
+        "cap_px": 12,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "back_r": {
+        "backface_px_without_with_caps": [
+          244,
+          64
+        ],
+        "cap_backside_px": 5,
+        "cap_px": 217,
+        "covers_front_blobs_top3": [
+          4
+        ],
+        "covers_front_px": 4
+      },
+      "front": {
+        "backface_px_without_with_caps": [
+          171,
+          79
+        ],
+        "cap_backside_px": 5,
+        "cap_px": 294,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "front_hi": {
+        "backface_px_without_with_caps": [
+          5402,
+          795
+        ],
+        "cap_backside_px": 785,
+        "cap_px": 6177,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "front_l": {
+        "backface_px_without_with_caps": [
+          273,
+          52
+        ],
+        "cap_backside_px": 5,
+        "cap_px": 248,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "front_lo": {
+        "backface_px_without_with_caps": [
+          20,
+          22
+        ],
+        "cap_backside_px": 3,
+        "cap_px": 4,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "front_r": {
+        "backface_px_without_with_caps": [
+          208,
+          51
+        ],
+        "cap_backside_px": 9,
+        "cap_px": 210,
+        "covers_front_blobs_top3": [
+          1,
+          1,
+          1
+        ],
+        "covers_front_px": 3
+      },
+      "k2": {
+        "backface_px_without_with_caps": [
+          6528,
+          1131
+        ],
+        "cap_backside_px": 1120,
+        "cap_px": 7637,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "left": {
+        "backface_px_without_with_caps": [
+          169,
+          28
+        ],
+        "cap_backside_px": 3,
+        "cap_px": 204,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "left_hi": {
+        "backface_px_without_with_caps": [
+          5690,
+          902
+        ],
+        "cap_backside_px": 893,
+        "cap_px": 6574,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "left_lo": {
+        "backface_px_without_with_caps": [
+          13,
+          13
+        ],
+        "cap_backside_px": 0,
+        "cap_px": 3,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "right": {
+        "backface_px_without_with_caps": [
+          112,
+          50
+        ],
+        "cap_backside_px": 4,
+        "cap_px": 127,
+        "covers_front_blobs_top3": [
+          1
+        ],
+        "covers_front_px": 1
+      },
+      "right_hi": {
+        "backface_px_without_with_caps": [
+          5666,
+          705
+        ],
+        "cap_backside_px": 701,
+        "cap_px": 6365,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      },
+      "right_lo": {
+        "backface_px_without_with_caps": [
+          7,
+          9
+        ],
+        "cap_backside_px": 2,
+        "cap_px": 2,
+        "covers_front_blobs_top3": [],
+        "covers_front_px": 0
+      }
+    },
+    "pitch_m": 0.001,
+    "totals": {
+      "backface_px_with_caps": 4519,
+      "backface_px_without_caps": 30538,
+      "cap_backside_px": 4028,
+      "cap_px": 34693,
+      "covers_front_px": 9,
+      "figure_px": 1670774,
+      "fills_gap_px": 30656,
+      "largest_covers_front_blob_px": 4
+    },
+    "views": [
+      "front",
+      "front_l",
+      "left",
+      "back_l",
+      "back",
+      "back_r",
+      "right",
+      "front_r",
+      "front_hi",
+      "left_hi",
+      "back_hi",
+      "right_hi",
+      "k2",
+      "front_lo",
+      "left_lo",
+      "back_lo",
+      "right_lo"
+    ]
+  },
+  "stage": "close",
+  "status": "измерено",
+  "tagged_retopo_caps": 1,
+  "triangles_by_mesh": {
+    "base": 2268,
+    "body": 44438
+  },
+  "triangles_by_part": {
+    "tripo_part_0": 15958,
+    "tripo_part_1": 2268,
+    "tripo_part_10": 1400,
+    "tripo_part_11": 1598,
+    "tripo_part_12": 400,
+    "tripo_part_2": 3999,
+    "tripo_part_3": 4000,
+    "tripo_part_4": 2999,
+    "tripo_part_5": 2999,
+    "tripo_part_6": 3767,
+    "tripo_part_7": 3600,
+    "tripo_part_8": 1600,
+    "tripo_part_9": 2118
+  },
+  "triangles_figure": 44438
+}

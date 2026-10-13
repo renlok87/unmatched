@@ -6,7 +6,8 @@ candidate_build.core (UM_FBX_v1 export: rotation, determinism pins, unit patch),
 measurements) and candidate_build.closure (boundary loops) read-only.
 
 Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factory-startup):
-  prepare   import both GLBs, match parts, prove identical geometry, scale to the card-04 frame,
+  prepare   import both GLBs, match parts, prove identical geometry, scale to the card-04 frame, optional
+            prepare.part_offsets_m (seat a detached rigid detail: final frame, after the map; st_prepare.py),
             ray-escape orientation of every high-poly part                      -> work/hp.blend
   retopo    per-part collapse decimation to the profile budget (two-step for dense regions: face),
             cleanup, caps of the base-top holes, deviation low<->high            -> work/lp.blend

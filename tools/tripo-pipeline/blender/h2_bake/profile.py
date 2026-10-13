@@ -13,6 +13,7 @@ Old profiles (Medusa: one weapon part, contract Medusa -> weapon.L) resolve to e
 
 import hashlib
 import json
+import math
 import re
 from pathlib import Path
 
@@ -86,6 +87,54 @@ def validate(p):
         problems.append("rig.bones: at most one weapon bone (found %s)" % side_bones)
     problems.extend(cloth_shell_problems(p))
     problems.extend(figure_top_part_problems(p))
+    problems.extend(part_offsets_problems(p))
+    return problems
+
+
+# ------------------------------------------------------------------ part offsets (Ancient Leshen stage 5 r3, 2026-10-14)
+PART_OFFSET_MAX_M = 0.05  # seats a detached rigid detail on its perch; not a tool to move limbs
+
+
+def part_offsets(p):
+    """Optional `prepare.part_offsets_m` = {tripo_part_N: [dx, dy, dz]}: the prepare stage translates the listed source
+    parts (both GLB twins, HPG_* and HPT_*) by this vector right after the frame map, i.e. in the FINAL frame in metres
+    (Blender axes of the profile: -Y front, +X the figure's left, +Z up — the frame of retopo.dense_regions, rig.bones and
+    seams targets). The frame map itself (scale, base footprint, figure top) is computed before the offset, so the other
+    parts keep their coordinates to the bit. Use: a rigid detail that Tripo generated off its perch (Ancient Leshen: the
+    crow tripo_part_8 hung 2.9 cm in front of the right forearm). None when absent — every profile written before the
+    key (Medusa, Arthur, Merlin, Harpy, Achilles, Angel, Leshen r1/r2) takes the old code path and keeps its bytes."""
+    prep = p.get("prepare")
+    return prep.get("part_offsets_m") if isinstance(prep, dict) else None
+
+
+def part_offsets_problems(p):
+    prep = p.get("prepare")
+    if prep is None:
+        return []
+    if not isinstance(prep, dict):
+        return ["prepare must be an object"]
+    cfg = prep.get("part_offsets_m")
+    if cfg is None:
+        return []
+    if not isinstance(cfg, dict) or not cfg:
+        return ["prepare.part_offsets_m must be a non-empty object {tripo_part_N: [dx, dy, dz]}"]
+    problems = []
+    for name, d in cfg.items():
+        if name not in p["parts"]:
+            problems.append("prepare.part_offsets_m: unknown part %s" % name)
+            continue
+        if p["parts"][name].get("mesh") == "base":
+            problems.append("prepare.part_offsets_m: %s is the base (normalised to the card-04 footprint)" % name)
+            continue
+        if not (isinstance(d, list) and len(d) == 3
+                and all(isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x) for x in d)):
+            problems.append("prepare.part_offsets_m.%s must be [dx, dy, dz] in metres (got %r)" % (name, d))
+            continue
+        length = math.sqrt(sum(float(x) ** 2 for x in d))
+        if length == 0.0:
+            problems.append("prepare.part_offsets_m.%s is zero (drop the entry)" % name)
+        elif length > PART_OFFSET_MAX_M:
+            problems.append("prepare.part_offsets_m.%s: %.4f m > %s m" % (name, length, PART_OFFSET_MAX_M))
     return problems
 
 

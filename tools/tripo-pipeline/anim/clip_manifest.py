@@ -49,7 +49,7 @@ H2ANIM = {"Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/med
           "Angel": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json"}
 # пилот 2026-10-14, этап 6 Ancient Leshen (регистрация Р6-1 отдельными строками)
 CHARS["AncientLeshen"] = ("LESH", "ASSET-ANCIENT-LESHEN-001")
-H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim.json"
+H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json"
 # пилот 2026-10-14, этап 6 Achilles (регистрация Р6-1 отдельными строками)
 CHARS["Achilles"] = ("ACH", "ASSET-ACHILLES-001")
 H2ANIM["Achilles"] = "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim.json"

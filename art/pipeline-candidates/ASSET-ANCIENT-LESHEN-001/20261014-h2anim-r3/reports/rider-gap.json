@@ -1,0 +1,471 @@
+{
+ "schema": "scratch.rider-gap/1",
+ "date": "2026-10-14",
+ "why": "приёмка клипа HitReact r1 (evidence/acceptance-anim/20261014-r1/HitReact/card.json, D=0): ворона на правом предплечье висела отдельно от руки. Замер показал, что это зазор модели в покое (2,90 см), а не деформация клипа; модель r3 (20261014-h2-bake-r3, prepare.part_offsets_m) посадила ворону на предплечье.",
+ "method": "headless Blender 5.2, скиненный меш тела клипа, вершины тела отнесены к частям Tripo по позиции (LP_tripo_part_* из work/lp_uv.blend bake-прогона, совпадение 2e-5 см). gap_min — минимум расстояния вершин вороны до поверхности опоры (ближайшая точка BVH): ворона правого предплечья (часть 8, жёстко arm_lower.R) — опора части 6/12/5 (рука, запястье, кисть); ворона левого плеча (часть 10, spine) — части 0/7; ворона левого предплечья (часть 11, arm_lower.L) — части 7/4. signed_* — со знаком (минус = внутри, подтверждено чётностью лучей): ворона в опору и опора в ворону. drift — смещение точки опоры под лапами относительно вороны. Скрипт вне репо C:/tmp/leshen-anim-r2/rider_gap.py.",
+ "runs": {
+  "r1": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim (модель 20261014-h2-bake-r2)",
+  "r3": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3 (модель 20261014-h2-bake-r3)"
+ },
+ "clips": {
+  "Idle": {
+   "crow_forearm_R": {
+    "r1": {
+     "min_gap_min_cm": 2.7033,
+     "max_gap_min_cm": 2.9016,
+     "min_signed_rider_to_perch_cm": 2.7033,
+     "min_signed_perch_to_rider_cm": 2.7033,
+     "min_signed_rider_to_others_cm": 5.5564,
+     "peak_drift_cm": 0.101
+    },
+    "r3": {
+     "min_gap_min_cm": 0.16,
+     "max_gap_min_cm": 0.16,
+     "min_signed_rider_to_perch_cm": 0.16,
+     "min_signed_perch_to_rider_cm": 0.1906,
+     "min_signed_rider_to_others_cm": 6.1563,
+     "peak_drift_cm": 0.0
+    },
+    "gap_min_cm_per_frame": {
+     "r1": [
+      2.8024,
+      2.7803,
+      2.7594,
+      2.7406,
+      2.7249,
+      2.7131,
+      2.7058,
+      2.7033,
+      2.7058,
+      2.7131,
+      2.7249,
+      2.7406,
+      2.7594,
+      2.7803,
+      2.8024,
+      2.8244,
+      2.8454,
+      2.8642,
+      2.8799,
+      2.8918,
+      2.8991,
+      2.9016,
+      2.8991,
+      2.8918,
+      2.8799,
+      2.8642,
+      2.8454,
+      2.8244,
+      2.8024,
+      2.7803,
+      2.7594,
+      2.7406,
+      2.7249,
+      2.7131,
+      2.7058,
+      2.7033,
+      2.7058,
+      2.7131,
+      2.7249,
+      2.7406,
+      2.7594,
+      2.7803,
+      2.8024,
+      2.8244,
+      2.8454,
+      2.8642,
+      2.88,
+      2.8918,
+      2.8991,
+      2.9016,
+      2.8991,
+      2.8918,
+      2.88,
+      2.8642,
+      2.8454,
+      2.8244,
+      2.8024
+     ],
+     "r3": [
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16
+     ]
+    }
+   },
+   "crow_shoulder_L": {
+    "r1": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0131,
+     "min_signed_perch_to_rider_cm": -0.0883,
+     "min_signed_rider_to_others_cm": 2.5722,
+     "peak_drift_cm": 0.0034
+    },
+    "r3": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0131,
+     "min_signed_perch_to_rider_cm": -0.0883,
+     "min_signed_rider_to_others_cm": 2.5722,
+     "peak_drift_cm": 0.0013
+    }
+   },
+   "crow_forearm_L": {
+    "r1": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 9.4763,
+     "peak_drift_cm": 0.0
+    },
+    "r3": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 9.4763,
+     "peak_drift_cm": 0.0
+    }
+   }
+  },
+  "LungeAttack": {
+   "crow_forearm_R": {
+    "r1": {
+     "min_gap_min_cm": 1.8373,
+     "max_gap_min_cm": 2.9619,
+     "min_signed_rider_to_perch_cm": 1.8373,
+     "min_signed_perch_to_rider_cm": 1.8373,
+     "min_signed_rider_to_others_cm": 5.5564,
+     "peak_drift_cm": 0.4526
+    },
+    "r3": {
+     "min_gap_min_cm": 0.16,
+     "max_gap_min_cm": 0.16,
+     "min_signed_rider_to_perch_cm": 0.16,
+     "min_signed_perch_to_rider_cm": 0.1906,
+     "min_signed_rider_to_others_cm": 3.1837,
+     "peak_drift_cm": 0.0
+    },
+    "gap_min_cm_per_frame": {
+     "r1": [
+      2.9016,
+      2.5172,
+      2.0775,
+      1.8373,
+      1.9825,
+      2.232,
+      2.0258,
+      1.8888,
+      2.8136,
+      2.9576,
+      2.9548,
+      2.9619,
+      2.719,
+      2.7592,
+      2.9016
+     ],
+     "r3": [
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16
+     ]
+    }
+   },
+   "crow_shoulder_L": {
+    "r1": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0414,
+     "min_signed_perch_to_rider_cm": -0.3017,
+     "min_signed_rider_to_others_cm": 2.4848,
+     "peak_drift_cm": 0.0247
+    },
+    "r3": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0414,
+     "min_signed_perch_to_rider_cm": -0.3017,
+     "min_signed_rider_to_others_cm": 2.4848,
+     "peak_drift_cm": 0.0061
+    }
+   },
+   "crow_forearm_L": {
+    "r1": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 7.857,
+     "peak_drift_cm": 0.0
+    },
+    "r3": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 7.857,
+     "peak_drift_cm": 0.0
+    }
+   }
+  },
+  "HitReact": {
+   "crow_forearm_R": {
+    "r1": {
+     "min_gap_min_cm": 2.4524,
+     "max_gap_min_cm": 2.9016,
+     "min_signed_rider_to_perch_cm": 2.4524,
+     "min_signed_perch_to_rider_cm": 2.4524,
+     "min_signed_rider_to_others_cm": 5.2912,
+     "peak_drift_cm": 0.0165
+    },
+    "r3": {
+     "min_gap_min_cm": 0.16,
+     "max_gap_min_cm": 0.16,
+     "min_signed_rider_to_perch_cm": 0.16,
+     "min_signed_perch_to_rider_cm": 0.1906,
+     "min_signed_rider_to_others_cm": 6.0978,
+     "peak_drift_cm": 0.0
+    },
+    "gap_min_cm_per_frame": {
+     "r1": [
+      2.9016,
+      2.6755,
+      2.4524,
+      2.5397,
+      2.656,
+      2.7132,
+      2.7697,
+      2.8211,
+      2.863,
+      2.8912,
+      2.9016
+     ],
+     "r3": [
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16
+     ]
+    }
+   },
+   "crow_shoulder_L": {
+    "r1": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0414,
+     "min_signed_perch_to_rider_cm": -0.0883,
+     "min_signed_rider_to_others_cm": 2.7145,
+     "peak_drift_cm": 0.0095
+    },
+    "r3": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0414,
+     "min_signed_perch_to_rider_cm": -0.0883,
+     "min_signed_rider_to_others_cm": 2.7145,
+     "peak_drift_cm": 0.005
+    }
+   },
+   "crow_forearm_L": {
+    "r1": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 9.38,
+     "peak_drift_cm": 0.0
+    },
+    "r3": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 9.38,
+     "peak_drift_cm": 0.0
+    }
+   }
+  },
+  "DeathSettle": {
+   "crow_forearm_R": {
+    "r1": {
+     "min_gap_min_cm": 2.4088,
+     "max_gap_min_cm": 2.9016,
+     "min_signed_rider_to_perch_cm": 2.4088,
+     "min_signed_perch_to_rider_cm": 2.4079,
+     "min_signed_rider_to_others_cm": 5.5564,
+     "peak_drift_cm": 0.0192
+    },
+    "r3": {
+     "min_gap_min_cm": 0.16,
+     "max_gap_min_cm": 0.16,
+     "min_signed_rider_to_perch_cm": 0.16,
+     "min_signed_perch_to_rider_cm": 0.1906,
+     "min_signed_rider_to_others_cm": 6.1563,
+     "peak_drift_cm": 0.0
+    },
+    "gap_min_cm_per_frame": {
+     "r1": [
+      2.9016,
+      2.8267,
+      2.682,
+      2.5877,
+      2.5631,
+      2.5478,
+      2.5397,
+      2.5365,
+      2.5363,
+      2.5369,
+      2.5362,
+      2.5323,
+      2.523,
+      2.5064,
+      2.4793,
+      2.447,
+      2.4201,
+      2.4088,
+      2.4164,
+      2.4331,
+      2.4499,
+      2.4575
+     ],
+     "r3": [
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16,
+      0.16
+     ]
+    }
+   },
+   "crow_shoulder_L": {
+    "r1": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0358,
+     "min_signed_perch_to_rider_cm": -0.3017,
+     "min_signed_rider_to_others_cm": 2.7365,
+     "peak_drift_cm": 0.0139
+    },
+    "r3": {
+     "min_gap_min_cm": 0.0001,
+     "max_gap_min_cm": 0.0001,
+     "min_signed_rider_to_perch_cm": -0.0358,
+     "min_signed_perch_to_rider_cm": -0.3017,
+     "min_signed_rider_to_others_cm": 2.7365,
+     "peak_drift_cm": 0.0075
+    }
+   },
+   "crow_forearm_L": {
+    "r1": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 4.0653,
+     "peak_drift_cm": 0.0
+    },
+    "r3": {
+     "min_gap_min_cm": 0.1519,
+     "max_gap_min_cm": 0.1519,
+     "min_signed_rider_to_perch_cm": 0.1519,
+     "min_signed_perch_to_rider_cm": 0.1545,
+     "min_signed_rider_to_others_cm": 4.0653,
+     "peak_drift_cm": 0.0
+    }
+   }
+  }
+ },
+ "verdict": "ворона правого предплечья: r1 — зазор 1,84–2,96 см во всех кадрах всех клипов (в покое 2,90); r3 — 0,160 см в каждом кадре всех четырёх клипов, без пересечений (со знаком ≥ +0,16 / +0,19 см), опора под лапами 100 % arm_lower.R, дрейф 0; ворона левого предплечья 0,152 см и ворона плеча (лапы утоплены в плечо ≤ 0,04 см, как у модели r2) — без изменений"
+}

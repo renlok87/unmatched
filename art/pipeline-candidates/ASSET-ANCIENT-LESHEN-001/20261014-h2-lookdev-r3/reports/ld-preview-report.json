@@ -1,0 +1,225 @@
+{
+  "backface_culling": true,
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей",
+  "lut_exr_read_by_blender": {
+    "float_buffer": true,
+    "max_abs_diff_vs_json": 0.0,
+    "size": [
+      16,
+      16
+    ]
+  },
+  "ortho_frame": {
+    "side": "left",
+    "source": "checks_report art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+    "views": {
+      "back": {
+        "base_centre_x_share": 0.49954,
+        "bottom": 0.9412999999999999,
+        "ortho_height_m": 0.81558,
+        "px": [
+          1086,
+          1448
+        ],
+        "top": 0.03936
+      },
+      "front": {
+        "base_centre_x_share": 0.5,
+        "bottom": 0.94199,
+        "ortho_height_m": 0.81247,
+        "px": [
+          1086,
+          1448
+        ],
+        "top": 0.0366
+      },
+      "side": {
+        "base_centre_x_share": 0.5013799999999999,
+        "bottom": 0.9412999999999999,
+        "ortho_height_m": 0.81558,
+        "px": [
+          1086,
+          1448
+        ],
+        "top": 0.03936
+      }
+    }
+  },
+  "samples": 64,
+  "shots": [
+    {
+      "name": "class-front",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-front-h21",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-front-ld",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "class-side",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-side-h21",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-side-ld",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "class-back",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-back-h21",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-back-ld",
+      "px": [
+        1086,
+        1448
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-skull_front-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-skull_front-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-antlers-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-antlers-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_r_claws-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_r_claws-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-crow_shoulder-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-crow_shoulder-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-roots_base-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-roots_base-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    }
+  ],
+  "stage": "ld_preview",
+  "status": "измерено"
+}

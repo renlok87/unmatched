@@ -4,7 +4,15 @@ orientation of every high-poly part (ray escape) and save work/hp.blend.
 
 Figure height: the source top mapped to scale.figure_top_m is the highest vertex of any non-base part (weapon included),
 or, with the optional scale.figure_top_part, the top of that part (the head under a raised sword or antlers: the budget
-top of Specs()); profile.figure_top_source_z. The report then names the part and the figure bounds top."""
+top of Specs()); profile.figure_top_source_z. The report then names the part and the figure bounds top.
+
+Part offsets (optional prepare.part_offsets_m = {tripo_part_N: [dx, dy, dz]}, profile.part_offsets; Ancient Leshen
+stage 5 r3, 2026-10-14): a rigid detail that Tripo generated off its perch (the crow tripo_part_8 hung 2.9 cm in front
+of the right forearm) is translated by that vector in the FINAL frame (metres, -Y front, +X the figure's left, +Z up —
+the frame of retopo.dense_regions, rig.bones and seams targets), on both twins, right after the frame map: the map
+(scale, base footprint, figure top) and every other part keep their coordinates to the bit. The final frame, not the
+source one, because every number an author measures (rider gap, contact point) is in it and the offset does not feed
+back into the figure scale. The report gets a part_offsets_m block only when the key is present (Medusa bytes)."""
 
 from pathlib import Path
 
@@ -82,6 +90,14 @@ def run(params, profile):
             U.set_coords(obj.data, c)
             if obj.data.has_custom_normals and is_base:
                 pass  # non-uniform base scale: custom normals are re-derived by Blender from the split data
+    # optional prepare.part_offsets_m (profile.part_offsets): translate the listed parts in the final frame, after the
+    # frame map (the map and every other part keep their bytes); both twins, so the bake rays and the retopo agree
+    offsets = P.part_offsets(profile)
+    if offsets:
+        for n in sorted(offsets, key=U.part_key):
+            d = np.asarray(offsets[n], dtype=np.float64)
+            for obj in (hpg[n], hpt[n]):
+                U.set_coords(obj.data, U.coords(obj.data) + d)
     lo, hi = U.bounds(list(hpg.values()))
     fig_lo, fig_hi = U.bounds([hpg[n] for n in names if n != base_part])
     for n in names:
@@ -133,6 +149,11 @@ def run(params, profile):
                                      "figure_bounds_top_m": U.r(fig_hi[2], 5),
                                      "note": "scale.figure_top_m is the top of this part; the figure bounds top (weapon, "
                                              "ornaments) frames the concept views (profile.frame_top_m)"}
+    if offsets:  # profiles without the key keep their report bytes
+        report["part_offsets_m"] = {
+            "parts": {n: U.rv(offsets[n], 6) for n in sorted(offsets, key=U.part_key)},
+            "frame": "final (metres, -Y front, +X figure left, +Z up), applied after frame_map to HPG_* and HPT_*",
+            "note": "parts.<part>.final_bounds_m include the offset; source_bounds_m do not"}
     U.write_json(run_dir / "reports" / "prepare-report.json", report)
     if not report["passed"]:
         raise RuntimeError("prepare checks failed: %s" % [k for k, c in checks.items() if not c["passed"]])

@@ -1,0 +1,546 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.02486
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 57,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 57,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 43,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.148,
+      "max_growth_of_height": 0.00159,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005435,
+      "max_penetration_of_height": 0.005563,
+      "frame": 4,
+      "worst_bone": "root",
+      "tol": 0.002,
+      "base_top_cm": 6.003,
+      "base_radius_cm": 14.688
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 0.000115,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/preview/AncientLeshen-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.5454
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       4,
+       5
+      ],
+      "frame": 4,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 1,
+      "warn_regions": {
+       "arm_upper.R|arm_upper.R": 1
+      },
+      "warn_z_of_height": 0.53,
+      "max_ratio": 3.941,
+      "max_growth_of_height": 0.01849,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005435,
+      "max_penetration_of_height": 0.005581,
+      "frame": 8,
+      "worst_bone": "root",
+      "tol": 0.002,
+      "base_top_cm": 6.003,
+      "base_radius_cm": 14.688
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/preview/AncientLeshen-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.19897
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 2,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.522,
+      "max_growth_of_height": 0.01066,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005435,
+      "max_penetration_of_height": 0.005469,
+      "frame": 7,
+      "worst_bone": "root",
+      "tol": 0.002,
+      "base_top_cm": 6.003,
+      "base_radius_cm": 14.688
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/preview/AncientLeshen-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.54668
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 0
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 17,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.894,
+      "max_growth_of_height": 0.01346,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005435,
+      "max_penetration_of_height": 0.005854,
+      "frame": 17,
+      "worst_bone": "root",
+      "tol": 0.002,
+      "base_top_cm": 6.003,
+      "base_radius_cm": 14.688
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/preview/AncientLeshen-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 3.2,
+  "lines": [
+   "CLIP_AUTHOR OK Idle art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_Idle.fbx rest 2.134e-05 pose 1.4e-05 unreached [4, 5, 6, 7, 8, 9]",
+   "CLIP_AUTHOR OK LungeAttack art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_LungeAttack.fbx rest 2.134e-05 pose 1.5e-05 unreached []",
+   "CLIP_AUTHOR OK HitReact art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_HitReact.fbx rest 2.134e-05 pose 1.4e-05 unreached []",
+   "CLIP_AUTHOR OK DeathSettle art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_DeathSettle.fbx rest 2.134e-05 pose 1.9e-05 unreached [6, 7, 8, 9, 10, 11]"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json"
+}

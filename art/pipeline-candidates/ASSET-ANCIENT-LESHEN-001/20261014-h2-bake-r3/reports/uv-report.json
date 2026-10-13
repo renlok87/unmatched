@@ -1,0 +1,780 @@
+{
+  "atlas_px": 4096,
+  "caps": {
+    "count": 3,
+    "note": "cap texels are filled by the textures stage from their rim (caps.npz), not baked",
+    "per_cap": [
+      {
+        "boundary_vertices": 256,
+        "cap": 1,
+        "faces": 1960,
+        "label": 1,
+        "part": "tripo_part_0",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ],
+        "vertices": 1109
+      },
+      {
+        "boundary_vertices": 176,
+        "cap": 1,
+        "faces": 1068,
+        "label": 1001,
+        "part": "tripo_part_1",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 623
+      },
+      {
+        "boundary_vertices": 118,
+        "cap": 1,
+        "faces": 168,
+        "label": 6001,
+        "part": "tripo_part_6",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ],
+        "vertices": 144
+      }
+    ],
+    "rim_samples": 9074,
+    "texel_priority": 0.7,
+    "texels_4k": 485974
+  },
+  "checks": {
+    "island_gap_px_at_4k": {
+      "expected": ">= 8",
+      "measured": 8,
+      "note": "raster at pixel centres; None = no two islands closer than the BFS horizon",
+      "passed": true
+    },
+    "no_folded_uv_triangles": {
+      "expected": 0,
+      "measured": {
+        "tripo_part_0": 0,
+        "tripo_part_1": 0,
+        "tripo_part_10": 0,
+        "tripo_part_11": 0,
+        "tripo_part_12": 0,
+        "tripo_part_2": 0,
+        "tripo_part_3": 0,
+        "tripo_part_4": 0,
+        "tripo_part_5": 0,
+        "tripo_part_6": 0,
+        "tripo_part_7": 0,
+        "tripo_part_8": 0,
+        "tripo_part_9": 0
+      },
+      "passed": true
+    },
+    "priority_face_denser_than_body": {
+      "expected": "face >= 1.5 x dress",
+      "measured": {
+        "dress": 35.777,
+        "face": 71.553,
+        "reference_part": "tripo_part_0"
+      },
+      "passed": true
+    },
+    "raster_overlap_px": {
+      "expected": "<= 0",
+      "measured": 0,
+      "note": "pixel centres strictly inside two or more UV triangles (any islands, any parts)",
+      "passed": true
+    },
+    "uv_inside_0_1": {
+      "expected": "[0, 1]",
+      "measured": [
+        [
+          0.0013,
+          0.0013
+        ],
+        [
+          0.995497,
+          0.994735
+        ]
+      ],
+      "passed": true
+    }
+  },
+  "coverage_share": 0.4569,
+  "footprints": {
+    "note": "BC/RM/AO of faces hidden at rest under the covering part, from the visible surface around them (footprints.npz); their normal map stays baked",
+    "per_contact": [
+      {
+        "faces": 0,
+        "name": "shoulder_top_r",
+        "part": "tripo_part_6"
+      }
+    ],
+    "texels_4k": 0
+  },
+  "islands_total": 1243,
+  "min_gap_px": 8,
+  "pack": {
+    "margin": 0.0013,
+    "margin_method": "FRACTION",
+    "rotate": "ANY",
+    "shape_method": "CONCAVE"
+  },
+  "parts": {
+    "tripo_part_0": {
+      "area_cm2": 2350.911,
+      "caps": {
+        "area_cm2": 507.076,
+        "texel_density_px_per_cm_4k": 25.044,
+        "uv_area_px": 318028.7
+      },
+      "islands": 687,
+      "priority_factor_default": 1.0,
+      "raster_px": 3327099,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 3009077.5
+    },
+    "tripo_part_1": {
+      "area_cm2": 1168.8,
+      "caps": {
+        "area_cm2": 615.596,
+        "texel_density_px_per_cm_4k": 16.099,
+        "uv_area_px": 159557.8
+      },
+      "islands": 11,
+      "priority_factor_default": 0.45,
+      "raster_px": 462486,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 8.05,
+      "texel_density_px_per_cm_4k": 16.099,
+      "uv_area_px": 302944.0
+    },
+    "tripo_part_10": {
+      "area_cm2": 92.363,
+      "caps": null,
+      "islands": 17,
+      "priority_factor_default": 1.25,
+      "raster_px": 184728,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 22.36,
+      "texel_density_px_per_cm_4k": 44.721,
+      "uv_area_px": 184721.2
+    },
+    "tripo_part_11": {
+      "area_cm2": 74.101,
+      "caps": null,
+      "islands": 19,
+      "priority_factor_default": 1.25,
+      "raster_px": 148197,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 22.36,
+      "texel_density_px_per_cm_4k": 44.721,
+      "uv_area_px": 148198.6
+    },
+    "tripo_part_12": {
+      "area_cm2": 8.75,
+      "caps": null,
+      "islands": 4,
+      "priority_factor_default": 1.0,
+      "raster_px": 11186,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 11199.5
+    },
+    "tripo_part_2": {
+      "area_cm2": 307.242,
+      "caps": null,
+      "islands": 262,
+      "priority_factor_default": 1.0,
+      "raster_px": 393150,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 393258.0
+    },
+    "tripo_part_3": {
+      "area_cm2": 303.537,
+      "caps": null,
+      "islands": 57,
+      "priority_factor_default": 1.0,
+      "raster_px": 388573,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 388515.5
+    },
+    "tripo_part_4": {
+      "area_cm2": 263.077,
+      "caps": null,
+      "islands": 47,
+      "priority_factor_default": 1.5,
+      "raster_px": 757640,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 26.832,
+      "texel_density_px_per_cm_4k": 53.665,
+      "uv_area_px": 757639.2
+    },
+    "tripo_part_5": {
+      "area_cm2": 251.651,
+      "caps": null,
+      "islands": 60,
+      "priority_factor_default": 1.5,
+      "raster_px": 724700,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 26.832,
+      "texel_density_px_per_cm_4k": 53.665,
+      "uv_area_px": 724734.4
+    },
+    "tripo_part_6": {
+      "area_cm2": 194.54,
+      "caps": {
+        "area_cm2": 13.366,
+        "texel_density_px_per_cm_4k": 25.044,
+        "uv_area_px": 8383.1
+      },
+      "islands": 34,
+      "priority_factor_default": 1.0,
+      "raster_px": 257368,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 249004.3
+    },
+    "tripo_part_7": {
+      "area_cm2": 177.369,
+      "caps": null,
+      "islands": 13,
+      "priority_factor_default": 1.0,
+      "raster_px": 227069,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 17.888,
+      "texel_density_px_per_cm_4k": 35.777,
+      "uv_area_px": 227025.5
+    },
+    "tripo_part_8": {
+      "area_cm2": 92.758,
+      "caps": null,
+      "islands": 12,
+      "priority_factor_default": 1.25,
+      "raster_px": 185468,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 22.36,
+      "texel_density_px_per_cm_4k": 44.721,
+      "uv_area_px": 185511.5
+    },
+    "tripo_part_9": {
+      "area_cm2": 126.358,
+      "caps": null,
+      "islands": 20,
+      "priority_factor_default": 1.5,
+      "raster_px": 598292,
+      "regions": [
+        "face"
+      ],
+      "texel_density_px_per_cm_2k": 34.406,
+      "texel_density_px_per_cm_4k": 68.812,
+      "uv_area_px": 598314.4
+    }
+  },
+  "passed": true,
+  "region_density_px_per_cm_4k": {
+    "face": 71.553
+  },
+  "stage": "uv",
+  "status": "измерено",
+  "unwrap": {
+    "charts": {
+      "tripo_part_0": {
+        "charts": 677,
+        "fallback_charts": 5,
+        "fallback_faces": 570,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 12,
+            "charts_unwrapped": 57,
+            "round": 0
+          },
+          {
+            "bad": 12,
+            "charts_unwrapped": 24,
+            "round": 1
+          },
+          {
+            "bad": 10,
+            "charts_unwrapped": 24,
+            "round": 2
+          },
+          {
+            "bad": 8,
+            "charts_unwrapped": 20,
+            "round": 3
+          },
+          {
+            "bad": 7,
+            "charts_unwrapped": 16,
+            "round": 4
+          },
+          {
+            "bad": 6,
+            "charts_unwrapped": 14,
+            "round": 5
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 12,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 3.1284,
+        "stretch_log_p95_median": 0.0
+      },
+      "tripo_part_1": {
+        "charts": 11,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 11,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.4127,
+        "stretch_log_p95_median": 0.2246
+      },
+      "tripo_part_10": {
+        "charts": 15,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 11,
+            "round": 0
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 2
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 3
+          }
+        ],
+        "stretch_log_p95_max": 0.4915,
+        "stretch_log_p95_median": 0.2169
+      },
+      "tripo_part_11": {
+        "charts": 16,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 2,
+            "charts_unwrapped": 9,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 5
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4174,
+        "stretch_log_p95_median": 0.2115
+      },
+      "tripo_part_12": {
+        "charts": 4,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 1,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 3
+          }
+        ],
+        "stretch_log_p95_max": 0.2757,
+        "stretch_log_p95_median": 0.1826
+      },
+      "tripo_part_2": {
+        "charts": 257,
+        "fallback_charts": 1,
+        "fallback_faces": 205,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 9,
+            "charts_unwrapped": 18,
+            "round": 0
+          },
+          {
+            "bad": 7,
+            "charts_unwrapped": 18,
+            "round": 1
+          },
+          {
+            "bad": 7,
+            "charts_unwrapped": 14,
+            "round": 2
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 14,
+            "round": 3
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 10,
+            "round": 4
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 10,
+            "round": 5
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4701,
+        "stretch_log_p95_median": 0.0
+      },
+      "tripo_part_3": {
+        "charts": 50,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 12,
+            "charts_unwrapped": 17,
+            "round": 0
+          },
+          {
+            "bad": 10,
+            "charts_unwrapped": 24,
+            "round": 1
+          },
+          {
+            "bad": 6,
+            "charts_unwrapped": 20,
+            "round": 2
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 12,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 8,
+            "round": 4
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 5
+          }
+        ],
+        "stretch_log_p95_max": 0.499,
+        "stretch_log_p95_median": 0.1195
+      },
+      "tripo_part_4": {
+        "charts": 42,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 7,
+            "charts_unwrapped": 15,
+            "round": 0
+          },
+          {
+            "bad": 10,
+            "charts_unwrapped": 14,
+            "round": 1
+          },
+          {
+            "bad": 7,
+            "charts_unwrapped": 20,
+            "round": 2
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 14,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 4
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 5
+          }
+        ],
+        "stretch_log_p95_max": 0.4979,
+        "stretch_log_p95_median": 0.1777
+      },
+      "tripo_part_5": {
+        "charts": 57,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 12,
+            "charts_unwrapped": 14,
+            "round": 0
+          },
+          {
+            "bad": 11,
+            "charts_unwrapped": 24,
+            "round": 1
+          },
+          {
+            "bad": 8,
+            "charts_unwrapped": 22,
+            "round": 2
+          },
+          {
+            "bad": 6,
+            "charts_unwrapped": 16,
+            "round": 3
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 12,
+            "round": 4
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 8,
+            "round": 5
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 4,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4852,
+        "stretch_log_p95_median": 0.1633
+      },
+      "tripo_part_6": {
+        "charts": 30,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 3,
+            "charts_unwrapped": 12,
+            "round": 0
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 6,
+            "round": 1
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 6,
+            "round": 2
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 10,
+            "round": 3
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 8,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 5
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4933,
+        "stretch_log_p95_median": 0.1632
+      },
+      "tripo_part_7": {
+        "charts": 11,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 10,
+            "round": 0
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 1
+          }
+        ],
+        "stretch_log_p95_max": 0.4664,
+        "stretch_log_p95_median": 0.243
+      },
+      "tripo_part_8": {
+        "charts": 12,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 11,
+            "round": 0
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 1
+          }
+        ],
+        "stretch_log_p95_max": 0.4783,
+        "stretch_log_p95_median": 0.2115
+      },
+      "tripo_part_9": {
+        "charts": 20,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 3,
+            "charts_unwrapped": 6,
+            "round": 0
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 6,
+            "round": 1
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 6,
+            "round": 2
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 6,
+            "round": 3
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 4,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 5
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4002,
+        "stretch_log_p95_median": 0.2044
+      }
+    },
+    "method": "voronoi charts + MINIMUM_STRETCH (fallback: one island per face)"
+  }
+}
