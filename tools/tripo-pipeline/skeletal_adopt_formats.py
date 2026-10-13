@@ -306,6 +306,19 @@ def h2_lookdev(ldfbx: dict, ldmaps: dict, profile: dict, repo_path, sha256_file)
     passed = ld_ok and manifest_ok and rig_ok and n_directx
     face = (ldfbx.get("checks") or {}).get("export_frame_face_points_along_rotated_front_ue_plus_x") or {}
     top = (((rig.get("checks") or {}).get("unit_scale_1_and_height") or {}).get("measured") or {}).get("skeletal_top_cm")
+    # optional candidate.figure_top_part (pilot 2026-10-14): the figure top is the top of that part in the H2.1
+    # prepare report (same run as the rig report). Without it the top is the whole skeletal mesh, as before — which is a
+    # raised weapon or antlers for some heroes (Angel's sword tip 55.909 uu vs his head 55.000 uu).
+    top_part = c.get("figure_top_part")
+    if top_part:
+        prep_rel = rig_rel.rsplit("/", 1)[0] + "/prepare-report.json"
+        prep_path = repo_path(prep_rel)
+        if not prep_path.is_file():
+            raise NormaliseError("figure_top_part %s: prepare report missing: %s" % (top_part, prep_rel))
+        part = (json.loads(prep_path.read_text(encoding="utf-8")).get("parts") or {}).get(top_part)
+        if not part or not part.get("final_bounds_m"):
+            raise NormaliseError("figure_top_part %s: no final_bounds_m in %s" % (top_part, prep_rel))
+        top = round(float(part["final_bounds_m"][1][2]) * 100.0, 4)
     profile_id = mprof.get("profile_id") if manifest_ok else None
     build = {
         "schema": "normalised from %s + %s" % (LOOKDEV_RUN_SCHEMA, rig_rel),
@@ -321,7 +334,7 @@ def h2_lookdev(ldfbx: dict, ldmaps: dict, profile: dict, repo_path, sha256_file)
                       "scale_ratio_note": "extent of the read-back look-dev skeletal meshes / H2.1 authored skeletal "
                                           "bounds (rig report bounds_authored_m), per authored axis"},
         "sockets": rig.get("sockets") or [],
-        "measures": {"figure_top_uu": top},
+        "measures": {"figure_top_uu": top, "figure_top_part": top_part},
         "checks": {"export_face_plus_x": {
             "passed": face.get("passed") is True, "measured": face.get("measured"), "expected": face.get("expected"),
             "source": "ld-fbx-report checks.export_frame_face_points_along_rotated_front_ue_plus_x"}},
