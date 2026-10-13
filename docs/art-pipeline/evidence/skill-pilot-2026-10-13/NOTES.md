@@ -90,6 +90,14 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F69 | 3 | seams counts a flipped real face lying 0.1 mm over the part's own cap as a hole | tool: pass when a same-part cap is within ε behind |
 | F70 | 3 | Triangle budget: targets + caps + 2× shelled parts must stay ≤ 45k (Achilles 44 706) | HANDBOOK §4.2 retopo |
 | F71 | 3 | Bronze: full tone correction gives pale brass, half gives darker bronze (0.73); leather stuck at the class floor (1.75× too bright); H2LD bronze reads coppery and glossy vs the concept's matte gold | HANDBOOK §4.4: damp metal gains (the concept's metal is paint, not PBR); UE capture decides |
+| F72 | 3→4 | **Systemic:** stage 3 exits with a main class out of tone range, and T is capped at 1.0 only at stage 4 — both Leshen (bone 0.775) and Achilles (bronze 0.717) lost a full cycle (7.5 and 6.9 `rework_blender`). `ld_measure` suggestions were applied once / halved | SKILL §6 stage 3 exit: `t_cap` 2.0 from the tone table (CLI for `tools/art/acceptance/_tone.py` on the look-dev measure-report) or one more grade iteration from `gain_suggestion` |
+| F73 | 4 | No profile route for a ragged Tripo base underside (Leshen: own base part, z ×1.27) | acceptance §9.3 row; option to flatten/cap the base rim or use the standard Ø0.30×0.06 base |
+| F74 | 4 | WEAPON_HAND none: close-weapon repeats the upper figure, the attacking claws get no close-up | capture: frame close-weapon on `WEAPON_SOCKET_BONE` |
+| F75 | 4 | codex exec picks up project skills even with `--ignore-user-config`: the acceptor read SKILL.md (outside its inputs) — Leshen and Achilles | §8.2: prompt line limiting the rubric to acceptance-and-blender.md |
+| F76 | 4 | Card `ACCEPTOR_PROFILE` (opus-xhigh) vs the launcher's explicit Sol choice — no precedence stated | §8.1: explicit choice wins, recorded in NOTES |
+| F77 | 4 | pose-04 (left thigh raise) is shot from the left, where the shield hides hip and kilt: the П3-3 cloth shell went unjudged | capture: second angle for pose-04 away from the shield (like pose-03b) |
+| F78 | 4 | G-NAMES «figure top» undefined when a crest/headgear rises above the head (card vs launcher lesson disagreed) | rubric: defer to the card's height field, body mesh without the weapon |
+| F79 | 4 | Tone-related rework items both heroes also include stage-3 artefacts the stage-3 agents did not see (Achilles: brown spear tip, skin-coloured nose guard, collar smears, elbow pinch; Leshen: faceted claws/antler tines) | stage 3 exit: executor checks the same close-ups the acceptor uses (`capture_acceptance_set.py` dry run) before handing over |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

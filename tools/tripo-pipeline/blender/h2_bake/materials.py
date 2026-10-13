@@ -260,6 +260,9 @@ def remap(maps, valid, m, cloth_w, cfg):
     sel = (m >= 0.5) & valid
     csel = (cloth_w >= 0.5) & valid
     for tag, s_ in (("metal", sel), ("cloth", csel)):
+        if not s_.any():  # no cloth texels (team_mask.cloth_parts empty): nothing to measure
+            before[tag] = {"texels": 0}
+            continue
         before[tag] = {"texels": int(s_.sum()),
                        "bc_srgb_mean": [round(float(x) * 255, 1) for x in bc[s_].mean(0)],
                        "roughness_mean": round(float(rm[..., 1][s_].mean()), 4),
@@ -284,7 +287,7 @@ def remap(maps, valid, m, cloth_w, cfg):
     rough = rm[..., 1].copy()
     c_q = None
     cr = cfg.get("cloth_roughness")
-    if cr and cr.get("apply", True):  # H2.1 measured: 0.80-0.90 made the cloth lighter and greyer -> off in the profile
+    if cr and cr.get("apply", True) and csel.any():  # H2.1 measured: 0.80-0.90 made the cloth lighter and greyer -> off in the profile
         c_rank, c_q = rank01(rm[..., 1], csel)
         r_cloth = cr["lo"] + (cr["hi"] - cr["lo"]) * c_rank
         rough = rough * (1 - cloth_w) + r_cloth * cloth_w
@@ -298,6 +301,9 @@ def remap(maps, valid, m, cloth_w, cfg):
     after = {}
     core = (m >= 0.99) & valid
     for tag, s_ in (("metal", sel), ("metal_core_m_ge_0.99", core), ("cloth", csel)):
+        if not s_.any():
+            after[tag] = {"texels": 0}
+            continue
         after[tag] = {"texels": int(s_.sum()),
                       "bc_srgb_mean": [round(float(x) * 255, 1) for x in maps["BC"][s_].mean(0)],
                       "roughness_mean": round(float(rough[s_].mean()), 4),
@@ -315,6 +321,8 @@ def remap(maps, valid, m, cloth_w, cfg):
 
 
 def cloth_weight(bc, part_ids, part_names, team_cfg, tx):
+    if not team_cfg["cloth_parts"]:  # a hero without cloth (team_mask.cloth_parts empty): no cloth roughness remap
+        return np.zeros(part_ids.shape, np.float32)
     h, s, v = tx.rgb_to_hsv(bc)
     hsv = team_cfg["cloth_hsv"]
     idx = [part_names.index(p) for p in team_cfg["cloth_parts"]]

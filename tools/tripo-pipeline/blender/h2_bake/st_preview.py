@@ -237,7 +237,7 @@ def run(params, profile):
         return raw / (name + ".png")
 
     # ---- orthographic views framed like the concepts (framing.py; without preview.frame = the Medusa H2 canon)
-    ocams, side, frame_source = FR.cameras(pcfg.get("frame"), profile["scale"]["figure_top_m"], repo)
+    ocams, side, frame_source = FR.cameras(pcfg.get("frame"), PR.frame_top_m(profile, run_dir), repo)
 
     def ortho(vn):
         oc = ocams[vn]

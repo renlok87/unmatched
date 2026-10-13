@@ -209,3 +209,10 @@ def test_medusa_rig_stage_is_byte_identical(tmp_path):
         assert PR.sha256(run / "export" / name) == committed[key]["sha256"], name
     rep = json.loads((run / "reports" / "rig-report.json").read_text(encoding="utf-8"))
     assert "cloth_shell" not in rep and rep["passed"]
+    # F25 staging: the pair was moved to export/ on PASS (nothing left in staging), the report names export/ paths and
+    # equals the committed one after run-path normalisation
+    assert not list((run / "work" / "rig" / "export-staging").glob("*.fbx"))
+    old = (MEDUSA_RUN / "reports" / "rig-report.json").read_text(encoding="utf-8")
+    new = (run / "reports" / "rig-report.json").read_text(encoding="utf-8")
+    assert new.replace(run.resolve().as_posix(), "<run>") == old.replace(
+        "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake", "<run>")

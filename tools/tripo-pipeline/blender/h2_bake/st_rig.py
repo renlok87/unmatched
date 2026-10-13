@@ -35,7 +35,10 @@ Every later stage (export, probes, seams, preview, look-dev, TeamAccent) reads t
 runs: the profiles written before it (Medusa, Arthur, Merlin, Harpy) give byte-identical FBX (tests/test_cloth_shell.py).
 
 Export: candidate_build.core (read only) — UM_FBX_v1 rotation +90 deg about Z with EditBone.transform(roll=True),
-data x100, FBX_SCALE_UNITS, Triangulate, UnitScaleFactor patched to 1.0, determinism pins; path_mode STRIP."""
+data x100, FBX_SCALE_UNITS, Triangulate, UnitScaleFactor patched to 1.0, determinism pins; path_mode STRIP. The pair is
+written to work/rig/export-staging/, read back and checked there, and moved to export/ only when every check passed
+(pilot 2026-10-13, F25: a failed rig left valid-looking FBX in export/). A failed rig leaves export/ as it was; the
+report always names the export/ paths (same bytes in either directory)."""
 
 import math
 import re
@@ -428,8 +431,16 @@ def run(params, profile):
     rot = core.export_rotation(preset)
     data_scale = float(preset["temporary_data_scale"])
     core.transform_for_fbx(scene, arm, figure, Matrix.Scale(data_scale, 4) @ rot)
-    sk_fbx = run_dir / "export" / profile["exports"]["skeletal_fbx"]
-    base_fbx = run_dir / "export" / profile["exports"]["base_fbx"]
+    # staging (pilot 2026-10-13, F25): the pair is written and read back under work/, export/ gets it only on PASS. The
+    # FBX bytes do not depend on the directory (no path inside: bpy.data.filepath is empty, path_mode STRIP), and the
+    # report names the published paths.
+    sk_pub = run_dir / "export" / profile["exports"]["skeletal_fbx"]
+    base_pub = run_dir / "export" / profile["exports"]["base_fbx"]
+    staging = run_dir / "work" / "rig" / "export-staging"
+    sk_fbx, base_fbx = staging / sk_pub.name, staging / base_pub.name
+    for p in (sk_fbx, base_fbx):
+        if p.exists():
+            p.unlink()
     core.export_pair(scene, arm, skinned, base_part, preset, sk_fbx, base_fbx)
     # ---- read back: export frame, then the authored frame
     rt = bpy.data.scenes.new("h2_rt")
@@ -494,8 +505,8 @@ def run(params, profile):
               "bounds_authored_m": {"skeletal": [U.rv(lo_sk, 5), U.rv(hi_sk, 5)], "base": [U.rv(lo_b, 5), U.rv(hi_b, 5)]},
               "expected_ue_bounds_uu_at_import_scale_1": {"skeletal": measure.ue_predicted(bounds_export_cm),
                                                           "base": measure.ue_predicted({"min": cm(lo_rtb), "max": cm(hi_rtb)})},
-              "sockets": sockets, "exports": {"skeletal_fbx": {"path": P_rel(sk_fbx, repo), "sha256": core.sha256(sk_fbx), "bytes": sk_fbx.stat().st_size},
-                                              "base_fbx": {"path": P_rel(base_fbx, repo), "sha256": core.sha256(base_fbx), "bytes": base_fbx.stat().st_size},
+              "sockets": sockets, "exports": {"skeletal_fbx": {"path": P_rel(sk_pub, repo), "sha256": core.sha256(sk_fbx), "bytes": sk_fbx.stat().st_size},
+                                              "base_fbx": {"path": P_rel(base_pub, repo), "sha256": core.sha256(base_fbx), "bytes": base_fbx.stat().st_size},
                                               "settings": core.export_settings_report(preset, profile["exports"]["fbx_preset"], preset_path, data_scale)},
               "roundtrip": {"skeletal": rt_meas, "base": rtb_meas, "bounds_export_frame_cm": bounds_export_cm},
               "checks": dict(checks), "failed": checks.failed(), "passed": not checks.failed(), "status": "измерено",
@@ -504,8 +515,11 @@ def run(params, profile):
         report["cloth_shell"] = {"parts": shells, "note": "decision П3-3: inner copy offset against the normal, reversed "
                                                           "winding, same UV0, weights copied, rim bridged (closed shell)"}
     U.write_json(run_dir / "reports" / "rig-report.json", report)
-    if checks.failed():
+    if checks.failed():  # the staged pair stays under work/rig/export-staging for inspection; export/ is not touched
         raise RuntimeError("rig checks failed: %s" % checks.failed())
+    sk_pub.parent.mkdir(parents=True, exist_ok=True)
+    for src, dst in ((sk_fbx, sk_pub), (base_fbx, base_pub)):
+        src.replace(dst)  # publish on PASS (same volume: an atomic rename)
 
 
 def P_rel(path, repo):

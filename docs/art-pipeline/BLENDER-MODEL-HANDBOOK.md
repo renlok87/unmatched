@@ -208,6 +208,8 @@ SKEL_UM_Humanoid (объект арматуры = кость 0 в UE, носит
 | Rest pose | = поза миниатюры (как смоделирована фигура), **не** T/A-поза |
 | Веса | ≤ 4 влияния, нормализованы, невзвешенных вершин нет, веса < 0,01 удаляются, затем снап к сетке 1/255 |
 | Жёсткие части | оружие 100 % на кости оружия; подставка не скинится и уходит отдельным FBX |
+| Оружие из нескольких частей Tripo | Tripo режет тонкое оружие (копьё Achilles = части 10 + 13, меч Angel = клинок с гардой + рукоять): одна часть — меш `weapon`, остальные — в меш `body` с правилом `rigid` 100 % на кости оружия (`profile.py:68` допускает одну часть `weapon`; решение П3-1, `docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`) |
+| Предмет в руке без своей кости (щит, фонарь) | `rigid` 100 % на `arm_lower` или `hand` своей стороны, новой кости нет (щит Achilles на `arm_lower.L` прошёл все пробы; решение П3-2). Новая кость — стоп (§0.3 п.7) |
 | Голова кости оружия | в точке хвата: туда встанет сокет `Weapon` (0, 0, 0) |
 | Расширения (только по решению) | `crown_snake.NN` (≤ 4, ≤ 15°), `cloth_front/back`, `wing_tip.L/R` |
 | Harpy | крылья = цепочка `arm_upper → arm_lower → hand` |
@@ -263,14 +265,31 @@ SKEL_UM_Humanoid (объект арматуры = кость 0 в UE, носит
 | Medusa | 55 | 50–55 | 55,009 | 55,01 | 56/24 |
 | Harpy | 42 | 35–42 | 42,0 | 42,0 | 2,0 |
 
-Высота меряется от низа подставки (z = 0) до верха фигуры по профильной части (`scale.figure_top_m`, например 0,55);
-оружие выше фигуры проверку не валит. Подставка: Ø 0,30 × 0,06 м у Medusa/Arthur (5–6 uu высотой). Отношение высот
-помощник/герой = 0,78 ± 0,06 (автотест).
+Высота меряется от низа подставки (z = 0). **Верх бюджета** (`Specs()` BudgetUU и FigureTopUU) — верх головы с
+прилегающим убором: шлем с гребнем (Achilles 0,55), корона (Arthur). Деталь, которая поднимается над головой (поднятый
+клинок, посох, рога), — **верх bounds** (BoundsTopUU: меч Arthur 60,06, рога Ancient Leshen 73,58), она бюджет не
+валит. Пометка в карточке — `FIGURE_HEIGHT_M` (бюджет) и `FIGURE_BOUNDS_TOP_M` (SKILL.md §7.2).
+
+`prepare` ставит на `scale.figure_top_m` самую высокую вершину **любой** части, кроме подставки — оружие и рога
+включительно (`st_prepare.py`, `profile.figure_top_source_z`). Поднятый меч Angel поставил бы голову на 0,541 м
+(пилот 2026-10-13, F28; здесь и ниже F-номера — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`). Если
+деталь выше головы — в профиле `scale.figure_top_part` = часть с верхом бюджета (голова, шлем). Тогда `figure_top_m` =
+верх этой части, `prepare-report.json#figure_top_part` пишет её и верх bounds, а орто-кадры концепта строятся по верху
+bounds (`profile.frame_top_m`: рамка концепта меряет весь силуэт). Профили без ключа (Medusa и др.) работают
+по-старому, байт в байт. Прогоны пилота сделаны до ключа: `figure_top_m` подобран по разведке (Angel 0,55904 — кончик
+клинка при голове 0,55; Leshen 0,7356 — рога при черепе 0,55003). Пробы деформации нормируют пороги высоты по полному
+росту с рогами (F59, не исправлено): у фигуры с высоким украшением читать числа проб, а не только вердикт.
+
+Подставка: Ø 0,30 × 0,06 м у Medusa/Arthur (5–6 uu высотой). Отношение высот помощник/герой = 0,78 ± 0,06 (автотест).
 
 Треугольники (измерено, **не бюджет**): Medusa 43 054 (тело 38 054 + лук 5 000), Arthur 38 684, Merlin 33 967,
-Harpy 37 177; подставки 864–2 240. Предложение 04: герой 15–25k, помощник 8–15k — решение за GD-058. Практика H2:
-целиться в 30–45k на героя, 20–30k на Harpy-подобных, подставка ~1,2–2k. Выход за 45k — записать в отчёт, не резать
-молча.
+Harpy 37 177, Achilles 44 706 (тело 43 506 + копьё 1 200); подставки 864–2 240. Предложение 04: герой 15–25k,
+помощник 8–15k — решение за GD-058. Практика H2: целиться в 30–45k на героя, 20–30k на Harpy-подобных, подставка
+~1,2–2k. Считается **итог** тела и оружия на экспорте (`rig-report.json#meshes_pre_export.<меш>.triangles`, без
+подставки): `retopo.target_tris` + крышки `close` (`close-report.json#cap_triangles`, у Achilles 4 908) + грани частей
+`rig.cloth_shell` ещё раз и мост кромки (юбка Achilles: 2 399 граней, 315 рёбер кромки). Сумма `target_tris` под 45k не
+гарантирует итог под 45k (F70): запас под крышки и оболочки закладывать в `target_tris`. Выход за 45k — записать в
+отчёт, не резать молча.
 
 ---
 
@@ -390,15 +409,16 @@ Medusa» без проверки, что это верно для нового �
 |---|---|---|
 | `profile_id`, `asset_id`, `status`, `history` | свой id `<hero>-h2-bake/1`; `status: "предложено"`; `history.previous_profiles` | — |
 | `sources` | `source_spec`, `parts_glb`, `tex_glb` (пути и sha256 из spec) | две GLB должны иметь **одинаковую** геометрию по частям; prepare это проверяет |
-| `expected_part_count`, `parts` | число частей Tripo и роль каждой (тело, лицо, кисти, оружие, подставка) | части нумеруются Tripo произвольно — роли определять по превью, а не по номеру |
-| `scale` | `figure_top_m` = бюджет / 100 (0,55 для 55 uu), `base_diameter_m`, `base_height_m` | высота — по фигуре, не по оружию |
+| `expected_part_count`, `parts` | число частей Tripo и роль каждой (тело, лицо, кисти, оружие, подставка) | части нумеруются Tripo произвольно — роли определять по рендеру частей в своих цветах, а не по номеру и не по габаритам (у Achilles по габаритам вышли «голова» = гребень, F17); оружие из нескольких частей — §2.6 (П3-1) |
+| `scale` | `figure_top_m` = бюджет / 100 (0,55 для 55 uu), `base_diameter_m`, `base_height_m`; необязательный `figure_top_part` | `prepare` берёт самую высокую вершину не-подставки, оружие и рога включительно; деталь выше головы — `figure_top_part` (§2.10) |
 | `orientation` | `method` ray-escape, `samples_per_part 4000`, `seed 0`, `flip_below_score -0.5`, `min_score_after_fix 0.5`, `expected_inside_out_parts` — **пустой до первого прогона** | первый prepare перечислит вывернутые части и откажет; список переносится в **новый** файл профиля, порог не ослабляется |
-| `retopo` | `method` COLLAPSE, `target_tris` по частям (крупные части первыми), `dense_regions` (лицо ~1 600 tris), `cleanup`, `caps` | сумма → 30–45k на героя; лицо, кисти, оружие получают приоритет |
-| `closure` | `contact_caps` по петлям, которые открываются в позах | у Medusa 19 крышек; видимость крышек в rest ≤ 0,01 % и ≤ 9 px |
-| `uv` | `atlas_px 4096`, `runtime_px 2048`, `min_gap_px 8`, `pack_margin_fraction 0.0013`, `max_overlap_px 0`, `texel_priority` (лицо ×2, кисти ×1,75, оружие ×1,5, подставка ×0,45) | Smart UV запрещён (5 402 острова у Medusa); только charts (Voronoi + MINIMUM_STRETCH) |
+| `retopo` | `method` COLLAPSE, `target_tris` по частям (крупные части первыми), `dense_regions` (лицо ~1 600 tris), `cleanup`, `caps` | итог с крышками и оболочками → 30–45k на героя (§2.10); лицо, кисти, оружие получают приоритет. Регион `name: "face"` обязателен: его `part` — часть с лицом, по ней `rig` и `ld_fbx` меряют фронт лица (`profile.face_part_key`; без региона — `tripo_part_1` Medusa, у Achilles это подставка: rig FAIL, 0 граней лица, F12) |
+| `closure` | `contact_caps` по петлям, которые открываются в позах | у Medusa 19 крышек; видимость крышек в rest ≤ 0,01 % и ≤ 9 px; выбор крышка / стык весов / оболочка — «Новый герой» ниже |
+| `uv` | `atlas_px 4096`, `runtime_px 2048`, `min_gap_px 8`, `pack_margin_fraction 0.0013`, `max_overlap_px 0`, `texel_priority` (лицо ×2, кисти ×1,75, оружие ×1,5, подставка ×0,45), `density_reference_part`, `charts.chart_area_cm2` | Smart UV запрещён (5 402 острова у Medusa); только charts (Voronoi + MINIMUM_STRETCH). `density_reference_part` — крупная часть тела, с которой сравнивается плотность лица (без ключа `tripo_part_0` = платье Medusa). Острова, прошедшие проверку на 512 px, на 4K перекрывались на 7–17 px (`uv-report.json#checks.raster_overlap_px`, F30, F56): рукавам и клинкам — меньший `chart_area_cm2` (по части или `charts.regions`) |
 | `bake` | `device`, `resolution 4096`, AO (128 samples, distance 0,044 м = 0,08 × рост), `cage` (1,5 × p99 отклонения, 0,6–4 мм, `max_ray_factor 2.5`), `ao_exclusions` (AO части без загораживающей части, которая в анимации отходит — кулак Medusa у пояса) | `device: "GPU"` (Medusa): FBX повторяются байт в байт, а N/ORM расходятся в 1–3 пикселях на 1–2 уровня; `CPU` (Merlin) бит-стабилен, но медленнее. Выбор записать в отчёт |
-| `textures` | `prefix T_<Hero>_H2`, `maps`, `ao_gate`, металл-маска, `edge_extend_px 16` | — |
-| `rig` | `skeleton UM_HUMANOID_17_v2`, `armature_object SKEL_UM_Humanoid`, `character <Hero>`, `max_influences 4`, `clean_below 0.01`, `bones` (голова/хвост каждой кости по геометрии героя), `weights` (`chain`, `zblend`, `cloth`, `rigid`), `junctions`, `seam_pairs` | кости ставить по геометрии нового героя; копия координат Medusa = гарантированный FAIL проб |
+| `textures` | `prefix T_<Hero>_H2`, `maps`, `ao_gate`, `team_mask`, металл-маска `materials.metal`, `edge_extend_px 16` | `team_mask.cloth_hsv` и `base_band.part` — значения Medusa, перенастроить (чек-лист ниже). Металл есть — блок `materials.metal` обязателен (look-dev читает маску). Металла нет — без блока: стадия пишет нулевую `work/uv/metal_mask.npy` и `textures-report.json#metal_mask` (F51) |
+| `rig` | `skeleton UM_HUMANOID_17_v2`, `armature_object SKEL_UM_Humanoid`, `character <Hero>`, `max_influences 4`, `clean_below 0.01`, `bones` (голова/хвост каждой кости по геометрии героя), `weights` (`chain`, `zblend`, `cloth`, `rigid`), `junctions`, `seam_pairs`, необязательный `cloth_shell` | кости ставить по геометрии нового героя (разведка, ниже); копия координат Medusa = гарантированный FAIL проб |
+| `seams` | `raycast` (`pitch_m 0.0015`, `margin_m 0.1`, `posed_clearance_m 0.005`), `max_new_blob_px 8`, `frames`, `k2_frames` под свою фигуру | сетка лучей одна на все позы: rest + `margin_m`, сторона, которую поза покидает, отодвигается до позы + `posed_clearance_m` (`profile.seams_grid_bounds`, F55/F65). Обход пилота `margin_m 0.2` больше не нужен; расширение пишется в `seams-report.json#see_through.<blend\|fbx>.grid_extended_by_posed_bounds_m` |
 | `sockets` | `Weapon` на кости оружия, `Head` на `head`, `location_uu: null` | — |
 | `exports` | `fbx_preset blender/_tools/presets/UM_FBX_v1.json`, `skeletal_fbx SK_<Hero>_H2.fbx`, `base_fbx SM_<Hero>_H2_Base.fbx` | — |
 | `meshes`, `materials` | какие части → body/weapon/base; один слот | — |
@@ -407,11 +427,66 @@ Medusa» без проверки, что это верно для нового �
 
 Оружие: если Tripo не смоделировал рукоять внутри кулака (Arthur) или древко (Merlin), нужен мост-цилиндр или сборка из
 частей (`split-from-part` / `parts` в CLI-пути). В генерическом `h2_bake` такого режима нет — если оружие героя без
-хвата, это остановка с описанием (решения — в `h2_bake_arthur/repairs.py`, `h2_bake_merlin/`).
+хвата, это остановка с описанием (решения — в `h2_bake_arthur/repairs.py`, `h2_bake_merlin/`). Оружие, которое Tripo
+разрезал на части, и предмет в руке без кости — §2.6 (П3-1, П3-2).
+
+#### Новый герой: разведка и чек-лист профиля (пилот 2026-10-13)
+
+**Разведка до профиля** (F19). Координаты Medusa не переносятся, поэтому профиль пишется по замерам своей фигуры.
+Сначала черновой профиль (роли частей, `scale`, `orientation`) и стадии `prepare`, `retopo`, `close` в scratch-каталоге
+вне репо (`C:/tmp/<key>-scout`). Из них:
+
+1. Габариты частей в финальной рамке — `prepare-report.json#parts.<part>.final_bounds_m`, вывернутые части —
+   `#orientation`; роли частей — по рендеру частей в своих цветах (F17).
+2. Положение костей: сечения частей по высоте (шея, плечи, локти, запястья, таз, колени, щиколотки) по `work/lp.blend` —
+   своим bpy-скриптом или осмотром в живом Blender (§6, только чтение). Голова кости оружия — в точке хвата.
+3. Инвентарь петель — `close-report.json#loops_before.<part>`: каждая петля с периметром ≥
+   `closure.inventory_min_perimeter_cm`, ближайшая часть и медиана расстояния до неё. Это кандидаты крышек и стыков.
+4. Толщина ткани: луч снаружи насквозь через часть (bpy `ray_cast`). Две стенки с зазором — замкнутая оболочка (вырез
+   изнутри закрывается крышкой: плащ Achilles, петля 92 см). Одна стенка — одинарный лист (юбка Achilles), ему нужна
+   `rig.cloth_shell`. Посылка «плащ Achilles — лист» оказалась ложной (F63); лист от оболочки отличает и инвентарь
+   петель: у листа петля идёт по всей кромке (F35).
+
+Готового инструмента разведки в `tools/` нет: скрипты пилота остались в `C:/tmp` и в репо не переносились. Разведка —
+разовые скрипты исполнителя, а её числа идут в профиль с пометкой `note`.
+
+**Значения Medusa, которые надо перенастроить.** Скопированные как есть, они дают FAIL или меряют чужую часть.
+
+| Ключ | У Medusa | Что поставить |
+|---|---|---|
+| `retopo.dense_regions[name=face].part`, `box_m` | `tripo_part_1` | часть и рамка своего лица (голова, шлем; F12) |
+| `uv.density_reference_part` | нет ключа = `tripo_part_0` (платье) | крупная часть тела |
+| `textures.team_mask.cloth_parts`, `cloth_hsv` | платье; `v_max 0.4`, `s_max 0.34` (тёмная ткань) | своя ткань по замеру BC: на красном плаще Achilles `team_mask_cloth_share` падал (F20). Ткани нет — `cloth_parts: []`, тогда проверка «не применима» (`not_applicable`, F52; вороны Leshen как обход больше не нужны). `TeamMask` устарел, но проверка стадии `textures` осталась |
+| `textures.team_mask.base_band.part` | `tripo_part_2` | часть подставки (у Angel `tripo_part_2` — штанина, F29) |
+| `textures.materials` | металл Medusa (золото), `ao_exclusions`, `rim_filters` | свой металл по частям (§4.4) или без блока; `ao_exclusions`/`rim_filters` — только свои контакты |
+| `rig.*`, `sockets`, `seams.frames`, `seams.k2_frames`, `preview.*` | Medusa | по разведке и под свою фигуру |
+
+**Закрытие стыков: что выбрать.**
+
+| Ситуация | Средство | Прецедент |
+|---|---|---|
+| петля части уходит из-под соседа в позе (плечо под плащом, бедро под юбкой, подошва) | крышка `closure.contact_caps` | Medusa 19, Achilles 13 |
+| штаны из двух частей Tripo: верх штанины открывается при сгибе бедра | крышки на верх каждой штанины; стык весов там складывал бедро | Angel (F31) |
+| седловидный вырез плеча: крышка видна в покое (216 px) | стык весов `rig.junctions` (полоса `band_m` берёт веса соседа) | Leshen, плечи ствола, полоса 2,5 см (F61) |
+| конец оружия у подставки (пятка копья, петля 1,4 см) | своя крышка с `min_perimeter_cm` ниже общего `closure.min_perimeter_cm` (по умолчанию 3 см: короче — пропуск) | `spear_butt`, 1,0 (F16) |
+| одинарный лист ткани показывает изнанку в позах (пятна > `seams.max_new_blob_px`) | сначала веса и стыки, затем `rig.cloth_shell` | юбка Achilles (П3-3, F64) |
+| толстая оболочка с вырезом изнутри | крышка на вырез | плащ Achilles, `cloak_back` (F63) |
+
+`rig.cloth_shell = {"parts": [...], "offset_mm": 0.3}` (0 < `offset_mm` ≤ 1). Стадия `rig` после весов добавляет каждой
+части внутреннюю копию её реальных граней: обратная намотка, тот же UV0, веса копируются, смещение против нормали, по
+кромке — мост. Атлас и бейк не меняются, а треугольники части удваиваются (§2.10). Без ключа FBX Medusa совпадает байт
+в байт (`tests/test_cloth_shell.py`). Перед ключом — инвентарь петель (лист или оболочка, п.4 разведки).
+
+**Безногий ствол** (Ancient Leshen, F53). Частей ног нет. Ствол — правило `cloth`: `hips`, выше талии `spine`, ниже
+`leg_start_z` половины по сторонам на `leg_upper.L/R` до `leg_max`. У подставки — правило `rigid` на `root`: подставка
+не скинится, правило нужно только стыку. Стык `rig.junctions` ствола с подставкой полосой 0,22 м держит корни на месте,
+кости ног гнут середину ствола. Без стыка веса бедра поднимали корни (пятна 130–446 px). Этапу 6 записать в `NOTES`
+карточки: ног нет, кости ног гнут ствол.
 
 ### 4.3 Прогон стадий
 
-Запускать **по одной стадии** и читать отчёт после каждой. `all` — только для повтора уже отлаженного профиля.
+Запускать **по одной стадии** и читать отчёт после каждой. `all` — только для повтора уже отлаженного профиля. Нового
+героя — только после разведки (4.2, «Новый герой»).
 
 ```bash
 P=art/pipeline-candidates/<ASSET-ID>/build-profiles/<hero>-h2-bake-h2.json
@@ -429,22 +504,28 @@ h2_bake/blender_entry.py -- work/params/<stage>.json`, лог в `logs/<stage>.l
 |---|---|---|---|
 | `prepare` | импорт двух GLB (`HPG_*` геометрия, `HPT_*` текстура), идентичность частей, перевод в кадр фигуры, ray-escape ориентация, `work/hp.blend` | `reports/prepare*.json`: части совпали, высота, список вывернутых | вывернутые части не в профиле → новый профиль с `expected_inside_out_parts`; геометрия GLB различается → неверная пара файлов, остановка |
 | `retopo` | Decimate COLLAPSE по частям на нетекстурном двойнике, плотные зоны, очистка (merge 1e-6, dissolve 1e-7, острова < 2e-7 м²), крышки следов, `work/lp.blend` | треугольники по частям, двустороннее отклонение в мм | QuadriFlow/voxel не использовать; маска vertex group в Decimate — жёсткая, не «смещение»; швить крышки в рваные петли нельзя (33 дубля) — только отдельные утопленные веера |
-| `close` | contact caps по открывающимся петлям | инвентарь петель, число крышек | новая открытая петля → добавить крышку в профиль (новый файл) |
-| `uv` | charts + unwrap MINIMUM_STRETCH + pack_islands (CONCAVE, rotate ANY) | 0 перекрытий, зазор ≥ 8 px на 4K, плотность по приоритетам | — |
+| `close` | contact caps по открывающимся петлям | инвентарь петель (`close-report.json#loops_before` / `loops_after`), число крышек, `checks.caps_hidden_at_rest` | новая открытая петля → добавить крышку в профиль (новый файл); крышка видна в покое (седловидный вырез) → стык весов (4.2) |
+| `uv` | charts + unwrap MINIMUM_STRETCH + pack_islands (CONCAVE, rotate ANY) | 0 перекрытий, зазор ≥ 8 px на 4K, плотность по приоритетам | `raster_overlap_px` > 0 → меньший `charts.chart_area_cm2` части; отчёт не называет острова — искать по `uv-layout-1024.png` |
 | `bake` | Cycles selected-to-active по частям: NORMAL (OpenGL tangent), AO 128, BC/RM/HIT через EMIT | карта HIT без дыр, AO не константа | чёрные пятна AO = вывернутая часть или смешанная намотка → ориентация, не порог |
 | `aux` | AO без загораживающих частей, карта rest-позиций | — | — |
-| `textures` | паддинг, N DirectX + N_OpenGL, ORM = (AO, R, M), металл, TeamMask; 4K + 2K | гейты AO: p99 − p1 ≥ 32, ≥ 2 % текселей < 250; «внутрь» ≤ 0,02 на ячейку | — |
-| `rig` | арматура, веса по позиции, экспорт UM_FBX_v1, `work/sk_authored.blend` | треугольники, 17 костей, 1 слот, ≤ 4 влияния, лицо +X | — |
+| `textures` | паддинг, N DirectX + N_OpenGL, ORM = (AO, R, M), металл, TeamMask; 4K + 2K; `work/uv/metal_mask.npy` (у героя без металла — нулевая) | гейты AO: p99 − p1 ≥ 32, ≥ 2 % текселей < 250; «внутрь» ≤ 0,02 на ячейку; `team_mask_cloth_share` 0,5–0,98 или `not_applicable` | `team_mask_cloth_share` FAIL → `cloth_hsv` под свою ткань (4.2) |
+| `rig` | арматура, веса по позиции, `rig.cloth_shell` (если задан), экспорт UM_FBX_v1 в `work/rig/export-staging/`, read-back, `work/sk_authored.blend` | треугольники, 17 костей, 1 слот, ≤ 4 влияния, лицо +X | FBX попадают в `export/` только при PASS (пилот, F25); при FAIL `export/` не трогается, пара лежит в staging для разбора |
 | `probes` | `rig_deform_probe.py` на .blend и на FBX (7 поворотов), `validate_clip.py --kind=skeletal-mesh` | `reports/probes-report.json`: 7/7 plausible в обоих, validate PASS | неверная зона → координаты костей/правила весов; **не** сглаживать веса (растяжение 1,46× → 3,10×) |
-| `seams` | позы-пробы, доля открытого обода (> 1,5 мм, ≤ 5 % периметра), сквозные лучи | нет новых дыр | дыра в позе → крышка или вес у стыка |
-| `preview` | Cycles, K2-камера (FOV 35°, pitch −55°), 1920×1080 | смотреть глазами: лицо, кисти, оружие, ноги на подставке | — |
+| `seams` | позы-пробы, доля открытого обода (> 1,5 мм, ≤ 5 % периметра), сквозные лучи | нет новых дыр; `seams-report.json#see_through.<blend\|fbx>.poses.<поза>.largest_new_blob_px` и `_view` | дыра в позе → крышка или вес у стыка (выбор — 4.2). Петля с большой `median_to_cover_mm` (свободный край плаща в 16,7 мм от торса, F15) — не контакт: её «раскрытие» не мерило, судят сквозные лучи. Ложные срабатывания лучей: строки 9–14 px вдоль плоской «земли» у подставки (F57), перевёрнутая реальная грань в 0,1 мм над крышкой своей части (F69) — проверить на `work/seams_raw`, записать в отчёт |
+| `preview` | Cycles, K2-камера (FOV 35°, pitch −55°), 1920×1080 | смотреть глазами: лицо, кисти, оружие, ноги на подставке | чёрные пятна в крупном плане с отсечением задних граней, где слоёв много (корни Leshen), — предел отскоков прозрачности превью (F62), не дефект модели |
 | `compose`, `manifest` | листы `preview/*.jpg`, `reports/run-manifest.json` | — | — |
 
 Повтор для детерминизма: второй прогон в другой каталог (например `C:/tmp/<task>/repro`) и `--compare-with <первый
 run>` → `reports/determinism-report.json`. Ожидается: FBX (`export/*`), BC, TeamMask, UV-лист и отчёты стадий
-`identical` (rig-report — `identical after run-path normalisation`); при `device: GPU` у N/ORM допустимо
-`different` в единицах пикселей с `max_abs_diff` ≤ 2; превью-JPEG (Cycles с denoise) и `compose-report` отличаются
-всегда и не сравниваются. Любое другое расхождение — недетерминизм сборки, остановка.
+`identical` (rig-report — `identical after run-path normalisation`); при `device: GPU` у N, N_OpenGL, ORM (4K и 2K)
+допустимо `different` в единицах пикселей с `max_abs_diff` ≤ 2, и вместе с ними `textures-report.json` (в нём sha256 и
+статистика этих карт; пилот: 4 карты N по 1–6 пикселей, F24); превью-JPEG (Cycles с denoise) и `compose-report`
+отличаются всегда и не сравниваются. Любое другое расхождение — недетерминизм сборки, остановка.
+
+Отчёт пишется в каталог **того** прогона, который запущен с `--compare-with` (F33). Повтор пишет его в repro; чтобы
+отчёт лёг в производственный прогон, после повтора выполнить
+`run_h2_bake.py --profile $P --run-dir $R --stages manifest --compare-with C:/tmp/<task>/repro` (стадия `manifest`
+только переписывает `run-manifest.json`, выходы не трогает). Look-dev — то же с `--mode lookdev --stages ld_manifest`.
 
 ### 4.4 Look-dev и TeamAccent
 
@@ -459,8 +540,43 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
   `SK_<Hero>_H2LD.fbx`. Образцы: `medusa-h2-lookdev.json`, отчёты `*-lookdev-v2.md`. Новый герой ставит в look-dev
   профиль `frame` (как `preview.frame` H2-профиля, 4.2): `ld_measure` берёт пиксели концепта под масками прохода ID и
   отказывает концепту, аспект которого отличается от кадра больше чем на 1 %.
+- Входы нового героя (пилот 2026-10-13, F21). `source.files.baseline_BC` / `baseline_ORM` = его собственные
+  `textures/T_<Key>_H2_{BC,ORM}.png`: у Medusa это `work/h2-baseline/` (текстуры до H2.1), у нового героя такого прогона
+  нет. `work/uv/metal_mask.npy` look-dev читает всегда (`lookdev.py:328`). Металл есть — блок `textures.materials.metal`
+  H2-профиля обязателен (проход металла: маска + металлик 0,9–1, §2.4). Металла нет — блок не нужен, стадия `textures`
+  пишет нулевую маску (F51; Leshen писал её руками).
+- Класс металла и кожи — по отделке **концепта**, а не по прецеденту героя: матовый клинок — `metal_forged`,
+  полированный — `steel_polished` (`steel_polished` Arthur дал матовому клинку Angel почти чёрный тон, F34). Соседние
+  вещи одного тёмного цвета (рубашка под пальто) держать разными классами с контрастом: усиления `ld_measure` прижимают
+  обе к полу класса, и они сливаются (F34).
+- Усиления металлических классов (`grade.gains`) — с демпфированием, не полный `gain_suggestion`: металл концепта —
+  краска, а не PBR. Бронза Achilles: полная поправка тона дала бледную латунь, половина — тёмную бронзу (0,73), H2LD
+  читается медной и глянцевой против матового золота концепта (F71). Почему усиление не полное — в `note` профиля;
+  решает съёмка UE (4.6).
+- Слота `horn_claw` в генерическом look-dev нет: череп, рога и когти уходят в `legacy_bake` (Leshen, F54) — записать в
+  отчёт. Класс в библиотеке есть (Harpy, слот `brass`), но слот героя — новый режим инструмента, решение владельца.
 - Классы MatID — только существующие (`material-library/README.md`). Нужен новый класс (как маховые перья Harpy) —
   остановка, это решение.
+- **Сдача этапа 3: тон и крупные планы** (пилот: обе приёмки вернули `rework_blender` — основной класс вне допуска тона,
+  кость Leshen y_ratio 0,775, бронза Achilles 0,717, потолок T 1,0; плюс артефакты крупных планов, которых исполнитель
+  этапа 3 не смотрел; F72, F79). До передачи на приёмку:
+  1. Таблица тона — тем же кодом, что строит `frames/tone.json` съёмки
+     (`tools/art/acceptance/capture_acceptance_set.py:470-482` → `tools/art/acceptance/_tone.py`
+     `tone_table(measure, maps)`; отдельного CLI нет; запуск из корня репо):
+     ```bash
+     python -c "import json,sys; sys.path.insert(0,'tools/art/acceptance'); from _tone import tone_table; R=sys.argv[1]+'/reports/'; t=tone_table(json.load(open(R+'measure-report.json',encoding='utf-8')), json.load(open(R+'ld-maps-report.json',encoding='utf-8'))); print(t['t_cap'], t['out_of_tolerance'], t['floor_limited'], t['family_changed_main'])" <run look-dev>
+     ```
+     Нужен `t_cap` = 2.0: все классы в допуске `_tone.py` (основной класс ≥ 10 % пикселей; Y_ratio и у основного ещё
+     `y_ratio_loo` в 0,80–1,25; |dHue| ≤ 15°). Иначе — ещё итерация grade: новый look-dev профиль, `grade.gains` вне
+     допуска из `measure-report.json#gain_suggestion.<класс>.suggested_gain` (металл — демпфированно, причина в `note`),
+     прогон `ld_maps` … `ld_measure`, таблица заново. Класс `floor` T не снижает (`known_issues`). Не дошли до 2.0 —
+     причина и числа в отчёт этапа 3, а не молча на приёмку.
+  2. Крупные планы приёмщика — снять в scratch-каталог и осмотреть самому (Read каждого JPEG):
+     `python tools/art/acceptance/capture_acceptance_set.py --fbx <LD>/export/SK_<Key>_H2LD.fbx --textures <LD>/textures --out C:/tmp/<key>-stage3-check/frames --key <Key> --side-view <SIDE_VIEW> --sheet art/imagegen/concept-<key>-codex/sheet-<key>.png`
+     → `close-head`, `close-hands`, `close-torso`, `close-legs-back`, `close-weapon`, `pose-01` … `pose-04`, `compare-*`
+     (кадры не evidence: этап 4 снимает свои). Пилот пропустил: коричневый наконечник копья, наносник цвета кожи, мазки
+     на вороте, защемление локтя (Achilles), гранёные когти и отростки рогов (Leshen). Найденное чинится средствами
+     профиля до передачи (классы look-dev, `retopo.dense_regions`, веса).
 - TeamAccent пишет только новые файлы (`textures/<prefix>_TeamAccent_{2K,4K}.png`, `reports/ld-team-*.json`).
   Проверить по отчёту: покрытие 5–12 %, ≤ 20 % на часть, 0 на металле, коже, камне, дереве, когтях.
 - Компоненты `team_accent` (h2-bake 0.6.1) — каждый необязателен, нужен хотя бы один: `hem` — полоса ткани
@@ -470,6 +586,23 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
   верхнего уровня называют основную ткань (проверка `dress_parts`) и отделку (контраст `ta_report`). Классы акцента —
   только с `teamDyeAllowed`. Пустой компонент пропускается (`skipped` в отчёте), достаточность решает
   `area_share_range`; пустой акцент целиком — `ta_maps` падает, классы выбрать заново.
+- `ribbon` берёт **один** класс: сандалии Achilles (`leather_worn`, 4,3 %) при ремнях `leather_smooth` остались в цвете
+  концепта (F67). Тонкие ремни: `open_radius_px 3`, `min_component_opened_texels 1000` (у Medusa 8 / 5000 — полосы
+  птеруг 4 мм стирались: 0,74 % вместо 1,47 %). Подкладку плаща (изнанка замкнутой оболочки) и полосу «N см от кромки»
+  генерический TeamAccent не выделяет (F27).
+- **Доля ниже 5 %** (решения П3-4, П3-4a, П3-4b,
+  `docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`; прецедент Arthur 3,56 %). Красятся только разрешённые зоны (отделка ткани, ремни, кожа снаряжения, перья; не металл,
+  кожа персонажа, узорная кайма, не главный цвет одежды). Если их меньше 5 %: (а) `team_accent.area_share_range` опустить
+  до замера (Achilles [0,02; 0,12] при 2,20 %; Angel [0,007; 0,12] при 0,73 %); (б) с ним
+  `render.readability.screen_share_min` (K2 5× спереди/сзади, по умолчанию 0,01) — до измеренного минимума (Angel
+  0,0003); (в) спину целиком закрывает неокрашиваемая вещь главного цвета (плащ Achilles) — `screen_share_min` 0,
+  долю спереди записать; проверка «ткань вне акцента не меняется» на < 500 видимых пикселях — порог
+  `dress_unchanged_share_min` до измеренного пола (Achilles 0,86 на 225 px); вид, где ткани < `dress_min_px` (100),
+  — «нет замера», не провал. Каждое снижение — новый файл профиля (`…-teamaccent-b.json`) и новый run, числа и зоны — в
+  разделе героя `material-library/team-accent.md`. Решает последний прогон TeamAccent.
+- `ta_report` с проваленной проверкой останавливает драйвер, как `ta_maps`: код ≠ 0, `ta_manifest` не пишется (F32).
+  Читать `ld-team-report.json#checks`. `ta_manifest` принимает профиль вне репо (путь пишется абсолютным, F60).
+  Блок `frame` профилю TeamAccent не нужен: `ta_render` снимает только K2 (F24).
 - Тона под концепт — предсказание; решение по материалу принимается только по съёмке в UE (4.6,
   `ue_hero_lookdev.py review`), не по прогнозу `lookdev_r2.py forecast`.
 
@@ -815,6 +948,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | Карта RM | `T_Medusa_RM.png` (Tier A) | ORM |
 | Формат концептов героя | 1024×1024, `#808080`, y = 917, `check_inputs.py` (mvp-v1) | hero-quality-v1: портретный кадр, рисуется поверх орто черновика (3.1) |
 | TeamColor | вся одежда (`TeamMask`) | акценты (`TeamAccent`) + кольцо |
+| Верх фигуры (§2.10 до 2026-10-14) | «по профильной части, оружие выше фигуры проверку не валит» | `prepare` берёт самую высокую вершину с оружием и рогами; верх бюджета — `scale.figure_top_part` |
+| Сетка лучей `seams` | rest + `margin_m` (обход пилота — `margin_m 0.2`) | расширяется по позам сама (`posed_clearance_m`), `margin_m 0.1` |
 | Цвет P2 | `#9FC2D8` (С-11) | `#5A7F9F` |
 | `17 §7` (2026-09-25) | «пресет и оси не подтверждены» | подтверждены ART-001 |
 | Сокет `Weapon` Harpy | кисть (rig-contract) | `foot.R` (профиль) — расхождение открыто |

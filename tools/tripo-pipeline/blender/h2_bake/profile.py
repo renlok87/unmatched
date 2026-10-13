@@ -85,7 +85,70 @@ def validate(p):
     if len(side_bones) > 1:
         problems.append("rig.bones: at most one weapon bone (found %s)" % side_bones)
     problems.extend(cloth_shell_problems(p))
+    problems.extend(figure_top_part_problems(p))
     return problems
+
+
+# ------------------------------------------------------------------ figure top part (pilot 2026-10-13, NOTES F28/F58)
+def figure_top_part(p):
+    """Optional `scale.figure_top_part` (a tripo_part_N): the part whose highest source vertex is mapped to
+    scale.figure_top_m. None when absent: the old rule, the highest vertex of any non-base part (weapon, antlers and
+    raised blades included) — Medusa, Arthur, Merlin, Harpy and every profile written before the key."""
+    return p.get("scale", {}).get("figure_top_part")
+
+
+def figure_top_part_problems(p):
+    name = figure_top_part(p)
+    if name is None:
+        return []
+    if name not in p["parts"]:
+        return ["scale.figure_top_part: unknown part %s" % name]
+    if p["parts"][name].get("mesh") == "base":
+        return ["scale.figure_top_part: %s is the base" % name]
+    return []
+
+
+def figure_top_source_z(p, part_top_z):
+    """Source z mapped to scale.figure_top_m (prepare): part_top_z = {part: highest source z} of the non-base parts."""
+    name = figure_top_part(p)
+    if name is None:
+        return max(part_top_z.values())
+    return part_top_z[name]
+
+
+def frame_top_m(p, run_dir):
+    """Height in metres (from z = 0) that the concept framing spans (framing.cameras): the top of the whole figure
+    silhouette, as the concept mask measures it. Without scale.figure_top_part that is scale.figure_top_m (the old
+    value, byte for byte); with it, the figure bounds top of the run's reports/prepare-report.json
+    (figure_bounds_final_m max z: a raised blade or antlers above the budget top)."""
+    if figure_top_part(p) is None:
+        return p["scale"]["figure_top_m"]
+    rep = json.loads((Path(run_dir) / "reports" / "prepare-report.json").read_text(encoding="utf-8"))
+    return float(rep["figure_bounds_final_m"][1][2])
+
+
+# ------------------------------------------------------------------ seams ray grid (pilot 2026-10-13, NOTES F55 / F65)
+SEAMS_MARGIN_M = 0.1
+SEAMS_POSED_CLEARANCE_M = 0.005
+
+
+def seams_grid_bounds(rest_lo, rest_hi, posed_lo, posed_hi, rcfg):
+    """(lo, hi, extended) of the one see-through ray grid of every pose (st_seams.see_through): the rest bounds +
+    seams.raycast.margin_m, each side pushed out to the posed bounds + seams.raycast.posed_clearance_m where a probe pose
+    leaves it. A raised arm or a swung spear that left rest + margin made the rays start inside the hand (false blobs
+    295 / 92 / 37 px in the pilot). Elementwise min / max: a side that no pose leaves keeps the old float exactly, so a
+    figure whose poses stay inside (Medusa: 92.8 mm of the 100 mm margin) keeps its grid, pixel phases and report.
+    extended = [[lo by], [hi by]] in metres (rounded 1e-4), or None when nothing moved."""
+    import numpy as np
+
+    margin = float(rcfg.get("margin_m", SEAMS_MARGIN_M))
+    clearance = float(rcfg.get("posed_clearance_m", SEAMS_POSED_CLEARANCE_M))
+    lo0, hi0 = np.asarray(rest_lo) - margin, np.asarray(rest_hi) + margin
+    lo = np.minimum(lo0, np.asarray(posed_lo) - clearance)
+    hi = np.maximum(hi0, np.asarray(posed_hi) + clearance)
+    if np.array_equal(lo, lo0) and np.array_equal(hi, hi0):
+        return lo0, hi0, None
+    return lo, hi, [[round(float(x), 4) for x in lo0 - lo], [round(float(x), 4) for x in hi - hi0]]
 
 
 # ------------------------------------------------------------------ cloth shell (decision П3-3, Achilles pilot 2026-10-13)
@@ -269,7 +332,8 @@ def rule_bones(rule):
 def frame_map(base_bounds, figure_top_z, cfg):
     """Source (Tripo GLB metres, Blender axes after glTF import) -> final (candidate metres) map.
 
-    base_bounds: ((x0, y0, z0), (x1, y1, z1)) of the base part; figure_top_z: highest source vertex.
+    base_bounds: ((x0, y0, z0), (x1, y1, z1)) of the base part; figure_top_z: highest source vertex of the non-base
+    parts, or of scale.figure_top_part when the profile names one (figure_top_source_z).
     The base is normalised to the card-04 footprint (diameter x diameter x height); every other part is scaled
     uniformly by s about the base centre, and the source contact «feet on the base top» is kept:
     z' = H + (z - base_top) * s, with s = (figure_top - H) / (figure_top_src - base_top_src)."""

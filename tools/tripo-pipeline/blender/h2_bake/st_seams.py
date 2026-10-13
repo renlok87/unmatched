@@ -18,7 +18,11 @@ Poses: the 7 poses of anim/rig_deform_probe.py (same bones, world axes, angles),
                against rest; on the authored .blend and on the exported FBX read back (work/probe-fbx-authored.blend).
                Gate: no 8-connected blob of NEW back-face pixels (pose and not rest, same view and grid) larger
                than seams.max_new_blob_px, on both (a hole is a blob; rim-edge grazing rays leave single pixels, whose
-               sum per pose is reported, not gated).
+               sum per pose is reported, not gated). The grid (one for every pose: pixel phases match) covers the rest
+               bounds + seams.raycast.margin_m (default 0.1), each side pushed out to the posed bounds +
+               seams.raycast.posed_clearance_m (default 0.005) where a probe pose leaves it
+               (profile.seams_grid_bounds; pilot 2026-10-13, F55 / F65: rays that start inside a raised hand or a
+               swung spear see its back faces).
 4. frames      Workbench, runtime 2K BaseColor, BACKFACE CULLING, transparent film (composed over magenta: magenta
                inside the silhouette = see-through), orthographic close-ups of each pose's contact (seams.frames) and
                K2 perspective frames (seams.k2_frames), rendered on the FBX read-back -> work/seams_raw/*.png
@@ -229,6 +233,12 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
     return rows
 
 
+def scene_points(objs, co_body, co_bow):
+    """Every vertex of the ray scene (posed body and weapon, static base)."""
+    bco = U.coords(objs["base"].data)
+    return np.vstack([co_body, co_bow, bco] if objs["bow"] is not None else [co_body, bco])
+
+
 def ray_scene(objs, labels, co_body, co_bow):
     body, bow, base = objs["body"], objs["bow"], objs["base"]
     vpart, vcap, fcap = labels["body"]
@@ -244,8 +254,19 @@ def ray_scene(objs, labels, co_body, co_bow):
     for p in base.data.polygons:
         polys.append([bco[v] for v in p.vertices])
         labs.append(labels["base"] * 1000)
-    pts = np.vstack([co_body, co_bow, bco] if bow is not None else [co_body, bco])
-    return raycam.build(polys, labs), pts
+    return raycam.build(polys, labs), scene_points(objs, co_body, co_bow)
+
+
+def posed_bounds(arm, objs):
+    """(lo, hi) over the vertices of the ray scene in every probe pose (rest excluded)."""
+    lo = hi = None
+    for name in [t[0] for t in TESTS]:
+        pose(arm, name)
+        pts = scene_points(objs, evaluated(objs["body"]), evaluated_or_none(objs["bow"]))
+        lo = pts.min(0) if lo is None else np.minimum(lo, pts.min(0))
+        hi = pts.max(0) if hi is None else np.maximum(hi, pts.max(0))
+    reset_pose(arm)
+    return lo, hi
 
 
 def see_through(arm, objs, labels, rcfg, names_by_label):
@@ -255,13 +276,16 @@ def see_through(arm, objs, labels, rcfg, names_by_label):
 
     out = {}
     rest_masks = {}
+    p_lo, p_hi = posed_bounds(arm, objs)
     reset_pose(arm)
     extent = None
+    extended = None
     for name in ["rest"] + [t[0] for t in TESTS]:
         pose(arm, name)
         (bvh, lab), pts = ray_scene(objs, labels, evaluated(objs["body"]), evaluated_or_none(objs["bow"]))
-        if extent is None:  # one grid (origin, size) for every pose: the rest bounds + margin, so pixel phases match
-            lo, hi = pts.min(0) - float(rcfg.get("margin_m", 0.1)), pts.max(0) + float(rcfg.get("margin_m", 0.1))
+        if extent is None:  # one grid (origin, size) for every pose, so pixel phases match: rest bounds + margin, pushed
+            # out to the posed bounds + clearance where a pose leaves it (profile.seams_grid_bounds)
+            lo, hi, extended = PR.seams_grid_bounds(pts.min(0), pts.max(0), p_lo, p_hi, rcfg)
             extent = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
         grid = extent
         per_view, per_part, total, new_blob, new_blob_view = {}, {}, 0, 0, None
@@ -294,7 +318,12 @@ def see_through(arm, objs, labels, rcfg, names_by_label):
         o["new_vs_rest_by_part"] = {p: o["per_part"].get(p, 0) - rest["per_part"].get(p, 0)
                                     for p in sorted(set(o["per_part"]) | set(rest["per_part"]))
                                     if o["per_part"].get(p, 0) != rest["per_part"].get(p, 0)}
-    return {"pitch_m": pitch, "views": [v[0] for v in views], "poses": out}
+    res = {"pitch_m": pitch, "views": [v[0] for v in views], "poses": out}
+    if extended is not None:  # only when a pose left rest + margin (a figure that stays inside keeps its report bytes)
+        res["grid_extended_by_posed_bounds_m"] = {"lo": extended[0], "hi": extended[1],
+                                                  "note": "metres beyond rest bounds + margin_m (x, y, z), posed bounds + "
+                                                          "posed_clearance_m"}
+    return res
 
 
 def workbench_frames(scene, arm, objs, bc_path, fcfg, k2cfg, raw):

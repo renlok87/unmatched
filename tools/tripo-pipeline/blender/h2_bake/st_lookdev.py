@@ -486,7 +486,7 @@ def run_preview(params, profile, ld):
     # concept framing (framing.py): look-dev `frame` (a new character: {"checks_report": <its checks-report.json>,
     # "side": SIDE_VIEW}); without it the Medusa H2 canon 1021 x 1540, which run_measure refuses for a concept of
     # another aspect (the class pass must lie over the concept pixel for pixel)
-    ocams, side, frame_source = FR.cameras(ld.get("frame"), profile["scale"]["figure_top_m"], params["repo_root"])
+    ocams, side, frame_source = FR.cameras(ld.get("frame"), PR.frame_top_m(profile, src_run), params["repo_root"])
     for vn in FR.VIEWS:
         oc = ocams[vn]
         cam_data.type = "ORTHO"

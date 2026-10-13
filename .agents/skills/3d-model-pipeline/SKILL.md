@@ -202,6 +202,10 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
    `claims.art_accepted: false`.
 
 **Этап 3 — сборка в Blender** (HANDBOOK §4.1–4.4, `references/acceptance-and-blender.md`).
+0. Поля карточки этапа 3 пишет этап 0 (§7.2): `CHARACTER`, `FIGHTER_NAME`, `FIGURE_HEIGHT_M` и `_RANGE_M`,
+   `UE_NAMES`, `CLIP_PREFIX`. Пакетная заявка пилота 2026-10-13 их не записала (F18). Нет поля — дефолт П3-5
+   (`docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`): `CHARACTER` = PascalCase ключа
+   контента, рост 0,55 м, если пропорции концепта не говорят иного; в карточку с `decided_by: delegated (П3-5)`.
 1. До первого прогона — регистрация этапа 3 (`references/new-character-registration.md` §3): `CHARACTER` в
    `docs/art-pipeline/rig/rig-contract.json` → `skeletons.UM_HUMANOID_17_v2.characters` с подъёмом `revision`;
    проверка `python -m unittest tools/tripo-pipeline/tests/test_rig_rules.py` → OK. Сторону оружия `h2_bake` берёт из
@@ -217,6 +221,24 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
    (`h2_bake/framing.py`; без ключа — канон Medusa 1021 × 1540). Тот же `frame` — в look-dev профиле
    `<key>-h2-lookdev.json` (верхний уровень): `ld_measure` сравнивает концепт с проходом ID пиксель в пиксель и
    отказывает концепту другого аспекта, а `tone.json` (потолок T этапа 4) верен только при такой рамке.
+   До профиля — разведка и чек-лист HANDBOOK §4.2 «Новый герой»: кости по сечениям частей, инвентарь петель `close`,
+   толщина ткани; значения Medusa, которые перенастраиваются (часть лица `retopo.dense_regions` `face`,
+   `uv.density_reference_part`, `textures.team_mask.cloth_hsv` и `base_band.part`); выбор крышка / стык весов /
+   оболочка.
+   Правила пилота (решения П3 по делегированию, тот же файл решений; HANDBOOK §2.6, §2.10, §4.2, §4.4):
+   - **П3-1.** Оружие, которое Tripo разрезал на части: одна часть — меш `weapon`, остальные — в `body` с `rigid` 100 %
+     на кости оружия.
+   - **П3-2.** Щит или другой предмет в руке без своей кости — `rigid` 100 % на `arm_lower`/`hand` своей стороны;
+     новая кость — стоп §5 п.5.
+   - **П3-3.** Одинарный лист ткани, который в позах показывает изнанку: сначала средства профиля (стыки весов, крышки),
+     затем ключ `rig.cloth_shell {parts, offset_mm}`. Перед ключом — луч толщины: толстая оболочка с вырезом изнутри
+     закрывается крышкой (плащ Achilles), лист — оболочкой (юбка Achilles).
+   - **Высота.** Деталь выше головы (поднятый клинок, рога) — `scale.figure_top_part` = часть с верхом бюджета; без
+     ключа `prepare` ставит на `figure_top_m` самую высокую вершину вместе с оружием (HANDBOOK §2.10).
+   - **Без металла и без ткани.** Нет металла — без блока `textures.materials.metal`: нулевую маску для look-dev пишет
+     стадия `textures`. Нет ткани — `team_mask.cloth_parts: []`, проверка `team_mask_cloth_share` «не применима».
+   - **Треугольники.** ≤ 45k — итог тела с оружием на экспорте (`rig-report.json#meshes_pre_export`) с крышками и
+     оболочками, не сумма `target_tris`.
 3. `python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py` по одной стадии (HANDBOOK §4.3), затем
    `--mode lookdev` и `--mode teamaccent` (HANDBOOK §4.4). TeamAccent (`team_accent` профиля, правило 5–12 % площади —
    `docs/art-pipeline/material-library/team-accent.md`): компоненты `hem` (полоса ткани `cloth_class` вдоль кромки
@@ -225,12 +247,27 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
    колчанной лямке или плаще (`class` — их класс с `teamDyeAllowed`; без `hem` обязательно задать `cloth_class`/`trim_class`
    верхнего уровня — основная ткань и отделка для проверки `dress_parts` и контраста `ta_report`). Пустой компонент пропускается с `skipped` в отчёте; долю решает
    `area_share_range` (5–12 %). Ни один компонент не дал акцента — `ta_maps` падает с сообщением: выбрать классы
-   заново (не стоп; новый режим или новый класс MatID — стоп §5 п.5). Тонкое оружие (тетива, стрелы) — только средствами
+   заново (не стоп; новый режим или новый класс MatID — стоп §5 п.5). **П3-4, П3-4a, П3-4b:** разрешённых зон меньше 5 %
+   (латы, костюм из одной кожи, спина под плащом главного цвета) — порог опускается до замера, а не красится главный
+   цвет. Это `area_share_range`, `render.readability.screen_share_min` (0 при закрытой спине) и
+   `dress_unchanged_share_min` на < 500 px; каждое снижение — новым файлом профиля, числа — в разделе героя
+   `team-accent.md` (HANDBOOK §4.4). `ta_report` с проваленной проверкой останавливает драйвер (код ≠ 0, `ta_manifest`
+   не пишется) — читать `ld-team-report.json#checks`. Тонкое оружие (тетива, стрелы) — только средствами
    профиля: `retopo.target_tris` и `retopo.dense_regions` для части оружия, `uv.texel_priority` (`st_retopo.py:217-227`,
    `st_uv.py:417`). Режима утолщения и моста в generic `h2_bake` нет (grep `solidify|thicken|bridge` пуст). Не
    читается на этапе 4 — пункт `rework_fix_list` (этап 5, тот же профильный путь), а если профиль не помог —
    пометка «не закрыто», без стопа. Оружие без хвата (нужен мост-цилиндр) — стоп §5 п.5.
-4. Выход: маркеры всех стадий, `probes-report.json` 7/7 на .blend и FBX, `determinism-report.json`, `ld-*`, `ld-team-*`.
+4. Выход: маркеры всех стадий, `probes-report.json` 7/7 на .blend и FBX, `determinism-report.json` в **производственном**
+   прогоне (повтор пишет его в repro — перенос `--stages manifest --compare-with <repro>`, HANDBOOK §4.3), `ld-*`,
+   `ld-team-*`. Перед передачей на этап 4 (HANDBOOK §4.4 «Сдача этапа 3»; пилот: обе приёмки — `rework_blender` из-за
+   тона и непросмотренных крупных планов, F72, F79):
+   - таблица тона тем же кодом, что `frames/tone.json` съёмки (`tools/art/acceptance/_tone.py` `tone_table` по
+     `measure-report.json` и `ld-maps-report.json` look-dev; `capture_acceptance_set.py:470-482`) даёт `t_cap` 2.0.
+     Иначе ещё итерация grade из `measure-report.json#gain_suggestion` (металл — демпфированно, причина в `note`);
+     не дошло — числа и причина в отчёт этапа 3;
+   - `capture_acceptance_set.py` в scratch-каталог (`C:/tmp/<key>-stage3-check`): исполнитель сам смотрит
+     `close-head`, `close-hands`, `close-torso`, `close-legs-back`, `close-weapon`, `pose-01` … `pose-04` — те же кадры,
+     что увидит приёмщик, — и чинит найденное до передачи.
 
 **Этап 3 — проп** (ветка `prop`; регистрация персонажа, h2_bake, look-dev и TeamAccent не делаются).
 1. Run-каталог `R=art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-prop-build` (решение скилла; новый на каждый прогон,
@@ -359,6 +396,9 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 Файл обязан читаться YAML-парсером (`python -c "import yaml,sys;yaml.safe_load(open(sys.argv[1],encoding='utf-8'))" <ASSET_DIR>/asset-card.yaml`
 → без ошибки): текст с двоеточиями и спецсимволами — только в двойных кавычках, числа — числами. Пометка «проп:»
 в комментарии — значение поля у ветки `prop`; `null` у пропа пишется с `decided_by` «не применимо к пропу».
+Поля этапа 3 — `CHARACTER`, `FIGHTER_NAME`, `FIGURE_HEIGHT_M`, `FIGURE_HEIGHT_RANGE_M`, `UE_NAMES`, `CLIP_PREFIX` —
+пишутся на этапе 0, в пакетной заявке тоже. Пилот 2026-10-13 их не получил, и этап 3 брал дефолты П3-5 (F18).
+`FIGURE_BOUNDS_TOP_M` пишет этап 3 по замеру.
 
 ```yaml
 # Заявка этапа 0. Файл: <ASSET_DIR>/asset-card.yaml. Поле без значения пользователя берёт дефолт §7.1 с decided_by.
@@ -398,8 +438,15 @@ POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}  # GD-058 final; ге
                                     #   проп: {figure_tris_max: <по пропу того же вида>, base_tris_max: null};
                                     #   бочка — 4000 в форме Tripo (references/tripo3d-stages.md §5.3)
 FIGURE_HEIGHT_M: 0.55               # Specs().BudgetUU = м × 100; герой 0.55 (Arthur, Medusa), помощник 0.45 / 0.42
+                                    #   верх БЮДЖЕТА = верх головы с прилегающим убором (шлем с гребнем Achilles, корона
+                                    #   Arthur); поднятый клинок, посох, рога — выше бюджета (FIGURE_BOUNDS_TOP_M); такая
+                                    #   деталь выше головы → в профиле bake scale.figure_top_part (HANDBOOK §2.10)
                                     #   проп: target_height_m candidate-params пропа того же вида (бочка 0.26, фонарь 0.95 —
                                     #   ASSET-DECOR-KIT-001/20260928-{p15-barrel,lantern-tripo-h31}/reports/candidate-params.json)
+FIGURE_BOUNDS_TOP_M: null           # пишет этап 3: верх bounds фигуры без подставки = rig-report.json
+                                    #   #bounds_authored_m.skeletal[1][2] (Specs().BoundsTopUU = м × 100; меч Arthur
+                                    #   0.6006, рога Ancient Leshen 0.7358); без детали выше головы ≈ FIGURE_HEIGHT_M;
+                                    #   проп: null
 FIGURE_HEIGHT_RANGE_M: [0.52, 0.56] # Specs() Min/MaxUU у ближайшего по роли и оружию (§7.1 «Рост и длительности»;
                                     #   S08HeroesV2.cpp:105-108): Arthur 52–56 (меч), Medusa 50–55 (лук), Merlin 40–48
                                     #   (посох, помощник), Harpy 35–42 (когти, крылатый помощник). Дефолт [0.52, 0.56] —

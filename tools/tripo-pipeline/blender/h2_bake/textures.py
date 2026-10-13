@@ -18,6 +18,9 @@ H2.1 (profile textures.materials, module materials.py): AO of the listed parts f
 before the footprints/caps read their rim; rim filters of named contacts (keep only the rim samples of the surface
 that continues under the contact); after the caps, the metal mask and the BC/ORM remap (metal, cloth roughness).
 Without textures.materials the stage is the H2 stage unchanged.
+Metal-free hero (no materials.metal parts): no metal mask, no remap, the H2.1 metal checks are not run, and
+work/uv/metal_mask.npy is written all-zero (look-dev reads it). Empty team_mask.cloth_parts (no cloth): TeamMask R = 0
+and the check team_mask_cloth_share is reported as not applicable (pilot 2026-10-13, F51, F52).
 PNG writing: Pillow, compress_level 6, no metadata -> identical bytes for identical pixels."""
 
 import argparse
@@ -242,6 +245,13 @@ def load_sibling(name):
     return mod
 
 
+def metal_pass(mcfg):
+    """True when profile textures.materials has a metal block with parts (the H2.1 metal mask and BC/ORM remap run).
+    A hero without metal (no materials, no `metal`, or `metal` without parts) skips both; the stage then writes an
+    all-zero work/uv/metal_mask.npy for look-dev (pilot 2026-10-13, F51: the remap of an empty mask crashed)."""
+    return bool(mcfg and mcfg.get("metal") and mcfg["metal"].get("parts"))
+
+
 def contact_labels(run_dir, part_names, names):
     """Labels (part index * 1000 + cap index, the uv-stage encoding) of named contact caps (close-report.json)."""
     close = json.loads((Path(run_dir) / "reports" / "close-report.json").read_text(encoding="utf-8"))
@@ -299,7 +309,7 @@ def run(run_dir, profile):
         valid_maps, cap_stats = cap_fill(maps, alpha, caps, cap_mask, edge_px)
     stats["caps"] = cap_stats
     metal_m = None
-    if mcfg and mcfg.get("metal"):
+    if metal_pass(mcfg):
         pos = np.load(w / "uv" / "position.npy")
         vb = valid_maps["BC"] & uv_cov
         metal_m, mstats["metal_mask"] = mat.metal_mask(maps["BC"], vb, part_ids, part_names, pos, mcfg["metal"], tx)
@@ -314,11 +324,14 @@ def run(run_dir, profile):
     tm = tcfg["team_mask"]
     cloth_idx = [part_names.index(p) for p in tm["cloth_parts"]]
     in_cloth = np.isin(part_ids, cloth_idx)
-    h, s, v = rgb_to_hsv(filled["BC"])
-    hsv = tm["cloth_hsv"]
-    r = smooth_le(v, hsv["v_max"], hsv["ramp"]) * smooth_le(s, hsv["s_max"], hsv["ramp"])
-    r = np.where(in_cloth, r, 0.0).astype(np.float32)
-    r = blur3(r, int(tm.get("blur", 0))) * in_cloth
+    hsv = tm.get("cloth_hsv")
+    if cloth_idx:
+        h, s, v = rgb_to_hsv(filled["BC"])
+        r = smooth_le(v, hsv["v_max"], hsv["ramp"]) * smooth_le(s, hsv["s_max"], hsv["ramp"])
+        r = np.where(in_cloth, r, 0.0).astype(np.float32)
+        r = blur3(r, int(tm.get("blur", 0))) * in_cloth
+    else:  # a hero without cloth (Ancient Leshen, pilot F52): R = 0, the cloth-share check is not applicable
+        r = np.zeros(part_ids.shape, np.float32)
     g = base_band.astype(np.float32)
     team = np.stack([r, g, np.zeros_like(r)], -1)
     team_valid = uv_cov
@@ -385,8 +398,13 @@ def run(run_dir, profile):
         checks["cap_texels_filled_from_rim"] = {
             "passed": cap_stats["cap_texels_not_painted"] == 0 and cap_stats["painted_outside_cap_raster"] == 0,
             "measured": cap_stats, "expected": "every cap texel of the uv raster painted, none outside"}
-    checks["team_mask_cloth_share"] = {"passed": 0.5 <= cloth_share <= 0.98, "measured": round(cloth_share, 4),
-                                       "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)"}
+    if cloth_idx:
+        checks["team_mask_cloth_share"] = {"passed": 0.5 <= cloth_share <= 0.98, "measured": round(cloth_share, 4),
+                                           "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)"}
+    else:
+        checks["team_mask_cloth_share"] = {"passed": True, "not_applicable": True, "measured": None,
+                                           "expected": "not applicable: team_mask.cloth_parts is empty (a hero without "
+                                                       "cloth; TeamMask is deprecated, TeamAccent carries the team colour)"}
     if metal_m is not None:  # H2.1: measured on the written 8-bit 4K maps
         ck = mcfg.get("checks", {})
         core = (metal_m >= 0.99) & uv_cov
@@ -437,6 +455,11 @@ def run(run_dir, profile):
                                        "художественно не принято"}
     if metal_m is not None:
         np.save(w / "uv" / "metal_mask.npy", metal_m.astype(np.float32))
+    else:  # look-dev (ld_maps) reads the mask of every source run: a metal-free hero gets an all-zero one (pilot F51)
+        np.save(w / "uv" / "metal_mask.npy", np.zeros(part_ids.shape, np.float32))
+        report["metal_mask"] = {"path": "work/uv/metal_mask.npy", "value": 0.0,
+                                "note": "no metal pass (textures.materials.metal absent or without parts): all-zero "
+                                        "mask for look-dev; BC and ORM keep the Tripo values"}
     out = run_dir / "reports" / "textures-report.json"
     out.write_text(json.dumps(report, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
     if not report["passed"]:

@@ -1,6 +1,10 @@
 """Stage prepare: import the untextured high-poly by parts (HPG_*) and the textured 8K/PBR high-poly (HPT_*),
 match the parts by node name, prove identical geometry, map both into the final frame (card 04), measure the
-orientation of every high-poly part (ray escape) and save work/hp.blend."""
+orientation of every high-poly part (ray escape) and save work/hp.blend.
+
+Figure height: the source top mapped to scale.figure_top_m is the highest vertex of any non-base part (weapon included),
+or, with the optional scale.figure_top_part, the top of that part (the head under a raised sword or antlers: the budget
+top of Specs()); profile.figure_top_source_z. The report then names the part and the figure bounds top."""
 
 from pathlib import Path
 
@@ -60,7 +64,8 @@ def run(params, profile):
     # ---- final frame map (base normalised to the card-04 footprint, figure uniform)
     base_part = [n for n in names if profile["parts"][n]["mesh"] == "base"][0]
     bc = U.coords(hpg[base_part].data)
-    top = max(float(U.coords(hpg[n].data)[:, 2].max()) for n in names if n != base_part)
+    # highest non-base vertex (old rule), or the top of scale.figure_top_part (a raised blade / antlers above the head)
+    top = P.figure_top_source_z(profile, {n: float(U.coords(hpg[n].data)[:, 2].max()) for n in names if n != base_part})
     fmap = P.frame_map((bc.min(0), bc.max(0)), top, profile["scale"])
     for n in names:
         is_base = n == base_part
@@ -123,6 +128,11 @@ def run(params, profile):
               "bounds_final_m": [U.rv(lo, 5), U.rv(hi, 5)], "figure_bounds_final_m": [U.rv(fig_lo, 5), U.rv(fig_hi, 5)],
               "orientation": scores, "parts": per_part, "checks": checks,
               "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
+    if P.figure_top_part(profile) is not None:  # profiles without the key keep their report bytes
+        report["figure_top_part"] = {"part": P.figure_top_part(profile), "top_m": U.r(fmap["figure_top_m"], 5),
+                                     "figure_bounds_top_m": U.r(fig_hi[2], 5),
+                                     "note": "scale.figure_top_m is the top of this part; the figure bounds top (weapon, "
+                                             "ornaments) frames the concept views (profile.frame_top_m)"}
     U.write_json(run_dir / "reports" / "prepare-report.json", report)
     if not report["passed"]:
         raise RuntimeError("prepare checks failed: %s" % [k for k, c in checks.items() if not c["passed"]])

@@ -28,7 +28,8 @@ and writes new files next to it (or into another --run-dir for the determinism c
   ta_render  (st_team.py, Blender) Cobble light of the board, exposure calibrated to the W4-A anchor (K1 board ROI
              p50 = 131.2), K2 5x front / back (+ 1.6x), sets ld | ld_p1 | ld_p2 + ID pass.
   ta_report  (this module) screen share of the accent, CIELAB contrast accent / dress next to it and P1 / P2, the dress
-             and the gold unchanged by the dye outside the accent; sheets concept | ld | P1 | P2.
+             and the gold unchanged by the dye outside the accent; sheets concept | ld | P1 | P2. A failed check raises
+             after the report is written (as ta_maps): the driver exits non-zero and ta_manifest does not run.
   ta_manifest  inputs / outputs / modules with sha256 (reports/ld-team-manifest.json).
 Deterministic: no randomness, Pillow PNG without metadata; the frames are Blender (EEVEE) editor frames, not UE."""
 
@@ -107,6 +108,15 @@ def write_json(path, data):
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def repo_rel(path, repo):
+    """Repo-relative posix path; a path outside the repo (a scratch profile) stays absolute (pilot F60: the manifest
+    refused it with ValueError)."""
+    try:
+        return Path(path).resolve().relative_to(Path(repo).resolve()).as_posix()
+    except ValueError:
+        return Path(path).resolve().as_posix()
 
 
 def check(checks, name, passed, measured, expected, note=""):
@@ -688,6 +698,8 @@ def run_report(run_dir, ta, repo):
            "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
     write_json(run_dir / "reports" / "ld-team-report.json", rep)
     print("ta_report passed=%s" % rep["passed"], [k for k, c in checks.items() if not c["passed"]], flush=True)
+    if not rep["passed"]:  # as ta_maps: the driver stops before ta_manifest and exits non-zero (pilot 2026-10-13, F32)
+        raise RuntimeError("ta_report checks failed: %s" % [k for k, c in checks.items() if not c["passed"]])
     return rep
 
 
@@ -709,7 +721,7 @@ def run_manifest(run_dir, ta, ta_path, repo, blender_version):
     mods = {p.name: sha256(p) for p in (HERE / "lookdev_accent.py", HERE / "st_team.py", HERE / "st_lookdev.py",
                                         HERE / "run_h2_bake.py", HERE / "blender_entry.py")}
     man = {"schema": "unmatched.h2-lookdev-teamaccent-run/1", "asset_id": ta["asset_id"],
-           "profile": {"path": Path(ta_path).resolve().relative_to(repo).as_posix(), "sha256": sha256(ta_path),
+           "profile": {"path": repo_rel(ta_path, repo), "sha256": sha256(ta_path),
                        "profile_id": ta["profile_id"]},
            "pins": maps["pins"], "modules": mods, "blender": blender_version, "outputs": outs,
            "untouched": "look-dev profile, ld-maps-report.json, run-manifest.json and every texture of ld_maps (pinned by "

@@ -110,11 +110,12 @@ def h21_sheets(raw, out, repo, profile, tag):
         a = label(flat(raw / ("closeup-%s-base.png" % c["name"])), "H2: %s" % c["name"], 22)
         b = label(flat(raw / ("closeup-%s-h2.png" % c["name"])), "H2.1: %s" % c["name"], 22)
         pairs.append(row([a, b], 600))
-    grid = Image.new("RGB", (pairs[0].width * 2, 600 * ((len(pairs) + 1) // 2) + 50), BG)
-    for i, pr in enumerate(pairs):
-        grid.paste(pr, ((i % 2) * pairs[0].width, 50 + (i // 2) * 600))
-    label(grid, "крупные планы H2 | H2.1, ортокамера — %s" % tag, 30)
-    written["closeups-h2-vs-h21.jpg"] = save_jpeg(grid, out / "closeups-h2-vs-h21.jpg", max_w=2400)
+    if pairs:  # preview.closeups may be [] (no sheet then)
+        grid = Image.new("RGB", (pairs[0].width * 2, 600 * ((len(pairs) + 1) // 2) + 50), BG)
+        for i, pr in enumerate(pairs):
+            grid.paste(pr, ((i % 2) * pairs[0].width, 50 + (i // 2) * 600))
+        label(grid, "крупные планы H2 | H2.1, ортокамера — %s" % tag, 30)
+        written["closeups-h2-vs-h21.jpg"] = save_jpeg(grid, out / "closeups-h2-vs-h21.jpg", max_w=2400)
     rows_ = []
     for c in profile["preview"].get("pose_closeups", []):
         stem = "pose-%s-%s" % (c["name"], c["pose"])
@@ -199,12 +200,16 @@ def run(run_dir, profile, repo):
         a = label(flat(raw / ("closeup-%s-hp.png" % c["name"])), "high-poly: %s" % c["name"], 22)
         b = label(flat(raw / ("closeup-%s-h2.png" % c["name"])), "H2 игровая: %s" % c["name"], 22)
         pairs.append(row([a, b], 600))
-    grid_w = pairs[0].width * 2
-    grid = Image.new("RGB", (grid_w, 600 * ((len(pairs) + 1) // 2) + 50), BG)
-    for i, p in enumerate(pairs):
-        grid.paste(p, ((i % 2) * pairs[0].width, 50 + (i // 2) * 600))
-    label(grid, "крупные планы, ортокамера — %s" % tag, 30)
-    written["closeups-hp-vs-h2.jpg"] = save_jpeg(grid, out / "closeups-hp-vs-h2.jpg", max_w=2400)
+    skipped = {}
+    if pairs:
+        grid_w = pairs[0].width * 2
+        grid = Image.new("RGB", (grid_w, 600 * ((len(pairs) + 1) // 2) + 50), BG)
+        for i, p in enumerate(pairs):
+            grid.paste(p, ((i % 2) * pairs[0].width, 50 + (i // 2) * 600))
+        label(grid, "крупные планы, ортокамера — %s" % tag, 30)
+        written["closeups-hp-vs-h2.jpg"] = save_jpeg(grid, out / "closeups-hp-vs-h2.jpg", max_w=2400)
+    else:  # pilot 2026-10-13 (F60): an empty preview.closeups crashed on pairs[0]
+        skipped["closeups-hp-vs-h2.jpg"] = "preview.closeups is empty"
     k2_sets = ((("prev", prev_name),) if prev else ()) + (("h2", "H2 игровая модель"),)
     for key, crop_px, zoom in (("k2-5x", 640, 1), ("k2-1p6", 220, 3)):
         tiles = []
@@ -260,7 +265,9 @@ def run(run_dir, profile, repo):
     layout = run_dir / "work" / "uv" / "uv-layout-1024.png"
     if layout.exists():
         written["uv-layout-1024.png"] = {"note": "written by the uv stage"}
+    rep = {"stage": "compose", "outputs": written, "label": tag}
+    if skipped:  # only when a sheet had no input (the Medusa report keeps its bytes)
+        rep["skipped"] = skipped
     (run_dir / "reports" / "compose-report.json").write_text(
-        json.dumps({"stage": "compose", "outputs": written, "label": tag}, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
-        encoding="utf-8")
+        json.dumps(rep, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
     return written
