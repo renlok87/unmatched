@@ -779,6 +779,39 @@ class McpUnreal:
         launcher.write_text(UE_PY_LAUNCHER.replace("@STARTED@", started.as_posix()).replace("@TARGET@", script.as_posix()),
                             encoding="utf-8", newline="\n")
         command = 'py "%s" %s' % (launcher.as_posix(), args_path.as_posix())
+        drop = os.environ.get("UE_CONSOLE_DROP")
+        if drop:
+            # hidden editor started with review/ue_py/console_drop.py (ART-016; pilot 2026-10-14): the command is handed
+            # over as a file (cmd-<seq>.json -> done-<seq>.json), as review/ue_live.py does — a -RenderOffScreen editor
+            # cannot focus its Cmd box. Without UE_CONSOLE_DROP the typed path below is unchanged.
+            if not os.path.exists(os.path.join(drop, "ready.json")):
+                raise PipelineError("UE_CONSOLE_DROP=%s: no ready.json (console_drop.py not running in the editor)" % drop)
+            seq = int(time.time() * 1000)
+            while os.path.exists(os.path.join(drop, "cmd-%d.json" % seq)) or os.path.exists(os.path.join(drop, "done-%d.json" % seq)):
+                seq += 1
+            cmd_path = os.path.join(drop, "cmd-%d.json" % seq)
+            with open(cmd_path + ".tmp", "w", encoding="utf-8") as handle:
+                json.dump({"seq": seq, "command": command}, handle)
+            os.replace(cmd_path + ".tmp", cmd_path)
+            self.calls.append({"editor_python_drop": script.name, "drop_seq": seq})
+            done = os.path.join(drop, "done-%d.json" % seq)
+            deadline = time.time() + timeout
+            while time.time() < deadline:
+                if out.exists():
+                    time.sleep(0.3)
+                    try:
+                        return json.loads(out.read_text(encoding="utf-8"))
+                    except ValueError:
+                        pass
+                if os.path.exists(done) and not started.exists() and not out.exists():
+                    try:
+                        res = json.loads(Path(done).read_text(encoding="utf-8"))
+                    except ValueError:
+                        res = {}
+                    if res and not res.get("ok"):
+                        raise PipelineError("console (drop) %s failed: %s" % (script.name, res.get("error")))
+                time.sleep(0.5)
+            raise PipelineError("editor python %s (drop) wrote no %s within %ss" % (script.name, out.name, timeout))
         grace = float(os.environ.get("TRIPO_PIPELINE_CONSOLE_GRACE_S", "20"))
         for attempt in range(5):
             m = None
@@ -2669,6 +2702,15 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     measured["skeletal_bounds_uu"] = {"min": [round(v, 4) for v in lo_u], "max": [round(v, 4) for v in hi_u]} if lo_u else None
     measured["axis_mapping"] = maps
     fronts = sorted({mp["blender_front_minus_y_becomes"] for mp in maps})
+    # opt-in axes.front_from_best_bound_fit (pilot 2026-10-14, Ancient Leshen): a figure whose front/back depth is
+    # symmetric within the tolerance matches a map and its front/back mirror; keep only the maps within 5x the best
+    # error (true map 0.0005 uu vs mirror 0.0315 uu). Off by default: every existing profile keeps the old check.
+    if len(fronts) > 1 and (profile.get("axes") or {}).get("front_from_best_bound_fit"):
+        best = min(mp["max_error_uu"] for mp in maps)
+        keep = [mp for mp in maps if mp["max_error_uu"] <= max(5.0 * best, 0.005)]
+        measured["axis_mapping_rejected_by_best_fit"] = [mp for mp in maps if mp not in keep]
+        maps = keep
+        fronts = sorted({mp["blender_front_minus_y_becomes"] for mp in maps})
     check("skeletal_bounds_match_build_front_unambiguous", len(maps) >= 1 and len(fronts) == 1,
           {"maps": maps, "fronts": fronts},
           note="authored Blender bounds from the build report (cm, front -Y) mapped onto UE bounds, tolerance "
