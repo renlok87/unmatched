@@ -68,9 +68,9 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 
 | Роль | Как вызвать | Правила |
 |---|---|---|
-| Codex (этап 1) | Основной путь — `codex.exe exec` после пробы exec (`references/concept-sheet.md` §5.2): exe из `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/` (его запускает само приложение; каталог и версия меняются с обновлением — путь только глобом, хэш и версию не закреплять, F37), при «used by another process» — копия в `C:/tmp/codex-bin/`; при закрытом приложении годится и exe пакета `C:/Program Files/WindowsApps/OpenAI.Codex_*/app/resources/`. Пакет на машине один, «exe соседней версии» нет. Из PowerShell: `Get-Content <prompt> -Raw -Encoding UTF8 \| & $exe exec -C <repo> -s workspace-write -c 'windows.sandbox="unelevated"' --skip-git-repo-check -` (`$OutputEncoding` и `[Console]::OutputEncoding` — UTF-8). Флаг `windows.sandbox="unelevated"` обязателен: без него при открытом приложении песочница не запускает команд, а код выхода всё равно 0 (concept-sheet §5.2). Exec занят и копией — приложение ChatGPT через управление рабочим столом (computer-use или Windows-MCP): Ctrl+N в проекте `unmached`, сообщение «Прочитай `<prompt file>` и выполни задачу» (`docs/game-design/visual/07-prompt-templates.md` §1.1; concept-sheet §5.3). Приложение пользователя не закрывать. npm-`codex` не работает | Промпт-файл пишет Claude: `docs/game-design/visual/06-tasks/prompts/<ASSET_ID>-concept.codex.md`. Codex пишет только в `art/imagegen/concept-<key>-codex/` и не коммитит |
-| Приёмщик «Opus xhigh» (по умолчанию) | Агент Workflow `agent(prompt, {model: 'opus', effort: 'xhigh', schema: <строгая выходная схема своего вида>, label})`, свежий контекст (скрипт и промпт — `references/acceptance-and-blender.md` §8.2–8.3). Схема — `tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json`, как у Sol: с полной схемой Workflow возвращал строки `"null"` (F6, F102, RA-11). На вход — только кадры, отчёты, концепт и рубрика | Не правит. Его сессия отлична от сессии исполнителя. `session_id` обоих пишутся в карточку |
-| Приёмщик «Sol 6.1 xhigh» | Тот же `$exe`, прошедший пробу exec (не npm-`codex`; GUI-путь приёмщику не подходит — нужны `--output-schema` и `-o`): `Get-Content <acceptor-prompt.md> -Raw -Encoding UTF8 \| & $exe exec --ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -c 'windows.sandbox="unelevated"' -s read-only -C <repo> --skip-git-repo-check --output-schema tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json -o <evidence>/card.json --json -i <кадр1> -i <кадр2> -- -` (полная команда — `references/acceptance-and-blender.md` §8.4). Схема — строгая производная своего вида (`model`/`concept`/`anim`), не полная `asset-acceptance-2.schema.json`: полную строгий режим отвергает. Отказ схемы — тот же вызов без `--output-schema` (§8.4, под командой). Каждый кадр — отдельный `-i`, перед `-` разделитель `--` (`codex exec --help`; версия codex-cli меняется с приложением, F37); затем `validate_card.py`. Промпт несёт блок чтения кириллицы (OEM, `cmd /c type`) и строку «рубрика — только этот файл» — дословно по `references/concept-sheet.md` §11 (RA-03; без них Sol читал рубрику кракозябрами при коде 0 и открывал SKILL.md, F36, F75). Пилот: модель 10–14,5 мин, клип ≈ 5 мин; сбой песочницы (код 0, карточка-заглушка) или карточка «СБОЙ ОКРУЖЕНИЯ» — сбой окружения, не попытка: цикл не тратится (§8.4) | Только по явному выбору запускающего; второй приёмщик пары «другим профилем» — почти всегда Sol (в пилоте 13 из 16 карточек). Повторная приёмка — тем же профилем |
+| Codex (этап 1) | `codex.exe exec` после пробы exec (выбор exe, команда, кодировки — `references/concept-sheet.md` §5.2): exe приложения из `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/` — только глобом, хэш и версию не закреплять (F37); флаг `-c 'windows.sandbox="unelevated"'` обязателен (без него песочница при открытом приложении не запускает команд, а код выхода 0). Exec не работает — приложение ChatGPT через управление рабочим столом (concept-sheet §5.3). Приложение пользователя не закрывать; npm-`codex` не работает. Пачка — полосы `codex_lane.py` (§11.3) | Промпт-файл пишет Claude: `docs/game-design/visual/06-tasks/prompts/<ASSET_ID>-concept.codex.md`. Codex пишет только в `art/imagegen/concept-<key>-codex/` и не коммитит |
+| Приёмщик «Opus xhigh» (по умолчанию) | Агент Workflow `agent(prompt, {model: 'opus', effort: 'xhigh', schema: <строгая выходная схема своего вида>, label})`, свежий контекст (скрипт и промпт — `references/acceptance-and-blender.md` §8.2–8.3). Схема — `tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json`, как у Sol: с полной схемой Workflow возвращал строки `"null"` (F6, F102, RA-11). Второй приёмщик Opus — сохранённый workflow `.claude/workflows/second-acceptor.js` (`Workflow({name: "second-acceptor", args: {items, schema}})`), затем `finish_second.py` (там же §8.3). На вход — только кадры, отчёты, концепт и рубрика | Не правит. Его сессия отлична от сессии исполнителя. `session_id` обоих пишутся в карточку |
+| Приёмщик «Sol 6.1 xhigh» | Тот же `$exe`, прошедший пробу exec (GUI-путь приёмщику не подходит — нужны `--output-schema` и `-o`). Обязательно: `--ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -c 'windows.sandbox="unelevated"' -s read-only`, строгая схема своего вида `…output-<kind>.schema.json` (не полная — её строгий режим отвергает), каждый кадр отдельным `-i`, `--` перед `-`; затем `validate_card.py`. Полная команда, отказ схемы и разбор событий — `references/acceptance-and-blender.md` §8.4. Промпт несёт блок чтения кириллицы (OEM, `cmd /c type`) и строку «рубрика — только этот файл» дословно по `references/concept-sheet.md` §11 (RA-03; без них Sol читал рубрику кракозябрами при коде 0 и открывал SKILL.md, F36, F75). Сбой песочницы (код 0, карточка-заглушка) или карточка «СБОЙ ОКРУЖЕНИЯ» — сбой окружения, не попытка: цикл не тратится. Пилот: модель 10–14,5 мин, клип ≈ 5 мин | Только по явному выбору запускающего; второй приёмщик пары «другим профилем» — почти всегда Sol (в пилоте 13 из 16 карточек). Повторная приёмка — тем же профилем |
 | Доработка «Opus xhigh» (этапы 5, 6) | Агент Workflow `{model: 'opus', effort: 'xhigh'}` с брифом доработки (модель — `references/acceptance-and-blender.md` §10, клип — `references/animation-vfx-sfx.md` §10.6), работает headless-скриптами. Фактический механизм и effort записываются (RA-21): блок этапа в заявке (`STAGE5[]`, `STAGE6.executor`, §7.2) и `executor_session_id` следующей карточки (субагент — `claude-code:<uuid>/agent:<name>`, F40) | Делает лично, не делегирует, свою работу не принимает |
 | Tripo Studio (шаги 1b и 2) | Запускающий агент через Claude in Chrome в своей вкладке; расширение не подключено, а Studio открыта и залогинена в Chrome пользователя — клики Windows-MCP в этой вкладке (`references/tripo3d-stages.md` §2, F9). Разрешение трат — сама заявка пользователя (§1), в лимите и сроке журнала; отдельно не спрашивать. Если клик блокирует классификатор прав сессии (живая проверка 2026-10-09: Real-World Transactions) или пользователь — гейт §5 п.2: пользователь проходит чек-лист `references/tripo3d-stages.md` §8 сам, агент проверяет результат | Цена — с кнопки до клика. Строка журнала — после каждой операции |
 
@@ -104,8 +104,10 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 4. Исчерпаны циклы: концепт — 3, модель — 2, клип — 2. Плюс один **поздний фикс** модели на фигуру (RC-06, правило
    скилла): дефект модели, который вскрыла приёмка клипов уже после pass модели, чинится этапом 5 и новой приёмкой
    модели. Поздний фикс тратит цикл модели, если цикл остался; если циклов нет — один раз сверх лимита (приёмка
-   `r4`: не-pass → `escalate_user`, так считает `validate_card.py`). Перепринятие клипов с неизменными ключами цикл
-   клипа не тратит (маршрут — `references/animation-vfx-sfx.md` §10.5). Второй дефект модели из клипов — стоп.
+   `r4`, не-pass → `escalate_user`). Пока схема карточки модели допускает только `r1`–`r3`, карточку `r4` валидатор
+   отвергает (код 1): до правки поздний фикс без оставшегося цикла — сразу `escalate_user`
+   (`references/acceptance-and-blender.md` §6). Перепринятие клипов с неизменными ключами цикл клипа не тратит
+   (маршрут — `references/animation-vfx-sfx.md` §10.5). Второй дефект модели из клипов — стоп.
 5. Нужен новый MatID-класс, новая кость, расширение `optional_extensions` (§3) или новый режим generic `h2_bake` —
    мост-цилиндр для оружия без хвата (HANDBOOK §0.3 п.7, §4.2 «Оружие», §4.4). Тонкая деталь (тетива, древко,
    стрелы), которую профиль не сделал читаемой, — не стоп: пункт «не закрыто» и балл F
@@ -251,55 +253,29 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    контракта по `rig.character`; часть и меш оружия, кости `weapon.*` и сокет `Weapon` профиля — по `WEAPON_HAND`
    (таблица Д-1, там же §2; правша — проверка `export_frame_bow_on_rotated_right`, без оружия — без части `weapon`).
 2. Новый файл профиля `<key>-h2-bake-h2.json` по HANDBOOK §4.2 (образец — `medusa-h2-bake-h2.json`, не драйверы
-   `h2_bake_arthur/merlin/harpy`). Каждый ключ пройти, координаты костей задать по новой геометрии. Профиль нового
-   героя — `"profile_version": 2` (ДС-5; 1 — только Medusa и пилот). У v2 `validate()` требует три ключа явно:
-   `uv.density_reference_part` (часть body), `textures.team_mask.base_band.part` (часть base) и `preview.frame` с
-   `side`; молчаливые значения Medusa больше не наследуются (RB-15, F29). Расширенные пробы рига у v2 блокируют сборку;
-   `rig.probe_skip` — только для фигуры без голеней и стоп (Leshen), прежние 7 проб не пропускаются (RB-08). Блок
-   `preview` (h2-bake 0.6.1): `previous_candidate` и `baseline` **удалить** — это прежний кандидат W4-B и текстуры H2 до
-   H2.1 Medusa; у нового персонажа их нет, без ключей стадия `preview` и `compose` обходятся без них. `concepts` — свои
-   виды; `closeups`, `pose_closeups`, `channel_views` переписать под свою фигуру (цели в метрах финальной рамки,
-   `pose_closeups` — только позы `st_seams.pose`, можно `[]`); `frame` =
-   `{"checks_report": "<папка видов>/checks-report.json", "side": "<SIDE_VIEW>"}` — орто-кадры по кадрированию своего
-   концепта (`h2_bake/framing.py`; без ключа — канон Medusa 1021 × 1540). Тот же `frame` — в look-dev профиле
-   `<key>-h2-lookdev.json` (верхний уровень): `ld_measure` сравнивает концепт с проходом ID пиксель в пиксель и
-   отказывает концепту другого аспекта, а `tone.json` (потолок T этапа 4) верен только при такой рамке.
-   До профиля — разведка и чек-лист HANDBOOK §4.2 «Новый герой»: кости по сечениям частей, инвентарь петель `close`,
-   толщина ткани; значения Medusa, которые перенастраиваются (часть лица `retopo.dense_regions` `face`,
-   `uv.density_reference_part`, `textures.team_mask.cloth_hsv` и `base_band.part`); выбор крышка / стык весов /
-   оболочка.
-   Правила пилота (решения П3 по делегированию, тот же файл решений; HANDBOOK §2.6, §2.10, §4.2, §4.4):
-   - **П3-1.** Оружие, которое Tripo разрезал на части: одна часть — меш `weapon`, остальные — в `body` с `rigid` 100 %
-     на кости оружия.
-   - **П3-2.** Щит или другой предмет в руке без своей кости — `rigid` 100 % на `arm_lower`/`hand` своей стороны;
-     новая кость — стоп §5 п.5.
-   - **П3-3.** Одинарный лист ткани, который в позах показывает изнанку: сначала средства профиля (стыки весов, крышки),
-     затем ключ `rig.cloth_shell {parts, offset_mm}`. Перед ключом — луч толщины: толстая оболочка с вырезом изнутри
-     закрывается крышкой (плащ Achilles), лист — оболочкой (юбка Achilles).
-   - **Высота.** Деталь выше головы (поднятый клинок, рога) — `scale.figure_top_part` = часть с верхом бюджета; без
-     ключа `prepare` ставит на `figure_top_m` самую высокую вершину вместе с оружием (HANDBOOK §2.10).
-   - **Без металла и без ткани.** Нет металла — без блока `textures.materials.metal`: нулевую маску для look-dev пишет
-     стадия `textures`. Нет ткани — `team_mask.cloth_parts: []`, проверка `team_mask_cloth_share` «не применима».
-   - **Треугольники.** ≤ 45k — итог тела с оружием на экспорте (`rig-report.json#meshes_pre_export`) с крышками и
-     оболочками, не сумма `target_tris`.
+   `h2_bake_arthur/merlin/harpy`): каждый ключ пройти, кости — по геометрии своей фигуры. До профиля — разведка и
+   чек-лист HANDBOOK §4.2 «Новый герой» (сечения частей, инвентарь петель `close`, толщина ткани, значения Medusa,
+   которые перенастраиваются; выбор крышка / стык весов / оболочка). Гейты профиля нового героя:
+   - `"profile_version": 2` (ДС-5; 1 — только Medusa и пилот): `validate()` требует `uv.density_reference_part` (часть
+     body), `textures.team_mask.base_band.part` (часть base) и `preview.frame` с `side` (RB-15, F29); расширенные пробы
+     рига блокируют сборку, `rig.probe_skip` — только фигуре без голеней и стоп, прежние 7 проб не пропускаются (RB-08);
+   - `preview.previous_candidate` и `preview.baseline` удалить (кандидат W4-B и текстуры Medusa);
+     `frame` = `{"checks_report": "<папка видов>/checks-report.json", "side": "<SIDE_VIEW>"}` — и в bake-, и в look-dev
+     профиле: без него `ld_measure` отказывает концепту другого аспекта, а `tone.json` неверен (HANDBOOK §4.2, §4.4).
+   Правила пилота П3 (`docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`; подробно — HANDBOOK
+   §2.6, §2.10, §4.2, §4.4): П3-1 — разрезанное Tripo оружие: одна часть `weapon`, остальные в `body` с `rigid` 100 %
+   на кости оружия; П3-2 — предмет в руке без кости: `rigid` 100 % на `arm_lower`/`hand` (новая кость — стоп §5 п.5);
+   П3-3 — лист ткани с изнанкой: сначала стыки и крышки, затем `rig.cloth_shell` после луча толщины; деталь выше
+   головы — `scale.figure_top_part`; нет металла — без блока `textures.materials.metal`, нет ткани —
+   `team_mask.cloth_parts: []`; ≤ 45k — итог тела с оружием на экспорте (`rig-report.json#meshes_pre_export`).
 3. `python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py` по одной стадии (HANDBOOK §4.3), затем
-   `--mode lookdev` и `--mode teamaccent` (HANDBOOK §4.4). TeamAccent (`team_accent` профиля, правило 5–12 % площади —
-   `docs/art-pipeline/material-library/team-accent.md`): компоненты `hem` (полоса ткани `cloth_class` вдоль кромки
-   класса `band_class` ниже `band_z_max_m`) и `ribbon` (ремень/перевязь класса `class` выше `z_min_m`) — каждый
-   необязателен, нужен хотя бы один. Ткань без кромки (латы, туника без каймы) — только `ribbon` на поясе, перевязи,
-   колчанной лямке или плаще (`class` — их класс с `teamDyeAllowed`; без `hem` обязательно задать `cloth_class`/`trim_class`
-   верхнего уровня — основная ткань и отделка для проверки `dress_parts` и контраста `ta_report`). Пустой компонент пропускается с `skipped` в отчёте; долю решает
-   `area_share_range` (5–12 %). Ни один компонент не дал акцента — `ta_maps` падает с сообщением: выбрать классы
-   заново (не стоп; новый режим или новый класс MatID — стоп §5 п.5). **П3-4, П3-4a, П3-4b:** разрешённых зон меньше 5 %
-   (латы, костюм из одной кожи, спина под плащом главного цвета) — порог опускается до замера, а не красится главный
-   цвет. Это `area_share_range`, `render.readability.screen_share_min` (0 при закрытой спине) и
-   `dress_unchanged_share_min` на < 500 px; каждое снижение — новым файлом профиля, числа — в разделе героя
-   `team-accent.md` (HANDBOOK §4.4). `ta_report` с проваленной проверкой останавливает драйвер (код ≠ 0, `ta_manifest`
-   не пишется) — читать `ld-team-report.json#checks`. Тонкое оружие (тетива, стрелы) — только средствами
-   профиля: `retopo.target_tris` и `retopo.dense_regions` для части оружия, `uv.texel_priority` (`st_retopo.py:217-227`,
-   `st_uv.py:417`). Режима утолщения и моста в generic `h2_bake` нет (grep `solidify|thicken|bridge` пуст). Не
-   читается на этапе 4 — пункт `rework_fix_list` (этап 5, тот же профильный путь), а если профиль не помог —
-   пометка «не закрыто», без стопа. Оружие без хвата (нужен мост-цилиндр) — стоп §5 п.5.
+   `--mode lookdev` и `--mode teamaccent` (HANDBOOK §4.4). TeamAccent — компоненты `hem`/`ribbon` (хотя бы один) по
+   HANDBOOK §4.4 и `docs/art-pipeline/material-library/team-accent.md`; разрешённых зон меньше 5 % — порог опускается до
+   замера новым файлом профиля (П3-4, П3-4a, П3-4b), главный цвет не красится; `ta_maps` без акцента или `ta_report` с
+   проваленной проверкой — код ≠ 0, читать `ld-team-report.json#checks` и выбрать классы заново (не стоп; новый класс
+   MatID — стоп §5 п.5). Тонкое оружие (тетива, стрелы) — только средствами профиля (`retopo.target_tris`,
+   `retopo.dense_regions`, `uv.texel_priority`): не читается — пункт `rework_fix_list` или «не закрыто», без стопа;
+   оружие без хвата (нужен мост-цилиндр) — стоп §5 п.5 (`references/acceptance-and-blender.md` §9.3).
 4. Выход: маркеры всех стадий, `probes-report.json` с `probes.passed` `n/N` на .blend и FBX, `ld-*`, `ld-team-*`.
    Детерминизм (ДС-7, HANDBOOK §4.3): полный повтор — один раз на фигуру, на прогоне, который идёт в UE (после pass
    приёмки, до 7a); прогон доработки с `--reuse-from` повторяет только пересчитанные стадии. Отчёт повтор пишет в
@@ -419,8 +395,9 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 5. Перед закрытием редактора — 0 dirty-пакетов (`ue7a/discard_master.py` сбрасывает грязный `M_UM_Figure_v2`, F92),
    коммит результата 7a; редактор закрывает оркестратор по PID (`references/ue-import-package.md` §1 п.1).
 
-**7b — без редактора (UBT, `UnrealEditor-Cmd`), окном на пачку 5–10 героев (§11).** Предусловие: ни один
-`UnrealEditor.exe` движка не держит Live Coding (F9) и на этом чекауте нет GUI-редактора (HANDBOOK §0.1). Уже открытый
+**7b — без редактора (UBT, `UnrealEditor-Cmd`), одним окном на все фигуры пачки** (до 5–10, когда пользователь
+разрешит пачку больше пилотной; §1, §11). Предусловие: ни один `UnrealEditor.exe` движка не держит Live Coding (F9) и
+на этом чекауте нет GUI-редактора (HANDBOOK §0.1). Уже открытый
 редактор новую строку `Specs()` не увидит (статическая таблица `S08HeroesV2.cpp:104`). Агентский редактор (пачки или
 брошенный) оркестратор закрывает по PID при 0 dirty-пакетов. Открыт интерактивный редактор — гейт §5 п.7.
 1. Базовая линия `validate_registry.py` до de010 (RA-15), затем `de010.py apply --only <Key>` и `de011.py apply --only
@@ -444,18 +421,15 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    то же для `--map sarpedon` с `S08BenchSarpedon-<Key>.json`. Только реальные доски, PNG открыть глазами. Один замер
    стоимости `render_bench.py` на окно 7b — на самой тяжёлой фигуре, `--repeats 1`, GPU-токен,
    `--client-args=-BenchFocusFighter=<Key>`, `--out` в `$W` (F160; `references/ue-import-package.md` §6.5).
-4. Трасса `<dir>/bench.trace.log`: нет `BENCH FAILED fixture load`; `ARTLOOK … heroes=v2` и задник доски; `BENCH focus fighter=<id> (<Key>)`; для
-   нового бойца есть `ARTPREVIEW heroesV2 fighter=<id> mesh=…/SK_<Key>_<Stage> … clips=4/4` и нет
-   `ARTPREVIEW heroesV2 fighter=<id> missing=… fallback=legacy`, `death … mi=missing`,
-   `death dissolve=missing fallback=hide`, `anim fighter=<id> clip=… missing=1`
-   (`S08ArtLook.cpp:129`, `S08FighterActor.cpp:882, 911, 934, 1286, 1310`). Отпечаток каждого кадра —
-   `python tools/art/render_fingerprint.py check --trace <dir>/bench.trace.log --shot bench-<View с p вместо точки>-1920x1080.png`
-   → код 0 (эталон `docs/art-pipeline/render-reference.json`). Лист K1/K2 в цвете и в сером (02 §8.6, шаг 6); лист
-   клипов AN-18 — `clip_review_sheet.py run --packaged --heroes <Key> --fixture marmoreal=…,sarpedon=…` и `sheet
-   --heroes <Key>` (`--heroes` обязателен, RB-12; пачка — одним вызовом с картой фикстур на героя, F159). Лист
-   доказывает, что клип играет в игре, но плохо показывает, как читается DeathSettle (F163).
-   Подставка без просвета — `tools/tripo-pipeline/review/base_seethrough.py` (схема `/2`) по HANDBOOK §8; первый прогон
-   был на сдаче модели (этап 3).
+4. Проверки кадров и трасс — чек-лист `references/ue-import-package.md` §6.3: каждый PNG открыт глазами (реальная доска,
+   её задник, все фигуры v2, новый боец крупно на K2); в `bench.trace.log` нет `BENCH FAILED fixture load`, `missing=`,
+   `fallback=legacy`, `mi=missing`, есть `ARTLOOK … heroes=v2`, `BENCH focus fighter=<id> (<Key>)` и
+   `ARTPREVIEW heroesV2 … clips=4/4`; отпечаток каждого кадра `render_fingerprint.py check … --shot bench-<View с p
+   вместо точки>-1920x1080.png` → код 0. Лист K1/K2 в цвете и в сером (02 §8.6, шаг 6). Лист клипов AN-18 —
+   `clip_review_sheet.py run --packaged --heroes <Key> --fixture marmoreal=…,sarpedon=…` и `sheet --heroes <Key>`
+   (`--heroes` обязателен, RB-12; пачка — одним вызовом с картой фикстур на героя, F159; команды — там же §6.2); лист
+   доказывает, что клип играет в игре, но плохо показывает, как читается DeathSettle (F163). Подставка без просвета —
+   `base_seethrough.py` (схема `/2`) повтором по HANDBOOK §8; первый прогон был на сдаче модели (этап 3).
 5. Редактор пользователя после 7b открывается только на пересобранном `UnmatchedEditor`. Реестры и статусы — по одной
    таблице `references/new-character-registration.md` §10 (RA-26): `asset-registry.json` — первая запись после этапа 0 в
    начале 7b («технически импортировано», `ue-editor-frames`), после осмотра кадров `-Bench` — `live-packaged-probe`,
@@ -473,13 +447,13 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 | Исполнитель доработки | «Opus xhigh»; механизм (Workflow или субагент), модель и effort — фактические, в блоке этапа заявки (§7.2) | требование заказчика №3; RA-21 |
 | Порог и вето | `score` ≥ 8,0; любое измерение < 1,0 → не pass; S < 1,5 → возврат на этап 1 или 2; pass модели с `score` 8,0–8,4 — второй приёмщик другим профилем, итог по минимуму | решение скилла (`references/acceptance-and-blender.md` §6, §8.5) |
 | Циклы | концепт 3, модель 2 (r1→r3), клип 2; генераций на вид ≤ 4 | решение скилла |
-| Кредиты Tripo | лимит и срок — из журнала `credits-ledger.json` (`limits.tripo.credits`, `limits.tripo.until`; решение 2026-10-13 «На триппо нет лимита» сняло потолок 3000 ВР-04); `until: null` = окно открыто; граница — свежий баланс Studio. На 2026-10-14 в журнале ещё `until` «2026-10-28»: снимает ли «нет лимита» и срок — решение пользователя (SUMMARY исследования, п.1), данные журнала агент не меняет (RA-04). Перед каждой операцией с шага 1b `ledger.py check --service tripo --next-cost <цена с кнопки> --balance <баланс Studio>` → код 0 (остаток лимита и баланс ≥ цены, строка условий есть); на этапе 0 — тот же вызов без `--balance` (только остаток лимита на весь план). Ожидаемо на героя: черновик ≈ 30 (замер формы Studio 2026-10-09: режим по умолчанию H3.1 без 8K, не списывалось; точная цена — с кнопки до клика) + H2 95 (60 + 30 + 5; 65 только при неизрасходованной пробе 8K) | ВР-реестр ВР-04; `references/tripo3d-stages.md` §3 |
+| Кредиты Tripo | лимит и срок — из журнала `credits-ledger.json` (`limits.tripo.credits`, `limits.tripo.until`; решение 2026-10-13 «На триппо нет лимита» сняло потолок 3000 ВР-04); `until: null` = окно открыто; граница — свежий баланс Studio. На 2026-10-14 в журнале ещё `until` «2026-10-28»: снимает ли «нет лимита» и срок — решает пользователь, данные журнала агент не меняет (RA-04). Предпроверка — `ledger.py check --service tripo` (§5 п.3): на этапе 0 без `--balance`, с шага 1b — с `--balance <баланс Studio>` перед каждой операцией (`references/tripo3d-stages.md` §1). Ожидаемо на героя: черновик ≈ 30 + H2 95 (60 + 30 + 5); точная цена — с кнопки до клика (§3 там же) | ВР-реестр ВР-04; `references/tripo3d-stages.md` §1, §3 |
 | Описание и имя бойца | `DESCRIPTION`, `ANCHORS`, `FIGHTER_NAME` — из `scraped-data/api/heroes/<slug>.json` и эталонной БД (имя, оружие, помощники) текстом; аватар и сканы в генератор не подаются. Персонажа там нет (новый помощник, например Sir Gawain) — пишутся по заявке пользователя с `decided_by: delegated (ВР-реестр 2026-10-06)`; это не гейт стопа | `07-prompt-templates.md` §3.1, ВР-PR08; решение скилла |
 | Помощник без нового героя | `OWNER_HERO_SLUG` — слаг героя-владельца (из заявки; не задан — ближайший по сюжету герой ростера, решение по делегированию); `HERO_SLUG` = он же; вариант bench-фикстуры: `--hero-name "<FighterName владельца>" --hero-slug <OWNER_HERO_SLUG> --sidekick-name "<FIGHTER_NAME>"`; `S08FighterNames.json` не трогается (формат держит одного помощника на героя), строка в NOTES | решение скилла; `references/new-character-registration.md` §0, Д-2, Р7-8 |
 | SYNTX и Codex | SYNTX — без подтверждения каждой генерации, в лимитах и сроке журнала (ВР-04/ВР-PR04); Codex — по подписке, строка журнала `ledger.py add --service Codex` на каждый пакет-запуск и на каждую приёмку Sol (квота общая, RC-12); бюджет сессий пачки — §11 | `07-prompt-templates.md` §4 |
 | Источник движения клипов | паттерн библиотеки героя с тем же классом оружия (`MOTION_SOURCE: "library: <Key образца>"`); видеорефы SYNTX — только нестандартное движение, причина в `MOTION_SOURCE` (визуального лимита SYNTX хватает примерно на одного героя) | ДС-6; `references/animation-vfx-sfx.md` §6.1 |
 | Редактор UE 7a | агентский скрытый редактор пачки, его поднимает и закрывает оркестратор; 7a — один герой за раз; гейт §5 п.7 — только интерактивный редактор | ДС-3; `references/ue-import-package.md` §1 п.1 |
-| Кадры приёмки, листы, бенч | кадры приёмщику — 1200 px по длинной стороне, JPEG q92; PNG листов и бенча — в рабочий каталог вне git | ДС-8; HANDBOOK §8 |
+| Кадры приёмки, листы, бенч | кадры приёмщику модели — 1200 px по длинной стороне, JPEG q92 (кадры клипа `prep_acceptance.py` пока не уменьшает); PNG листов K1/K2 и бенча — в рабочий каталог вне git, JPEG-листы инструментов — в git | ДС-8; HANDBOOK §8 |
 | Бюджет полигонов | ≤ 45 000 tris LOD0 фигура с оружием, подставка ≤ 2 500 | `docs/game-design/evidence/GD-058/final-2026-10-03/README.md`; практика — HANDBOOK §2.10 |
 | Рост и длительности | рост и кадр контакта — по ближайшему существующему герою той же роли и оружия (таблица `Specs()` в `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp:105-116`: MVP и герои пилота Angel, Ancient Leshen, Achilles; HANDBOOK §2.10; помощник к герою — 0,78 ± 0,06). Idle — тоже по ближайшему герою; совпадение с чужим Idle допустимо: лист K1/K2 опознаёт бойца по фокусу запуска (Д-3, `references/animation-vfx-sfx.md` §2.1) | решение скилла |
 | Слоты этапа 6 | `HIT_TYPE` по оружию из `BLADE`, `CLAW`, `ARROW`, `MAGIC`; смерть — `DTH-TEMPLATE`; FX и звук способности, VO — нет | `references/animation-vfx-sfx.md` §8–§9 |
@@ -672,7 +646,10 @@ decided_by:                         # ОДИН ключ на файл; по ка
   git; живую — ждать, чужую операцию не ломать.
 - **Тесты перед коммитом этапов 3, 6, 7:** `python -m pytest tools/tripo-pipeline/tests tools/art/visual/tests
   tools/tripo-pipeline/blender/h2_bake/tests tools/art/acceptance -q` зелёные; допустимы только 3 xfail известного
-  дрейфа данных (F91, RA-16; `references/ue-import-package.md` §7.3).
+  дрейфа данных (пресеты Merlin/Arthur, UM-MASTERS; F91, RA-16; `references/ue-import-package.md` §7.3). Этапы 6 и 7
+  правят записи, которые проверяют ещё `tools/art/anim/tests tools/art/de010/tests tools/art/material_library/tests
+  tools/art/pipeline_batch/tests tools/art/tests/test_registration_check.py` — их добавить (весь `tools/art/tests` не
+  брать: в нём 2 известных падения `test_concept_paste_assets`, текстуры вне git).
 - **Фикс инструмента — вместе с документом** (RA-05). Коммит fix/feat инструмента пайплайна несёт правку справочника
   скилла или HANDBOOK, где описан шаг или опция: пять коммитов пилота (cd3ee7fe, 22c19667, 3ed2d354, 8e00e5f0,
   9322d489) меняли только код, и опции `figure_top_part`, `--light-pinned`, скрытый редактор узнавали из NOTES.
@@ -753,7 +730,8 @@ Evidence 7a лежит в каталоге ассета `$E7`, а не в `$E`: 
 и LUT, как у Medusa; проверка после первого прогона этапа 3 — `git check-ignore -v` для 4K-мастера и 2K-карты.
 
 Сырые GLB и 4K-мастера — локально, sha256 в source-spec и отчётах; кадры — JPEG 1200 px q92 (HANDBOOK §8, ДС-8);
-PNG листов `-Bench`, AN-18 и бенча — только в `$W` (в пилоте 18 PNG листов на 45 МБ ушли в коммит, RA-13).
+PNG листов K1/K2 и бенча — только в `$W`, сырые кадры AN-18 — в `C:/tmp/visual/AN-18` (в пилоте 18 PNG листов на 45 МБ
+ушли в коммит, RA-13); JPEG-листы, которые инструменты пишут в репозиторий (`h2anim_ue.py sheet`, лист AN-18), — evidence.
 Реестров два, и они разведены. `docs/art-pipeline/asset-registry.json` создаётся на этапе 0, следующая запись — в
 начале 7b; проверяется `validate_registry.py`. `docs/game-design/visual/03-asset-registry.csv` получает строки на
 шаге 7.8 (таблица статусов — `references/new-character-registration.md` §10). Журнал трат —
@@ -824,8 +802,9 @@ PNG листов `-Bench`, AN-18 и бенча — только в `$W` (в пи
 | `tools/art/pipeline_batch/codex_lane.py` | 1a, 1c | полоса Codex по claim-файлам; задание закрывается по ответу, а не по выходу процесса |
 | `tools/art/pipeline_batch/rebg.py` | 1a | ровный серый фон фронта лицензионной фигуры (F7) |
 | `tools/art/pipeline_batch/make_1c.py` | 1c | задания 1c по орто 1b |
-| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой (Sol); блок OEM — до первой волны (`references/concept-sheet.md` §5.6) |
-| `tools/art/pipeline_batch/finish_second.py` | 1, 4 | карточки второго приёмщика Workflow → `card-2.json` и пара `validate_card --second` |
+| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой (Sol); промпт с блоком OEM и рубрикой (`references/concept-sheet.md` §5.6) |
+| `.claude/workflows/second-acceptor.js` | 1, 4, 7a.2 | второй приёмщик «Opus xhigh» со строгой выходной схемой (`references/acceptance-and-blender.md` §8.3) |
+| `tools/art/pipeline_batch/finish_second.py` | 1, 4, 7a.2 | вывод `second-acceptor` → `card-2.json` и пара `validate_card --second` (затем ещё раз с `--check-files`) |
 | `tools/art/pipeline_batch/prep_1b.py`, `tripo_log.py`, `post_1b.py` | 1b | очередь Tripo, строка журнала, приём GLB и орто |
 | `tools/art/pipeline_batch/post_h2.py` | 2 | source-spec, превью, рамки частей по вершинам (F10) |
 | `tools/art/pipeline_batch/git_lock.py` | коммит | зависший `.git/index.lock` (F82) |

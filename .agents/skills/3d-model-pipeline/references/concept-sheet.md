@@ -486,7 +486,8 @@ python tools/art/pipeline_batch/make_1c.py --tasks-out $W/tasks-1c.txt --ust-out
 # приёмка листов 1c пачкой (Sol): предпроверка пакета, промпт по разделу 11, codex exec, validate_card
 python tools/art/pipeline_batch/sheet_acceptance.py all --work $W --date YYYY-MM-DD [--workers 3] \
     --user-quote "<дословная цитата задачи пользователя>"
-# второй приёмщик Opus через Workflow: снять строки "null" (F6) и посчитать пару validate_card --second
+# второй приёмщик Opus: сохранённый workflow second-acceptor (acceptance-and-blender.md §8.3) со схемой
+# …output-concept…; его вывод {"result": [...]} → снять строки "null" (F6) и посчитать пару validate_card --second
 python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]
 ```
 
@@ -500,8 +501,9 @@ python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-r
   пакет-запуск и на каждую приёмку (5.5 п.4). Квоты не хватает — приёмщик Opus (другая квота).
 - **Шаблоны читаются из этого файла дословно.** `make_tasks.py` и `make_1c.py` берут блоки 5.4, 6.1, 6.2, 8.1, 8.2 по
   заголовкам. После правки этих блоков или заголовков — `--dry-run` обоих: новый плейсхолдер без значения — код 2.
-- Промпт пакетной приёмки обязан нести блок чтения кириллицы раздела 11. На 2026-10-14 `sheet_acceptance.py` велит
-  `Get-Content -Encoding UTF8` (сбой RA-03): до первой волны инструмент исправить.
+- Промпт пакетной приёмки несёт блок чтения кириллицы раздела 11 (OEM, `cmd /c type`, «СБОЙ ОКРУЖЕНИЯ»):
+  `sheet_acceptance.py` исправлен в dd69be64 (был `Get-Content -Encoding UTF8`, сбой RA-03); рубрика вставлена в
+  промпт целиком. После правки блока в разделе 11 — сверить его копию в `sheet_acceptance.py`.
 
 ## 6. Промпт-пак 1a — дизайн-front
 
@@ -927,8 +929,8 @@ concept-sheet.md §11» и `frames: ["<key>-front.png"]`; в `rework_fix_list` C
 1. Второй приёмщик — **другой профиль** («Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт ниже, те
    же файлы, новый контекст; первую карточку он не видит. Ответ — `card-2.json` рядом с `card.json` (для Sol —
    `--output-schema tools/art/acceptance/asset-acceptance-2.output-concept.schema.json -o <каталог>/card-2.json`;
-   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`). Ответ
-   Workflow-приёмщика Opus (строки `"null"` вместо пустых полей, F6/F102) — через
+   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`). Opus — сохранённый
+   workflow `second-acceptor` (там же §8.3) со схемой `…output-concept…`; его ответ (страховка от строк `"null"`, F6/F102) — через
    `python tools/art/pipeline_batch/finish_second.py <workflow-output.json>`: он чистит карточку, пишет `card-2.json` и
    сразу считает пару (п.2).
 2. Итог пары:

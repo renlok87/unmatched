@@ -605,7 +605,7 @@ look-dev, выровненных по концепту: у нового перс
 `weapon_body_min_distance_m` (3D-зазор по всем вершинам; тело — фигура без подставки, без кисти и предплечья руки с
 оружием) и флаги `*_contact` (зазор < 3 мм). Зазор есть — факт в `known_issues` не обязателен; `*_contact: true` —
 запись в `known_issues` (`item: "D"`, кадр позы) с пометкой «этап 6: клипы не сводят оружие с головой/телом» (клипы
-проверяет приёмка этапа 6). `pose-03b` — второй ракурс той же позы для глаз (Medusa: `pose-01` — касание лука и змей,
+проверяет приёмка клипов шага 7a.2, ДС-1). `pose-03b` — второй ракурс той же позы для глаз (Medusa: `pose-01` — касание лука и змей,
 0,44 мм; `pose-03` — 0,077 м, az 150; Arthur: `pose-02` — клинок перед глазом на кадре, но зазор 0,028 м).
 
 ## 6. Формула и вердикт
@@ -698,7 +698,11 @@ pass на этой границе (8,1 и 8,3) требует второго п�
 тратит цикл. Поэтому приёмок модели не больше трёх (r1–r3), а после r3 — эскалация (§11). Исключение — **поздний
 фикс** (RC-06): дефект модели, который вскрыла приёмка клипов уже после `pass` модели, идёт на этап 5 и новую приёмку
 модели. Он тратит цикл модели, если цикл остался; если циклов нет — один раз на фигуру сверх лимита (`r4`; не-`pass`
-на нём — `escalate_user`, `validate_card.py` считает так же; `references/animation-vfx-sfx.md` §10.5). Лимиты концепта, клипа и Tripo считаются отдельно (SKILL.md §5 п.4).
+на нём — `escalate_user`; `references/animation-vfx-sfx.md` §10.5). **Пока схема не исправлена** (ревью 2026-10-14,
+код-пробел): у `kind: model` поле `cycle` допускает только `r1`–`r3` (`asset-acceptance-2.schema.json`, ветка `model`;
+`asset-acceptance-2.output-model.schema.json`), карточку `r4` `validate_card.py` отвергает кодом 1, а Sol со строгой
+схемой её не выдаст. До правки поздний фикс без оставшегося цикла модели — сразу `escalate_user` (пакет §11), этап 5
+не запускается. Лимиты концепта, клипа и Tripo считаются отдельно (SKILL.md §5 п.4).
 
 ## 7. Карточка `unmatched.asset-acceptance/2`
 
@@ -711,7 +715,7 @@ pass на этой границе (8,1 и 8,3) требует второго п�
 | `schema` | `"unmatched.asset-acceptance/2"` (у концепта `unmatched.concept-acceptance/1`, у клипа `unmatched.anim-acceptance/1`) |
 | `kind` | `"model"` |
 | `asset_id`, `date` | id заявки; дата приёмки `YYYY-MM-DD` |
-| `cycle` | `"r1"` \| `"r2"` \| `"r3"` |
+| `cycle` | `"r1"` \| `"r2"` \| `"r3"` (`r4` позднего фикса схема модели пока не допускает, §6) |
 | `previous_card` | путь от корня репозитория к `card.json` предыдущего цикла; у r1 — `null`, с r2 обязателен |
 | `accepted_object` | массив `{path, sha256}`: SK и SM FBX и все 2K-текстуры §2.1 (`BC`, `N`, `ORM`, `MatID`, `Edge`, `TeamAccent_2K`); пути от корня репозитория |
 | `frames` | объект `{dir, files}`: `dir` — каталог кадров **от корня репозитория** (`art/pipeline-candidates/<ASSET_ID>/evidence/acceptance/<YYYYMMDD>-r<N>/frames`; калибровка — `docs/art-pipeline/evidence/acceptance-calibration-<YYYYMMDD>/<прогон>/frames`, §12); кадры во временном каталоге вне репозитория в карточку не попадают — их сначала снимают или копируют в `dir`; `files` = `frames.json#files` (кадры §3, `frames.json`, `sheet.png`, `tone.json`, если есть) |
@@ -1091,6 +1095,17 @@ label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"accepto
 изменений. Если `agent()` вернул `null`, вызов повторяется один раз. Второй `null` —
 гейт стопа SKILL.md §5 п.2.
 
+**Второй приёмщик «Opus xhigh» — сохранённый workflow** `.claude/workflows/second-acceptor.js` (dfb4e81d; перенесён
+из сессии пилота, RA-11, F102):
+`Workflow({name: "second-acceptor", args: {items: [{asset, evidence, label, prompt?}], schema: <JSON …output-<kind>.schema.json>}})`.
+Элемент — одна карточка (в пачке их несколько, агенты идут параллельно); `prompt` по умолчанию —
+`<evidence>/acceptor-prompt-2.md`, `label` — `acceptor2-<ASSET_ID>-r<N>` (клип — `acceptor2-<ASSET_ID>-<Clip>-r<N>`),
+`acceptor.session_id = "workflow:" + label`, при `null` — один повтор внутри workflow. Результат — список
+`{asset, evidence, card}`: сохранить его как `{"result": [...]}` и передать
+`python tools/art/pipeline_batch/finish_second.py <файл>` (§8.5 п.6): он пишет `card-2.json` и считает пару. Валидатор
+`finish_second.py` зовёт без `--check-files`, поэтому затем — `validate_card.py card.json --second card-2.json
+--final-json final.json --print-verdict --check-files` (§8.1 п.5а).
+
 ### 8.4 Вызов «Sol 6.1 xhigh» (по явному выбору запускающего)
 
 `codex exec` exe приложения ChatGPT (npm-`codex` не работает; SKILL.md §4, выбор exe — `references/concept-sheet.md`
@@ -1200,7 +1215,7 @@ WebSocket, вызов продолжается и завершается (кал
 | Первый приёмщик | Второй | Вызов | Файлы |
 |---|---|---|---|
 | «Opus xhigh» (§8.3) | «Sol 6.1 xhigh» | §8.4 с `--output-schema …output-model.schema.json` и `-o "$E/card-2.json"`, события в `$E/acceptor-events-2.jsonl`; отказ схемы — запасной вызов §8.4 без `--output-schema` | `acceptor-prompt-2.md`, `card-2.json` |
-| «Sol 6.1 xhigh» (§8.4) | «Opus xhigh» | §8.3 с `label: "acceptor2-<ASSET_ID>-r<N>"` | `acceptor-prompt-2.md`, `card-2.json` |
+| «Sol 6.1 xhigh» (§8.4) | «Opus xhigh» | сохранённый workflow `second-acceptor` (§8.3) с `label: "acceptor2-<ASSET_ID>-r<N>"`, затем `finish_second.py` и `validate_card.py --second … --check-files` | `acceptor-prompt-2.md`, `card-2.json` |
 
 Правила:
 
@@ -1239,7 +1254,8 @@ Workflow с брифом §10. Агент не делегирует, не зап
 Второй источник — **поздний фикс** (RA-08, RC-06; SKILL.md §5 п.4): карточка клипа, чей `rework_fix_list` несёт пункты
 с `tool` «этап 5 модели». Этот список пишет приёмщик клипа, а не оркестратор (у Achilles список r3 составил оркестратор,
 и пункт 2 оказался ложным FAIL, F149). Бриф §10 тот же, `{{SOURCE_CARD}}` — карточка клипа. Цикл модели тратится,
-если остался; если нет — один раз на фигуру сверх лимита (`r4`, §6). Маршрут клипов после доработки модели —
+если остался; если нет — один раз на фигуру сверх лимита (`r4`, §6; пока схема модели не допускает `r4` — сразу
+`escalate_user`, §6). Маршрут клипов после доработки модели —
 `references/animation-vfx-sfx.md` §10.5.
 
 Что запущено на самом деле, записывается фактом (RA-21): механизм (`workflow` или `subagent`), модель, effort и id
@@ -1436,7 +1452,8 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 ## 11. Эскалация после r3
 
 Срабатывает, если `r3` (или `r4` позднего фикса, §6) дал `escalate_user` — гейт стопа SKILL.md §5 п.4 (исчерпаны
-циклы модели; второй дефект модели из клипов — тоже). Тот же пакет
+циклы модели; второй дефект модели из клипов — тоже; поздний фикс без оставшегося цикла, пока схема модели не
+допускает `r4`, §6). Тот же пакет
 собирается при гейте стопа §5 п.2 на вызове приёмщика или исполнителя и при стопе SKILL.md §5 п.5 из §9.3 п.2 (оружие без хвата).
 Остановиться и передать решение пользователю. Третий цикл доработки не запускается.
 
@@ -1680,10 +1697,11 @@ python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 20
   повтор `-i` с `--` перед `-` работает; первое событие `--json` — `thread.started` с `thread_id`; 732–940 с на приёмку.
   `--ignore-user-config` проверен пробой и полной приёмкой (r4: Sol = Opus на `medusa-r1`, 8,1).
 - Не проверено на живом вызове:
-  - `agent()` Workflow с выходной схемой `…output-<kind>.schema.json` (§8.3, с 2026-10-14) в репозитории не записан:
-    пилот (F102) ссылается на workflow `model-second-acceptor`, его скрипта в `tools/` нет — скрипт §8.3 и есть
-    эталон. С полной схемой Workflow отвечал строками `"null"` (F6, §8.5 п.6). Если схема отвергнута, вызов делается
-    без `schema`, с требованием «только JSON», а затем `validate_card.py`;
+  - `agent()` Workflow с выходной схемой `…output-<kind>.schema.json` (§8.3, с 2026-10-14): в пилоте так шёл workflow
+    второго приёмщика сессии (`model-second-acceptor`, F102); он перенесён в репозиторий как
+    `.claude/workflows/second-acceptor.js` (dfb4e81d, §8.3) и после переноса живым вызовом ещё не прогонялся. С
+    полной схемой Workflow отвечал строками `"null"` (F6, §8.5 п.6). Если схема отвергнута, вызов делается без
+    `schema`, с требованием «только JSON», а затем `validate_card.py`;
   - отказ строгой схемы и запасной вызов без `--output-schema` (§8.4) — отказа не было.
 - Насколько EEVEE-рендер кадров (BC + N с инвертированным для Blender зелёным + ORM, AgX) совпадает с тем, как
   материал увидит UE, не проверялось. Окончательная проверка материала и тона — UE-съёмка этапа 7 (HANDBOOK §4.4, §4.6).

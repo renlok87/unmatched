@@ -64,7 +64,7 @@ python -c "import numpy, PIL, scipy; print('deps ok')"
 | Headless-вызов | `"$B" -b --factory-startup --python-exit-code 1 --python <script> -- <args>` |
 | Blender MCP (живой) | `127.0.0.1:9876` (иногда `:9877`), клиент `C:/Users/ren/.claude/mcp-servers/clients/blender_mcp.py`. Только осмотр (раздел 6) |
 | Unreal | UE 5.8.2, проект `unreal/Unmatched`, редактор с MCP `127.0.0.1:8123`. Проверка: `netstat -ano \| grep ':8123 .*LISTEN'`. Редактор — **агентский скрытый** (ДС-3): пользователь UE сам не открывает (2026-10-14). Рецепт запуска (`-RenderOffScreen -unattended -nosplash`, без Live Coding, консоль через `UE_CONSOLE_DROP` и `console_drop.py`), PID-файл, опознание чужого редактора по командной строке и закрытие — `.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.1; здесь не повторяется. Видимый или свёрнутый редактор как норма не годится: он не берёт фокус консоли, `py_file` падает по таймауту, модальные окна держат шаг (F121, F125). Этап 7a — один герой за раз, редактор пачки поднимает и закрывает оркестратор. Фоновый редактор троттлит CPU: `ue_hero_lookdev.py review` выключает троттлинг сам (F153, 4.6) |
-| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку. Пока шаг жив, heartbeat обновляет файл: шаг дольше 25 мин не перехватывается, устаревшей блокировка становится через 25 мин после смерти её процесса (RB-21) |
+| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку. Пока шаг жив, heartbeat обновляет файл: шаг дольше 25 мин не перехватывается, устаревшей блокировка становится через 25 мин после смерти её процесса (RB-21). Зависший, но живой шаг держит её бесконечно (предела удержания и PID в файле нет) — разбор оркестратором: процесс `ue_lock.py --step` найти по командной строке и погасить по PID (`.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.2) |
 | Python | 3.10+, numpy, Pillow, scipy (scipy нужен look-dev стадиям H2) |
 
 ### 0.3 Правила остановки
@@ -575,7 +575,8 @@ run>` → `reports/determinism-report.json` (`unmatched.h2-bake-determinism/2`, 
 один раз на фигуру, на прогоне, который идёт в UE (после `pass` приёмки, до этапа 7a). Прогон доработки с
 `--reuse-from` повторяет только пересчитанные стадии: повтор с тем же `--reuse-from`, стадии, взятые обоими из одного
 источника, детерминизм не доказывают (`reused_in_both`, `scope: recomputed_stages_only`). Код изменился
-(`--reuse-allow-code-drift`) — полный повтор. Каталог повтора удалить сразу после переноса отчёта (ниже) — он не данные
+(`--reuse-allow-code-drift`) — полный повтор. Поздний фикс (модель после `pass`, дефект из клипов) — тоже прогон с
+`--reuse-from` от прогона с полным повтором: повтор только пересчитанных стадий, второй полный не нужен. Каталог повтора удалить сразу после переноса отчёта (ниже) — он не данные
 пользователя (8, «Очистка»).
 
 Отчёт пишется в каталог **того** прогона, который запущен с `--compare-with` (F33). Повтор пишет его в repro; чтобы
@@ -726,7 +727,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    python tools/tripo-pipeline/anim/h2anim_run.py art/pipeline-candidates/<ASSET>/build-profiles/<hero>-h2anim.json
    ```
    Внутри: `clip_author.py` → `validate_clip.py --skeleton=UM_HUMANOID_17_v2 --character=<character>` (поле
-   `character` spec — ключ `rig-contract.json`, например `Arthur`, а не `KingArthur`; `h2anim_run.py:89`) →
+   `character` spec — ключ `rig-contract.json`, например `Arthur`, а не `KingArthur`; `h2anim_run.py:92`) →
    `clip_contact_check.py` → листы поз (`clip_pose_probe.py`, `overlay_bones.py`).
 3. PASS-условия:
    - validate: имя арматуры, кости по стороне, лицо +X, fps 24, длительность N/24 ± 0,05 с, in place (≤ 0,5 % роста),
@@ -787,7 +788,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    Look-dev съёмка: `python tools/art/material_library/ue_hero_lookdev.py review --config <review-config.json> --out
    <dir> --tag <tag>` (образец конфига — `ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json`; допуски зон против
    концепта — блок `tolerance` конфига: яркость ± 15 %, тон ± 12°, насыщенность ± 0,10). Блокировку `ue_lock`
-   команда берёт сама (`ue_hero_lookdev.py:335`) — в `ue_lock.py` не оборачивать, иначе ждёт сама себя.
+   команда берёт сама (`ue_hero_lookdev.py:446`; так же `verify` и `apply-mi`) — в `ue_lock.py` не оборачивать, иначе
+   ждёт сама себя.
    - **Прогрев** (F153, 172fd4f1): `review` сам выключает троттлинг CPU фонового редактора и ждёт сходимости; не
      сошёлся — код 3 (`settle.status: not_settled`), кадров нет: повторить без чужой нагрузки на GPU.
      `--allow-unsettled` — только для диагностики, MI по таким кадрам не подстраивать (у Leshen `Saturation` 1,22
@@ -1033,9 +1035,12 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
   (`tools/tripo-pipeline/review/frames_to_jpeg.py`);
 - кадры приёмки модели для приёмщика — не больше 1200 px по длинной стороне, JPEG q92 (`capture_acceptance_set.py`
   так и снимает; ДС-8): с кадрами 1920 px Sol терял WebSocket в каждой приёмке (RC-22, F97);
-- листы (`h2anim_ue.py sheet`, лист AN-18) и PNG бенча — в рабочий каталог `$W` (`C:/tmp/<ASSET_ID>-stage7`), не в
-  git; в evidence — JPEG по правилу выше (ДС-8, RA-13: коммит 3528ae0b унёс 18 PNG на 45 МБ; бенч `--out $E/bench`
-  коммитил PNG, F160).
+- PNG листов K1/K2 (`tools/art/visual/sheet.py`), сырые PNG кадров `-Bench` и AN-18 и PNG бенча — в рабочий каталог
+  `$W` (`C:/tmp/<ASSET_ID>-stage7`) или каталог кадров инструмента вне репо, не в git; в evidence — JPEG по правилу
+  выше (ДС-8, RA-13: коммит 3528ae0b унёс 18 PNG листов на 45 МБ; бенч `--out $E/bench` коммитил PNG, F160).
+  JPEG-листы, которые инструменты сами пишут в репозиторий, — evidence и идут в git: `h2anim_ue.py sheet` →
+  `<h2anim run>/preview/<Key>-H2Anim-ue-sheet.jpg` (вход приёмки клипов), `clip_review_sheet.py sheet` →
+  `docs/game-design/evidence/VISUAL/AN-NN/sheet-*.jpg`.
 
 **Очистка** (RC-03; диск: около 22 ГБ на фигуру, каждый прогон h2-bake 2,4–2,6 ГБ). Сразу после своего отчёта
 исполнитель удаляет свои временные выходы — это не данные пользователя:

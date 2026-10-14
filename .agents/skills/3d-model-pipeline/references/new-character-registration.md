@@ -320,7 +320,7 @@ python tools/art/anim/clip_review_sheet.py sheet --heroes <Key>     # или --c
 `"character": "<Character>"`, `"ue_hero": "<Key>"` — у Arthur это разные значения (`Arthur` и `KingArthur`). Длины клипов
 жёстко заданы в игре (`S08HeroesV2.cpp:157-165`, ± 0,02 с в тесте `S08HeroesV2Tests.cpp:310`): Idle = `<IdleSeconds>`,
 LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK §2.8). `<ContactFrame>` должен быть одним из
-`key_frames` LungeAttack: иначе `de010.py` откажет (`tools/art/de010/de010.py:65-74`).
+`key_frames` LungeAttack: иначе `de010.py` откажет (`tools/art/de010/de010.py:187-189`).
 
 | № | Файл:строка | Что добавить (по образцу) | Проверка |
 |---|---|---|---|
@@ -347,15 +347,15 @@ LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK
 ### 5.1 Ассеты UE, которые создают инструменты de010/de011
 
 `de010.py apply` ставит notify `Contact` на LungeAttack каждого героя из своего списка `HEROES`. `de011.py apply` создаёт
-для каждого героя из того же списка (`de011.py:58-63` итерирует `de010.HEROES`) Masked-MIC
+для каждого героя из того же списка (`de011.py:66-71` итерирует `de010.HEROES`) Masked-MIC
 `MI_<Key>_<Stage>_{P1,P2}_Dissolve` (дочерние к MI тела). Без notify тест `HeroesV2.Contact` падает
 (`S08HeroesV2Tests.cpp:540`). Без MIC тест `HeroesV2.Dissolve` падает (`:735`), а фигура при смерти пропадает рывком
 (`S08FighterActor.cpp:1269`, трасса `death … mi=missing`, `:1286-1289`).
 
 | № | Файл:строка | Что добавить (по образцу) | Проверка |
 |---|---|---|---|
-| Р7-1 | `tools/art/de010/de010.py:39-42` (`HEROES`) | `("<Key>", "<Stage>", "<ASSET_ID>/build-profiles/<content-key>-h2anim.json", <ContactFrame>),`. Строка нужна всегда: по ней `de011.py apply` создаёт MIC, а каждый следующий `de010.py apply` переставляет notify и этому герою | `$W/de010/apply.json`: у клипа `<Key>` одна notify `Contact` в `time` = `<ContactFrame>`/24, длина и число кадров до/после равны |
-| Р7-2 | `tools/art/de011/de011.py:40` (`CAPTURE_LOOKS`) | `"<Key>": "P1"` (или `P2`, чтобы в съёмке были оба цвета). Без этой строки `de011.py capture` падает с `KeyError`, `apply` её не читает | `de011.py capture --tag after --dissolve` без ошибки |
+| Р7-1 | `tools/art/de010/de010.py:50-57` (`HEROES`) | `("<Key>", "<Stage>", "<ASSET_ID>/build-profiles/<content-key>-h2anim.json", <ContactFrame>),`. Строка нужна всегда: по ней `de011.py apply` создаёт MIC, а каждый следующий `de010.py apply` переставляет notify и этому герою | `$W/de010/apply.json`: у клипа `<Key>` одна notify `Contact` в `time` = `<ContactFrame>`/24, длина и число кадров до/после равны |
+| Р7-2 | `tools/art/de011/de011.py:46` (`CAPTURE_LOOKS`) | `"<Key>": "P1"` (или `P2`, чтобы в съёмке были оба цвета). Без этой строки `de011.py capture` падает с `KeyError`, `apply` её не читает | `de011.py capture --tag after --dissolve` без ошибки |
 
 **Основной путь — headless, шаг 7b `SKILL.md`.** Оба `apply` запускают свой `UnrealEditor-Cmd` проекта этого чекаута и
 сохраняют ассеты. GUI-редактор этого чекаута в это время должен быть закрыт: так требует однотипный инструмент
@@ -367,7 +367,7 @@ LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK
 # до de010: базовая линия реестра (RA-15) — с ней сравнивается вывод после 7b
 python tools/tripo-pipeline/validate_registry.py 2>&1 | grep '^ERROR' > $W/validate-registry-before.txt
 # после импорта клипов (h2anim_ue.py import) и MI тела. Повторный импорт клипов удаляет клип вместе с notify
-# (h2anim_ue.py:13-14), тогда de010 apply повторить. Сначала --dry-run: план без редактора
+# (h2anim_ue.py:21), тогда de010 apply повторить. Сначала --dry-run: план без редактора
 python tools/art/de010/de010.py apply --only <Key> --dry-run
 python tools/art/material_library/ue_lock.py --step "de010 apply <Key>" -- \
     python tools/art/de010/de010.py apply --only <Key> --frames $W/de010

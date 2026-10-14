@@ -32,7 +32,7 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 
 `<Key>` и `<Character>` — разные вещи. Пример: `king-arthur-h2anim.json` содержит `"hero": "KingArthur", "character":
 "Arthur", "ue_hero": "KingArthur"`. `h2anim_run.py` передаёт в `validate_clip.py --character` поле `spec["character"]`,
-то есть ключ контракта (`tools/tripo-pipeline/anim/h2anim_run.py:89`; так же HANDBOOK §4.5 п.2).
+то есть ключ контракта (`tools/tripo-pipeline/anim/h2anim_run.py:92`; так же HANDBOOK §4.5 п.2).
 
 ---
 
@@ -94,7 +94,7 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 | Achilles / Achilles (пилот) | копьё `weapon.R` (две части, П3-1) + щит на `arm_lower.L` (П3-2) | 2,5 | к. 7 = 292 мс (укол) |
 
 Источник контактов — поле `design` клипа LungeAttack в `ASSET-*/build-profiles/*-h2anim.json`. Те же числа стоят в
-`S08HeroesV2.h:115-118`, `tools/art/de010/de010.py:12-15` и автотесте `Unmatched.S08.HeroesV2.Contact`
+`S08HeroesV2.h:115-118`, `tools/art/de010/de010.py:50-57` (`HEROES`) и автотесте `Unmatched.S08.HeroesV2.Contact`
 (`S08HeroesV2Tests.cpp:514`).
 
 **Новый герой.** Числа задаются на этапе 0 полями `IDLE_SECONDS` и `LUNGE_CONTACT_FRAME`. Дефолт (решение по делегированию,
@@ -108,7 +108,7 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
   `unique_idle_keys`; доработка Д-3, `references/new-character-registration.md` §2). Совпадение Idle с чужим героем
   лист не ломает;
 - `LUNGE_CONTACT_FRAME` входит в `key_frames` клипа LungeAttack в спеке — иначе `de010.py` откажет
-  (`tools/art/de010/de010.py:12-13`; проверка `:71` смотрит только fps 24, длину 14 к. и `key_frames`). Ключ в `keys`
+  (`tools/art/de010/de010.py:50-57`; проверка `:187` смотрит только fps 24, длину 14 к. и `key_frames`). Ключ в `keys`
   (`"f": N`) на этом кадре — правило скилла для читаемого удара; `de010.py` его не проверяет.
 
 ### 2.2 Нейминг и пути
@@ -294,7 +294,7 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 
 **Blender** — только headless. Скрипты `validate_clip.py`, `clip_contact_check.py` и `clip_author.py` в живом Blender
 бросают RuntimeError (`validate_clip.py:1-9`). Рабочий путь — только `h2anim_run.py` (§6.3): он передаёт полный набор
-флагов (`h2anim_run.py:89-93`) и пишет отчёт в `validation-h2anim/`, который служит источником гейта `G-VALIDATE`
+флагов (`h2anim_run.py:92-96`) и пишет отчёт в `validation-h2anim/`, который служит источником гейта `G-VALIDATE`
 (§10.2). Прямой вызов — **только диагностика**, с `--out` вне `docs/art-pipeline/animation-library/validation-h2anim/`,
 чтобы не перезаписать отчёт гейта более слабым:
 
@@ -318,10 +318,10 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
   (`cue_contract.py validate-table`, §12.1), запускать в этом же чекауте.
 - Каждая UE-команда выполняется под блокировкой `C:/tmp/ue-editor.lock`, по одному герою на блокировку:
   `MSYS_NO_PATHCONV=1 UE_LOCK_OWNER=<ASSET_ID>-7a python tools/art/material_library/ue_lock.py --step "<шаг>" -- <команда>`
-  (`ue_lock.py:13-14`; heartbeat держит шаг дольше 25 мин, RB-21). Сами скрипты `tools/tripo-pipeline/*` блокировку не
-  берут.
+  (`ue_lock.py:31`; heartbeat держит шаг дольше 25 мин, RB-21; зависший шаг держит её бесконечно —
+  `references/ue-import-package.md` §1 п.2). Сами скрипты `tools/tripo-pipeline/*` блокировку не берут.
 - `h2anim_ue.py frames` отказывает, если в открытом уровне есть несохранённые изменения или если открыт сам
-  `L_P17ControlScene` (`h2anim_ue.py:205-212`).
+  `L_P17ControlScene` (`h2anim_ue.py:443-447`).
 - Headless-коммандлеты (`UnrealEditor-Cmd`: `ue_import_audio.py`, `ue_verify_audio.py`, `fx_ability.py`) запускаются
   только когда на этом чекауте нет GUI-редактора (`fx_ability.py:4`: «the editor of THIS checkout must be closed»;
   HANDBOOK §0.1). Поэтому они выполняются в окне шага 7b вместе с `de010`/`de011` (`SKILL.md` §6, этап 7b), а не
@@ -460,7 +460,7 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 ### 6.2 Спека `<content-key>-h2anim.json`
 
 Копировать образец **целиком**: инструменты читают обязательные ключи `run_dir`, `target.base_fbx`, `meshes`, `weapon`,
-`ue.mesh_for_preview` (`h2anim_run.py:66,118`, `h2anim_ue.py:164,205`). Образец выбирается по оружию:
+`ue.mesh_for_preview` (`h2anim_run.py:69,121`, `h2anim_ue.py:149,157`). Образец выбирается по оружию:
 
 | Тип фигуры | Образец |
 |---|---|
@@ -584,7 +584,7 @@ python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S                          
 Отчёты: `reports/ue-canonical-skeleton.json`, `ue-import-clips.json`, `ue-measure-clips.json`, `ue-frames.json`,
 `ue-frames-closeup.json`. Кадры: `preview/ue/<Key>-<Clip>-fNN-{front,q34}-ue-editor.jpg` и лист
 `preview/<Key>-H2Anim-ue-sheet.jpg`. Условия замера — HANDBOOK §4.6 п.5. Кадры редактора нужны для диагностики и приёмки
-клипов 7a.2. Это не K1/K2 и не evidence SHOT: отпечатка RENDER у них нет (`h2anim_ue.py:214-218`).
+клипов 7a.2. Это не K1/K2 и не evidence SHOT: отпечатка RENDER у них нет (`h2anim_ue.py:456-457`).
 
 **После импорта.** Когда `AM_<Key>_HitReact` и `AM_<Key>_DeathSettle` лежат в `Content` (`ue-import-clips.json`),
 можно добавлять ключи `<Key>` в CUE-011/013 и гонять `validate-table` (§12.1) — в чекауте этого `Content` (§5). Шаг
@@ -753,7 +753,7 @@ python -c "import json,sys; m=json.load(open(sys.argv[1])); json.dump([x for x i
     -run=pythonscript -script="<checkout>/tools/audio/ue_verify_audio.py C:/tmp/audio-src/ue-import-<ID>.json" -unattended -nosplash -nullrhi
 ```
 
-Путь движка — `UE_ROOT`, по умолчанию `C:\Program Files\Epic Games\UE_5.8` (`tools/art/de010/de010.py:34`). Критерии:
+Путь движка — `UE_ROOT`, по умолчанию `C:\Program Files\Epic Games\UE_5.8` (`tools/art/de010/de010.py:42`). Критерии:
 - `AUDIO-IMPORT summary … failed=0`;
 - `ue-import-<ID>-verify.json` → `problems: 0`;
 - строка ID в `03-sound-registry.csv` с пометкой о прослушивании (§4.3);
@@ -834,8 +834,10 @@ Notify `Contact` в приёмку клипа не входит: его став
 
 ### 10.3 Кадры приёмщика
 
-Кадры копируются в `frames/` инструментом `tools/tripo-pipeline/ue7a/prep_acceptance.py` (шаг 7a.2); имена — как у
-источника, длинная сторона не больше 1200 px (ДС-8):
+Кадры копируются в `frames/` инструментом `tools/tripo-pipeline/ue7a/prep_acceptance.py` (шаг 7a.2); имена и размеры
+— как у источника. ДС-8 (1200 px) касается кадров модели: кадры клипа инструмент не уменьшает (UE-кадры 1920 × 1080,
+Blender-лист 1680 × 2520, UE-лист до 4200 × 1860; в пилоте у клипов было 0–2 переподключения WebSocket против 5/5 у
+модели, RC-22) — уменьшение до 1200 px в `prep_acceptance.py` — код-пробел ревью 2026-10-14:
 - Blender-лист `<Key>-<Clip>-blender-sheet.jpg` (§6.3);
 - крупные планы Blender (RA-27, F146): `python tools/tripo-pipeline/anim/clip_closeups.py --spec <S> --clip <Clip>` →
   `<run>/preview/closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера каждого кадра — в
@@ -892,8 +894,9 @@ r ≥ 2 приёмщик получает пункты прежней карто
 1. Второй приёмщик — **другой профиль** («Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт, те же
    кадры `frames/` клипа, новый контекст; первую карточку он не видит. Ответ — `<Clip>/card-2.json` (для Sol —
    `--output-schema tools/art/acceptance/asset-acceptance-2.output-anim.schema.json -o <E>/<Clip>/card-2.json`, остальное —
-   команда `references/acceptance-and-blender.md` §8.4 с `windows.sandbox="unelevated"`,
-   label Workflow — `acceptor2-<ASSET_ID>-<Clip>-r<N>`).
+   команда `references/acceptance-and-blender.md` §8.4 с `windows.sandbox="unelevated"`; для Opus — сохранённый
+   workflow `second-acceptor` со схемой `…output-anim…` и label `acceptor2-<ASSET_ID>-<Clip>-r<N>`, затем
+   `finish_second.py`, там же §8.3).
 2. Итог пары: `python tools/art/acceptance/validate_card.py <E>/<Clip>/card.json --second <E>/<Clip>/card-2.json
    --final-json <E>/<Clip>/final.json --print-verdict --check-files`. `score` — минимум двух; вердикт — карточки с
    меньшим `score` (при равенстве — более строгий), строгий маршрут другой карточки (`rework_blender` по гейту или вето)
@@ -933,7 +936,8 @@ LungeAttack и D 0 в DeathSettle, F141):
 2. **Цикл модели тратится**: этап 5 по этой карточке (`source_card` в `STAGE5[]` заявки) → новый прогон модели
    `…-r<N+1>` с `--reuse-from` (ДС-7) → сдача модели (HANDBOOK §4.4) → приёмка модели цикла r<N+1> (на r ≥ 2 второй
    приёмщик видит `changed_vs_previous`). Циклов модели не осталось — один поздний фикс сверх лимита, приёмка `r4`;
-   второй дефект модели из клипов — `escalate_user`.
+   второй дефект модели из клипов — `escalate_user`. Пока схема карточки модели допускает только `r1`–`r3` (код-пробел,
+   `references/acceptance-and-blender.md` §6), поздний фикс без оставшегося цикла — сразу `escalate_user`.
 3. **Что перепринимается** после pass модели. Новый `SK_<Key>_H2.fbx` меняет sha цели, поэтому все 4 клипа авторятся
    заново по новой спеке `<content-key>-h2anim-r<N>.json` (тот же блок `clips`, новый `target`; `H2ANIM` → новая
    спека, строки `H2ANIM_CLIP` героя снять, §6.5). В UE (7a): переимпорт меша (`references/ue-import-package.md` §4.4),
