@@ -1,0 +1,1878 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SM_Beowulf_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base",
+  "extra:MI_Beowulf_H2LD_DebugClass": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+  "extra:MI_Beowulf_H2LD_Neutral": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+  "skeletal": "/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_UM_MatLUT_Beowulf",
+  "texture:MatID": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "wool_coarse",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+   "front": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+   "side": "art/imagegen/concept-beowulf-codex/beowulf-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/measure-report.json",
+  "debug_calibration": {
+   "1": [
+    145,
+    186,
+    219
+   ],
+   "10": [
+    217,
+    222,
+    154
+   ],
+   "13": [
+    223,
+    176,
+    144
+   ],
+   "15": [
+    190,
+    222,
+    153
+   ],
+   "3": [
+    229,
+    151,
+    216
+   ],
+   "4": [
+    157,
+    207,
+    199
+   ],
+   "7": [
+    158,
+    224,
+    152
+   ],
+   "8": [
+    227,
+    144,
+    185
+   ],
+   "9": [
+    152,
+    206,
+    218
+   ]
+  },
+  "debug_calibration_note": "r1 (2026-10-14): the default hue decode put the chain-mail tunic (steel_blued, class 1, debug hue 222.5 deg) into wool_coarse (class 9, hue 202.4 deg; after TSR/tonemap sRGB8 145,186,219 vs 152,206,218) -> steel_blued 'not measured' and the fur zone mixed with the tunic. Calibration = sRGB8 medians on beowulf-r1-front-debug.png (mantle shoulders, tunic chest/skirt; p10-p90 equal) and the hue-decoded class medians of the three r1 debug views for the other classes; nearest colour < 40 levels. gold_antique (class 4) renders dim on the small accents (helmet band 62,131,124): with the calibration fewer gold pixels decode, its hue/sat are read on the default decode of r1 as well (review README). legacy_bake (beard) stays undetected on black (F131): scratch sample in the review README",
+  "hero": "Beowulf",
+  "key_zones": [
+   "wool_coarse"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "wool_coarse",
+   "steel_blued",
+   "metal_forged",
+   "gold_antique",
+   "leather_worn",
+   "linen",
+   "skin",
+   "wood",
+   "legacy_bake"
+  ],
+  "note": "3d-model-pipeline stage 7a (skill check figure 2026-10-14): Beowulf H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the leather belt and baldric, ribbon leather_smooth 3.48 %), teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run 20261014-h2-lookdev-t5 as is); base M_UM_BaseMarker vertex-mask (team ring by height on the lower tier, VertexMaskWeight 1, SideBandWeight 0). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = wool_coarse (the fur mantle, the largest zone, 36 %, as the Blender ld_measure of the run). Metal hue matters (F110/F120/F138, C29): small gold accents (torc, guard, pommel, helmet rims) are judged by hue and saturation against the concept, not only luminance.",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.3
+   }
+  },
+  "render_gates_note": "legacy_bake = the red-brown braided beard and the eyes (MatID 0, the dark catch-all); the concept median is the beard (hue 25.5, sat 0.49): gate = the look-dev concept gate of legacy_bake (hue 10-40, s >= 0.3); reported, not in tolerance_zones (class 0 decode is unreliable against the black backdrop, F90/F131)",
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2ld-ue-import",
+  "side_camera": "+X",
+  "side_camera_note": "SIDE_VIEW left (asset card): on the concept side view the figure faces left -> camera at +X (Leshen / Achilles precedent; Angel's -X was F98)",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "wool_coarse",
+   "steel_blued",
+   "metal_forged",
+   "gold_antique",
+   "leather_smooth",
+   "leather_worn",
+   "linen",
+   "skin",
+   "wood"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/Beowulf/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "weapon_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 43861
+   },
+   "folder": "/Game/PipelineCandidates/Beowulf/H2LD",
+   "height_uu": 55.0149,
+   "hero_root": "/Game/PipelineCandidates/Beowulf",
+   "instances": {
+    "base_instance": {
+     "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+     "scalars": {
+      "SideBandWeight": 0.0,
+      "VertexMaskWeight": 1.0
+     }
+    },
+    "extra:MI_Beowulf_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_Beowulf_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "FixClassA": 0.0,
+      "FixClassB": 8.0,
+      "FixGainA": 0.55,
+      "FixGainB": 1.3,
+      "FixSpecA": 0.0,
+      "FixSpecB": 0.0,
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 8.9811,
+      "TeamDyeGain": 27.739
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_UM_MatLUT_Beowulf",
+      "TeamAccentTexture": "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/Beowulf/Rig/SK_Beowulf_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "wool_coarse",
+   "steel_blued",
+   "metal_forged",
+   "gold_antique",
+   "leather_smooth",
+   "leather_worn",
+   "linen",
+   "skin",
+   "wood",
+   "legacy_bake"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "content": "ASSET-BEOWULF-001-7a 2026-10-14T11:24:25+00:00 ue_hero_lookdev review Beowulf r2\npid=36532 host=DESKTOP-QNDBQMU since=1791977065.370 max_hold_s=7200",
+  "heartbeats": 11,
+  "host": "DESKTOP-QNDBQMU",
+  "max_hold_exceeded": false,
+  "max_hold_s": 7200.0,
+  "owner": "ASSET-BEOWULF-001-7a",
+  "pid": 36532,
+  "stale_taken": null,
+  "stamp": "ASSET-BEOWULF-001-7a 2026-10-14T11:24:25+00:00 ue_hero_lookdev review Beowulf r2",
+  "step": "ue_hero_lookdev review Beowulf r2",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-14T11:28:14+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4169,
+    0.4045,
+    0.4097
+   ],
+   "settled": true,
+   "sha256": "5db6dd1e003e2babade0aeaba5ec7dbbeac7addae68b5d026075c2e25d177645",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.519,
+    0.4645,
+    0.4429
+   ],
+   "settled": true,
+   "sha256": "8c0af5e2b65bc3cccda6924f55ca1d2ec33489a724f38d95920203da756a5cfc",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5207,
+    0.4731,
+    0.4792
+   ],
+   "settled": true,
+   "sha256": "508f48d8f69ed7d2d21a4408fcf01ebaf7fe057ccd87ccabf5a589eed890f7e4",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5487,
+    0.4785,
+    0.4757
+   ],
+   "settled": true,
+   "sha256": "fc9b9847f2564d6f377c851a2e8102b77972c991ddeb17373978e5c720569340",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4344,
+    0.4102,
+    0.4015
+   ],
+   "settled": true,
+   "sha256": "79b9e2cbaaf3a2a01c0a60527b34f26c7d3cf4a224e837a105ee23e079f62869",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "beowulf-r2-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4437,
+    0.3838,
+    0.3686
+   ],
+   "settled": true,
+   "sha256": "a9fa70d480a04f3710b6b9e900e795f29e5ef04f287af857b33254108babea54",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5068,
+    0.4488,
+    0.4194
+   ],
+   "settled": true,
+   "sha256": "9b53c6e01bbda4cbaf6209f809caff0662ae6f5d3b9ced94cd47fb8c5db56e80",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4705,
+    0.4871,
+    0.4877
+   ],
+   "settled": true,
+   "sha256": "2960fb4dc3f9443a339906f97ab88445bdcb360c1020a425cfd568bb0bfa2b50",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6236,
+    0.5038,
+    0.503
+   ],
+   "settled": true,
+   "sha256": "c609aeb5ec38affac9b8b616f5f0e215a534253be3dc27cbbea0bff653e3412c",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6099,
+    0.5169,
+    0.5027
+   ],
+   "settled": true,
+   "sha256": "9c43059b1cffff3b4e89e43712dea5deb14e69c72dba95fd0f2cfd5058ea4941",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4124,
+    0.3859,
+    0.4107
+   ],
+   "settled": true,
+   "sha256": "f0281287bce7e863d961fad753774af2187f183182b5823a31f9774e01322e66",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "beowulf-r2-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4852,
+    0.4243,
+    0.406
+   ],
+   "settled": true,
+   "sha256": "7992409f084a1c9cfd6334265675d8e4813a8b4125ac4aa8bfe993e7da9a272f",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5516,
+    0.5568,
+    0.5502
+   ],
+   "settled": true,
+   "sha256": "e015b6d1d0eb59c62847043d2fba4200511ba0a6ade2adaccf772198b54c8acf",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5617,
+    0.545,
+    0.5461
+   ],
+   "settled": true,
+   "sha256": "b9dde895774da88ce0061bd038d10e59a0bdcfb06304b0e40d66cdaf460e88be",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5559,
+    0.5415,
+    0.5435
+   ],
+   "settled": true,
+   "sha256": "6ec9cacd1d68b6270f781e0d9457f668e618f27c068ebbd5855c29e9c7c488f5",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6886,
+    0.7095,
+    0.7033
+   ],
+   "settled": true,
+   "sha256": "4d5a060c5df9d47c30c10359a4bb9f114d9dbb4e2237cf904e86c3234033ad5a",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7583,
+    0.7196,
+    0.715
+   ],
+   "settled": true,
+   "sha256": "a452bfe38d437142e13af3750d25837823592b351a53687ccc7a550d63989bc5",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7542,
+    0.7185,
+    0.7152
+   ],
+   "settled": true,
+   "sha256": "7719b74706872371dca61f02be8b6f11eb2c198f8ead03231965fd92d453a1fe",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "beowulf-r2-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.591,
+    0.5503,
+    0.4845
+   ],
+   "settled": true,
+   "sha256": "6179a249463c5c457477861a01fb88455bea384f5ff0f7751907edec83f1d6a7",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3698,
+    0.3265,
+    0.3606
+   ],
+   "settled": true,
+   "sha256": "3999350e8da724da918b40e7be034a30ee41257ac33ba20c130ebd0fe5634d9b",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4279,
+    0.3878,
+    0.3826
+   ],
+   "settled": true,
+   "sha256": "6810a69d46deb849982867571f99b545aeb205e376344a7f59ba7b6e6ccbbfb0",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4414,
+    0.3964,
+    0.3867
+   ],
+   "settled": true,
+   "sha256": "fd471a3a944c3ee6c4b9759166a6576cd1b55c554507e82217360ceea98344cb",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4165,
+    0.3948,
+    0.3922
+   ],
+   "settled": true,
+   "sha256": "94bf4fd0955c7bf87ec01a474db339fc55b303c0c4263009e77fa0d8e0868697",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "beowulf-r2-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3091,
+    0.3089,
+    0.3113
+   ],
+   "settled": true,
+   "sha256": "83e2c2dcd8e8f29d81bb1144a3c50f831000d6a7eb1259d741c8e906ffa8eee2",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "beowulf-r2-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3769,
+    0.3248,
+    0.337
+   ],
+   "settled": true,
+   "sha256": "4f005f66ed31cbc58c631d4ce65b06bdc73931b5c0d54a7d2aca2bc71cd9bea7",
+   "subject": "Beowulf (/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Beowulf_H2LD_DebugClass": false,
+  "extra:MI_Beowulf_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "settle": {
+  "allow_unsettled": false,
+  "max_diffs": 79,
+  "min_diffs": 39,
+  "shot_extra_grabs": 6,
+  "status": "settled",
+  "threshold": 1.0,
+  "throttle": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  },
+  "throttle_restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "unsettled_measured_shots": [],
+  "unsettled_other_shots": [],
+  "warmup_converged": true
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-14T11:24:25+00:00",
+ "tag": "r2",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  1.1234,
+  0.5235,
+  0.5411,
+  0.5342,
+  0.5098,
+  0.5349,
+  0.5167,
+  0.5118,
+  0.5424,
+  0.5212,
+  0.5145,
+  0.5412,
+  0.5213,
+  0.5308,
+  0.5108,
+  0.5222,
+  0.5475,
+  0.5218,
+  0.5384,
+  0.5344,
+  0.5143,
+  0.5145,
+  0.5148,
+  0.5217,
+  0.5414,
+  0.5211,
+  0.543,
+  0.5344,
+  0.509,
+  0.5147,
+  0.518,
+  0.5321,
+  0.5434,
+  0.5388,
+  0.5463,
+  0.5365,
+  0.5361,
+  0.5354,
+  0.5185
+ ]
+}

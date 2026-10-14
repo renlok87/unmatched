@@ -1,0 +1,147 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-BEOWULF-001",
+  "clip": "HitReact",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_HitReact.fbx",
+      "sha256": "7f984be2cac888bd73b89291bb6db1f815766ea2fd909fad5a600f2faa2cf83a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json",
+      "sha256": "d3227542f85e141749221a977578acade57ab756c9df5f651c39b489f70b9660"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance-anim/20261014-r1/HitReact/frames",
+    "files": [
+      "Beowulf-HitReact-blender-sheet.jpg",
+      "Beowulf-HitReact-f02-back.jpg",
+      "Beowulf-HitReact-f02-front.jpg",
+      "Beowulf-HitReact-f02-q34.jpg",
+      "Beowulf-HitReact-f04-q34l.jpg",
+      "Beowulf-HitReact-f00-front-ue-editor.jpg",
+      "Beowulf-HitReact-f00-q34-ue-editor.jpg",
+      "Beowulf-HitReact-f02-front-ue-editor.jpg",
+      "Beowulf-HitReact-f02-q34-ue-editor.jpg",
+      "Beowulf-HitReact-f04-front-ue-editor.jpg",
+      "Beowulf-HitReact-f04-q34-ue-editor.jpg",
+      "Beowulf-HitReact-f07-front-ue-editor.jpg",
+      "Beowulf-HitReact-f07-q34-ue-editor.jpg",
+      "Beowulf-HitReact-f10-front-ue-editor.jpg",
+      "Beowulf-HitReact-f10-q34-ue-editor.jpg",
+      "Beowulf-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/grip-HitReact.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_HitReact.validation.json",
+      "note": "AM_Beowulf_HitReact.validation.json#result = pass; AM_Beowulf_HitReact.validation.json#clip_sha256 = 7f984be2cac888bd73b89291bb6db1f815766ea2fd909fad5a600f2faa2cf83a",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-HitReact.json",
+      "note": "contact-HitReact.json#result = pass; contact-HitReact.json#fails = []",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=BEO-HitReact].status = technically_imported; clip-manifest.json#clips[id=BEO-HitReact].validation.result = pass; contact-HitReact.json#result = pass; clip-manifest.json#clips[id=BEO-HitReact].source.files[0].sha256 = 7f984be2cac888bd73b89291bb6db1f815766ea2fd909fad5a600f2faa2cf83a; ue-import-clips.json#fbx_sha256.AM_Beowulf_HitReact = 7f984be2cac888bd73b89291bb6db1f815766ea2fd909fad5a600f2faa2cf83a",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "К.0 → к.2–4: с front читаются запрокидывание головы и подъём рук, с q34 — отдача корпуса назад, доворот и изменение наклона меча. Быстрый выход в отдачу сменяется удержанием и возвратом на к.7–10. Силуэт тяжёлого воина с мечом, щитом и меховой мантией сохраняется; спиной к основной камере герой не разворачивается.",
+      "frames": [
+        "Beowulf-HitReact-f00-front-ue-editor.jpg",
+        "Beowulf-HitReact-f00-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f02-front-ue-editor.jpg",
+        "Beowulf-HitReact-f02-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f04-q34-ue-editor.jpg",
+        "Beowulf-HitReact-blender-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "К.2–4 front/q34 и left на Blender-листе: корпус и голова уходят назад от фронтального удара, рука со щитом отлетает, обе подошвы сохраняют место и опору на подставке. Подол не проваливается через её край, меч не пересекает корпус. Небольшой сгиб колен соответствует известному пределу прямых rest-цепей; заметного приседа нет.",
+      "frames": [
+        "Beowulf-HitReact-blender-sheet.jpg",
+        "Beowulf-HitReact-f02-front-ue-editor.jpg",
+        "Beowulf-HitReact-f02-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f04-front-ue-editor.jpg",
+        "Beowulf-HitReact-f02-q34.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "К.2 front/back/q34: воротник, мантия и суставы сохраняют непрерывную оболочку, видимых дыр, разрывов и оторванных частей нет. К.4 q34l: щит остаётся круглым, умбон и кромка целы. При сравнении к.0 и к.2 q34 заметно небольшое покачивание меча относительно закрытого кулака — известный предел HitReact, след движения без разрыва. Составной меч и жёсткое крепление щита к предплечью учтены как ограничения; видимого отрыва хвата нет.",
+      "frames": [
+        "Beowulf-HitReact-f02-front.jpg",
+        "Beowulf-HitReact-f02-back.jpg",
+        "Beowulf-HitReact-f02-q34.jpg",
+        "Beowulf-HitReact-f04-q34l.jpg",
+        "Beowulf-HitReact-f00-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f02-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "К.4 → к.7 → к.10 на Blender-листе и UE front/q34: наклон корпуса, положение головы, меча и щита последовательно сходят к исходной позе. К.7 уже близок к rest, остаточная разница мала; к.10 визуально совпадает с к.0. Возврат мягкий, без видимого скачка или смены опоры.",
+      "frames": [
+        "Beowulf-HitReact-blender-sheet.jpg",
+        "Beowulf-HitReact-f04-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f07-front-ue-editor.jpg",
+        "Beowulf-HitReact-f07-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f10-front-ue-editor.jpg",
+        "Beowulf-HitReact-f10-q34-ue-editor.jpg",
+        "Beowulf-HitReact-f00-front-ue-editor.jpg",
+        "Beowulf-HitReact-f00-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "Beowulf-HitReact-f02-q34.jpg",
+      "note": "Небольшое покачивание меча в закрытом кулаке учтено в D = 1,5 как известный предел HitReact. Обе части меча сохраняют связный силуэт, видимого отрыва рукояти нет."
+    },
+    {
+      "item": "D",
+      "frame": "Beowulf-HitReact-f00-q34-ue-editor.jpg",
+      "note": "Щит держит кисть; ремня на предплечье нет, между щитом и предплечьем остаётся просвет. Это известное жёсткое крепление к arm_lower.L; при отдаче щит не отделяется от хвата."
+    },
+    {
+      "item": "C",
+      "frame": "Beowulf-HitReact-blender-sheet.jpg",
+      "note": "На к.2–4 виден небольшой сгиб колен при сохранённой опоре стоп. Учтён известный предел прямых ног в rest; движение не выглядит приседом."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13a39-e508-74d1-aa6d-bd92cde0a751"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-beowulf",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

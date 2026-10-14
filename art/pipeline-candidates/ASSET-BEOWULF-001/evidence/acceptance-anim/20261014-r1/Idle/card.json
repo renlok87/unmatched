@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-BEOWULF-001",
+  "clip": "Idle",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_Idle.fbx",
+      "sha256": "6f423ee229dab0806c8d40eff8d736d3986c3f0a3b8b3c656d6e77a43f7aa6e8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json",
+      "sha256": "d3227542f85e141749221a977578acade57ab756c9df5f651c39b489f70b9660"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance-anim/20261014-r1/Idle/frames",
+    "files": [
+      "Beowulf-Idle-blender-sheet.jpg",
+      "Beowulf-Idle-f15-q34.jpg",
+      "Beowulf-Idle-f30-front.jpg",
+      "Beowulf-Idle-f30-q34l.jpg",
+      "Beowulf-Idle-f45-q34b.jpg",
+      "Beowulf-Idle-seam-f60-f00-front.jpg",
+      "Beowulf-Idle-seam-f60-f00-q34.jpg",
+      "Beowulf-Idle-f00-front-ue-editor.jpg",
+      "Beowulf-Idle-f00-q34-ue-editor.jpg",
+      "Beowulf-Idle-f15-front-ue-editor.jpg",
+      "Beowulf-Idle-f15-q34-ue-editor.jpg",
+      "Beowulf-Idle-f30-front-ue-editor.jpg",
+      "Beowulf-Idle-f30-q34-ue-editor.jpg",
+      "Beowulf-Idle-f45-front-ue-editor.jpg",
+      "Beowulf-Idle-f45-q34-ue-editor.jpg",
+      "Beowulf-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/grip-Idle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_Idle.validation.json",
+      "note": "AM_Beowulf_Idle.validation.json#result = pass; AM_Beowulf_Idle.validation.json#clip_sha256 = 6f423ee229dab0806c8d40eff8d736d3986c3f0a3b8b3c656d6e77a43f7aa6e8; AM_Beowulf_Idle.validation.json#fails = []",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-Idle.json",
+      "note": "contact-Idle.json#result = pass; contact-Idle.json#fails = []; contact-Idle.json#checks[check=foot_slide_L].status = pass; contact-Idle.json#checks[check=foot_slide_R].status = pass; contact-Idle.json#checks[check=loop_seam].status = pass",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=BEO-Idle].status = technically_imported; clip-manifest.json#clips[id=BEO-Idle].validation.result = pass; contact-Idle.json#result = pass; clip-manifest.json#clips[id=BEO-Idle].source.files[0].sha256 = 6f423ee229dab0806c8d40eff8d736d3986c3f0a3b8b3c656d6e77a43f7aa6e8; ue-import-clips.json#fbx_sha256.AM_Beowulf_Idle = 6f423ee229dab0806c8d40eff8d736d3986c3f0a3b8b3c656d6e77a43f7aa6e8",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "UE f00/f15/f30/f45 front и q34: собранная стойка сохраняется, голова слегка меняет наклон и направление, меч покачивается, щит следует руке. Дыхательное движение корпуса различимо, но с front выражено слабее движения меча; фазы дыхания читаются менее отчётливо, чем требуется для 2. Характер спокойной силы сохранён, разворота спиной к камере нет.",
+      "frames": [
+        "Beowulf-Idle-blender-sheet.jpg",
+        "Beowulf-Idle-f00-front-ue-editor.jpg",
+        "Beowulf-Idle-f15-front-ue-editor.jpg",
+        "Beowulf-Idle-f30-front-ue-editor.jpg",
+        "Beowulf-Idle-f45-front-ue-editor.jpg",
+        "Beowulf-Idle-f00-q34-ue-editor.jpg",
+        "Beowulf-Idle-f15-q34-ue-editor.jpg",
+        "Beowulf-Idle-f30-q34-ue-editor.jpg",
+        "Beowulf-Idle-f45-q34-ue-editor.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На Blender-листе и UE f00/f15/f30/f45 обе стопы сохраняют места опоры на подставке: заметного скольжения, подъёма пятки или отрыва носка нет. Подол и мантия не проваливаются через подставку. В обеих парах seam f60/f00 положение стоп совпадает. Почти прямые ноги и малая амплитуда переноса веса учтены как известный предел фигуры, видимого нарушения опоры он не создаёт.",
+      "frames": [
+        "Beowulf-Idle-blender-sheet.jpg",
+        "Beowulf-Idle-f15-q34.jpg",
+        "Beowulf-Idle-f00-front-ue-editor.jpg",
+        "Beowulf-Idle-f15-front-ue-editor.jpg",
+        "Beowulf-Idle-f30-front-ue-editor.jpg",
+        "Beowulf-Idle-f45-front-ue-editor.jpg",
+        "Beowulf-Idle-seam-f60-f00-front.jpg",
+        "Beowulf-Idle-seam-f60-f00-q34.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "Крупные планы f15-q34, f30-front, f30-q34l и f45-q34b: оболочка цела, хват меча сохраняется, щит не отрывается. На f30-front остаётся небольшой острый угловатый переход манжеты возле гарды; на f45-q34b переход рукава под мантией жёсткий, без раскрытия оболочки. Это следы без разрывов, якорь 1,5. Двухчастный меч и щит без собственной кости учтены как известные пределы: видимой щели между частями меча или потери хвата щита нет.",
+      "frames": [
+        "Beowulf-Idle-f15-q34.jpg",
+        "Beowulf-Idle-f30-front.jpg",
+        "Beowulf-Idle-f30-q34l.jpg",
+        "Beowulf-Idle-f45-q34b.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "В seam f60/f00 front и q34 совпадают силуэт, положение головы, плеч, меча, щита, подола и стоп: видимого скачка шва нет. Последовательность f00/f15/f30/f45 показывает малое чередование поз вокруг исходной стойки; финальная поза соответствует роли Idle.",
+      "frames": [
+        "Beowulf-Idle-seam-f60-f00-front.jpg",
+        "Beowulf-Idle-seam-f60-f00-q34.jpg",
+        "Beowulf-Idle-blender-sheet.jpg",
+        "Beowulf-H2Anim-ue-sheet.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "Beowulf-Idle-f15-front-ue-editor.jpg",
+      "note": "Дыхание корпуса с front менее выразительно, чем покачивание меча; учтено в R = 1,5. На игровом листе K1/K2 сохранить проверку читаемости дыхания."
+    },
+    {
+      "item": "D",
+      "frame": "Beowulf-Idle-f30-front.jpg",
+      "note": "Небольшой угловатый переход манжеты возле гарды, без дыры или разрыва; учтён в D = 1,5. Известное разделение меча на две части не даёт видимого отрыва."
+    },
+    {
+      "item": "D",
+      "frame": "Beowulf-Idle-f30-q34-ue-editor.jpg",
+      "note": "Щит следует предплечью жёстко; самостоятельного движения щита нет. Постоянный зазор до предплечья и отсутствие ремня — известный предел модели; хват сохраняется."
+    },
+    {
+      "item": "C",
+      "frame": "Beowulf-Idle-blender-sheet.jpg",
+      "note": "Ноги остаются почти прямыми, перенос веса малой амплитуды. Известный предел rest-позы, заметного скольжения или потери опоры нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13a39-d83d-7603-b0e5-29e2aae363b4"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-beowulf",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

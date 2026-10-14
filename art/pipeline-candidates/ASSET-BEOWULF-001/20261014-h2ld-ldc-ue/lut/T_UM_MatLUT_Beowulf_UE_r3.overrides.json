@@ -1,0 +1,119 @@
+{
+ "asset_id": "ASSET-BEOWULF-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.31,
+    0.142,
+    0.052
+   ],
+   "wornBC": [
+    0.76,
+    0.36,
+    0.13
+   ],
+   "ymedClassHero": 0.45321
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0513,
+    0.0252,
+    0.0116
+   ],
+   "ymedClassHero": 0.02956,
+   "specular": 0.35,
+   "roughTypical": 0.44,
+   "roughLo": 0.38,
+   "roughHi": 0.5
+  },
+  "leather_worn": {
+   "bc": [
+    0.0529,
+    0.0222,
+    0.011
+   ],
+   "ymedClassHero": 0.0275
+  },
+  "linen": {
+   "bc": [
+    0.1022,
+    0.0823,
+    0.0666
+   ],
+   "ymedClassHero": 0.0849,
+   "sheenIntensity": 0.03,
+   "sheenTint": 0.8,
+   "specular": 0.18
+  },
+  "metal_forged": {
+   "bc": [
+    0.2674,
+    0.2292,
+    0.2172
+   ],
+   "wornBC": [
+    0.6714,
+    0.5722,
+    0.5412
+   ],
+   "ymedClassHero": 0.29684
+  },
+  "skin": {
+   "bc": [
+    0.4125,
+    0.2086,
+    0.1046
+   ],
+   "ymedClassHero": 0.24625
+  },
+  "steel_blued": {
+   "bc": [
+    0.0549,
+    0.0461,
+    0.0429
+   ],
+   "wornBC": [
+    0.1387,
+    0.115,
+    0.1063
+   ],
+   "ymedClassHero": 0.07476
+  },
+  "stone_base": {
+   "bc": [
+    0.0284,
+    0.0262,
+    0.0273
+   ],
+   "ymedClassHero": 0.02678
+  },
+  "wood": {
+   "bc": [
+    0.107,
+    0.0343,
+    0.0091
+   ],
+   "ymedClassHero": 0.0475
+  },
+  "wool_coarse": {
+   "ymedClassHero": 0.0598,
+   "sheenIntensity": 0.0,
+   "sheenTint": 0.8,
+   "specular": 0.1,
+   "roughTypical": 0.85,
+   "roughLo": 0.7,
+   "roughHi": 0.95
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Beowulf",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Beowulf --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ },
+ "derived_from": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Beowulf_UE_r2.overrides.json",
+ "note_ue_r2": "UE look-dev r2 (2026-10-14, skill check stage 7a, by delegation, light mode). r1 (review/r1, debug decode calibrated offline C:/tmp/ASSET-BEOWULF-001-stage7/measure-calib: the default hue decode put the chain-mail tunic steel_blued into wool_coarse) UE/concept Y absolute, neutral board: wool_coarse 3.70 (sat 0.31 vs 0.46: pale beige fur), linen 1.63, leather_smooth 1.76, skin 1.35, gold_antique 1.2-1.5 (hue 30.7 / sat 0.49 vs 28.8 / 0.50), wood 1.16, metal_forged 1.09, leather_worn 0.97, steel_blued 0.88; beard (class 0, scratch sample) 3.05. Relative to the skin (plain diffuse, matches the Blender look-dev 1.075) the fur is 2.7x too bright (Blender 0.93) and the steel 0.65 / metal_forged 0.81 too dark (Blender 0.81 / 1.12). r2: wool_coarse sheen 0.35 -> 0.03 (tint 0.8), specular 0.4 -> 0.18 (Achilles r3 values, F139/F140); linen sheen 0.2 -> 0.03 (tint 0.8), specular 0.4 -> 0.18; leather_smooth specular 0.5 -> 0.3, roughness 0.37 -> 0.5 (0.42-0.58); steel_blued F0 and worn x1.3; metal_forged F0 and worn x1.2; gold, skin, wood, leather_worn unchanged in the LUT",
+ "note_ue_r3": "UE look-dev r3 (2026-10-14, the last light-mode iteration). r2 (review/r2/measure-r2.json, calibrated decode, neutral board) UE/concept Y absolute: wool_coarse 1.475 (sat 0.50 vs 0.46 - brown fur now), metal_forged 1.35, skin 1.33, steel_blued 1.24, leather_worn 1.20, wood 1.16, gold_antique 1.05 (hue 32.8 / sat 0.45 vs 28.8 / 0.50; scratch: torc sat 0.44 vs 0.52, helmet band 0.37 vs 0.44), leather_smooth 1.01, linen 0.97; beard (scratch) 2.18. Relative to the skin the fur is still 1.11 (Blender 0.93) and, as the exposure anchor, pushes every other class below tolerance. r3: wool_coarse sheen 0.03 -> 0, specular 0.18 -> 0.1, roughness 0.72 -> 0.85 (0.7-0.95); leather_smooth specular 0.3 -> 0.35, roughness 0.5 -> 0.44 (0.38-0.5) (r1 0.5/0.37 gave 1.76, r2 0.3/0.5 gave 1.01); gold_antique F0 sRGB sat 0.50 -> 0.57 at the same Y (linear [0.31, 0.142, 0.052], Y 0.171) and worn sat 0.50 -> 0.55 ([0.76, 0.36, 0.13], Y 0.429) for the pale torc / helmet bands (C29)"
+}

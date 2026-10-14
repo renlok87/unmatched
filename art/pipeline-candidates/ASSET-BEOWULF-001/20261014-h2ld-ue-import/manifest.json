@@ -1,0 +1,520 @@
+{
+  "asset_id": "ASSET-BEOWULF-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "build_profile": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2ld-lookdev-ue-import.json",
+    "export_basename": "SK_Beowulf_H2LD",
+    "primary_role": "h2-parts-glb",
+    "primary_source": "tripo-ada45143-h2",
+    "profile": "skeletal-adopt",
+    "triangle_loss_tolerance": 0.001,
+    "ue": {
+      "asset_name": null,
+      "dimension_tolerance": 0.01,
+      "folder": "/Game/PipelineCandidates/Beowulf/H2LD",
+      "import_materials": false,
+      "import_note": "skeletal-adopt: meshes imported with import_materials=false, import_textures=false; textures are the adopted 2K runtime PNGs",
+      "import_textures": false
+    }
+  },
+  "created_at": "2026-10-14T11:11:47+00:00",
+  "exports": [],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20261014-h2ld-ue-import",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-ada45143-h2": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+          "sha256": "6eb2b2f567d198a689a6a91ac0a5d787ba2299fb34c04d5fd272add2a14a6a4d"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "ab56d5dbb27db6502c53fad9ca2893416209898229ecdf976596422a9cf35d34"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 48004692,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+          "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-parts20.glb",
+          "produced_by": "generate",
+          "role": "h2-parts-glb",
+          "sha256": "4431493e4e5d58c85c35fc06fd583baddcdac081104ecbe41f294cf375024839",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 20,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 722719
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 27924
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 35385
+              },
+              {
+                "name": "meshes[12]",
+                "triangles": 32268
+              },
+              {
+                "name": "meshes[13]",
+                "triangles": 159150
+              },
+              {
+                "name": "meshes[14]",
+                "triangles": 47260
+              },
+              {
+                "name": "meshes[15]",
+                "triangles": 34352
+              },
+              {
+                "name": "meshes[16]",
+                "triangles": 24309
+              },
+              {
+                "name": "meshes[17]",
+                "triangles": 13035
+              },
+              {
+                "name": "meshes[18]",
+                "triangles": 11799
+              },
+              {
+                "name": "meshes[19]",
+                "triangles": 7313
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 162898
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 146808
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 157756
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 116151
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 114509
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 67790
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 40111
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 24706
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 46970
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1993213
+          }
+        },
+        {
+          "bytes": 81569420,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+          "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-tex8k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "h2-tex8k-pbr-glb",
+          "sha256": "f66a1b93620b0368024d8fa92f549e7ccb45c1c9e53ba054cdadabf0232019cd",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 60,
+            "materials": 20,
+            "mesh_count": 20,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 722719
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 27924
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 35385
+              },
+              {
+                "name": "meshes[12]",
+                "triangles": 32268
+              },
+              {
+                "name": "meshes[13]",
+                "triangles": 159150
+              },
+              {
+                "name": "meshes[14]",
+                "triangles": 47260
+              },
+              {
+                "name": "meshes[15]",
+                "triangles": 34352
+              },
+              {
+                "name": "meshes[16]",
+                "triangles": 24309
+              },
+              {
+                "name": "meshes[17]",
+                "triangles": 13035
+              },
+              {
+                "name": "meshes[18]",
+                "triangles": 11799
+              },
+              {
+                "name": "meshes[19]",
+                "triangles": 7313
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 162898
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 146808
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 157756
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 116151
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 114509
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 67790
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 40111
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 24706
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 46970
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1993213
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+          "present": true,
+          "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+          "present": true,
+          "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856",
+          "view": "front"
+        },
+        {
+          "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+          "present": true,
+          "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0",
+          "view": "left"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 95.0
+      },
+      "registered_at": "2026-10-14T11:11:47+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-BEOWULF-001",
+        "date": "2026-10-14",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "h2-parts-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 20,
+            "glb_skins": 0,
+            "glb_triangles": 1993213
+          },
+          "h2-tex8k-pbr-glb": {
+            "armatures": 0,
+            "glb_images": 60,
+            "glb_materials": 20,
+            "glb_mesh_count": 20,
+            "glb_skins": 0,
+            "glb_triangles": 1993213
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 48004692,
+            "expected_sha256": "4431493e4e5d58c85c35fc06fd583baddcdac081104ecbe41f294cf375024839",
+            "in_git": false,
+            "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+            "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-parts20.glb",
+            "produced_by": "generate",
+            "role": "h2-parts-glb"
+          },
+          {
+            "expected_bytes": 81569420,
+            "expected_sha256": "f66a1b93620b0368024d8fa92f549e7ccb45c1c9e53ba054cdadabf0232019cd",
+            "in_git": false,
+            "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+            "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-tex8k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "h2-tex8k-pbr-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-beowulf-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "multi-view",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": true,
+            "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+            "parts_mode": "Баланс (Balanced)",
+            "pbr": true,
+            "polygon_count": 2000000,
+            "privacy": true,
+            "remove_lighting": true,
+            "seed": null,
+            "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии",
+            "texture_8k": true,
+            "topology": "Треугольник",
+            "ultra_mesh_quality": true
+          },
+          "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+          "views": {
+            "back": {
+              "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+              "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8"
+            },
+            "front": {
+              "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+              "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856"
+            },
+            "left": {
+              "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+              "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0"
+            },
+            "right": null
+          }
+        },
+        "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+        "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 20835.0,
+              "balance_before": 20895.0,
+              "observed_debit": 60.0,
+              "quoted": 60.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 20805.0,
+              "balance_before": 20835.0,
+              "observed_debit": 30.0,
+              "quoted": 30.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+            "op": "texture"
+          },
+          {
+            "credits": {
+              "balance_after": 20800.0,
+              "balance_before": 20805.0,
+              "observed_debit": 5.0,
+              "quoted": 5.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "Генератор PBR после 8K",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-ada45143-h2",
+        "task_id": "ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa"
+      },
+      "spec_sha256": "6f275b9de032d5ab51ab2cef54c8afdb3124082bc4cac8ee428b9d6b870be257"
+    }
+  },
+  "stages": {
+    "adopt": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "b59687d692df172c17e9e60f999754494263b6ae17f0024708a3b493bf4b8a84",
+      "finished_at": "2026-10-14T11:11:48+00:00",
+      "outputs": {
+        "reports/adopt-report.json": {
+          "bytes": 27220,
+          "sha256": "0f4f939daf79b57f24014551d503b60ce7205a392494b1f20a2589f01ec32cb2"
+        }
+      },
+      "started_at": "2026-10-14T11:11:48+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "inputs": 16,
+        "passed": true
+      },
+      "tool_version": "0.8.0"
+    },
+    "preflight": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "b816da9a9ff0c1b638efb533eec02eb43973088ad5aaef057014834e90086875",
+      "finished_at": "2026-10-14T11:11:48+00:00",
+      "outputs": {
+        "reports/preflight.json": {
+          "bytes": 3488,
+          "sha256": "f03ca6244ce58706753738a3269e86e4a5391ea4c57f53c2b855d94e4e9325d6"
+        }
+      },
+      "started_at": "2026-10-14T11:11:48+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "sources_verified": 2
+      },
+      "tool_version": "0.8.0"
+    },
+    "ue-import": {
+      "attempts": 1,
+      "backend": "mcp",
+      "fingerprint": "c973bb434488a1af0db28d904240e442d5d8d11d5bc13abebfc22ac382200130",
+      "finished_at": "2026-10-14T11:12:29+00:00",
+      "outputs": {
+        "reports/ue-import-report.json": {
+          "bytes": 48696,
+          "sha256": "4b4a0c625ed62d7e32256f7079aaf3b90f62ee4b370b52f201adb94d6d806f03"
+        },
+        "reports/ue-mcp-calls.json": {
+          "bytes": 102665,
+          "sha256": "37489caef85c96b72f3079d8308cf58692ce089bbad3f8a70494913d2ca6025b"
+        }
+      },
+      "started_at": "2026-10-14T11:11:52+00:00",
+      "status": "completed",
+      "summary": {
+        "assets": 17,
+        "failed_checks": [],
+        "kind": "skeletal-adopt",
+        "passed": true,
+        "primary_asset": "/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD"
+      },
+      "tool_version": "0.8.0",
+      "ue_owned_assets": [
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P1",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Base_P2",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_DebugClass",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_Neutral",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P1",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Materials/MI_Beowulf_H2LD_P2",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SK_Beowulf_H2LD",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Meshes/SM_Beowulf_H2LD_Base",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_BC",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_Edge",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_MatID",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_N",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_ORM",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_Beowulf_H2LD_TeamAccent",
+        "/Game/PipelineCandidates/Beowulf/H2LD/Textures/T_UM_MatLUT_Beowulf"
+      ]
+    }
+  },
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

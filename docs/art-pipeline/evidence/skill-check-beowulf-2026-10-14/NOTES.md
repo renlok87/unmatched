@@ -122,3 +122,24 @@ Stage 6 result: Angel r2 pattern on Arthur's sword clips, shield as `extra_parts
 4/4, foot slide ≤ 0.28 %, sword/shield through body 0, rider gap shield 0.00 / 0.12 mm in all clips; manifest and sheet
 checks PASS; HIT_TYPE BLADE; prompts + known-limits ready. Bake t4 full repeat: pass. Sleeve-top cut edge left for the
 clip acceptor at 7a.2 on purpose (test of the late-fix route).
+
+## Stage 7a findings (executor, 2026-10-14 ≈ 16:10–16:55)
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C48 | 7a | UE look-dev class decoding confuses chainmail (`steel_blued`) with fur (`wool_coarse`) — their ID colours are almost equal after the render; small gold decodes partially, its brightness jumps between runs with no material change (1.54 → 1.20 → 1.05) | wider ID palette distance; minimum pixel share per class before a verdict |
+| C49 | 7a | First UE iteration starts from the library sheen 0.35 on cloth/fur — third hero in a row with the same washed-out fur (F139) | write the F139 starting values into the LUT at the Blender look-dev stage |
+| C50 | 7a | `write_review_config` does not carry the base parameters into `verify`; `apply-mi` does not update the expected values after its edits — both edited by hand | carry base scalars; `apply-mi --update-verify` |
+| C51 | 7a.2 | Stage 6 left no `run-acceptor.ps1` and the skill has no template for the clip acceptor launcher — written by hand | tool `ue7a/run_clip_acceptors.py` (parallel Sol + validate) |
+| C52 | 7a | `env_bench_fixtures.cts` does not run on the host checkout: `backend/node_modules` is empty (lives in a container volume); ran in a temp folder inside the backend container | run inside the container by a documented command, or vendor the generator |
+| C53 | 6/7a | `clip_manifest` writes the wrong provenance for BEO-* (Medusa + ARTH video instead of the Angel r2 pattern) | provenance from the spec's `pattern` / `MOTION_SOURCE` |
+| C54 | 3/7a | The vertex-mask team ring (height band) has a toothed upper edge on a close side frame (2–3 teeth, a dark wedge back-left at the bottom) — fine at K2 | smooth the band edge (face split along the height plane) |
+| C55 | 6 | The clip acceptor prompts again carry a wrong stage-6 executor id (repeat of C32) | launcher writes the actual id |
+
+Stage 7a result: one import run (`technically_imported`, 27/27, idempotent), verify 14/14; vertex-mask base ring even at
+K2 for P1/P2; UE look-dev r1 → `apply-mi` r2, r3 (fur sheen 0 / roughness 0.85 → 1.17× concept, beard FixGainA 0.4,
+leather, metals): 7/9 classes in tolerance, linen and metal_forged at the noise band; small gold reads as gold in UE (C29
+was a Blender-preview effect), helmet bands still paler (0.36 vs 0.44). Clips accepted at 7a.2 first time by Sol: Idle
+8.8, LungeAttack 8.8, HitReact 9.4, DeathSettle 8.8 — the sleeve-top cut edge went to `known_issues` (D 1.5), no «stage 5
+model» item → no late fix. Registrations: CUE-011/013, cook dirs, fighter names (Беовульф, Виглаф), bench variants of
+both boards. 23 new `.uasset`. ≈ 45 min.

@@ -1,0 +1,775 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_from_concept": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_Beowulf_H2_2K_N.png",
+          "h21_sha256": "a445248df1248b6d72eeced0c374fff068ec22cb33b43e8ed6e9dc13560b729f",
+          "passed": true,
+          "sha256": "a445248df1248b6d72eeced0c374fff068ec22cb33b43e8ed6e9dc13560b729f"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SK_Beowulf_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SM_Beowulf_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "a91dcba20a0a724eabfcf473dca62980ce572097ae2952406b6709f1763d85be",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t5.json",
+            "profile_id": "beowulf-h2-lookdev/5",
+            "sha256": "a91dcba20a0a724eabfcf473dca62980ce572097ae2952406b6709f1763d85be"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "f86c7b02a616daa8814650352ac226391443af16b49c3c6cc4884995c3e3eab0",
+          "rig_passed": true,
+          "rig_report_fbx": "f86c7b02a616daa8814650352ac226391443af16b49c3c6cc4884995c3e3eab0",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "a91dcba20a0a724eabfcf473dca62980ce572097ae2952406b6709f1763d85be",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t5.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t5.json",
+    "profile_id": "beowulf-h2-lookdev/5",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "beowulf-h2-lookdev/5",
+      "measured": {
+        "build_report": "beowulf-h2-lookdev/5",
+        "textures_report": "beowulf-h2-lookdev/5"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "e57edc1fea17c63eb6f60779dbfa719ae48296c87255dc98adb0082eb8d98ea8",
+          "report": "e57edc1fea17c63eb6f60779dbfa719ae48296c87255dc98adb0082eb8d98ea8",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "0a63bfc05cbe96280a3d450c0d8b387cd449b81d3c28a3fba8651c6ce982068a",
+          "report": "0a63bfc05cbe96280a3d450c0d8b387cd449b81d3c28a3fba8651c6ce982068a",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "667ac4d077b069bf886bb981a0a646e7df1ad82a6e7663c5468bed043e7fcebc",
+          "profile": "667ac4d077b069bf886bb981a0a646e7df1ad82a6e7663c5468bed043e7fcebc",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "9c0364d7b742300438a0b08632f72f661d2a6b805ea2f00edaca7c81bb2c9353",
+          "profile": "9c0364d7b742300438a0b08632f72f661d2a6b805ea2f00edaca7c81bb2c9353",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Beowulf_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_Beowulf_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -4.499,
+          0.1
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_Beowulf_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Beowulf_H2_Body": 42462,
+        "SK_Beowulf_H2_Sword": 1399,
+        "SM_Beowulf_H2_Base": 1430
+      },
+      "measured": {
+        "SK_Beowulf_H2_Body": 42462,
+        "SK_Beowulf_H2_Sword": 1399,
+        "SM_Beowulf_H2_Base": 1430
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/rig-report.json": "5d6602aadfaf29bee527a4517a00aec3763d79f1052d1c19d369bc6f1bca88db",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/textures-report.json": "3a6ce848044c346731434edcb5eb48a0e0044d4329ebc0372ca3bf3e0019dc04",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SK_Beowulf_H2LD.fbx": "0a63bfc05cbe96280a3d450c0d8b387cd449b81d3c28a3fba8651c6ce982068a",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SM_Beowulf_H2LD_Base.fbx": "e57edc1fea17c63eb6f60779dbfa719ae48296c87255dc98adb0082eb8d98ea8",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json": "d6ca408ce7d24c5b17e662711384882609f3aa8e3a038516d0ee426b64e3beae",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-maps-report.json": "ece022c90b302bcb3ddbafe9cb2c0c8561ad95294e5045e9417b5cddffc74517",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/run-manifest.json": "94091f154daf877ec27a935e1037f93c30956b4fd52dccc9f7d4267ace2d7465",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_BC.png": "a37cf19c47c6b5e13aa60bfeab82ef21e9456236e22fce4e7e7ae163d6dc1b73",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_Edge.png": "7e522c9b52d102cbeb0e642fd993435f61d2480a13b2896f7203596459910f9f",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_MatID.png": "74a18068ccce034623c325ed26edaebdb711e0841179ef65fa340aa068f91f58",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_N.png": "a445248df1248b6d72eeced0c374fff068ec22cb33b43e8ed6e9dc13560b729f",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_ORM.png": "491fa0ec7e12d344e21d231cabad53b3e7bab1bb3b600dc2dcb4ac64203e7da4",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_TeamMask.png": "35d519708e84a413f372e6b8d5eccc44c48405042a6dfad5bb0a4fb3d4326abb",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_TeamAccent_2K.png": "9c0364d7b742300438a0b08632f72f661d2a6b805ea2f00edaca7c81bb2c9353",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_UM_MatLUT_Beowulf.dds": "667ac4d077b069bf886bb981a0a646e7df1ad82a6e7663c5468bed043e7fcebc",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t5.json": "a91dcba20a0a724eabfcf473dca62980ce572097ae2952406b6709f1763d85be"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SM_Beowulf_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SK_Beowulf_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t5.json",
+    "report:build": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/../20261014-h2-bake-t4/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_UM_MatLUT_Beowulf.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile beowulf-h2-lookdev/5); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "beowulf-h2ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2ld-lookdev-ue-import.json",
+    "sha256": "58b5c354cc868ee3b5fcc0234274c5abab3c7e6b04b4b529bed797ad30a196c6"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Beowulf_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_Beowulf_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_Beowulf_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_Beowulf_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_Beowulf_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_Beowulf_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Beowulf_H2_Body": [
+                "M_Beowulf_H2_Atlas"
+              ],
+              "SK_Beowulf_H2_Sword": [
+                "M_Beowulf_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Beowulf_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            15.001,
+            15.006,
+            6.0
+          ],
+          "min": [
+            -15.006,
+            -14.993,
+            0.002
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            14.993,
+            15.006,
+            6.0
+          ],
+          "min": [
+            -15.006,
+            -15.001,
+            0.002
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            17.787,
+            8.945,
+            55.015
+          ],
+          "min": [
+            -17.85,
+            -11.717,
+            5.67
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            11.717,
+            17.787,
+            55.015
+          ],
+          "min": [
+            -8.945,
+            -17.85,
+            5.67
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            11.717,
+            17.85,
+            55.015
+          ],
+          "min": [
+            -8.945,
+            -17.787,
+            5.67
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SM_Beowulf_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SK_Beowulf_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55,
+        "skeletal_top_m": 0.55015,
+        "top_part": "tripo_part_3"
+      },
+      "meshes_pre_export_m": {
+        "SK_Beowulf_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 42462
+        },
+        "SK_Beowulf_H2_Sword": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1399
+        },
+        "SM_Beowulf_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1430
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.02,
+                0.105,
+                0.352
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.006,
+                0.134,
+                0.329
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.018,
+                -0.104,
+                0.35
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.021,
+                -0.121,
+                0.329
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.022,
+                0.065,
+                0.4
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.02,
+                0.105,
+                0.352
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.022,
+                -0.065,
+                0.4
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.018,
+                -0.104,
+                0.35
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.014,
+                0.071,
+                0.085
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.07268,
+                0.08493,
+                0.0494
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.014,
+                -0.071,
+                0.085
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.07268,
+                -0.08493,
+                0.0494
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.006,
+                0.134,
+                0.329
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.04309,
+                0.12505,
+                0.3047
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.021,
+                -0.121,
+                0.329
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.03815,
+                -0.12622,
+                0.32378
+              ]
+            },
+            "head": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.445
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.00286,
+                -0.0,
+                0.57373
+              ]
+            },
+            "hips": {
+              "head_m": [
+                -0.004,
+                -0.0,
+                0.245
+              ],
+              "parent": "root",
+              "tail_m": [
+                -0.004,
+                -0.0,
+                0.29
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                -0.008,
+                0.054,
+                0.178
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.014,
+                0.071,
+                0.085
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.008,
+                -0.054,
+                0.178
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.014,
+                -0.071,
+                0.085
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                -0.004,
+                0.04,
+                0.245
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.008,
+                0.054,
+                0.178
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.004,
+                -0.04,
+                0.245
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.008,
+                -0.054,
+                0.178
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.24503
+              ]
+            },
+            "spine": {
+              "head_m": [
+                -0.004,
+                -0.0,
+                0.3
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.004,
+                -0.0,
+                0.42876
+              ]
+            },
+            "weapon.R": {
+              "head_m": [
+                0.0378,
+                -0.1269,
+                0.3234
+              ],
+              "parent": "hand.R",
+              "tail_m": [
+                0.04191,
+                -0.13049,
+                0.34125
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Beowulf_H2_Body": {
+              "triangles": 42462,
+              "vertices": 23536
+            },
+            "SK_Beowulf_H2_Sword": {
+              "triangles": 1399,
+              "vertices": 728
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            3.78,
+            12.69,
+            32.34
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -4.499,
+            0.1
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            -0.0,
+            -0.0,
+            49.0
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}
