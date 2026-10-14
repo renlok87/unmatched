@@ -5,10 +5,16 @@
 
 | | |
 |---|---|
-| Вход | принятый H2LD-набор этапа 3 (карточка этапа 4 с вердиктом `pass`), 4 клипа этапа 6 (все карточки клипов `pass`), звуки и FX этапа 6 |
-| Выход | ассеты в `/Game/PipelineCandidates/<Key>/{<Stage>,Rig,H2Anim}`, правки C++ и конфигов из регистрации, кадры `-Bench` обеих досок, строки реестров, evidence |
-| Критерий выхода | `ue-import-report.json` → `technically_imported` и все checks passed; автотесты `Unmatched.S08` PASS (в том числе `HeroesV2.Contact` и `HeroesV2.Dissolve`); кадры `-Bench` Marmoreal и Sarpedon открыты и осмотрены; трассы без отката; реестры обновлены |
-| Исполнитель | запускающий агент |
+| Вход | принятый H2LD-набор этапа 3 (карточка этапа 4 с вердиктом `pass`), 4 клипа этапа 6 авторены и прошли валидаторы (`validate_clip`, `clip_contact_check`, `clip_manifest.py check`), звуки и FX этапа 6. Карточки клипов `pass` — не вход, а выход 7a: приёмке клипа нужен UE-импорт (ДС-1, §4.5) |
+| Выход | ассеты в `/Game/PipelineCandidates/<Key>/{<Stage>,Rig,H2Anim}`, 4 карточки клипов `pass` (7a), правки C++ и конфигов из регистрации, кадры `-Bench` обеих досок, строки реестров, evidence |
+| Критерий выхода | `ue-import-report.json` → `technically_imported` и все checks passed; 4 карточки клипов `pass` (§4.5); `registration_check.py` PASS; автотесты `Unmatched.S08` PASS (в том числе `HeroesV2.Contact` и `HeroesV2.Dissolve`); кадры `-Bench` Marmoreal и Sarpedon открыты и осмотрены; трассы без отката; реестры обновлены |
+| Исполнитель | запускающий агент; редактор 7a поднимает и закрывает оркестратор (§1 п.1, ДС-3) |
+
+Решения по итогам пилота 2026-10-13/14 — `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`
+(ДС-1…ДС-8), находки F — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`. Два класса стопа (ДС-2):
+вопрос пользователю — только деньги и лимиты, лицензия и IP, решения вне делегирования, необратимое (удаление чужих
+данных, история git); FAIL стадии или инструмента — разбор оркестратором (причина, фикс или опция инструмента, строка F
+в NOTES, при выборе — файл решения); FAIL при тюнинге профиля — итерация (не больше 3), не стоп.
 
 Норма — `docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md` (дальше HANDBOOK): §2 «Контракт», §4.6 «Импорт в UE», §4.7
 «Подключение в игру S08», §5 «Статический пропс», §7.6 «Экспорт и UE», §8 «Сдача». Числа контракта (оси, масштаб,
@@ -28,8 +34,8 @@ README evidence их не записывать. Отступлениями от 
 | Notify `Contact` ставится шагом `de010.py apply` (§5 п.3) | §4.6–4.7 этого шага нет | автотест `Unmatched.S08.HeroesV2.Contact` требует ровно один notify на LungeAttack (`S08HeroesV2Tests.cpp:537-540`) |
 | `init` получает `--export-basename SK_<Key>_<Stage>` (§4.1 шаг 4) | §4.6 п.4 флаг не указан | так инициализированы все четыре принятых импорта (§4.1) |
 
-Порядок этапа. Шаги 7.0–7.4 — подэтап 7a SKILL.md (открытый редактор, MCP), шаги 7.5–7.8 — подэтап 7b (без
-GUI-редактора на этом checkout и без живой сессии Live Coding, §1 п.4):
+Порядок этапа. Шаги 7.0–7.4a — подэтап 7a SKILL.md (агентский скрытый редактор, MCP; §1 п.1), шаги 7.5–7.8 —
+подэтап 7b (без GUI-редактора на этом checkout и без живой сессии Live Coding, §1 п.4):
 
 | Шаг | Что | Раздел | Подэтап |
 |---|---|---|---|
@@ -38,6 +44,7 @@ GUI-редактора на этом checkout и без живой сессии 
 | 7.2 | написать профиль импорта и конфиг съёмки | §3 | 7a |
 | 7.3 | импортировать: скелет, меш, клипы, замеры, сверка | §4.1–4.2 | 7a |
 | 7.4 | look-dev съёмка в редакторе | §4.3 | 7a |
+| 7.4a | UE-кадры клипов и приёмка 4 клипов (шаг 7a.2 SKILL.md, ДС-1) | §4.5 | 7a |
 | 7.5 | подключить S08: de010/de011, C++, сборка, автотесты | §5 | 7b |
 | 7.6 | упаковать один раз | §6.1 | 7b |
 | 7.7 | снять кадры `-Bench` обеих досок, осмотреть, проверить трассы | §6.2–6.4 | 7b |
@@ -51,7 +58,8 @@ GUI-редактора на этом checkout и без живой сессии 
 
 ```bash
 export MSYS_NO_PATHCONV=1        # иначе /Game/... станет C:/Program Files/Git/Game/...
-export PYTHONIOENCODING=utf-8
+export PYTHONIOENCODING=utf-8    # для прочих скриптов; точки входа этапа сами пишут UTF-8 (70905fa2, 76168867; F47)
+export UE_CONSOLE_DROP=C:/tmp/<ASSET_ID>-stage7/drop   # консоль скрытого редактора через файлы (§1 п.1; F121, F125)
 ROOT="$(pwd -W)"                                                    # корень текущего checkout в виде C:/...
 T="python tools/tripo-pipeline/tripo_pipeline.py"                 # CLI 0.8.0 (tripo_pipeline.py:81)
 L="python tools/art/material_library/ue_lock.py"                   # блокировка редактора
@@ -59,26 +67,57 @@ P=art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2ld-lookdev-u
 R=art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import    # run-каталог импорта (образец Medusa 20260929-h2ld-ue-import)
 S=art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim.json                   # спека клипов этапа 6
 V=art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ldc-ue       # look-dev съёмка в UE: review-config.json (§3.2) + review/<tag>/
-E=docs/art-pipeline/evidence/<content-key>-<YYYYMMDD>             # evidence этапа (HANDBOOK §9)
-W=C:/tmp/<ASSET_ID>-stage7                                         # логи и сырые PNG, вне git
+E7=art/pipeline-candidates/<ASSET_ID>/evidence/stage7a-<YYYYMMDD>  # evidence 7a: снимки, um-masters, discard-master (F94)
+E=docs/art-pipeline/evidence/<content-key>-<YYYYMMDD>             # evidence 7b и README этапа (HANDBOOK §9)
+W=C:/tmp/<ASSET_ID>-stage7                                         # логи, сырые PNG, листы, бенч, drop/ и editor.pid — вне git
 netstat -ano | grep ':8123 .*LISTEN'                               # MCP редактора должен слушать
 ```
 
 `<content-key>` — CONTENT_KEY заявки (`king-arthur`), `<Key>` — KEY (`KingArthur`), `<Stage>` — стадия из UE_NAMES
 (`H2LD`, `H3LD` только у второго поколения). Имя каталога `$V` повторяет образцы
-`ASSET-MEDUSA-001/20260930-h2ld-ldc-ue` и `ASSET-MERLIN-001/20260930-h2ld-ldc-ue`.
+`ASSET-MEDUSA-001/20260930-h2ld-ldc-ue` и `ASSET-MERLIN-001/20260930-h2ld-ldc-ue`. Evidence 7a пишется в каталог
+ассета `$E7` (объём записи 7a — каталог ассета; пилот так и сделал, F94), README этапа и всё 7b — в `$E`.
 
 Правила среды:
 
-1. **Предусловие MCP-шагов (7a)** — запущен GUI-редактор `unreal/Unmatched` с MCP `127.0.0.1:8123` (HANDBOOK §0.2).
-   Редактор пользователя не закрывать и не перезапускать (AGENTS.md «Agent and process lifecycle»). Порт не слушает —
-   агент запускает свой редактор командой HANDBOOK §0.2 и записывает PID. Закрывает он только этот PID и только при
-   0 dirty-пакетов.
+1. **Редактор 7a — агентский (ДС-3; RA-07, RC-05).** Пользователь UE сам не открывает (2026-10-14: «я ничего сам
+   вручную не открывал и не запускал»), поэтому гейт «редактор пользователя» стоит только при интерактивном запуске.
+   - **Один 7a за раз.** 7a идёт строго по одному герою. Редактор пачки поднимает и закрывает оркестратор; агенты
+     героев свой редактор не запускают и чужой не закрывают, а только выполняют шаги под `ue_lock`. Причина: второй
+     агент 7a взял бы чужой редактор на :8123 и потерял бы его, когда первый закроет свой PID (пилот спасла ручная
+     сериализация).
+   - **Запуск — скрытый редактор.** Видимый или свёрнутый редактор не берёт фокус консоли, и `py_file` падает по
+     таймауту (F121). Рецепт пилота (командная строка из `C:/tmp/ASSET-ACHILLES-001-stage7/editor.log`):
+
+     ```text
+     "C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor.exe" <ROOT>/unreal/Unmatched/Unmatched.uproject
+         -ModelContextProtocolPort=8123
+         -ExecCmds="ModelContextProtocol.StartServer 8123,py <ROOT>/tools/tripo-pipeline/review/ue_py/console_drop.py $W/drop"
+         -RenderOffScreen -ForceRes -ResX=2033 -ResY=1216 -unattended -nosplash -NoSound -abslog=$W/editor.log
+     ```
+
+     Без `-LiveCoding`: сессия Live Coding заблокировала бы сборку `UnmatchedEditor` во всех checkout (§1 п.4).
+     `-unattended` гасит модальные диалоги. Запуск — PowerShell `Start-Process -PassThru`, его `.Id` (PID Windows, а не
+     PID Git Bash) пишется в `$W/editor.pid`. Готовность: порт `:8123` слушает (`netstat` из блока выше) и есть
+     `$W/drop/ready.json`. Дальше в каждой оболочке `export UE_CONSOLE_DROP=$W/drop`: консольные команды
+     (`ue_live.Ue.console`, `editor_python` CLI — F125, 3ed2d354) идут файлами, а не набором текста.
+   - **Закрытие** — после коммита результата 7a и при 0 dirty-пакетов (грязный `M_UM_Figure_v2` — `discard_master.py`,
+     §4.3): команда `quit-editor` через drop (`python -c "import sys; sys.path.insert(0, 'tools/tripo-pipeline/review');
+     from ue_live import Ue; Ue().console('quit-editor')"` с `UE_CONSOLE_DROP`) или `taskkill /PID <editor.pid>` без `/F`.
+     Процесс проверить по PID: он завершился.
+   - **Чужой редактор.** До запуска — список `UnrealEditor.exe` с командной строкой
+     (`Get-CimInstance Win32_Process -Filter "Name='UnrealEditor.exe'" | Select ProcessId, CommandLine`).
+     Агентский (в строке `-unattended`, `-RenderOffScreen`, `-abslog=C:\tmp\…`): его PID есть в `editor.pid` идущей
+     пачки — работать в нём под `ue_lock`; хозяина нет (брошен прошлым прогоном) — оркестратор закрывает его как свой:
+     результат прошлого шага сохранён и закоммичен, 0 dirty-пакетов, закрыть по PID. Интерактивный запуск (без этих
+     флагов, из Epic Launcher или с `-LiveCoding`) — гейт SKILL.md §5 п.7: стоп и вопрос пользователю; такой редактор
+     агент не закрывает (AGENTS.md «Agent and process lifecycle»).
 2. **Блокировка.** Каждая команда, которая ходит в редактор по MCP, запускается так:
-   `$L --step "<шаг>" -- <команда>`. `ue_lock.py` держит `C:/tmp/ue-editor.lock`, ждёт чужую блокировку (опрос 20 с,
-   устаревшей считается блокировка старше 25 мин) и возвращает код команды (`ue_lock.py:94-104`). На одну блокировку —
-   один шаг одного героя (HANDBOOK §0.2). Скрипты `tools/tripo-pipeline/**` блокировку сами не берут (grep `ue_lock`
-   там пуст), поэтому их надо оборачивать.
+   `$L --step "<шаг>" -- <команда>`. `ue_lock.py` держит `C:/tmp/ue-editor.lock`, ждёт чужую блокировку (опрос 20 с) и
+   возвращает код команды. Пока шаг жив, поток heartbeat обновляет время файла (70905fa2, RB-21): шаг дольше 25 мин не
+   перехватывается; устаревшей блокировка становится через 25 мин после смерти её процесса. На одну блокировку — один
+   шаг одного героя (HANDBOOK §0.2). Скрипты `tools/tripo-pipeline/**` блокировку сами не берут (grep `ue_lock` там
+   пуст), поэтому их надо оборачивать.
 3. **Не оборачивать** `ue_hero_lookdev.py review` и `ue_hero_lookdev.py verify`: они берут ту же блокировку сами
    (`ue_hero_lookdev.py:335`, `:598`). Если обернуть, команда упрётся в собственную блокировку и простоит до её
    «устаревания» через 25 мин.
@@ -92,8 +131,10 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
      `UnmatchedEditor` с новой строкой `Specs()`.
 
    Порядок: сначала все MCP-шаги §4 (7a), затем `git add -f` новых `.uasset` и коммит (§7.3), затем шаги 7b.
-   - Редактор свой — агент закрывает его по PID (0 dirty-пакетов) и выполняет 7b.
-   - Открыт редактор пользователя — это гейт стопа SKILL.md §5 п.7. Worktree его не обходит: сборка `UnmatchedEditor`
+   Сборка и `UnrealEditor-Cmd` пачки идут одним окном 7b на несколько героев (5–10), когда все их 7a закрыты.
+   - Редактор агентский (редактор пачки или брошенный, п.1) — оркестратор закрывает его по п.1 (0 dirty-пакетов) и
+     выполняет 7b.
+   - Открыт интерактивный редактор (п.1, «Чужой редактор») — это гейт стопа SKILL.md §5 п.7. Worktree его не обходит: сборка `UnmatchedEditor`
      в worktree упирается в тот же мьютекс Live Coding, без неё автотесты проверяют старую таблицу `Specs()`, а
      `tools/git/safe-integrate.sh` при изменениях в `unreal/` отказывает, пока запущен UnrealEditor главного checkout
      (`safe-integrate.sh:52-57`, «UE/UBT processes of the main checkout are running»). Агент сохраняет и коммитит
@@ -112,14 +153,14 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
 | Пункт | Где | Проверка |
 |---|---|---|
 | Вердикт модели `pass` | `art/pipeline-candidates/<ASSET_ID>/evidence/acceptance/<YYYYMMDD>-r<N>/card.json` (при неустойчивом pass — ещё `card-2.json` и `final.json`) | `python tools/art/acceptance/validate_card.py <card.json> --print-verdict` → код 0, вердикт `pass`. Код 3 (`needs_second_acceptor`, `score` 8,0–8,4) — входом служит итог пары: `validate_card.py card.json --second card-2.json --final-json final.json` → код 0 и `verdict: pass` в `final.json` (`references/acceptance-and-blender.md` §8.5) |
-| Вердикты 4 клипов `pass` | `art/pipeline-candidates/<ASSET_ID>/evidence/acceptance-anim/<YYYYMMDD>-r<N>/<Clip>/card.json` × 4 (`references/animation-vfx-sfx.md`, путь карточки клипа) | то же для каждой из четырёх карточек |
+| 4 клипа авторены (ДС-1) | `<YYYYMMDD>-h2anim/` этапа 6: `export/AM_<Key>_<Clip>.fbx` × 4, отчёты валидаторов, заготовки промптов приёмки `evidence/acceptance-anim-prompts/<Clip>/acceptor-prompt.md` | `validate_clip` и `clip_contact_check` PASS (HANDBOOK §4.5), `python tools/tripo-pipeline/anim/clip_manifest.py check` → `MANIFEST_CHECK PASS` (герой с битой регистрацией называется по имени, RB-07). Карточки клипов здесь ещё не нужны: их даёт §4.5 после импорта |
 | Look-dev run | `<YYYYMMDD>-h2-lookdev/export/SK_<Key>_H2LD.fbx`, `SM_<Key>_H2LD_Base.fbx`, `textures/T_<Key>_H2LD_2K_*`, `T_<Key>_H2LD_TeamAccent_2K.png`, LUT `.dds` | отчёты `reports/ld-*`, `ld-team-*` есть (HANDBOOK §4.4) |
 | Bake run | `<YYYYMMDD>-h2-bake/export/SK_<Key>_H2.fbx` | нужен для канонического скелета (§4.1 шаг 3) |
 | Клипы | `<YYYYMMDD>-h2anim/export/AM_<Key>_{Idle,LungeAttack,HitReact,DeathSettle}.fbx` | validate PASS (HANDBOOK §4.5) |
 | Source-spec этапа 2 | `art/pipeline-candidates/<ASSET_ID>/source-specs/tripo-<task8>-h2.json`, `source_id` = `tripo-<task8>-h2` (`references/tripo3d-stages.md`, шаг «Source-spec») | файл есть, `source_id` совпадает с `--primary-source` §4.1 шаг 4 |
 | Экспорт | все FBX — только пресет `UM_FBX_v1` через `candidate_build/core.py` | HANDBOOK §2.2; FBX из `blender/ASSET-MEDUSA-001/build_tripo_medusa.py` (не в git, `SKEL_Medusa`, кость `weapon`) не принимать (HANDBOOK §1) |
 | Имя слота | `materials.atlas` профиля H2 bake (`st_rig.py:219-220`), например `M_Medusa_H2_Atlas` | ue-import сверяет слоты с отчётом сборки (`tripo_pipeline.py:2731`, check `skeletal_material_slots`); шаблон для нового — `M_<Key>_H2_Atlas` (решение скилла) |
-| Подставка без просвета | — | `python tools/tripo-pipeline/review/base_seethrough.py --out $E/base-seethrough.json <Key>=<lookdev run>/export/SM_<Key>_H2LD_Base.fbx,<lookdev run>/export/SK_<Key>_H2LD.fbx` → `with_figure` в пороге HANDBOOK §8 |
+| Подставка без просвета | — | `python tools/tripo-pipeline/review/base_seethrough.py --out $E7/base-seethrough.json <Key>=<lookdev run>/export/SM_<Key>_H2LD_Base.fbx,<lookdev run>/export/SK_<Key>_H2LD.fbx` → `with_figure` в пороге HANDBOOK §8 (≤ 0,1 uu²). Схема `base-seethrough/2` (с 2026-10-14) целит лучи в реальный верх подставки; прежнее правило `--aim plane` давало ложный FAIL на кромке выпуклого верха (F149: Achilles 0,98 → 0,00, Leshen 2,81 → 0,01) и нужно только для сверки старых отчётов. Первый прогон — на выходе этапа 3 (сдача модели): оба дефекта пилота нашлись только здесь (F134, F144) |
 | Регистрация этапов 3 и 6 | `references/new-character-registration.md` §3 (Р3-1…Р3-4) и §4 (Р6-1…Р6-4) | проверки этих таблиц PASS |
 | Реестр этапа 0 | запись `<ASSET_ID>` в `docs/art-pipeline/asset-registry.json` | см. §7.1 |
 
@@ -139,7 +180,27 @@ B Metallic, не RM; MatID, Edge, TeamAccent, LUT). Факты по сущест
 ## 3. Профили (шаг 7.2)
 
 Оба файла новые. Закоммиченный профиль не правится, новая версия — новый файл (HANDBOOK §0.1). Каждый ключ надо
-пройти вручную: значение «как у Medusa» без проверки — дефект.
+пройти: значение «как у Medusa» без проверки — дефект.
+
+Пишут их инструменты (W2-a, ee301065; агенты пилота писали эти скрипты заново для каждого героя, RA-12). Шаблон —
+файл принятого героя (Medusa или герой пилота с той же стороной оружия) или своя прошлая ревизия. Инструмент
+перенацеливает имена, сам считает значения из отчётов (ниже по таблицам), смысловые ключи героя принимает через
+`--set путь=текст` / `--set-json путь=<json>` / `--drop путь` и отказывает (код 2), если имя героя-шаблона где-то
+осталось:
+
+```bash
+python tools/tripo-pipeline/ue7a/write_import_profile.py --template <профиль импорта шаблона> \
+    --asset-dir art/pipeline-candidates/<ASSET_ID> --key <Key> --lookdev-run <lookdev run> \
+    --lookdev-profile <профиль look-dev> --bake-run <bake run> --profile-id <content-key>-h2ld-lookdev-ue-import/1 \
+    --set meshes.weapon.object=SK_<Key>_H2_<Оружие> --set candidate.figure_top_part=tripo_part_<N> \
+    --status-note-file <note.txt> --out $P [--dry-run]
+#   новая ревизия своего профиля: --template <свой rev N> --previous <свой rev N> --previous-run <run импорта rev N>
+#   --rev-note " Rev N+1 (…): …"
+python tools/tripo-pipeline/ue7a/write_review_config.py --template <review-config шаблона> \
+    --asset-dir art/pipeline-candidates/<ASSET_ID> --run-dir $R --height-uu <верх bounds меша из ue-import-report> \
+    --lookdev-run <lookdev run> --clips-run <h2anim run> --import-profile $P \
+    --set side_camera=+X --set-json 'zones=[…]' --out $V/review-config.json [--dry-run]
+```
 
 ### 3.1 Профиль импорта `$P`
 
@@ -155,8 +216,9 @@ B Metallic, не RM; MatID, Edge, TeamAccent, LUT). Факты по сущест
 | `candidate.library_inputs.LUT`, `.TeamAccent` | `path` + `sha256` LUT и `T_<Key>_H2LD_TeamAccent_2K.png`. Первый импорт — LUT look-dev run как есть (итерация 0) |
 | `armature.bones` | 16 базовых костей + кость оружия своей стороны (WEAPON_BONE заявки) или без неё при `null` (HANDBOOK §2.6) |
 | `scale.figure_height_m`, `top_part` | FIGURE_HEIGHT_M заявки; часть с верхом фигуры (не оружие) |
-| `meshes.base` | объект подставки, `footprint_m`, pivot |
-| `axes` | `blender_front -Y`, `expected_ue_front +X`, сторона оружия по WEAPON_HAND |
+| `candidate.figure_top_part` | часть с макушкой (`tripo_part_<N>` профиля bake): верх фигуры — верх этой части в отчёте `prepare` H2.1. Обязателен, если выше головы есть поднятое оружие, рога или гребень: без ключа `figure_height_as_profile` берёт верх всего меша и даёт ложный FAIL (F80, cd3ee7fe; Angel — остриё меча 55,909 uu против макушки 55,000) |
+| `meshes.base` | объект подставки, `footprint_m`, pivot. `footprint_m` — ширина X, Y и верх Z из `rig-report.json` прогона bake → `expected_ue_bounds_uu_at_import_scale_1.base` (uu / 100), а не 0,06 м заявки: верх подставки bake другой (пилот: 5,805 uu; F142). `write_import_profile.py` берёт его сам |
+| `axes` | `blender_front -Y`, `expected_ue_front +X`, сторона оружия по WEAPON_HAND. Фигура, симметричная по глубине (перёд и спина в допуске bounds), даёт FAIL `skeletal_bounds_match_build_front_unambiguous` — тогда `"front_from_best_bound_fit": true` новым файлом профиля (F124, 3ed2d354; Leshen: верная карта 0,0005 uu против зеркальной 0,0315 uu) |
 | `sockets` | `Head` на `head`, `location_uu: null`; `Weapon` на кости оружия `(0,0,0)`. При `WEAPON_BONE: null` сокет `Weapon` ставится на кость точки удара из поля `WEAPON_SOCKET_BONE` заявки и записывается в профиль: у Harpy это `foot.R` (`harpy-h3ld-lookdev-ue-import.json:123-126`), а контракт говорит про кисть (`rig-contract.json` → `skeletons.UM_HUMANOID_17_v2.characters.Harpy.note`) — расхождение открыто (HANDBOOK §2.7). Сокет `Head` обязателен: без него фигура выпадает из evidence-съёмки (`S08FlowGameMode.cpp:5071-5074`, `DoesSocketExist(TEXT("Head"))`). Сокет `Weapon` нужен и проверке `verify` (§3.2: клип без сокета `Weapon` не проходит) |
 | `expectations` | треугольники по частям и кости из `ld-fbx-report.json` look-dev run |
 | `ue.skeletal_asset`, `base_asset` | `SK_<Key>_<Stage>`, `SM_<Key>_<Stage>_Base` (UE_NAMES) |
@@ -164,7 +226,7 @@ B Metallic, не RM; MatID, Edge, TeamAccent, LUT). Факты по сущест
 | `ue.masters` | фигура `/Game/UM/Materials/v2/M_UM_Figure_v2` в текущей ревизии (история — `docs/art-pipeline/material-library/m-um-figure-v2.md` и `git log`), подставка `/Game/UM/Materials/M_UM_BaseMarker` |
 | `ue.figure_instance`, `base_instance`, `team_instances` | `MI_<Key>_<Stage>`, `MI_<Key>_<Stage>_Base`, `MI_<Key>_<Stage>_{team}`, `MI_<Key>_<Stage>_Base_{team}`. Игра грузит `MI_<Key>_<Stage>_P1/_P2` и `…_Base_P1/_P2` (`S08HeroesV2.cpp:138-145` `BodyMaterialPath`, `PedestalMaterialPath`; `S08Team.h:21`) |
 | `ue.teams`, `team_color_mode` | палитра P1/P2 HANDBOOK §2.9; `none` (краситель — TeamAccent) |
-| `ue.figure_parameters` | `TeamDyeGain`, `TeamDyeCeiling` по правилу `docs/art-pipeline/material-library/team-accent.md` из `ld-team-accent-report.json` своего run |
+| `ue.figure_parameters` | `TeamDyeGain`, `TeamDyeCeiling` по правилу `docs/art-pipeline/material-library/team-accent.md` из `ld-team-accent-report.json` своего run (LDV-13; `write_import_profile.py` считает сам). Кость как основной класс (`legacy_bake`, класс 0) LUT не настраивается — только скаляры MI здесь: `Saturation`, `FixClassA`/`FixGainA`/`FixSpecA` (F131, §4.3) |
 | `ue.folder_note` | `run with: ue-import --ue-folder /Game/PipelineCandidates/<Key>/<Stage>` |
 | `ue.reimport_*` | **не копировать.** Это история look-dev Medusa, CLI эти блоки не читает (grep `reimport_` по `tripo_pipeline.py` пуст) |
 
@@ -173,8 +235,9 @@ B Metallic, не RM; MatID, Edge, TeamAccent, LUT). Факты по сущест
 Его читают `ue_hero_lookdev.py verify` (§4.1 шаг 6) и `ue_hero_lookdev.py review` (§4.3). Образцы:
 `art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json` (оружие слева) и
 `art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review-config.json` (оружие справа). Формат описан в
-docstring `tools/art/material_library/ue_hero_lookdev.py:22-37`. Блок `verify` обязателен: `cmd_verify` читает его
-без проверки (`ue_hero_lookdev.py:581-610`), без блока команда падает с `KeyError`.
+docstring `tools/art/material_library/ue_hero_lookdev.py`. Блок `verify` обязателен: без него команда падает с
+`KeyError`. Пишется `write_review_config.py` (§3) после шагов 4–5 §4.1: `verify.height_uu` берётся из
+`ue-import-report.json` импорта, `verify.clips_reference` — из замера клипов. Образцы пилота — `ASSET-{ANGEL,ANCIENT-LESHEN,ACHILLES}-001/20261014-h2ld-ldc-ue/review-config.json`.
 
 | Ключ | Что задать |
 |---|---|
@@ -183,13 +246,15 @@ docstring `tools/art/material_library/ue_hero_lookdev.py:22-37`. Блок `verif
 | `run_dir` | `$R` (run импорта §4.1 шаг 4) |
 | `concept.front\|side\|back` | принятые виды этапа 1 `art/imagegen/concept-<content-key>-codex/<content-key>-<view>.png` |
 | `concept_zones` | медианы концепта по классам: `<lookdev run>/reports/measure-report.json` (образец Medusa) или файл команды `ue_hero_lookdev.py concept` (образец Merlin, `concept-classes.json`) |
-| `side_camera` | `"+X"`, если на виде side лицо смотрит влево; `"-X"`, если вправо (`ue_hero_lookdev.py:242-246`) |
+| `side_camera` | из `SIDE_VIEW` заявки, без осмотра картинки: `left` → `"+X"`, `right` → `"-X"` (`ue_hero_lookdev.py` `views`). У Angel при `SIDE_VIEW: left` стоял `"-X"`, и боковой кадр UE показал другой бок, чем концепт (F98, RA-17); Leshen и Achilles — `"+X"` |
 | `teams` | `["P1", "P2"]` |
 | `variants`, `base_mi` | свои MI: `neutral`, `P1`, `P2` (и отладочный `debug`, если есть) из `/Game/PipelineCandidates/<Key>/<Stage>/Materials/` |
 | `zones` | классы MatID своего героя: значения `lookdev.zones.class_of` профиля look-dev (HANDBOOK §4.4) |
-| `key_zones`, `tolerance_zones`, `never_dye_zones`, `anchor_zone` | подмножества `zones` своего героя. `anchor_zone` задать обязательно: без него берётся `"linen"` — класс Medusa (`ue_hero_lookdev.py:831`). `never_dye_zones` — классы, которые TeamAccent не красит (`team_accent` профиля look-dev) |
+| `key_zones`, `tolerance_zones`, `never_dye_zones`, `anchor_zone` | подмножества `zones` своего героя. `anchor_zone` задать обязательно: без него берётся `"linen"` — класс Medusa. Значение — класс экспозиции `ld_measure` look-dev (пилот: Angel `skin`, Leshen `wood`, Achilles `wool_coarse`). Ткань с sheen — смещённый якорь (F140: плащ Achilles 1,43× кожи и после правки sheen): в README записать и отношение к `skin`. `never_dye_zones` — классы, которые TeamAccent не красит (`team_accent` профиля look-dev) |
 | `render_gates` | гейты своих классов или `null` (у Merlin `null`; у Medusa гейт класса `legacy_bake`) |
-| `tolerance` | образец HANDBOOK §4.6 п.6: `luma_ratio 0.15`, `hue_deg 12.0`, `sat 0.1` |
+| `light_profile_pinned` | **обязателен**: профиля света `cobble-probe` в `S08ArtBoardProfiles.json` больше нет (ND-5, 2026-10-04), без ключа `review` выходит с `SystemExit`. Значение пилота — `art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json` (его `light_profile.data`, cobble-probe rev 5); тот же файл — `--light-pinned` кадров клипов (§4.5; F81) |
+| `debug_calibration` | только если отладочный декод путает классы: смотреть карты классов первой съёмки (`review/<tag>/frames/<hero>-<tag>-<view>-classmap.png`). Angel: шёлк (класс 11) читался как `metal_forged` (класс 3) и мерился как 0 px, пока не добавили блок калибровки (F90). Класс 0 (`legacy_bake`: кость, волосы) на чёрном фоне не декодируется вовсе — его нет в `tolerance_zones`, он идёт через `render_gates` (F131) |
+| `tolerance` | образец HANDBOOK §4.6 п.6: `luma_ratio 0.15`, `hue_deg 12.0`, `sat 0.1`; `luma_noise_band` по умолчанию 0,04 — разброс кадров между сессиями редактора (F155, §4.3) |
 | `min_px`, `reading_bias_ev`, `restore_level` | как у образцов (`150`, `-0.75`, `/Game/S08/S08Arena`) — это настройки съёмки, не героя |
 | `verify.skeleton`, `folder`, `hero_root`, `clips_folder` | `/Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton`, `/Game/PipelineCandidates/<Key>/<Stage>`, `/Game/PipelineCandidates/<Key>`, `/Game/PipelineCandidates/<Key>/H2Anim` |
 | `verify.height_uu` | знаменатель доли смещения клипа (`measure_clips.py:117`). Образцы расходятся: Medusa `55.0`, Merlin `49.42` (= его `BoundsTopUU`). Решение скилла: верх bounds меша из `ue-import-report.json` |
@@ -199,20 +264,25 @@ docstring `tools/art/material_library/ue_hero_lookdev.py:22-37`. Блок `verif
 | `verify.expect.base_uv_channels`, `clips` | `2`, `4` |
 | `verify.textures` | настройки карт по HANDBOOK §2.4; имя ключа кромки — `Edge` (как в образцах) |
 | `verify.instances` | обязателен (`ue_hero_lookdev.py:643`): родитель, текстуры, скаляры и переключатели своих MI — пути `<Key>/<Stage>`, свои `T_UM_MatLUT_<короткий ключ>`, `T_<Key>_<Stage>_Edge` или `_EdgeMask` (§2), `TeamDyeGain`/`TeamDyeCeiling` из §3.1, цвета P1/P2 по HANDBOOK §2.9 |
-| `verify.clips_reference` | `<h2anim run>/reports/ue-measure-clips.json` — его пишет §4.1 шаг 5 (`h2anim_ue.py:166`) |
+| `verify.clips_reference` | `<h2anim run>/reports/ue-measure-clips.json` — его пишет §4.1 шаг 5. После доработки клипов — путь последнего прогона клипов (`…-h2anim-r<N>`): со старым `verify` падает на `h2anim_clips_play_on_mesh` (у пилота все три конфига указывали на r1, исправлено fabf5215) |
 
 ## 4. Импорт (шаг 7.3) — HANDBOOK §4.6 с блокировкой
 
 ### 4.1 Команды
 
 ```bash
-mkdir -p "$E" "$W" "$V"
-# 1. Мастер-материалы (повтор ничего не меняет; PASS для figure, base_marker, game_layer)
-$L --step "<Key> um_masters" -- python tools/tripo-pipeline/um_masters.py --backend mcp build --report $E/um-masters-report.json
+mkdir -p "$E7" "$W" "$V"
+# 1. Мастер-материалы — только проверка (ДС-4): verify читает графы в редакторе и ничего не пишет
+$L --step "<Key> um_masters verify" -- python tools/tripo-pipeline/um_masters.py --backend mcp verify --report $E7/um-masters-verify.json
+#    базовая линия 2026-10-14: figure и base_marker — FAIL только expression_properties_match_plan (дрейф RimColor
+#    с FX-05 b425f06d, F91; та же ошибка UM-MASTERS у validate_registry), game_layer PASS. Это не стоп. Другой FAIL —
+#    разбор оркестратором (ДС-2). Проверку маршрута героя делает сам ue-import: check um_masters_current PASS
 # 2. Снимок до: открытый уровень записан, 0 dirty-пакетов
-$L --step "<Key> snapshot before" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E/snapshot-before.json \
+$L --step "<Key> snapshot before" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E7/snapshot-before.json \
     --extra-folder /Game/ArtTests --extra-folder /Game/S08
-# 3. Канонический скелет из SK_<Key>_H2.fbx спеки → /Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton (+ SK_<Key>)
+# 3. Канонический скелет из SK_<Key>_H2.fbx спеки → /Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton (+ меш
+#    превью SK_<Key>); при новом sha FBX (доработка модели) меш превью переимпортируется сам, --refresh-preview —
+#    принудительно (F145, 172fd4f1)
 $L --step "<Key> skeleton" -- python tools/tripo-pipeline/anim/h2anim_ue.py skeleton $S
 # 4. Меш на канонический скелет (CLI 0.8.0, профиль skeletal-adopt)
 $T init --run-dir $R --asset-id <ASSET_ID> --primary-source tripo-<task8>-h2 \
@@ -230,9 +300,15 @@ $L --step "<Key> clips measure" -- python tools/tripo-pipeline/anim/h2anim_ue.py
 # 6. Сверка импорта: скелет, кости, LOD/треугольники/UV, слоты, текстуры, MI, дубли, клипы на меше (блокировку берёт сам)
 python tools/art/material_library/ue_hero_lookdev.py verify --config $V/review-config.json --out $V/review/verify --tag v1
 # 7. Снимок после
-$L --step "<Key> snapshot after" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E/snapshot-after.json \
-    --compare $E/snapshot-before.json --extra-folder /Game/ArtTests --extra-folder /Game/S08
+$L --step "<Key> snapshot after" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E7/snapshot-after.json \
+    --compare $E7/snapshot-before.json --extra-folder /Game/ArtTests --extra-folder /Game/S08
+# 8. Манифест клипов: после импорта клипы получают technically_imported (нужно гейту G-MANIFEST приёмки, §4.5)
+python tools/tripo-pipeline/anim/clip_manifest.py build      # → MANIFEST_CHECK PASS; один сборщик за раз (F117)
 ```
+
+`um_masters.py build` в импорте не запускать: он отказывает по дрейфу, который был до прогона, а `--force`
+переписывает общие мастера (RA-16; пилот шаг пропустил). Пересборка мастеров — только при смене графа в
+`art/um-materials/um-masters.json`, отдельной задачей с коммитом (ДС-4).
 
 `--ue-folder` обязателен. Без него CLI кладёт ассеты в `/Game/PipelineCandidates/<Asset>/<run_id>` (справка
 `ue-import --help`), а игра ищет `/Game/PipelineCandidates/<Key>/<Stage>` (`S08HeroesV2.cpp:126` `StageRoot`).
@@ -255,6 +331,10 @@ $L --step "<Key> snapshot after" -- python tools/tripo-pipeline/review/ue_conten
       checks: `bone0_is_armature_object_node`, `skeleton_is_canonical_target`, `front_axis_as_fbx_preset`,
       `figure_height_as_profile`, `skeletal_material_slots`, `sockets_weapon_head`, `uv_channels_as_profile`,
       `textures_size_colour_space_compression`, `um_instances_parent_textures_values`, `no_numbered_duplicates`.
+      FAIL check — разбор оркестратором (ДС-2), не вопрос пользователю. Известные ложные FAIL пилота и их опции:
+      `figure_height_as_profile` при поднятом оружии или рогах — `candidate.figure_top_part` (F80);
+      `skeletal_bounds_match_build_front_unambiguous` у фигуры, симметричной по глубине, —
+      `axes.front_from_best_bound_fit` (F124); оба — новым файлом профиля (§3.1) и новым run (§4.4).
 - [ ] Скелет: число костей в UE и имена `_L/_R` по HANDBOOK §2.6 (кость 0 = `SKEL_UM_Humanoid`; кость оружия
       по WEAPON_BONE или её нет).
 - [ ] Клипы (`reports/ue-*.json` от `measure`): кадр 0 = ref pose, кость 0 неподвижна, масштаб 1,0, длительности по
@@ -264,10 +344,7 @@ $L --step "<Key> snapshot after" -- python tools/tripo-pipeline/review/ue_conten
 - [ ] Снимок после: `protected_unchanged: true`, добавлены только ассеты этого героя.
 - [ ] Папка совпадает с UE_NAMES заявки: `ls unreal/Unmatched/Content/PipelineCandidates/<Key>/<Stage>/{Meshes,Materials,Textures}`,
       `…/<Key>/Rig`, `…/<Key>/H2Anim`.
-- [ ] Редакторные кадры (по желанию, для глаз):
-      `$L --step "<Key> frames" -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=Idle` (по клипу за
-      вызов), затем `python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S` (без редактора). Это диагностика,
-      а не приёмка K1/K2 (`h2anim_ue.py:28`).
+- [ ] Редакторные кадры клипов — вход приёмки клипов §4.5 (ДС-1); это не приёмка K1/K2 в игре (`-Bench`, §6.2).
 
 ### 4.3 Look-dev съёмка в редакторе (шаг 7.4)
 
@@ -278,58 +355,129 @@ python tools/art/material_library/ue_hero_lookdev.py review --config $V/review-c
 Конфиг — §3.2. Инструмент генерический: имя героя и все пути берутся из конфига, а не из списка в коде. Почему не
 `ue_h5cb1.py review` — HANDBOOK §4.6 п.6: его `--hero` берёт только четырёх зашитых героев (`ue_h5cb1.py:655`).
 
-Кадры редактора не несут отпечатка RENDER и в приёмку не идут (`ue_hero_lookdev.py:37`). Они нужны для решения по
-материалу. Если зоны вне допуска, итерация идёт через новую LUT
-(`ue_hero_lookdev.py lut --overrides <json> --out <dds>`), новый файл профиля `$P` (с новым `sha256` LUT) и повторный
-импорт по §4.4. По лёгкому режиму AGENTS.md («Iteration speed») итераций не больше 3; съёмка каждой — новым `--tag`
-(`r2`, `r3`). Силуэт, пропорции и палитра здесь не правятся: это возврат на этап 1 или 2
-(`references/acceptance-and-blender.md`).
+Кадры редактора не несут отпечатка RENDER и в приёмку не идут. Они нужны для решения по материалу.
+
+- **Устоявшиеся кадры** (F153, 172fd4f1). `review` сам выключает троттлинг фонового редактора и ждёт сходимости
+  прогрева; не сошёлся — код 3 (`settle.status: not_settled`), кадров нет: повторить съёмку (другая нагрузка на GPU —
+  убрать). `--allow-unsettled` — только для диагностики, по таким кадрам MI не подстраивать (у Leshen `Saturation`
+  1,22 подобрали на неустоявшихся кадрах).
+- **Полоса шума** (F155). Устоявшиеся кадры на тех же входах расходятся между сессиями редактора на ~4 % по якорю.
+  Зона в пределах `tolerance.luma_noise_band` (0,04) от края допуска помечается `noise band` — по ней MI не правят.
+- **Итерация материала.** Зоны вне допуска → новая LUT (`ue_hero_lookdev.py lut --overrides <json> --out <dds>`)
+  и/или скаляры MI в новом файле профиля `$P` (новый `sha256` LUT), затем без переимпорта (RC-10, 172fd4f1):
+
+  ```bash
+  python tools/art/material_library/ue_hero_lookdev.py apply-mi --config $V/review-config.json --out $V/review/<tag> \
+      --tag <tag> --profile <новый $P> [--dry-run]
+  #   задаёт только изменившиеся значения MI, LUT переимпортирует поверх себя при новом sha DDS, затем verify;
+  #   блокировку берёт сам. Новый FBX, другая текстура (кроме LUT) или другая структура ассетов — отказ с причиной:
+  #   тогда переимпорт §4.4
+  ```
+
+  По лёгкому режиму AGENTS.md («Iteration speed») итераций не больше 3 (FAIL при тюнинге — итерация, не стоп, ДС-2);
+  съёмка каждой — новым `--tag` (`r2`, `r3`).
+- **Стартовые значения** (пилот; норма — HANDBOOK §4.4). Тёмная кожа и шёлк с библиотечными specular 0,5 / sheen 0,5
+  в UE в 2–3 раза ярче концепта (F93), тёмное красное сукно с sheen 0,35 — в 2,4–2,7 раза ярче и розовое (F139): первая
+  итерация — specular 0,2–0,3, sheen ≤ 0,1 (сукно ≤ 0,05), roughness кожи 0,55–0,6. Металл: F0 — из оттенка концепта,
+  не из пресета (F138: бронза Achilles в UE шла слоновой костью); съёмка судит и оттенок металла, не только яркость
+  (F120).
+- **Класс 0** (`legacy_bake`: кость, волосы) на чёрном фоне декодер не видит, а LUT его не настраивает (путь шейдера
+  v1): только скаляры MI профиля `Saturation`, `FixClassA`/`FixGainA`/`FixSpecA` (§3.1; F131). `verify` читает и их.
+- **Перед закрытием редактора** — 0 dirty-пакетов. Создание MI помечает `M_UM_Figure_v2` грязным (как у
+  Medusa, Merlin, Harpy); сохранять его нельзя (мастер пересобирают только de010/de011 в 7b), поэтому — перезагрузка без
+  сохранения (F92):
+
+  ```bash
+  $L --step "<Key> discard master" -- python tools/tripo-pipeline/ue7a/discard_master.py --out $E7/discard-master.json
+  #   код 0 — грязных пакетов нет; 1 — остались (разбор, ничего не сохранять)
+  ```
+
+Силуэт, пропорции и палитра здесь не правятся: это возврат на этап 1 или 2 (`references/acceptance-and-blender.md`).
 
 ### 4.4 Повторный импорт после доработки
 
+Переимпорт нужен только при новом FBX (меш или подставка), другой текстуре, кроме LUT, или другой структуре ассетов.
+Скаляры MI и LUT — `apply-mi` без переимпорта (§4.3). Пилот сделал 9 переимпортов (Angel 3, Leshen 5, Achilles 4 прогона
+импорта), порядок ниже на них проверен.
+
 Новый run-каталог CLI откажет импортировать в папку, где лежат ассеты прежнего run: код 3, «holds assets this run did
-not create… use another --ue-folder» (`tripo_pipeline.py:2035-2040`). Другая папка сломает пути `Specs()`. Поэтому
-ассеты прежнего run удаляются скриптом, без ручных кликов, тем же MCP-вызовом `asset delete`, которым CLI удаляет
-свои ассеты (`ue_delete_owned`, `tripo_pipeline.py:1993-2016`; клиент `tools/tripo-pipeline/review/ue_live.py`,
-`Ue().call`). Порядок (на новом герое не проверялся):
+not create… use another --ue-folder». Другая папка сломает пути `Specs()`. Поэтому ассеты прежнего run удаляются
+скриптом, без ручных кликов, тем же MCP-вызовом `asset delete`, которым CLI удаляет свои ассеты. Порядок:
 
 1. Снимок до удаления:
-   `$L --step "<Key> snapshot before re-import" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E/snapshot-before-r<N>.json --extra-folder /Game/ArtTests --extra-folder /Game/S08`.
-2. Удалить под `$L` только ассеты из списка `stages["ue-import"].ue_owned_assets` в `manifest.json` прежнего run и
-   только внутри `/Game/PipelineCandidates/<Key>/<Stage>/`. Канонический скелет `Rig/` и клипы `H2Anim/` в этот список
-   не входят и остаются. Сначала MI (дети раньше родителя), потом меши, потом текстуры — как ранги `UE_DELETE_RANK`
-   (`tripo_pipeline.py:1989-1990`):
+   `$L --step "<Key> snapshot before re-import" -- python tools/tripo-pipeline/review/ue_content_snapshot.py $E7/snapshot-before-r<N>.json --extra-folder /Game/ArtTests --extra-folder /Game/S08`.
+2. Удалить под `$L` только ассеты из `stages["ue-import"].ue_owned_assets` в `manifest.json` прежнего run и только
+   внутри `/Game/PipelineCandidates/<Key>/<Stage>/`: MI (дети раньше родителя), потом меши, потом текстуры.
+   Канонический скелет `Rig/`, клипы `H2Anim/` и общие мастера не трогаются (W2-a, ee301065):
 
-```bash
-OLD=art/pipeline-candidates/<ASSET_ID>/<прежний run импорта>
-$L --step "<Key> delete previous import" -- python -c "
-import json, sys
-sys.path.insert(0, 'tools/tripo-pipeline/review')
-from ue_live import Ue
-root = '/Game/PipelineCandidates/<Key>/<Stage>/'
-own = json.load(open(sys.argv[1] + '/manifest.json', encoding='utf-8'))['stages']['ue-import']['ue_owned_assets']
-own = [a for a in own if a.startswith(root)]
-rank = lambda a: (0 if '/Materials/' in a else 1 if '/Meshes/' in a else 2, -len(a))
-ue = Ue()
-for a in sorted(own, key=rank):
-    if not ue.call('asset', 'delete', {'path': a}):
-        sys.exit('UE refused to delete ' + a)
-    print('deleted', a)
-print('left', ue.call('asset', 'find_assets', {'folder_path': root.rstrip('/'), 'name': '', 'recursive': True}))
-" "$OLD"
-```
+   ```bash
+   $L --step "<Key> delete previous import" -- python tools/tripo-pipeline/ue7a/delete_prev.py --key <Key> \
+       --prev-run art/pipeline-candidates/<ASSET_ID>/<прежний run импорта> [--stage H2LD] --out $E7/delete-prev-r<N>.json
+   #   --dry-run — только план; код 0 — удалено и папка пуста, 1 — UE отказал или в папке что-то осталось
+   ```
 
-   Ожидается: `left` без ассетов. Что-то осталось — это чужие ассеты в целевой папке, стоп по HANDBOOK §0.3 п.5.
-3. Новый run-каталог `<YYYYMMDD>-h2ld-ue-import-r<N>` с новым профилем, затем шаги 4, 6 и 7 §4.1 (снимок после — с
-   `--compare $E/snapshot-before-r<N>.json`). Шаг 5 (клипы) — только если менялись клипы.
-4. Последствия для шагов 7b:
+   Код 1 с остатком — в целевой папке чужие ассеты (HANDBOOK §0.3 п.5): не удалять, разбор оркестратором (ДС-2) —
+   чьи они (снимок, `git log`); удаление чужого — необратимо, только с ответом пользователя.
+3. Новый профиль (`write_import_profile.py --template <свой rev N> --previous <свой rev N> --previous-run <run rev N>
+   --rev-note …`, §3) и новый run-каталог `<YYYYMMDD>-h2ld-ue-import-r<N>`, затем шаги 4, 6 и 7 §4.1 (снимок после — с
+   `--compare $E7/snapshot-before-r<N>.json`). Шаг 5 (клипы) — только если менялись клипы.
+4. **После доработки модели** (этап 5, новый `SK_<Key>_H2.fbx`): меш превью клипов `Rig/SK_<Key>` обновляет
+   `h2anim_ue.py skeleton $S` новой спеки (переимпорт по sha FBX; `--refresh-preview` — принудительно); `frames` и
+   `measure` на устаревшем меше отказывают (F145, 172fd4f1). Явный путь с отчётом позы скелета до и после —
+   `$L --step "<Key> refresh carrier" -- python tools/tripo-pipeline/ue7a/refresh_carrier.py --key <Key> --spec $S --out <h2anim run>/reports/ue-carrier-refresh.json`.
+   Затем клипы заново (§4.1 шаг 5) и их приёмка (§4.5).
+5. **После доработки клипов** — `verify.clips_reference` в `review-config.json` → `ue-measure-clips.json` нового прогона
+   клипов (§3.2; fabf5215), затем `clip_manifest.py build` (§4.1 шаг 8).
+6. Последствия для шагов 7b:
    - MIC растворения `MI_<Key>_<Stage>_P{1,2}_Dissolve` — дети удалённых `MI_<Key>_<Stage>_P1/_P2`, у них пропал
      родитель. `de011.py apply` ставит родителя заново (`tools/art/de011/de011_apply_ue.py:68-80`). Если 7b ещё
-     впереди, это делает обычный шаг §5 п.1; если 7b уже пройден — повторить `de011.py apply` и автотесты §5 п.4.
-     Пока у MIC нет родителя, редактор может пометить его dirty (не проверено): вручную не сохранять, записать в
-     README evidence; `de011.py apply` восстанавливает связь и сохраняет MIC.
+     впереди, это делает обычный шаг §5 п.1; если 7b уже пройден — повторить `de011.py apply --only <Key>` и
+     автотесты §5 п.4. Пока у MIC нет родителя, редактор может пометить его dirty (не проверено): вручную не сохранять,
+     записать в README evidence; `de011.py apply` восстанавливает связь и сохраняет MIC.
    - Если шаг 5 повторялся, `h2anim_ue.py import` удалил клипы вместе с notify `Contact` (`h2anim_ue.py:13-15`).
-     Тогда повторить `de010.py apply` и автотесты §5 п.4.
+     Тогда повторить `de010.py apply --only <Key>` и автотесты §5 п.4.
+
+### 4.5 UE-кадры клипов и приёмка клипов (шаг 7.4a; SKILL.md 7a п.2, ДС-1)
+
+Приёмка клипов — здесь, а не на этапе 6: гейт карточки `G-MANIFEST` требует статус клипа `technically_imported`
+(импорт с тем же sha FBX), а кадры приёмки — UE-кадры редактора. До импорта карточку не выписать, а импорт раньше
+требовал принятых клипов — круг (F43, RA-01). Этап 6 сдаёт 4 клипа с PASS валидаторов (§2); «4 клипа `pass`» — выход
+7a. Порядок на героя: skeleton → import клипов → measure (§4.1 шаги 3, 5) → `clip_manifest.py build` (шаг 8) → кадры →
+приёмка.
+
+```bash
+PIN=art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json   # свет: cobble-probe удалён (ND-5), F81
+for C in Idle LungeAttack HitReact DeathSettle; do        # длинный захват — по клипу за вызов
+  $L --step "<Key> frames $C" -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=$C --light-pinned $PIN
+done
+$L --step "<Key> frames closeup" -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=LungeAttack \
+    --closeup --light-pinned $PIN
+python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S    # лист из снятых кадров, без редактора
+```
+
+- Без `--light-pinned` `frames` выходит с `SystemExit` (F81, 22c19667). Подставка по умолчанию — `SM_<Key>_H2LD_Base`
+  импорта 7a (`--no-base` — без неё; F96); камера сама отходит для фигур выше ~59 uu (F136); кадр на устаревшем меше
+  превью — отказ (F145, §4.4 п.4); прогрев не сошёлся — `settle.status: not_settled` в отчёте, переснять.
+- Notify `Contact` для кадров в редакторе не нужен; если нужен раньше 7b — задача живого редактора
+  (`references/animation-vfx-sfx.md` §7). Шаг `de010.py apply` в 7b это не отменяет (§5 п.3).
+- Каталог приёмки цикла (кадры в `<Clip>/frames/`, заполненный промпт из заготовки этапа 6, `run-acceptor.ps1`) —
+  инструментом; он сверяет sha клипов в промпте с текущими файлами (W2-a, ee301065):
+
+  ```bash
+  python tools/tripo-pipeline/ue7a/prep_acceptance.py --asset-dir art/pipeline-candidates/<ASSET_ID> --key <Key> \
+      --run <h2anim run> --spec $S --date <YYYY-MM-DD> --cycle r1 [--clips …] [--dry-run]
+  #   r2+: --previous <каталог прошлого цикла> --run <…-h2anim-r<N>> --replace "<старый run>/=<новый run>/" --refresh-sha
+  #   код 2 — нет кадра или заготовки, плейсхолдер не заполнен, sha расходится
+  ```
+
+- Приёмщики, рубрика R/C/D/L, вердикт и маршрут доработки — `references/animation-vfx-sfx.md` §10–§11; карточки —
+  `evidence/acceptance-anim/<YYYYMMDD>-r<N>/<Clip>/card.json`, проверка — `validate_card.py <card.json>
+  --print-verdict --check-files` (код 3 — пара по §8.5 `references/acceptance-and-blender.md`). Промпт Sol несёт блок
+  чтения кириллицы и «рубрика — только этот файл» (RA-03, как `references/concept-sheet.md` §11).
+- Доработка клипа: новый прогон этапа 6 → переимпорт клипов (§4.1 шаг 5), `verify.clips_reference` (§4.4 п.5),
+  `clip_manifest.py build`, кадры, повторная приёмка. Клип вскрыл дефект модели — маршрут
+  `references/animation-vfx-sfx.md` §10 (этап 5 модели, затем §4.4 п.4).
+- Выход шага: 4 карточки `pass`. Только после этого — коммит 7a и шаги 7b.
 
 ## 5. Подключение S08 (шаг 7.5) — обязательно для героя и помощника
 
@@ -344,15 +492,29 @@ print('left', ue.call('asset', 'find_assets', {'folder_path': root.rstrip('/'), 
 можно сделать ещё в 7a (SKILL.md, 7a п.3). Всё остальное в разделе — подэтап 7b (§1 п.4).
 
 1. **Строки этапа 7 из `references/new-character-registration.md`** (§5 там) — все, с их проверками:
-   - `de010.py` `HEROES` (Р7-1) и `de011.py` `CAPTURE_LOOKS` (Р7-2), затем оба `apply` под `$L` (команды — там же,
-     §5.1). Порядок: после импорта клипов и MI тела (§4);
-   - таблица `Specs()` и автотесты `S08HeroesV2Tests.cpp` (счётчик «four heroes» `:110`, имена, отношение
-     помощник/герой, `WantMs`, `WantSeconds`), `S08AudioBank` и его тесты (Р7-3…Р7-5);
+   - базовая линия `validate_registry.py` (вывод ERROR в `$W/validate-registry-before.txt`) — до de010 (RA-15, F157);
+   - `de010.py` `HEROES` (Р7-1) и `de011.py` `CAPTURE_LOOKS` (Р7-2), затем оба `apply --only <Key>` под `$L`, сначала
+     `--dry-run` (команды — там же, §5.1; W1-b, 76168867). Без `--only` они пересохраняют `AM_*_LungeAttack` и MIC всех
+     героев списка (пилот: 12 файлов MVP, ERROR `validate_registry` 1 → 5; F157, RC-14; откат — §7.3). Мастер `M_UM_Figure_v2`
+     пересохраняется только при новом графе (`tools/art/de010/master-builds.json`). Порядок: после импорта клипов и MI
+     тела (§4);
+   - таблица `Specs()` и автотесты `S08HeroesV2Tests.cpp` (счётчик «seven heroes» `:111` на 2026-10-14, имена,
+     отношение помощник/герой, `WantMs`, `WantSeconds`), `S08AudioBank` и его тесты (Р7-3…Р7-5);
    - CUE-таблица (Р7-6), три строки `+DirectoriesToAlwaysCook` (`<Key>/<Stage>`, `<Key>/Rig`, `<Key>/H2Anim` в
      `unreal/Unmatched/Config/DefaultGame.ini`; у Harpy стадия `H3LD`, анимации в `H2Anim`), `S08FighterNames.json`
      (Р7-7, Р7-8), `git add -f` (Р7-10);
    - варианты bench-фикстур обеих досок (Р7-11, генератор Д-2; без них нового бойца нет на кадрах — §6.2) и запись
-     `HEROES` листа клипов (Р6-4, Д-3).
+     `HEROES` листа клипов (Р6-4, Д-3);
+   - полнота регистрации — одной командой (RB-04; W2-a, ee301065), после всех строк и до упаковки, и ещё раз перед
+     `safe-integrate`:
+
+     ```bash
+     python tools/art/registration_check.py --heroes <Key>     # код 0 — все пункты PASS/SKIP, 1 — пропуск, 2 — ошибка входа
+     ```
+
+     Он ловит тихие откаты, которых не видят автотесты: нет строки `Specs()` (legacy-фигура), `HitType` по умолчанию
+     BLUNT (выпад молчит), нет ключа CUE-011/013, нет строк cook, пропуски de010/de011, манифеста, листа, контракта рига,
+     вариантов bench и записи реестра.
 2. **Строка `Specs()` — все 11 полей `FHeroSpec`** (`unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.h:99-119`):
 
    | Поле | Откуда |
@@ -400,7 +562,9 @@ print('left', ue.call('asset', 'find_assets', {'folder_path': root.rstrip('/'), 
 ### 6.1 Одна упаковка на изменение
 
 ```bash
-# только если регистрация добавила или переименовала Config/**.json (AGENTS.md «Packaging trap»):
+# только если регистрация добавила или переименовала Config/**.json, который должен лечь в пак (AGENTS.md «Packaging
+# trap»). Исключение — варианты bench-фикстур Config/Bench/S08Bench<Map>-<Key>.json: их нет в RuntimeDependencies,
+# packaged-клиент читает их loose-файлом (§6.2), touch и сборка игрового target ради них не нужны (F162, RA-25)
 touch unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs
 node tools/s08/build-editor.cjs Unmatched Win64 Development \
     -Project="$ROOT/unreal/Unmatched/Unmatched.uproject" -WaitMutex -NoXGE -MaxParallelActions=4
@@ -412,9 +576,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/s08/package-client.ps1
 #   Игровой target никогда не собирать с -NoLiveCoding: пакет падает при старте (package-client.ps1:40-52, HANDBOOK §4.7)
 ```
 
-Упаковка делается один раз на изменение (AGENTS.md «One package per change»). Повторные пакеты и бенчи ради
-стоимости запрещены: стоимость меряется только там, где её требует карточка, одним прогоном. Если она в пороге,
-число записывается и работа идёт дальше (AGENTS.md «No cost optimizations within budget»).
+Упаковка делается один раз на изменение (AGENTS.md «One package per change»); в пачке — одна упаковка на все фигуры
+окна 7b (пилот: одна на троих). Повторные пакеты и бенчи ради стоимости запрещены: стоимость меряется только там,
+где её требует карточка, одним прогоном. Если она в пороге, число записывается и работа идёт дальше (AGENTS.md «No
+cost optimizations within budget»). После любой переупаковки запуски листа клипов AN-18 переснимаются сами: кэш
+запуска сверяет штамп сборки (`BuildStamp.json`), `--force` не нужен (76168867).
 
 Проверка, что кукер взял ассеты. Ассеты лежат в IoStore-контейнере, поэтому листинг берётся из `.utoc`, а не из
 `.pak`: на `.pak` grep даёт 0 строк, на `.utoc` — пути (проверено 2026-10-09 на Medusa):
@@ -447,9 +613,13 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
 ```
 
 - `--fixture` с доской другой карты, несуществующий файл, путь с пробелом и `-BenchFixture=` внутри `--extra` дают
-  код 2 до запуска. Трасса `BENCH FAILED fixture load <path>` (`S08FlowGameMode.cpp:8916`) — packaged-клиент не
-  прочитал loose-файл (это чтение живым прогоном ещё не подтверждено): путь пака из регистрации Д-2 (строка
-  `RuntimeDependencies`, сборка игрового target, одна упаковка).
+  код 2 до запуска. Packaged-клиент читает loose-файл варианта — подтверждено живым прогоном пилота 7b (трасса
+  `BENCH scene fixture=S08BenchMarmoreal-Angel.json`, F158). Трасса `BENCH FAILED fixture load <path>`
+  (`S08FlowGameMode.cpp:8916`) — файл не прочитан: проверить путь; путь пака из регистрации Д-2 (строка
+  `RuntimeDependencies`, сборка игрового target, одна упаковка) — только запасной.
+- GPU-шаги (кадры `-Bench`, AN-18, замер §6.5) — без своих параллельных Blender- и UE-процессов: GPU-токен
+  `C:/tmp/unmatched-gpu.lock` берут только `live_tune`/`render_bench`, а Cycles чужого bake сдвигает кадры и цену
+  (RC-23).
 
 - `--views` и `--out` обязательны (`live_tune.py bench --help`). Каждый запуск ждёт `C:/tmp/unmatched-gpu.lock`.
   Пока открыта сессия live tune, `bench` ждёт её `stop`.
@@ -466,11 +636,30 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
   и меняет имена PNG на `bench-<View>-<clip>-f<NN>-1920x1080.png` (`S08FlowGameModeFigures.cpp:128-130`).
 - Растворение без смерти в бою проверяется отдельным запуском с `--extra=-BenchDissolve=0.5`. Это проверка, не
   приёмочный кадр.
-- Игровые листы клипов K1/K2 строит
-  `python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key> --fixture marmoreal=S08BenchMarmoreal-<Key>.json,sarpedon=S08BenchSarpedon-<Key>.json`
-  и потом `sheet --cards <AN-… клипов героя>`. Нужна запись героя в `HEROES` этого инструмента (Р6-4, Д-3); новый
-  герой — первым ключом `--heroes`, иначе K1 снимется на чужой фикстуре и `sheet` запишет проблему. Приёмка клипов
-  описана в `references/animation-vfx-sfx.md` §11.
+- Игровые листы клипов K1/K2 (AN-18) строит `clip_review_sheet.py` (W1-b, 76168867; нужна запись героя в `HEROES`,
+  Р6-4, Д-3). `--heroes` и `--cards`/`--heroes` у `sheet` обязательны: без них инструмент снимал бы и переписывал
+  листы всех героев.
+
+  ```bash
+  # один новый герой
+  python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key> \
+      --fixture marmoreal=S08BenchMarmoreal-<Key>.json,sarpedon=S08BenchSarpedon-<Key>.json
+  # пачка: каждый герой со своей фикстурой одним вызовом (F159)
+  python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key1>,<Key2> \
+      --fixture "<Key1>:marmoreal=S08BenchMarmoreal-<Key1>.json,sarpedon=S08BenchSarpedon-<Key1>.json;<Key2>:marmoreal=…,sarpedon=…"
+  # только K2, K1 — из готовых запусков (например, после доработки клипа на той же сборке)
+  python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key> --fixture … --k1-from <каталог кадров>
+  python tools/art/anim/clip_review_sheet.py sheet --heroes <Key> [--k1-from <тот же каталог>]
+  ```
+
+  Первый запуск каждой группы фикстуры снимает K1 + K2×1,6 по объединению AN-17 и карточек только этой группы, а не
+  всех героев `HEROES` (лист больше не дорожает с ростером, RC-09); остальные запуски группы — K2×1,6 по своим позам.
+  `--k1-from` K1 не снимает: берёт готовый запуск, который покрывает позы героя, снят на его же фикстуре и (packaged)
+  на той же сборке, иначе отказ. У вариантов Д-2 по одному новому бойцу на фикстуру, поэтому в пачке K1 снимается на
+  каждого героя, а `--k1-from` экономит повторные съёмки. Пилот: 591 с на доску на героя, 66 % времени 7b.
+  `sheet` не пишет карточку с пустой клеткой (код 1, пропуски названы) — переснять кадры (`--allow-missing` — только
+  черновики вне `docs/`). Лист доказывает, что клип играет в пакете, но плохо показывает, как он читается (F163:
+  DeathSettle Achilles к.0 и к.21 почти одинаковы сверху): читаемость решает приёмка клипа §4.5.
 
 ### 6.3 Проверки кадров и трасс
 
@@ -494,15 +683,17 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
       `mi=missing` (`S08FighterActor.cpp:843-845`). Без MIC фигура исчезает рывком: трасса
       `death dissolve=missing fallback=hide` (`:1308-1311`).
 - [ ] Лист для делегированной приёмки (ВР-17): K1 и K2 обеих досок, в цвете и в сером:
-      `python tools/art/visual/sheet.py <ASSET_ID> --inputs <PNG обеих досок> --out $E/game-sheet`
-      (цвет, серый Rec.709, дейтеранопия). Лист открыть и осмотреть.
+      `python tools/art/visual/sheet.py <ASSET_ID> --inputs <PNG обеих досок> --out $W/game-sheet`
+      (цвет, серый Rec.709, дейтеранопия; PNG). Лист открыть и осмотреть. В git — только JPEG-копии:
+      `python tools/tripo-pipeline/review/frames_to_jpeg.py --src $W/game-sheet --out $E/game-sheet --png-kept-at $W/game-sheet`
+      и `sheet-manifest.json` (ДС-8, RA-13: в пилоте 18 PNG листов — 45,4 МБ в одном коммите 3528ae0b).
 
 ### 6.4 Evidence
 
-- PNG остаются в `$W` (вне git). В `$E` идут JPEG 1200 px q92 и `*.evidence.json`:
+- PNG кадров, листов и бенча остаются в `$W` (вне git; ДС-8). В `$E` идут JPEG 1200 px q92 и `*.evidence.json`:
   `python tools/tripo-pipeline/review/frames_to_jpeg.py --src $W/bench-marmoreal --out $E/bench-marmoreal --png-kept-at $W/bench-marmoreal`,
   то же для Sarpedon (HANDBOOK §8). Туда же — `bench.trace.log` (в git `*.log` игнорируется, поэтому копия как `.txt`,
-  `tools/art/render/LIVE-TUNE.md`).
+  `tools/art/render/LIVE-TUNE.md`). Замер §6.5 — так же: `bench-run.json`, `nvidia-smi.csv`, трасса `.txt` и JPEG.
 - `$E/README.md` — по шаблону HANDBOOK §9. В нём числа из отчётов, что не проверялось, отступления (таблица решений
   скилла во вступлении этого файла).
 
@@ -516,9 +707,21 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
 в паке, как в подсказке `render_bench.py run --help`):
 
 ```bash
-python tools/art/render/render_bench.py run --variant dx12-lumen-high-v2 --name <content-key>-stage7 \
-    --out $E/bench --bench-fixture <значение -BenchFixture из сухого прогона>
+# GPU-токен: без файла C:/tmp/unmatched-gpu.lock render_bench отказывает (REFUSED, код 2). Занят (live tune держит его
+# всю сессию, чужой бенч) — ждать владельца; чужой токен не удалять. Свой — создать атомарно:
+( set -C; echo "owner=<ASSET_ID>-stage7 step=render_bench $(date -Is)" > C:/tmp/unmatched-gpu.lock )
+python tools/art/render/render_bench.py run --variant dx12-lumen-high-v2 --repeats 1 --name <content-key>-stage7 \
+    --out $W/render-bench --bench-fixture <значение -BenchFixture из сухого прогона> \
+    --client-args=-BenchFocusFighter=<Key>
+rm C:/tmp/unmatched-gpu.lock                      # только свой токен
 ```
+
+- `--repeats 1` — «ровно один прогон» (по умолчанию инструмент делает 3).
+- `--client-args=-BenchFocusFighter=<Key>` — без него K2 меряет героя зрителя фикстуры (Medusa), а не нового бойца.
+- `--out` — в `$W`, не в `$E`: PNG бенча в git не идут (ДС-8); в `$E` — отчёты и JPEG (§6.4). Все три пункта пилот
+  записал отступлением (F160, RA-14; `docs/art-pipeline/evidence/achilles-20261014/README.md`).
+- **Пачка — один замер** на самую тяжёлую фигуру окна 7b (больше всего треугольников; пилот — Achilles, 44 804 tris), а
+  не на каждую.
 
 Число записать в `$E/README.md`. Правка — только при превышении порога (ACC-022 60 FPS) или поломке; оптимизации в
 пределах бюджета запрещены, повторных бенчей нет (AGENTS.md «No cost optimizations within budget»). Правка одного
@@ -530,14 +733,14 @@ python tools/art/render/render_bench.py run --variant dx12-lumen-high-v2 --name 
 
 | Реестр | Когда | Что |
 |---|---|---|
-| `docs/art-pipeline/asset-registry.json` | запись создаётся на этапе 0, на этапе 7 обновляется | `status: "технически импортировано"`, `stage: "live-packaged-probe"` (словарь `vocabularies.stage`), слои и пути по образцу записи `ASSET-MEDUSA-001`. Проверка — `python tools/tripo-pipeline/validate_registry.py`. На 2026-10-09 он уже даёт FAIL на чужой ошибке (`sharedDependencies[UM-MASTERS]` sha256 `um-masters.json`), поэтому критерий такой: вывод до и после правки сравнён, новых ошибок нет (HANDBOOK §3.2 п.1, §8) |
+| `docs/art-pipeline/asset-registry.json` | запись создаётся на этапе 0; этапы 1–7a её не трогают, первый писатель — 7b (F161) | в начале 7b, вместе со строками регистрации: `status: "технически импортировано"`, `stage: "ue-editor-frames"` (импорт и UE-кадры 7a — факт) — иначе `registration_check.py` до упаковки даёт FAIL `registry`; после осмотра кадров `-Bench` (7.8) — `stage: "live-packaged-probe"` (словарь `vocabularies.stage`), слои и пути по образцу записи `ASSET-MEDUSA-001`. Проверка — `python tools/tripo-pipeline/validate_registry.py`. Он уже даёт ERROR на чужой ошибке (`sharedDependencies[UM-MASTERS]` sha256 `um-masters.json`, F91), поэтому критерий такой: базовая линия снята до de010 (§5 п.1; RA-15), вывод после сравнён с ней, новых ошибок нет (HANDBOOK §3.2 п.1, §8) |
 | `docs/game-design/visual/03-asset-registry.csv` | этап 7 | строки по образцу `SK_Merlin_H2LD` и `AM_Merlin_<Clip>` (регистрация Р7-9; колонки `00-VISUAL-BRIEF.md` §4.7): `area=hero`, `ue_path=/Game/PipelineCandidates/<Key>/<Stage>/Meshes/SK_<Key>_<Stage>`, `rollback_flag=-S08HeroesLegacy` (общий флаг отката фигур v2, AGENTS.md «Rollback flags»; у нового персонажа блок-аута ART-003 нет, откат даёт серый Body — пометка из Р7-9), `link=<ASSET_ID>; AN-…`; 4 строки `AM_<Key>_<Clip>` (`area=anim`) |
 
 Статус в 03 CSV задают правила ВР-RG07 и ВР-17 (`docs/game-design/visual/02-visual-design.md`, серия ВР-RG;
 `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`):
 
 - пока лист K1/K2 §6.3 не осмотрен — `status=технически импортировано`, `acceptance=нет`;
-- когда карточки этапа 4 и всех клипов этапа 6 дали `pass`, а лист K1/K2 обеих досок в цвете и в сером осмотрен, —
+- когда карточки этапа 4 и всех 4 клипов (приёмка 7a, §4.5) дали `pass`, а лист K1/K2 обеих досок в цвете и в сером осмотрен, —
   `status=художественно принято`, `acceptance=по делегированию <дата> (ВР-17): <путь листа>; <пути card.json>`.
   Формулировка «художественно принято, по делегированию» обязательна, без пометки этот статус ставит только
   пользователь. Это отступление от HANDBOOK §0 п.3 (вступление).
@@ -546,7 +749,8 @@ python tools/art/render/render_bench.py run --variant dx12-lumen-high-v2 --name 
 `docs/game-design/evidence/(ART|GD)-NNN/…/*.md` со строкой «Решение: принято» (`vocabularies.status`). Скилл такой акт
 не пишет, поэтому запись остаётся «технически импортировано».
 
-Если появились новые каталоги — строка в `docs/art-pipeline/DIRECTORY-MAP.md` (HANDBOOK §8).
+Если появились новые каталоги — строка в `docs/art-pipeline/DIRECTORY-MAP.md` (HANDBOOK §8). Сводная таблица
+статусов всех реестров по этапам — `references/new-character-registration.md` §10.
 
 ### 7.2 Чек-лист сдачи этапа 7
 
@@ -557,19 +761,30 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 Профили (новые файлы): build-profiles/<content-key>-h2ld-lookdev-ue-import.json, <YYYYMMDD>-h2ld-ldc-ue/review-config.json
 Карточки pass: evidence/acceptance/<…>/card.json; evidence/acceptance-anim/<YYYYMMDD>-r<N>/<Clip>/card.json ×4
 
-- [ ] Вход §2: вердикты pass (validate_card.py код 0; у модели с кодом 3 — final.json пары с pass), FBX UM_FBX_v1, слот = materials.atlas, base_seethrough в пороге,
+- [ ] Вход §2: модель pass (validate_card.py код 0; с кодом 3 — final.json пары с pass), 4 клипа авторены с PASS
+      валидаторов и clip_manifest check, FBX UM_FBX_v1, слот = materials.atlas, base_seethrough /2 в пороге,
       source-spec tripo-<task8>-h2.json
-- [ ] Среда: MCP :8123, каждая MCP-команда под ue_lock.py (ue_hero_lookdev — без обёртки), свои PID записаны
+- [ ] Среда: агентский скрытый редактор (-RenderOffScreen, console_drop, без -LiveCoding), PID в $W/editor.pid,
+      один 7a за раз; каждая MCP-команда под ue_lock.py (ue_hero_lookdev — без обёртки)
+- [ ] um_masters verify: только известный дрейф F91 (figure, base_marker), build не запускался
+- [ ] Профили — write_import_profile.py / write_review_config.py: candidate.figure_top_part при оружии или рогах
+      выше головы, footprint_m из rig-report, side_camera из SIDE_VIEW, light_profile_pinned
 - [ ] init с --export-basename SK_<Key>_<Stage>; ue-import-report.json: technically_imported, passed, непрошедших
       checks нет; повтор → skipped
 - [ ] Скелет Rig/SK_<Key>_Skeleton; кости по HANDBOOK §2.6; сокеты Weapon/Head ± 0,05 uu (или Weapon на кости удара при WEAPON_BONE null)
-- [ ] Клипы H2Anim ×4: measure — кадр 0 = ref pose, кость 0 неподвижна, масштаб 1,0, длительности HANDBOOK §2.8
+- [ ] Клипы H2Anim ×4: measure — кадр 0 = ref pose, кость 0 неподвижна, масштаб 1,0, длительности HANDBOOK §2.8;
+      clip_manifest.py build → MANIFEST_CHECK PASS
 - [ ] review-config.json: каждый ключ пройден (verify-блок, zones, anchor_zone, side_camera — свои, не Medusa)
-- [ ] ue_hero_lookdev verify: passed true; review — зоны в допусках (≤ 3 итерации, повторный импорт по §4.4)
-- [ ] Снимок до/после: protected_unchanged: true
-- [ ] 7b начат без GUI-редактора на checkout и без Live Coding; иначе — гейт SKILL.md §5 п.7, пакет пользователю
-- [ ] Регистрация этапа 7 (references/new-character-registration.md) — все строки и их проверки PASS
-- [ ] de010.py apply (notify Contact) и de011.py apply (MIC растворения) — после последнего импорта клипов и MI
+- [ ] ue_hero_lookdev verify: passed true; review — кадры settled, зоны в допусках (≤ 3 итерации через apply-mi;
+      переимпорт §4.4 только при новом FBX, текстуре или структуре)
+- [ ] Снимок до/после: protected_unchanged: true; discard_master.py — 0 dirty-пакетов
+- [ ] Приёмка клипов §4.5: 4 карточки pass (validate_card.py код 0 или пара)
+- [ ] Коммит 7a; редактор закрыт оркестратором (0 dirty); 7b без GUI-редактора на checkout и без Live Coding;
+      интерактивный редактор — гейт SKILL.md §5 п.7, пакет пользователю
+- [ ] Регистрация этапа 7 (references/new-character-registration.md) — все строки и их проверки PASS;
+      registration_check.py --heroes <Key> → код 0
+- [ ] Базовая линия validate_registry до de010; de010.py apply --only <Key> (notify Contact) и de011.py apply
+      --only <Key> (MIC растворения) — после последнего импорта клипов и MI; MVP не пересохранены
 - [ ] Specs(): 11 полей FHeroSpec из заявки и замеров; DefaultGame.ini: 3 строки cook
 - [ ] Сборка UnmatchedEditor: "Result: Succeeded"; Unmatched.S08: EXIT CODE 0, нет Result={Fail};
       HeroesV2.Contact PASS (notify на LungeAttack), HeroesV2.Dissolve PASS
@@ -578,12 +793,17 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
       с -BenchFocusFighter=<Key>: PNG осмотрены (новый боец на K2), нет BENCH FAILED fixture load;
       RENDER код 0 (--shot с p вместо точки); ARTLOOK heroes=v2 + backdrop доски; BENCH focus без error;
       ARTPREVIEW heroesV2 … clips=4/4; нет missing= / fallback=legacy / anim … missing=1; dissolve mi= не missing
-- [ ] Лист K1/K2 обеих досок, цвет + серый — $E/game-sheet, осмотрен
+- [ ] Лист K1/K2 обеих досок, цвет + серый — PNG в $W/game-sheet, осмотрен; в $E/game-sheet — JPEG
+- [ ] Лист клипов AN-18: run --heroes <Key> со своей фикстурой (пачка — карта фикстур на героя), sheet --heroes <Key>
+- [ ] Замер стоимости: один на окно 7b, самая тяжёлая фигура; --repeats 1, GPU-токен, --client-args=-BenchFocusFighter=<Key>,
+      --out в $W; число в README
 - [ ] Evidence $E: JPEG 1200 q92 + *.evidence.json, трасса, README по HANDBOOK §9 с отступлениями
-- [ ] asset-registry.json: технически импортировано / live-packaged-probe; validate_registry — новых ошибок нет
+- [ ] asset-registry.json: технически импортировано / ue-editor-frames в начале 7b → live-packaged-probe;
+      validate_registry — новых ошибок против базовой линии нет
 - [ ] 03-asset-registry.csv: строки по ВР-RG07/ВР-17 с пометкой делегирования
-- [ ] Свои процессы остановлены по PID; редактор пользователя не тронут; 0 dirty-пакетов
-- [ ] В git НЕ идут: work/, .staging/, logs/*.log, run.lock, *.fbm/, PNG кадров, 4K-мастера, сырые GLB (per-asset .gitignore этапа 0)
+- [ ] Свои процессы остановлены по PID; 0 dirty-пакетов
+- [ ] В git НЕ идут: work/, .staging/, logs/*.log, run.lock, *.fbm/, PNG кадров, листов и бенча, 4K-мастера,
+      сырые GLB (per-asset .gitignore этапа 0)
 ```
 
 ### 7.3 Коммит
@@ -593,8 +813,19 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
   `reset`, `clean` и push.
 - `.uasset` — только `git add -f` поимённо: `Content/` в `unreal/Unmatched/.gitignore`. Это ассеты
   `<Key>/<Stage>/**`, `<Key>/Rig/**`, `<Key>/H2Anim/**` (включая `AM_<Key>_LungeAttack` с notify после `de010.py
-  apply`), `/Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_P{1,2}_Dissolve` и пересобранный `M_UM_Figure_v2`
-  (регистрация Р7-10). Образец того, что лежит в git, — `git ls-files unreal/Unmatched/Content/PipelineCandidates/Medusa`.
+  apply`), `/Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_P{1,2}_Dissolve` (регистрация Р7-10). `M_UM_Figure_v2` —
+  только если граф мастера сменился (новая запись в `tools/art/de010/master-builds.json`). Образец того, что лежит в
+  git, — `git ls-files unreal/Unmatched/Content/PipelineCandidates/Medusa`.
+- **Только ассеты нового героя.** `git status` по `Content/` показывает пересохранённые файлы других героев
+  (`AM_*_LungeAttack`, `MI_*_Dissolve` MVP и пилота) — значит, de010/de011 шли без `--only`: вернуть поимённо только
+  те файлы, которые пересохранил свой прогон (список — в его `apply.json`; `git checkout -- <путь>` на каждый), как
+  оркестратор пилота (F157, 3528ae0b), и сверить `validate_registry` с базовой линией. Чужие незакоммиченные правки
+  не трогать.
+- Перед коммитом: тесты инструментов зелёные (70905fa2) — `python -m pytest tools/tripo-pipeline/tests
+  tools/art/visual/tests tools/tripo-pipeline/blender/h2_bake/tests tools/art/acceptance -q`; допустимы только 3 xfail
+  известного дрейфа данных (пресеты Merlin/Arthur, UM-MASTERS; F91, RA-16). Зависший `.git/index.lock` —
+  `python tools/art/pipeline_batch/git_lock.py [--remove-stale]`: снимается только блокировка старше 2 мин при
+  отсутствии живых процессов git (F82, RC-21).
 - Исключения из коммита задаёт per-asset `.gitignore`, созданный на этапе 0 (шаблон —
   `references/intake-and-evidence.md` §3).
 
@@ -602,6 +833,8 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 
 Работа в worktree интегрируется только так (AGENTS.md «Integration workflow»):
 
+0. `python tools/art/registration_check.py --heroes <Key>` → код 0 на ветке, которая уже содержит свежий
+   `fix/admin-panel` (параллельная ветка могла переписать общие файлы регистрации; RB-04).
 1. `tools/git/safe-integrate.sh <branch>` — сухой прогон.
 2. `tools/git/safe-integrate.sh <branch> --apply`. Ветка должна уже содержать свежий `fix/admin-panel`, и на ней
    должны пройти сборка и тесты. При изменениях в `unreal/` скрипт откажет, пока запущены UnrealEditor, UBT или
@@ -642,7 +875,7 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
    (§7.1, `area` по `00-VISUAL-BRIEF.md` §4.7) и коммитом. Строку cook и bench-кадры добавляет трек ENV, когда
    размещает проп.
 
-## 9. Ловушки (проверены 2026-10-09)
+## 9. Ловушки (проверены 2026-10-09; строки с F — пилот 2026-10-13/14)
 
 | Ловушка | Симптом | Правило |
 |---|---|---|
@@ -663,7 +896,7 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 | Карта кромки и LUT | «нет текстуры» при сверке имён | `Edge` или `EdgeMask`, LUT по короткому ключу — из профиля, сверка `ls` (§2) |
 | 2048 для всего | ложный FAIL размера подставки | 2048² — карты фигуры; у подставки бывают свои 1024² (Harpy) |
 | Сокет без кости оружия | check `sockets_weapon_head` FAIL при `WEAPON_BONE: null` | `Weapon` — на кости удара из профиля (Harpy `foot.R`), `Head` обязателен (§3.1) |
-| Новый `Config/**.json` | в паке нет профиля или файла, который должен лежать в паке | touch `Unmatched.Build.cs` + сборка игрового target до упаковки (AGENTS.md «Packaging trap»). Вариант bench-фикстуры в пак не нужен: packaged-клиент читает его loose-файлом (§6.2) |
+| Новый `Config/**.json` | в паке нет профиля или файла, который должен лежать в паке | touch `Unmatched.Build.cs` + сборка игрового target до упаковки (AGENTS.md «Packaging trap»). Вариант bench-фикстуры `Config/Bench/S08Bench<Map>-<Key>.json` — исключение: его нет в `RuntimeDependencies`, packaged-клиент читает его loose-файлом (§6.1–6.2; F158, F162) |
 | `UnrealPak -List` по `.pak` | 0 строк, «кукер всё выбросил» | ассеты в IoStore: листинг `.utoc` (§6.1) |
 | Кукер не взял ассеты | в редакторе есть, в игре `fallback=legacy` | три строки `+DirectoriesToAlwaysCook` на героя; Dissolve покрывает `/Game/UM/Materials/v2` (`DefaultGame.ini:45`) |
 | Нет MIC растворения | фигура исчезает рывком при смерти, `HeroesV2.Dissolve` FAIL | `de011.py apply` по регистрации, повтор после повторного импорта MI (§4.4); проверка `-BenchDissolve` (§6.3) |
@@ -678,4 +911,22 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 | Клип без узла меша / клип «поверх» | AnimSequence не создан / смесь ключей | HANDBOOK §2.8, §7.5; `h2anim_ue.py import` удаляет старый клип сам — вместе с notify (§5 п.3) |
 | Образец `build_tripo_medusa.py` | `SKEL_Medusa`, кость `weapon`, фигура смотрит в +Y | не в git, запрещён как образец (HANDBOOK §1); образцы — `tools/tripo-pipeline/blender/candidate_build/*`, `h2_bake/*` |
 | Байты из живого Blender | невоспроизводимый FBX/PNG | только headless; MCP Blender — осмотр (HANDBOOK §0.1, §6) |
+| Видимый или свёрнутый редактор 7a | консоль не берёт фокус, `py_file` и `editor_python` падают по таймауту (F121) | скрытый редактор + `console_drop.py`, `UE_CONSOLE_DROP` (§1 п.1; F125) |
+| Два агента 7a на одном :8123 | второй потеряет редактор, когда первый закроет свой PID | один 7a за раз, редактор пачки — у оркестратора (§1 п.1, ДС-3) |
+| `um_masters.py build` в импорте | отказ по дрейфу RimColor, бывшему до прогона (F91) | только `verify`; пересборка — при смене графа, отдельно (§4.1, ДС-4) |
+| Поднятое оружие или рога выше головы | FAIL `figure_height_as_profile` (F80) | `candidate.figure_top_part` (§3.1) |
+| Фигура, симметричная по глубине | FAIL `skeletal_bounds_match_build_front_unambiguous` (F124) | `axes.front_from_best_bound_fit: true` (§3.1) |
+| `h2anim_ue.py frames` без света | `SystemExit`: `cobble-probe` удалён (F81) | `--light-pinned <review-b3.2.json>` (§4.5) |
+| Клип-кадры после доработки модели | старый меш превью (F145) | `h2anim_ue.py skeleton` новой спеки (переимпорт по sha), `refresh_carrier.py` (§4.4 п.4) |
+| Грязный `M_UM_Figure_v2` после MI | вопрос «сохранить?» при закрытии редактора (F92) | `discard_master.py` (§4.3), мастер не сохранять |
+| Съёмка на неустоявшихся кадрах | MI подобраны под шум прогрева (F153) | `review` код 3 `not_settled` — переснять (§4.3) |
+| Зона у края допуска | вердикт яркости меняется между сессиями (F155) | полоса шума ±4 %: по `noise band` MI не правят (§4.3) |
+| Подстройка MI полным переимпортом | +20–30 мин редактора на фигуру (RC-10) | `apply-mi` (§4.3); переимпорт — только FBX, текстура, структура |
+| `verify` после доработки клипов | FAIL `h2anim_clips_play_on_mesh` | `verify.clips_reference` → новый `ue-measure-clips.json` (§3.2) |
+| `side_camera` по картинке | боковой кадр UE с другого бока, чем концепт (F98) | `SIDE_VIEW` left → `+X`, right → `-X` (§3.2) |
+| `base_seethrough` по плоскости | ложный FAIL на кромке выпуклого верха (F149) | схема `/2` по умолчанию (`--aim surface`) (§2) |
+| de010/de011 без `--only` | пересохранены `AM_*_LungeAttack` и MIC всех героев, ERROR `validate_registry` (F157) | `--only <Key>`, базовая линия до de010, откат поимённо (§5 п.1, §7.3) |
+| `render_bench.py` без токена или фокуса | REFUSED; K2 меряет Medusa; три прогона; PNG в git (F160) | GPU-токен, `--repeats 1`, `--client-args=-BenchFocusFighter=<Key>`, `--out $W` (§6.5) |
+| Лист AN-18 на несколько новых героев | одна фикстура на запуск (F159) | `--fixture "<Key>:…;<Key2>:…"` (§6.2) |
+| Строка регистрации пропущена | тихий откат: legacy-фигура, немой выпад, `missing` CUE (RB-04) | `registration_check.py --heroes <Key>` (§5 п.1, §7.4) |
 | Остальное | дубли `Name_1`, Interchange при переимпорте, 47 dirty-пакетов, Restore Packages, порядок `Rotator`, кадр 888×500 | HANDBOOK §7.6 |

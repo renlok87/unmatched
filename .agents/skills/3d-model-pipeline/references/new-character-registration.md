@@ -6,7 +6,12 @@
 `unreal/Unmatched/Source/`, `unreal/Unmatched/Config/`, `docs/art-pipeline/rig/` и `docs/unreal/contracts/`. Сверка
 выполнена 2026-10-09 после коммита `f634d660` и повторена после раунда 2 переписывания скилла (доработки Д-1…Д-3 в
 рабочей копии): номера строк даны на это состояние. Перед правкой место находится тем же grep, номер строки только
-помогает.
+помогает. С пилота 2026-10-14 персонажей семь: к четырём MVP добавлены Angel, AncientLeshen, Achilles (`3528ae0b`),
+поэтому строки сдвинулись, а счётчики и списки ниже выросли; образец «отдельными строками» — записи пилота.
+
+Полноту регистрации проверяет один инструмент (RB-04; W2-a, ee301065) — в 7b после всех строк, до упаковки, и перед
+`safe-integrate`: `python tools/art/registration_check.py --heroes <Key>` → код 0 (таблица «герой × место», пункты
+§3–§5 этого файла; §9).
 
 Норма производства — `docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md` (далее HANDBOOK). HANDBOOK §4.7 («обязательно для героя и
 помощника») называет три правки (Specs, DefaultGame.ini, `git add -f`), и этого недостаточно: автотесты `Unmatched.S08.HeroesV2.*` проверяют больше.
@@ -25,9 +30,13 @@ VFX и SFX, 7 = упаковка, импорт в UE и подключение S
   `rig-contract.json` → `optional_extensions` (`crown_snakes`, `cloak`, `harpy_wings`: `crown_snake.NN`,
   `cloth_front/back`, `wing_tip.L/R`; все со статусом «предложено, не реализовано», `rig-contract.json:169-184`). Тот же
   стоп — при новом классе MatID (HANDBOOK §4.4, §0.3 п.7) и при негуманоидной анатомии.
+- **Сбой инструмента — не вопрос пользователю.** Отказ `registration_check`, `clip_manifest.py check`, `de010.py`,
+  тестов или сборки на строках этого файла — разбор оркестратором: причина, фикс строки или инструмента, строка F в
+  NOTES (ДС-2, `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`). Вопрос пользователю —
+  только решения вне делегирования, как новая кость выше.
 - Окружение и задники досок к этому файлу не относятся (трек ENV-MAPS, AGENTS.md «Board scenes and heroes»).
 - **Имя бойца в автотестах — до правки `Specs()`.** Автотесты берут имена вне ростера как «незнакомый герой»:
-  `S08AudioTests.cpp:49` — `Robin Hood`, `S08HeroesV2Tests.cpp:107` и `:489` — `Sinbad`. Если `FIGHTER_NAME` нового
+  `S08AudioTests.cpp:49` — `Robin Hood`, `S08HeroesV2Tests.cpp:108` и `:490` — `Sinbad`. Если `FIGHTER_NAME` нового
   персонажа совпадает с таким именем, его строка `Specs()` ломает эти тесты, и этап 7 не проходит (`EXIT CODE` ≠ 0).
   Поэтому до Р7-3 — `grep -n '"<FighterName>"' unreal/Unmatched/Source/Unmatched/S08/*Tests.cpp` (без учёта
   регистра: `grep -in`). Каждое совпадение вне строк, которые добавляет сам персонаж (Р7-4, Р7-5), — замена имени в
@@ -57,7 +66,7 @@ VFX и SFX, 7 = упаковка, импорт в UE и подключение S
 | `<IdleSeconds>` | `IDLE_SECONDS` | `2.5` | `56/24` | Specs(), `clip_review_sheet.py` HEROES; длина клипа Idle = N/24; совпадение с чужим Idle допустимо (Д-3) |
 | `<ContactFrame>` | `LUNGE_CONTACT_FRAME` | `7` | `8` | Specs(), de010, тест Contact |
 | `<BudgetUU>`, `<MinUU>`, `<MaxUU>` | `FIGURE_HEIGHT_M` × 100, `FIGURE_HEIGHT_RANGE_M` × 100 | `55`, `52`, `56` | `55`, `50`, `55` | Specs(); `figure_height_m` профиля ue-import |
-| `<PRE>` | `CLIP_PREFIX` (решение скилла: 3–4 заглавные буквы от `<Character>`) | `ARTH` | `MED` | префикс id клипа в манифесте (`^[A-Z]{3,4}-…`, `clip-manifest.schema.json:35`), `clip_review_sheet.py` HEROES; не должен совпадать с `MED`, `HAR`, `ARTH`, `MER` |
+| `<PRE>` | `CLIP_PREFIX` (решение скилла: 3–4 заглавные буквы от `<Character>`) | `ARTH` | `MED` | префикс id клипа в манифесте (`^[A-Z]{3,4}-…`, `clip-manifest.schema.json:35`), `clip_review_sheet.py` HEROES; не должен совпадать с занятыми (`clip_manifest.py` `CHARS`; на 2026-10-14 `MED`, `HAR`, `ARTH`, `MER`, `ANG`, `LESH`, `ACH`) |
 | `<AUDIO_KEY>` | `AUDIO_KEY` (решение скилла: `<Character>` заглавными) | `ARTHUR` | `MEDUSA` | банк звука `DTH-<AUDIO_KEY>`, `VO-<AUDIO_KEY>-…`; совпадает с правилом у всех четырёх существующих |
 | `<HIT_TYPE>` | `HIT_TYPE` (слот `hit_type`, этап 6, `references/animation-vfx-sfx.md` §9) | `BLADE` | `ARROW` | `S08AudioBank::HitType` |
 | `<owner_slug>` | `OWNER_HERO_SLUG` (только помощник без нового героя; иначе `null`) | — | — | `--hero-slug` варианта bench-фикстуры (Д-2 «Только помощник»), ключ владельца в `S08FighterNames.json` (Р7-8) |
@@ -79,11 +88,11 @@ VFX и SFX, 7 = упаковка, импорт в UE и подключение S
 
 ```bash
 python -c "import json;print(sorted(json.load(open('docs/art-pipeline/rig/rig-contract.json',encoding='utf-8'))['skeletons']['UM_HUMANOID_17_v2']['characters']))"
-#   2026-10-09: ['Arthur', 'Harpy', 'Medusa', 'Merlin']
+#   2026-10-14: ['Achilles', 'AncientLeshen', 'Angel', 'Arthur', 'Harpy', 'Medusa', 'Merlin']
 ```
 
-От `CHARACTER` выводятся `AUDIO_KEY` (заглавными: `ROBINHOOD`) и `CLIP_PREFIX` (3–4 заглавные, не `MED`, `HAR`,
-`ARTH`, `MER`: `ROB`).
+От `CHARACTER` выводятся `AUDIO_KEY` (заглавными: `ROBINHOOD`) и `CLIP_PREFIX` (3–4 заглавные, не из занятых в
+`clip_manifest.py` `CHARS`: `ROB`).
 
 Значения существующих персонажей выписаны из `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp:105-108`:
 
@@ -93,6 +102,9 @@ python -c "import json;print(sorted(json.load(open('docs/art-pipeline/rig/rig-co
 | Merlin | нет | 45 (40–48) | 44,986 / 49,42 | 3,0 | 8 (тычок посохом) |
 | Medusa | да | 55 (50–55) | 55,009 / 55,01 | 56/24 | 8 (выпуск стрелы) |
 | Harpy | нет | 42 (35–42) | 42,0 / 42,0 | 2,0 | 7 (удар когтями, окно к.7–9) |
+| Angel (пилот) | да | 55 (52–56) | 55,0 / 55,909 (поднятый меч) | 2,5 | 7 |
+| Ancient Leshen (пилот) | да | 55 (50–55) | 55,003 / 73,56 (рога выше черепа) | 56/24 | 8 |
+| Achilles (пилот) | да | 55 (52–56) | 55,0 / 54,9931 | 2,5 | 7 |
 
 ## 2. Доработки инструментов Д-1…Д-3: сделаны, для нового персонажа — только данные
 
@@ -104,9 +116,9 @@ H2.1-базы в `preview`, рамка концепта `frame`, TeamAccent бе
 строка `HEROES`, карточки `anim.csv`). Проверка, что доработки на месте в текущем checkout:
 
 ```bash
-python -m pytest tools/tripo-pipeline/blender/h2_bake/tests -q    # Д-1: 22 passed (test_weapon_side.py 12,
-                                                                   #   test_new_character_stages.py 10; Blender-тест
-                                                                   #   без Blender 5.2 — skipped)
+python -m pytest tools/tripo-pipeline/blender/h2_bake/tests -q    # Д-1: все passed (2026-10-14: 163, в том числе
+                                                                   #   test_weapon_side.py, test_new_character_stages.py;
+                                                                   #   Blender-тест без Blender 5.2 — skipped)
 python tools/art/render/live_tune.py bench --help | grep -- --fixture         # Д-2: флаг есть
 python tools/art/anim/clip_review_sheet.py run --help | grep -- --fixture     # Д-3: флаг есть
 python tools/art/anim/clip_review_sheet.py --check                # Д-3: "check": "PASS", "fails": []
@@ -199,6 +211,11 @@ node backend/node_modules/ts-node/dist/bin.js --transpile-only -P backend/tsconf
 - `--hero-name` и `--sidekick-name` обязаны точно совпасть с `FighterName` новых строк `Specs()` (Р7-3): клиент
   выбирает v2-фигуру по имени бойца (`S08HeroesV2::Find`), `heroSlug` задаёт только портрет и рубашку.
 - Вариант сохраняет статы King Arthur (здоровье 18, движение 2, ближний бой) — для кадров этого достаточно.
+- `--sidekick-name` — только для помощника, у которого есть своя v2-фигура (строка `Specs()`): помощник без фигуры
+  стоит на доске заглушкой. У героя пилота без фигуры помощника (Patroclus у Achilles) флаг не передавали: на месте
+  `f-1-sk0` остался Merlin v2 (F135). Номер помощника на подставке и табличка «№» в игре сейчас есть только у Harpy
+  (`S08FighterActor.cpp`, `S08HeroesV2.cpp` `HarpyNumber`, 1–3); нумерованные помощники других героев — C++ до ростера
+  (RB-10), не строка регистрации.
 - Файлы вариантов коммитятся вместе с персонажем: без них `--check` их не видит, а кадры не воспроизводятся.
 - **Только помощник** (новый помощник уже подключённого героя, `OWNER_HERO_SLUG` задан). Генератор требует
   `--hero-name`/`--hero-slug` всегда: передаётся текущий владелец, новый боец — только `--sidekick-name`:
@@ -223,9 +240,10 @@ python tools/art/render/live_tune.py bench --map marmoreal --fixture S08BenchMar
 - редактор (без `--packaged`) — абсолютный путь файла в checkout (`worktree`), сборка не нужна;
 - packaged — копия из пака (`pak`), если `Saved/StagedBuilds/Windows/Manifest_UFSFiles_Win64.txt` содержит
   `Unmatched/Config/Bench/<файл>`; иначе абсолютный путь файла в checkout (`loose`), **без перепаковки**. Чтение
-  loose-файла packaged-клиентом живым прогоном ещё не подтверждено (основание — UE 5.8 `IsNonPakFilenameAllowed` не
-  запрещает `.json`, прецедент `-BenchMoveDraft=<abs json>` в `docs/game-design/evidence/DE-FOOTAGE/2026-10-04/B/bench/`).
-  Если в `bench.trace.log` есть `BENCH FAILED fixture load <path>` — путь пака ниже.
+  loose-файла packaged-клиентом подтверждено живым прогоном пилота 7b (трасса
+  `BENCH scene fixture=S08BenchMarmoreal-Angel.json`, F158). Поэтому варианты не трогают `Unmatched.Build.cs`: touch и
+  сборка игрового target ради них не нужны (F162). Если в `bench.trace.log` есть `BENCH FAILED fixture load <path>` —
+  путь пака ниже.
 
 Путь пака (только при отказе loose или если вариант нужен в паке надолго): строка
 `RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08Bench<Map>-<Key>.json", StagedFileType.UFS);` на каждый файл
@@ -247,27 +265,37 @@ Idle, LungeAttack, HitReact, DeathSettle (шаблон — комментари�
 ```
 
 - Четыре карточки клипов — новые строки `docs/game-design/visual/06-tasks/anim.csv` (area `anim`) со следующими
-  свободными номерами (на 2026-10-09 занято до `AN-36`; карточка этапа 0 `VISUAL_CARD_ID` берёт свой номер раньше).
+  свободными номерами (на 2026-10-14 занято до `AN-144`; карточка этапа 0 `VISUAL_CARD_ID` берёт свой номер раньше;
+  номер — по максимуму в файле на момент записи, в пачке — одним писателем, иначе две фигуры возьмут один номер).
   Образец — `AN-01…AN-04` King Arthur: `title` содержит `(<Clip>)` («King Arthur — выпад (LungeAttack), клип D-11»),
   `keyframes` — строки `<мс> мс к.<N>: …`, `timing` — длина и кадры при 24 fps.
 - Страж реестра (`--check`, `run`, `sheet`): каждая карточка из `HEROES` есть в `06-tasks/*.csv` и её `title`
   называет свой клип; карточка с чужим клипом или со старым вычисленным номером `AN-17…AN-20` — ошибка до листа.
-- Кадры K1 = объединение `UNION` (AN-17) и кадров `к.N` из `keyframes` карточек всех персонажей `HEROES`: ключевые
-  кадры нового клипа попадают в K1 сами.
+- Кадры K1 = объединение `UNION` (AN-17) и кадров `к.N` из `keyframes` карточек **группы запуска** — героев с той же
+  фикстурой (76168867): ключевые кадры нового клипа попадают в K1 сами, а лист не дорожает с каждым героем `HEROES`
+  (RC-09).
 - Боец трассы опознаётся по фокусу запуска (`BENCH clip-pose … fighter=<id>` в каталоге `<frames>/<map>/<Key>`).
   Длина Idle — запасной признак и только когда она уникальна среди `HEROES`: совпадение Idle с чужим героем лист не
   ломает, уникальность Idle больше не требование заявки.
-- K1 снимает первый ключ `--heroes`; если K1 и K2 сняты на разных `-BenchFixture`, `sheet` пишет проблему (тот же id
-  бойца может быть другой фигурой). Поэтому новый персонаж идёт первым ключом и со своим вариантом Д-2.
+- Первый запуск каждой группы фикстуры снимает K1 + K2×1,6, остальные — только K2×1,6 по своим позам. У каждого
+  нового персонажа — свой вариант Д-2, поэтому несколько новых героев идут одним вызовом через карту фикстур на героя
+  (F159): `--fixture "<Key1>:marmoreal=…,sarpedon=…;<Key2>:marmoreal=…,sarpedon=…"`.
+- `--heroes` у `run` и `--heroes`/`--cards` у `sheet` обязательны (RB-12): по умолчанию инструмент снял бы всех
+  героев и переписал бы их закоммиченные листы. `sheet` не пишет карточку с пустой клеткой (код 1) — переснять кадры;
+  `--allow-missing` — только черновик вне `docs/`.
+- Готовый запуск пропускается, только если совпал штамп сборки (`BuildStamp.json`), виды, позы и фикстура: после
+  переупаковки кадры переснимаются сами, `--force` не нужен. `--k1-from <DIR>` — K2 без нового K1: K1 берётся из
+  готового запуска того же героя на его фикстуре и той же сборке (повторная съёмка после доработки клипа).
 
 ```bash
 python tools/art/anim/clip_review_sheet.py --check        # "check": "PASS", "fails": [] (AN-01…AN-16 прежние)
 python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key> \
     --fixture marmoreal=S08BenchMarmoreal-<Key>.json,sarpedon=S08BenchSarpedon-<Key>.json
-python tools/art/anim/clip_review_sheet.py sheet --cards <AN-… четырёх клипов через запятую>
+python tools/art/anim/clip_review_sheet.py sheet --heroes <Key>     # или --cards <AN-… четырёх клипов через запятую>
 ```
 
-`run --fixture FILE` годится только с одной доской (`--maps marmoreal`); для двух досок — пары `map=FILE`. Значение
+`run --fixture FILE` годится только с одной доской (`--maps marmoreal`); для двух досок — пары `map=FILE`, для
+нескольких героев — карта `<Key>:…;<Key2>:…` (часть без `<Key>:` — фикстура остальных героев вызова). Значение
 уходит в `live_tune.py bench --fixture`. `-BenchFocusFighter` `run` не добавляет и добавлять не нужно: фокус клипа задаёт
 `-BenchClipPoseFighter` (а `S08FxBenchFocus` выполняется после разбора поз и перезаписал бы фокус). Пробный запуск —
 после этапа 7 (Specs, упаковка). Лист открыть и осмотреть: в каждой строке фигура нового персонажа.
@@ -296,11 +324,11 @@ LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK
 
 | № | Файл:строка | Что добавить (по образцу) | Проверка |
 |---|---|---|---|
-| Р6-1 | `tools/tripo-pipeline/anim/clip_manifest.py:41-42` (`CHARS`) | `"<Character>": ("<PRE>", "<ASSET_ID>")` | Р6-3 |
-| Р6-1 | там же `:44-47` (`H2ANIM`) | `"<Character>": "art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim.json"` | Р6-3 |
-| Р6-1 | там же `:5-6`, `:277` (текст «16 слотов = 4 клипа × 4 персонажа») | число слотов в тексте: 4 × число персонажей | — |
-| Р6-2 | `docs/art-pipeline/animation-library/clip-manifest.schema.json:36` (`character.enum`) | `"<Character>"` в перечисление `["Medusa", "Harpy", "Arthur", "Merlin"]` | Р6-3 |
-| Р6-3 | `docs/art-pipeline/animation-library/clip-manifest.json` (генерируется) | пересборка: 4 новых слота `<PRE>-Idle/LungeAttack/HitReact/DeathSettle`, заполненные клипами H2Anim | `python tools/tripo-pipeline/anim/clip_manifest.py build` → `MANIFEST_CHECK PASS` (build сам вызывает check) |
+| Р6-1 | `tools/tripo-pipeline/anim/clip_manifest.py` после словарей `CHARS`/`H2ANIM` (`:42-56`, образец — строки пилота) | отдельными строками с комментарием: `CHARS["<Character>"] = ("<PRE>", "<ASSET_ID>")` и `H2ANIM["<Character>"] = "art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim.json"` | Р6-3 |
+| Р6-1 | там же, `H2ANIM_CLIP` (только при доработке одного клипа новым прогоном, F103) | `H2ANIM_CLIP["<Character>", "<Clip>"] = "art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim-r<N>.json"` — остальные клипы берут спеку из `H2ANIM`. Без строки G-MANIFEST падает: sha проверки ≠ зарегистрированного прогона (76168867) | Р6-3 |
+| Р6-1 | там же, docstring и `notes` (текст «28 слотов: 4 клипа D-11 x 7 персонажей») | число слотов в тексте: 4 × число персонажей | — |
+| Р6-2 | `docs/art-pipeline/animation-library/clip-manifest.schema.json:36` (`character.enum`) | `"<Character>"` в перечисление (на 2026-10-14 — четыре MVP и три героя пилота) | Р6-3 |
+| Р6-3 | `docs/art-pipeline/animation-library/clip-manifest.json` (генерируется) | пересборка: 4 новых слота `<PRE>-Idle/LungeAttack/HitReact/DeathSettle`, заполненные клипами H2Anim. На этапе 6 клипы получают `measured`, `technically_imported` — только после UE-импорта 7a (тот же sha FBX): тогда `build` ещё раз (`references/ue-import-package.md` §4.1 шаг 8; приёмка клипов — после него, ДС-1). `build` пересобирает все слоты и заберёт чужие недоделанные доработки: один сборщик за раз, манифест коммитится сразу после доработки (F117) | `python tools/tripo-pipeline/anim/clip_manifest.py build` → `MANIFEST_CHECK PASS` (build сам вызывает check). `check` требует 4 записи h2anim у каждого героя `H2ANIM` (спека, FBX, отчёт) и называет героя с битой регистрацией (RB-07) |
 | Р6-4 | `tools/art/anim/clip_review_sheet.py:65-70` (`HEROES`) и `docs/game-design/visual/06-tasks/anim.csv` | запись `"<Key>": Hero("<Character>", "<PRE>", <IdleSeconds>, ("AN-…", "AN-…", "AN-…", "AN-…"))` и 4 карточки клипов (Д-3, раздел 2). Сам лист строится на этапе 7 | `python tools/art/anim/clip_review_sheet.py --check` → `"fails": []` (ловит и карточку, не совпадающую со своим клипом) |
 
 `validate_clip.py`, `h2anim_run.py`, `clip_contact_check.py`, `h2anim_ue.py` читают персонажа из спеки и контракта,
@@ -309,9 +337,12 @@ LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK
 
 ## 5. Обязательно: этап 7 (импорт и подключение S08)
 
-Порядок: импорт меша, MI и клипов (`references/ue-import-package.md`) → de010/de011 → C++ и тесты → cue-table → конфиги →
-кадры в игре. Всё ниже обязательно для героя и помощника: подключение S08 входит в выход этапа 7. Логи и сырые кадры —
-в `$W` = `C:/tmp/<ASSET_ID>-stage7` (блок «Среда UE» в `references/ue-import-package.md`).
+Порядок: импорт меша, MI и клипов и приёмка клипов (7a, `references/ue-import-package.md` §4, ДС-1) → базовая линия
+`validate_registry.py` → de010/de011 `--only <Key>` → C++ и тесты → cue-table → конфиги → запись `asset-registry.json`
+(§10) → `registration_check.py --heroes <Key>` → упаковка и кадры в игре. Всё ниже обязательно для героя и помощника:
+подключение S08 входит в выход этапа 7. Логи и сырые кадры — в `$W` = `C:/tmp/<ASSET_ID>-stage7` (блок «Среда UE» в
+`references/ue-import-package.md`). Правки общих файлов пачки (этот раздел, `anim.csv`, манифест) делает один
+писатель за раз (RC-13): параллельные агенты героев переписали бы строки друг друга.
 
 ### 5.1 Ассеты UE, которые создают инструменты de010/de011
 
@@ -327,31 +358,41 @@ LungeAttack 14 кадров, HitReact 10, DeathSettle 21 при 24 fps (HANDBOOK
 | Р7-2 | `tools/art/de011/de011.py:40` (`CAPTURE_LOOKS`) | `"<Key>": "P1"` (или `P2`, чтобы в съёмке были оба цвета). Без этой строки `de011.py capture` падает с `KeyError`, `apply` её не читает | `de011.py capture --tag after --dissolve` без ошибки |
 
 **Основной путь — headless, шаг 7b `SKILL.md`.** Оба `apply` запускают свой `UnrealEditor-Cmd` проекта этого чекаута и
-сохраняют ассеты (`de010.py:79-107`). GUI-редактор этого чекаута в это время должен быть закрыт: так требует однотипный
-инструмент `tools/art/fx/fx_ability.py:4`, и так HANDBOOK §0.1 ограничивает шаги `UnrealEditor-Cmd`. Если открыт редактор
-пользователя, агент его не закрывает: это гейт стопа `SKILL.md` §5 п.7, worktree его не обходит
-(`references/ue-import-package.md` §1 п.4).
+сохраняют ассеты. GUI-редактор этого чекаута в это время должен быть закрыт: так требует однотипный инструмент
+`tools/art/fx/fx_ability.py:4`, и так HANDBOOK §0.1 ограничивает шаги `UnrealEditor-Cmd`. Агентский редактор 7a
+закрывает оркестратор; открыт интерактивный редактор — гейт стопа `SKILL.md` §5 п.7, worktree его не обходит
+(`references/ue-import-package.md` §1 пп. 1, 4; ДС-3).
 
 ```bash
+# до de010: базовая линия реестра (RA-15) — с ней сравнивается вывод после 7b
+python tools/tripo-pipeline/validate_registry.py 2>&1 | grep '^ERROR' > $W/validate-registry-before.txt
 # после импорта клипов (h2anim_ue.py import) и MI тела. Повторный импорт клипов удаляет клип вместе с notify
-# (h2anim_ue.py:13-14), тогда de010 apply повторить.
+# (h2anim_ue.py:13-14), тогда de010 apply повторить. Сначала --dry-run: план без редактора
+python tools/art/de010/de010.py apply --only <Key> --dry-run
 python tools/art/material_library/ue_lock.py --step "de010 apply <Key>" -- \
-    python tools/art/de010/de010.py apply --frames $W/de010
+    python tools/art/de010/de010.py apply --only <Key> --frames $W/de010
 python tools/art/material_library/ue_lock.py --step "de011 apply <Key>" -- \
-    python tools/art/de011/de011.py apply --frames $W/de011
+    python tools/art/de011/de011.py apply --only <Key> --frames $W/de011
+#   пачка: --only <Key1>,<Key2>,… — одним прогоном на окно 7b
 ```
+
+`--only` (76168867) ограничивает `apply` новыми героями. Без него оба `apply` пересохраняют `AM_*_LungeAttack` и MIC
+растворения **всех** героев своего списка: в 7b пилота — 12 файлов MVP и ERROR `validate_registry` 1 → 5, их
+откатывали поимённо (F157, 3528ae0b; RC-14 — с каждым героем квадратично больше бинарного шума в git). Без `--only`
+инструмент печатает предупреждение, сколько героев он перепишет.
 
 **Запасной путь только для notify — задача живого редактора** из `references/animation-vfx-sfx.md` §7 (через
 `ue_live`, под `ue_lock.py`). Он ставит notify одного клипа без пересборки материала. Применять, когда notify нужен
-сразу после импорта клипов в открытом редакторе (например, перед UE-кадрами приёмки клипов этапа 6), а шаг 7b ещё
+сразу после импорта клипов в открытом редакторе (например, перед UE-кадрами приёмки клипов 7a, ДС-1), а шаг 7b ещё
 впереди. Строку Р7-1 он не заменяет, и `de011.py apply` для MIC нужен всё равно.
 
 Ограничения инструментов:
 
-- `de010.py apply` пересобирает `M_UM_Figure_v2` текущим графом `tools/art/material_library/ue_v2_master.py`
-  (`figure_v2_graph`, `de010.py:120-130`) и заново ставит notify всем героям списка. `de011.py apply` тоже пересобирает
-  `M_UM_Figure_v2` (`de011.py:99-108`) и создаёт MIC всех героев; notify он не трогает. Обе операции идемпотентны. После
-  них обязательны тесты `HeroesV2.HitTint`, `HeroesV2.FxChannels`, `HeroesV2.Dissolve` (5.3).
+- `de010.py apply` и `de011.py apply` пересобирают `M_UM_Figure_v2` текущим графом
+  `tools/art/material_library/ue_v2_master.py` (`figure_v2_graph`) **только** если `.uasset` мастера с текущим
+  `graph_signature` не записан в `tools/art/de010/master-builds.json` (76168867); `--rebuild-master` — принудительно,
+  только при смене графа. `de010` ставит notify героям `--only`, `de011` создаёт их MIC; notify он не трогает. Обе
+  операции идемпотентны. После них обязательны тесты `HeroesV2.HitTint`, `HeroesV2.FxChannels`, `HeroesV2.Dissolve` (5.3).
 - Пока notify нет, рантайм берёт кадр контакта из `LungeContactFrame` (`S08HeroesV2.cpp:167-181`, `ContactSeconds`), и
   тайминг удара не ломается. Тест Contact при этом всё равно падает, поэтому шаг обязателен.
 
@@ -360,11 +401,11 @@ python tools/art/material_library/ue_lock.py --step "de011 apply <Key>" -- \
 | № | Файл:строка | Что добавить (по образцу) | Проверка |
 |---|---|---|---|
 | Р7-3 | `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp:104-109` (`Specs()`) | `{TEXT("<FighterName>"), TEXT("<Key>"), TEXT("<Stage>"), <bHero>, <BudgetUU>f, <MinUU>f, <MaxUU>f, <FigureTopUU>f, <BoundsTopUU>f, <IdleSeconds>f, <ContactFrame>},` — все 11 полей `FHeroSpec` (`S08HeroesV2.h:99-119`); `FigureTopUU` и `BoundsTopUU` — измеренные в UE после импорта (`ue-import-report.json` / отчёт look-dev), не прогноз | тесты 5.3 |
-| Р7-4 | `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2Tests.cpp:110` | `TestEqual("five heroes", Specs().Num(), 5);` (число = новое число строк) | `HeroesV2.Mapping` |
+| Р7-4 | `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2Tests.cpp:111` (на 2026-10-14 — `TestEqual("seven heroes", Specs().Num(), 7);`) | `TestEqual("eight heroes", Specs().Num(), 8);` (число = новое число строк) | `HeroesV2.Mapping` |
 | Р7-4 | там же `:102` (цикл имён Mapping) | `TEXT("<FighterName>")` в список `{TEXT("King Arthur"), …}` | `HeroesV2.Mapping` |
 | Р7-4 | там же `:199` (цикл отношения помощник/герой) | только для помощника: `TEXT("<FighterName>")` в `{TEXT("Merlin"), TEXT("Harpies")}`. Правило 0,78 ± 0,06 (HANDBOOK §2.10) иначе для нового помощника не проверяется | `HeroesV2.Scale` |
 | Р7-4 | там же `:514-515` (`WantMs`) | `{TEXT("<Key>"), <ContactFrame> × 1000 / 24 f}` (к.7 → `291.667f`, к.8 → `333.333f`) | `HeroesV2.Contact` |
-| Р7-4 | там же `:107` (`FS08HeroesV2MappingTest`) и `:489` (`FS08HeroesV2ActorTest`) — `Sinbad` как незнакомый герой | только если `<FighterName>` = `Sinbad` (или другое имя из `grep -in '"<FighterName>"' …/S08/*Tests.cpp`, раздел 0): заменить имя-образец в обоих местах на `Unknown Fighter` (решение скилла: имени нет в ростере и в `scraped-data/api/heroes`) | `HeroesV2.Mapping`, `HeroesV2.Actor` |
+| Р7-4 | там же `:108` (`FS08HeroesV2MappingTest`) и `:490` (`FS08HeroesV2ActorTest`) — `Sinbad` как незнакомый герой | только если `<FighterName>` = `Sinbad` (или другое имя из `grep -in '"<FighterName>"' …/S08/*Tests.cpp`, раздел 0): заменить имя-образец в обоих местах на `Unknown Fighter` (решение скилла: имени нет в ростере и в `scraped-data/api/heroes`) | `HeroesV2.Mapping`, `HeroesV2.Actor` |
 | Р7-4 | там же `:721-722` (`WantSeconds`) | `{TEXT("<Key>"), 0.5f}` для героя, `0.4f` для помощника (`S08HeroesV2.h:202-203`) | `HeroesV2.Dissolve` |
 | Р7-5 | `unreal/Unmatched/Source/Unmatched/S08/S08AudioBank.cpp:54-60` (`CharacterKey`) | `if (Name.Contains(TEXT("<подстрока имени>"), ESearchCase::IgnoreCase)) return TEXT("<AUDIO_KEY>");`. Правило подстрочное: имя с «harp», «arthur», «merlin», «medusa» перехватит чужой ключ. Новую строку ставить выше пересекающейся | `Unmatched.S08.Audio` |
 | Р7-5 | там же `:62-68` (`HitType`) | `if (Key == TEXT("<AUDIO_KEY>")) return TEXT("<HIT_TYPE>");`. Без строки тип BLUNT: удар звучит `CMB-HIT-BLUNT`, а выпад молчит, потому что банка `CMB-LUNGE-BLUNT` нет (`S08FlowGameModeAudio.cpp:526-527`). Слот `hit_type` обязателен по `docs/game-design/audio/02-audio-design.md` §8.1 | `Unmatched.S08.Audio` |
@@ -419,7 +460,7 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 | Р7-7 | `unreal/Unmatched/Config/DefaultGame.ini:33-44` | `+DirectoriesToAlwaysCook=(Path="/Game/PipelineCandidates/<Key>/<Stage>")`, `…/<Key>/Rig`, `…/<Key>/H2Anim`. MIC (`/Game/UM/Materials/v2`, `:45`), FX (`/Game/S08`, `:17`) и звук (`/Game/Audio`, `:18`) уже в списке | листинг `.utoc` содержит ассеты (`references/ue-import-package.md` §6.1; `.pak` даёт 0 строк — IoStore) |
 | Р7-8 | `unreal/Unmatched/Config/Cards/S08FighterNames.json:5-6` (`heroes`, ключ — `heroSlug` героя-владельца с сервера) | для героя: `"<slug>": {"hero": {"en": "<FighterName>", "ru": "<имя по-русски>"}, "sidekick": {…}}`. **Только помощник** (`OWNER_HERO_SLUG`): формат держит одного помощника на героя (`"sidekick"` — объект), поэтому запись не добавляется и чужая не перезаписывается (иначе у владельца в реальной игре сменится табличка его помощника, например Merlin у `king-arthur`); строка в NOTES заявки «S08FighterNames: формат на одного помощника, табличка — серверное имя». Без записи табличка показывает серверное имя (`:3`). Файл уже в пак-списке (`Unmatched.Build.cs:61`): touch не нужен | табличка при наведении на кадре показывает русское имя |
 | Р7-9 | `docs/game-design/visual/03-asset-registry.csv` | строки по образцу `SK_Merlin_H2LD` и `AM_Merlin_<Clip>`: `SK_<Key>_<Stage>` (area `hero`, `ue_path` `/Game/PipelineCandidates/<Key>/<Stage>/Meshes/SK_<Key>_<Stage>`, `rollback_flag` «-S08HeroesLegacy (серый Body: блок-аута ART-003 у нового персонажа нет)» — блок-ауты есть только у трёх имён, `S08FighterActor.cpp:347-353`), 4 строки `AM_<Key>_<Clip>` (area `anim`), строки звука и FX из раздела 6. Всего 13 колонок | `PYTHONIOENCODING=utf-8 python -c "import csv;r=list(csv.DictReader(open('docs/game-design/visual/03-asset-registry.csv',encoding='utf-8-sig')));print(len(r),{len(x) for x in r})"` → множество `{13}` |
-| Р7-10 | `.uasset` новых ассетов | `git add -f` поимённо: `unreal/Unmatched/.gitignore:8` игнорирует `Content/`. Касается `/Game/PipelineCandidates/<Key>/…`, `/Game/UM/Materials/v2/Dissolve/MI_<Key>_*`, перезаписанных `AM_<Key>_LungeAttack` и `M_UM_Figure_v2` | `git status --short --ignored` по этим путям |
+| Р7-10 | `.uasset` новых ассетов | `git add -f` поимённо: `unreal/Unmatched/.gitignore:8` игнорирует `Content/`. Касается `/Game/PipelineCandidates/<Key>/…`, `/Game/UM/Materials/v2/Dissolve/MI_<Key>_*`, перезаписанного `AM_<Key>_LungeAttack`; `M_UM_Figure_v2` — только при смене графа (`master-builds.json`, 5.1). Файлы других героев в коммит не идут (F157; `references/ue-import-package.md` §7.3) | `git status --short --ignored` по этим путям; `validate_registry` против базовой линии 5.1 — новых ERROR нет |
 
 ### 5.6 Кадры в игре
 
@@ -431,17 +472,18 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
    --sidekick-name "<FighterName>"`, Д-2) → `unreal/Unmatched/Config/Bench/S08Bench{Marmoreal,Sarpedon}-<Key>.json`;
    проверка `env_bench_fixtures.cts --check` (канонические и оба варианта `ok`); файлы коммитятся с персонажем. Можно
    ещё в 7a: сборки не требует.
-2. Одна упаковка (`tools/s08/package-client.ps1`, AGENTS.md «One package per change»). Вариант в пак не добавляется:
-   packaged-клиент читает его loose-файлом, перепаковка не нужна (Д-2; живым прогоном ещё не подтверждено — при
-   `BENCH FAILED fixture load` путь пака Д-2).
+2. `registration_check.py --heroes <Key>` → код 0, затем одна упаковка (`tools/s08/package-client.ps1`, AGENTS.md «One
+   package per change»; пачка — одна на окно 7b). Вариант в пак не добавляется, touch `Unmatched.Build.cs` ради него
+   не нужен: packaged-клиент читает его loose-файлом (Д-2; подтверждено пилотом, F158, F162; при
+   `BENCH FAILED fixture load` — путь пака Д-2).
 3. `-Bench` на Marmoreal и Sarpedon: `live_tune.py bench --map <доска> --fixture S08Bench<Map>-<Key>.json
    --extra=-BenchFocusFighter=<Key> …` (полная команда — `references/ue-import-package.md` §6.2).
 4. Осмотр PNG глазами (AGENTS.md «Look before you report»).
 5. Проверка трассы. Нет `BENCH FAILED fixture load` (`S08FlowGameMode.cpp:8916`; тогда путь пака Д-2). Нет
    `ARTPREVIEW heroesV2 fighter=… missing=… fallback=legacy` (`S08FighterActor.cpp:882`). Нет `death … mi=missing`
    (`:1286-1289`). Нет `anim … missing=1` (`:934`, функция `PlayHeroClip`).
-6. Лист клипов AN-18: `clip_review_sheet.py run --packaged --heroes <Key> --fixture marmoreal=…,sarpedon=…`, затем
-   `sheet --cards …` (Д-3, раздел 2).
+6. Лист клипов AN-18: `clip_review_sheet.py run --packaged --heroes <Key> --fixture marmoreal=…,sarpedon=…` (пачка —
+   карта фикстур на героя, F159), затем `sheet --heroes <Key>` (Д-3, раздел 2).
 
 ## 6. Только если нужно: способность, FX, свой звук, тюнинг
 
@@ -458,7 +500,7 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 | Лейтмотив, стинги | `STG-SELECT/WIN/LOSE-<AUDIO_KEY>`, `STG-SIDEKICK-DOWN-<AUDIO_KEY>` (`S08FlowGameModeAudio.cpp:641`, `:991`) | стинги по 02-audio-design.md §8.1; фолбэк — общие | 6 | то же |
 | Тюнинг материала (Fix, ВР-16) | `unreal/Unmatched/Config/ArtTuner/S08ArtTunerParams.json:114-137` | 6 строк `<Key>.FixClassA…FixSpecB` по образцу `KingArthur.*`; если тест должен их считать — героя в список `S08HeroMaterialsTests.cpp:216` и число в `:224` | 7 | `Unmatched.S08.ArtTuner` |
 | то же | `unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json:76` (`heroMaterials`) | `"<Key>": {"*": {…}}` только по итогам live tune; ключ должен быть в `Specs()`, иначе запись отбрасывается с ошибкой (`S08BoardArt.cpp:174-178`) | 7 | трасса без `unknown hero key` |
-| Видео-референсы движения | `tools/art/syntx_video_refs/build_manifest.py:16` (зашит на `ASSET-MEDUSA-001`) | решает `references/animation-vfx-sfx.md`; для нового персонажа нужен свой каталог `art/animation-refs/<ASSET_ID>/` | 6 | — |
+| Видео-референсы движения (только нестандартное движение) | `tools/art/syntx_video_refs/build_manifest.py:16` (зашит на `ASSET-MEDUSA-001`) | по умолчанию источник движения — паттерн библиотеки героя с тем же классом оружия, видеорефы SYNTX — только с причиной в карточке (ДС-6; F44); тогда свой каталог `art/animation-refs/<ASSET_ID>/`, порядок — `references/animation-vfx-sfx.md` | 6 | — |
 | Фикстура трассы CUE с новым героем | `unreal/Unmatched/Source/Unmatched/S08/S08CueDispatcherTests.cpp:48` (`FighterClip`, зеркало `cue_contract.fighter_clip`) | `TEXT("<Key>")` в список ключей — только если в фикстуры `tools/s08/cue_contract` добавлен бой с новым героем | 7 | `Unmatched.S08.CueDispatcher` |
 
 ## 7. Проверено: правка не нужна
@@ -473,7 +515,7 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 | `tools/art/material_library/ue_h5cb1.py` (HEROES, `review --hero`), `lookdev_5cb0.py`, `ue_v2_accent.py` | разовые инструменты волн 5c-B1 и v2.1. Съёмка look-dev нового героя: `python tools/art/material_library/ue_hero_lookdev.py review --config <review json> --out <dir> --tag <tag>`, образец конфига `art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review-config.json` |
 | `tools/art/de011/de011_capture_ue.py` | имена в docstring; съёмку задаёт `CAPTURE_LOOKS` (Р7-2) |
 | `S08FlowGameModeFigures.cpp`, `S08AbilityFx.cpp:51` `HeroKeyOfName`, `S08BoardArt.cpp:171-172` | читают `Specs()` |
-| `tools/art/render/render_bench.py` | правка кода не нужна: сцена задаётся флагом `run --bench-fixture` (для варианта Д-2 — то значение `-BenchFixture`, которое печатает `live_tune.py bench --dry-run --fixture …`). Новый персонаж добавляет меши и материалы, поэтому замер нужен ровно один — на этапе 7b, на варианте фикстуры Д-2; команда — `references/ue-import-package.md` §6.5, правило «записать число, править только превышение» — `SKILL.md` §8 «Режим» (AGENTS.md «Iteration speed», «No cost optimizations within budget») |
+| `tools/art/render/render_bench.py` | правка кода не нужна: сцена задаётся флагом `run --bench-fixture` (для варианта Д-2 — то значение `-BenchFixture`, которое печатает `live_tune.py bench --dry-run --fixture …`). Новый персонаж добавляет меши и материалы, поэтому замер нужен ровно один — на этапе 7b, на варианте фикстуры Д-2 (пачка — один на самую тяжёлую фигуру окна 7b); полная команда (`--repeats 1`, GPU-токен, `--client-args=-BenchFocusFighter=<Key>`, F160) — `references/ue-import-package.md` §6.5, правило «записать число, править только превышение» — `SKILL.md` §8 «Режим» (AGENTS.md «Iteration speed», «No cost optimizations within budget») |
 | `tools/tripo-pipeline/blender/candidate_build/*`, `candidate/atlas.py`, `review/control_scene.py`, `review/control_scene_analyze.py`, `review/team_contrast.py`, `tests/test_candidate_integration.py`, `run_rig_v2_validation.py`, `check_inputs.py`, `tools/art/art003_*`, `art005_*`, `t5*`, `move_selection/build_mockups.py`, `tools/s08/run-phase2-demo.ps1`, `tools/s09/*` | история прежних волн (W4-B, mvp-v1, 5c), тесты кандидатов или демо; имена в комментариях и фикстурах |
 | Тесты на фиксированных фикстурах боя (`S08FacingTests.cpp`, `Fx/S08AbilityFxTests.cpp`, `S08BoardGraphTests.cpp`, `S08MoveHighlightTests.cpp`, `S09/S09CombatStageTests.cpp`, `S09/S09ResultTests.cpp`) | проверяют механику на четырёх нынешних бойцах; новый персонаж их не ломает |
 | UI-галереи, заголовки и их тесты (`UmHudGallery.cpp`, `UmWorldGallery.cpp`, `UmPendingGallery.cpp`, `UmWorldLayerTests.cpp`, `S08ArtHudTests.cpp`, `S08ArtHudUmgTests.cpp`, `UmHudPanelsTests.cpp`, `UmPortraitTests.cpp`, `UmHeroCard.h`, `UmHudPlayerPanel.h`, `S08VoDirector.h` и др.) | стенды HUD на фиксированных данных; в заголовках имена только в комментариях |
@@ -490,23 +532,51 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
   `python tools/tripo-pipeline/validate_registry.py`. `contentKey` — ключ из `docs/game-design/05-content-matrix.csv` или
   `null`, если ключа там нет (`SKILL.md` этап 0); валидатор проверяет только не-`null` значение
   (`validate_registry.py:295-297`). `manifest06Row` — `null` без строки в `docs/game-design/06-asset-manifest.csv`
-  (`:290-291`). Отсутствие персонажа в 05 и 06 — не стоп. На 2026-10-09 валидатор уже выдаёт одну старую ошибку: sha256
-  `art/um-materials/um-masters.json`, `RESULT: FAIL (1 errors)`. Критерий для нового персонажа — новых ошибок 0.
+  (`:290-291`). Отсутствие персонажа в 05 и 06 — не стоп. На 2026-10-14 валидатор уже выдаёт одну старую ошибку: sha256
+  `art/um-materials/um-masters.json` (UM-MASTERS, F91), `RESULT: FAIL (1 errors)`. Критерий для нового персонажа —
+  новых ошибок 0 против базовой линии (в 7b — снятой до de010, 5.1).
 
 ## 9. Короткий чек-лист регистрации
 
 ```text
 [ ] этап 3: rig-contract.json characters (<weapon_bone>/<ue_weapon_bone> из заявки) + revision; RIG-CONTRACT.md;
             test_rig_rules.py OK; profile_id уникальны; профиль h2-bake по WEAPON_HAND (таблица Д-1)
-[ ] этап 6: clip_manifest.py CHARS/H2ANIM + schema enum; clip_manifest.py build → MANIFEST_CHECK PASS;
+[ ] этап 6: clip_manifest.py CHARS/H2ANIM отдельными строками (H2ANIM_CLIP — при доработке клипа) + schema enum;
+            clip_manifest.py build → MANIFEST_CHECK PASS (ещё раз после UE-импорта 7a);
             длины клипов 14/10/21 кадр и Idle = IDLE_SECONDS; кадр контакта среди key_frames;
             clip_review_sheet.py HEROES (Hero с 4 карточками) + 4 карточки anim.csv → --check PASS
-[ ] этап 7: de010.HEROES + de011.CAPTURE_LOOKS → de010/de011 apply (шаг 7b, под ue_lock, редактор чекаута закрыт);
-            grep имени бойца в S08/*Tests.cpp (Robin Hood :49, Sinbad :107/:489 → Unknown Fighter);
+[ ] этап 7: базовая линия validate_registry до de010; de010.HEROES + de011.CAPTURE_LOOKS → de010/de011 apply
+            --only <Key> (шаг 7b, под ue_lock, редактор чекаута закрыт; MVP не пересохранены);
+            grep имени бойца в S08/*Tests.cpp (Robin Hood :49, Sinbad :108/:490 → Unknown Fighter);
             Specs() (11 полей) + S08HeroesV2Tests (счётчик, имена, ratio, WantMs, WantSeconds);
             S08AudioBank CharacterKey/HitType + S08AudioTests; сборка + HeroesV2/Audio PASS;
             cue-table CUE-011/013 → validate-table PASS, pytest PASS; DefaultGame.ini ×3; S08FighterNames.json;
+            asset-registry.json (§10); registration_check.py --heroes <Key> → код 0;
             03-asset-registry.csv; git add -f; варианты фикстуры Р7-11 → -Bench обеих досок (--fixture),
-            кадры осмотрены, трассы чистые; лист AN-18 (run --fixture) осмотрен
+            кадры осмотрены, трассы чистые; лист AN-18 (run --heroes <Key> --fixture …, sheet --heroes <Key>) осмотрен;
+            перед safe-integrate — registration_check.py ещё раз
 [ ] по условию: CUE-014/FX, свой DTH/VO/стинги/карты-сигнатуры, Art Tuner, heroMaterials, фикстура CUE
 ```
+
+## 10. Статусы и реестры по этапам
+
+Одна таблица для всех справочников (RA-26). Расхождения, которые она снимает: SKILL.md говорил «максимум технически
+импортировано», `references/ue-import-package.md` §7.1 — «художественно принято, по делегированию» в 03;
+`references/animation-vfx-sfx.md` ставил строки 03 на этап 6, SKILL.md — на этап 7; запись `asset-registry.json`
+стояла «предложено» до 7b, и никто не говорил, что так и задумано (F161). Решение скилла по делегированию: общий файл
+реестра пишется как можно реже (каждая запись — возможный конфликт пачки, RC-13), а строки 03 — когда у ассета есть
+путь в UE.
+
+| Этап | `docs/art-pipeline/asset-registry.json` | `docs/game-design/visual/03-asset-registry.csv` | Карточки и прочее |
+|---|---|---|---|
+| 0 | создаёт запись: «предложено», `planned` (`references/intake-and-evidence.md` §1) | — | `asset-card.yaml`; строка `VISUAL_CARD_ID` в `06-tasks/anim.csv` |
+| 1–2 | не трогается | — | карточки `acceptance-concept/…/card.json`; строки журнала трат на каждую операцию Tripo и пакет Codex |
+| 3–5 | не трогается | — | карточки `acceptance/…/card.json` модели («художественно принято, по делегированию» — только в `status_note` карточки) |
+| 6 | не трогается | — (строки клипов, звука и FX ждут UE-путей) | 4 карточки клипов в `anim.csv`, запись `HEROES` листа; манифест клипов — `measured` |
+| 7a | не трогается | — | манифест клипов — `technically_imported` после импорта; карточки клипов `acceptance-anim/…/card.json` |
+| 7b, до упаковки | «технически импортировано», `ue-editor-frames` (импорт и UE-кадры 7a — факт; иначе `registration_check` даёт FAIL `registry`) | — | строки регистрации §5 |
+| 7b, шаг 7.8 | `live-packaged-probe` после осмотра кадров `-Bench`; выше «технически импортировано» не поднимается: «художественно принято» требует акта `docs/game-design/evidence/(ART\|GD)-NNN/…` | все строки ассета (Р7-9: `SK_<Key>_<Stage>`, 4 `AM_<Key>_<Clip>`, звук и FX): «технически импортировано», после осмотра листа K1/K2 — «художественно принято, по делегированию <дата> (ВР-17)» | `DIRECTORY-MAP.md` при новых каталогах; README evidence |
+
+Проверка реестра — `validate_registry.py`: новых ERROR против базовой линии нет (5.1). Статус исполнителя в
+`asset-registry.json` — максимум «технически импортировано» (HANDBOOK §0 п.3); пометка «по делегированию» существует
+только в 03 и в карточках приёмки (`references/ue-import-package.md` §7.1).

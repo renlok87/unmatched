@@ -96,3 +96,19 @@
 - SKILL «Пакетный режим»: таблица `pipeline_batch/*` и `ue7a/*`, `git_lock.py` перед коммитом (F82),
   `registration_check.py`; этап 6 → `grip_check.py` (`--side`, `--shield-bone`, `--base`).
 - Codex-полоса: отдельный `CODEX_HOME` без хуков (`--codex-home`) пробой не проверен (нужен живой Codex).
+
+## W2-d · съёмка и входы приёмщиков (42ed7951)
+- `acceptance-and-blender.md` §8.1 п.3: «Плейсхолдеры `{{UE_NAMES}}`, `{{BAKE_PROFILE_KEYS}}`, `{{HEIGHT_RULE}}`,
+  `{{TA_REPORT}}`, `{{ANCHORS}}`, `{{PREV_FIX_LIST}}` — из `acceptor_inputs.py --frames $E/frames`
+  (`$E/acceptor-inputs.json#placeholders`, коммитится с карточкой)».
+- §8.2 «Вход»: «TeamAccent: {{TA_REPORT}}», «Рост: {{HEIGHT_RULE}}», «якоря {{ANCHORS}}»; строка заявки: «UE_NAMES
+  {{UE_NAMES}}; ключи bake-профиля {{BAKE_PROFILE_KEYS}} — выдержка, сам профиль не открывай (его текстовые поля —
+  записи исполнителя)» вместо `{{BAKE_PROFILE}}`; прежний цикл: «Пункты прежнего цикла: {{PREV_FIX_LIST}} — для каждого
+  в rationale “rN <список> п.K: закрыт” или “не закрыт — что видно, кадр”».
+- §8.4: «Все файлы `frames.json#files` — не больше 1200 px по длинной стороне».
+- §8.5 (RC-19, F151): «При r ≥ 2 второй приёмщик получает `frames.json#changed_vs_previous.changed` и пункты фикса».
+- §2.3 и §3: «2000 px» → «1200 px по длинной стороне»; у съёмки флаг `--previous <прежний frames>`.
+- `animation-vfx-sfx.md` §10.3: «Крупные планы Blender — `clip_closeups.py --spec S --clip <Clip>` →
+  `closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера в `<Key>-<Clip>-closeups.json`, на r2/r3 — `--shots-from`
+  отчёта прежнего цикла. У Idle — пара шва `<Key>-Idle-seam-fNN-f00-{front,q34}.jpg` (последний кадр / кадр 0, разница
+  `seam.views.*.diff_px`)»; `ue7a/prep_acceptance.py` копирует их приёмщику.

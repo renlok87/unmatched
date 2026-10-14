@@ -8,7 +8,7 @@
 |---|---|---|
 | §1 запись `docs/art-pipeline/asset-registry.json` | этап 0, шаг 2 (герой, помощник, существо, проп) | `python tools/tripo-pipeline/validate_registry.py` — новых ошибок нет (HANDBOOK §3.2 п.1) |
 | §2 `STOP-RIG-CONTRACT-3.md` | этап 0, ветка `non-humanoid` (гейт SKILL.md §5 п.1) | пользователь |
-| §3 `.gitignore` ассета | этап 0, шаг 1 | `git check-ignore -v` после первого прогона этапа 3 |
+| §3 `.gitignore` ассета | этап 0, шаг 1 | гейт этапа 0: `git check-ignore -v` на путь сырого GLB (§3, F2); после первого прогона этапа 3 — ещё 4K-мастер и 2K-карта |
 
 ## 1. Запись `docs/art-pipeline/asset-registry.json` (этап 0)
 
@@ -18,6 +18,9 @@
 `hero` | `sidekick` | `creature` | `prop`; у пропа набора `ASSET-DECOR-KIT-001` — `parent` и `id` вида
 `ASSET-DECOR-KIT-001.<NAME>`. `backlog` — только id из `docs/game-design/14-sprint-backlog.csv`, иначе `[]`.
 `nextStep`, `blocker`, `doneCriteria` — непустые строки.
+
+Запись этапа 0 стоит «предложено» / `planned` до шага 7b: этапы 1–7a её не обновляют, первый писатель после этапа 0 —
+7b (F161). Кто и когда меняет статусы во всех реестрах — таблица `references/new-character-registration.md` §10.
 
 ```json
 {
@@ -120,7 +123,12 @@
 9,5–12,9 МБ; Medusa `.gitignore` закрывает их так же). `*-h2-lookdev*/textures/*_4K.png` поглощает и
 `*_TeamAccent_4K.png`.
 
-В git идут 2K-набор (`*_2K_*`, `*_TeamAccent_2K.png`), MatID 4K и LUT, как у Medusa. Проверка после первого прогона
-этапа 3: `git check-ignore -v <файл>` для 4K-мастера и для 2K-карты (вторая не игнорируется).
+В git идут 2K-набор (`*_2K_*`, `*_TeamAccent_2K.png`), MatID 4K и LUT, как у Medusa.
+
+Проверки (F2: пакетная заявка 2026-10-13 файл не создала, сырые GLB по 45–79 МБ попали бы в коммит):
+- **этап 0, гейт:** `git check-ignore -v <ASSET_DIR>/<YYYYMMDD>-draft-tripo/source/x.glb` печатает правило
+  `*-tripo/source/*.glb` из `<ASSET_DIR>/.gitignore` (файла может ещё не быть: `check-ignore` проверяет путь);
+- **после первого прогона этапа 3:** `git check-ignore -v <файл>` для 4K-мастера и для 2K-карты (вторая не
+  игнорируется).
 
 Сырые GLB и 4K-мастера — локально, sha256 в source-spec и отчётах; кадры — JPEG 1200 px q92 (HANDBOOK §8).

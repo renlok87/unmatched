@@ -24,6 +24,9 @@
 Стоп этапа 1 с вопросом пользователю — только гейты стопа скилла (SKILL.md): Codex не запустился после попытки по
 разделу 5; кредитов Tripo не хватает на черновик или две черновые генерации подряд неудачны; исчерпаны генерации или
 циклы (раздел 10). Анатомия вне контракта рига (не гуманоид и не крылатый бипед) сюда не доходит: это стоп этапа 0.
+Сбой инструмента или окружения (код 2 `check_concept_views.py`, сбой песочницы Codex, карточка «СБОЙ ОКРУЖЕНИЯ»,
+раздел 11) — не вопрос пользователю, а разбор оркестратором: причина, фикс или опция инструмента, строка F в NOTES
+(ДС-2, `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`).
 
 ## 2. Схема этапа
 
@@ -187,6 +190,7 @@ stdout/stderr на UTF-8, непойманный сбой даёт код 2 (т�
 | Рост между видами (`set.height`) | > 3,0 % | > 5,0 % |
 | Связность (`view.single_component`) | прочая компонента ≥ 0,5 % кадра | — |
 | Прозрачность (`view.alpha`) | есть альфа | — |
+| Ракурс side (`view.facing`, только с `--side-ortho <orthos>/ortho_<SIDE_VIEW>.png`, шаг 1c) | разница IoU прямо/зеркало < 0,05 или оба IoU < 0,5 | IoU с зеркалом орто больше прямого на 0,05 (вид нарисован с другой стороны, F8) |
 
 **WARN — не повод для ретрая и не CORRECTION.** WARN видит приёмщик на листе и в отчёте и учитывает в измерении C.
 Перегенерация по автопроверкам — только при FAIL (раздел 10). Пример: канон Medusa имеет центр подставки с разбросом
@@ -277,9 +281,10 @@ LEFT» на back Medusa, посох Merlin «on viewer LEFT» на front и «on
 
 ```bash
 REPO="C:/Users/ren/WebstormProjects/unmached/unmached"
-# 1. Кандидаты. Приложение запускает свою копию из %LOCALAPPDATA% (2026-10-09: bin/9691020b546a15b2/codex.exe,
-#    codex-cli 0.162.0-alpha.2 — тот же номер, что у exe пакета). npm-codex не работает (07 §1.1).
-for EXE in /c/Users/ren/AppData/Local/OpenAI/Codex/bin/*/codex.exe; do :; done; echo "$EXE"
+# 1. Кандидаты. Приложение запускает свою копию из %LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/codex.exe. Каталог и
+#    версия меняются с обновлением (2026-10-09 — 9691020b…, 0.162.0-alpha.2; 2026-10-13 — 2e5e00daee91c61d,
+#    0.162.0-alpha.17.2): путь только глобом, хэш и версию не закреплять (F37). npm-codex не работает (07 §1.1).
+EXE=$(ls -t /c/Users/ren/AppData/Local/OpenAI/Codex/bin/*/codex.exe | head -1); echo "$EXE"   # самый свежий exe
 # 2. Проба exec С КОМАНДОЙ (не «Reply OK»: модель ответит и без песочницы, сбой останется скрытым). Флаг
 #    windows.sandbox="unelevated" обязателен на этой машине (ниже). Проба прошла, если в событиях есть
 #    command_execution с "exit_code":0.
@@ -311,7 +316,10 @@ helper_unknown_error: setup refresh had errors` (`codex-windows-sandbox-setup.ex
 
 `--ignore-user-config` в пробе отключает пользовательский `~/.codex/config.toml` (MCP-серверы, хуки, плагины —
 шум в stderr); модель задаётся `-m`. В рабочем запуске этапа 1 флаг не ставится: `image_gen` и настройки задания идут
-из конфига пользователя (так проверено). Приёмщику флаг нужен (§8.4 рубрики модели).
+из конфига пользователя (так проверено). Приёмщику флаг нужен (§8.4 рубрики модели). Цена конфига пользователя —
+его хуки: процесс генератора висит до 23 мин после ответа (пилот, 1c: +977…+1408 с; RC-11). Задание готово, когда
+файл `-o` не пуст (5.5 п.0); свой процесс после этого гасить по PID (дерево процессов, не по имени). В пачке это
+делает `codex_lane.py` (5.6).
 
 Проверено 2026-10-09: `--version` exe из `%LOCALAPPDATA%` и из пакета → `codex-cli 0.162.0-alpha.2`, код 0; позиционный
 `[PROMPT]` и `-` (stdin) — `codex.exe exec --help`; `exec` exe из `%LOCALAPPDATA%` **при открытом приложении работает**
@@ -410,8 +418,19 @@ python -c "import json,sys;f=lambda p:(lambda d:([i['sha256'] for i in d['inputs
     $P/design/checks-report.json $T/1a/checks-report.json      # 1c: $P/checks-report.json $T/1c/checks-report.json
 ```
 
-   `DIFFERENT` — отчёт пакета не от выбранных файлов: корректирующий запуск на записи (п.3). Затем кодировка
-   текстовых файлов пакета (раздел 3, «Кодировка») — `UTF8 OK` и код 0:
+   `DIFFERENT` — отчёт пакета не от выбранных файлов: корректирующий запуск на записи (п.3).
+
+   **Ракурс side (1c, F8).** Отдельным прогоном вне пакета (в сравнение выше он не входит, иначе отчёты разойдутся):
+
+```bash
+python tools/art/concept/check_concept_views.py --set $P --key $K --views side --role <role> \
+    --side-ortho art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-draft-tripo/orthos/ortho_<SIDE_VIEW>.png --out $T/facing
+# код 1 и FAIL view.facing — side нарисован зеркально (IoU с зеркалом орто больше прямого на 0,05; пилот 2026-10-14:
+# прямо 0,96–0,97, зеркало 0,56–0,67): брак вида, корректирующий запуск 1c этого вида; на этап 2 не идёт
+# (tripo3d-stages.md §5.5). WARN (разница меньше 0,05 или оба IoU < 0,5) — смотрит приёмщик
+```
+
+   Затем кодировка текстовых файлов пакета (раздел 3, «Кодировка») — `UTF8 OK` и код 0:
 
 ```bash
 python -c "import pathlib,sys;bad=[str(p) for p in pathlib.Path(sys.argv[1]).rglob('*') if p.suffix in ('.json','.md') and (p.read_bytes()[:3]==b'\xef\xbb\xbf' or '????' in p.read_bytes().decode('utf-8','replace') or '\ufffd' in p.read_bytes().decode('utf-8','replace'))];print('\n'.join(bad) or 'UTF8 OK');sys.exit(bool(bad))" \
@@ -450,6 +469,39 @@ python tools/art/visual/ledger.py check
    FAIL (код 1) — приёмщика не звать (гейт `G-CHECKS` FAIL предрешён): корректирующий запуск `…fix<N>.codex.md` на
    этот вид с CORRECTION из FAIL-проверки, пока у вида есть генерации (≤ 4 за этап); нет — раздел 10, `escalate_user`.
 6. Приёмка (раздел 11).
+
+### 5.6 Пачка фигур: полосы Codex и пакетная приёмка
+
+Инструменты пачки — `tools/art/pipeline_batch/` (W2-a, ee301065; были `C:/tmp/concept-wave/*`, RA-12, RC-15). Рабочий
+каталог пачки — вне git (`W=C:/tmp/concept-wave-<YYYYMMDD>`).
+
+```bash
+# 1a: поля этапа 1 asset-card.yaml, palette.json и файлы заданий из файла ростера
+python tools/art/pipeline_batch/make_tasks.py --roster <roster.json> --tasks-out $W/tasks-1a.txt [--dry-run]
+# полоса Codex: берёт задание по claim-файлу <logs>/<id>.claim, запускает codex exec (команда 5.2, шаг 4);
+# 4–5 полос — каждая отдельным фоновым процессом со своим --name; остановка всех — файл <logs>/STOP
+python tools/art/pipeline_batch/codex_lane.py --tasks $W/tasks-1a.txt --name d1 --logs $W/logs [--once] [--grace 10]
+# 1c: задания по орто 1b; лицензионные фигуры с решением пользователя — в отдельный список (сначала Codex, F7/F8)
+python tools/art/pipeline_batch/make_1c.py --tasks-out $W/tasks-1c.txt --ust-out $W/tasks-1c-ust.txt [--only …]
+# приёмка листов 1c пачкой (Sol): предпроверка пакета, промпт по разделу 11, codex exec, validate_card
+python tools/art/pipeline_batch/sheet_acceptance.py all --work $W --date YYYY-MM-DD [--workers 3] \
+    --user-quote "<дословная цитата задачи пользователя>"
+# второй приёмщик Opus через Workflow: снять строки "null" (F6) и посчитать пару validate_card --second
+python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]
+```
+
+- **Число полос — 4–5** (RC-24). Пилот: 2 полосы — 30 фронтов за 108 мин (3,6 мин на фигуру), 8 полос — 33 за 70 мин
+  (2,1 мин на фигуру при задержке втрое больше).
+- **Готовность задания** (RC-11). `codex_lane.py` считает задание готовым, когда файл `-o` не пуст и в выводе есть
+  «tokens used», и через `--grace` гасит своё дерево процессов по PID. Отдельный `CODEX_HOME` без хуков
+  (`--codex-home`) пробой не проверен: перед боевой волной одна проба, что `image_gen` в нём работает.
+- **Квота Codex общая** для генерации и приёмщика Sol (RC-12): пилот — 11–15 сессий Codex на фигуру (1a, 1c, приёмки
+  листа, модели и клипов). Перед волной — остаток лимита; строка журнала `ledger.py add --service Codex` на каждый
+  пакет-запуск и на каждую приёмку (5.5 п.4). Квоты не хватает — приёмщик Opus (другая квота).
+- **Шаблоны читаются из этого файла дословно.** `make_tasks.py` и `make_1c.py` берут блоки 5.4, 6.1, 6.2, 8.1, 8.2 по
+  заголовкам. После правки этих блоков или заголовков — `--dry-run` обоих: новый плейсхолдер без значения — код 2.
+- Промпт пакетной приёмки обязан нести блок чтения кириллицы раздела 11. На 2026-10-14 `sheet_acceptance.py` велит
+  `Get-Content -Encoding UTF8` (сбой RA-03): до первой волны инструмент исправить.
 
 ## 6. Промпт-пак 1a — дизайн-front
 
@@ -566,9 +618,12 @@ Output one single image.
 1. Черновик Tripo — маршрут «Черновик» в `tripo3d-stages.md`: single-image по `design/<key>-front.png`, без 8K и без
    «по частям»; цена с кнопки до клика; перед кликом
    `python tools/art/visual/ledger.py check --service tripo --next-cost <цена с кнопки> --balance <баланс> --model "Tripo Studio H3.1"`
-   → код 0 (остаток ВР-04 и баланс не меньше цены, строка условий Tripo есть — `tripo3d-stages.md` §1); после
-   операции — строка журнала и source-spec по тому же файлу. GLB →
-   `art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-draft-tripo/source/<key>-draft-tripo-<task8>.glb`.
+   → код 0 (лимит и срок — из журнала `credits-ledger.json`, решение 2026-10-13 «На триппо нет лимита»; `until: null`
+   = окно открыто, поддерживается `ledger.py`; граница — баланс Studio; строка условий Tripo есть —
+   `tripo3d-stages.md` §1); после операции — строка журнала и source-spec по тому же файлу. GLB выгружается сразу
+   (`tripo3d-stages.md` §5.2 п.11, RC-20) →
+   `art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-draft-tripo/source/<key>-draft-tripo-<task8>.glb`. Пачка
+   черновиков — `prep_1b.py` → `tripo_log.py` → `post_1b.py` (`tripo3d-stages.md` §5.2).
 2. Ортопроекции (Blender headless; аспект — раздел 4.2):
 
 ```bash
@@ -872,7 +927,10 @@ concept-sheet.md §11» и `frames: ["<key>-front.png"]`; в `rework_fix_list` C
 1. Второй приёмщик — **другой профиль** («Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт ниже, те
    же файлы, новый контекст; первую карточку он не видит. Ответ — `card-2.json` рядом с `card.json` (для Sol —
    `--output-schema tools/art/acceptance/asset-acceptance-2.output-concept.schema.json -o <каталог>/card-2.json`;
-   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`).
+   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`). Ответ
+   Workflow-приёмщика Opus (строки `"null"` вместо пустых полей, F6/F102) — через
+   `python tools/art/pipeline_batch/finish_second.py <workflow-output.json>`: он чистит карточку, пишет `card-2.json` и
+   сразу считает пару (п.2).
 2. Итог пары:
    ```bash
    python tools/art/acceptance/validate_card.py <каталог>/card.json --second <каталог>/card-2.json \
@@ -901,8 +959,8 @@ concept-sheet.md §11» и `frames: ["<key>-front.png"]`; в `rework_fix_list` C
 | `score`, `verdict` | по формуле и правилам выше |
 | `verdict_reason` | обязательно при `verdict` ≠ `pass` (≥ 10 символов): какое правило сработало |
 | `rework_fix_list` | `[{item, frame, fix, tool}]`: `item` — измерение < 2 или `G-CHECKS` при FAIL; `frame` — вид/файл; `fix` — одна английская строка, пригодная для CORRECTION; `tool` — `Codex 1c CORRECTION` \| `Tripo 1b черновик` \| `Codex 1a` |
-| `acceptor` | `{profile: "Opus xhigh"\|"Sol 6.1 xhigh", session_id}` |
-| `executor_session_id` | сессия запускающего агента (≠ `acceptor.session_id`) |
+| `acceptor` | `{profile: "Opus xhigh"\|"Sol 6.1 xhigh", session_id}` — профиль фактического запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, в карточку пишется то, что запущено (F76, F119) |
+| `executor_session_id` | сессия запускающего агента (≠ `acceptor.session_id`); исполнитель-субагент — `claude-code:<uuid>/agent:<name>` (F40) |
 | `decided_by` | `"delegated (ВР-реестр 2026-10-06)"` или `"user"` |
 | `status_note` | при pass по делегированию — содержит «по делегированию» (`docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`) |
 
@@ -921,18 +979,35 @@ python tools/art/acceptance/validate_card.py \
 
 ```text
 Ты — приёмщик этапа 1 скилла 3d-model-pipeline (концепт-лист). Файлы не правишь, ничего не генерируешь.
+Текстовые файлы читай так, чтобы кириллица дошла целой. В песочнице codex PowerShell работает в Constrained
+Language Mode и пишет вывод в OEM-кодировке: `Get-Content -Encoding UTF8` даёт кракозябры, смена
+`[Console]::OutputEncoding` запрещена, `rg` нет. Рабочие способы (проверено пробой 2026-10-13): читай КАЖДЫЙ
+текстовый файл (рубрику, checks-report.json, generation-records.json, verification.json, предыдущую карточку)
+командой `Get-Content <файл> -Raw -Encoding OEM` (байты UTF-8 проходят без перекодировки и читаются верно) или
+`cmd /c type <файл>`. Кодовые точки (`[int[]][char[]]`) не нужны. Если кириллица рубрики всё равно пришла
+кракозябрами — это сбой окружения: не оценивай по догадкам, верни карточку, где verdict_reason начинается со слов
+«СБОЙ ОКРУЖЕНИЯ: кириллица не читается».
+Рубрика (обязательна к прочтению целиком): .agents/skills/3d-model-pipeline/references/concept-sheet.md, раздел 11
+(таблица S, C, Q, P). Рубрика — ТОЛЬКО этот файл: SKILL.md и другие файлы скилла (.agents/skills/**, кроме
+concept-sheet.md) не открывай и не учитывай.
 Объект: <1a: дизайн-front design/<key>-front.png | 1c: виды <key>-front/side/back.png и лист sheet-<key>.png>.
 Открой каждый файл как картинку. Прочитай checks-report.json и generation-records.json.
 Выдержка карточки ассета: DESCRIPTION, ANCHORS, PALETTE, ANATOMY, WEAPON_HAND, SIDE_VIEW (<значения>).
 Эталон качества: <QUALITY_REFERENCE> (открой). Для 1c — ещё дизайн design/<key>-front.png и ортопроекции 1b.
-Рубрика: references/concept-sheet.md раздел 11 (таблица S, C, Q, P). На 1a C = 1,5 по фиксированному правилу
-раздела 11, в rework_fix_list C на 1a не включай. T- или A-поза = S 0. Балл — по якорям, шаг 0,5; обоснование с
+На 1a C = 1,5 по фиксированному правилу раздела 11, в rework_fix_list C на 1a не включай. T- или A-поза = S 0.
+Балл — по якорям, шаг 0,5; обоснование с
 именами файлов из frames.files. Гейт один — G-CHECKS по checks-report.json (код 0 → PASS); WARN не гейт, учитывай их
 в C. rework_fix_list — только измерения < 2 и G-CHECKS при FAIL; у пункта: item, frame (вид), fix (одна английская
 строка для CORRECTION), tool (Codex 1c CORRECTION | Tripo 1b черновик | Codex 1a). Вердикт посчитай по правилам
 раздела 11; при не-pass заполни verdict_reason. Заполни все поля таблицы «Карточка» раздела 11 (date, previous_card,
 frames как {dir, files} с именами без пути). Верни только JSON карточки.
 ```
+
+Блок чтения кириллицы и строка «рубрика — только этот файл» обязательны в каждом промпте приёмщика Sol (RA-03). Без
+них Sol читал рубрику кракозябрами при коде 0 (F36, приёмка модели Angel r1) и открывал SKILL.md вне входов (F75); образец —
+`art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance/20261014-r2/acceptor-prompt.md:9-20`. Карточка, где
+`verdict_reason` начинается со «СБОЙ ОКРУЖЕНИЯ», — сбой окружения, а не приёмка: цикл (раздел 10) не тратится, балл не
+пишется; разбор оркестратором (ДС-2), затем тот же вызов заново (`acceptance-and-blender.md` §8.4).
 
 ## 12. Выход этапа 1 → этап 2
 
@@ -942,6 +1017,10 @@ frames как {dir, files} с именами без пути). Верни тол
   «концепт | модель» на этапах 3–4 (HANDBOOK §3.1) и `preview.concepts` профиля H2-bake (HANDBOOK §4.2).
 - Коммит пакета, заданий, орто, карточек — запускающим агентом после приёмки (`git commit --no-verify`, AGENTS.md).
   GLB черновика в git не идёт.
+- **Ждёт решения пользователя (RC-16):** пакет 1a (выбранный фронт, `generation-records.json`, проверки,
+  `verification.json`) коммитится вместе с записью реестра ещё до 1b, а не после 1c. Причина: волны 2026-10-13 оставили
+  96 из 100 пакетов (756 МБ) вне git — worktree их не видит, потеря = повтор 1a за квоту Codex. Правило упирается в
+  вес репозитория (SUMMARY исследования, «Решения пользователя» п.4–5); до ответа действует строка выше.
 
 ## 13. Снятые неоднозначности прогона 2026-10-09
 
@@ -989,14 +1068,15 @@ frames как {dir, files} с именами без пути). Верни тол
 ### 13.2 Ростер из БД и пилот (2026-10-13)
 
 Волны 1a по таблице `Hero` (84 фигуры) и пилот 1c → этап 2 (Achilles, Angel, Ancient Leshen). Полный список
-находок — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`.
+находок — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`. Скрипты волн перенесены из
+`C:/tmp/concept-wave/` в `tools/art/pipeline_batch/` с тестами (ee301065): скрипты из `C:/tmp` больше не запускать.
 
 | № | Замечание | Решение |
 |---|---|---|
-| 20 | Лицензионные персонажи (Marvel, The Witcher): Codex image_gen, SYNTX (Seedream, Nano Banana) и Gemini на 1a отказывают (`moderation_blocked`); обходные формулировки промпта — не путь | 1a — сервис по подписке пользователя, который такие фигуры рисует (unstability.ai, Recraft v4, промпт из карточки: `DESCRIPTION_EN`, `ANCHORS_EN`, палитра), фон приводится к ровному тёмно-серому (`C:/tmp/concept-wave/rebg.py`, сырой кадр — `design/<key>-front-raw.png`), `verification.json` с `design_source`. Recraft не берёт эталон качества картинкой → Q/P ниже 8,0 → `escalate_user` (§10); решение пользователя — `evidence/acceptance-concept/<run>/user-decision.json` и запись в `docs/game-design/decisions/` (прецедент `2026-10-13-licensed-concepts-user-accepted.md`). Фигуру, которую не рисует ни один сервис (Alice), — фронт от пользователя |
+| 20 | Лицензионные персонажи (Marvel, The Witcher): Codex image_gen, SYNTX (Seedream, Nano Banana) и Gemini на 1a отказывают (`moderation_blocked`); обходные формулировки промпта — не путь | 1a — сервис по подписке пользователя, который такие фигуры рисует (unstability.ai, Recraft v4, промпт из карточки: `DESCRIPTION_EN`, `ANCHORS_EN`, палитра), фон приводится к ровному тёмно-серому (`python tools/art/pipeline_batch/rebg.py <in.png> <out.png> [tone] [grad]`, сырой кадр — `design/<key>-front-raw.png`), `verification.json` с `design_source`. Recraft не берёт эталон качества картинкой → Q/P ниже 8,0 → `escalate_user` (§10); решение пользователя — `evidence/acceptance-concept/<run>/user-decision.json` и запись в `docs/game-design/decisions/` (прецедент `2026-10-13-licensed-concepts-user-accepted.md`). Фигуру, которую не рисует ни один сервис (Alice), — фронт от пользователя |
 | 21 | 1c для лицензионного персонажа: Codex рисует виды поверх орто черновика, хотя отдельные вызовы дают `moderation_blocked` (Ancient Leshen: лист 8,1/8,1, пара pass) | 1c сначала обычным заданием Codex; unstability — только если Codex отказал во всём виде после ретраев |
-| 22 | Зеркальный side (лицом не в ту сторону) автопроверки не ловят: в `check_concept_views.py` нет проверки ракурса | приёмщик сверяет side с `ortho_<SIDE_VIEW>` глазами (8.1, 11); запускающий до приёмки — IoU силуэта side с `ortho_<SIDE_VIEW>` и с его зеркалом (прототип `C:/tmp/concept-wave/side_mirror_check.py`; пилот: прямое 0,60–0,87, зеркало 0,41–0,45). Зеркало выше прямого на 0,03 — брак вида, на этап 2 не идёт (`tripo3d-stages.md` §5.5) |
-| 23 | Пакетный запуск: несколько полос `codex exec` по одному файлу-очереди; без захвата задания две полосы берут одно | claim-файл `logs/<id>.claim` (CreateNew) перед запуском задания (`C:/tmp/concept-wave/run-claim-loop.ps1`, волны 1a/1c 2026-10-13); полосы закрываются флагом-файлом остановки |
+| 22 | Зеркальный side (лицом не в ту сторону) автопроверки не ловили | `check_concept_views.py --side-ortho <orthos>/ortho_<SIDE_VIEW>.png` (ee301065): FAIL `view.facing`, когда IoU силуэта side с зеркалом орто больше прямого на 0,05 (пилот 2026-10-14: прямо 0,96–0,97, зеркало 0,56–0,67); прогон запускающего до приёмки — 5.5 п.2; приёмщик всё равно сверяет side с `ortho_<SIDE_VIEW>` глазами (8.1, 11). FAIL — брак вида, на этап 2 не идёт (`tripo3d-stages.md` §5.5) |
+| 23 | Пакетный запуск: несколько полос `codex exec` по одному файлу-очереди; без захвата задания две полосы берут одно | `tools/art/pipeline_batch/codex_lane.py --tasks --name --logs [--stop-file] [--grace]` (claim-файл `<logs>/<id>.claim`, остановка — файл STOP), задания — `make_tasks.py` (1a) и `make_1c.py` (1c), приёмка листов — `sheet_acceptance.py` (5.6) |
 
 ## 14. Источники
 
@@ -1011,4 +1091,5 @@ frames как {dir, files} с именами без пути). Верни тол
 `C:/tmp/skill-review-codex/robin-hood/` (`RUN-REPORT.md`, `AMBIGUITIES.md`).
 Инструменты скилла (CLI и калибровка — `tools/art/concept/README.md`): `tools/art/concept/draft_orthos.py`,
 `tools/art/concept/check_concept_views.py`, `tools/art/acceptance/validate_card.py`,
-`tools/art/acceptance/asset-acceptance-2.schema.json`.
+`tools/art/acceptance/asset-acceptance-2.schema.json`; пачка — `tools/art/pipeline_batch/` (5.6).
+Решения по итогам пилота — `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md` (ДС-1…ДС-8).
