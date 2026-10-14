@@ -1,0 +1,1157 @@
+{
+ "experiment": "Tripo Studio tools vs h2_bake (Beowulf ASSET-BEOWULF-001), 2026-10-14",
+ "credits": {
+  "balance_before": 20800,
+  "balance_after": 20625,
+  "spent": 175,
+  "ledger_rows": 16,
+  "ops": [
+   [
+    "Smart Mesh P2.0 quad x4 (25000/22000/12000/6000), multi-view",
+    "b71b1c74,1d926810,704977ba,77db66fe",
+    0,
+    "trial (list 100)"
+   ],
+   [
+    "Smart Mesh P2.0 tri x4 (50000/45000/30000/15000), multi-view",
+    "cd7db824,9de9c8ac,7c18ad7e,30699cc6",
+    0,
+    "trial (list 100)"
+   ],
+   [
+    "Texture 8K + Remove Lighting on quad 22000",
+    "1d926810",
+    30,
+    ""
+   ],
+   [
+    "PBR on quad 22000",
+    "1d926810",
+    5,
+    ""
+   ],
+   [
+    "Save as a New Model (clone of H2 ada45143 PBR version)",
+    "64e5c0ee",
+    0,
+    ""
+   ],
+   [
+    "Retopology quad 10000, Smart Mesh P1.0, on clone",
+    "64e5c0ee",
+    40,
+    ""
+   ],
+   [
+    "Smart UV on clone (multi-part)",
+    "64e5c0ee",
+    0,
+    "refused: 'Smart UV is not currently supported for multi-part models.'"
+   ],
+   [
+    "Smart UV on Smart Mesh tri 45000",
+    "9de9c8ac",
+    20,
+    ""
+   ],
+   [
+    "Save as a New Model (clone of 1d926810 textured)",
+    "4835e4a1",
+    0,
+    ""
+   ],
+   [
+    "Auto Rig Humanoid Mixamo",
+    "4835e4a1",
+    20,
+    ""
+   ],
+   [
+    "Auto Rig Humanoid UE5 Mannequin",
+    "1d926810",
+    20,
+    ""
+   ],
+   [
+    "Animate presets idle/slash/hit_to_body_01/fall",
+    "4835e4a1",
+    0,
+    "applied by a click on the tile, no price button"
+   ],
+   [
+    "Text-to-motion 5 s",
+    "4835e4a1",
+    20,
+    ""
+   ],
+   [
+    "Auto Rig Humanoid UE5 Mannequin on H2 clone",
+    "64e5c0ee",
+    20,
+    ""
+   ],
+   [
+    "Animate preset slash",
+    "64e5c0ee, 1d926810",
+    0,
+    ""
+   ]
+  ]
+ },
+ "smart_mesh_variants": {
+  "sm-quad-b71b1c74.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 56473,
+   "quads": 0,
+   "verts": 28527,
+   "loose_components": 18,
+   "images": [],
+   "topology": "quad",
+   "target": 25000,
+   "studio_faces": 31527,
+   "uv": false,
+   "texture": false,
+   "task": "b71b1c74",
+   "overshoot_vs_target": 1.261
+  },
+  "sm-quad-1d926810.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 48694,
+   "quads": 0,
+   "verts": 24401,
+   "loose_components": 10,
+   "images": [],
+   "topology": "quad",
+   "target": 22000,
+   "studio_faces": 28002,
+   "uv": false,
+   "texture": false,
+   "task": "1d926810",
+   "overshoot_vs_target": 1.273
+  },
+  "sm-quad-704977ba.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 26460,
+   "quads": 0,
+   "verts": 13242,
+   "loose_components": 5,
+   "images": [],
+   "topology": "quad",
+   "target": 12000,
+   "studio_faces": 15194,
+   "uv": false,
+   "texture": false,
+   "task": "704977ba",
+   "overshoot_vs_target": 1.266
+  },
+  "sm-quad-77db66fe.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 13062,
+   "quads": 0,
+   "verts": 6569,
+   "loose_components": 7,
+   "images": [],
+   "topology": "quad",
+   "target": 6000,
+   "studio_faces": null,
+   "uv": false,
+   "texture": false,
+   "task": "77db66fe",
+   "overshoot_vs_target": 2.177
+  },
+  "sm-tri-cd7db824.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 55647,
+   "quads": 0,
+   "verts": 28238,
+   "loose_components": 39,
+   "images": [],
+   "topology": "tri",
+   "target": 50000,
+   "studio_faces": null,
+   "uv": false,
+   "texture": false,
+   "task": "cd7db824",
+   "overshoot_vs_target": 1.113
+  },
+  "sm-tri-9de9c8ac.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 48644,
+   "quads": 0,
+   "verts": 24627,
+   "loose_components": 19,
+   "images": [],
+   "topology": "tri",
+   "target": 45000,
+   "studio_faces": null,
+   "uv": false,
+   "texture": false,
+   "task": "9de9c8ac",
+   "overshoot_vs_target": 1.081
+  },
+  "sm-tri-7c18ad7e.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 33332,
+   "quads": 0,
+   "verts": 16708,
+   "loose_components": 7,
+   "images": [],
+   "topology": "tri",
+   "target": 30000,
+   "studio_faces": null,
+   "uv": false,
+   "texture": false,
+   "task": "7c18ad7e",
+   "overshoot_vs_target": 1.111
+  },
+  "sm-tri-30699cc6.glb": {
+   "mesh_objects": 1,
+   "tri_equiv": 16552,
+   "quads": 0,
+   "verts": 8302,
+   "loose_components": 10,
+   "images": [],
+   "topology": "tri",
+   "target": 15000,
+   "studio_faces": null,
+   "uv": false,
+   "texture": false,
+   "task": "30699cc6",
+   "overshoot_vs_target": 1.103
+  }
+ },
+ "smart_mesh_quad22000_textured": {
+  "mesh_objects": 1,
+  "tri_equiv": 48694,
+  "quads": 0,
+  "verts": 50829,
+  "loose_components": 4098,
+  "images": [
+   [
+    8192,
+    8192
+   ],
+   [
+    4096,
+    4096
+   ],
+   [
+    4096,
+    4096
+   ]
+  ],
+  "fbx_quads": 20692,
+  "fbx_tris": 7310,
+  "fbx_faces": 28002,
+  "uv": {
+   "coverage_pct": 42.95,
+   "overlap_px_of_1024": 3,
+   "overlap_pct_of_covered": 0.001,
+   "triangles": 48694,
+   "islands_uv_connected": 4096
+  }
+ },
+ "smart_uv_tri45000": {
+  "mesh_objects": 1,
+  "tri_equiv": 48644,
+  "quads": 0,
+  "verts": 28148,
+  "loose_components": 151,
+  "images": [],
+  "uv": {
+   "coverage_pct": 80.85,
+   "overlap_px_of_1024": 108,
+   "overlap_pct_of_covered": 0.013,
+   "triangles": 48644,
+   "islands_uv_connected": 151
+  },
+  "texture": "none (model had none)"
+ },
+ "tripo_retopo_q10000_h2clone": {
+  "mesh_objects": 20,
+  "tri_equiv": 22469,
+  "quads": 0,
+  "verts": 28345,
+  "loose_components": 4009,
+  "images": [
+   [
+    4096,
+    4096
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    4096,
+    4096
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ]
+  ],
+  "uv_part0": {
+   "coverage_pct": 43.29,
+   "overlap_px_of_1024": 83,
+   "overlap_pct_of_covered": 0.018,
+   "triangles": 7111,
+   "islands_uv_connected": 1326
+  }
+ },
+ "tripo_retopo_packuv_export": {
+  "mesh_objects": 20,
+  "tri_equiv": 22466,
+  "quads": 0,
+  "verts": 28370,
+  "loose_components": 4015,
+  "images": [
+   [
+    8192,
+    8192
+   ],
+   [
+    8192,
+    8192
+   ],
+   [
+    8192,
+    8192
+   ]
+  ],
+  "uv_all_parts": {
+   "coverage_pct": 47.26,
+   "overlap_px_of_1024": 177,
+   "overlap_pct_of_covered": 0.036,
+   "triangles": 22466,
+   "islands_uv_connected": 4009,
+   "parts": 20
+  }
+ },
+ "ours_lookdev_t5": {
+  "SK": {
+   "mesh_objects": 2,
+   "tri_equiv": 43861,
+   "quads": 0,
+   "verts": 24264,
+   "loose_components": 30,
+   "images": []
+  },
+  "Base": {
+   "mesh_objects": 1,
+   "tri_equiv": 1430,
+   "quads": 0,
+   "verts": 925,
+   "loose_components": 5,
+   "images": []
+  },
+  "uv_atlas": {
+   "coverage_pct": 48.47,
+   "overlap_px_of_1024": 150241,
+   "overlap_pct_of_covered": 29.56,
+   "triangles": 45291,
+   "islands_uv_connected": 698
+  },
+  "uv_note": "6099 flipped + 1902 zero-area UV triangles in SK body UVMap; 148 of 607 body islands mixed orientation (folds) — outside this experiment, to verify against h2_bake uv-report (raster_overlap_px 0)"
+ },
+ "h2_source_ada45143": {
+  "mesh_objects": 20,
+  "tri_equiv": 1993213,
+  "quads": 0,
+  "verts": 1040682,
+  "loose_components": 585,
+  "images": [
+   [
+    4096,
+    4096
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    4096,
+    4096
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    128,
+    128
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    2048,
+    2048
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    512,
+    512
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    1024,
+    1024
+   ],
+   [
+    256,
+    256
+   ],
+   [
+    256,
+    256
+   ]
+  ]
+ },
+ "rigs": {
+  "ours": {
+   "bones": 17,
+   "bone_names": [
+    "root",
+    "hips",
+    "spine",
+    "head",
+    "arm_upper.L",
+    "arm_lower.L",
+    "hand.L",
+    "arm_upper.R",
+    "arm_lower.R",
+    "hand.R",
+    "weapon.R",
+    "leg_upper.L",
+    "leg_lower.L",
+    "foot.L",
+    "leg_upper.R",
+    "leg_lower.R",
+    "foot.R"
+   ]
+  },
+  "tripo_ue5_sm": {
+   "bones": 61,
+   "bone_names": [
+    "root",
+    "pelvis",
+    "spine_01",
+    "spine_02",
+    "spine_03",
+    "clavicle_l",
+    "upperarm_l",
+    "lowerarm_l",
+    "hand_l",
+    "index_01_l",
+    "index_02_l",
+    "index_03_l",
+    "middle_01_l",
+    "middle_02_l",
+    "middle_03_l",
+    "pinky_01_l",
+    "pinky_02_l",
+    "pinky_03_l",
+    "ring_01_l",
+    "ring_02_l",
+    "ring_03_l",
+    "thumb_01_l",
+    "thumb_02_l",
+    "thumb_03_l",
+    "lowerarm_twist_01_l",
+    "upperarm_twist_01_l",
+    "clavicle_r",
+    "upperarm_r",
+    "lowerarm_r",
+    "hand_r",
+    "index_01_r",
+    "index_02_r",
+    "index_03_r",
+    "middle_01_r",
+    "middle_02_r",
+    "middle_03_r",
+    "pinky_01_r",
+    "pinky_02_r",
+    "pinky_03_r",
+    "ring_01_r",
+    "ring_02_r",
+    "ring_03_r",
+    "thumb_01_r",
+    "thumb_02_r",
+    "thumb_03_r",
+    "lowerarm_twist_01_r",
+    "upperarm_twist_01_r",
+    "neck_01",
+    "head",
+    "thigh_l",
+    "calf_l",
+    "calf_twist_01_l",
+    "foot_l",
+    "ball_l",
+    "thigh_twist_01_l",
+    "thigh_r",
+    "calf_r",
+    "calf_twist_01_r",
+    "foot_r",
+    "ball_r",
+    "thigh_twist_01_r"
+   ]
+  },
+  "tripo_ue5_h2": {
+   "bones": 61,
+   "bone_names": [
+    "root",
+    "pelvis",
+    "spine_01",
+    "spine_02",
+    "spine_03",
+    "clavicle_l",
+    "upperarm_l",
+    "lowerarm_l",
+    "hand_l",
+    "index_01_l",
+    "index_02_l",
+    "index_03_l",
+    "middle_01_l",
+    "middle_02_l",
+    "middle_03_l",
+    "pinky_01_l",
+    "pinky_02_l",
+    "pinky_03_l",
+    "ring_01_l",
+    "ring_02_l",
+    "ring_03_l",
+    "thumb_01_l",
+    "thumb_02_l",
+    "thumb_03_l",
+    "lowerarm_twist_01_l",
+    "upperarm_twist_01_l",
+    "clavicle_r",
+    "upperarm_r",
+    "lowerarm_r",
+    "hand_r",
+    "index_01_r",
+    "index_02_r",
+    "index_03_r",
+    "middle_01_r",
+    "middle_02_r",
+    "middle_03_r",
+    "pinky_01_r",
+    "pinky_02_r",
+    "pinky_03_r",
+    "ring_01_r",
+    "ring_02_r",
+    "ring_03_r",
+    "thumb_01_r",
+    "thumb_02_r",
+    "thumb_03_r",
+    "lowerarm_twist_01_r",
+    "upperarm_twist_01_r",
+    "neck_01",
+    "head",
+    "thigh_l",
+    "calf_l",
+    "calf_twist_01_l",
+    "foot_l",
+    "ball_l",
+    "thigh_twist_01_l",
+    "thigh_r",
+    "calf_r",
+    "calf_twist_01_r",
+    "foot_r",
+    "ball_r",
+    "thigh_twist_01_r"
+   ]
+  },
+  "tripo_mixamo_sm": {
+   "bones": 65,
+   "bone_names": [
+    "mixamorig:Hips",
+    "mixamorig:LeftUpLeg",
+    "mixamorig:LeftLeg",
+    "mixamorig:LeftFoot",
+    "mixamorig:LeftToeBase",
+    "mixamorig:LeftToe_End",
+    "mixamorig:RightUpLeg",
+    "mixamorig:RightLeg",
+    "mixamorig:RightFoot",
+    "mixamorig:RightToeBase",
+    "mixamorig:RightToe_End",
+    "mixamorig:Spine",
+    "mixamorig:Spine1",
+    "mixamorig:Spine2",
+    "mixamorig:LeftShoulder",
+    "mixamorig:LeftArm",
+    "mixamorig:LeftForeArm",
+    "mixamorig:LeftHand",
+    "mixamorig:LeftHandIndex1",
+    "mixamorig:LeftHandIndex2",
+    "mixamorig:LeftHandIndex3",
+    "mixamorig:LeftHandIndex4",
+    "mixamorig:LeftHandMiddle1",
+    "mixamorig:LeftHandMiddle2",
+    "mixamorig:LeftHandMiddle3",
+    "mixamorig:LeftHandMiddle4",
+    "mixamorig:LeftHandPinky1",
+    "mixamorig:LeftHandPinky2",
+    "mixamorig:LeftHandPinky3",
+    "mixamorig:LeftHandPinky4",
+    "mixamorig:LeftHandRing1",
+    "mixamorig:LeftHandRing2",
+    "mixamorig:LeftHandRing3",
+    "mixamorig:LeftHandRing4",
+    "mixamorig:LeftHandThumb1",
+    "mixamorig:LeftHandThumb2",
+    "mixamorig:LeftHandThumb3",
+    "mixamorig:LeftHandThumb4",
+    "mixamorig:Neck",
+    "mixamorig:Head",
+    "mixamorig:HeadTop_End",
+    "mixamorig:RightShoulder",
+    "mixamorig:RightArm",
+    "mixamorig:RightForeArm",
+    "mixamorig:RightHand",
+    "mixamorig:RightHandIndex1",
+    "mixamorig:RightHandIndex2",
+    "mixamorig:RightHandIndex3",
+    "mixamorig:RightHandIndex4",
+    "mixamorig:RightHandMiddle1",
+    "mixamorig:RightHandMiddle2",
+    "mixamorig:RightHandMiddle3",
+    "mixamorig:RightHandMiddle4",
+    "mixamorig:RightHandPinky1",
+    "mixamorig:RightHandPinky2",
+    "mixamorig:RightHandPinky3",
+    "mixamorig:RightHandPinky4",
+    "mixamorig:RightHandRing1",
+    "mixamorig:RightHandRing2",
+    "mixamorig:RightHandRing3",
+    "mixamorig:RightHandRing4",
+    "mixamorig:RightHandThumb1",
+    "mixamorig:RightHandThumb2",
+    "mixamorig:RightHandThumb3",
+    "mixamorig:RightHandThumb4"
+   ]
+  }
+ },
+ "skin_regions": {
+  "tripo_ue5_smartmesh": {
+   "base(939 v)": "calf_twist_01_r 51.9 %, ball_l 29.6 %, ball_r 9.7 %",
+   "shield(1024 v)": "hand_l 100 %",
+   "sword": "welded into the body component (45 911 v), no separate part",
+   "weapon_bone": null
+  },
+  "tripo_mixamo_smartmesh": {
+   "base": "RightFoot 77.7 %, LeftToeBase 12.7 %, LeftFoot 9.6 %",
+   "shield": "LeftHand 100 %"
+  },
+  "tripo_ue5_h2clone": {
+   "base part_13": "calf_twist_01_l 57.1 %, calf_twist_01_r 32.8 %, ball_r 9.5 %",
+   "sword part_7": "pinky_03_r 60.2 %, index_03_r 38.7 %",
+   "shield part_2": "hand_l 100 %",
+   "head part_3": "clavicle_r 49.2 %, head 30.6 %, clavicle_l 13.3 %"
+  },
+  "ours": {
+   "base": "separate static mesh SM_Beowulf_H2_Base",
+   "sword": "weapon.R 100 %",
+   "head": "head 83.7 %"
+  },
+  "dominant_group_vertex_counts": {
+   "ours": {
+    "spine": 9737,
+    "arm_r": 2719,
+    "arm_l": 4598,
+    "leg": 4013,
+    "head": 3197,
+    "static": 925
+   },
+   "tripo_ue5_sm": {
+    "leg": 13368,
+    "arm_r": 10685,
+    "spine": 3232,
+    "head": 11587,
+    "arm_l": 11957
+   },
+   "tripo_ue5_h2": {
+    "leg": 12873,
+    "arm_l": 6890,
+    "spine": 1208,
+    "head": 983,
+    "arm_r": 6416
+   }
+  }
+ },
+ "left_right": {
+  "tripo_ue5_smartmesh": "hand_l x>0 at the shield, hand_r x<0 at the sword: correct",
+  "tripo_mixamo": "LeftHand x=+0.226 (shield), RightHand x=-0.231: correct",
+  "tripo_ue5_h2clone": "hand_l x=+0.26, hand_r x=-0.24: correct"
+ },
+ "animations_tripo": {
+  "A warrior holding a sword in the right hand and a round shield ": {
+   "frames": [
+    1.0,
+    120.0
+   ],
+   "seconds_24fps": 4.958
+  },
+  "fall.001": {
+   "frames": [
+    1.0,
+    73.0
+   ],
+   "seconds_24fps": 3.0
+  },
+  "hit_to_body_01.001": {
+   "frames": [
+    1.0,
+    32.0
+   ],
+   "seconds_24fps": 1.292
+  },
+  "idle.001": {
+   "frames": [
+    1.0,
+    369.0
+   ],
+   "seconds_24fps": 15.333
+  },
+  "slash.001": {
+   "frames": [
+    1.0,
+    159.0
+   ],
+   "seconds_24fps": 6.583
+  }
+ },
+ "animations_ours_D11_seconds": {
+  "Idle": 2.5,
+  "LungeAttack": 0.583,
+  "HitReact": 0.417,
+  "DeathSettle": 0.875
+ },
+ "in_place": "export option 'Animation stay in Place' ON: Hips x/z constant in all 5 clips; vertical drop in fall 0.34 of rest hips height units",
+ "exports": {
+  "generate_page_skeleton_glb": "broken: joints without TRS, one inverse bind matrix with w=2e-308, stray 2 m Icosphere; Blender import gives NaN bones",
+  "animate_page_glb": "valid: skeleton + selected clips, 'Animation stay in Place', 'Number of Animations' chooser",
+  "glb_quads": "GLB is triangulated; quad topology only via FBX (Blender preset)"
+ }
+}

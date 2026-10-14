@@ -81,3 +81,24 @@ hem in `pose-04b`); gates all PASS and recomputed by `--check-files`; validate_c
 
 Stage 4 second acceptor: Opus xhigh via `second-acceptor` — S 2 / F 1.5 / T 1.5 / D 1.5 = 8.1 pass; pair final 8.1 pass
 (finish_second exit 0). Model accepted at r1 — no stage 5.
+
+## Tripo tools experiment (separate agent, user: «Да, но сделай это в отдельном агенте…», no credit limit)
+
+175 credits (20 800 → 20 625, 16 ledger rows AN-45). Report: `tripo-tools-experiment/README.md`, numbers and 11 frames.
+Verdict: keep the skill's route (H2 «по частям» + stage 3 in Blender); update the `tripo3d-stages.md` §4 table.
+- Smart Mesh P2.0 (new): good-looking mesh but a new generation, not a retopology of the accepted H2; one welded mesh
+  (sword fused to the hand), no parts, texture-step UV only (4 096 islands, 43 %); overshoots the target ×1.1–1.27.
+- Remesh: ceiling 10 000 quads, coarse face. Smart UV: refuses multi-part models (props only). Pack UV on export (new):
+  one 8K atlas from 20 parts but 4 009 ragged islands.
+- Auto-rig «Humanoid» (UE5 / Mixamo): 61–65 bones, no weapon bone; left/right now correct, but the base is weighted to
+  feet/calves, on the H2 clone the sword to the fingertips and the head to the clavicles (frame 06).
+- Animation presets (free) / Text-to-motion (20): 3–6× our D-11 lengths, the base travels with the feet.
+- New: Smart Mesh P2.0 and P1.0 Fast; texture 4K = 20 (not 30); Multi-stage Motion 20; export options Pack UV, Export
+  Skeleton, clip choice, «Animation stay in Place»; image models (GPT Image 2, Midjourney v8.2, Nano Banana).
+- Traps: Smart Mesh privacy resets to «Sharing Only» on every load; skeleton export from the Model page gives a broken GLB
+  (export from the Animate page works).
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C36 | 3/4 | The experiment measured 6 099 flipped UV triangles and ~30 % UV overlap in our look-dev body while `uv-report.json` says 0. Orchestrator check: 6 099 = the `cloth_shell` inner faces (3 999 + 1 700 + 400: same UV0, reversed winding by design, П3-3) — not a defect, but any external UV measure misreads it | tag shell faces (attribute / vertex group) and exclude them in UV checks; one line in HANDBOOK §4.2 `cloth_shell` |
+| C37 | 2 | `tripo3d-stages.md` §4 is out of date (Smart Mesh row, 4K price 20, Smart UV refusal text, auto-rig and animation facts, new export options, Smart Mesh privacy reset) | update §4 from `tripo-tools-experiment/README.md` |
