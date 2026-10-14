@@ -33,13 +33,33 @@ k_c = Y(концепт)/Y(H2LD), и `y_ratio_loo = k_loo / k_класса`: во
 Допуски (решение скилла; калибровка — Medusa H2LD 20260929-h2-lookdev: все классы вне пола в пределах 0,965–1,203,
 |dHue| ≤ 3,8°, якорь `linen` по leave-one-out 1,01):
   основной класс  — доля пикселей рендера (pixels_ld) ≥ 10 % суммы классов;
-  вне допуска     — Y_ratio < 0,80 или > 1,25 (≈ ±0,3 EV) или |dHue| > 15°; у основного класса ещё y_ratio_loo вне
+  вне допуска     — Y_ratio < 0,80 или > 1,25 (≈ ±0,3 EV) или |dHue| > 15° (только у хроматических медиан, ниже);
+                    у основного класса ещё y_ratio_loo вне
                     0,80–1,25 (у якорного класса это единственная проверка яркости);
   потолок T       — 1,0, если вне допуска хоть один основной класс; 1,5 — если только второстепенные; иначе 2,0.
+
+Оттенок — только у хроматических медиан (решение скилла по пилоту 2026-10-13, RB-06). Критерий |dHue| > 15°
+применяется, только когда обе медианы класса (концепт и H2LD) хроматические — насыщенность ≥ 0,15, тот же порог
+`CHROMA_SAT`, что у семейства тона. Оттенок почти серого цвета — шум: сталь меча Angel (sat 0,020 / 0,043) давала
+dHue −114° и выносила класс за допуск без дефекта тона; основной нейтральный класс (сталь, чёрная кожа, белый лён) так
+получил бы `t_cap` 1,0. Переход нейтральный ↔ хроматический ловит семейство (`family`, |dSat| ≥ 0,20 — признак S).
+Нет насыщенностей в отчёте (`concept.sat`/`ld.sat`) — оттенок проверяется, как раньше. Поле строки `hue_checked`.
+
+CLI (выход этапа 3, HANDBOOK §4.4 «Сдача этапа 3»; тот же код, что `frames/tone.json` съёмки):
+
+    python tools/art/acceptance/_tone.py <measure-report.json | run look-dev> [<ld-maps-report.json>] [--json]
+
+Без второго аргумента берётся `ld-maps-report.json` рядом с measure-report (как в `capture_acceptance_set.py`), если он
+есть. Печатает `t_cap`, классы `out` и `floor`, смену семейства основного класса, предупреждения и строки классов;
+`--json` — всю таблицу. Код выхода: 0 — `t_cap` 2.0 (тон сдаётся); 2 — `t_cap` ниже 2.0 (ещё итерация grade); 1 — вход
+не читается.
 """
 from __future__ import annotations
 
+import json
 import math
+import sys
+from pathlib import Path
 
 MAIN_SHARE = 0.10
 Y_LO, Y_HI = 0.80, 1.25
@@ -60,12 +80,26 @@ def _k(zone):
     return yc / max(yl, 1e-5) if yc > 0 else None
 
 
-def family(zone, d_hue):
-    """same | changed | None (нет медиан): граница S (семейство цвета) и T (светлота, насыщенность)."""
+def _sats(zone):
+    """(sat концепта, sat H2LD) медиан класса или None."""
     try:
-        sc, sl = float(zone["concept"]["sat"]), float(zone["ld"]["sat"])
+        return float(zone["concept"]["sat"]), float(zone["ld"]["sat"])
     except (KeyError, TypeError, ValueError):
         return None
+
+
+def hue_applies(zone):
+    """Проверять ли |dHue| класса: обе медианы хроматические (sat ≥ CHROMA_SAT). Нет насыщенностей — да (как раньше)."""
+    s = _sats(zone)
+    return s is None or (s[0] >= CHROMA_SAT and s[1] >= CHROMA_SAT)
+
+
+def family(zone, d_hue):
+    """same | changed | None (нет медиан): граница S (семейство цвета) и T (светлота, насыщенность)."""
+    s = _sats(zone)
+    if s is None:
+        return None
+    sc, sl = s
     cc, cl = sc >= CHROMA_SAT, sl >= CHROMA_SAT
     if cc and cl:
         return "changed" if abs(d_hue) > FAMILY_HUE_DEG else "same"
@@ -118,6 +152,7 @@ def tone_table(measure: dict, maps: dict | None = None) -> dict:
         r["role"] = "main" if r["share"] >= MAIN_SHARE else "secondary"
         r["anchor"] = r["class"] == anchor
         r["family"] = family(zones[r["class"]], r["d_hue_deg"])
+        r["hue_checked"] = hue_applies(zones[r["class"]])
         loo = loo_ratio(r["class"], zones, floor, total) if r["role"] == "main" else None
         r["y_ratio_loo"] = round(loo, 3) if loo is not None else None
         if r["role"] == "main" and loo is None and r["class"] not in floor:
@@ -125,7 +160,8 @@ def tone_table(measure: dict, maps: dict | None = None) -> dict:
                             "класса относительно фигуры не проверена" % (r["class"], int(LOO_MIN_SHARE * 100)))
         out_y = r["y_ratio"] < Y_LO or r["y_ratio"] > Y_HI
         out_loo = r["y_ratio_loo"] is not None and not (Y_LO <= r["y_ratio_loo"] <= Y_HI)
-        out = out_y or out_loo or abs(r["d_hue_deg"]) > HUE_MAX_DEG
+        out_hue = r["hue_checked"] and abs(r["d_hue_deg"]) > HUE_MAX_DEG
+        out = out_y or out_loo or out_hue
         if r["class"] in floor:
             r["status"] = "floor"  # концепт темнее пола альбедо: остаток — свет, T не снижает
         elif out:
@@ -136,6 +172,8 @@ def tone_table(measure: dict, maps: dict | None = None) -> dict:
     return {
         "schema": "unmatched.acceptance-tone/1",
         "rule": {"main_share_min": MAIN_SHARE, "y_ratio_ok": [Y_LO, Y_HI], "hue_abs_max_deg": HUE_MAX_DEG,
+                 "hue_checked": "|dHue| проверяется, только когда обе медианы хроматические (sat >= %.2f); оттенок "
+                                "почти серого цвета — шум (RB-06)" % CHROMA_SAT,
                  "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и "
                                 "legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по "
                                 "построению, его яркость проверяет только y_ratio_loo",
@@ -156,3 +194,59 @@ def tone_table(measure: dict, maps: dict | None = None) -> dict:
                                 if r["role"] == "main" and r["family"] == "changed" and r["class"] not in floor],
         "warnings": warnings,
     }
+
+
+def _fmt(v, nd=3):
+    return "—" if v is None else ("%.*f" % (nd, v) if isinstance(v, float) else str(v))
+
+
+def format_table(t: dict, measure_path: str = "", maps_path: str | None = None) -> str:
+    """Человекочитаемая сводка tone_table для CLI (выход этапа 3)."""
+    lines = ["measure-report: %s" % measure_path,
+             "ld-maps-report: %s" % (maps_path or "нет (пол альбедо не учтён: классы floor считаются как обычные)"),
+             "t_cap: %s" % t["t_cap"],
+             "out: %s" % (", ".join(t["out_of_tolerance"]) or "—"),
+             "floor: %s" % (", ".join(t["floor_limited"]) or "—"),
+             "family_changed_main: %s" % (", ".join(t["family_changed_main"]) or "—"),
+             "anchor: %s; framing: %s" % (t["anchor_class"] or "—", t["framing"])]
+    lines += ["warning: %s" % w for w in t["warnings"]]
+    lines.append("%-16s %6s %-10s %7s %7s %8s %-5s %-7s %s" % ("class", "share", "role", "y_ratio", "y_loo", "dHue",
+                                                             "hue?", "family", "status"))
+    for r in t["classes"]:
+        lines.append("%-16s %6.3f %-10s %7s %7s %8.1f %-5s %-7s %s" % (
+            r["class"], r["share"], r["role"] + ("*" if r["anchor"] else ""), _fmt(r["y_ratio"]),
+            _fmt(r["y_ratio_loo"]), r["d_hue_deg"], "yes" if r["hue_checked"] else "no", r["family"] or "—",
+            r["status"]))
+    return "\n".join(lines)
+
+
+def main(argv=None) -> int:
+    import argparse  # noqa: PLC0415
+    for stream in (sys.stdout, sys.stderr):  # русские сообщения читаемы в Git Bash/агентах (консоль cp1251)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+    ap = argparse.ArgumentParser(description="Таблица тона H2LD против концепта (t_cap приёмки, выход этапа 3)")
+    ap.add_argument("measure", help="measure-report.json look-dev или каталог run look-dev (<run>/reports/...)")
+    ap.add_argument("maps", nargs="?", help="ld-maps-report.json (по умолчанию — рядом с measure-report, если есть)")
+    ap.add_argument("--json", action="store_true", help="напечатать всю таблицу tone.json")
+    a = ap.parse_args(argv)
+    mp = Path(a.measure)
+    if mp.is_dir():
+        mp = mp / "reports" / "measure-report.json"
+    maps_p = Path(a.maps) if a.maps else mp.with_name("ld-maps-report.json")
+    try:
+        measure = json.loads(mp.read_text(encoding="utf-8"))
+        maps = json.loads(maps_p.read_text(encoding="utf-8")) if (a.maps or maps_p.is_file()) else None
+        t = tone_table(measure, maps)
+    except (OSError, ValueError) as e:
+        print("FAIL: %s" % e, file=sys.stderr)
+        return 1
+    if a.json:
+        print(json.dumps(t, ensure_ascii=False, indent=2))
+    else:
+        print(format_table(t, mp.as_posix(), maps_p.as_posix() if maps is not None else None))
+    return 0 if t["t_cap"] >= 2.0 else 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

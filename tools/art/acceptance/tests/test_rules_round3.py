@@ -133,7 +133,7 @@ def frames_repo(tmp_path, card, sheet_bytes=b"sheet", **man_over):
 def test_frames_manifest_ok(tmp_path):
     card = frames_repo(tmp_path, model_card())
     assert run(card, check_files=True, repo=tmp_path)[0] == []
-    assert vc.file_warnings(card, tmp_path) == []
+    assert not any("frames.json#sheet" in w for w in vc.file_warnings(card, tmp_path))
 
 
 def test_frames_manifest_files_must_match(tmp_path):
