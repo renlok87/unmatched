@@ -1,0 +1,138 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": "Idle",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r1/Idle/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/export/AM_Achilles_Idle.fbx",
+      "sha256": "606b0fb6197115111412589a6dc635ea0a279c4019b16f22543c6c817a4f7c44"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json",
+      "sha256": "f73d4c434774033cf3f6ad1da917b4f9e0d10a8440b858da1d4b8ee9da646d78"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r2/Idle/frames",
+    "files": [
+      "Achilles-Idle-blender-sheet.jpg",
+      "Achilles-Idle-f15-front.jpg",
+      "Achilles-Idle-f30-q34.jpg",
+      "Achilles-Idle-f30-q34r.jpg",
+      "Achilles-Idle-f00-front-ue-editor.jpg",
+      "Achilles-Idle-f00-q34-ue-editor.jpg",
+      "Achilles-Idle-f15-front-ue-editor.jpg",
+      "Achilles-Idle-f15-q34-ue-editor.jpg",
+      "Achilles-Idle-f30-front-ue-editor.jpg",
+      "Achilles-Idle-f30-q34-ue-editor.jpg",
+      "Achilles-Idle-f45-front-ue-editor.jpg",
+      "Achilles-Idle-f45-q34-ue-editor.jpg",
+      "Achilles-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/grip-Idle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_Idle.validation.json",
+      "note": "AM_Achilles_Idle.validation.json#result = pass; AM_Achilles_Idle.validation.json#fails = []; AM_Achilles_Idle.validation.json#clip_sha256 = 606b0fb6197115111412589a6dc635ea0a279c4019b16f22543c6c817a4f7c44",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/contact-Idle.json",
+      "note": "contact-Idle.json#result = pass; contact-Idle.json#fails = []",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ACH-Idle].status = technically_imported; clip-manifest.json#clips[id=ACH-Idle].validation.result = pass; clip-manifest.json#clips[id=ACH-Idle].ue.status = technically_imported; clip-manifest.json#clips[id=ACH-Idle].source.files[0].sha256 = 606b0fb6197115111412589a6dc635ea0a279c4019b16f22543c6c817a4f7c44; ue-import-clips.json#fbx_sha256.AM_Achilles_Idle = 606b0fb6197115111412589a6dc635ea0a279c4019b16f22543c6c817a4f7c44",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "На Blender-листе и UE-кадрах 0/15/30/45 с front и q34 читаются спокойное дыхание корпуса и плеч, небольшое покачивание щита и поворот головы. Силуэт сохраняет характер гоплита на страже: вертикальное копьё справа, щит слева, устойчивый корпус; разворота спиной нет. Малое движение соответствует покою и масштабу движений образцов Arthur и Merlin.",
+      "frames": [
+        "Achilles-Idle-blender-sheet.jpg",
+        "Achilles-Idle-f00-front-ue-editor.jpg",
+        "Achilles-Idle-f15-front-ue-editor.jpg",
+        "Achilles-Idle-f30-front-ue-editor.jpg",
+        "Achilles-Idle-f30-q34-ue-editor.jpg",
+        "Achilles-Idle-f45-q34-ue-editor.jpg",
+        "Achilles-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На к.0/15/30/45 стопы сохраняют места на подставке, пятка копья остаётся в одной точке при малом наклоне древка. Отрыва стоп, скольжения хвата и прохождения оружия через корпус не видно. Небольшой сгиб исходно прямых ног при переносе веса не нарушает опору; плащ и юбка следуют тазу без заметного провала в подставку.",
+      "frames": [
+        "Achilles-Idle-blender-sheet.jpg",
+        "Achilles-Idle-f00-front-ue-editor.jpg",
+        "Achilles-Idle-f15-front-ue-editor.jpg",
+        "Achilles-Idle-f30-front-ue-editor.jpg",
+        "Achilles-Idle-f45-front-ue-editor.jpg",
+        "Achilles-Idle-f00-q34-ue-editor.jpg",
+        "Achilles-Idle-f45-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "Крупные планы к.15 front и к.30 q34/q34r показывают целую оболочку корпуса, сохранённый хват древка и отсутствие видимого разрыва у правой подмышки. У правого локтя возле края наруча остаётся небольшое уплощение перехода — след деформации без разрыва. Двухчастное копьё сохраняет единый контур; жёсткая привязка щита к предплечью не даёт видимого смещения хвата.",
+      "frames": [
+        "Achilles-Idle-f15-front.jpg",
+        "Achilles-Idle-f30-q34.jpg",
+        "Achilles-Idle-f30-q34r.jpg",
+        "Achilles-Idle-f30-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 1.5,
+      "rationale": "На листе к.0/15/30/45 изменения корпуса, головы и щита согласованы и малы; различие между к.45 и rest к.0 почти незаметно, заметного выброса позы нет. Однако отдельного к.60 и последовательности непосредственно вокруг шва в предоставленных кадрах нет: невидимость самого перехода к.60→0 визуально не установлена, поэтому верхний якорь 2 не подтверждён.",
+      "frames": [
+        "Achilles-Idle-blender-sheet.jpg",
+        "Achilles-Idle-f00-front-ue-editor.jpg",
+        "Achilles-Idle-f45-front-ue-editor.jpg",
+        "Achilles-Idle-f00-q34-ue-editor.jpg",
+        "Achilles-Idle-f45-q34-ue-editor.jpg",
+        "Achilles-H2Anim-ue-sheet.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "Achilles-Idle-f30-q34r.jpg",
+      "note": "Небольшое уплощение перехода у правого локтя возле края наруча учтено в D; видимого разрыва нет. Проверить читаемость этого места с look-dev материалами на K2 этапа 7."
+    },
+    {
+      "item": "L",
+      "frame": "Achilles-Idle-blender-sheet.jpg",
+      "note": "Лист содержит к.0/15/30/45, без отдельного к.60. На этапе 7 проверить шов к.60→0 в движении; оценка L по текущим кадрам не удостоверяет точное совпадение границ петли."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a137fd-2866-7342-919c-b441eab0192a"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage5r3-achilles",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

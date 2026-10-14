@@ -1,0 +1,151 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ACHILLES-001",
+  "clip": "DeathSettle",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r1/DeathSettle/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/export/AM_Achilles_DeathSettle.fbx",
+      "sha256": "dd2b4f1cfd0db6ec4f910aecb95c15edfe1a61c119b798c1bffb344dc366b6ff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json",
+      "sha256": "f73d4c434774033cf3f6ad1da917b4f9e0d10a8440b858da1d4b8ee9da646d78"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r2/DeathSettle/frames",
+    "files": [
+      "Achilles-DeathSettle-blender-sheet.jpg",
+      "Achilles-DeathSettle-f13-left.jpg",
+      "Achilles-DeathSettle-f21-back.jpg",
+      "Achilles-DeathSettle-f21-front.jpg",
+      "Achilles-DeathSettle-f21-q34.jpg",
+      "Achilles-DeathSettle-f21-q34b.jpg",
+      "Achilles-DeathSettle-f21-q34r.jpg",
+      "Achilles-DeathSettle-f21-right.jpg",
+      "Achilles-DeathSettle-f00-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f00-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f03-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f03-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f07-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f07-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f11-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f11-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f17-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f17-q34-ue-editor.jpg",
+      "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+      "Achilles-DeathSettle-f21-q34-ue-editor.jpg",
+      "Achilles-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/grip-DeathSettle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Achilles_DeathSettle.validation.json",
+      "note": "AM_Achilles_DeathSettle.validation.json#result = pass; AM_Achilles_DeathSettle.validation.json#fails = []; AM_Achilles_DeathSettle.validation.json#clip_sha256 = dd2b4f1cfd0db6ec4f910aecb95c15edfe1a61c119b798c1bffb344dc366b6ff",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2anim-r3/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; contact-DeathSettle.json#fails = []; contact-DeathSettle.json#checks[check=skin_stretch].status = warn; contact-DeathSettle.json#checks[check=skin_stretch].visible_torn_edges = 0",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ACH-DeathSettle].status = technically_imported; clip-manifest.json#clips[id=ACH-DeathSettle].validation.result = pass; clip-manifest.json#clips[id=ACH-DeathSettle].ue.status = technically_imported; clip-manifest.json#clips[id=ACH-DeathSettle].source.files[0].sha256 = dd2b4f1cfd0db6ec4f910aecb95c15edfe1a61c119b798c1bffb344dc366b6ff; ue-import-clips.json#fbx_sha256.AM_Achilles_DeathSettle = dd2b4f1cfd0db6ec4f910aecb95c15edfe1a61c119b798c1bffb344dc366b6ff; contact-DeathSettle.json#result = pass",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "Achilles-DeathSettle-blender-sheet.jpg и UE front/q34: к.0 — собранная стойка; к.3 — отшатывание с поднятым подбородком; к.7–14 — последовательный наклон корпуса и опускание головы; к.17–21 — удержанный поклон к копью с повисшей головой. Фазы различимы с обоих ракурсов; отсутствие возврата в боевую стойку отделяет смерть от HitReact. Копьё справа, круглый щит слева и гребень сохраняют характер Achilles, разворота спиной к камере нет.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f03-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f03-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f07-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f11-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg",
+        "Achilles-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Achilles-DeathSettle-blender-sheet.jpg, UE f00/f14/f21 front и q34: стопы сохраняют места на верхней плоскости подставки, пятка наклоняющегося копья остаётся на ней. На f21-q34r.jpg и f21-right.jpg правая рука раскрыта в локте относительно rest и образует упор; кисть обхватывает древко без отрыва. Корпус склонён к опоре, колени подогнуты без падения на них, щит не входит в бедро. Две жёсткие части копья, щит на предплечье и ограниченный сгиб исходно прямых ног учтены как пределы фигуры; видимого нарушения опоры здесь нет.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f21-q34.jpg",
+        "Achilles-DeathSettle-f21-q34r.jpg",
+        "Achilles-DeathSettle-f21-right.jpg",
+        "Achilles-DeathSettle-f00-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f00-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "r1 п.1: закрыт (Achilles-DeathSettle-f21-q34b.jpg). На этом крупном плане кромка за правой подмышкой сомкнута, открытого просвета и выступающего рваного лоскута нет. На f21-right.jpg, f21-q34r.jpg и f21-front.jpg оболочка руки и хват копья целы; остаются небольшие угловатые следы у правого локтя и на переходе юбки к бедру, поэтому якорь «следы без разрывов» — 1,5. На f21-back.jpg плащ сохраняет непрерывную поверхность. Ограничения подола и щиколоток учтены; видимого раскрытия оболочки они на представленных кадрах не дают.",
+      "frames": [
+        "Achilles-DeathSettle-f21-q34b.jpg",
+        "Achilles-DeathSettle-f21-right.jpg",
+        "Achilles-DeathSettle-f21-q34r.jpg",
+        "Achilles-DeathSettle-f21-front.jpg",
+        "Achilles-DeathSettle-f21-q34.jpg",
+        "Achilles-DeathSettle-f21-back.jpg",
+        "Achilles-DeathSettle-f13-left.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Achilles-DeathSettle-blender-sheet.jpg: изменения наклона уменьшаются от к.11 через к.14 к к.17. UE f17 и f21 front/q34 сохраняют поклон, повисшую голову, опору копья и положение стоп без видимого скачка или дрожи. Небольшое остаточное изменение щита выглядит оседанием, удержание терминальной позы не нарушает; возврата в rest нет.",
+      "frames": [
+        "Achilles-DeathSettle-blender-sheet.jpg",
+        "Achilles-DeathSettle-f14-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f14-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f17-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f17-q34-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-front-ue-editor.jpg",
+        "Achilles-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "Achilles-DeathSettle-f21-right.jpg",
+      "note": "На крупном плане к.21 остаются небольшая угловатость правого локтя и плоские следы на стыке юбки с бедром без открытого разрыва; учтено в D=1,5. Проверить их читаемость на игровом листе K1/K2 этапа 7."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a137fd-285f-79b1-ba5e-9c580de95065"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage5r3-achilles",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

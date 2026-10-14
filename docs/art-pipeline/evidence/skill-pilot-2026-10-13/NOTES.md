@@ -172,6 +172,9 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F151 | 4 r3 | Acceptor variance: Achilles r3 frames are pixel-identical to r2 except pose-02 (weights-only rework), yet T fell 2.0 → 1.5 on an identical close-torso-back → 8.8 → 8.1 and a forced second acceptor | capture: per-frame diff vs the previous cycle in frames.json (for the launcher, not the acceptor); rubric: a reworked model is re-scored only on changed frames + the fix items |
 | F152 | 4 | The bake profile carries rework notes (`note`, `status_note`, `weights_note`, `rig.junctions[].note`) and the acceptor reads the whole file for 4 G-NAMES keys | tool: an excerpt of the 4 keys for the acceptor |
 | F153 | 7 | UE look-dev review frames can be measured before they settle (warm-up diff ~2.5 vs 0.3–0.8 settled); Leshen's MI Saturation 1.22 was tuned on unsettled r3 frames (wood +0.133 vs 0.10 at the reading exposure once settled) | tool: fail/warn when warm-up has not converged |
+| F154 | 6 | Idle L stuck at 1.5 (r1, r2): acceptor frames never show the loop seam (keys 0/15/30/45 only); `loop_seam` PASS is in a report the acceptor does not score from | clip frames: a last-frame/frame-0 pair for Idle |
+| F155 | 7 | Settled UE review frames on byte-identical inputs vary ~4 % in the exposure anchor between editor sessions (bronze 1.159 → 1.118 flips a luma verdict) | ue_hero_lookdev: noise band / margin |
+| F156 | 6 | Known limits are free text repeated in every clip prompt; closing one item meant four exact-string edits | prompt template takes a list; stage-5 rework writes the closures |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 
