@@ -235,6 +235,7 @@ def new_character_profile():
     pv["samples"] = 1
     pv["k2"]["resolution"] = [192, 108]
     pv["frame"] = {"px": [102, 136], "top": 0.04, "bottom": 0.93, "base_x": 0.5, "side": "right"}
+    p["uv"]["density_reference_part"] = "tripo_part_0"  # a new hero names it (W1-d, RB-15): the dress, a body part
     assert PR.validate(p) == []
     return p
 

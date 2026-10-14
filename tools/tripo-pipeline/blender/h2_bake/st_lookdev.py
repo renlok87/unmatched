@@ -10,7 +10,9 @@ so UV1 is in metres of the object (the detail tiles use uvD = UV1 x tilesPerMete
 scale of its UV0 island: no rotation and no mirror, so the detail normal stays in the tangent basis UE builds from UV0.
 Islands: polygons connected through shared (vertex, UV0) corners. The export is the rig-stage export (candidate_build.core,
 determinism pins), then read-back checks against the H2.1 FBX read back in the same process: bones and parents,
-triangles, positions and UV0 of every loop identical, face +X, UV layer order [UVMap, UV1_m], UV1 density.
+triangles, positions and UV0 of every loop identical, face +X, UV layer order [UVMap, UV1_m], UV1 density. The pair is
+written and read back in work/ld_fbx/export-staging/ and moved to export/ only when every check passed (RB-13, as the rig
+stage): a failed ld_fbx leaves export/ untouched.
 
 ld_preview: the same studio light, AgX and orthographic cameras as st_preview (concept framing, framing.py: look-dev
 `frame`, a new character {"checks_report": <checks-report.json of its concept set>, "side": SIDE_VIEW}; without it the
@@ -197,8 +199,16 @@ def run_fbx(params, profile, ld):
     if bpy.data.filepath:
         raise RuntimeError("bpy.data.filepath must stay empty before the FBX export (deterministic bytes)")
     core.transform_for_fbx(scene, arm, figure, Matrix.Scale(data_scale, 4) @ rot)
-    sk_fbx = run_dir / "export" / ld["exports"]["skeletal_fbx"]
-    base_fbx = run_dir / "export" / ld["exports"]["base_fbx"]
+    # staging (W1-d 2026-10-14, RB-13; as the rig stage, F25): the pair is written and read back under work/, export/
+    # gets it only on PASS. The FBX bytes do not depend on the directory (bpy.data.filepath empty, path_mode STRIP: the
+    # atlas is stored by file name), and the report names the published paths with the sha256 of the same bytes.
+    sk_pub = run_dir / "export" / ld["exports"]["skeletal_fbx"]
+    base_pub = run_dir / "export" / ld["exports"]["base_fbx"]
+    staging = run_dir / "work" / "ld_fbx" / "export-staging"
+    sk_fbx, base_fbx = staging / sk_pub.name, staging / base_pub.name
+    for p in (sk_fbx, base_fbx):
+        if p.exists():
+            p.unlink()
     core.export_pair(scene, arm, skinned, base, preset, sk_fbx, base_fbx)
     bone_names = [b[0] for b in rig["bones"]]
     # read back: new FBX and the H2.1 FBX
@@ -253,9 +263,9 @@ def run_fbx(params, profile, ld):
            face_rt is not None and Vector(face_rt).dot(front_export) > 0.5 and abs(front_export.x - 1.0) < 1e-6,
            {"face_normal": face_rt, "rotated_front": U.rv(front_export, 3), "face_polygons": len(face_polys)}, "dot > 0.5, front = +X")
     rep = {"stage": "ld_fbx", "uv1": dict(ld["uv1"], per_mesh=uv1), "meshes_pre_export": pre,
-           "exports": {"skeletal_fbx": {"path": (Path(ld["run_rel"]) / "export" / sk_fbx.name).as_posix(), "sha256": core.sha256(sk_fbx),
+           "exports": {"skeletal_fbx": {"path": (Path(ld["run_rel"]) / "export" / sk_pub.name).as_posix(), "sha256": core.sha256(sk_fbx),
                                         "bytes": sk_fbx.stat().st_size},
-                       "base_fbx": {"path": (Path(ld["run_rel"]) / "export" / base_fbx.name).as_posix(), "sha256": core.sha256(base_fbx),
+                       "base_fbx": {"path": (Path(ld["run_rel"]) / "export" / base_pub.name).as_posix(), "sha256": core.sha256(base_fbx),
                                     "bytes": base_fbx.stat().st_size},
                        "settings": core.export_settings_report(preset, profile["exports"]["fbx_preset"], preset_path, data_scale)},
            "roundtrip": {"ld": {"skeletal": ld_m[0], "base": ld_m[1]}},
@@ -265,8 +275,11 @@ def run_fbx(params, profile, ld):
            "checks": dict(checks), "failed": checks.failed(), "passed": not checks.failed(), "status": "измерено",
            "claims": {"art_accepted": False, "game_ready": False}}
     U.write_json(run_dir / "reports" / "ld-fbx-report.json", rep)
-    if checks.failed():
+    if checks.failed():  # the staged pair stays under work/ld_fbx/export-staging for inspection; export/ is not touched
         raise RuntimeError("ld_fbx checks failed: %s" % checks.failed())
+    sk_pub.parent.mkdir(parents=True, exist_ok=True)
+    for src, dst in ((sk_fbx, sk_pub), (base_fbx, base_pub)):
+        src.replace(dst)  # publish on PASS (same volume: an atomic rename)
 
 
 # ------------------------------------------------------------------ preview

@@ -11,7 +11,12 @@ exploratory triangles -> deviation curve, reports/decimation-curve.json; run it 
 `blender -b --factory-startup --python-exit-code 1` process (no live Blender, no network, no paid Tripo call).
 Tripo sources are only read (sha256 checked by prepare). The run directory gets export/, textures/, preview/,
 reports/ (all deterministic) and work/ (blend files, npy composites, raw frames: not for git).
---compare-with: byte comparison of every output with another run of the same profile (reports/determinism-report.json).
+--compare-with: determinism verdict against another run of the same profile (determinism.py: tolerance table, scope)
+  -> reports/determinism-report.json; exit code 1 and the list of failures when a file is outside its tolerance.
+--reuse-from <old run> [--reuse-allow-code-drift] (h2 mode, new empty --run-dir, --stages all; reuse.py): stages whose
+  profile blocks, input files, Blender and code equal those of the old run are taken over (work/ files hard-linked,
+  reports copied with `reused_from`); recomputation starts at the first stage that differs. Plan: work/reuse-plan.json.
+Every h2 stage records its fingerprint in work/stages.json (the stage ledger, reuse.py); the manifest copies it.
 
 Look-dev mode (material library v1 on a finished H2.1 run; lookdev.py, st_lookdev.py):
   python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode lookdev       --profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json       --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev [--stages ld_maps,ld_fbx,...]
@@ -142,43 +147,47 @@ def outputs(run_dir):
     return out
 
 
-def normalised_json(path, run_dir):
-    text = path.read_text(encoding="utf-8")
-    for token in (rel(run_dir), str(Path(run_dir).resolve()).replace("\\", "/"), str(Path(run_dir).resolve())):
-        text = text.replace(token, "<run>")
-    return text
+def reused_stages(run_dir):
+    """{stage: source run} of the stages a run took over with --reuse-from (its stage ledger; {} for a full run)."""
+    try:
+        ledger = load_local("reuse").load_ledger(run_dir)
+    except (RuntimeError, ValueError):
+        return {}
+    if not ledger:
+        return {}
+    return {s: (e.get("reused_from") or {}).get("run") for s, e in ledger["stages"].items() if e.get("reused_from")}
 
 
-def compare(run_dir, other):
-    a, b = outputs(run_dir), outputs(other)
-    rows = {}
-    for k in sorted(set(a) | set(b)):
-        if k in NOT_COMPARED:
-            continue
-        if k not in a or k not in b:
-            rows[k] = {"result": "missing in " + ("this run" if k not in a else "other run")}
-            continue
-        if a[k]["sha256"] == b[k]["sha256"]:
-            rows[k] = {"result": "identical"}
-            continue
-        item = {"result": "different", "sha256": [a[k]["sha256"], b[k]["sha256"]]}
-        if k.endswith(".json") and normalised_json(run_dir / k, run_dir) == normalised_json(other / k, other):
-            item["result"] = "identical after run-path normalisation"
-        elif k.endswith(".png"):
-            import numpy as np
-            from PIL import Image
-            x = np.asarray(Image.open(run_dir / k)).astype(np.int16)
-            y = np.asarray(Image.open(other / k)).astype(np.int16)
-            if x.shape == y.shape:
-                diff = np.abs(x - y)
-                item.update({"differing_values": int((diff > 0).sum()), "max_abs_diff": int(diff.max()),
-                             "differing_pixels": int((diff.reshape(diff.shape[0], diff.shape[1], -1).max(-1) > 0).sum())})
-        rows[k] = item
-    summary = {}
-    for v in rows.values():
-        summary[v["result"]] = summary.get(v["result"], 0) + 1
-    return {"schema": "unmatched.h2-bake-determinism/1", "this_run": rel(run_dir), "other_run": rel(other),
-            "summary": summary, "files": rows}
+def determinism(run_dir, other, tag, h2=True):
+    """--compare-with: writes reports/determinism-report.json into run_dir, prints the verdict; -> exit code."""
+    det, reuse = load_local("determinism"), load_local("reuse")
+    other = Path(other).resolve()
+    stage_of = (lambda r: reuse.owner(r) or None) if h2 else None
+    rep = det.compare(run_dir, other, REPO, stage_of=stage_of,
+                      reuse_a=reused_stages(run_dir) if h2 else None, reuse_b=reused_stages(other) if h2 else None)
+    (run_dir / "reports" / "determinism-report.json").write_text(
+        json.dumps(rep, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    det.print_verdict(rep, tag, lambda s: print(s, flush=True))
+    return 1 if rep["verdict"] != "pass" else 0
+
+
+def blender_version(exe):
+    ver = subprocess.run([exe, "-b", "--factory-startup", "--version"], capture_output=True, text=True,
+                         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.splitlines()
+    return next((l.strip() for l in ver if l.startswith("Blender")), None)
+
+
+def merge_timings(path, timings):
+    """work/timings.json keeps the stages of earlier invocations (stages run one by one, F87)."""
+    old = {}
+    if path.is_file():
+        try:
+            old = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            old = {}
+    old.update(timings)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(old, indent=2), encoding="utf-8")
 
 
 def run_lookdev(a):
@@ -190,7 +199,13 @@ def run_lookdev(a):
     if ld.get("schema") != "unmatched.h2-lookdev-profile/1":
         raise ValueError("--mode lookdev needs a unmatched.h2-lookdev-profile/1 profile")
     src_profile = REPO / ld["source"]["profile"]
-    profile = load_local("profile").load(src_profile)
+    prof_mod = load_local("profile")
+    profile = prof_mod.load(src_profile)
+    if prof_mod.is_new_hero_profile(profile) and ld.get("frame") is None:  # RB-15: no silent Medusa canon for a new hero
+        raise ValueError("look-dev profile %s: a new hero (source profile_version %s) needs a top-level `frame` "
+                         "{\"checks_report\": \"art/imagegen/concept-<key>-codex/checks-report.json\", \"side\": "
+                         "\"<SIDE_VIEW>\"}; without it ld_preview / ld_measure use the Medusa canon 1021 x 1540 "
+                         "(framing.py, HANDBOOK §4.4)" % (a.profile, prof_mod.profile_version(profile)))
     lookdev = load_local("lookdev")
     stages = LD_ORDER if a.stages == "all" else [s for s in LD_ORDER if s in a.stages.split(",")]
     timings = {}
@@ -230,12 +245,10 @@ def run_lookdev(a):
                 json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
         timings[stage] = round(time.time() - t0, 1)
         print("[h2-lookdev] %s done in %.1f s" % (stage, timings[stage]), flush=True)
-    (run_dir / "work" / "timings.json").write_text(json.dumps(timings, indent=2), encoding="utf-8")
+    merge_timings(run_dir / "work" / "timings.json", timings)
     if a.compare_with:
-        rep = compare(run_dir, Path(a.compare_with).resolve())
-        (run_dir / "reports" / "determinism-report.json").write_text(
-            json.dumps(rep, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
-        print("[h2-lookdev] determinism:", rep["summary"], flush=True)
+        return determinism(run_dir, a.compare_with, "h2-lookdev", h2=False)
+    return 0
 
 
 def run_teamaccent(a):
@@ -272,8 +285,10 @@ def run_teamaccent(a):
                              next((l.strip() for l in ver if l.startswith("Blender")), None))
         timings[stage] = round(time.time() - t0, 1)
         print("[h2-teamaccent] %s done in %.1f s" % (stage, timings[stage]), flush=True)
-    (run_dir / "work" / "ta").mkdir(parents=True, exist_ok=True)
-    (run_dir / "work" / "ta" / "timings.json").write_text(json.dumps(timings, indent=2), encoding="utf-8")
+    merge_timings(run_dir / "work" / "ta" / "timings.json", timings)
+    if a.compare_with:
+        return determinism(run_dir, a.compare_with, "h2-teamaccent", h2=False)
+    return 0
 
 
 def main():
@@ -284,21 +299,67 @@ def main():
     ap.add_argument("--blender", default=os.environ.get("H2_BAKE_BLENDER", DEFAULT_BLENDER))
     ap.add_argument("--compare-with")
     ap.add_argument("--mode", choices=("h2", "lookdev", "teamaccent"), default="h2")
+    ap.add_argument("--reuse-from", help="h2 mode: earlier run of this hero; unchanged stages are taken over (reuse.py)")
+    ap.add_argument("--reuse-allow-code-drift", action="store_true",
+                    help="reuse stages whose code changed since the old run (then the full determinism repeat is required)")
     a = ap.parse_args()
     if a.mode == "lookdev":
         return run_lookdev(a)
     if a.mode == "teamaccent":
         return run_teamaccent(a)
     run_dir = Path(a.run_dir).resolve()
+    prof_mod = load_local("profile")
+    reuse = load_local("reuse")
+    profile = prof_mod.load(a.profile)
+    profile_rel, profile_sha = rel(a.profile), sha256(a.profile)
+    bver_cache = []
+
+    def bver():
+        if not bver_cache:
+            bver_cache.append(blender_version(a.blender))
+        return bver_cache[0]
+
+    stages = ORDER if a.stages == "all" else [s for s in ORDER + OPTIONAL if s in a.stages.split(",")]
+    plan = None
+    if a.reuse_from:
+        source = Path(a.reuse_from).resolve()
+        if a.stages != "all":
+            raise SystemExit("--reuse-from builds a complete run: use it with --stages all")
+        if source == run_dir:
+            raise SystemExit("--reuse-from: the old run and --run-dir are the same directory")
+        if run_dir.exists() and any(p.is_file() for p in run_dir.rglob("*")):
+            raise SystemExit("--reuse-from needs a new, empty --run-dir (%s has files)" % run_dir)
+        plan = reuse.plan(source, profile, REPO, bver(), prof_mod.load, a.reuse_allow_code_drift)
+        reuse.print_plan(plan, lambda s: print(s, flush=True))
     for d in ("work", "logs", "reports", "export", "textures", "preview"):
         (run_dir / d).mkdir(parents=True, exist_ok=True)
-    prof_mod = load_local("profile")
-    profile = prof_mod.load(a.profile)
-    stages = ORDER if a.stages == "all" else [s for s in ORDER + OPTIONAL if s in a.stages.split(",")]
     timings = {}
+    if plan is not None:
+        t0 = time.time()
+        carried = reuse.apply(plan, run_dir, REPO)
+        src_rel = rel(plan["source"])
+        for row in plan["stages"]:
+            if row["action"] == "reuse":  # the old fingerprint: the outputs were made with the old code (drift stays visible)
+                reuse.record(run_dir, row["stage"], row["old_fingerprint"], profile_rel, profile_sha, 0.0,
+                             reused_from={"run": src_rel, "evidence": plan["evidence"], "code_drift": row.get("code_drift") or []})
+        timings["reuse_apply"] = round(time.time() - t0, 1)
+        (run_dir / "work" / "reuse-plan.json").write_text(json.dumps(
+            dict(plan, source=src_rel, carried=carried, seconds=timings["reuse_apply"]), indent=1, ensure_ascii=False,
+            sort_keys=True) + "\n", encoding="utf-8")
+        print("[h2-bake] reused %s in %.1f s: %d links (%.2f GB), %d reports, %d copies, %d unowned copied%s" % (
+            ", ".join(plan["reused"]) or "nothing", timings["reuse_apply"], carried["link"], carried["linked_bytes"] / 1e9,
+            carried["report"], carried["copy"], carried["unowned_copied"],
+            (" (%s)" % ", ".join(carried["unowned"][:8])) if carried["unowned"] else ""), flush=True)
+        stages = [s for s in stages if s in plan["recomputed"]]
     for stage in stages:
         t0 = time.time()
         print("[h2-bake] %s ..." % stage, flush=True)
+        if stage in reuse.REUSABLE:
+            reuse.invalidate_from(run_dir, stage)
+            n = reuse.unshare(run_dir, stage)
+            if n:
+                print("[h2-bake]   %d hard links of %s unlinked before the stage writes" % (n, stage), flush=True)
+        links = reuse.snapshot_links(run_dir)
         if stage in BLENDER_STAGES:
             blender_stage(a.blender, stage, a.profile, run_dir)
         elif stage == "textures":
@@ -308,13 +369,12 @@ def main():
         elif stage == "compose":
             load_local("compose").run(run_dir, profile, REPO)
         elif stage == "manifest":
-            ver = subprocess.run([a.blender, "-b", "--factory-startup", "--version"], capture_output=True, text=True,
-                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.splitlines()
             modules = {p.name: sha256(p) for p in sorted(HERE.glob("*.py"))}
             core = REPO / "tools" / "tripo-pipeline" / "blender" / "candidate_build"
             manifest = {"schema": SCHEMA, "tool": load_local("__init__").VERSION, "asset_id": profile["asset_id"],
                         "profile": {"path": rel(a.profile), "sha256": sha256(a.profile), "profile_id": profile["profile_id"]},
-                        "blender": next((l.strip() for l in ver if l.startswith("Blender")), None),
+                        "blender": bver(),
+                        "stages": stage_block(reuse, run_dir, profile, bver),
                         "modules": modules,
                         "read_only_dependencies": {rel(p): sha256(p) for p in (core / "core.py", core / "measure.py", core / "closure.py",
                                                                                REPO / profile["exports"]["fbx_preset"])},
@@ -326,15 +386,59 @@ def main():
                         "status": "измерено"}
             (run_dir / "reports" / "run-manifest.json").write_text(
                 json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+            if manifest["stages"] and manifest["stages"]["stale"]:
+                print("[h2-bake] WARNING stages built from other profile blocks / inputs than the current profile: %s"
+                      % manifest["stages"]["stale"], flush=True)
+            if manifest["stages"] and manifest["stages"]["code_drift"]:
+                print("[h2-bake] note: stages built by other code than this checkout (full determinism repeat "
+                      "decides): %s" % manifest["stages"]["code_drift"], flush=True)
+        reuse.check_links(run_dir, links, stage)
         timings[stage] = round(time.time() - t0, 1)
+        if stage in reuse.REUSABLE:
+            spec = reuse.STAGE_INPUTS[stage]
+            reuse.record(run_dir, stage, reuse.fingerprint(stage, profile, REPO, bver() if spec.get("blender") else None),
+                         profile_rel, profile_sha, timings[stage])
         print("[h2-bake] %s done in %.1f s" % (stage, timings[stage]), flush=True)
-    (run_dir / "work" / "timings.json").write_text(json.dumps(timings, indent=2), encoding="utf-8")
+    merge_timings(run_dir / "work" / "timings.json", timings)
     if a.compare_with:
-        rep = compare(run_dir, Path(a.compare_with).resolve())
-        (run_dir / "reports" / "determinism-report.json").write_text(
-            json.dumps(rep, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
-        print("[h2-bake] determinism:", rep["summary"], flush=True)
+        return determinism(run_dir, a.compare_with, "h2-bake")
+    return 0
+
+
+def stage_block(reuse, run_dir, profile, bver):
+    """run-manifest.json#stages: the stage ledger (fingerprint chain, reuse, wall time) and the stages whose recorded
+    fingerprint differs from the current profile / inputs (`stale`: run again or start a new run). None without a
+    ledger (a run made before h2-bake 0.7.0, re-manifested)."""
+    ledger = reuse.load_ledger(run_dir)
+    if not ledger:
+        return None
+    fps = {s: e["fingerprint"] for s, e in ledger["stages"].items() if s in reuse.REUSABLE}
+    chain = reuse.chain(fps)
+    stale, code_drift = {}, {}
+    for s, fp in fps.items():
+        spec = reuse.STAGE_INPUTS[s]
+        changes, drift = reuse.differences(reuse.fingerprint(s, profile, REPO, bver() if spec.get("blender") else None), fp)
+        if changes:
+            stale[s] = changes
+        if drift:
+            code_drift[s] = drift
+    plan = run_dir / "work" / "reuse-plan.json"
+    reuse_info = None
+    if plan.is_file():
+        p = json.loads(plan.read_text(encoding="utf-8"))
+        reuse_info = {"from": p["source"], "evidence": p["evidence"], "reused": p["reused"],
+                      "recomputed": p["recomputed"], "code_drift": p["code_drift"],
+                      "determinism": "full repeat required (scope full) — code drift in reused stages" if p["code_drift"]
+                      else "the run that goes to UE needs the full repeat; otherwise repeat the recomputed stages"}
+    return {"ledger": "work/stages.json", "order": [s for s in reuse.REUSABLE if s in fps],
+            "per_stage": {s: {"chain_sha256": chain[s], "profile_keys": sorted(fps[s]["profile"]),
+                              "seconds": ledger["stages"][s].get("seconds"),
+                              "reused_from": (ledger["stages"][s].get("reused_from") or {}).get("run")} for s in fps},
+            "stale": stale, "code_drift": code_drift, "reuse": reuse_info}
 
 
 if __name__ == "__main__":
-    main()
+    for _stream in (sys.stdout, sys.stderr):
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+    sys.exit(main())

@@ -9,7 +9,12 @@ bone weapon.L under hand.L):
   rig contract docs/art-pipeline/rig/rig-contract.json -> skeletons.<rig.skeleton>.characters.<rig.character>
   .weapon_bone (the key every v2 profile already has), and, for a character missing from the contract, the one
   weapon.L / weapon.R bone of rig.bones. An explicit value that contradicts the contract is an error.
-Old profiles (Medusa: one weapon part, contract Medusa -> weapon.L) resolve to exactly the previous behaviour."""
+Old profiles (Medusa: one weapon part, contract Medusa -> weapon.L) resolve to exactly the previous behaviour.
+
+New-hero rules (W1-d 2026-10-14, RB-15; new_hero_problems): a profile of any asset outside LEGACY_ASSETS (the MVP
+Medusa and the pilot Achilles, Angel, Ancient Leshen), or with `profile_version` >= 2, must name
+uv.density_reference_part (a body part), textures.team_mask.base_band.part (the base part) and preview.frame (with
+`side`); a named part of any profile must have that role."""
 
 import hashlib
 import json
@@ -88,6 +93,88 @@ def validate(p):
     problems.extend(cloth_shell_problems(p))
     problems.extend(figure_top_part_problems(p))
     problems.extend(part_offsets_problems(p))
+    problems.extend(new_hero_problems(p))
+    return problems
+
+
+# ------------------------------------------------------------------ new-hero profile rules (W1-d 2026-10-14, RB-15, F29)
+# The Medusa defaults that a copied profile silently inherits (uv.density_reference_part = Medusa's dress tripo_part_0,
+# team_mask.base_band.part = tripo_part_2: Angel's trouser leg, F29; no preview.frame = the Medusa canon 1021 x 1540)
+# are allowed only for the profiles written before this rule: the MVP (Medusa) and the skill pilot (Achilles, Angel,
+# Ancient Leshen). Every other asset is a new hero (profile_version 2) and must name them; the roles of named parts are
+# checked for every profile (all MVP and pilot profiles already name a body / base part there).
+LEGACY_ASSETS = ("ASSET-MEDUSA-001", "ASSET-ACHILLES-001", "ASSET-ANGEL-001", "ASSET-ANCIENT-LESHEN-001")
+NEW_HERO_PROFILE_VERSION = 2
+PROFILE_RULES_DOC = "HANDBOOK §4.2 «Новый герой»"
+
+
+def profile_version(p):
+    """Rules version of the profile: optional top-level `profile_version` (int >= 1); absent -> 1 for LEGACY_ASSETS (the
+    MVP and the pilot, old defaults allowed), 2 for every other asset_id (a new hero copied from Medusa without the key
+    is still a new hero)."""
+    v = p.get("profile_version")
+    if v is None:
+        return 1 if p.get("asset_id") in LEGACY_ASSETS else NEW_HERO_PROFILE_VERSION
+    return v
+
+
+def is_new_hero_profile(p):
+    v = profile_version(p)
+    return isinstance(v, int) and not isinstance(v, bool) and v >= NEW_HERO_PROFILE_VERSION
+
+
+def _part_role_problem(p, where, name, role):
+    if not isinstance(name, str) or name not in p["parts"]:
+        return "%s: unknown part %r" % (where, name)
+    if p["parts"][name].get("mesh") != role:
+        return "%s: %s is a %s part, must be a %s part" % (where, name, p["parts"][name].get("mesh"), role)
+    return None
+
+
+def new_hero_problems(p):
+    problems = []
+    v = p.get("profile_version")
+    if v is not None:
+        if not isinstance(v, int) or isinstance(v, bool) or v < 1:
+            return ["profile_version must be an integer >= 1 (got %r)" % (v,)]
+        if v < NEW_HERO_PROFILE_VERSION and p.get("asset_id") not in LEGACY_ASSETS:
+            problems.append("profile_version %d is only for the MVP and pilot assets %s; a new hero is profile_version %d"
+                            % (v, ", ".join(LEGACY_ASSETS), NEW_HERO_PROFILE_VERSION))
+    uv_ref = p["uv"].get("density_reference_part")
+    tm = p["textures"].get("team_mask")
+    band = tm.get("base_band") if isinstance(tm, dict) else None
+    band_part = band.get("part") if isinstance(band, dict) else None
+    # roles: every profile that names the part (MVP and pilot included)
+    if uv_ref is not None:
+        msg = _part_role_problem(p, "uv.density_reference_part", uv_ref, "body")
+        if msg:
+            problems.append(msg)
+    if band_part is not None:
+        msg = _part_role_problem(p, "textures.team_mask.base_band.part", band_part, "base")
+        if msg:
+            problems.append(msg + " (Medusa's tripo_part_2 is Angel's trouser leg, F29)")
+    if not is_new_hero_profile(p):
+        return problems
+    base = next((n for n, c in p["parts"].items() if c.get("mesh") == "base"), "<base part>")
+    if uv_ref is None:
+        problems.append("new hero (profile_version %d): uv.density_reference_part missing — name the large body part "
+                        "the face texel density is compared with (the default tripo_part_0 is Medusa's dress; %s)"
+                        % (profile_version(p), PROFILE_RULES_DOC))
+    if band_part is None:
+        problems.append("new hero (profile_version %d): textures.team_mask.base_band.part missing — name the base part "
+                        "(%s here; Medusa's tripo_part_2 is another hero's trouser leg, F29; %s)"
+                        % (profile_version(p), base, PROFILE_RULES_DOC))
+    frame = p.get("preview", {}).get("frame") if isinstance(p.get("preview"), dict) else None
+    hint = ('{"checks_report": "art/imagegen/concept-<key>-codex/checks-report.json", "side": "<SIDE_VIEW>"}')
+    if frame is None:
+        problems.append("new hero (profile_version %d): preview.frame missing — the ortho frames would use the Medusa "
+                        "canon 1021 x 1540; set %s (framing.py; %s)" % (profile_version(p), hint, PROFILE_RULES_DOC))
+    elif not isinstance(frame, dict) or not (isinstance(frame.get("checks_report"), str) and frame["checks_report"]
+                                             or "px" in frame):
+        problems.append("new hero: preview.frame must be %s or explicit numbers {\"px\": [W, H], ...} (framing.py)" % hint)
+    elif frame.get("side") not in ("left", "right"):
+        problems.append("new hero: preview.frame.side must be SIDE_VIEW of the asset card, left or right (got %r; the "
+                        "default left is Medusa's)" % (frame.get("side"),))
     return problems
 
 

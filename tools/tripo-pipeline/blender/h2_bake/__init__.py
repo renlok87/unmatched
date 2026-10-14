@@ -42,7 +42,11 @@ Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factor
                                                                                  -> preview/*.jpg
   curve     (optional, --stages curve) exploratory triangles -> deviation curve  -> reports/decimation-curve.json
 
+Driver services (0.7.0): every h2 stage records its fingerprint (profile blocks, code, inputs, Blender) in
+work/stages.json; --reuse-from <old run> takes over the unchanged stages (reuse.py); --compare-with gives a determinism
+verdict by the tolerance table of determinism.py (exit code 1 outside it).
+
 Statuses: every number is "измерено" at most; budgets are "предложено"; nothing here is art-accepted.
 """
 
-VERSION = "h2-bake/0.6.1"  # 0.6.1: preview.previous_candidate / preview.baseline optional, concept framing from preview.frame / look-dev frame (framing.py), TeamAccent hem / ribbon optional (new characters; Medusa outputs unchanged); 0.6.0: weapon side / no weapon from the profile and rig contract (D-1; Medusa outputs unchanged); 0.5.0: --mode teamaccent (lookdev_accent.py, st_team.py); 0.4.0: --mode lookdev; the h2 stages are unchanged
+VERSION = "h2-bake/0.7.0"  # 0.7.0 (W1-d 2026-10-14): stage ledger work/stages.json + --reuse-from (reuse.py), determinism verdict with a tolerance table and exit code 1 (determinism.py), new-hero profile rules (profile.new_hero_problems), ld_fbx through staging; outputs of every stage unchanged; 0.6.1: preview.previous_candidate / preview.baseline optional, concept framing from preview.frame / look-dev frame (framing.py), TeamAccent hem / ribbon optional (new characters; Medusa outputs unchanged); 0.6.0: weapon side / no weapon from the profile and rig contract (D-1; Medusa outputs unchanged); 0.5.0: --mode teamaccent (lookdev_accent.py, st_team.py); 0.4.0: --mode lookdev; the h2 stages are unchanged
