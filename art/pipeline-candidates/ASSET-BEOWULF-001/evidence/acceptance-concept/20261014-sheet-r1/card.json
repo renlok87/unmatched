@@ -1,0 +1,120 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-BEOWULF-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+      "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856"
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+      "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0"
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+      "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-beowulf-codex",
+    "files": [
+      "sheet-beowulf.png",
+      "beowulf-front.png",
+      "beowulf-side.png",
+      "beowulf-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-beowulf-codex/checks-report.json",
+    "art/imagegen/concept-beowulf-codex/generation-records.json",
+    "art/imagegen/concept-beowulf-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-beowulf-codex/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 33; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В beowulf-front.png и beowulf-back.png руки отделены от корпуса просветами, меч и щит образуют ясные самостоятельные контуры. В beowulf-side.png различимы профиль шлема, борода, мантия, ближний щит и дальний клинок; перекрытие кисти щитом соответствует выбранному левому профилю. Стойка нейтральная, локти согнуты, T- или A-позы нет. Тонкие части клинка и гарды читаются.",
+      "frames": [
+        "beowulf-front.png",
+        "beowulf-side.png",
+        "beowulf-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "В beowulf-front.png, beowulf-side.png и beowulf-back.png совпадают стойка, основные пропорции, длина мантии, высота щита и расположение оружия: меч в собственной правой руке, щит слева. Левый профиль и задний вид строгие. Есть небольшие расхождения орнамента шлема, прядей меха и складок; клинок несколько уже и прямее соответствующих орто. В sheet-beowulf.png масштаб и линия земли согласованы, небольшое отклонение ширины подставки side не составляет заметной смены масштаба. Отмеченные исполнителем несовпадения рамки и почти ровного фона не означают разные позы или персонажей.",
+      "frames": [
+        "beowulf-front.png",
+        "beowulf-side.png",
+        "beowulf-back.png",
+        "sheet-beowulf.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "beowulf-front.png, beowulf-side.png и beowulf-back.png соответствуют уровню расписанной коллекционной миниатюры эталона Medusa: различимы металл, дерево, кожа, мех и камень; проработаны лицо, плетение бороды, кольчуга, гравировка, древесные волокна и износ. Детализация расположена внутри силуэта, выраженных грубых или плоских зон относительно эталона нет.",
+      "frames": [
+        "beowulf-front.png",
+        "beowulf-side.png",
+        "beowulf-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "В beowulf-front.png, beowulf-side.png и beowulf-back.png присутствуют железный серый, коричневый мех и выветренное дерево; все якоря сохранены там, где доступны ракурсу. На sheet-beowulf.png свотчи соответствуют заданной PALETTE, однако торк и золотая отделка фигуры выглядят более бледными и менее насыщенными, чем свотч #C99A35. Акцент остаётся различимым; это отклонение тона, а не потеря цвета или якоря.",
+      "frames": [
+        "beowulf-front.png",
+        "beowulf-side.png",
+        "beowulf-back.png",
+        "sheet-beowulf.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "beowulf-front.png",
+      "note": "Клинок немного уже и прямее, чем в ortho_front; аналогичное изменение видно сзади. Сторона оружия, хват и общая поза сохранены."
+    },
+    {
+      "item": "C",
+      "frame": "beowulf-back.png",
+      "note": "Отдельные пряди меха и орнамент шлема не совпадают буквально с другими видами; крупная форма мантии и конструкция костюма согласованы."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-beowulf.png",
+      "note": "Ширина подставки side составляет 63.444% кадра против 64.275% в ortho-framing.json. Небольшие отклонения рамки и фона остаются в пределах PASS checker; фигура полностью видна, межвидовой разброс высоты составляет 0.306%."
+    },
+    {
+      "item": "P",
+      "frame": "beowulf-front.png",
+      "note": "Золото торка и отделки светлее и менее насыщенно, чем #C99A35 на листе; основной набор цветов и все якоря присутствуют."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13945-297e-73b2-b280-742f6aac8d64"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261014",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

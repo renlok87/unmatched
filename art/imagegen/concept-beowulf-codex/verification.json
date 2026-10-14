@@ -1,0 +1,700 @@
+{
+  "date": "2026-10-14",
+  "stage": "1c",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/design-front-g2/checks-report.json",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "side",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/side-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "side",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/side-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/back-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "back",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks/back-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "front,side,back",
+      "generation": {
+        "front": 2,
+        "side": 1,
+        "back": 2
+      },
+      "exit_code": 0,
+      "report": "art/imagegen/concept-beowulf-codex/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 33,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "front",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
+      "passed": true,
+      "note": "Строгий фронт: лицо и корпус вперёд, подставка с ребра. Поворота три четверти, коллажа, текста и водяного знака нет. Ортографичность оценена визуально."
+    },
+    {
+      "view": "front",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+      "passed": false,
+      "note": "Общая стойка, стороны рук, щит и хват следуют черновику; лишней анатомии и нового оружия нет. Однако клинок стал уже и прямее, форма острия и отдельные края меха/шлема отличаются от image 1; точное сохранение силуэта не достигнуто."
+    },
+    {
+      "view": "front",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+      "passed": true,
+      "note": "Сохранены лицо, плетёная борода, мех, кольчуга, деревянный щит, кожаные сапоги и золотой торк. В g2 исправлена светлая подставка g1 на тёмный камень. Кольчуга остаётся детальнее крупных плоских пятен CORE."
+    },
+    {
+      "view": "front",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT.;",
+      "passed": true,
+      "note": "Меч в собственной правой руке, слева для зрителя; щит на левой руке, справа для зрителя."
+    },
+    {
+      "view": "front",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+      "passed": false,
+      "note": "Вся фигура и подставка видны. Измерено: верх 4.213% вместо 4.0%, низ 93.992% вместо 94.0%, центр x50.0%, ширина подставки 64.825%, верх подставки ~86.188% вместо 85.9%. Точная рамка исходника не воспроизведена; автоматические допуски пройдены."
+    },
+    {
+      "view": "front",
+      "item": "the same plain flat dark gray background in every view.",
+      "passed": false,
+      "note": "Фон выглядит почти ровным тёмно-серым, но не является сплошной заливкой: контрольные точки RGB 41–43, медиана рамки [42,42,42] вместо [46,46,46] исходника. Между видами есть разница до 1 RGB по медианам. Требование буквальной одинаковой плоской заливки не закрыто."
+    },
+    {
+      "view": "side",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
+      "passed": true,
+      "note": "Строгий левый профиль: лицо к левому краю, видна собственная левая сторона; нет три четверти, перспективного сокращения подставки, текста или водяного знака."
+    },
+    {
+      "view": "side",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+      "passed": false,
+      "note": "Щит перед ближней левой рукой, клинок дальше за щитом; поза и крупные объёмы близки черновику. Точные контуры клинка, носа/бороды и меха отличаются от image 1; лишней анатомии и новых предметов нет."
+    },
+    {
+      "view": "side",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+      "passed": true,
+      "note": "Мех, плетёная борода, кольчуга, деревянный щит, кожа и палитра сохранены. Выбран g1: отделка шлема ближе принятому дизайну, чем у g2; у g2 также видна изменённая гарда возле торка."
+    },
+    {
+      "view": "side",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT.;",
+      "passed": true,
+      "note": "Левый щит находится перед корпусом; меч остаётся на дальней правой стороне, как в орто. Правая кисть закрыта щитом, поэтому её анатомическую принадлежность нельзя независимо подтвердить только по этому ракурсу; расположение согласовано с фронтом."
+    },
+    {
+      "view": "side",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+      "passed": false,
+      "note": "Всё видно. Верх 3.936% вместо 4.0%, низ 93.854% вместо 94.0%, центр x49.954%; ширина подставки 63.444% вместо 64.275% из framing, края x18.232–81.676% вместо x17.9–82.1%; верх ~86.119% вместо 85.9%. Подставка немного уже исходной, точная рамка не закрыта."
+    },
+    {
+      "view": "side",
+      "item": "the same plain flat dark gray background in every view.",
+      "passed": false,
+      "note": "Фон почти ровный, но контрольные точки RGB 41–44, медиана [43,43,42] вместо [46,46,46] исходника. Слабая неоднородность и межвидовая разница остаются; строгая сплошная одинаковая заливка не достигнута."
+    },
+    {
+      "view": "back",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
+      "passed": true,
+      "note": "Камера строго сзади: лица и бороды не видно, корпус симметричен относительно фронта; подставка с ребра. Нет три четверти, текста, коллажа или водяного знака."
+    },
+    {
+      "view": "back",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+      "passed": false,
+      "note": "Меч справа, щит слева, руки и мантия сохраняют общую позу черновика. Однако клинок уже и прямее, его остриё и детали контура меха/плаща изменены; точное сохранение силуэта image 1 не достигнуто."
+    },
+    {
+      "view": "back",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+      "passed": true,
+      "note": "Материалы и палитра согласованы с утверждённым фронтом и выбранным side g1. В g2 исправлены длинные кольчужные рукава g1: участки кожи между короткими рукавами и наручами снова видны. Плетёная борода скрыта этим ракурсом, что ожидаемо."
+    },
+    {
+      "view": "back",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT.;",
+      "passed": true,
+      "note": "Меч в собственной правой руке, справа для зрителя; щит на собственной левой стороне, слева для зрителя."
+    },
+    {
+      "view": "back",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+      "passed": false,
+      "note": "Всё видно. Верх 3.936% вместо 4.0%, низ 93.992% вместо 94.0%, центр x50.0%, ширина 64.825%, верх подставки ~86.119% вместо 85.9%. Автоматические допуски пройдены, буквальная рамка исходника не совпадает."
+    },
+    {
+      "view": "back",
+      "item": "the same plain flat dark gray background in every view.",
+      "passed": false,
+      "note": "Фон почти ровный, но контрольные точки RGB 41–44, медиана [42,42,42] вместо [46,46,46] исходника. Небольшая неоднородность остаётся; строгая одинаковая плоская заливка не закрыта."
+    }
+  ],
+  "generations_per_view": {
+    "front": {
+      "used": 2,
+      "allowed": 2,
+      "total_in_records": 2,
+      "lifetime_allowed": 4,
+      "selected": 2
+    },
+    "side": {
+      "used": 2,
+      "allowed": 2,
+      "total_in_records": 2,
+      "lifetime_allowed": 4,
+      "selected": 1
+    },
+    "back": {
+      "used": 2,
+      "allowed": 2,
+      "total_in_records": 2,
+      "lifetime_allowed": 4,
+      "selected": 2
+    }
+  },
+  "limit_reached": [
+    {
+      "view": "front",
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+        "the same plain flat dark gray background in every view."
+      ]
+    },
+    {
+      "view": "side",
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+        "the same plain flat dark gray background in every view."
+      ]
+    },
+    {
+      "view": "back",
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+        "the same plain flat dark gray background in every view."
+      ]
+    }
+  ],
+  "final_script_exit_code": 0,
+  "final_summary": {
+    "PASS": 33,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "candidate_observations": [
+    {
+      "view": "front",
+      "generation": 1,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions",
+        "identity, costume, colours and materials",
+        "same plain flat dark gray background"
+      ],
+      "note": "Скрипт без FAIL, но визуально изменены контур и положение кисти с мечом; подставка стала светлой вместо тёмного камня утверждённого дизайна; видна неоднородность фона."
+    },
+    {
+      "view": "side",
+      "generation": 1,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions",
+        "same plain flat dark gray background"
+      ],
+      "note": "Левый профиль и щит ориентированы верно; точный контур клинка и лица расходится с орто, фон имеет слабый градиент. Повтор по CHECKLIST, не по WARN."
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions",
+        "identity, costume, colours and materials",
+        "same plain flat dark gray background"
+      ],
+      "note": "Оружие справа, лицо не видно. Рукава кольчуги ошибочно продлены до наручей вместо открытых участков рук; точный контур меча/плаща не сохранён; фон неоднороден на малом уровне."
+    },
+    {
+      "view": "front",
+      "generation": 2,
+      "selected": true,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+        "the same plain flat dark gray background in every view."
+      ],
+      "note": "Предпочтён g1 благодаря исправленному материалу подставки; точность контура, рамки и фона ограничена. Лимит двух генераций исчерпан."
+    },
+    {
+      "view": "side",
+      "generation": 2,
+      "selected": false,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+        "the same plain flat dark gray background in every view."
+      ],
+      "note": "Подставка по размеру ближе к исходной, но изменены отделка шлема и видимость/положение гарды рядом с торком; для согласованности выбран g1."
+    },
+    {
+      "view": "back",
+      "generation": 2,
+      "selected": true,
+      "failed_items": [
+        "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+        "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+        "the same plain flat dark gray background in every view."
+      ],
+      "note": "Исправлены рукава g1; точное совпадение контуров, рамки и плоской заливки не достигнуто."
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261013-draft-tripo/orthos/ortho_front.png",
+      "before_sha256": "525a792fe14196cb648d1518388c21fec28cfb16dec6ab810c514ed0bd5a4a8c",
+      "after_sha256": "525a792fe14196cb648d1518388c21fec28cfb16dec6ab810c514ed0bd5a4a8c",
+      "unchanged": true,
+      "bytes": 451483
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261013-draft-tripo/orthos/ortho_left.png",
+      "before_sha256": "0204a225e3059d6a3870424cd379f8112b9b1d3d4c3ee9e85aea665fc50a5b7a",
+      "after_sha256": "0204a225e3059d6a3870424cd379f8112b9b1d3d4c3ee9e85aea665fc50a5b7a",
+      "unchanged": true,
+      "bytes": 211718
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261013-draft-tripo/orthos/ortho_back.png",
+      "before_sha256": "365724996038892909d0d7eb027c8e9fcf4f2b186eb5bf2755c5c2dbc3a7ff8b",
+      "after_sha256": "365724996038892909d0d7eb027c8e9fcf4f2b186eb5bf2755c5c2dbc3a7ff8b",
+      "unchanged": true,
+      "bytes": 279490
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261013-draft-tripo/orthos/ortho-framing.json",
+      "before_sha256": "b54950d756d300ae7087bea766ed81becf00949a934567f0ddc66bf62da673b8",
+      "after_sha256": "b54950d756d300ae7087bea766ed81becf00949a934567f0ddc66bf62da673b8",
+      "unchanged": true,
+      "bytes": 3785
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/design/beowulf-front.png",
+      "before_sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195",
+      "after_sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195",
+      "unchanged": true,
+      "bytes": 2041282
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/palette.json",
+      "before_sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+      "after_sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+      "unchanged": true,
+      "bytes": 298
+    }
+  ],
+  "earlier_files_preserved": [
+    {
+      "path": "art/imagegen/concept-beowulf-codex/palette.json",
+      "sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-design-front-g1.png",
+      "sha256": "8b78ac5b18bf67357d61726cea59190d0769485077a6e13ca6f53b59feaf53ff",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-design-front-g2.png",
+      "sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/design/beowulf-front.png",
+      "sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/design/checks-report.json",
+      "sha256": "29d1f62c927b4bab6e27c958919242cdee22a1c45f34250ef81c8c374759ffe1",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/checks/design-front-g1/checks-report.json",
+      "sha256": "d9182c35233cedb859a37f89461cac1a521674124226d6676299467437ed44a7",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-beowulf-codex/checks/design-front-g2/checks-report.json",
+      "sha256": "ea742bf0c7c70be3064bb293289129b38d5fb356f3e42005b4331e5243db5149",
+      "unchanged": true
+    }
+  ],
+  "byte_copies": [
+    {
+      "view": "front",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-5bc27eb2-9eaf-49b6-aac5-aba6c3c9aa1c.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-front-g1.png",
+      "sha256": "7f0062dcbc5685040b1f989f8eb6059aab2068a516069b0883c4881475dc0c98",
+      "identical": true
+    },
+    {
+      "view": "front",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-367971ea-7c8a-4c53-8d44-0cec62f41062.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-front-g2.png",
+      "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856",
+      "identical": true
+    },
+    {
+      "view": "side",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-39806925-17e3-4929-9276-88100794d21c.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-side-g1.png",
+      "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0",
+      "identical": true
+    },
+    {
+      "view": "side",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-8251236b-f9f6-485d-be6e-100ff52820e0.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-side-g2.png",
+      "sha256": "b650d7766d828ca2fa84862d103e2622d8f8d34932efd484ea0e0d91d47b8b02",
+      "identical": true
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-7666290a-a3e8-4bbf-ba80-c7edff70cf39.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-back-g1.png",
+      "sha256": "7be0890b95569273a8c96e57cd597d1dc2db9d7cd15c26a6017401e486191f2a",
+      "identical": true
+    },
+    {
+      "view": "back",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13934-ba2a-79a1-b02f-22f3292738c6\\exec-d4e441c0-d441-4205-ae63-2491c9652b02.png",
+      "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-back-g2.png",
+      "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8",
+      "identical": true
+    }
+  ],
+  "selected_copies": [
+    {
+      "view": "front",
+      "generation": 2,
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+      "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856",
+      "identical": true
+    },
+    {
+      "view": "side",
+      "generation": 1,
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+      "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0",
+      "identical": true
+    },
+    {
+      "view": "back",
+      "generation": 2,
+      "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+      "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8",
+      "identical": true
+    }
+  ],
+  "selected_copy_identical": true,
+  "limitations": [
+    "Все три вида исчерпали лимит этой задачи: точное сохранение силуэта, буквальная рамка и строго одинаковая плоская заливка фона не достигнуты. Автоматические допуски checker пройдены.",
+    "Ортографичность и уровень камеры оценены по изображению; данных камеры у image_gen нет.",
+    "На левом профиле правая кисть скрыта щитом; сторона меча оценена по орто и согласованности с фронтом.",
+    "Кольчуга остаётся с подробными кольцами вместо полностью крупных плоских пятен CORE.",
+    "Штатный лист checker масштабирует копии для отчёта. Сами исходники, кандидаты и выбранные PNG не редактировались."
+  ],
+  "scope_verification": {
+    "method": "Управляемые записи Python, побайтные копии и выходы checker ограничены art/imagegen/concept-beowulf-codex/. Сравнены хэши шести входов и защищённых прежних файлов пакета. Полный аудит остальных файлов репозитория не выполнялся; git запрещён заданием.",
+    "tool_originals_exception": "image_gen сохраняет оригиналы под C:/Users/ren/.codex/generated_images/; это явно предусмотренное заданием исключение. Они оставлены на месте. outside_folder перечисляет управляемые записи вне пакета.",
+    "encoding": "JSON и Markdown записаны Python Path.write_text(encoding='utf-8') без BOM; JSON нормализованы json.dumps(ensure_ascii=False, indent=2). Код передавался как base64, без PowerShell redirection и без кириллицы через pipe.",
+    "processes": "Фоновые процессы не запускались. Все shell-команды и image_gen завершены; процессов для остановки нет.",
+    "bytecode": "Для рабочих команд Python использованы -B и PYTHONDONTWRITEBYTECODE=1.",
+    "protected_previous_files": "palette.json, design/, два concepts/beowulf-design-front-g<N>.png и прежние checks/ сохранены побайтно. В сводных журналах сохранены старые записи; прежняя verification целиком в previous_runs."
+  },
+  "orchestration_errors": [
+    {
+      "action": "npx openskills read 3d-model-pipeline",
+      "error": "ENOTCACHED: openskills отсутствует в локальном npm-кэше; скачивания и npm log не созданы.",
+      "resolution": "Навык прочитан с диска."
+    },
+    {
+      "action": "Чтение метаданных через python -c",
+      "error": "SyntaxError при передаче кавычек PowerShell; записей до сбоя не было.",
+      "resolution": "Код передан через base64."
+    },
+    {
+      "action": "Регистрация финального отчёта",
+      "error": "SyntaxError при подстановке объекта выбранных поколений; записей до сбоя не было.",
+      "resolution": "Регистрация исправлена; checker не перезапускался, его код 0."
+    },
+    {
+      "action": "Финальная запись документации",
+      "error": "CreateProcessAsUserW 206: командная строка слишком длинная; процесс не создан и файлы не изменены.",
+      "resolution": "Текст записан последовательными короткими Python-командами внутри пакета."
+    }
+  ],
+  "previous_runs": [
+    {
+      "date": "2026-10-13",
+      "stage": "1a",
+      "status": "предложено",
+      "source_unchanged": true,
+      "outside_folder": [],
+      "checks": [
+        {
+          "view": "design-front",
+          "generation": 1,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-beowulf-codex/checks/design-front-g1/checks-report.json",
+          "summary": {
+            "PASS": 12,
+            "WARN": 1,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "design-front",
+          "generation": 2,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-beowulf-codex/checks/design-front-g2/checks-report.json",
+          "summary": {
+            "PASS": 13,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "design-front",
+          "generation": 2,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-beowulf-codex/design/checks-report.json",
+          "final": true,
+          "summary": {
+            "PASS": 13,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        }
+      ],
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+          "passed": true,
+          "note": "Одна фигура, одна двухъярусная подставка; надписей, коллажа, водяного знака и лишних частей не видно."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+          "passed": true,
+          "note": "Корпус и лицо направлены вперёд; у обеих ступеней подставки горизонтальные края, плоскость верха не видна. Наклон самого щита не является поворотом фигуры."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+          "passed": true,
+          "note": "Фигура, меч, щит и подставка полностью в кадре. Верх маски 6,354%, низ 92,680%, центр подставки x49,954%. Фон визуально ровный; контрольные точки RGB около 45–47."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+          "passed": true,
+          "note": "Меч в собственной правой руке, слева для зрителя. Просвет справа для зрителя виден между локтем/предплечьем и корпусом, слева — между предплечьем и мехом; руки не образуют T- или A-позу."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: longsword in the figure's own RIGHT hand; round wooden shield on the LEFT arm; fur mantle; braided beard;",
+          "passed": true,
+          "note": "Длинный меч, деревянный щит на левой руке, меховая мантия и плетёная борода видимы."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+          "passed": true,
+          "note": "Серо-железная кольчуга и шлем, коричневый мех, выветренное дерево щита и золотой торк присутствуют. На каменной подставке нет командного цвета, цветного кольца и металлической полосы."
+        }
+      ],
+      "generations_per_view": {
+        "design-front": {
+          "used": 2,
+          "allowed": 2,
+          "selected": 2
+        }
+      },
+      "limit_reached": [],
+      "candidate_observations": [
+        {
+          "generation": 1,
+          "failed_checklist_items": [
+            "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+            "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+            "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+          ],
+          "note": "Верх подставки виден; просветы у рук перекрыты мехом и щитом; отмечена слабая неравномерность фона. WARN view.frame_top: 3,039%; WARN не был основанием повторной генерации."
+        },
+        {
+          "generation": 2,
+          "failed_checklist_items": [],
+          "note": "Исправлены подставка, просветы и фон. 13 PASS, 0 WARN, 0 FAIL; выбран g2."
+        }
+      ],
+      "limitations": [
+        "Геометрическая ортографичность оценена по изображению, а не по данным камеры: это концепт, не рендер 3D-сцены.",
+        "Кольчуга содержит подробный узор отдельных колец; требование CORE о крупных плоских пятнах реализовано лишь частично. Все пункты заданного CHECKLIST пройдены; художественное решение остаётся за приёмщиком."
+      ],
+      "scope_verification": {
+        "method": "Все команды выполнялись из корня репозитория. Записи Python, побайтные копии и отчёты checker ограничены пакетом; PYTHONDONTWRITEBYTECODE=1 и python -B исключали pycache. Git, Unreal, Tripo, SYNTX, скачивания и правка пикселей не использовались.",
+        "tool_originals_exception": "image_gen сохранил свои оригиналы в C:/Users/ren/.codex/generated_images/; это предусмотренное заданием исключение. Оба оригинала оставлены на месте."
+      },
+      "source_hashes": [
+        {
+          "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+          "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "unchanged": true,
+          "bytes": 2034907
+        },
+        {
+          "path": "art/imagegen/concept-beowulf-codex/palette.json",
+          "before_sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+          "after_sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+          "unchanged": true,
+          "bytes": 298
+        }
+      ],
+      "byte_copies": [
+        {
+          "generation": 1,
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13340-d4a0-7d13-a368-098932ab806b\\exec-e86bf37d-b6fc-4c35-a0e8-ddae4a334029.png",
+          "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-design-front-g1.png",
+          "sha256": "8b78ac5b18bf67357d61726cea59190d0769485077a6e13ca6f53b59feaf53ff",
+          "identical": true
+        },
+        {
+          "generation": 2,
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13340-d4a0-7d13-a368-098932ab806b\\exec-ba7855ef-f4c6-4474-b527-34057be45b37.png",
+          "saved_path": "art/imagegen/concept-beowulf-codex/concepts/beowulf-design-front-g2.png",
+          "sha256": "9fca88027c1287d84a83ecefa869a8d963fa61e393d40edcbb8f2a6dd37a3195",
+          "identical": true
+        }
+      ],
+      "selected_copy_identical": true
+    }
+  ]
+}
