@@ -6,6 +6,12 @@ CPD 13 progress / CPD 14 style) and one Masked dissolve MIC per hero body MI.
     python tools/art/de011/de011.py apply                 # rebuild M_UM_Figure_v2 (v2.3) + the 8 dissolve MICs, saved
     python tools/art/de011/de011.py capture --tag after --dissolve
     python tools/art/de011/de011.py compare               # metrics + evidence report (no editor)
+    python tools/art/de011/de011.py apply --only <Key>[,<Key>...] [--dry-run] [--rebuild-master]
+
+--only / --dry-run / --rebuild-master as in tools/art/de010/de010.py (F157): apply creates / updates the dissolve MICs
+of these heroes only (without --only: of every hero of de010.HEROES, with a warning on stderr); inspect and capture
+take --only too. M_UM_Figure_v2 is rebuilt only when tools/art/de010/master-builds.json does not list its file at the
+current graph_signature.
 
 Every editor step is a separate headless UnrealEditor-Cmd of the main checkout's project (the runner of
 tools/art/de010/de010.py: -ExecutePythonScript, -RenderOffScreen, no window). Lossless frames go to --frames (outside
@@ -55,14 +61,14 @@ def dissolve_mi(key: str, stage: str, look: str) -> str:
     return "%s/MI_%s_%s_%s_Dissolve" % (DISSOLVE_ROOT, key, stage, look)
 
 
-def mics() -> list:
+def mics(rows: list | None = None) -> list:
     return [{"asset": dissolve_mi(key, stage, look), "parent": body_mi(key, stage, look)}
-            for key, stage, _, _ in de010.HEROES for look in LOOKS]
+            for key, stage, _, _ in (de010.HEROES if rows is None else rows) for look in LOOKS]
 
 
-def figures() -> list:
+def figures(rows: list | None = None) -> list:
     res = []
-    for key, stage, _, _ in de010.HEROES:
+    for key, stage, _, _ in (de010.HEROES if rows is None else rows):
         look = CAPTURE_LOOKS[key]
         root = stage_root(key, stage)
         res.append({"key": key, "look": look, "mesh": "%s/Meshes/SK_%s_%s" % (root, key, stage),
@@ -75,7 +81,7 @@ def figures() -> list:
 def cmd_inspect(a) -> None:
     frames = Path(a.frames)
     mats, meshes = [], []
-    for key, stage, _, _ in de010.HEROES:
+    for key, stage, _, _ in de010.select_heroes(getattr(a, "only", None)):
         root = stage_root(key, stage)
         for look in LOOKS:
             mats += [body_mi(key, stage, look), "%s/Materials/MI_%s_%s_Base_%s" % (root, key, stage, look)]
@@ -89,33 +95,49 @@ def cmd_inspect(a) -> None:
 
 def cmd_capture(a) -> None:
     frames = Path(a.frames)
+    rows = de010.select_heroes(getattr(a, "only", None))
     res = de010.run_editor(HERE / "de011_capture_ue.py", {"out": str(frames / ("capture-%s.json" % a.tag)),
                                                           "frames": str(frames), "tag": a.tag,
-                                                          "figures": figures(), "dissolve": bool(a.dissolve)},
+                                                          "figures": figures(rows),
+                                                          "dissolve": bool(a.dissolve)},
                            frames, "capture-" + a.tag)
     res.update(started_at=de010.now())
     de010.write(frames / ("capture-%s.json" % a.tag), res)
     print(json.dumps(res, indent=1)[:2000])
 
 
+def apply_plan(a) -> tuple:
+    """(plan, ARGS["master"], graph): the dissolve MICs and the master skip / rebuild of an apply. No editor."""
+    only = getattr(a, "only", None)
+    rows = de010.select_heroes(only)
+    master, mplan, g = de010.master_task(Path(a.frames), getattr(a, "rebuild_master", False))
+    plan = {"tool": "de011 apply", "heroes": [h[0] for h in rows], "mics": mics(rows), "master": mplan,
+            "warning": de010.warn_all(rows, "both dissolve MICs of every hero are re-created and re-saved", only)}
+    return plan, master, g
+
+
 def cmd_apply(a) -> None:
     frames = Path(a.frames)
-    g = vm.figure_v2_graph(vm.load_spec())
-    sig = vm.graph_signature(g)
-    master = {"master": vm.MASTER, "settings": vm.SETTINGS, "nodes": g.nodes, "links": g.links, "attrs": g.attrs,
-              "instances": [], "signature": sig, "out": str(frames / "apply-master.json")}
+    plan, master, g = apply_plan(a)
+    if getattr(a, "dry_run", False):
+        print(json.dumps(plan, indent=1))
+        return
+    mplan = plan["master"]
+    print("master %s: %s" % (mplan["action"], mplan["reason"]), flush=True)
     res = de010.run_editor(HERE / "de011_apply_ue.py", {"out": str(frames / "apply.json"), "master": master,
+                                                        "master_skip": mplan if mplan["action"] == "skip" else None,
                                                         "master_script": str(vm.HERE / "ue" / "um_v2_master.py"),
-                                                        "switch": vm.DISSOLVE_SWITCH, "mics": mics()},
+                                                        "switch": vm.DISSOLVE_SWITCH, "mics": plan["mics"]},
                            frames, "apply")
-    res["master"].update(graph_signature=sig, node_count=len(g.nodes), link_count=len(g.links),
-                         core_hlsl_sha256=hashlib.sha256(vm.CORE_HLSL.read_bytes()).hexdigest(),
-                         dissolve_hlsl_sha256=hashlib.sha256(vm.DISSOLVE_HLSL.read_bytes()).hexdigest())
+    de010.after_master(res, mplan, g, "de011 apply")
+    res["master"].update(dissolve_hlsl_sha256=hashlib.sha256(vm.DISSOLVE_HLSL.read_bytes()).hexdigest())
+    res["heroes"] = plan["heroes"]
     res["finished_at"] = de010.now()
     de010.write(frames / "apply.json", res)
     m = res["master"]
     print(json.dumps({"compile_errors": m.get("compile_errors"), "expressions": m.get("expressions"),
                       "statistics": m.get("statistics"), "blend_mode": m.get("blend_mode"),
+                      "master_action": m.get("master_action"),
                       "mics": {k.rsplit("/", 1)[1]: {x: v[x] for x in ("blend_mode", "switches", "statistics")}
                                for k, v in res["mics"].items()}}, indent=1))
 
@@ -199,7 +221,8 @@ def cmd_compare(a) -> None:
         raise SystemExit(1)
 
 
-def main() -> int:
+def main(argv: list | None = None) -> int:
+    de010.utf8_stdio()
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("command", choices=["inspect", "capture", "apply", "compare"])
     ap.add_argument("--tag", choices=["before", "after"])
@@ -207,7 +230,12 @@ def main() -> int:
     ap.add_argument("--frames", default="C:/tmp/de011", help="lossless frames and editor logs (outside the repo)")
     ap.add_argument("--evidence", default=None,
                     help="compare: the report / JPEG folder (default the DE-011 evidence; AN-29 passes its own)")
-    a = ap.parse_args()
+    ap.add_argument("--only", default=None, metavar="KEY[,KEY...]",
+                    help="apply / inspect / capture: only these de010.HEROES keys; default every hero (apply warns)")
+    ap.add_argument("--dry-run", action="store_true", help="apply: print the plan, no editor")
+    ap.add_argument("--rebuild-master", action="store_true",
+                    help="apply: rebuild M_UM_Figure_v2 even when de010/master-builds.json has its file at this graph")
+    a = ap.parse_args(argv)
     if a.command == "inspect":
         cmd_inspect(a)
     elif a.command == "capture":

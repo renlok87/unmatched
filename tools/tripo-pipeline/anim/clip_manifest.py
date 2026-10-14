@@ -1,7 +1,8 @@
 """Манифест библиотеки анимаций: сборка (build) и проверка (check).
 
 python tools/tripo-pipeline/anim/clip_manifest.py build   # пересобрать clip-manifest.json
-python tools/tripo-pipeline/anim/clip_manifest.py check   # схема + файлы + sha256 + правила статусов
+python tools/tripo-pipeline/anim/clip_manifest.py check   # схема + файлы + sha256 + правила статусов + регистрация
+                                                          # H2ANIM: 4 записи H2Anim на героя (спека, FBX, отчёт)
 
 build собирает записи функциями slot()/medusa_draft()/tripo_test()/bvh_fixture()/glb_fixture() ниже
 (28 слотов: 4 клипа D-11 x 7 персонажей — 4 брифа 18 §4, Angel, Ancient Leshen и Achilles; 27 безусловных, HAR-HitReact условен до
@@ -53,6 +54,10 @@ H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/buil
 # пилот 2026-10-14, этап 6 Achilles (регистрация Р6-1 отдельными строками)
 CHARS["Achilles"] = ("ACH", "ASSET-ACHILLES-001")
 H2ANIM["Achilles"] = "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json"
+# Переопределение спеки на клип (F103): доработка одного клипа новым прогоном — одна строка
+#   H2ANIM_CLIP["<Character>", "<Clip>"] = "art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim-rN.json"
+# остальные клипы героя берут спеку из H2ANIM. Пусто — у всех героев одна спека на 4 клипа (как раньше).
+H2ANIM_CLIP = {}
 VAL2 = os.path.join(LIB, "validation-h2anim")
 V2_KEY = "UM_HUMANOID_17_v2"
 NO_LICENSE = {"terms": "нет файла", "commercial_use": "n/a"}
@@ -102,20 +107,32 @@ def contract_revision():
     return load_json("docs/art-pipeline/rig/rig-contract.json")["revision"]
 
 
+def spec_for(char, clip):
+    """Спека H2Anim клипа: переопределение H2ANIM_CLIP[(char, clip)], иначе H2ANIM[char]."""
+    return H2ANIM_CLIP.get((char, clip), H2ANIM[char])
+
+
+def h2anim_paths(spec, clip):
+    """(FBX клипа, отчёт validate_clip v2) по спеке — пути от корня репозитория."""
+    hero = spec["ue_hero"]
+    return ("%s/export/AM_%s_%s.fbx" % (spec["run_dir"], hero, clip),
+            "docs/art-pipeline/animation-library/validation-h2anim/AM_%s_%s.validation.json" % (hero, clip))
+
+
 def h2anim(char, clip):
     """Production-слот, заполненный кандидатом H2Anim (волна 5c), или None, если спеки/клипа нет."""
-    spec = load_json(H2ANIM[char])
+    spec_rel = spec_for(char, clip)
+    spec = load_json(spec_rel)
     if not spec or clip not in spec["clips"]:
         return None
     pre, asset = CHARS[char]
     t = TARGETS[clip]
     hero = spec["ue_hero"]
     c = spec["clips"][clip]
-    fbx = "%s/export/AM_%s_%s.fbx" % (spec["run_dir"], hero, clip)
+    fbx, vrel = h2anim_paths(spec, clip)
     if not os.path.exists(os.path.join(REPO, fbx)):
         return None
     cid = f"{pre}-{clip}"
-    vrel = "docs/art-pipeline/animation-library/validation-h2anim/AM_%s_%s.validation.json" % (hero, clip)
     rep_v = load_json(vrel)
     fbx_sha = sha(fbx)
     if rep_v is None:
@@ -161,7 +178,7 @@ def h2anim(char, clip):
         "required_mvp": cid not in CONDITIONAL, "cue": t["cue"],
         "source": {"type": "blender_keyframed",
                    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
-                   "reference": H2ANIM[char], "files": [file_entry(fbx, "fbx")]},
+                   "reference": spec_rel, "files": [file_entry(fbx, "fbx")]},
         "license": OWN,
         "fps": {"target": 24, "measured": rep_v and rep_v.get("fps")},
         "duration_s": dur,
@@ -293,6 +310,51 @@ def build():
     print("MANIFEST_BUILT", len(clips), "clips")
 
 
+def registration_errors(m):
+    """RB-07: у каждого героя H2ANIM 4 production-записи H2Anim — спека есть и содержит клип, FBX и отчёт validate_clip v2
+    (того же FBX) есть, и запись манифеста <PRE>-<Clip> собрана из этой спеки. Иначе ошибка с именем героя: опечатка в
+    пути спеки больше не превращается в пустой слот slot() с MANIFEST_CHECK PASS."""
+    errors = []
+    by_id = {c["id"]: c for c in m["clips"] if c.get("role") == "production"}
+    for char, clip in H2ANIM_CLIP:
+        if char not in H2ANIM or clip not in TARGETS:
+            errors.append(f"H2ANIM_CLIP[{char!r}, {clip!r}]: нет героя в H2ANIM или клипа в {', '.join(TARGETS)}")
+    for char in H2ANIM:
+        if char not in CHARS:
+            errors.append(f"{char}: есть в H2ANIM, нет в CHARS")
+            continue
+        pre = CHARS[char][0]
+        for clip in TARGETS:
+            spec_rel = spec_for(char, clip)
+            where = f"{char} {clip}"
+            spec = load_json(spec_rel)
+            if spec is None:
+                errors.append(f"{where}: нет спеки H2Anim {spec_rel} (H2ANIM / H2ANIM_CLIP)")
+                continue
+            if clip not in spec.get("clips", {}):
+                errors.append(f"{where}: в спеке {spec_rel} нет клипа {clip}")
+                continue
+            fbx, vrel = h2anim_paths(spec, clip)
+            if not os.path.exists(os.path.join(REPO, fbx)):
+                errors.append(f"{where}: нет FBX {fbx} (спека {spec_rel})")
+                continue
+            rep_v = load_json(vrel)
+            if rep_v is None:
+                errors.append(f"{where}: нет отчёта validate_clip {vrel}")
+            elif rep_v.get("clip_sha256") != sha(fbx):
+                errors.append(f"{where}: отчёт {vrel} снят с другого FBX (clip_sha256 != sha256 {fbx})")
+            rec = by_id.get(f"{pre}-{clip}")
+            if rec is None:
+                errors.append(f"{where}: в манифесте нет записи {pre}-{clip} (clip_manifest.py build)")
+                continue
+            files = rec["source"].get("files") or [{}]
+            if (rec["source"].get("type") != "blender_keyframed" or rec["source"].get("reference") != spec_rel
+                    or files[0].get("path") != fbx or rec["validation"].get("report") != vrel):
+                errors.append(f"{where}: запись {pre}-{clip} собрана не из {spec_rel} (источник "
+                              f"{rec['source'].get('reference') or rec['source'].get('type')}) — clip_manifest.py build")
+    return errors
+
+
 def check():
     import jsonschema  # pip-пакет; есть в системном Python
     with open(SCHEMA, encoding="utf-8") as f:
@@ -300,6 +362,7 @@ def check():
     with open(MANIFEST, encoding="utf-8") as f:
         m = json.load(f)
     errors = [e.message for e in jsonschema.Draft202012Validator(schema).iter_errors(m)]
+    errors += registration_errors(m)
     ids = [c["id"] for c in m["clips"]]
     if len(ids) != len(set(ids)):
         errors.append("duplicate ids")
@@ -323,6 +386,9 @@ def check():
 
 
 if __name__ == "__main__":
+    for stream in (sys.stdout, sys.stderr):  # кириллица в трубе Bash агента (cp1251), RB-11
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
     if cmd == "build":
         build()

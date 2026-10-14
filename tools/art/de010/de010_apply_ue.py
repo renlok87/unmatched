@@ -2,9 +2,12 @@
 
 ARGS: JSON file named by the environment variable DE010_ARGS:
   {"out": <report.json>, "master": {<ARGS of tools/art/material_library/ue/um_v2_master.py>, "out": <json>},
-   "master_script": <path of um_v2_master.py>, "clips": [{"key", "path", "frame", "fps"}], "notify_class": "S08ContactAnimNotify"}
+   "master_script": <path of um_v2_master.py>, "clips": [{"key", "path", "frame", "fps"}], "notify_class": "S08ContactAnimNotify",
+   "master_skip": null | {"reason", "graph_signature", "uasset_sha256"}}
 1. M_UM_Figure_v2 is rebuilt in place by the existing builder um_v2_master.py with the v2.2 graph of
    tools/art/material_library/ue_v2_master.py (hit tint, CPD 12); "instances" is empty, so no MI is touched.
+   With "master_skip" (the host found the file already built from this graph, de010.py master_plan) the builder does
+   not run and the master is only read (no save): F157, the binary master is not re-saved by a hero registration.
 2. Every LungeAttack gets exactly one "Contact" notify (US08ContactAnimNotify) on the notify track "Contact" at
    frame / fps of its build profile; an earlier "Contact" notify is removed first (idempotent). The play length and
    the frame count are read before and after (they must not change). The clips are saved.
@@ -19,6 +22,7 @@ import unreal as u
 ARGS = json.load(open(os.environ["DE010_ARGS"], encoding="utf-8"))
 LIB = u.AnimationLibrary
 EAL = u.EditorAssetLibrary
+MEL = u.MaterialEditingLibrary
 TRACK = "Contact"
 
 
@@ -43,6 +47,19 @@ def notifies(seq):
     return res
 
 
+def master_readonly(path, skip):
+    """The report of a skipped rebuild: the master is loaded and read, never modified or saved."""
+    res = {"master": path, "skipped": True, "reason": skip.get("reason"), "uasset_sha256": skip.get("uasset_sha256")}
+    mat = load(path)
+    try:
+        res["expressions"] = int(MEL.get_num_material_expressions(mat))
+        res["parameters"] = {"scalar": sorted(str(x) for x in MEL.get_scalar_parameter_names(mat)),
+                             "static_switch": sorted(str(x) for x in MEL.get_static_switch_parameter_names(mat))}
+    except Exception as exc:  # noqa: BLE001 - informative only
+        res["read_error"] = str(exc)
+    return res
+
+
 def clip_info(seq):
     return {"play_length": round(float(seq.get_play_length()), 5), "frames": int(LIB.get_num_frames(seq)),
             "tracks": [str(t) for t in LIB.get_animation_notify_track_names(seq)], "notifies": notifies(seq)}
@@ -51,9 +68,12 @@ def clip_info(seq):
 report = {}
 try:
     m = dict(ARGS["master"])
-    code = open(ARGS["master_script"], encoding="utf-8").read()
-    exec(compile(code, ARGS["master_script"], "exec"), {"__name__": "__ue_task__", "ARGS": m, "unreal": u})
-    report["master"] = json.load(open(m["out"], encoding="utf-8"))
+    if ARGS.get("master_skip"):
+        report["master"] = master_readonly(m["master"], ARGS["master_skip"])
+    else:
+        code = open(ARGS["master_script"], encoding="utf-8").read()
+        exec(compile(code, ARGS["master_script"], "exec"), {"__name__": "__ue_task__", "ARGS": m, "unreal": u})
+        report["master"] = json.load(open(m["out"], encoding="utf-8"))
     cls = getattr(u, ARGS["notify_class"]).static_class()
     report["clips"] = {}
     for clip in ARGS["clips"]:

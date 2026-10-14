@@ -3,10 +3,12 @@
 ARGS: JSON file named by the environment variable DE010_ARGS (the runner of tools/art/de010/de010.py):
   {"out": <report.json>, "master": {<ARGS of tools/art/material_library/ue/um_v2_master.py>, "out": <json>},
    "master_script": <path of um_v2_master.py>, "switch": "UseDissolve",
-   "mics": [{"asset": <dissolve MIC>, "parent": <hero body MI>}]}
+   "mics": [{"asset": <dissolve MIC>, "parent": <hero body MI>}],
+   "master_skip": null | {"reason", "graph_signature", "uasset_sha256"}}
 1. M_UM_Figure_v2 is rebuilt in place by the existing builder um_v2_master.py with the v2.3 graph of
    tools/art/material_library/ue_v2_master.py (static switch UseDissolve, default off); "instances" is empty, so no MI
-   of a hero or of the test scene is touched.
+   of a hero or of the test scene is touched. With "master_skip" (de010.py master_plan: the file is already built from
+   this graph) the builder does not run; the master is only loaded and read, never saved (F157).
 2. One dissolve MIC per hero body MI (P1 and P2): parent = the hero MI (every texture, knob and static switch is
    inherited), UseDissolve = true, blend mode override Masked. Created or updated in place, saved.
 Then the editor quits.
@@ -55,10 +57,19 @@ def switches(mi, master):
 report = {}
 try:
     m = dict(ARGS["master"])
-    code = open(ARGS["master_script"], encoding="utf-8").read()
-    exec(compile(code, ARGS["master_script"], "exec"), {"__name__": "__ue_task__", "ARGS": m, "unreal": u})
-    report["master"] = json.load(open(m["out"], encoding="utf-8"))
+    skip = ARGS.get("master_skip")
+    if skip:
+        report["master"] = {"master": m["master"], "skipped": True, "reason": skip.get("reason"),
+                            "uasset_sha256": skip.get("uasset_sha256")}
+    else:
+        code = open(ARGS["master_script"], encoding="utf-8").read()
+        exec(compile(code, ARGS["master_script"], "exec"), {"__name__": "__ue_task__", "ARGS": m, "unreal": u})
+        report["master"] = json.load(open(m["out"], encoding="utf-8"))
     master = load(m["master"])
+    if skip:
+        report["master"]["statistics"] = stats(master)
+        report["master"]["parameters"] = {"static_switch": sorted(str(x) for x in
+                                                                  MEL.get_static_switch_parameter_names(master))}
     report["master"]["blend_mode"] = str(master.get_editor_property("blend_mode"))
     report["mics"] = {}
     for spec in ARGS["mics"]:

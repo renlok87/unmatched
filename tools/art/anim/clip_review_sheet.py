@@ -1,19 +1,32 @@
 """AN-18 (ВР-17): acceptance sheets of the 16 D-11 clips from -BenchClipPose (AN-17) frames.
 
 Commands
-  run    one bench launch per map x character through tools/art/render/live_tune.py bench. The first launch of a map
-         (the first key of --heroes, KingArthur by default) shoots K1 + K2x1.6 over the AN-17 pose union; the others
-         shoot K2x1.6 only, over the poses of their own character (K1 does not depend on the focus fighter, it is taken
-         from the first launch). --fixture FILE (one map) or --fixture marmoreal=FILE,sarpedon=FILE passes a bench
-         fixture variant (a new character on the scene, skill reference new-character-registration.md D-2) on to
-         live_tune.py bench --fixture.
-           python tools/art/anim/clip_review_sheet.py run [--packaged] [--maps marmoreal,sarpedon] [--heroes ...]
-               [--fixture ...]
-  sheet  for every clip card of HEROES (AN-01...AN-16 for the four MVP characters, plus the registered new ones):
+  run    one bench launch per map x character of --heroes (REQUIRED, no default: every registered hero would be one
+         packaged launch per map) through tools/art/render/live_tune.py bench. Per map, the first launch of each fixture
+         group (the heroes that get the same --fixture file) shoots K1 + K2x1.6 over the AN-17 pose union plus the card
+         frames of that group; the others shoot K2x1.6 only, over the poses of their own character (K1 does not depend
+         on the focus fighter). The MVP run (--heroes KingArthur,Merlin,Medusa,Harpy) shoots exactly the AN-17 union.
+         --fixture passes a bench fixture variant (a new character on the scene, new-character-registration.md D-2) on
+         to live_tune.py bench --fixture:
+           FILE (one map) | marmoreal=FILE,sarpedon=FILE (every hero of the run)
+           | <Key>:marmoreal=FILE,sarpedon=FILE;<Key2>:... (F159: per hero - several new heroes in one call, each in its
+             own fixture and its own K1 launch; a part without '<Key>:' is the default of the other heroes).
+         --k1-from DIR (RC-09): no launch shoots K1; every hero shoots K2x1.6 of its own cards only, and the sheet takes
+         K1 from the finished launches DIR/<map>/<Key> (checked: a K1 launch covers the hero's card poses, with the same
+         fixture file and - packaged - the same staged build).
+         A launch whose folder holds exit=0 is skipped only when its run-stamp.json matches: the same BuildStamp.json of
+         the staged packaged client (commit, sourceHash, builtAt), views, poses and fixture; any repackage re-runs it
+         (editor launches always re-run). --force re-runs everything.
+           python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key>[,<Key>...] [--maps marmoreal,sarpedon]
+               [--fixture ...] [--k1-from DIR] [--force]
+  sheet  for the clip cards given by --cards AN-..,AN-.. or --heroes <Key>,.. (REQUIRED; the four cards per hero):
          rows = the key frames of the clip (column keyframes of the card; Idle - the
          quarters of the loop), columns = Marmoreal K1 (figure crop by figrect + 25 %), Marmoreal K2x1.6, Sarpedon K1
          (crop), Sarpedon K2x1.6; colour / gray Rec.709 / deuteranopia (Machado 2009, 1.0) JPEGs <= 2 MB, frames.json.
-           python tools/art/anim/clip_review_sheet.py sheet [--frames C:/tmp/visual/AN-18] [--out docs/.../VISUAL]
+         A card with any cell without a frame is NOT written (the committed sheet stays; exit 1, the gaps listed);
+         --allow-missing draws "нет кадра" cells instead (drafts outside docs/ only). --k1-from DIR as in run.
+           python tools/art/anim/clip_review_sheet.py sheet --heroes <Key> [--frames C:/tmp/visual/AN-18] [--k1-from DIR]
+               [--out docs/.../VISUAL]
   --check  self-test on synthetic frames and traces (no engine).
 
 The source PNG frames stay outside git (C:/tmp/visual/AN-18/<map>/<hero>/); only the sheets and frames.json are
@@ -44,6 +57,10 @@ FRAMES_DEFAULT = Path("C:/tmp/visual/AN-18")
 OUT_DEFAULT = REPO / "docs/game-design/evidence/VISUAL"
 MANIFEST = REPO / "docs/art-pipeline/animation-library/clip-manifest.json"
 LIVE_TUNE = REPO / "tools/art/render/live_tune.py"
+# the staged packaged client of live_tune.py bench --packaged and its stamp (tools/s08/package-client.ps1)
+STAGED_STAMP = REPO / "unreal/Unmatched/Saved/StagedBuilds/Windows/BuildStamp.json"
+RUN_STAMP = "run-stamp.json"  # written by run next to live_tune's exit.txt: build, views, poses, fixture of the launch
+MVP_KEYS = ("KingArthur", "Merlin", "Medusa", "Harpy")
 MAPS = {"marmoreal": ("Marmoreal original", "c121b47f8d6eb28daccb76d05"),
         "sarpedon": ("Sarpedon original", "c7fa64a26c29a0835f2383e63")}
 FPS = 24
@@ -91,6 +108,7 @@ RE_SHOT = re.compile(r"BENCH shot view=(\S+) saved=(\d) path=(.+)$")
 RE_FOCUS = re.compile(r"BENCH clip-pose poses=\d+ views=\d+ fighter=(\S+)")
 RE_FIXTURE = re.compile(r"-BenchFixture=(\S+)")
 RE_SHOTNAME = re.compile(r"bench-(.+?)-(Idle|LungeAttack|HitReact|DeathSettle)-(f\d+|q\d+)-1920x1080\.png$")
+RE_FIXTURE_HERO = re.compile(r"^([A-Za-z]\w+):(.+)$")  # '<Key>:<spec>'; 'C:/x.json' (one letter) stays a file
 
 
 class SheetError(Exception):
@@ -164,11 +182,14 @@ def pose_arg(tokens: dict[str, list[str]]) -> str:
     return ";".join(parts)
 
 
-def union_tokens(cards: dict | None = None) -> dict[str, list[str]]:
-    """The K1 pose list: the AN-17 union, plus (given the cards) the card frames of every registered character."""
+def union_tokens(cards: dict | None = None, heroes: list[str] | None = None) -> dict[str, list[str]]:
+    """The K1 pose list: the AN-17 union, plus (given the cards) the card frames of the given characters (default every
+    registered one). run passes the heroes of one K1 launch (RC-09: the union does not grow with the roster)."""
     frames = {c: set(fr) for c, fr in UNION.items()}
     if cards is not None:
-        for cid, (_, clip) in clip_cards().items():
+        for cid, (key, clip) in clip_cards().items():
+            if heroes is not None and key not in heroes:
+                continue
             if clip != "Idle" and cid in cards:
                 frames[clip] |= {int(t[1:]) for t in card_keyframes(cards[cid], clip)}
     out = {"Idle": [f"q{q}" for q in IDLE_Q]}
@@ -197,6 +218,131 @@ def parse_fixtures(spec: str, maps: list[str]) -> dict[str, str]:
     return out
 
 
+def parse_fixture_map(spec: str, maps: list[str], heroes: list[str] | None = None) -> dict[str, dict[str, str]]:
+    """--fixture -> {'*': {map: file}, '<Key>': {map: file}}. Parts split by ';': '<Key>:<spec>' is the fixture of one
+    hero (F159), a part without a key is the default of every other hero; <spec> is the parse_fixtures form."""
+    out: dict[str, dict[str, str]] = {}
+    for part in (p.strip() for p in (spec or "").split(";")):
+        if not part:
+            continue
+        m = RE_FIXTURE_HERO.match(part)
+        if m:
+            key, sub = m.group(1), m.group(2)
+            if key not in HEROES:
+                raise SheetError(f"--fixture {part!r}: {key} is not a HEROES key ({', '.join(HEROES)})")
+            if heroes is not None and key not in heroes:
+                raise SheetError(f"--fixture names {key}, which is not in --heroes {','.join(heroes)}")
+        else:
+            key, sub = "*", part
+        if key in out:
+            raise SheetError(f"--fixture: {'the default (no <Key>:)' if key == '*' else key} given twice")
+        out[key] = parse_fixtures(sub, maps)
+    return out
+
+
+def fixture_for(fmap: dict[str, dict[str, str]], hero: str, map_key: str) -> str:
+    """The fixture file of a hero's launch on a map: its own entry, else the default, else '' (the canonical fixture)."""
+    return fmap.get(hero, {}).get(map_key) or fmap.get("*", {}).get(map_key) or ""
+
+
+def read_json(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError):
+        return None
+
+
+def current_build(packaged: bool) -> dict | None:
+    """The stamp of the staged packaged client (BuildStamp.json of package-client.ps1); None for editor launches."""
+    if not packaged:
+        return None
+    d = read_json(STAGED_STAMP)
+    return {k: d.get(k) for k in ("commit", "sourceHash", "builtAt")} if isinstance(d, dict) else None
+
+
+def describe_build(b: dict | None) -> str:
+    return f"{str(b.get('commit') or '?')[:8]} built {b.get('builtAt') or '?'}" if b else "no stamp"
+
+
+def cached(out: Path, want: dict) -> tuple[bool, str]:
+    """(skip?, why): a finished launch (exit=0) is reused only when run-stamp.json has the same build, views, poses,
+    fixture and mode. A missing stamp (older launch, editor launch, no BuildStamp.json) re-runs."""
+    ex = out / "exit.txt"
+    if not ex.exists() or "exit=0" not in ex.read_text(encoding="utf-8", errors="replace"):
+        return False, ""
+    st = read_json(out / RUN_STAMP)
+    if st is None:
+        return False, f"no {RUN_STAMP} (a launch of an older tool)"
+    if want["build"] is None:
+        return False, ("editor launch: no build stamp to compare" if not want["packaged"]
+                       else f"no {STAGED_STAMP.name} of the staged client")
+    if st.get("build") != want["build"]:
+        return False, f"build changed ({describe_build(st.get('build'))} -> {describe_build(want['build'])})"
+    for k in ("packaged", "views", "poses", "fixture"):
+        if st.get(k) != want[k]:
+            return False, f"{k} changed"
+    if st.get("exit") != 0:
+        return False, f"exit {st.get('exit')}"
+    return True, f"build {describe_build(want['build'])}"
+
+
+def k1_source_runs(root: Path, map_key: str) -> list[dict]:
+    """The launches under root/<map>/ that shot K1 (--k1-from)."""
+    d = root / map_key
+    if not d.is_dir():
+        return []
+    runs = []
+    for sub in sorted(p for p in d.iterdir() if p.is_dir()):
+        if (sub / "bench.trace.log").is_file():
+            r = parse_run(sub, sub.name if sub.name in HEROES else None)
+            if has_k1(r):
+                runs.append(r)
+    return runs
+
+
+def k1_names(run: dict) -> set[str]:
+    return {n for n, sh in run["shots"].items() if sh["view"] == VIEW_K1 and Path(sh["path"]).is_file()}
+
+
+def check_k1_source(root: Path, maps: list[str], heroes: list[str], fmap: dict, cards: dict,
+                    build: dict | None) -> dict[tuple[str, str], str]:
+    """--k1-from: for every map x hero a finished K1 launch under root that covers the hero's card poses, with the
+    hero's fixture file and (packaged) the current build. Returns {(map, hero): launch folder}; else SheetError."""
+    found = {}
+    for map_key in maps:
+        runs = k1_source_runs(root, map_key)
+        if not runs:
+            raise SheetError(f"--k1-from {root}: no launch with K1 frames under {map_key}/ (shoot K1 first: run without "
+                             "--k1-from)")
+        for hero in heroes:
+            need = {f"bench-{VIEW_K1}-{clip}-{t}-1920x1080.png" for clip, toks in hero_tokens(cards, hero).items()
+                    for t in toks}
+            fx = Path(fixture_for(fmap, hero, map_key)).name if fixture_for(fmap, hero, map_key) else ""
+            ok = [r for r in runs if need <= k1_names(r) and (not fx or r["fixture"] == fx)]
+            if not ok:
+                raise SheetError(f"--k1-from {root}/{map_key}: no K1 launch covers the {len(need)} K1 poses of {hero}"
+                                 + (f" with fixture {fx}" if fx else "") + " (shoot K1 with this hero on the scene)")
+            if build is not None:
+                same = [r for r in ok if r.get("build") == build]
+                if not same:
+                    raise SheetError(f"--k1-from {root}/{map_key}: the K1 launch for {hero} was shot on build "
+                                     f"{describe_build(ok[0].get('build'))}, the staged client is "
+                                     f"{describe_build(build)}: re-shoot K1")
+                ok = same
+            found[(map_key, hero)] = ok[0]["run"]
+    return found
+
+
+def need_hint(cmd: str) -> str:
+    keys = ", ".join(HEROES)
+    if cmd == "run":
+        return (f"run needs --heroes <Key>[,<Key>...]: one packaged launch per map x hero (registered: {keys}). A new "
+                f"hero: --heroes <Key> --fixture <Key>:marmoreal=...,sarpedon=...; the MVP sheets: --heroes "
+                f"{','.join(MVP_KEYS)}")
+    return (f"sheet needs --cards AN-..,AN-.. or --heroes <Key>[,<Key>...] (registered: {keys}); it writes into "
+            f"{OUT_DEFAULT.relative_to(REPO).as_posix()}/<card> by default, so name the cards of this run only")
+
+
 def live_tune_has_fixture() -> bool:
     r = subprocess.run([sys.executable, str(LIVE_TUNE), "bench", "--help"], capture_output=True, text=True,
                        cwd=str(REPO))
@@ -206,42 +352,67 @@ def live_tune_has_fixture() -> bool:
 # ---- run --------------------------------------------------------------------------------------------------------------
 
 def cmd_run(a) -> int:
+    heroes = list(dict.fromkeys(h.strip() for h in (getattr(a, "heroes", "") or "").split(",") if h.strip()))
+    if not heroes:
+        raise SheetError(need_hint("run"))
     cards = load_cards(REPO)
     check_registry(cards)
     maps = [m for m in a.maps.split(",") if m]
-    heroes = [h for h in a.heroes.split(",") if h]
     unknown = [m for m in maps if m not in MAPS] + [h for h in heroes if h not in HEROES]
-    if unknown or not heroes:
-        raise SheetError(f"unknown map / hero {unknown or '(none)'}; maps {', '.join(MAPS)}, heroes {', '.join(HEROES)}")
-    fixtures = parse_fixtures(getattr(a, "fixture", "") or "", maps)
-    if fixtures and not live_tune_has_fixture():
+    if unknown:
+        raise SheetError(f"unknown map / hero {unknown}; maps {', '.join(MAPS)}, heroes {', '.join(HEROES)}")
+    fmap = parse_fixture_map(getattr(a, "fixture", "") or "", maps, heroes)
+    if fmap and not live_tune_has_fixture():
         raise SheetError("live_tune.py bench has no --fixture yet (new-character-registration.md D-2)")
-    union = union_tokens(cards)
-    for hero in heroes:  # every card pose must be in the union K1 run (K1 cells of all the characters)
-        for clip, toks in hero_tokens(cards, hero).items():
-            if clip != "Idle" and not set(toks) <= set(union[clip]):
-                raise SheetError(f"{hero} {clip}: card frames {toks} outside the K1 union")
+    packaged = bool(getattr(a, "packaged", False))
+    build = current_build(packaged)
+    k1_from = Path(a.k1_from) if getattr(a, "k1_from", None) else None
+    if k1_from is not None:
+        for (map_key, hero), run in check_k1_source(k1_from, maps, heroes, fmap, cards, build).items():
+            print(f"{map_key} {hero}: K1 from {run}", flush=True)
+        if build is None:
+            print("WARNING: editor launches: the build of the --k1-from frames is not compared", file=sys.stderr)
     results = []
     for map_key in maps:
+        k1_owner: dict[str, str] = {}  # fixture file -> the hero whose launch shoots K1 for its group
         for hero in heroes:
-            first = hero == heroes[0]  # K1 comes from the first launch of the map, whatever character it focuses
+            fx = fixture_for(fmap, hero, map_key)
+            first = k1_from is None and fx not in k1_owner
+            if first:
+                k1_owner[fx] = hero
+                group = [h for h in heroes if fixture_for(fmap, h, map_key) == fx]
+                poses = pose_arg(union_tokens(cards, group))
+                print(f"{map_key}: K1 in the {hero} launch (fixture {fx or 'canonical'}, for {', '.join(group)})",
+                      flush=True)
+            else:
+                poses = pose_arg(hero_tokens(cards, hero))
             views = f"{VIEW_K1}+{VIEW_K2}" if first else VIEW_K2
-            poses = pose_arg(union if first else hero_tokens(cards, hero))
             out = Path(a.frames) / map_key / hero
-            if (out / "exit.txt").exists() and "exit=0" in (out / "exit.txt").read_text() and not a.force:
-                print(f"skip {out} (done)")
-                continue
+            want = {"map": map_key, "hero": hero, "packaged": packaged, "views": views, "poses": poses, "fixture": fx,
+                    "build": build}
+            skip, why = cached(out, want)
+            if not a.force:
+                if skip:
+                    print(f"skip {out} (done, {why})", flush=True)
+                    continue
+                if why:
+                    print(f"rerun {out}: {why}", flush=True)
             cmd = [sys.executable, str(LIVE_TUNE), "bench", "--map", map_key, "--views", views, "--out", str(out),
                    f"--bench-warmup={a.warmup:g}", f"--bench-settle={a.settle:g}", f"--bench-measure={a.measure:g}",
                    f"--extra=-BenchClipPose={poses}", f"--extra=-BenchClipPoseFighter={hero}"]
-            if a.packaged:
+            if packaged:
                 cmd.append("--packaged")
-            if map_key in fixtures:
-                cmd.append(f"--fixture={fixtures[map_key]}")
+            if fx:
+                cmd.append(f"--fixture={fx}")
             t0 = time.time()
             print(f"[{time.strftime('%H:%M:%S')}] {map_key} {hero} views={views}", flush=True)
             r = subprocess.run(cmd, cwd=str(REPO))
             results.append({"map": map_key, "hero": hero, "exit": r.returncode, "seconds": round(time.time() - t0)})
+            out.mkdir(parents=True, exist_ok=True)
+            (out / RUN_STAMP).write_text(json.dumps(dict(want, schema="unmatched.an18-launch/1", exit=r.returncode,
+                                                         seconds=results[-1]["seconds"],
+                                                         finished=time.strftime("%Y-%m-%dT%H:%M:%S")),
+                                                    ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
             print(json.dumps(results[-1]), flush=True)
     return 0 if all(r["exit"] == 0 for r in results) else 1
 
@@ -307,19 +478,29 @@ def parse_run(run: Path, key: str | None = None) -> dict:
                         heroes[p["fighter"]] = k
     cmdline = (run / "cmdline.txt").read_text(encoding="utf-8").strip() if (run / "cmdline.txt").exists() else ""
     fx = RE_FIXTURE.search(cmdline)
+    stamp = read_json(run / RUN_STAMP) or {}
     return {"run": str(run), "shots": shots, "artlook": artlook, "focus": focus, "heroes": heroes, "scene": scene,
-            "key": key, "cmdline": cmdline, "fixture": Path(fx.group(1)).name if fx else ""}
+            "key": key, "cmdline": cmdline, "fixture": Path(fx.group(1)).name if fx else "",
+            "build": stamp.get("build")}
 
 
 def has_k1(run: dict | None) -> bool:
     return bool(run) and any(s["view"] == VIEW_K1 for s in run["shots"].values())
 
 
-def k1_run_for(map_runs: dict[str, dict], hero: str) -> dict | None:
-    """The K1 launch of a card: the character's own launch if it shot K1, else the first registered one that did."""
-    if has_k1(map_runs.get(hero)):
-        return map_runs[hero]
-    return next((map_runs[k] for k in HEROES if has_k1(map_runs.get(k))), None)
+def k1_run_for(map_runs: dict[str, dict], hero: str, extra: list[dict] | tuple = ()) -> dict | None:
+    """The K1 launch of a card: the character's own launch if it shot K1; else a K1 launch with the same fixture file
+    as its K2 launch (same build first; --k1-from launches, extra, before the frames folder); else the first one."""
+    own = map_runs.get(hero)
+    if has_k1(own):
+        return own
+    cands = [r for r in extra if has_k1(r)] + [map_runs[k] for k in HEROES if has_k1(map_runs.get(k))]
+    if own is not None:
+        same = [r for r in cands if r["fixture"] == own["fixture"]]
+        same.sort(key=lambda r: r.get("build") != own.get("build"))  # stable: the same build first
+        if same:
+            return same[0]
+    return cands[0] if cands else None
 
 
 def hero_fighter(runs: list[dict], hero: str) -> str:
@@ -376,12 +557,12 @@ def build_stamp(runs: list[dict]) -> str:
         head = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--short=8", "HEAD"], capture_output=True,
                               text=True).stdout.strip()
         return f"editor build (UnrealEditor -game), worktree HEAD {head} — черновик, Frames пересоберёт в пакете"
-    stamp = REPO / "unreal/Unmatched/Saved/StagedBuilds/Windows/stamp.json"
-    if stamp.exists():
-        try:
-            return "packaged " + json.loads(stamp.read_text(encoding="utf-8")).get("commit", "?")[:8]
-        except json.JSONDecodeError:
-            pass
+    builds = {json.dumps(r["build"], sort_keys=True) for r in runs if r.get("build")}
+    if builds:  # the build the frames were shot on (run-stamp.json), not whatever is staged now
+        return "packaged " + "; ".join(describe_build(json.loads(b)) for b in sorted(builds))
+    stamp = read_json(STAGED_STAMP)
+    if isinstance(stamp, dict) and stamp.get("commit"):
+        return "packaged " + str(stamp["commit"])[:8]
     return "packaged"
 
 
@@ -438,24 +619,41 @@ def save_jpeg(img: Image.Image, path: Path) -> int:
     raise SheetError(f"{path} > {SHEET_MAX_BYTES} bytes at quality 60")
 
 
+def sheet_cards(a, reg: dict) -> set[str]:
+    """--cards and / or --heroes (the four cards of each) -> card ids; neither -> SheetError (no 'every card' default)."""
+    cards_arg = [c.strip() for c in (getattr(a, "cards", "") or "").split(",") if c.strip()]
+    heroes_arg = [h.strip() for h in (getattr(a, "heroes", "") or "").split(",") if h.strip()]
+    if not cards_arg and not heroes_arg:
+        raise SheetError(need_hint("sheet"))
+    bad = [h for h in heroes_arg if h not in HEROES]
+    if bad:
+        raise SheetError(f"--heroes {bad} not in HEROES ({', '.join(HEROES)})")
+    only = set(cards_arg) | {cid for h in heroes_arg for cid in HEROES[h].cards}
+    if only - set(reg):
+        raise SheetError(f"--cards {sorted(only - set(reg))} are not clip cards of HEROES ({', '.join(reg)})")
+    return only
+
+
 def cmd_sheet(a) -> int:
     cards = load_cards(REPO)
-    manifest = {c["id"]: c for c in json.loads(MANIFEST.read_text(encoding="utf-8"))["clips"]
-                if c.get("role") == "production"}
     check_registry(cards)
     reg = clip_cards()
+    only = sheet_cards(a, reg)
+    manifest = {c["id"]: c for c in json.loads(MANIFEST.read_text(encoding="utf-8"))["clips"]
+                if c.get("role") == "production"}
     frames_root = Path(a.frames)
+    k1_from = Path(a.k1_from) if getattr(a, "k1_from", None) else None
+    allow_missing = bool(getattr(a, "allow_missing", False))
     runs: dict[str, dict[str, dict]] = {}
+    k1_extra: dict[str, list[dict]] = {}
     for map_key in MAPS:
         runs[map_key] = {}
         for hero in HEROES:
             d = frames_root / map_key / hero
             if (d / "bench.trace.log").exists():
                 runs[map_key][hero] = parse_run(d, hero)
+        k1_extra[map_key] = k1_source_runs(k1_from, map_key) if k1_from else []
     stamp = build_stamp([r for m in runs.values() for r in m.values()])
-    only = {c for c in a.cards.split(",") if c} if a.cards else set(reg)
-    if only - set(reg):
-        raise SheetError(f"--cards {sorted(only - set(reg))} are not clip cards of HEROES ({', '.join(reg)})")
     summary = {"cards": {}, "problems": []}
     for cid, (hero, clip) in reg.items():
         if cid not in only:
@@ -473,16 +671,22 @@ def cmd_sheet(a) -> int:
                            [w.strip() for w in re.search(r"WARN: ([^)]*)\)", mf["notes"]).group(1).split(",")]))
         tokens = card_keyframes(card, clip)
         cols, problems, sources = [], [], []
+        launches = {}
         rows = [{"token": t, "cells": {}} for t in tokens]
         for map_key, (map_name, board) in MAPS.items():
             mr = runs.get(map_key, {})
-            k1_run, k2_run = k1_run_for(mr, hero), mr.get(hero)
+            k1_run, k2_run = k1_run_for(mr, hero, k1_extra.get(map_key, [])), mr.get(hero)
+            launches[map_key] = {VIEW_K1: k1_run["run"] if k1_run else None, VIEW_K2: k2_run["run"] if k2_run else None}
             all_runs = [r for r in (k1_run, k2_run) if r]
             fighter = hero_fighter(all_runs, hero) if all_runs else ""
             if k1_run and k2_run and k1_run is not k2_run and k1_run["fixture"] != k2_run["fixture"]:
                 problems.append(f"{map_key} K1 from the {k1_run['key']} launch (fixture {k1_run['fixture'] or '?'}), K2 "
                                 f"from fixture {k2_run['fixture'] or '?'}: {fighter} may be another figure in K1; shoot "
                                 f"K1 in the {hero} launch (run --heroes {hero},... --fixture ...)")
+            if (k1_run and k2_run and k1_run is not k2_run and k1_run.get("build") and k2_run.get("build")
+                    and k1_run["build"] != k2_run["build"]):
+                problems.append(f"{map_key} K1 ({k1_run['run']}) shot on build {describe_build(k1_run['build'])}, K2 on "
+                                f"{describe_build(k2_run['build'])}: re-shoot K1 on the current build")
             short = map_name.split()[0]
             c1, c2 = f"{short} K1", f"{short} K2×1,6"
             cols += [c1, c2]
@@ -552,8 +756,18 @@ def cmd_sheet(a) -> int:
                   "доски: Marmoreal original c121b47f8d6eb28daccb76d05 (вклейка) · Sarpedon original "
                   "c7fa64a26c29a0835f2383e63 (lit3d) · K1 — кроп по figrect + 25 %, K2×1,6 — окно 640×360 1:1 у фигуры"]
         title = card["title"]
-        img = compose(cid, title, header, rows, cols)
         out = Path(a.out) / cid
+        missing = [f"{c} {r['token']}" for r in rows for c in cols if r["cells"].get(c) is None]
+        if missing and not allow_missing:  # RB-12: never paint "нет кадра" over a committed sheet
+            problems.append(f"sheet NOT written: {len(missing)} of {len(rows) * len(cols)} cells without a frame "
+                            f"({', '.join(missing[:6])}{', …' if len(missing) > 6 else ''}); {out} untouched "
+                            "(--allow-missing draws the gaps, for drafts outside docs/)")
+            summary["cards"][cid] = {"rows": len(rows), "problems": len(problems), "written": False,
+                                     "missingCells": len(missing)}
+            summary["problems"] += [f"{cid}: {p}" for p in problems]
+            print(f"{cid} {hero} {clip}: NOT written, {len(missing)} cells without a frame", flush=True)
+            continue
+        img = compose(cid, title, header, rows, cols)
         out.mkdir(parents=True, exist_ok=True)
         arr = np.asarray(img)
         qual = {}
@@ -568,10 +782,10 @@ def cmd_sheet(a) -> int:
                        "rootDeltaMaxUU": max((abs(float(re.search(r"rootDeltaUU=(-?[\d.]+)", s["clippose"]).group(1)))
                                               for s in sources if s["clippose"]), default=None),
                        "artlook": artlooks, "sceneTrace": scene, "jpegQuality": qual, "problems": problems,
-                       "sources": sources}
+                       "launches": launches, "sources": sources}
         (out / "frames.json").write_text(json.dumps(frames_json, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         summary["cards"][cid] = {"rows": len(rows), "problems": len(problems), "rootDeltaMaxUU": frames_json["rootDeltaMaxUU"],
-                                 "bytes": {n: (out / n).stat().st_size for n in qual}}
+                                 "written": True, "bytes": {n: (out / n).stat().st_size for n in qual}}
         summary["problems"] += [f"{cid}: {p}" for p in problems]
         print(f"{cid} {hero} {clip}: rows={len(rows)} problems={len(problems)} -> {out}", flush=True)
     print(json.dumps({k: v for k, v in summary.items() if k != "cards"}, ensure_ascii=False, indent=1)[:4000])
@@ -688,31 +902,46 @@ def cmd_check(_a) -> int:
             a = np.asarray(im).astype(int)
             if np.abs(a[..., 0] - a[..., 1]).max() > 8:
                 fails.append("gray sheet not gray")
+        # a missing frame: the card is not written, the sheet already there stays byte for byte
+        before = sha256(root / "out" / "AN-02" / "sheet-color.jpg")
+        (root / "frames" / "sarpedon" / "KingArthur" / "bench-K2x1.6-LungeAttack-f07-1920x1080.png").unlink()
+        if cmd_sheet(argparse.Namespace(frames=str(root / "frames"), out=str(root / "out"), cards="AN-02")) != 1:
+            fails.append("sheet with a missing frame did not fail")
+        if sha256(root / "out" / "AN-02" / "sheet-color.jpg") != before:
+            fails.append("sheet with a missing frame overwrote the old sheet")
     print(json.dumps({"check": "PASS" if not fails else "FAIL", "fails": fails}, ensure_ascii=False, indent=1))
     return 0 if not fails else 1
 
 
 def main(argv: list[str] | None = None) -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for stream in (sys.stdout, sys.stderr):  # RB-11: the Bash pipe of an agent is cp1251
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="self-test on synthetic frames")
     sub = ap.add_subparsers(dest="cmd")
     r = sub.add_parser("run")
     r.add_argument("--frames", default=str(FRAMES_DEFAULT))
     r.add_argument("--maps", default=",".join(MAPS))
-    r.add_argument("--heroes", default=",".join(HEROES))
+    r.add_argument("--heroes", default="", help="REQUIRED: HEROES keys, one launch per map x hero (no default)")
     r.add_argument("--packaged", action="store_true")
     r.add_argument("--warmup", type=float, default=30.0)
     r.add_argument("--settle", type=float, default=3.0)
     r.add_argument("--measure", type=float, default=1.0)
     r.add_argument("--force", action="store_true", help="re-run launches that already finished")
     r.add_argument("--fixture", default="", help="bench fixture variant: FILE (one map) or marmoreal=FILE,sarpedon=FILE "
-                                                  "(Config/Bench file, passed to live_tune.py bench --fixture)")
+                                                  "(every hero) or <Key>:marmoreal=FILE,sarpedon=FILE;<Key2>:... (per "
+                                                  "hero); Config/Bench file, passed to live_tune.py bench --fixture")
+    r.add_argument("--k1-from", default=None, metavar="DIR",
+                   help="no K1 launch: K1 comes from the finished launches DIR/<map>/<Key> (checked), K2 only")
     s = sub.add_parser("sheet")
     s.add_argument("--frames", default=str(FRAMES_DEFAULT))
     s.add_argument("--out", default=str(OUT_DEFAULT))
-    s.add_argument("--cards", default="", help="comma list, default every clip card of HEROES (AN-01..AN-16 + new)")
+    s.add_argument("--cards", default="", help="comma list of clip cards (this or --heroes is required)")
+    s.add_argument("--heroes", default="", help="the four clip cards of these HEROES keys")
+    s.add_argument("--k1-from", default=None, metavar="DIR", help="K1 launches DIR/<map>/<Key> (as in run --k1-from)")
+    s.add_argument("--allow-missing", action="store_true",
+                   help="write a card with gaps ('нет кадра' cells) instead of refusing it; drafts outside docs/ only")
     a = ap.parse_args(argv)
     try:
         if a.check:
