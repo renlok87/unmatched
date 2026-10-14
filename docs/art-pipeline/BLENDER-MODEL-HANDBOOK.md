@@ -5,6 +5,9 @@
 [PIPELINE.md](PIPELINE.md), [ADDING-AN-ASSET.md](ADDING-AN-ASSET.md), [rig/RIG-CONTRACT.md](rig/RIG-CONTRACT.md),
 [animation-library/README.md](animation-library/README.md), [material-library/](material-library/README.md) и коду
 `tools/tripo-pipeline/`. Там, где эти источники расходятся, здесь указано, что действует сейчас (раздел 10).
+Дополнено по пилоту скилла 2026-10-13/14: находки F — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`,
+решения П3 — `docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`, ДС-1…ДС-8 —
+`docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`.
 
 Граница ответственности исполнителя: **Blender → FBX и текстуры → импорт в UE → технические проверки в редакторе**.
 Художественная приёмка, кадры packaged-live для K1–K3/GD-058 и решения о бюджетах — не его зона.
@@ -38,7 +41,7 @@
 - Править закоммиченный профиль, по которому уже был прогон: новая версия — **новый файл** (`history.previous`).
 - Править общий код пайплайна (`tools/tripo-pipeline/**`) так, что меняется поведение для уже собранных героев.
   Новое поведение — только опцией профиля со старым значением по умолчанию + повтор детерминизма на Medusa
-  (`--compare-with`, раздел 4.5).
+  (`--compare-with`, раздел 4.3).
 - `git add -A`, `git add .`, `git stash`, `git reset`, `git clean`, push.
 
 ### 0.2 Окружение
@@ -47,7 +50,7 @@
 
 ```bash
 export MSYS_NO_PATHCONV=1      # иначе /Game/... превращается в C:/Program Files/Git/Game/...
-export PYTHONIOENCODING=utf-8  # отчёты содержат кириллицу и ≤/≈; cp1251-консоль падает на print
+export PYTHONIOENCODING=utf-8  # для прочих скриптов: точки входа пайплайна сами пишут UTF-8 (70905fa2, F47)
 T="python tools/tripo-pipeline/tripo_pipeline.py"
 B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 "$B" --version | head -1        # ожидается: Blender 5.2.2 LTS
@@ -60,24 +63,36 @@ python -c "import numpy, PIL, scipy; print('deps ok')"
 | Blender | 5.2.2 LTS, `C:/Program Files/Blender Foundation/Blender 5.2/blender.exe`. Код использует API 5.x (layered actions `action.layers→strips→channelbags`, `mesh.corner_normals`); на 4.x не запускать |
 | Headless-вызов | `"$B" -b --factory-startup --python-exit-code 1 --python <script> -- <args>` |
 | Blender MCP (живой) | `127.0.0.1:9876` (иногда `:9877`), клиент `C:/Users/ren/.claude/mcp-servers/clients/blender_mcp.py`. Только осмотр (раздел 6) |
-| Unreal | UE 5.8.2, проект `unreal/Unmatched`, редактор с MCP `127.0.0.1:8123`. Проверка: `netstat -ano \| grep ':8123 .*LISTEN'`. Запуск (если задача разрешает): `UnrealEditor.exe <Unmatched.uproject> -ModelContextProtocolPort=8123 "-ExecCmds=ModelContextProtocol.StartServer 8123" -log`, записать PID |
-| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку |
+| Unreal | UE 5.8.2, проект `unreal/Unmatched`, редактор с MCP `127.0.0.1:8123`. Проверка: `netstat -ano \| grep ':8123 .*LISTEN'`. Редактор — **агентский скрытый** (ДС-3): пользователь UE сам не открывает (2026-10-14). Рецепт запуска (`-RenderOffScreen -unattended -nosplash`, без Live Coding, консоль через `UE_CONSOLE_DROP` и `console_drop.py`), PID-файл, опознание чужого редактора по командной строке и закрытие — `.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.1; здесь не повторяется. Видимый или свёрнутый редактор как норма не годится: он не берёт фокус консоли, `py_file` падает по таймауту, модальные окна держат шаг (F121, F125). Этап 7a — один герой за раз, редактор пачки поднимает и закрывает оркестратор. Фоновый редактор троттлит CPU: `ue_hero_lookdev.py review` выключает троттлинг сам (F153, 4.6) |
+| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку. Пока шаг жив, heartbeat обновляет файл: шаг дольше 25 мин не перехватывается, устаревшей блокировка становится через 25 мин после смерти её процесса (RB-21) |
 | Python | 3.10+, numpy, Pillow, scipy (scipy нужен look-dev стадиям H2) |
 
 ### 0.3 Правила остановки
 
-Остановиться, записать причину и числа в отчёт, ничего не обходить, если:
+Остановиться, записать причину и числа в отчёт, ничего не обходить, если сработал пункт ниже. Стопов два класса
+(ДС-2; SKILL.md §5). **Вопрос пользователю** (стоп до ответа): деньги, лимиты и покупки; лицензия и IP; решения вне
+делегирования 2026-10-06 (контракт рига, новая кость или класс MatID); необратимое (удаление чужих данных или ассетов,
+история git) — п.1, п.5 и п.7. **Разбор оркестратором** — п.2–4 и п.6: исполнитель стоит, решение принимает оркестратор
+по делегированию, пользователю вопрос не задаётся. Пилот так закрыл не меньше шести FAIL инструментов (F12, F45, F80,
+F91, F124, F149).
 
 1. Цена операции Tripo выше остатка лимита задачи, или две неудачные генерации подряд.
 2. `prepare-generation --dry-run` вернул код 3: такие входы уже генерировались.
 3. Любая стадия завершилась с ошибкой, проверка дала FAIL, CLI вернул код 1 (проверка), 3 (конфликт), 4 (блокировка),
-   5 (нужен `resume`). Сначала разобрать причину по разделу 7.
+   5 (нужен `resume`). Сначала разобрать причину по разделу 7. Дальше — разбор оркестратором (ДС-2): баг инструмента —
+   фикс или опция профиля со старым значением по умолчанию, повтор детерминизма на Medusa (§0.1), тесты зелёные, строка
+   F в NOTES пачки, при выборе между вариантами — файл решения в `docs/game-design/decisions/`. FAIL при тюнинге
+   профиля (тон, крышки, веса, TeamAccent, MI в UE) — следующая итерация нового профиля, не больше 3, а не стоп.
 4. Нарушен контракт рига: не 17 костей (16 у Harpy), кость 0 не `SKEL_UM_Humanoid`, больше 4 влияний, масштаб кости ≠ 1.
 5. В целевой папке UE чужие ассеты или дубли `Name_1`; что-то изменилось в `/Game/ART004` или `/Game/ArtPreview`.
+   Чьи они, выясняет оркестратор (снимок, `git log`); удалить чужое — только с ответом пользователя (необратимо).
 6. Редактор упал или висит в модальном диалоге. Не повторять ту же операцию; прочитать
    `unreal/Unmatched/Saved/Crashes/*/Unmatched.log`, записать инцидент.
 7. Задача требует решения, которого нет в документе: смена бюджета, новый класс MatID, иной цвет команды, новая кость,
-   отказ от проверки. Это вопрос к владельцу, а не выбор исполнителя.
+   новый режим инструмента, меняющий норму (мост-цилиндр для оружия без хвата), отказ от проверки. Это не выбор
+   исполнителя, а вопрос пользователю (ДС-2). Не п.7: опция инструмента со старым значением по умолчанию, которая
+   закрывает FAIL без смены нормы (`rig.cloth_shell` П3-3, `prepare.part_offsets_m`, `base.flatten_bottom`), — её
+   решает оркестратор файлом решения (п.3).
 
 ---
 
@@ -208,8 +223,8 @@ SKEL_UM_Humanoid (объект арматуры = кость 0 в UE, носит
 | Rest pose | = поза миниатюры (как смоделирована фигура), **не** T/A-поза |
 | Веса | ≤ 4 влияния, нормализованы, невзвешенных вершин нет, веса < 0,01 удаляются, затем снап к сетке 1/255 |
 | Жёсткие части | оружие 100 % на кости оружия; подставка не скинится и уходит отдельным FBX |
-| Оружие из нескольких частей Tripo | Tripo режет тонкое оружие (копьё Achilles = части 10 + 13, меч Angel = клинок с гардой + рукоять): одна часть — меш `weapon`, остальные — в меш `body` с правилом `rigid` 100 % на кости оружия (`profile.py:68` допускает одну часть `weapon`; решение П3-1, `docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`) |
-| Предмет в руке без своей кости (щит, фонарь) | `rigid` 100 % на `arm_lower` или `hand` своей стороны, новой кости нет (щит Achilles на `arm_lower.L` прошёл все пробы; решение П3-2). Новая кость — стоп (§0.3 п.7) |
+| Оружие из нескольких частей Tripo | Tripo режет тонкое оружие (копьё Achilles = части 10 + 13, меч Angel = клинок с гардой + рукоять): одна часть — меш `weapon`, остальные — в меш `body` с правилом `rigid` 100 % на кости оружия (`profile.py:68` допускает одну часть `weapon`; решение П3-1, `docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md`). В спеке h2anim (4.5) такие части перечисляет `weapon.extra_parts` — иначе `clip_contact_check` пересечения пятки копья с плащом не проверяет (RB-09, F127) |
+| Предмет в руке без своей кости (щит, фонарь) | `rigid` 100 % на `arm_lower` или `hand` своей стороны, новой кости нет (щит Achilles на `arm_lower.L` прошёл все пробы; решение П3-2). Новая кость — стоп (§0.3 п.7). В спеке h2anim — элемент `weapon.extra_parts` `{"bone": "arm_lower.L", "islands": true}` |
 | Голова кости оружия | в точке хвата: туда встанет сокет `Weapon` (0, 0, 0) |
 | Расширения (только по решению) | `crown_snake.NN` (≤ 4, ≤ 15°), `cloth_front/back`, `wing_tip.L/R` |
 | Harpy | крылья = цепочка `arm_upper → arm_lower → hand` |
@@ -252,6 +267,14 @@ SKEL_UM_Humanoid (объект арматуры = кость 0 в UE, носит
 - Палитра: P1 `#E8C06A`, P2 `#5A7F9F` (в С-11 всё ещё `#9FC2D8` — устарело). Hex → linear только
   `FLinearColor::FromSRGBColor` / `um_masters.hex_to_linear`; `hex/255` запрещён.
 - Номер экземпляра (Harpy ×3) — на подставке (вершинная маска + `InstanceIndex`), не на фигуре.
+- Кольцо на подставке в UE рисует `M_UM_BaseMarker` по нормали вершин (полоса |n_z| < 0,35), а `TeamMask.G` он не
+  читает. Простой подставке ключ не нужен: правило по нормали чистое (Angel). **Двухъярусная подставка Tripo**
+  (Achilles: кольцо пятнами белый/P1/P2, F143, F150) — кольцо по высоте (h2-bake 0.8.0, W2-c):
+  `textures.team_mask.base_band.height_m: [z0, z1]` — грани подставки с центром в этом слое, кроме обращённых вниз,
+  идут в `TeamMask.G` и в вершинную маску `UM_Mask.R`; в профиле импорта UE `ue.base_material_mode: "vertex-mask"`,
+  `ue.base_marker.textures: true`, `ue.base_marker.parameters: {VertexMaskWeight: 1.0, SideBandWeight: 0.0}` и те же
+  скаляры в `review-config.json` `verify.instances`. Мастер `M_UM_BaseMarker` не меняется (прецедент — подставка
+  Harpy H3LD).
 
 ### 2.10 Высоты и бюджеты
 
@@ -277,8 +300,10 @@ SKEL_UM_Humanoid (объект арматуры = кость 0 в UE, носит
 верх этой части, `prepare-report.json#figure_top_part` пишет её и верх bounds, а орто-кадры концепта строятся по верху
 bounds (`profile.frame_top_m`: рамка концепта меряет весь силуэт). Профили без ключа (Medusa и др.) работают
 по-старому, байт в байт. Прогоны пилота сделаны до ключа: `figure_top_m` подобран по разведке (Angel 0,55904 — кончик
-клинка при голове 0,55; Leshen 0,7356 — рога при черепе 0,55003). Пробы деформации нормируют пороги высоты по полному
-росту с рогами (F59, не исправлено): у фигуры с высоким украшением читать числа проб, а не только вердикт.
+клинка при голове 0,55; Leshen 0,7356 — рога при черепе 0,55003). У профиля импорта UE свой ключ
+`candidate.figure_top_part` (проверка роста без поднятого меча и рогов, F80; `references/ue-import-package.md` §3.1).
+Пробы деформации нормируют пороги высоты по телу без оружия (F59 для оружия исправлен, 00f358c7). Украшение самого
+тела (рога, гребень) в эту рамку входит: у такой фигуры читать числа проб, а не только вердикт.
 
 Подставка: Ø 0,30 × 0,06 м у Medusa/Arthur (5–6 uu высотой). Отношение высот помощник/герой = 0,78 ± 0,06 (автотест).
 
@@ -400,6 +425,15 @@ art/pipeline-candidates/<ASSET-ID>/
 
 Новый прогон — всегда **новый** run-каталог. Закоммиченный каталог под другой конфиг не переиспользовать.
 
+Новый каталог — да, пересчёт — с первой изменённой стадии (ДС-7; RC-07, h2-bake 0.7.0):
+`run_h2_bake.py --profile <новый профиль> --run-dir <новый run> --reuse-from <прежний прогон>`. Стадии, у которых блоки
+профиля, входные файлы, код и версия Blender те же, берутся из прежнего прогона жёсткими ссылками (JSON-отчёты —
+копией с `reused_from`), план — `work/reuse-plan.json`, журнал стадий — `work/stages.json`. Изменился код —
+`--reuse-allow-code-drift`, и тогда полный повтор детерминизма (4.3). Прогон старше 0.7.0 (без `work/stages.json`) даёт
+максимум `prepare…textures`. Нужен `work/` прежнего прогона: пока доработка возможна, его не удалять (8, «Очистка»).
+Доработка «только веса» Achilles r3 гнала всю цепочку (13 мин сборки, затем 14 мин и 2,6 ГБ повтора детерминизма) —
+с `--reuse-from` она начинается с `rig`.
+
 ### 4.2 Профиль H2 bake
 
 Скопировать `medusa-h2-bake-h2.json` в `<hero>-h2-bake-h2.json` и пройти каждый ключ. Ничего не оставлять «как у
@@ -408,6 +442,9 @@ Medusa» без проверки, что это верно для нового �
 | Ключ | Что задать | Подводные камни |
 |---|---|---|
 | `profile_id`, `asset_id`, `status`, `history` | свой id `<hero>-h2-bake/1`; `status: "предложено"`; `history.previous_profiles` | — |
+| `profile_version` | `2` у нового героя (W1-d, h2-bake 0.7.0; RB-15). Без ключа: `1` — только Medusa и пилот (Achilles, Angel, Ancient Leshen), любой другой `asset_id` — `2` | v2 требует `uv.density_reference_part` (часть body), `textures.team_mask.base_band.part` (часть base) и `preview.frame` с `side`, иначе профиль не проходит `validate`; расширенные пробы рига блокируют сборку только у v2 (ДС-5, 4.3). Закоммиченные профили v1 не меняются |
+| `prepare` (необязательный) | `part_offsets_m: {tripo_part_N: [dx, dy, dz]}` — сдвиг жёсткой части Tripo в метрах финальной рамки (−Y фронт, +X левая сторона фигуры), ≤ 0,05 м, не подставка (8e00e5f0) | только для «наездника», которого Tripo сгенерировал с зазором (ворона Leshen висела в 2,9 см от предплечья, F137); конечности им не двигать. Без ключа prepare байт в байт прежний |
+| `base` (необязательный, h2-bake 0.8.0, W2-c) | `flatten_bottom: {}` — рваный или провисший низ подставки (F83; дефолты `floor_quantile` 0,5, `band_m` 0,008, `falloff_m` 0,012); `rim_smooth: {"z_band_m": [z0, z1]}` — зубцы кромки подошв и дыр подставки (F104) | после `rim_smooth` проверить `close-report.json#checks.caps_hidden_at_rest`: сглаживание рядом с крышкой ломает гейт, тогда сузить `parts`. Без ключей стадии не меняются |
 | `sources` | `source_spec`, `parts_glb`, `tex_glb` (пути и sha256 из spec) | две GLB должны иметь **одинаковую** геометрию по частям; prepare это проверяет |
 | `expected_part_count`, `parts` | число частей Tripo и роль каждой (тело, лицо, кисти, оружие, подставка) | части нумеруются Tripo произвольно — роли определять по рендеру частей в своих цветах, а не по номеру и не по габаритам (у Achilles по габаритам вышли «голова» = гребень, F17); оружие из нескольких частей — §2.6 (П3-1) |
 | `scale` | `figure_top_m` = бюджет / 100 (0,55 для 55 uu), `base_diameter_m`, `base_height_m`; необязательный `figure_top_part` | `prepare` берёт самую высокую вершину не-подставки, оружие и рога включительно; деталь выше головы — `figure_top_part` (§2.10) |
@@ -416,8 +453,8 @@ Medusa» без проверки, что это верно для нового �
 | `closure` | `contact_caps` по петлям, которые открываются в позах | у Medusa 19 крышек; видимость крышек в rest ≤ 0,01 % и ≤ 9 px; выбор крышка / стык весов / оболочка — «Новый герой» ниже |
 | `uv` | `atlas_px 4096`, `runtime_px 2048`, `min_gap_px 8`, `pack_margin_fraction 0.0013`, `max_overlap_px 0`, `texel_priority` (лицо ×2, кисти ×1,75, оружие ×1,5, подставка ×0,45), `density_reference_part`, `charts.chart_area_cm2` | Smart UV запрещён (5 402 острова у Medusa); только charts (Voronoi + MINIMUM_STRETCH). `density_reference_part` — крупная часть тела, с которой сравнивается плотность лица (без ключа `tripo_part_0` = платье Medusa). Острова, прошедшие проверку на 512 px, на 4K перекрывались на 7–17 px (`uv-report.json#checks.raster_overlap_px`, F30, F56): рукавам и клинкам — меньший `chart_area_cm2` (по части или `charts.regions`) |
 | `bake` | `device`, `resolution 4096`, AO (128 samples, distance 0,044 м = 0,08 × рост), `cage` (1,5 × p99 отклонения, 0,6–4 мм, `max_ray_factor 2.5`), `ao_exclusions` (AO части без загораживающей части, которая в анимации отходит — кулак Medusa у пояса) | `device: "GPU"` (Medusa): FBX повторяются байт в байт, а N/ORM расходятся в 1–3 пикселях на 1–2 уровня; `CPU` (Merlin) бит-стабилен, но медленнее. Выбор записать в отчёт |
-| `textures` | `prefix T_<Hero>_H2`, `maps`, `ao_gate`, `team_mask`, металл-маска `materials.metal`, `edge_extend_px 16` | `team_mask.cloth_hsv` и `base_band.part` — значения Medusa, перенастроить (чек-лист ниже). Металл есть — блок `materials.metal` обязателен (look-dev читает маску). Металла нет — без блока: стадия пишет нулевую `work/uv/metal_mask.npy` и `textures-report.json#metal_mask` (F51) |
-| `rig` | `skeleton UM_HUMANOID_17_v2`, `armature_object SKEL_UM_Humanoid`, `character <Hero>`, `max_influences 4`, `clean_below 0.01`, `bones` (голова/хвост каждой кости по геометрии героя), `weights` (`chain`, `zblend`, `cloth`, `rigid`), `junctions`, `seam_pairs`, необязательный `cloth_shell` | кости ставить по геометрии нового героя (разведка, ниже); копия координат Medusa = гарантированный FAIL проб |
+| `textures` | `prefix T_<Hero>_H2`, `maps`, `ao_gate`, `team_mask`, металл-маска `materials.metal`, `edge_extend_px 16`; необязательные `band_repaint` и `team_mask.base_band.height_m` (h2-bake 0.8.0) | `team_mask.cloth_hsv` и `base_band.part` — значения Medusa, перенастроить (чек-лист ниже). Металл есть — блок `materials.metal` обязателен (look-dev читает маску). Металла нет — без блока: стадия пишет нулевую `work/uv/metal_mask.npy` и `textures-report.json#metal_mask` (F51). Мазки цвета соседа на полосе стыка (ворот Achilles — это текстура Tripo) — `band_repaint`, а не `bake.cage` (F107). Двухъярусная подставка — `base_band.height_m` (2.9) |
+| `rig` | `skeleton UM_HUMANOID_17_v2`, `armature_object SKEL_UM_Humanoid`, `character <Hero>`, `max_influences 4`, `clean_below 0.01`, `bones` (голова/хвост каждой кости по геометрии героя), `weights` (`chain`, `zblend`, `cloth`, `rigid`), `junctions`, `seam_pairs`, необязательные `cloth_shell` и `probe_skip` | кости ставить по геометрии нового героя (разведка, ниже); копия координат Medusa = гарантированный FAIL проб. `probe_skip` — расширенные пробы, которых у фигуры нет (ствол Leshen без ног: `shin_l_bend`, `shin_r_bend`, `foot_l_flex`, `foot_r_flex`); прежние 7 пропускать нельзя (4.3) |
 | `seams` | `raycast` (`pitch_m 0.0015`, `margin_m 0.1`, `posed_clearance_m 0.005`), `max_new_blob_px 8`, `frames`, `k2_frames` под свою фигуру | сетка лучей одна на все позы: rest + `margin_m`, сторона, которую поза покидает, отодвигается до позы + `posed_clearance_m` (`profile.seams_grid_bounds`, F55/F65). Обход пилота `margin_m 0.2` больше не нужен; расширение пишется в `seams-report.json#see_through.<blend\|fbx>.grid_extended_by_posed_bounds_m` |
 | `sockets` | `Weapon` на кости оружия, `Head` на `head`, `location_uu: null` | — |
 | `exports` | `fbx_preset blender/_tools/presets/UM_FBX_v1.json`, `skeletal_fbx SK_<Hero>_H2.fbx`, `base_fbx SM_<Hero>_H2_Base.fbx` | — |
@@ -448,7 +485,9 @@ Medusa» без проверки, что это верно для нового �
    петель: у листа петля идёт по всей кромке (F35).
 
 Готового инструмента разведки в `tools/` нет: скрипты пилота остались в `C:/tmp` и в репо не переносились. Разведка —
-разовые скрипты исполнителя, а её числа идут в профиль с пометкой `note`.
+разовые скрипты исполнителя, а её числа идут в профиль с пометкой `note`. Роли частей из рамок по вершинам этапа 2
+(`tools/art/pipeline_batch/post_h2.py`, F10) — черновик: подтверждает их рендер частей в своих цветах (F17).
+Каталог разведки (`C:/tmp/<key>-scout`) — scratch: удалить после того, как числа легли в профиль (8, «Очистка»).
 
 **Значения Medusa, которые надо перенастроить.** Скопированные как есть, они дают FAIL или меряют чужую часть.
 
@@ -471,6 +510,7 @@ Medusa» без проверки, что это верно для нового �
 | конец оружия у подставки (пятка копья, петля 1,4 см) | своя крышка с `min_perimeter_cm` ниже общего `closure.min_perimeter_cm` (по умолчанию 3 см: короче — пропуск) | `spear_butt`, 1,0 (F16) |
 | одинарный лист ткани показывает изнанку в позах (пятна > `seams.max_new_blob_px`) | сначала веса и стыки, затем `rig.cloth_shell` | юбка Achilles (П3-3, F64) |
 | толстая оболочка с вырезом изнутри | крышка на вырез | плащ Achilles, `cloak_back` (F63) |
+| срез руки Tripo под плащом или кирасой рвётся полосой при руке вперёд (виден со спины) | стык весов `rig.junctions` рука\|плащ и рука\|кираса, полоса 0,03–0,04 м | Achilles r3 (F148; «вырез плаща» приёмщика — на деле срез руки, F129) |
 
 `rig.cloth_shell = {"parts": [...], "offset_mm": 0.3}` (0 < `offset_mm` ≤ 1). Стадия `rig` после весов добавляет каждой
 части внутреннюю копию её реальных граней: обратная намотка, тот же UV0, веса копируются, смещение против нормали, по
@@ -510,17 +550,33 @@ h2_bake/blender_entry.py -- work/params/<stage>.json`, лог в `logs/<stage>.l
 | `aux` | AO без загораживающих частей, карта rest-позиций | — | — |
 | `textures` | паддинг, N DirectX + N_OpenGL, ORM = (AO, R, M), металл, TeamMask; 4K + 2K; `work/uv/metal_mask.npy` (у героя без металла — нулевая) | гейты AO: p99 − p1 ≥ 32, ≥ 2 % текселей < 250; «внутрь» ≤ 0,02 на ячейку; `team_mask_cloth_share` 0,5–0,98 или `not_applicable` | `team_mask_cloth_share` FAIL → `cloth_hsv` под свою ткань (4.2) |
 | `rig` | арматура, веса по позиции, `rig.cloth_shell` (если задан), экспорт UM_FBX_v1 в `work/rig/export-staging/`, read-back, `work/sk_authored.blend` | треугольники, 17 костей, 1 слот, ≤ 4 влияния, лицо +X | FBX попадают в `export/` только при PASS (пилот, F25); при FAIL `export/` не трогается, пара лежит в staging для разбора |
-| `probes` | `rig_deform_probe.py` на .blend и на FBX (7 поворотов), `validate_clip.py --kind=skeletal-mesh` | `reports/probes-report.json`: 7/7 plausible в обоих, validate PASS | неверная зона → координаты костей/правила весов; **не** сглаживать веса (растяжение 1,46× → 3,10×) |
+| `probes` | `rig_deform_probe.py` на .blend и на FBX: прежние 7 поворотов + расширенные (правое предплечье, голени, стопы, скрутка кисти, поворот каждой кости `weapon.*`; RB-08), `validate_clip.py --kind=skeletal-mesh` | `reports/probes-report.json`: `passed`, `plausible` = `total` (`n/N`) в обоих, сводка — `#probes`, validate PASS. Расширенные блокируют только `profile_version ≥ 2`; у v1 их FAIL — WARN `extended_warnings` (ДС-5). `rig.probe_skip` выводит пробу из N | неверная зона → координаты костей/правила весов; **не** сглаживать веса (растяжение 1,46× → 3,10×). Нет голеней или стоп — `rig.probe_skip` (4.2). Предел разгибания скина (локоть Angel > ~141°, F122) пробы не меряют: его ловит дымовой прогон клипов (4.4, «Сдача модели») |
 | `seams` | позы-пробы, доля открытого обода (> 1,5 мм, ≤ 5 % периметра), сквозные лучи | нет новых дыр; `seams-report.json#see_through.<blend\|fbx>.poses.<поза>.largest_new_blob_px` и `_view` | дыра в позе → крышка или вес у стыка (выбор — 4.2). Петля с большой `median_to_cover_mm` (свободный край плаща в 16,7 мм от торса, F15) — не контакт: её «раскрытие» не мерило, судят сквозные лучи. Ложные срабатывания лучей: строки 9–14 px вдоль плоской «земли» у подставки (F57), перевёрнутая реальная грань в 0,1 мм над крышкой своей части (F69) — проверить на `work/seams_raw`, записать в отчёт |
 | `preview` | Cycles, K2-камера (FOV 35°, pitch −55°), 1920×1080 | смотреть глазами: лицо, кисти, оружие, ноги на подставке | чёрные пятна в крупном плане с отсечением задних граней, где слоёв много (корни Leshen), — предел отскоков прозрачности превью (F62), не дефект модели |
 | `compose`, `manifest` | листы `preview/*.jpg`, `reports/run-manifest.json` | — | — |
 
 Повтор для детерминизма: второй прогон в другой каталог (например `C:/tmp/<task>/repro`) и `--compare-with <первый
-run>` → `reports/determinism-report.json`. Ожидается: FBX (`export/*`), BC, TeamMask, UV-лист и отчёты стадий
-`identical` (rig-report — `identical after run-path normalisation`); при `device: GPU` у N, N_OpenGL, ORM (4K и 2K)
-допустимо `different` в единицах пикселей с `max_abs_diff` ≤ 2, и вместе с ними `textures-report.json` (в нём sha256 и
-статистика этих карт; пилот: 4 карты N по 1–6 пикселей, F24); превью-JPEG (Cycles с denoise) и `compose-report`
-отличаются всегда и не сравниваются. Любое другое расхождение — недетерминизм сборки, остановка.
+run>` → `reports/determinism-report.json` (`unmatched.h2-bake-determinism/2`, h2-bake 0.7.0). Вердикт выносит сам
+инструмент по таблице допусков (`h2_bake/determinism.py`, RB-14; F24, F86): первое подходящее правило по пути файла.
+
+| Файлы | Правило |
+|---|---|
+| `reports/run-manifest.json`, `determinism-report.json`, `decimation-curve.json`, `preview/*.jpg` (Cycles с denoise) | не сравниваются |
+| `compose-report.json`, `ld-compose-report.json`, `ld-team-*.json` (меряют кадры Cycles `ta_render`) | только `passed` совпадает |
+| `textures-report.json` | равен без `outputs.<карта>.{sha256, bytes}` карт, прошедших правило PNG |
+| `*.png` | тот же размер, `max_abs_diff` ≤ 2 на канал, отличаются ≤ 0,01 % пикселей (шум GPU-бейка N, N_OpenGL, ORM; пилот: 11 повторов, 1–6 пикселей на 1 уровень) |
+| прочие `*.json` | побайтно или равны после замены пути прогона на `<run>` и без `reused_from` |
+| FBX и всё остальное | побайтно |
+
+Код 1 `--compare-with` — расхождение сверх таблицы: модель дальше не идёт, разбор оркестратором (§0.3 п.3). Работает
+во всех режимах (`h2`, `lookdev`, `teamaccent`).
+
+**Когда повторять** (ДС-7; RC-08: 7 полных повторов пилота по 12–19 мин и 2,4–2,6 ГБ). Полный повтор (`scope: full`) —
+один раз на фигуру, на прогоне, который идёт в UE (после `pass` приёмки, до этапа 7a). Прогон доработки с
+`--reuse-from` повторяет только пересчитанные стадии: повтор с тем же `--reuse-from`, стадии, взятые обоими из одного
+источника, детерминизм не доказывают (`reused_in_both`, `scope: recomputed_stages_only`). Код изменился
+(`--reuse-allow-code-drift`) — полный повтор. Каталог повтора удалить сразу после переноса отчёта (ниже) — он не данные
+пользователя (8, «Очистка»).
 
 Отчёт пишется в каталог **того** прогона, который запущен с `--compare-with` (F33). Повтор пишет его в repro; чтобы
 отчёт лёг в производственный прогон, после повтора выполнить
@@ -539,7 +595,9 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 - Look-dev читает готовый H2-прогон только по sha256 и даёт: MatID, LUT, EdgeMask, UV1_m, тона под концепт,
   `SK_<Hero>_H2LD.fbx`. Образцы: `medusa-h2-lookdev.json`, отчёты `*-lookdev-v2.md`. Новый герой ставит в look-dev
   профиль `frame` (как `preview.frame` H2-профиля, 4.2): `ld_measure` берёт пиксели концепта под масками прохода ID и
-  отказывает концепту, аспект которого отличается от кадра больше чем на 1 %.
+  отказывает концепту, аспект которого отличается от кадра больше чем на 1 %. Look-dev нового героя без `frame` —
+  отказ профиля (W1-d). `ld_fbx` пишет FBX через staging и публикует `export/SK_<Key>_H2LD.fbx` только при PASS
+  (RB-13: прежде FBX этапа 4 и 7 появлялся до проверок).
 - Входы нового героя (пилот 2026-10-13, F21). `source.files.baseline_BC` / `baseline_ORM` = его собственные
   `textures/T_<Key>_H2_{BC,ORM}.png`: у Medusa это `work/h2-baseline/` (текстуры до H2.1), у нового героя такого прогона
   нет. `work/uv/metal_mask.npy` look-dev читает всегда (`lookdev.py:328`). Металл есть — блок `textures.materials.metal`
@@ -552,31 +610,27 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 - Усиления металлических классов (`grade.gains`) — с демпфированием, не полный `gain_suggestion`: металл концепта —
   краска, а не PBR. Бронза Achilles: полная поправка тона дала бледную латунь, половина — тёмную бронзу (0,73), H2LD
   читается медной и глянцевой против матового золота концепта (F71). Почему усиление не полное — в `note` профиля;
-  решает съёмка UE (4.6).
+  решает съёмка UE (4.6). Итерации тона — по таблице `_tone.py` после каждого прогона, а не одним линейным шагом
+  `gain_suggestion`: у AgX с клиппингом отдача падает (усиления 1,626 / 2,0 / 2,2 дали 0,775 / 0,827 / 0,856), и
+  насыщенность уходит к границе семейства (F85).
+- **Металл: F0 из концепта** (h2-bake 0.8.0, W2-c; F110, F120, F138). По умолчанию F0 металлического класса в LUT — его
+  медиана в H2.1 BC (бронза Achilles: яркость 0,63) с бледной кромкой износа пресета, и в UE бронза шла слоновой
+  костью. Look-dev `metal_f0` = `{"concept_report": <measure-report.json прежнего look-dev героя>, "anchor_class":
+  "skin", "classes": {<класс>: {"y_scale", "sat_scale", "hue_shift_deg", "worn": {"y_ratio", "sat_scale"}}}}` ставит F0
+  по оттенку и насыщенности медианы концепта, а яркость — от якоря skin; `worn.y_ratio` ≈ 2,5. Проверка
+  `ld-maps-report.json#checks.lut_metal_f0_from_concept`. Эффект виден только в UE: Blender-превью и кадры приёмки
+  берут металл из BC. Съёмка UE судит и оттенок металла, а не только яркость (F120: у Achilles `t_cap` 2,0 и T 2,0, а
+  бронза бледно-серебряная против тёплого золота концепта; после `metal_f0` — оттенок 29,1° против 30,9° концепта, F138).
+- **Стартовые значения материала в UE** (пилот, 7a; выдержка — `references/ue-import-package.md` §4.3). Библиотечные
+  specular 0,5 / sheen 0,5 дают тёмной коже и шёлку в UE в 2–3 раза ярче концепта (Angel — 3 итерации LUT, F93), тёмному
+  красному сукну с sheen 0,35 — в 2,4–2,7 раза ярче и розовый оттенок (F139). Первая итерация: тёмная кожа — specular
+  0,2–0,3, sheen ≤ 0,1, roughness 0,55–0,6; сукно — sheen ≤ 0,05, specular около 0,2. Якорь экспозиции съёмки —
+  простой диффузный класс (кожа персонажа), не ткань: плащ после правки sheen оставался в 1,43 раза ярче кожи (F140).
 - Слота `horn_claw` в генерическом look-dev нет: череп, рога и когти уходят в `legacy_bake` (Leshen, F54) — записать в
   отчёт. Класс в библиотеке есть (Harpy, слот `brass`), но слот героя — новый режим инструмента, решение владельца.
 - Классы MatID — только существующие (`material-library/README.md`). Нужен новый класс (как маховые перья Harpy) —
   остановка, это решение.
-- **Сдача этапа 3: тон и крупные планы** (пилот: обе приёмки вернули `rework_blender` — основной класс вне допуска тона,
-  кость Leshen y_ratio 0,775, бронза Achilles 0,717, потолок T 1,0; плюс артефакты крупных планов, которых исполнитель
-  этапа 3 не смотрел; F72, F79). До передачи на приёмку:
-  1. Таблица тона — тем же кодом, что строит `frames/tone.json` съёмки
-     (`tools/art/acceptance/capture_acceptance_set.py:470-482` → `tools/art/acceptance/_tone.py`
-     `tone_table(measure, maps)`; отдельного CLI нет; запуск из корня репо):
-     ```bash
-     python -c "import json,sys; sys.path.insert(0,'tools/art/acceptance'); from _tone import tone_table; R=sys.argv[1]+'/reports/'; t=tone_table(json.load(open(R+'measure-report.json',encoding='utf-8')), json.load(open(R+'ld-maps-report.json',encoding='utf-8'))); print(t['t_cap'], t['out_of_tolerance'], t['floor_limited'], t['family_changed_main'])" <run look-dev>
-     ```
-     Нужен `t_cap` = 2.0: все классы в допуске `_tone.py` (основной класс ≥ 10 % пикселей; Y_ratio и у основного ещё
-     `y_ratio_loo` в 0,80–1,25; |dHue| ≤ 15°). Иначе — ещё итерация grade: новый look-dev профиль, `grade.gains` вне
-     допуска из `measure-report.json#gain_suggestion.<класс>.suggested_gain` (металл — демпфированно, причина в `note`),
-     прогон `ld_maps` … `ld_measure`, таблица заново. Класс `floor` T не снижает (`known_issues`). Не дошли до 2.0 —
-     причина и числа в отчёт этапа 3, а не молча на приёмку.
-  2. Крупные планы приёмщика — снять в scratch-каталог и осмотреть самому (Read каждого JPEG):
-     `python tools/art/acceptance/capture_acceptance_set.py --fbx <LD>/export/SK_<Key>_H2LD.fbx --textures <LD>/textures --out C:/tmp/<key>-stage3-check/frames --key <Key> --side-view <SIDE_VIEW> --sheet art/imagegen/concept-<key>-codex/sheet-<key>.png`
-     → `close-head`, `close-hands`, `close-torso`, `close-legs-back`, `close-weapon`, `pose-01` … `pose-04`, `compare-*`
-     (кадры не evidence: этап 4 снимает свои). Пилот пропустил: коричневый наконечник копья, наносник цвета кожи, мазки
-     на вороте, защемление локтя (Achilles), гранёные когти и отростки рогов (Leshen). Найденное чинится средствами
-     профиля до передачи (классы look-dev, `retopo.dense_regions`, веса).
+- До передачи на приёмку — чек-лист «Сдача модели» в конце этого раздела (этапы 3 и 5).
 - TeamAccent пишет только новые файлы (`textures/<prefix>_TeamAccent_{2K,4K}.png`, `reports/ld-team-*.json`).
   Проверить по отчёту: покрытие 5–12 %, ≤ 20 % на часть, 0 на металле, коже, камне, дереве, когтях.
 - Компоненты `team_accent` (h2-bake 0.6.1) — каждый необязателен, нужен хотя бы один: `hem` — полоса ткани
@@ -606,15 +660,67 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 - Тона под концепт — предсказание; решение по материалу принимается только по съёмке в UE (4.6,
   `ue_hero_lookdev.py review`), не по прогнозу `lookdev_r2.py forecast`.
 
+#### Сдача модели (этапы 3 и 5)
+
+Один чек-лист на выходе этапа 3 и каждой доработки этапа 5 (RA-09). Без него в пилоте обе первые приёмки вернули
+`rework_blender`: основной класс вне допуска тона (кость Leshen 0,775, бронза Achilles 0,717 → потолок T 1,0) и
+артефакты крупных планов, которых исполнитель не смотрел (F72, F79). Дефекты подставки и «наездников» нашлись только
+на этапах 6–7 (F134, F137, F144), а кромку руки под плащом — только приёмка клипов (F129, F148, RC-06). Числа пунктов —
+в `STAGE3.handover` / `STAGE5[]` заявки (SKILL.md §7.2). Пункт не выполнен — причина и числа в отчёт, а не молча на
+приёмку.
+
+1. **Тон** (W1-c, f14ffced): `python tools/art/acceptance/_tone.py <run look-dev>` — тот же код, что строит
+   `frames/tone.json` съёмки. Код 0 — `t_cap` 2,0, тон сдаётся; 2 — ниже (печатает классы `out` и `floor`); 1 — ошибка
+   входа. Допуск: основной класс ≥ 10 % пикселей; `Y_ratio` и у основного ещё `y_ratio_loo` в 0,80–1,25; |dHue| ≤ 15°
+   только у хроматических медиан (`hue_checked`, RB-06). Не 2,0 — ещё итерация grade (новый look-dev профиль,
+   `gain_suggestion` вне допуска, металл демпфированно, не больше 3 итераций), таблица заново. Класс `floor` T не
+   снижает.
+2. **Свои крупные планы**: те же кадры, что увидит приёмщик, в scratch-каталог, и Read каждого JPEG:
+   `python tools/art/acceptance/capture_acceptance_set.py --fbx <LD>/export/SK_<Key>_H2LD.fbx --textures <LD>/textures --out C:/tmp/<key>-stage3-check/frames --key <Key> --side-view <SIDE_VIEW> --sheet art/imagegen/concept-<key>-codex/sheet-<key>.png --previous none`
+   → все `close-*`, `pose-01` … `pose-04`, `pose-03b`, `wire-*`, `compare-*`. Кадры не evidence: этап 4 снимает свои.
+   Пилот пропустил: коричневый наконечник копья, наносник цвета кожи, мазки на вороте, защемление локтя (Achilles),
+   гранёные когти и отростки рогов (Leshen). Найденное чинится средствами профиля до передачи; пункт этапа 5 закрыт,
+   только когда это видно на кадре того же вида (F100).
+3. **Подставка без просвета**: `python tools/tripo-pipeline/review/base_seethrough.py --out C:/tmp/<key>-stage3-check/base-seethrough.json <Key>=<LD>/export/SM_<Key>_H2LD_Base.fbx,<LD>/export/SK_<Key>_H2LD.fbx`
+   → `with_figure` ≤ 0,1 uu² в каждом направлении (схема `base-seethrough/2`, 8). Уже на этапе 3, а не на входе 7a:
+   открытые петли верха подставки Leshen и Achilles нашлись только там (F134, F144).
+4. **Зазор «наездников»**: жёсткая часть на кости (ворона на руке, щит, фонарь) в rest прилегает к телу — на
+   `close-*` и `turn-*` пункта 2 нет видимого зазора. Зазор (ворона Leshen — 2,9 см) — `prepare.part_offsets_m` (4.2),
+   а не `known_issues`: в клипе часть отрывается (вето D, F137). Готового замера зазора в `tools/` нет — минимальное
+   расстояние вершин части до тела хозяина меряет разовый скрипт разведки, число — в отчёт.
+5. **Дымовой прогон клипов** (RC-06): копия спеки героя библиотеки с тем же классом оружия (ДС-6; 4.5) в
+   `<bake run>/work/smoke/` (`h2anim_run.py` пишет пути от корня репозитория, `C:/tmp` не годится; `work/` не в git),
+   `ue_hero` = `<Key>Smoke`. Прогон `h2anim_run.py` (внутри `clip_contact_check`) и
+   `"$B" -b --factory-startup --python tools/tripo-pipeline/anim/grip_check.py -- <AM_<Key>Smoke_<Clip>.fbx> <out.json>
+   --side <R|L> [--shield-bone arm_lower.L] --base <SM_<Key>_H2_Base.fbx>` по LungeAttack и DeathSettle. Ищется то, что
+   пробы не ловят: кромка руки под плащом при руке вперёд со спины (F129, F148), зазор наездника в движении (F133),
+   предел разгибания скина (F122), оружие сквозь тело. FAIL `skin_stretch`/`limb_body`/`weapon_body` на паттерне —
+   дефект модели, чинится до приёмки. Порядок, что смотреть и что удалить после —
+   `.agents/skills/3d-model-pipeline/references/animation-vfx-sfx.md` §6.6. Клипы дыма — не клипы этапа 6.
+6. **Детерминизм** по ДС-7 (4.3): у прогона с `--reuse-from` — повтор пересчитанных стадий, `--compare-with` код 0;
+   полный повтор — один раз на фигуру, на прогоне для UE. Код 1 — модель дальше не идёт.
+7. **Пробы `n/N`**: `probes-report.json#passed`, `plausible` = `total` на .blend и FBX; у v1 — WARN
+   `extended_warnings` перечислить (4.3).
+8. **Тесты зелёные** — перед коммитом этапа (W1-a, 70905fa2): `python -m pytest tools/tripo-pipeline/tests
+   tools/art/visual/tests tools/tripo-pipeline/blender/h2_bake/tests tools/art/acceptance -q`; допустимы только 3 xfail
+   — дрейф данных до пилота (пины `um-material-presets-v1.json` у Merlin и Arthur, `UM-MASTERS` реестра; RB-03, F91,
+   RA-16). На 2026-10-14: 686 passed, 3 xfailed, около 11 мин.
+9. **Очистка** своих scratch-каталогов этого чек-листа и каталога повтора — после отчёта (8, «Очистка»).
+
 ### 4.5 Анимации H2Anim
 
 1. Скопировать `medusa-h2anim.json` в `<hero>-h2anim.json` (схема `unmatched.h2anim-spec/1`):
    - `target`: `sk_fbx` = `<run h2-bake>/export/SK_<Hero>_H2.fbx`, `base_fbx`, `sha256`, `rest_generation`
      (`H2`; у Harpy `H3`). Клипы авторятся на bake-меше: look-dev не меняет риг и rest, поэтому они ложатся и на H2LD;
-   - `meshes` (имена тела и оружия в FBX), `weapon` (`bone`, `side`), `run_dir`, `ue` (`skeleton`, `clips_folder`),
-     `fps 24`;
-   - `clips`: роль, N кадров, ключи, волны, IK стоп, `hand_pin`. Движение — по видео-референсам
-     `art/animation-refs/<ASSET>/`, а не из головы.
+   - `meshes` (имена тела и оружия в FBX), `weapon` (`bone`, `side`, необязательный `extra_parts` — части оружия и
+     щит в меше body, 2.6; RB-09), `run_dir`, `ue` (`skeleton`, `clips_folder`), `fps 24`;
+   - `clips`: роль, N кадров, ключи, волны, IK стоп, `hand_pin`. Движение — не из головы. Источник по умолчанию —
+     паттерн клипов героя библиотеки с тем же классом оружия (Angel ← мечевые клипы Arthur); видео-референсы SYNTX
+     `art/animation-refs/<ASSET>/` — только для нестандартного движения, с причиной в заявке (ДС-6; RA-18, F44: визуального
+     лимита SYNTX хватает примерно на одного героя). Вид источника — `clips.*.reference_kind` спеки (F50).
+   - Ноги прямые в покое, а бёдра двигаются (поворот корпуса) — опустить `hips` на 0,3–0,5 см, иначе стопы скользят;
+     сначала замерить rest-кости, след и подставку, прочитать лог IK (F48). Смещения целей кисти от Arthur не
+     переносятся.
 2. Прогон (всё headless, по одному процессу):
    ```bash
    python tools/tripo-pipeline/anim/h2anim_run.py art/pipeline-candidates/<ASSET>/build-profiles/<hero>-h2anim.json
@@ -627,24 +733,35 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
      кадр 0 = rest (и последний для idle/oneshot), пиковый сдвиг ≥ 2 % (меньше — WARN);
    - контакты: скольжение стопы ≤ 0,5 % роста; `skin_stretch` (ребро > 5× rest и > 2 % роста, видимое хоть с одного
      из 24 направлений) = FAIL; `limb_body` > 3× + 20 пар = FAIL; подол ниже верха подставки ≤ 1,5 % (WARN);
-     `weapon_tip` ± 0,2 % роста;
+     `weapon_tip` ± 0,2 % роста; `weapon_body` — по мешу оружия и частям `weapon.extra_parts`. Фигура без стоп (ствол
+     Leshen): `foot_slide` — WARN «не измерено», опору корней проверить отдельно (F113);
    - read-back: rest клипа = rest SK покостно ≤ 1e-4 см, fps = 24.
 4. Известные пределы (не «чинить» в клипе — описать в отчёте): подол скинен жёстко, поэтому смерть «на коленях»
    рвёт подол — смерть делается поклоном корпуса; плечо Arthur выше ~18° рвёт наплечник; поворот головы Harpy ≤ ~15°;
    двухзвенная IK не всегда достигает цели. `skin_stretch` не ловит щели без растяжения — нужен крупный план UE.
+   Пределы скина правой руки Angel: разгибание локтя > ~141° и скрутка предплечья > ~20° — FAIL (F122); меч в кулаке
+   при рубящем ударе — подъём плеча и поворот плеча, а не разгиб локтя. Замер — `grip_check.py` (хват, кисти, локти).
+5. Приёмки клипов на этапе 6 нет: этап 6 — headless-авторинг и валидаторы, приёмка — шаг 7a.2 после импорта в UE
+   (ДС-1; `.agents/skills/3d-model-pipeline/references/ue-import-package.md` §4.5).
 
 ### 4.6 Импорт в UE
 
-Все UE-шаги — под блокировкой `C:/tmp/ue-editor.lock` (`ue_lock.py`), по одному герою/клипу на блокировку, только в
-`/Game/PipelineCandidates/<Key>/...`.
+Все UE-шаги — в агентском редакторе (0.2; 7a — один герой за раз, ДС-3) под блокировкой `C:/tmp/ue-editor.lock`
+(`ue_lock.py`), по одному герою/клипу на блокировку, только в `/Game/PipelineCandidates/<Key>/...`. Команды этапа с
+переменными — `.agents/skills/3d-model-pipeline/references/ue-import-package.md` §4.
 
-1. Мастер-материалы (один раз на редактор, повтор ничего не меняет):
-   `python tools/tripo-pipeline/um_masters.py --backend mcp build --report <evidence>/um-masters-report.json` → PASS для
-   `figure`, `base_marker`, `game_layer`.
+1. Мастер-материалы — только проверка (ДС-4):
+   `python tools/tripo-pipeline/um_masters.py --backend mcp verify --report <evidence>/um-masters-verify.json`. Базовая
+   линия 2026-10-14: `figure` и `base_marker` — FAIL только `expression_properties_match_plan` (дрейф RimColor с FX-05
+   b425f06d, F91), `game_layer` PASS; это не стоп. `build` в импорте не запускать: «повтор ничего не меняет» неверно —
+   он отказывает по дрейфу до прогона, а `--force` переписывает общие мастера (RA-16). Пересборка — только при смене
+   графа в `art/um-materials/um-masters.json`, отдельной задачей с коммитом.
 2. Снимок до: `python tools/tripo-pipeline/review/ue_content_snapshot.py <evidence>/snapshot-before.json --extra-folder
    /Game/ArtTests --extra-folder /Game/S08`. Записать открытый уровень, 0 dirty-пакетов.
 3. Канонический скелет: `MSYS_NO_PATHCONV=1 python tools/tripo-pipeline/anim/h2anim_ue.py skeleton <spec>` →
-   `/Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton`.
+   `/Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton` (+ меш превью `Rig/SK_<Key>`). После доработки модели (новый
+   sha FBX спеки) меш превью переимпортируется сам, `--refresh-preview` — принудительно; `frames` и `measure` на
+   устаревшем меше отказывают (F145, 172fd4f1).
 4. Меш на скелет — CLI 0.8.0, профиль `skeletal-adopt` (образец `king-arthur-h2-ue-import.json`,
    `medusa-h2ld-lookdev-ue-import.json`; в профиле `ue.target_skeleton`):
    ```bash
@@ -662,12 +779,27 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 5. Клипы: `h2anim_ue.py import <spec>` (внутри `review/ue_py/import_clips.py`: animation-only, `FbxFactory`,
    `bForceRootLock=true`, `bEnableRootMotion=false`, старый клип удаляется перед импортом), затем
    `h2anim_ue.py measure <spec>`: кадр 0 = ref pose (0, 0 uu), кость 0 неподвижна, масштаб 1,0.
-6. Кадры для глаз (редакторные, **не приёмка**): `h2anim_ue.py frames <spec> --clips=Idle` (по клипу за вызов),
-   крупный план атаки `--clips=LungeAttack --frames=3,4,5 --closeup`, лист `h2anim_ue.py sheet <spec>`.
+6. Кадры клипов в редакторе: `h2anim_ue.py frames <spec> --clips=Idle --light-pinned <review report>` (по клипу за
+   вызов; без `--light-pinned` — `SystemExit`, профиль света `cobble-probe` удалён, F81), крупный план атаки
+   `--clips=LungeAttack --frames=3,4,5 --closeup`, лист `h2anim_ue.py sheet <spec>`. Подставка по умолчанию
+   `SM_<Key>_H2LD_Base` (`--no-base` — без неё, F96), камера отходит для фигур выше ~59 uu (F136). Это не K1/K2 и не
+   приёмка модели, но вход приёмки клипов шага 7a.2 (ДС-1; `references/ue-import-package.md` §4.5).
    Look-dev съёмка: `python tools/art/material_library/ue_hero_lookdev.py review --config <review-config.json> --out
    <dir> --tag <tag>` (образец конфига — `ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json`; допуски зон против
    концепта — блок `tolerance` конфига: яркость ± 15 %, тон ± 12°, насыщенность ± 0,10). Блокировку `ue_lock`
    команда берёт сама (`ue_hero_lookdev.py:335`) — в `ue_lock.py` не оборачивать, иначе ждёт сама себя.
+   - **Прогрев** (F153, 172fd4f1): `review` сам выключает троттлинг CPU фонового редактора и ждёт сходимости; не
+     сошёлся — код 3 (`settle.status: not_settled`), кадров нет: повторить без чужой нагрузки на GPU.
+     `--allow-unsettled` — только для диагностики, MI по таким кадрам не подстраивать (у Leshen `Saturation` 1,22
+     подобрали на неустоявшихся кадрах).
+   - **Полоса шума** (F155): устоявшиеся кадры на тех же входах расходятся между сессиями редактора на ~4 % по якорю.
+     Зона в пределах `tolerance.luma_noise_band` (0,04) от края допуска — `noise band`: по ней MI не правят.
+   - **Подстройка MI и LUT без переимпорта** (RC-10): `ue_hero_lookdev.py apply-mi --config … --out … --tag …
+     [--profile <новый профиль импорта>] [--dry-run]` — задаёт только изменившиеся значения MI, LUT переимпортирует при
+     новом sha DDS, затем `verify`. Новый FBX, другая текстура (кроме LUT) или другая структура — отказ с причиной, тогда
+     переимпорт. Стартовые значения материала — 4.4; итераций не больше 3 (AGENTS.md «Iteration speed»).
+   - Перед закрытием редактора — 0 dirty-пакетов: создание MI помечает `M_UM_Figure_v2` грязным, сохранять его нельзя —
+     перезагрузка без сохранения `tools/tripo-pipeline/ue7a/discard_master.py` (F92).
    `ue_h5cb1.py review --hero` принимает только четырёх зашитых героев (`ue_h5cb1.py:655`), новый герой через него
    не проходит.
 7. Снимок после с `--compare <evidence>/snapshot-before.json`: `protected_unchanged: true`, добавлены только свои ассеты.
@@ -785,7 +917,9 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | Ложное «внутрь» у подошв | тест без подставки | тест с плоскостью пола только для теста |
 | Нулевые corner normals | вырожденные треугольники | удалить треугольники < 1,1e-7 м² до переноса нормалей; UE сам выбросит < 1e-4 см² |
 | Дыры при сгибе в позе | Tripo режет части по линиям контакта | contact caps (`closure`) |
-| Дыры-следы в верхе подставки | контур стоп вырезан шире стоп | `base_seethrough.py`: `with_figure` ≤ 0,1 uu² в каждом направлении |
+| Дыры-следы в верхе подставки | контур стоп вырезан шире стоп | `base_seethrough.py`: `with_figure` ≤ 0,1 uu² в каждом направлении; проверять уже на сдаче модели (4.4) |
+| `base_seethrough` FAIL, а все «сквозные» лучи на кромке диска | схема `/1` (`--aim plane`) целила в плоскость по высшей вершине; на выпуклом верхе луч −55° проходил мимо подставки (F149) | схема `/2` по умолчанию (`--aim surface`, лучи в реальный верх): Achilles 0,98 → 0,00, Leshen 2,81 → 0,01 uu². `--aim plane` — только чтобы воспроизвести evidence до 2026-10-14 |
+| Рваный или провисший низ подставки, зубцы кромки подошв | так в high-poly Tripo; retopo и `dense_regions` его не правят (F83, F104) | `base.flatten_bottom`, `base.rim_smooth` (4.2) |
 | Decimate по маске «не слушается» | маска vertex group в Decimate жёсткая | плотные зоны — двухшаговым коллапсом по маске (`dense_regions`) |
 | 33 дубля треугольников у крышек | крышка вшита в рваную петлю | отдельные утопленные веер-крышки (`sink_m 0.0003`) |
 | QuadriFlow падает | рёбра < 1e-4 у Tripo | не использовать; только COLLAPSE |
@@ -814,6 +948,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | `armature_object_name` FAIL | старое имя (`SKEL_Medusa`) | только `SKEL_UM_Humanoid` |
 | `weapon_side` FAIL | одно имя `weapon` | `weapon.L`/`weapon.R` по герою |
 | Кость в 100 раз длиннее после glTF-импорта | эвристика костей glTF-импортёра | `TEMPERANCE` при импорте |
+| Расширенные пробы голеней и стоп FAIL у фигуры без ног | у ствола нет этих частей | `rig.probe_skip` (Leshen; 4.2); прежние 7 проб пропускать нельзя |
+| Расширенная проба FAIL у Medusa или героя пилота | гейт расширенных проб — только `profile_version ≥ 2` | у v1 это WARN `extended_warnings`, профиль не менять (ДС-5) |
 
 ### 7.5 Анимация
 
@@ -853,7 +989,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | Стадия переисполняется без изменений | CRLF поменял хеш скрипта | не трогать концы строк; каталоги с хешами — `-text` в `.gitattributes` |
 | `git add` падает на длинных путях | > 260 символов | `git -c core.longpaths=true ...` |
 | sha в реестре не совпадает с диском | `autocrlf` переписал JSON | хешировать LF-байты |
-| Второй агент в том же редакторе | общий редактор | `ue-editor.lock`, один герой/клип на блокировку |
+| Второй агент в том же редакторе | общий редактор | `ue-editor.lock`, один герой/клип на блокировку; 7a — один герой за раз, редактор пачки поднимает и закрывает оркестратор (ДС-3): второй агент 7a потерял бы чужой редактор на :8123 |
+| Коммит падает на `.git/index.lock` | приложение Codex гоняет `git diff` по главному checkout и оставляет зависший lock (F82, RC-21) | `python tools/art/pipeline_batch/git_lock.py --remove-stale` перед коммитом: снимает lock, только если он старше 2 мин и ни одного процесса git нет; код 1 — ждать |
 
 ---
 
@@ -864,16 +1001,21 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 **Герой:**
 - [ ] source-spec с sha256 всех исходников; профиль bake/lookdev/teamaccent/h2anim/ue-import — новые файлы, ни один
       закоммиченный не изменён.
-- [ ] H2 bake: все стадии с маркером; `probes-report.json` passed (7/7 на .blend и FBX, validate PASS);
-      `determinism-report.json` по правилу раздела 4.3 (FBX и отчёты совпадают; при GPU у N/ORM ≤ 2 уровня).
+- [ ] H2 bake: все стадии с маркером; `probes-report.json` passed (`n/N` на .blend и FBX — `plausible` = `total`,
+      validate PASS); `determinism-report.json` с вердиктом `pass` по таблице допусков 4.3, полный повтор (`scope:
+      full`) — на прогоне, который идёт в UE (ДС-7).
+- [ ] Сдача модели пройдена (4.4, чек-лист этапов 3 и 5), числа — в заявке.
 - [ ] Числа в отчёте: треугольники по частям и сумма, высота фигуры и bounds, кости 17 (16), слоты 1, UV 2,
       влияний ≤ 4, фронт +X, AO-гейты, TeamAccent покрытие.
 - [ ] Look-dev и TeamAccent: отчёты `ld-*`, `ld-team-*`.
-- [ ] H2Anim: 4 клипа validate PASS, контакты без FAIL (WARN перечислены), листы поз.
+- [ ] H2Anim: 4 клипа validate PASS, контакты без FAIL (WARN перечислены), листы поз. Приёмка клипов — шаг 7a.2
+      после импорта (ДС-1).
 - [ ] UE: снимок до/после (`protected_unchanged: true`), скелет, `ue-import-report.json` `technically_imported` со
       всеми checks, клипы импортированы и измерены, сокеты ± 0,05 uu, редакторные кадры с пометкой «EDITOR frame … not
       K1/K2 acceptance».
-- [ ] `base_seethrough.py`: `with_figure` ≤ 0,1 uu².
+- [ ] `base_seethrough.py`: `with_figure` ≤ 0,1 uu², схема `base-seethrough/2` (`--aim surface`, по умолчанию с
+      2026-10-14; `--aim plane` — только чтобы воспроизвести прежнее evidence, F149). Первый прогон — на сдаче модели
+      (4.4), на входе 7a — повтор.
 - [ ] Реестр обновлён, `validate_registry.py` до и после правки — новых ошибок нет (базовая ошибка UM-MASTERS, 3.2
       п.1); `DIRECTORY-MAP.md` — если появились новые каталоги.
 - [ ] Свои процессы (Blender headless, скрипты) остановлены по PID; редактор и живой Blender в исходном состоянии.
@@ -888,7 +1030,23 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 - добавлять **списком путей** (`git -c core.longpaths=true add --dry-run -- <пути>`, затем `add`);
 - не коммитить: `work/`, `.staging/`, `logs/*.log`, `run.lock`, `*.fbm/`, PNG кадров, 4K-мастера, сырые GLB;
 - кадры для доказательств — JPEG 1200 px q92 + `*.evidence.json`
-  (`tools/tripo-pipeline/review/frames_to_jpeg.py`).
+  (`tools/tripo-pipeline/review/frames_to_jpeg.py`);
+- кадры приёмки модели для приёмщика — не больше 1200 px по длинной стороне, JPEG q92 (`capture_acceptance_set.py`
+  так и снимает; ДС-8): с кадрами 1920 px Sol терял WebSocket в каждой приёмке (RC-22, F97);
+- листы (`h2anim_ue.py sheet`, лист AN-18) и PNG бенча — в рабочий каталог `$W` (`C:/tmp/<ASSET_ID>-stage7`), не в
+  git; в evidence — JPEG по правилу выше (ДС-8, RA-13: коммит 3528ae0b унёс 18 PNG на 45 МБ; бенч `--out $E/bench`
+  коммитил PNG, F160).
+
+**Очистка** (RC-03; диск: около 22 ГБ на фигуру, каждый прогон h2-bake 2,4–2,6 ГБ). Сразу после своего отчёта
+исполнитель удаляет свои временные выходы — это не данные пользователя:
+- каталог повтора детерминизма (`C:/tmp/<task>/repro`, `C:/tmp/<ASSET_ID>-r<N>-repro`) — после переноса
+  `determinism-report.json` в производственный прогон (4.3);
+- scratch чек-листа «Сдача модели» (`C:/tmp/<key>-stage3-check`), дым клипов `<bake run>/work/smoke/` (4.4), разведку
+  `C:/tmp/<key>-scout` — после отчёта этапа.
+
+`work/` прогонов (в нём `work/stages.json` и стадии, которые берёт `--reuse-from`, 4.1) и черновики пилота в `C:/tmp`
+(около 42 ГБ) не удалять: правило их очистки ждёт решения пользователя (SUMMARY исследования пилота, «Решения
+пользователя» п.3).
 
 ---
 
@@ -900,7 +1058,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 # <ASSET-ID> — <что сделано>, <дата>
 
 Статус: технически импортировано | измерено | остановлено (причина)
-Исполнитель: <модель>; Blender 5.2.2; UE 5.8.2
+Исполнитель: <механизм workflow|subagent>, <модель>, <effort>, <id сессии> (RA-21); Blender 5.2.2; UE 5.8.2
 
 ## Входы
 - source-spec: <путь>, sha256 исходников совпали: да/нет
@@ -911,13 +1069,14 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 |---|---|---|---|
 | треугольники (тело/оружие/подставка) | | 30–45k (практика H2, не бюджет) | |
 | высота фигуры, uu | | бюджет ± 1 % | |
-| пробы деформации | x/7 (.blend), x/7 (FBX) | 7/7 | |
+| пробы деформации | n/N (.blend), n/N (FBX); WARN `extended_warnings` у v1 | n = N | |
 | validate_clip (SK + 4 клипа) | | PASS | |
 | контакты клипов | FAIL: …; WARN: … | без FAIL | |
 | ue-import checks | n/n | все | |
 | сокеты Weapon/Head | Δ uu | ± 0,05 | |
 | base_seethrough with_figure | uu² | ≤ 0,1 | |
-| детерминизм | совпало n/n файлов | все | |
+| детерминизм | вердикт, `scope` (full / recomputed_stages_only), сравнено n файлов | `pass` по таблице 4.3 | |
+| тон (`_tone.py`) | `t_cap`, классы `out` / `floor` | 2,0 | |
 
 ## Отступления от хендбука
 - <шаг> — <что сделано иначе> — <почему>
@@ -950,6 +1109,14 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | TeamColor | вся одежда (`TeamMask`) | акценты (`TeamAccent`) + кольцо |
 | Верх фигуры (§2.10 до 2026-10-14) | «по профильной части, оружие выше фигуры проверку не валит» | `prepare` берёт самую высокую вершину с оружием и рогами; верх бюджета — `scale.figure_top_part` |
 | Сетка лучей `seams` | rest + `margin_m` (обход пилота — `margin_m 0.2`) | расширяется по позам сама (`posed_clearance_m`), `margin_m 0.1` |
+| Стоп на FAIL инструмента (0.3 до 2026-10-14) | «вопрос к владельцу» на каждом FAIL стадии и CLI | два класса стопа: FAIL инструмента и тюнинга — разбор оркестратором, вопрос пользователю — деньги, лицензия, решения вне делегирования, необратимое (ДС-2) |
+| Редактор UE (0.2 до 2026-10-14) | видимый запуск `UnrealEditor.exe … -log`; редактор открыт пользователем | агентский скрытый редактор, 7a — один герой за раз (ДС-3; `references/ue-import-package.md` §1) |
+| Мастер-материалы в импорте (4.6 п.1) | `um_masters build`, «повтор ничего не меняет» | `um_masters verify`; дрейф до прогона — не стоп (ДС-4) |
+| Пробы рига | 7/7 | `n/N`: прежние 7 + расширенные, гейт расширенных — `profile_version ≥ 2` (ДС-5) |
+| Детерминизм | полный повтор на каждом прогоне, допуски словами | полный повтор — один раз на фигуру, на прогоне для UE; доработка — `--reuse-from` и повтор пересчитанных стадий; вердикт по таблице допусков (ДС-7, 4.3) |
+| Источник движения клипов (4.5) | видео-референсы SYNTX обязательны | паттерн библиотеки с тем же оружием; SYNTX — для нестандартного движения (ДС-6) |
+| Кадры приёмки модели | 1920–2000 px | не больше 1200 px, JPEG q92; листы и бенч-PNG не в git (ДС-8) |
+| Проверки сдачи модели | тон и крупные планы на этапе 3; `base_seethrough` — только на входе 7a | единый чек-лист «Сдача модели» этапов 3 и 5 (4.4, RA-09) |
 | Цвет P2 | `#9FC2D8` (С-11) | `#5A7F9F` |
 | `17 §7` (2026-09-25) | «пресет и оси не подтверждены» | подтверждены ART-001 |
 | Сокет `Weapon` Harpy | кисть (rig-contract) | `foot.R` (профиль) — расхождение открыто |

@@ -24,7 +24,7 @@
 | Запускающий | сессия, которая ведёт ассет | снимает кадры (§3), вызывает приёмщика (§8), **записывает** возвращённый JSON в `card.json`, прогоняет `validate_card.py`, при коде 3 вызывает второго приёмщика (§8.5), ведёт маршрут | не ставит баллы и не правит карточку приёмщика |
 | Приёмщик | «Opus xhigh» (по умолчанию) или «Sol 6.1 xhigh» (по явному выбору запускающего) | гейты по отчётам, баллы S/F/T/D по кадрам; **возвращает только JSON карточки** (ответом агента или через `-o` CLI, §8.4) | не пишет файлы, не запускает скрипты и `validate_card.py`, не правит модель, не видит рассказов исполнителя |
 | Второй приёмщик | другой профиль, чем у первого (обычно «Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот) | то же, что приёмщик, на тех же кадрах и том же промпте; только при неустойчивом pass (§6, §8.5) | не видит карточку первого приёмщика |
-| Исполнитель доработки | всегда лично «Opus xhigh», агент Workflow | этап 5 по брифу §10 | не делегирует и не принимает свою работу |
+| Исполнитель доработки | всегда лично «Opus xhigh», агент Workflow; фактические механизм, модель, effort и id сессии — в `STAGE5[]` заявки (SKILL.md §7.2, RA-21) | этап 5 по брифу §10 | не делегирует и не принимает свою работу |
 
 Правила независимости:
 
@@ -35,10 +35,13 @@
    - агент Workflow: `workflow:<label>` (label задаёт запускающий, §8.3);
    - Codex: `codex:<thread_id>`;
    - основная сессия Claude Code: `claude-code:<uuid>`, где uuid — каталог сессии в пути scratchpad;
+   - субагент основной сессии: `claude-code:<uuid>/agent:<name>` (F40; так шли все исполнители пилота);
    - сборка старше скилла: `history:<ASSET_ID>/<run-dir>`.
 3. Приёмщик получает только перечисленное в §2.3: каталог кадров (с листом и `tone.json`), машинные отчёты, эталон
-   качества, поля заявки, рубрику (этот файл) и, начиная с r2, предыдущую карточку. Отчёт исполнителя в свободной
-   форме, чат, `git log` и брифы ему не передаются.
+   качества, поля заявки, выдержку bake-профиля и строки входа из `acceptor-inputs.json` (§8.1 п.3), рубрику (этот
+   файл) и, начиная с r2, предыдущую карточку и список её пунктов. Отчёт исполнителя в свободной форме, его статус
+   пунктов («закрыто»), заметки профилей (`note`, `status_note`), чат, `git log` и брифы ему не передаются (F118,
+   F147).
 4. Повторная приёмка идёт тем же профилем первого приёмщика, что r1, чтобы коэффициенты были сравнимы. Если «Sol 6.1
    xhigh» был выбран на r1, а на r2 его вызвать нельзя, срабатывает гейт стопа SKILL.md §5 п.2. Если Sol не
    запускается уже на r1, вся приёмка ассета идёт профилем «Opus xhigh», причина пишется в отчёт запускающего
@@ -71,8 +74,11 @@ H2-bake без look-dev и кандидат `skeletal-candidate` не прини
 
 ### 2.2 Предусловия (проверяет запускающий до съёмки)
 
-- Выход этапа 3 полон: все стадии `run_h2_bake.py` дали маркер и код 0. Probes 7/7 на .blend и FBX
-  (`probes-report.json` `passed: true`). У look-dev и TeamAccent `passed: true` (HANDBOOK §4.3–4.4, §8). Среди отчётов
+- Выход этапа 3 (этапа 5) сдан по чек-листу HANDBOOK §4.4 «Сдача модели» (RA-09): тон, свои крупные планы,
+  `base_seethrough`, зазор «наездников», дымовой прогон клипов — числа в `STAGE3`/`STAGE5[]` заявки.
+- Выход этапа 3 полон: все стадии `run_h2_bake.py` дали маркер и код 0. Пробы рига `n/N` на .blend и FBX
+  (`probes-report.json` `passed: true`, `#plausible` = `#total`; отчёт без `total` — прежние 7/7). У look-dev и
+  TeamAccent `passed: true` (HANDBOOK §4.3–4.4, §8). Среди отчётов
   look-dev есть `measure-report.json` (стадия `ld_measure`, `tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py:44`
   `LD_ORDER`): из него съёмка строит `tone.json` (§3). У героя без него съёмка даёт код 1; флаг `--allow-no-tone` —
   только ассет старше `ld_measure` (форки Arthur, Merlin, Harpy; калибровка §12).
@@ -80,8 +86,10 @@ H2-bake без look-dev и кандидат `skeletal-candidate` не прини
   (`references/concept-sheet.md`) и рядом его `checks-report.json` (по нему съёмка строит `compare-*`, §3). У ассета
   старше скилла листа нет — его рисует `check_concept_views.py --sheet --out <каталог>` по набору видов (§12 шаг 1);
   исходные виды не меняются.
-- Есть заявка `ASSET_DIR/asset-card.yaml` с полями `ANCHORS`, `PALETTE`, `WEAPON_HAND`, `SIDE_VIEW`,
-  `POLY_BUDGET`, `UE_NAMES`, `QUALITY_REFERENCE`, `ROLE` (SKILL.md, этап 0).
+- Есть заявка `ASSET_DIR/asset-card.yaml` с полями `ANCHORS_EN` (нет — `ANCHORS`, F39), `PALETTE`, `WEAPON_HAND`,
+  `SIDE_VIEW`, `POLY_BUDGET`, `UE_NAMES`, `FIGURE_HEIGHT_M` (и `FIGURE_BOUNDS_TOP_M`, если деталь тела выше головы),
+  `QUALITY_REFERENCE`, `ROLE` (SKILL.md, этап 0). Рост и `UE_NAMES` читают `acceptor_inputs.py` и пересчёт гейтов
+  `validate_card.py --check-files` (§4).
 - Каталог `art/pipeline-candidates/<ASSET_ID>/evidence/acceptance/<YYYYMMDD>-r<N>/` ещё не существует. Каталоги
   приёмки не перезаписываются: новая приёмка — новый `r<N>`.
 
@@ -89,8 +97,9 @@ H2-bake без look-dev и кандидат `skeletal-candidate` не прини
 
 1. Файлы `frames.json#files` (каталог `frames/`): кадры, `frames.json`, лист `sheet.png`, `compare-*` и, если есть,
    `tone.json`. Кадры `turn-*`, `close-*`, `pose-*`, `wire-*` (1200 × 1200) открываются в полном размере — это и есть
-   «1:1» рубрики. `sheet.png`, `compare-*` и `uv-layout.png` не больше 2000 px по любой стороне (съёмка уменьшает
-   больший лист), поэтому Read тоже показывает их целиком без уменьшения. Вырезки, увеличения и скрипты приёмщику не
+   «1:1» рубрики. `sheet.png`, `compare-*` и `uv-layout.png` не больше 1200 px по длинной стороне (ДС-8: с кадрами
+   1920–2000 px Sol терял WebSocket, RC-22, F97; наборы до 2026-10-14 — до 2000 px), поэтому Read тоже показывает их
+   целиком без уменьшения. Вырезки, увеличения и скрипты приёмщику не
    нужны и не разрешены: каждую зону модели показывают крупные планы `close-*` спереди и сзади (§3, таблица зон).
    Кроме `frames.json#files` приёмщик открывает только эталоны п.2 и отчёты п.3. Другие файлы каталога приёмки
    (`card*.json`, `final.json`, `acceptor-*`) он не открывает (§1 п.3).
@@ -104,9 +113,12 @@ H2-bake без look-dev и кандидат `skeletal-candidate` не прини
    У самой Medusa (`medusa-r1` калибровки) эталон рендера совпадает с кадрами, поэтому её T 2,0 значит «нет дефектов
    правил §5 п.1–7», а живопись проверяет только, что мотив узнаётся (меандр, змеи браслетов), а не его резкость
    (решение скилла по калибровке 2026-10-09, раунд 4).
-3. Отчёты §2.1 (только машинные JSON).
+3. Отчёты §2.1 (только машинные JSON). Bake-профиль приёмщик не открывает: его ключи для G-NAMES (`meshes`,
+   `materials.atlas`, `exports.fbx_preset`, `scale.figure_top_m`) приходят выдержкой без заметок исполнителя —
+   строки `{{BAKE_PROFILE_KEYS}}`, `{{HEIGHT_RULE}}`, `{{TA_REPORT}}` промпта (§8.1 п.3; F147, F152).
 4. Поля заявки из §2.2 и рубрику — §4–§7 этого файла.
-5. С r2 — предыдущую карточку (`previous_card`), чтобы проверить, закрыт ли `rework_fix_list`. Баллы ставятся по
+5. С r2 — предыдущую карточку (`previous_card`) и её пункты `{{PREV_FIX_LIST}}` (`rework_fix_list` и `known_issues`
+   словами прежнего приёмщика, без статуса исполнителя; F99), чтобы проверить, закрыт ли каждый. Баллы ставятся по
    свежим кадрам, а не переносятся (решение скилла).
 
 K2-кадры этапа 3 (`$BAKE/preview/frame-k2-*.jpg`) и листы проб (`$BAKE/preview/deform-*-fbx.jpg`) во вход приёмки
@@ -136,7 +148,7 @@ python tools/art/acceptance/capture_acceptance_set.py --fbx $LD/export/SK_<Key>_
     --sheet art/imagegen/concept-<content-key>-codex/sheet-<content-key>.png
 ```
 
-`--sheet` копирует лист в `frames/sheet.png` (шире 2000 px — уменьшает до 2000); свотчи палитры и виды инструмент
+`--sheet` копирует лист в `frames/sheet.png` (не больше 1200 px по длинной стороне, ДС-8); свотчи палитры и виды инструмент
 находит по `checks-report.json` рядом с листом и пишет в `frames.json#sheet` (`compare_palette_by`: `swatches` или
 `views`; `content_key`, `key_match` — ключ листа против `--key`). По видам листа строятся `compare-front/side/back.jpg`
 (`--side-view` — сторона side-вида из заявки, `left` → `turn-090`, `right` → `turn-270`). В `frames.json#accepted_object`
@@ -158,6 +170,11 @@ python tools/art/acceptance/capture_acceptance_set.py --fbx $R/export/SM_<Name>.
 `--out` удаляет только файлы с фиксированными именами. WARN «нет --sheet» — набор без листа: `validate_card.py` его не
 примет, съёмку повторить с `--sheet`.
 
+**Повторный цикл** (r ≥ 2; F151, RC-19). Съёмка сама сравнивает каждый кадр с одноимённым кадром
+`<дата>-r<N-1>/frames` рядом с `$E` (`--previous <каталог frames>` — явно, `--previous none` — не сравнивать) и пишет
+`frames.json#changed_vs_previous` (`changed`, `unchanged`, `same_fbx`; изменён — больше порога шума). Это вход
+запускающего (второй приёмщик, §8.5 п.1), а не основание балла.
+
 | Имя файла | Что на кадре | Для измерений |
 |---|---|---|
 | `turn-000.jpg` … `turn-315.jpg` (8 шт., орто, шаг 45°; 000 = спереди, 090 = левый бок `.L`, 180 = сзади, 270 = правый бок) | **полный рост** с подставкой, рендер EEVEE с BC + N + ORM, тональная кривая AgX | S, F, T |
@@ -168,13 +185,13 @@ python tools/art/acceptance/capture_acceptance_set.py --fbx $R/export/SM_<Name>.
 | `close-hands.jpg` | две панели: `hand.R` слева, `hand.L` справа, рамка 3 габарита кисти; только при арматуре | F, T |
 | `close-base.jpg` | подставка целиком со стопами, сверху-сбоку (az 30°, el 25°); без подставки — нижние 22 % модели | F, T |
 | `wire-front.jpg`, `wire-34.jpg`, `wire-back.jpg` | сетка треугольников на глине: спереди (az 0), 3/4 сверху (az 45°, el 15°) и сзади (az 180°: затылок, спина, плащ сзади) | F (и граница F/T, §5 п.3) |
-| `uv-layout.png` | UV0 всех мешей поверх затемнённого BC, границы островов жёлтые, подпись с покрытием; не больше 2000 px | справка к T (§5.3) |
+| `uv-layout.png` | UV0 всех мешей поверх затемнённого BC, границы островов жёлтые, подпись с покрытием; не больше 1200 px по длинной стороне | справка к T (§5.3) |
 | `pose-01.jpg` … `pose-04.jpg` | позы проб деформации из `rig_deform_probe.py`: 01 — `arm_l_raise` + `forearm_l_bend`, 02 — `arm_r_raise`, 03 — `spine_bend_fwd` + `head_turn`, 04 — `thigh_l_flex`; только при арматуре. Кадр позы — тоже **полный рост** (для дефектов F и T, которые поза открыла) | D (F, T — §5 правило 5) |
 | `pose-03b.jpg` | та же поза, что `pose-03`, с азимута, где оружие и голова разведены сильнее всего | D |
-| `sheet.png` | лист концепта с направляющими (и свотчами палитры, если у набора есть `palette.json`); не шире 2000 px | S |
+| `sheet.png` | лист концепта с направляющими (и свотчами палитры, если у набора есть `palette.json`); не больше 1200 px по длинной стороне | S |
 | `compare-front.jpg`, `compare-side.jpg`, `compare-back.jpg` | вид листа слева, `turn-000` / `turn-090`\|`turn-270` (по `SIDE_VIEW`) / `turn-180` справа: обе фигуры одного роста (верх фигуры и низ подставки на жёлтых линиях 0 % и 100 %), направляющие через 10 % роста; есть, когда рядом с листом лежит его `checks-report.json` | S (контур, пропорции) |
 | `tone.json` | тон классов H2LD против концепта, яркость якорного класса (leave-one-out), семейство тона и потолок T (`tools/art/acceptance/README.md` §1.1); нет у прогонов старше `ld_measure` (`--allow-no-tone`) и у пропа | T, S (семейство) |
-| `frames.json` | `unmatched.acceptance-frames/1`: входы с sha256, `accepted_object`, параметры рендера, позы, `pose_checks` (3D-зазоры оружие–голова и оружие–тело в **каждой** позе), `sheet` (источник, sha256, `key_match`), `compare`, `tone`, проверки, предупреждения | D, вход |
+| `frames.json` | `unmatched.acceptance-frames/1`: входы с sha256, `accepted_object`, параметры рендера, позы, `pose_checks` (3D-зазоры оружие–голова и оружие–тело в **каждой** позе), `sheet` (источник, sha256, `key_match`), `compare`, `tone`, `changed_vs_previous` (r ≥ 2), проверки, предупреждения | D, вход |
 
 **Полный рост** — кадр `turn-*` или `pose-*` в масштабе 1:1 (1200 px, фигура около 1000 px), без вырезок.
 **Крупный план** — кадр `close-*` (увеличение примерно ×2 у головы и ног … ×7 у хвата против `turn-*`). Эти два слова в
@@ -236,14 +253,19 @@ python tools/art/acceptance/capture_acceptance_set.py --fbx $R/export/SM_<Name>.
   Справочные числа (не решающие) помечаются «справочно».
 - `source_defect: true` — только у FAIL-гейта, когда дефект в исходнике Tripo (§6 правило 2).
 - Все отчёты, на которые ссылаются гейты, перечисляются в `reports`.
+- **Гейты пересчитывает валидатор** (RB-05, f14ffced): `validate_card.py --check-files` считает G-TOPO, G-UV, G-TEX,
+  G-RIG и G-NAMES сам — по отчётам `reports`/`source` и заявке (`--asset-card`, по умолчанию
+  `art/pipeline-candidates/<ASSET_ID>/asset-card.yaml`). Статус карточки, расходящийся с пересчётом, — код 1 (§8.1
+  п.5). Не пересчитываются (WARN): проп и форк без `ld-fbx-report.json`; без заявки пересчёт неполный (`UE_NAMES` и
+  рост не сверяются).
 
 | Гейт | PASS, если | Источник (H2-герой) | Норма |
 |---|---|---|---|
 | **G-TOPO** | треугольники фигуры с оружием ≤ `POLY_BUDGET.figure_tris_max` и подставки ≤ `POLY_BUDGET.base_tris_max`; почти вырожденных треугольников финального FBX не больше 0,1 % треугольников каждого меша; швы в позах проб не открываются | **решает** `$LD/reports/ld-fbx-report.json`: `#checks.triangles_as_h21` (финальные числа FBX), `#meshes_pre_export.<меш>.near_degenerate_triangles` и `.triangles`, `#passed`; затем `$BAKE/reports/seams-report.json#passed`, `$BAKE/reports/close-report.json#passed`; **справочно** `$BAKE/reports/retopo-report.json#checks.near_degenerate_faces` | заявка `POLY_BUDGET` (дефолт GD-058), HANDBOOK §2.10, §4.3 (`retopo`, `close`, `seams`) |
 | **G-UV** | 0 перекрытий, зазор островов не меньше нормы | `$BAKE/reports/uv-report.json#checks.raster_overlap_px`, `#checks.island_gap_px_at_4k`, `#checks.no_folded_uv_triangles` | HANDBOOK §4.2 `uv`, §4.3 стадия `uv` |
 | **G-TEX** | отгружаемые 2K-карты H2LD: размеры 2K; MatID валиден; металл ORM.B бинарен по классам; N = DirectX и единичной длины; AO не константа; TeamAccent в допуске | **решает** `$LD/reports/ld-maps-report.json` (он пишет отгружаемые `T_<Key>_H2LD_2K_*`): `#passed`, `#checks.matid_values_valid`, `#checks.matid_decodes_to_labels_4k`, `#checks.orm_metallic_binary_per_class_4k`; размер и sha256 — по карте: **BC, ORM, MatID, Edge** — `ld-maps-report.json#outputs.<файл>.px` = [2048, 2048] и `.sha256` = `accepted_object`; **N** — у неё в `#outputs` только `copied_from` и `sha256` (ключа `px` нет, это не FAIL): мост `#pins.2K_N.sha256` = `#outputs.T_<Key>_H2LD_2K_N.png.sha256` = `accepted_object` → размер `$BAKE/reports/textures-report.json#outputs.T_<Key>_H2_2K_N.png.px` = [2048, 2048] (и `#checks.sizes_2k`), DirectX и длина — `#checks.dx_equals_opengl_g_inverted_2k`, `#checks.normal_length_2k`; **TeamAccent_2K** — `$LD/reports/ld-team-accent-report.json#outputs.T_<Key>_H2LD_TeamAccent_2K.png.px` и `.sha256`, `#passed`; AO — `textures-report.json#checks.orm_occlusion_baked_not_constant` (канал R ORM look-dev переносит из bake без изменений) | HANDBOOK §2.4, §2.9, §4.3 стадия `textures`, §4.4 |
-| **G-RIG** | кости по контракту (17, у героя без оружия 16), ≤ 4 влияний, нет невзвешенных вершин, probes 7/7 на .blend и FBX, validate PASS, риг H2LD = риг H2 | `$BAKE/reports/rig-report.json#checks.bones_and_parents_as_profile`, `#checks.max_influences`, `#checks.no_unweighted_vertices`; `$BAKE/reports/probes-report.json#plausible`, `#validate_clip_v2.result`; `$BAKE/reports/validate-skeletal-mesh-v2.json#result`; мост к H2LD — `$LD/reports/ld-fbx-report.json#checks.bones_and_parents_as_h21`, `#checks.bone_heads_tails_as_h21`, `#checks.positions_and_uv0_per_loop_as_h21` | HANDBOOK §2.6, §4.3 стадии `rig`/`probes`; `docs/art-pipeline/rig/rig-contract.json` |
-| **G-NAMES** | (1) имена файлов FBX и текстур = `UE_NAMES` заявки; (2) имена мешей **внутри** FBX = блок `meshes` bake-профиля; (3) объект арматуры `SKEL_UM_Humanoid`; (4) один слот на меш, его имя = `materials.atlas` bake-профиля; (5) экспорт по пресету UM_FBX_v1 (фронт +X, масштаб 1, высота фигуры = `scale.figure_top_m` профиля × 100 uu, а он — бюджет роли HANDBOOK §2.10 ± 1 %) | `$LD/reports/ld-fbx-report.json#exports` (пути FBX), `#meshes_pre_export` (ключи = имена мешей, `.material_slots`), `#roundtrip.ld.skeletal.armature_objects`, `#checks.export_frame_face_points_along_rotated_front_ue_plus_x`; `ls $LD/textures/` против `UE_NAMES`; `$BAKE/reports/rig-report.json#checks.material_slots`, `#checks.unit_scale_1_and_height` (`measured.skeletal_top_cm` = `expected`, Medusa 55,009 при бюджете 55); профиль `meshes`, `materials.atlas`, `exports.fbx_preset`, `scale.figure_top_m` | HANDBOOK §2.1–2.3, §2.5, §2.10 |
+| **G-RIG** | кости по контракту (17, у героя без оружия 16), ≤ 4 влияний, нет невзвешенных вершин, пробы `n/N` на .blend и FBX (`#plausible` = `#total`: прежние 7 + расширенные без `skipped`; отчёт без `total` — 7/7), validate PASS, риг H2LD = риг H2 | `$BAKE/reports/rig-report.json#checks.bones_and_parents_as_profile`, `#checks.max_influences`, `#checks.no_unweighted_vertices`; `$BAKE/reports/probes-report.json#passed`, `#plausible`, `#total`, `#validate_clip_v2.result`; `$BAKE/reports/validate-skeletal-mesh-v2.json#result`; мост к H2LD — `$LD/reports/ld-fbx-report.json#checks.bones_and_parents_as_h21`, `#checks.bone_heads_tails_as_h21`, `#checks.positions_and_uv0_per_loop_as_h21` | HANDBOOK §2.6, §4.3 стадии `rig`/`probes`; `docs/art-pipeline/rig/rig-contract.json` |
+| **G-NAMES** | (1) имена файлов FBX и текстур = `UE_NAMES` заявки; (2) имена мешей **внутри** FBX = блок `meshes` bake-профиля; (3) объект арматуры `SKEL_UM_Humanoid`; (4) один слот на меш, его имя = `materials.atlas` bake-профиля; (5) экспорт по пресету UM_FBX_v1 (фронт +X, масштаб 1); рост — верх `SK_<Key>_H2_Body` **без оружия** = `FIGURE_HEIGHT_M` заявки ± 1 %, деталь тела выше головы (рога, гребень) — `FIGURE_BOUNDS_TOP_M` ± 1 % (HANDBOOK §2.10; F41, F78) | `$LD/reports/ld-fbx-report.json#exports` (пути FBX), `#meshes_pre_export` (ключи = имена мешей, `.material_slots`), `#roundtrip.ld.skeletal.armature_objects`, `#checks.export_frame_face_points_along_rotated_front_ue_plus_x`; `ls $LD/textures/` против `UE_NAMES`; `$BAKE/reports/rig-report.json#checks.material_slots`; рост — `$LD/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.<Body>.bounds_m.max[2]` (строка `{{HEIGHT_RULE}}`), справочно `rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm` (верх с оружием, Medusa 55,009 при бюджете 55); выдержка профиля `meshes`, `materials.atlas`, `exports.fbx_preset`, `scale.figure_top_m` (строка `{{BAKE_PROFILE_KEYS}}`) | HANDBOOK §2.1–2.3, §2.5, §2.10 |
 
 Уточнения:
 
@@ -263,12 +285,23 @@ python tools/art/acceptance/capture_acceptance_set.py --fbx $R/export/SM_<Name>.
   `SK_<Key>_H2.fbx`. На отгружаемый `SK_<Key>_H2LD.fbx` они переносятся мостом `ld-fbx-report.json#checks`:
   `bones_and_parents_as_h21`, `bone_heads_tails_as_h21`, `positions_and_uv0_per_loop_as_h21` (риг, кости и геометрия
   H2LD = H2). Все три `passed` — обязательны; без них G-RIG — FAIL.
+- **G-RIG: пробы `n/N`** (h2-bake 0.8.0, 00f358c7, f04ee771). К прежним 7 добавлены расширенные (правое предплечье,
+  голени, стопы, скрутка кисти, поворот кости оружия; RB-08). Гейтом они служат только при `profile_version ≥ 2`
+  (новый герой, ДС-5); у v1 (Medusa, пилот) гейт — прежние 7/7, а упавшая расширенная проба — WARN
+  `probes-report.json#extended_warnings`, запись в `known_issues` (`item: "G-RIG"`). `rig.probe_skip` профиля (фигура
+  без голеней и стоп, Leshen) выводит пробу из N; прежние 7 пропускать нельзя. Предел разгибания скина (локоть Angel
+  > ~141°, F122) пробы не меряют.
 - **G-NAMES: что решает.** Пункт (3) — `ld-fbx-report.json#roundtrip.ld.skeletal.armature_objects` (имя объекта арматуры
   в отгружаемом FBX). `rig-report.json#checks.armature_object_is_bone0_name` справочный: при повторном импорте в сцену,
   где имя уже занято, Blender добавляет `.001` (Medusa: `SKEL_UM_Humanoid.001` при `passed: true`). Пункт (1) — каждое
   имя `UE_NAMES` есть в `ls $LD/textures/` и в `#exports` (включение, не равенство: 4K-мастера, `TeamMask`,
   `N_OpenGL`, `MatLUT` в каталоге не мешают). Bake-профиль (`meshes`, `materials.atlas`, `exports.fbx_preset`) — не
-  отчёт: на него ссылается `note` («профиль `<путь>`#meshes = …»), в `reports` он не входит.
+  отчёт: на него ссылается `note` («профиль `<путь>`#meshes = …»), в `reports` он не входит. Приёмщик видит не профиль,
+  а его выдержку `{{BAKE_PROFILE_KEYS}}` (§8.1 п.3). Пункт (5), рост: верх тела без оружия, а не `scale.figure_top_m`
+  (у поднятого меча это кончик клинка: Angel 55,9 uu, +1,6 %; F41); строка `{{HEIGHT_RULE}}` даёт число и правило.
+- **TeamAccent_2K** решает отчёт того прогона, который дал принимаемую карту: тот же look-dev или отдельный прогон
+  TeamAccent (`-teamaccent-b`); прежний `passed: false` в look-dev прогоне — история (F38). Какой отчёт, называет
+  строка `{{TA_REPORT}}`.
 - **G-TOPO решает финальный FBX** (решение скилла по калибровке 2026-10-09). `retopo-report` меряет грани до
   триангуляции и экспорта (`st_retopo.py:93`, порог профиля `degenerate_area_m2`), `ld-fbx-report` — треугольники
   отгружаемого FBX с площадью < 1e-4 см² (`tools/tripo-pipeline/blender/candidate_build/measure.py:180-189`); UE такие
@@ -469,6 +502,10 @@ S < 1,5 в Blender не лечится (§9.4) и ведёт к возврату
 нормальной плотности сетки на `wire-*` (дефект скульпта исходника Tripo, а не retopo) — тоже F по факту; в пункте
 `rework_fix_list` поле `tool` = «исходник Tripo: форма» (§9.3).
 
+Жёсткая часть-«наездник» (ворона на руке, щит), которая в покое висит с видимым зазором от тела (Leshen — 2,9 см у
+предплечья), — дефект F по правилам п.6–7, а не `known_issues` «так выглядит»: в клипе такая часть отрывается, и вето D
+клипа отправило модель на поздний фикс (F137; `tool` — `prepare.part_offsets_m`, §9.3).
+
 ### 5.3 T — текстуры
 
 Кадры: все `close-*`, `turn-*`; `pose-*` — для дефектов, которые открыла поза (п.5); эталон — `QUALITY_REFERENCE` и
@@ -478,7 +515,9 @@ S < 1,5 в Blender не лечится (§9.4) и ведёт к возврату
 светлее живописи концепта, и якоря «тон ушёл» без нормировки экспозиции не различить. Источник тона — `frames/tone.json`
 (из `$LD/reports/measure-report.json` стадии `ld_measure`; пороги и поля — `tools/art/acceptance/README.md` §1.1).
 Балл T не выше `tone.json#t_cap`: 1,0 — основной класс (≥ 10 % пикселей) вне допуска, 1,5 — только второстепенный,
-2,0 — все в допуске. Вне допуска — яркость вне 0,80–1,25 от концепта или тон дальше 15°.
+2,0 — все в допуске. Вне допуска — яркость вне 0,80–1,25 от концепта или оттенок дальше 15°. Оттенок проверяется
+только у хроматических медиан (насыщенность концепта и H2LD ≥ 0,15): оттенок почти серого — шум (сталь Angel, sat 0,02,
+давала dHue −114°); поле строки `hue_checked` (RB-06, f14ffced).
 
 - **Яркость основного и якорного класса** (решение скилла по калибровке 2026-10-09, раунд 3). `ld_measure` нормирует
   экспозицию по якорному классу (`exposure.mode = anchor_class`, Medusa — `linen`), и его `y_ratio` = 1 по построению.
@@ -488,7 +527,8 @@ S < 1,5 в Blender не лечится (§9.4) и ведёт к возврату
 - **Семейство тона** — поле `family` класса и `family_changed_main` (§5.1, термины): смена семейства — S, светлота и
   насыщенность внутри семейства — T через `t_cap`.
 - Классы `status: floor` (концепт темнее физического пола альбедо, `ld-maps-report.json#grade.median_floor_applied`)
-  T не снижают и идут в `known_issues`.
+  T не снижают и идут в `known_issues`. Основной класс на `floor` (пальто Angel читалось серо-бурым против почти
+  чёрного концепта) — в той же записи пометка «этап 7: тон по UE-съёмке» (F42).
 - **Нет `tone.json`.** У героя это возможно только с `--allow-no-tone` (ассет старше `ld_measure`: форки, калибровка);
   новый герой без `measure-report.json` не снимается (§2.2). Тогда тон T не снижает; заметный на глаз сдвиг тона
   основного класса пишется в `known_issues` с пометкой «тон: нет measure-report, сверка — UE-съёмка этапа 7», а в
@@ -655,8 +695,10 @@ pass на этой границе (8,1 и 8,3) требует второго п�
   `references/animation-vfx-sfx.md` §10.5).
 
 Нумерация `r<N>` сквозная для модели ассета и не обнуляется после возврата на этап 1 или 2 (решение скилла). Возврат тоже
-тратит цикл. Поэтому приёмок модели не больше трёх (r1–r3), а после r3 — эскалация (§11). Лимиты концепта и Tripo
-считаются отдельно (SKILL.md §5 п.4).
+тратит цикл. Поэтому приёмок модели не больше трёх (r1–r3), а после r3 — эскалация (§11). Исключение — **поздний
+фикс** (RC-06): дефект модели, который вскрыла приёмка клипов уже после `pass` модели, идёт на этап 5 и новую приёмку
+модели. Он тратит цикл модели, если цикл остался; если циклов нет — один раз на фигуру сверх лимита (`r4`; не-`pass`
+на нём — `escalate_user`, `validate_card.py` считает так же; `references/animation-vfx-sfx.md` §10.5). Лимиты концепта, клипа и Tripo считаются отдельно (SKILL.md §5 п.4).
 
 ## 7. Карточка `unmatched.asset-acceptance/2`
 
@@ -681,8 +723,8 @@ pass на этой границе (8,1 и 8,3) требует второго п�
 | `verdict_reason` | обязателен при любом `verdict`, кроме `pass` (§6); у `pass` поле не пишется |
 | `rework_fix_list` | только F, T, D ниже 2 и FAIL-гейты (S никогда: в Blender не правится, валидатор отвергает); пункт = `{item, frame, fix, tool}`, других ключей нет; `item` — `F`, `T`, `D` или id гейта (`G-UV`). При `rework_blender` — не пустой и покрывает каждый FAIL-гейт, каждое измерение < 1,0, а при `score` < 8,0 — каждое из F, T, D ниже 2,0 (`validate_card.py`). При `pass` и при возврате по S (правило 1) — пустой массив. У ассета, собранного форком (`h2_bake_arthur` и т. п.), `tool` указывает ключ **генерического** bake-профиля: доработка форка — новая сборка этапа 3 генерическим `h2_bake` (§9.1) |
 | `known_issues` | необязательный массив `{item, frame, note}` (других ключей нет): замечания, которые вердикт не меняют, но должны дойти до доработки и этапа 7 — мелочи на крупных планах при pass, классы `floor` из `tone.json`, справочные числа гейтов (почти вырожденные треугольники), касание оружия в позах проб (`pose_checks.*_contact`), тон без `tone.json`, а при возврате по S — замечания F, T, D ниже 2,0; `item` — измерение или гейт, `frame` — из `frames.files` |
-| `acceptor` | `{profile: "Opus xhigh" \| "Sol 6.1 xhigh", session_id}`; соответствие поля заявки `ACCEPTOR_PROFILE` (SKILL.md §7.2): `opus-xhigh` → `"Opus xhigh"`, `sol-6.1-xhigh` → `"Sol 6.1 xhigh"`. У `card-2.json` второго приёмщика — другой профиль (§8.5) |
-| `executor_session_id` | id сессии исполнителя (§1 п.2), ≠ `acceptor.session_id` |
+| `acceptor` | `{profile: "Opus xhigh" \| "Sol 6.1 xhigh", session_id}` — профиль **фактического** запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, а заявку запускающий правит на факт (F76, F119: в пилоте заявки держали `opus-xhigh` при приёмках Sol); соответствие поля заявки (SKILL.md §7.2): `opus-xhigh` → `"Opus xhigh"`, `sol-6.1-xhigh` → `"Sol 6.1 xhigh"`. У `card-2.json` второго приёмщика — другой профиль (§8.5) |
+| `executor_session_id` | id сессии исполнителя (§1 п.2; субагент — `claude-code:<uuid>/agent:<name>`, F40), ≠ `acceptor.session_id` |
 | `decided_by` | `"delegated (ВР-реестр 2026-10-06)"` |
 | `status_note` | при `pass` — «художественно принято, по делегированию» со ссылкой на `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md` (валидатор ищет подстроку «по делегированию»); иначе — пустая строка или короткая пометка |
 
@@ -848,21 +890,35 @@ rework_blender`).
    ```
 3. Заполнить промпт приёмщика §8.2 и сохранить его как `$E/acceptor-prompt.md` (решение скилла: промпт хранится рядом с
    карточкой, чтобы приёмку можно было повторить). `{{ACCEPTOR_PROFILE}}` — строка enum схемы, а не значение заявки:
-   `opus-xhigh` → `Opus xhigh`, `sol-6.1-xhigh` → `Sol 6.1 xhigh`. `{{FRAMES_FILES_JSON}}` — JSON-массив
-   `frames.json#files` (там уже есть `frames.json`, `sheet.png`, `compare-*` и, если создан, `tone.json`). Все
-   плейсхолдеры заполняются до вызова; незаполненный `{{…}}` в промпте — ошибка запускающего, приёмщика не вызывать.
+   `opus-xhigh` → `Opus xhigh`, `sol-6.1-xhigh` → `Sol 6.1 xhigh`; ставится профиль, который реально запускается
+   (F76, F119). `{{FRAMES_FILES_JSON}}` — JSON-массив
+   `frames.json#files` (там уже есть `frames.json`, `sheet.png`, `compare-*` и, если создан, `tone.json`).
+   Плейсхолдеры `{{UE_NAMES}}`, `{{BAKE_PROFILE_KEYS}}`, `{{HEIGHT_RULE}}`, `{{TA_REPORT}}`, `{{ANCHORS}}`,
+   `{{PREV_FIX_LIST}}` — дословно из выдержки (W2-d, 42ed7951; RA-10, F38, F39, F41, F99, F147, F152):
+   ```bash
+   python tools/art/acceptance/acceptor_inputs.py --frames $E/frames --print   # → $E/acceptor-inputs.json#placeholders
+   #   --asset-card <yaml> — заявка не в каталоге ассета; --previous-card <card.json> | none — прежняя карточка
+   #   (по умолчанию <дата>-r<N-1>/ рядом с $E, при паре — final.json#source_card); код 1 — ошибка входа
+   ```
+   Выдержка берёт из bake-профиля только ключи G-NAMES и вырезает заметки исполнителя (`note`, `*_note`, `history`);
+   `acceptor-inputs.json` коммитится с карточкой, приёмщик его не открывает. WARN выдержки читать до вызова: «TeamAccent
+   … не найден» — строка G-TEX TeamAccent_2K будет FAIL (сначала найти прогон TeamAccent), «bake-профиль изменён после
+   look-dev» — вход не тот. Все плейсхолдеры заполняются до вызова; незаполненный `{{…}}` в промпте — ошибка
+   запускающего, приёмщика не вызывать.
 4. Вызвать приёмщика выбранным профилем (§8.3 или §8.4). Приёмщик возвращает только JSON.
 5. Записать ответ **без изменений** в `$E/card.json` (это делает запускающий, не приёмщик). Единственная разрешённая
    правка — у «Sol 6.1 xhigh»: `acceptor.session_id` `codex:pending` → `codex:<thread_id>` из первого события
    `acceptor-events*.jsonl` (`{"type":"thread.started","thread_id":…}`; §8.4); больше ничего в карточке не меняется,
-   правка пишется в отчёт запускающего. Сбой окружения Codex (§8.4, «Сбой песочницы») — не ответ приёмщика: карточку не
-   записывать и не проверять, попыткой не считать. Затем проверить:
+   правка пишется в отчёт запускающего. Сбой окружения Codex (§8.4, «Сбой песочницы») и карточка, где `verdict_reason`
+   начинается со «СБОЙ ОКРУЖЕНИЯ» (кириллица не прочиталась, §8.2; RA-03), — не ответ приёмщика: карточку не
+   проверять, попыткой не считать, разбор оркестратором (ДС-2), затем тот же вызов заново. Затем проверить:
    ```bash
    python tools/art/acceptance/validate_card.py $E/card.json --print-verdict --check-files
    ```
    Код 0 — карточка валидна, `score` и вердикт согласованы с §6, файлы `accepted_object` совпадают по sha256, кадры,
    отчёты, `source` гейтов и `previous_card` существуют, T не выше `t_cap` из `tone.json`, `frames.files` =
-   `frames.json#files`, кадры сняты с FBX из `accepted_object`, `sheet.png` не подменён. `WARN: … не совпадает с ключом
+   `frames.json#files`, кадры сняты с FBX из `accepted_object`, `sheet.png` не подменён, статусы гейтов = пересчёт по
+   отчётам и заявке (§4, RB-05; `frames.json` и `tone.json` читаются всегда, RB-16). `WARN: … не совпадает с ключом
    ассета` — лист другого ассета: стоп (§3, «Сверка входа»), кроме негативного контроля §12. Код 3 и
    `needs_second_acceptor` — карточка валидна, но `pass` неустойчив: шаг 5а. Код 1 — запускающий баллы **не правит**.
    Он один раз вызывает нового приёмщика с тем же промптом и выводом валидатора (`FAIL: …`) в конце. Второй код 1
@@ -877,8 +933,9 @@ rework_blender`).
    повтор, что в п.5. Другой профиль не запускается после пробы (§8.4) — второй приёмщик того же профиля в новом
    контексте и флаг `--same-profile-ok` (в `final.json` будет `same_profile_fallback: true`, причина — в отчёт
    запускающего).
-6. Сверить гейты: открыть каждую ссылку `файл#ключ` из `gates.<G>.note` и убедиться, что ключ там есть и значение
-   совпадает со статусом. Расхождение — тот же повтор, что в п.5.
+6. Сверка гейтов — работа `--check-files` (п.5): расхождение статуса с пересчётом — код 1 и тот же один повтор.
+   Вручную (каждая ссылка `файл#ключ` из `gates.<G>.note`: ключ есть, значение совпадает со статусом) — только при WARN
+   «гейты не пересчитаны» (проп, форк) или «пересчитаны не целиком» (нет заявки). Расхождение — тот же повтор, что в п.5.
 7. Открыть (Read) кадры, на которые ссылаются баллы ниже 2. Затем вести маршрут по вердикту (при паре — по итогу):
 
 | `verdict` | Дальше |
@@ -889,8 +946,9 @@ rework_blender`).
 | `return_to_stage_2` | `references/tripo3d-stages.md`, новая генерация (цена с кнопки, журнал кредитов) |
 | `escalate_user` | §11 |
 
-8. Закоммитить каталог приёмки (`card.json`, `acceptor-prompt.md`, при паре `card-2.json`, `acceptor-prompt-2.md`,
-   `final.json`; `frames/*.jpg`, `uv-layout.png`, `sheet.png`, `tone.json`, `frames.json`) по правилам SKILL.md:
+8. Закоммитить каталог приёмки (`card.json`, `acceptor-prompt.md`, `acceptor-inputs.json`, при паре `card-2.json`,
+   `acceptor-prompt-2.md`, `final.json`; `frames/*.jpg`, `uv-layout.png`, `sheet.png`, `tone.json`, `frames.json`;
+   кадры не больше 1200 px, ДС-8) по правилам SKILL.md:
    поимённо, `git commit --no-verify`. Все файлы `frames.files` коммитятся: без них `--check-files` на чужой машине
    даёт FAIL.
 
@@ -907,16 +965,24 @@ rework_blender`).
 Ты — приёмщик. Ты НЕ исполнитель: ничего не правишь, не запускаешь Blender, скрипты и validate_card.py, не пишешь
 файлы. Твоя единственная выдача — JSON-карточка по схеме tools/art/acceptance/asset-acceptance-2.schema.json; файл
 card.json записывает и проверяет запускающий.
-Текстовые файлы читай в UTF-8 (в Windows PowerShell — `Get-Content <файл> -Raw -Encoding UTF8`).
+Текстовые файлы читай так, чтобы кириллица дошла целой. В песочнице codex PowerShell работает в Constrained
+Language Mode и пишет вывод в OEM-кодировке: `Get-Content -Encoding UTF8` даёт кракозябры, смена
+`[Console]::OutputEncoding` запрещена, `rg` нет. Рабочие способы (проверено пробой 2026-10-13): читай КАЖДЫЙ
+текстовый файл (рубрику, JSON-отчёты, frames.json, tone.json, предыдущую карточку) командой
+`Get-Content <файл> -Raw -Encoding OEM` (байты UTF-8 проходят без перекодировки и читаются верно) или
+`cmd /c type <файл>`. Кодовые точки (`[int[]][char[]]`) не нужны. Если кириллица рубрики всё равно пришла
+кракозябрами — это сбой окружения: не оценивай по догадкам, верни карточку, где verdict_reason начинается со слов
+«СБОЙ ОКРУЖЕНИЯ: кириллица не читается».
 Рубрика (обязательна к прочтению целиком): .agents/skills/3d-model-pipeline/references/acceptance-and-blender.md,
 разделы 3 (кадры, «полный рост» и «крупный план»), 4 (гейты), 5 (якоря и общие правила), 6 (формула и вердикт),
-7 (поля карточки).
+7 (поля карточки). Рубрика — ТОЛЬКО этот файл: SKILL.md и другие файлы скилла (.agents/skills/**, кроме
+acceptance-and-blender.md) не открывай и не учитывай.
 
 ## Вход
 - Кадры: {{E}}/frames/ — открой КАЖДЫЙ файл из {{E}}/frames/frames.json#files в полном размере (1:1), не только имена.
   Вырезки и увеличения не нужны: каждую зону модели показывают close-* спереди и сзади (таблица зон §3), сетку —
-  wire-front, wire-34 и wire-back. Кроме этих файлов открывай только эталоны и отчёты ниже. Другие файлы каталога
-  {{E}} (card*.json, final.json, acceptor-*) не открывай.
+  wire-front, wire-34 и wire-back. Кроме этих файлов открывай только эталоны, отчёты и предыдущую карточку ниже.
+  Другие файлы каталога {{E}} (card*.json, final.json, acceptor-*) не открывай.
 - Лист концепта: {{E}}/frames/sheet.png и compare-front/side/back.jpg (вид листа и кадр в одном росте, направляющие
   через 10 %). Сторона side-вида: {{SIDE_VIEW}} (compare-side сделан с {{SIDE_TURN}}).
   Палитра: frames.json#sheet.compare_palette_by — swatches (по свотчам) или views (по видам листа).
@@ -926,16 +992,23 @@ card.json записывает и проверяет запускающий.
 - Эталон качества: {{QUALITY_REFERENCE}}; эталон рендера:
   docs/art-pipeline/evidence/acceptance-calibration-20261009/medusa-r1/frames/close-*.jpg.
 - Отчёты: {{BAKE}}/reports/ и {{LD}}/reports/ (только JSON из §4 рубрики).
+- {{TA_REPORT}}
+- {{HEIGHT_RULE}}
 - Заявка: роль {{ROLE}}; якоря {{ANCHORS}}; палитра {{PALETTE}}; оружие в {{WEAPON_HAND}};
   POLY_BUDGET {{POLY_BUDGET}} (figure_tris_max — фигура с оружием, base_tris_max — подставка);
-  UE_NAMES {{UE_NAMES}}; bake-профиль {{BAKE_PROFILE}} (meshes, materials.atlas).
-- Предыдущая карточка: {{PREVIOUS_CARD}} (null на r1). Проверь, закрыт ли её rework_fix_list,
-  но баллы ставь заново по свежим кадрам.
+  UE_NAMES {{UE_NAMES}}; ключи bake-профиля {{BAKE_PROFILE_KEYS}} — выдержка, сам профиль не открывай (его
+  текстовые поля — записи исполнителя).
+- Предыдущая карточка: {{PREVIOUS_CARD}} (null на r1); баллы ставь заново по свежим кадрам.
+  Пункты прежнего цикла: {{PREV_FIX_LIST}}
+  Для каждого пункта в rationale его измерения: «rN <список> п.K: закрыт» или «не закрыт — что видно, кадр». Закрыт —
+  только если это видно на кадре того же вида, что в пункте (close-* для close-*); слова исполнителя тебе не
+  передаются.
 
 ## Порядок
 1. Гейты G-TOPO, G-UV, G-TEX, G-RIG, G-NAMES — только по отчётам, по таблице §4 (G-TOPO решает ld-fbx-report).
    Нет отчёта или ключа = FAIL; где ключ лежит для каждой карты G-TEX (N — в bake-отчёте через мост pins,
-   TeamAccent — в ld-team-accent-report), сказано в строке G-TEX и в «Уточнениях» §4. Запись гейта: {"status": ..., "source": "<путь от корня к решающему отчёту, без #>",
+   TeamAccent — в отчёте из строки TeamAccent входа), сказано в строке G-TEX и в «Уточнениях» §4. G-NAMES (5): рост —
+   по строке «Рост для G-NAMES» входа (верх тела без оружия). Запись гейта: {"status": ..., "source": "<путь от корня к решающему отчёту, без #>",
    "note": "<файл#ключ = значение; ...>"}. Если гейт FAIL из-за дефекта исходника Tripo (нет части, фантом,
    слитые части) — добавь "source_defect": true и опиши дефект в note. Других ключей у гейта нет.
 2. Баллы S, F, T, D — только по кадрам, по якорям §5 и общим правилам §5 п.1–9 (шаг 0,5; видны признаки и верхнего,
@@ -975,13 +1048,22 @@ card.json записывает и проверяет запускающий.
 ## Запрещено
 - Ставить балл по отчёту вместо кадра (кроме потолка T из tone.json) или гейт по кадру вместо отчёта.
 - Учитывать что-либо, кроме перечисленного во «Входе» (чат, git log, отчёты исполнителя в свободной форме, другие
-  карточки этого цикла).
+  карточки этого цикла, bake-профиль целиком, acceptor-inputs.json, SKILL.md и другие файлы скилла).
 - Смягчать якоря «потому что исправимо» или ужесточать «на всякий случай»: балл — это то, что видно.
 
 Ответ — только JSON карточки, без текста вокруг.
 ```
 
 `{{SIDE_TURN}}` — `turn-090.jpg` при `SIDE_VIEW` left, `turn-270.jpg` при right (§3: 090 = левый бок `.L`).
+`{{UE_NAMES}}`, `{{BAKE_PROFILE_KEYS}}`, `{{HEIGHT_RULE}}`, `{{TA_REPORT}}`, `{{ANCHORS}}`, `{{PREV_FIX_LIST}}` —
+`$E/acceptor-inputs.json#placeholders` (§8.1 п.3); `{{ANCHORS}}` — `ANCHORS_EN` заявки (F39). Прежний `{{BAKE_PROFILE}}`
+(весь профиль с заметками доработки) упразднён: через него слова исполнителя доходили до приёмщика (F147, F118).
+
+Блок чтения кириллицы и строка «Рубрика — ТОЛЬКО этот файл» обязательны в каждом промпте приёмщика (RA-03; дословно
+как у листа концепта, `references/concept-sheet.md` §11, и у клипа, `references/animation-vfx-sfx.md` §10). Без них
+Sol читал рубрику кракозябрами при коде 0 (F36, Angel r1) и открывал SKILL.md вне входов (F75); образец —
+`art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance/20261014-r2/acceptor-prompt.md:9-20`. Приёмщику Opus
+(Workflow) блок не мешает: он читает файлы своими инструментами.
 
 ### 8.3 Вызов «Opus xhigh» (по умолчанию)
 
@@ -999,9 +1081,13 @@ const card = await agent(args.prompt, {
 return card
 ```
 
-`args = {prompt: <текст $E/acceptor-prompt.md>, schema: <JSON tools/art/acceptance/asset-acceptance-2.schema.json>,
-label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"acceptor2-<ASSET_ID>-r<N>"`); `acceptor.session_id =
-"workflow:" + label`. Возвращённый объект запускающий записывает в `$E/card.json` (второй — в `$E/card-2.json`) без
+`args = {prompt: <текст $E/acceptor-prompt.md>, schema: <JSON tools/art/acceptance/asset-acceptance-2.output-model.schema.json>,
+label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"acceptor2-<ASSET_ID>-r<N>"`; у листа и клипа —
+`…output-concept…` / `…output-anim…`); `acceptor.session_id = "workflow:" + label`. Схема — та же строгая **выходная**
+схема своего вида, что у Sol (§8.4; RA-11, F102), а не полная `asset-acceptance-2.schema.json`: в полной
+`verdict_reason` — строка, `source_defect` — boolean, и Workflow-приёмщик вместо `null` писал строку `"null"` (F6, 13
+карточек из 13 в пилоте). В выходной схеме пустое поле — JSON `null`, `validate_card.py` читает его как «поля нет».
+Возвращённый объект запускающий записывает в `$E/card.json` (второй — в `$E/card-2.json`) без
 изменений. Если `agent()` вернул `null`, вызов повторяется один раз. Второй `null` —
 гейт стопа SKILL.md §5 п.2.
 
@@ -1022,7 +1108,7 @@ label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"accepto
 |---|---|
 | `-c 'windows.sandbox="unelevated"'` | **обязателен** на этой машине. Без него при открытом приложении песочница Windows не запускает ни одной команды: каждый `command_execution` — `Failed to create unified exec process: helper_unknown_error: setup refresh had errors` (`codex-windows-sandbox-setup.exe` не может сменить ACL файлов, которые держит приложение; `~/.codex/.sandbox/sandbox.<дата>.log`, «os error 32»). С флагом чтение работает, а `-s read-only` по-прежнему запрещает запись (проба `Set-Content` → `PermissionDenied`, файл не создан) |
 | `-s read-only` | приёмщик читает, но не пишет; перекрывает `sandbox_mode = "danger-full-access"` пользовательского `~/.codex/config.toml` |
-| `--ignore-user-config` | не грузить `~/.codex/config.toml` пользователя: его MCP-серверы (ошибки авторизации, недоступные `127.0.0.1:8123`/`:3845`), хуки и плагины — шум и риск независимости (в калибровке без флага приёмщик прочитал чужой `SKILL.md` плагина и пытался открыть браузер). Модель, усилие и песочница задаются флагами, авторизация берётся из `CODEX_HOME` как прежде. Проверено пробой и полной приёмкой 2026-10-09 (r4, 940 с, 31 картинка, карточка валидна) |
+| `--ignore-user-config` | не грузить `~/.codex/config.toml` пользователя: его MCP-серверы (ошибки авторизации, недоступные `127.0.0.1:8123`/`:3845`), хуки и плагины — шум и риск независимости (в калибровке без флага приёмщик прочитал чужой `SKILL.md` плагина и пытался открыть браузер). Модель, усилие и песочница задаются флагами, авторизация берётся из `CODEX_HOME` как прежде. Проверено пробой и полной приёмкой 2026-10-09 (r4, 940 с, 31 картинка, карточка валидна). Проектные скиллы `.agents/skills` exec видит и с флагом (Leshen и Achilles читали SKILL.md, F75) — их отсекает строка «Рубрика — ТОЛЬКО этот файл» промпта §8.2 |
 | `-m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"'` | профиль «Sol 6.1 xhigh» явно (без пользовательского конфига модель по умолчанию другая) |
 | `--output-schema …output-<kind>.schema.json` | строгая схема своего вида (ниже) |
 | `-o "$E/card.json"` | карточку пишет CLI, а не модель |
@@ -1062,8 +1148,11 @@ Get-Content "$E/acceptor-prompt.md" -Raw -Encoding UTF8 | & $exe exec --ignore-u
 ```
 
 **Кодировки.** `Out-File -Encoding utf8` в Windows PowerShell 5.1 пишет BOM: первую строку `acceptor-events.jsonl` читать
-с `encoding="utf-8-sig"` (Python) перед `json.loads`. Файлы с кириллицей приёмщик читает `Get-Content -Raw -Encoding UTF8`
-(без `-Encoding` 5.1 читает ANSI и портит текст) — эта строка есть в шаблоне промпта §8.2.
+с `encoding="utf-8-sig"` (Python) перед `json.loads`. Запускающий подаёт промпт `Get-Content -Raw -Encoding UTF8` (его
+PowerShell — обычный). Внутри песочницы Sol (codex-cli 0.162.0-alpha.17.2) PowerShell работает в Constrained Language
+Mode и выводит OEM-кодировку: `-Encoding UTF8` даёт кракозябры при коде 0, и первая приёмка Angel прочла рубрику мусором
+(F36). Поэтому приёмщик читает файлы `Get-Content <f> -Raw -Encoding OEM` или `cmd /c type <f>` — блок в шаблоне §8.2
+(RA-03). Карточка, где `verdict_reason` начинается со «СБОЙ ОКРУЖЕНИЯ», — сбой окружения, не попытка (§8.1 п.5).
 
 **Сбой песочницы — сбой окружения, а не попытка приёмщика.** Код выхода `codex exec` в этом случае 0, и приёмщик всё
 равно возвращает валидную по строгой схеме «карточку-заглушку» (калибровка, попытка без `windows.sandbox`: все баллы 0,
@@ -1079,7 +1168,9 @@ Get-Content "$E/acceptor-prompt.md" -Raw -Encoding UTF8 | & $exe exec --ignore-u
 **Безвредные события.** `{"type":"error","message":"Reconnecting... n/5 (… websocket closed by server before
 response.completed)"}` и затем переход на HTTPS (`Falling back from WebSockets to HTTPS transport` — в stderr или событием `item.completed` с
 `item.type=error`) — обрыв
-WebSocket, вызов продолжается и завершается (калибровка: 5 таких событий в обеих попытках). Это не отказ схемы.
+WebSocket, вызов продолжается и завершается (калибровка: 5 таких событий в обеих попытках). Это не отказ схемы. В
+пилоте «Reconnecting… 5/5» было во всех 7 приёмках модели (40 кадров по 1920 px, около 1–2 мин на приёмку); кадры не
+больше 1200 px (ДС-8) — мера против этого (RC-22, F97).
 
 **Если `--output-schema` отвергнут** (код ≠ 0 и нет `$E/card.json`, или событие `error` с упоминанием схемы —
 `output_schema`, `json_schema`, `response_format`) — тот же вызов **без** строки `--output-schema …`, промпт уже
@@ -1114,7 +1205,12 @@ WebSocket, вызов продолжается и завершается (кал
 Правила:
 
 1. Промпт тот же (§8.2), меняются только `{{ACCEPTOR_PROFILE}}` и `{{ACCEPTOR_SESSION_ID}}`. Первую карточку второй
-   приёмщик не получает: это не ревью первой оценки, а независимая оценка тех же кадров.
+   приёмщик не получает: это не ревью первой оценки, а независимая оценка тех же кадров. **Повторная приёмка** (r ≥ 2;
+   F151, RC-19): в `acceptor-prompt-2.md` перед «Порядком» запускающий добавляет строку «Кадры, изменённые с rN-1:
+   <`frames.json#changed_vs_previous.changed`>; остальные совпадают с кадрами rN-1 в пределах шума». Пункты фикса
+   `{{PREV_FIX_LIST}}` в промпте уже есть. Второй приёмщик сначала проверяет пункты фикса на изменённых кадрах, баллы
+   ставит по всем кадрам, как обычно (§2.3 п.5). Причина: на r3 Achilles кадры совпали с r2, кроме `pose-02` (доработка
+   только весов), а T упал 2,0 → 1,5 на побайтно том же `close-torso-back` и потребовал второго приёмщика.
 2. Кадры не переснимаются: `frames` у обеих карточек совпадает до имени, иначе `--second` даёт код 1.
 3. Статусы гейтов обязаны совпасть (гейты — из тех же отчётов). Расхождение — сверка §8.1 п.6 и повтор той карточки,
    где ссылка `файл#ключ` не подтвердилась.
@@ -1122,12 +1218,14 @@ WebSocket, вызов продолжается и завершается (кал
    приёмщик того же профиля в новом контексте, проверка с `--same-profile-ok`. Это запасной путь, а не стоп.
 5. Итог (`final.json`): `score` — минимум; вердикт — по карточке `source_card` (§6). Если итог `rework_blender`, бриф
    §10 берёт `rework_fix_list` из `source_card`.
-6. Структурный вывод Workflow (§8.3) отдаёт поля-«пустышки» строкой: `"clip": "null"`, `"verdict_reason": "null"`
-   (пилот 2026-10-13, 13 карточек из 13), и однажды — свободный текст в `known_issues[].item` вместо буквы измерения.
-   `validate_card.py` такие карточки отвергает. Запускающий перед записью `card-2.json` заменяет строку `"null"` на
-   `null` (только это; баллы и тексты не трогает), а промпт `acceptor-prompt-2.md` дословно напоминает: «`item` —
-   только `S`, `C`, `Q`, `P` (концепт) или `S`, `F`, `T`, `D` (модель); пустое поле — JSON `null`, не строка».
-   Прототип — `C:/tmp/concept-wave/finish_second.py`.
+6. Строки `"null"` вместо `null` (`"clip": "null"`, `"verdict_reason": "null"`; пилот 2026-10-13, 13 карточек из 13)
+   и однажды свободный текст в `known_issues[].item` давал Workflow-вывод с **полной** схемой (F6, F102).
+   `validate_card.py` такие карточки отвергает. С выходной схемой §8.3 пустое поле приходит JSON `null`, и очистка не
+   нужна. Она остаётся для карточек, полученных с полной схемой (до 2026-10-14), и как страховка: если строка `"null"`
+   всё же пришла, запускающий перед записью `card-2.json` заменяет её на `null` (только это; баллы и тексты не трогает)
+   — `python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]` (чистит и сразу считает
+   пару `--second`). Промпт `acceptor-prompt-2.md` дословно напоминает: «`item` — только `S`, `C`, `Q`, `P` (концепт)
+   или `S`, `F`, `T`, `D` (модель); пустое поле — JSON `null`, не строка».
 
 ## 9. Этап 5: протокол доработки в Blender
 
@@ -1137,6 +1235,16 @@ WebSocket, вызов продолжается и завершается (кал
 `rework_fix_list` карточки `source_card`). `known_issues` в доработку не входят. Исполнитель — лично «Opus xhigh», новый агент
 Workflow с брифом §10. Агент не делегирует, не запускает приёмщика и не ставит себе баллы. После него — новая
 приёмка этапа 4 новым агентом-приёмщиком (§1).
+
+Второй источник — **поздний фикс** (RA-08, RC-06; SKILL.md §5 п.4): карточка клипа, чей `rework_fix_list` несёт пункты
+с `tool` «этап 5 модели». Этот список пишет приёмщик клипа, а не оркестратор (у Achilles список r3 составил оркестратор,
+и пункт 2 оказался ложным FAIL, F149). Бриф §10 тот же, `{{SOURCE_CARD}}` — карточка клипа. Цикл модели тратится,
+если остался; если нет — один раз на фигуру сверх лимита (`r4`, §6). Маршрут клипов после доработки модели —
+`references/animation-vfx-sfx.md` §10.5.
+
+Что запущено на самом деле, записывается фактом (RA-21): механизм (`workflow` или `subagent`), модель, effort и id
+сессии — в `STAGE5[]` заявки (SKILL.md §7.2) и в отчёт брифа. В пилоте все 13 исполнителей были субагентами
+`claude-code:<uuid>/agent:<name>` без записанного effort; профиль «Opus xhigh» требования №3 это не отменяет.
 
 **Ассет, собранный форком** (`h2_bake_arthur`, `h2_bake_merlin`, `h2_bake_harpy`; решение скилла по калибровке
 2026-10-09, раунд 3). Форки не запускаются (HANDBOOK §1), поэтому `rework_blender` такого ассета — не правка форка, а
@@ -1162,7 +1270,10 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 
 ### 9.2 Обязательные правила
 
-1. **Только `rework_fix_list`.** Правки вне списка («заодно улучшу») запрещены.
+1. **Только `rework_fix_list`.** Правки вне списка («заодно улучшу») запрещены. Пункт закрыт, только когда это видно
+   на кадре того же вида, что у приёмщика (`close-*`, `pose-*` scratch-съёмки чек-листа HANDBOOK §4.4 «Сдача
+   модели»), а не по числу отчёта: двугранный угол когтей Leshen упал 49° → 37°, а приёмщик грани на крупном плане
+   видел (F100).
 2. **Новый run, новый профиль.** Прежние run-каталоги и закоммиченные профили не трогаются (HANDBOOK §0.1, §4.1).
    Имена (решение скилла; `<N+1>` — номер следующей приёмки):
    - профили: `build-profiles/<content-key>-h2-bake-h2-r<N+1>.json`, при необходимости
@@ -1170,6 +1281,9 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
      (`<content-key>-h2-bake/<k+1>`), а прежний профиль добавлен в `history.previous_profiles`;
    - run-каталоги: `<YYYYMMDD>-h2-bake-r<N+1>/`, `<YYYYMMDD>-h2-lookdev-r<N+1>/`.
    Не путать с UE-раундами `*-h2ld-r2-ue` у Medusa: это раунды look-dev в UE, а не циклы приёмки.
+   Новый bake-run собирается с `--reuse-from <прежний bake-run>` (ДС-7, HANDBOOK §4.1): стадии с неизменными блоками
+   профиля, входами и кодом берутся из прежнего прогона, пересчёт — с первой изменённой стадии (план
+   `work/reuse-plan.json`). Доработка «только веса» больше не гонит `prepare…textures` заново (RC-07).
 3. **Цепочка пересборки.** Look-dev читает bake-прогон только по sha256 (`source.run`, `source.sha256` профиля
    look-dev). Правка bake-профиля требует новый bake-run, новый look-dev-профиль с новыми пинами и новый TeamAccent.
    Правка только тона (look-dev `classes`/`grade`) требует новый look-dev-run и новый TeamAccent; bake-run остаётся прежним.
@@ -1179,8 +1293,11 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
    для коммита из живого Blender не берутся.
 5. **Общий код пайплайна** (`tools/tripo-pipeline/**`) правится только по HANDBOOK §0.1: новая опция профиля со старым
    значением по умолчанию плюс повтор детерминизма на Medusa (`--compare-with`).
-6. **Детерминизм.** Повтор нового bake-run в `C:/tmp/<ASSET_ID>-r<N+1>-repro` с `--compare-with` по правилу HANDBOOK
-   §4.3. Расхождение сверх допуска — остановка.
+6. **Детерминизм** (ДС-7, HANDBOOK §4.3). Повтор нового bake-run в `C:/tmp/<ASSET_ID>-r<N+1>-repro` с тем же
+   `--reuse-from` и `--compare-with`: сравниваются только пересчитанные стадии (`scope: recomputed_stages_only`).
+   Полный повтор — один раз на фигуру, на прогоне, который идёт в UE; изменился код (`--reuse-allow-code-drift`) —
+   полный повтор сразу. Код 1 `--compare-with` (расхождение сверх таблицы допусков) — модель дальше не идёт, разбор
+   оркестратором (ДС-2). Каталог повтора удалить сразу после `determinism-report.json` (HANDBOOK §8, «Очистка»).
 7. **Образцы кода** (только чтение): `tools/tripo-pipeline/blender/h2_bake/*` (`st_*.py`, `textures.py`, `materials.py`,
    `lookdev.py`, `lookdev_accent.py`), `tools/tripo-pipeline/blender/candidate_build/*` (`core.py` экспорт UM_FBX_v1,
    `rig.py`, `mesh_ops.py`, `closure.py`, `orientation.py`, `weapon.py`). Ручные форки `h2_bake_arthur/`, `h2_bake_merlin/`,
@@ -1194,24 +1311,32 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 ### 9.3 Где правится дефект
 
 Ключи — профили Medusa (`art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json`,
-`medusa-h2-lookdev.json`); смысл ключей — HANDBOOK §4.2 и §4.4. Модули указаны относительно
-`tools/tripo-pipeline/blender/`.
+`medusa-h2-lookdev.json`) и необязательные опции h2-bake 0.6–0.8 пилота (`prepare.part_offsets_m`, `base.*`,
+`textures.band_repaint`, `rig.cloth_shell`, look-dev `metal_f0`); смысл ключей — HANDBOOK §4.2 и §4.4. Модули указаны
+относительно `tools/tripo-pipeline/blender/`.
 
 | Дефект (измерение или гейт) | Что править в новом профиле | Модуль (чтение) |
 |---|---|---|
-| F: гранёность, грубая сетка лица, кистей, оружия; G-TOPO: треугольников больше бюджета | `retopo.target_tris`, `retopo.dense_regions` | `h2_bake/st_retopo.py` |
+| F: гранёность, грубая сетка лица, кистей, оружия; G-TOPO: треугольников больше бюджета | `retopo.target_tris`, `retopo.dense_regions`; сначала запас бюджета — итог `rig-report.json#meshes_pre_export.*.triangles` с крышками и оболочками против 45k (в пилоте 44 438 из 45 000 до правки, F89, F70); `dense_regions` даёт на 9–13 % меньше цели — ставить с запасом (F84) | `h2_bake/st_retopo.py` |
 | F: дыра или видимая крышка, просвет в позе; G-TOPO: seams FAIL | `closure.contact_caps` — отдельные утопленные веера, не вшивать в рваную петлю (HANDBOOK §7.2) | `h2_bake/st_close.py`, `st_seams.py` |
 | F (п.5, `known_issues`): крышка контакта, открытая позой пробы (платье под кулаком, бедро под ладонью) — в доработку только если она попала в `rework_fix_list` при `score` < 8,0 | `closure.contact_caps` нужной пары (`shape: fit`, `bulge_m`, `repaint_footprint`; Medusa — `dress_under_fist`) | `h2_bake/st_close.py`, `st_seams.py` |
 | F: вырез крышки подставки под стопой (виден, когда поза поднимает стопу) | `closure.rebuild_retopo_caps` для части подставки (Medusa — `base_hole`: крышки по точной кромке, `z_band_m`, `expect`) и `closure.contact_caps` подошв (`sole_l`, `sole_r`) | `h2_bake/st_close.py` |
 | F/T: вывернутая часть, чёрные пятна AO | `orientation.expected_inside_out_parts` (порог не ослаблять) | `h2_bake/st_prepare.py` |
 | T: шов через лицо или кисти, мыло на зоне; G-UV | `uv.texel_priority`, `uv.charts` (Smart UV запрещён) | `h2_bake/st_uv.py`, `charts.py` |
+| F: рваный или провисший низ подставки из исходника Tripo (F73, F83); зубцы кромки подставки или подошв (F104) | `base.flatten_bottom` `{}` (дефолты: `floor_quantile` 0,5, `band_m` 0,008, `falloff_m` 0,012); `base.rim_smooth.z_band_m` `[z0, z1]`; после `rim_smooth` проверить `close-report.json#checks.caps_hidden_at_rest` — сглаживание у крышки ломает гейт, тогда сузить `parts` (HANDBOOK §4.2) | `h2_bake/st_prepare.py`, `st_retopo.py`, `base_ops.py` |
+| F: жёсткая часть-«наездник» висит с зазором от тела (ворона Leshen, 2,9 см; F137) | `prepare.part_offsets_m` `{tripo_part_N: [dx, dy, dz]}` в метрах финальной рамки, ≤ 0,05 м, не подставка | `h2_bake/st_prepare.py` |
 | T: полосы и растяжки переноса | `bake.cage` | `h2_bake/st_bake.py`, `st_aux.py` |
+| T: мазки цвета соседа на полосе стыка (ворот, F107) — это текстура Tripo, `bake.cage` её не лечит | `textures.band_repaint` | `h2_bake/textures.py`, `materials.py` |
 | T: AO-пятна на частях, которые в анимации отходят | `bake.ao_exclusions` | `h2_bake/st_aux.py`, `textures.py` |
 | T: металл читается пластиком; G-TEX | `textures.materials` (металл-маска), `textures.ao_gate` | `h2_bake/textures.py`, `materials.py` |
-| T: тон класса заметно ушёл от листа | look-dev `classes`, `grade` | `h2_bake/lookdev.py` |
+| T: тон класса заметно ушёл от листа | look-dev `classes`, `grade`; итерации — по `_tone.py`, не одним линейным шагом `gain_suggestion` (F85; HANDBOOK §4.4) | `h2_bake/lookdev.py` |
+| T (из UE-съёмки этапа 7): металл бледный, «слоновая кость» вместо бронзы (F110, F120, F138) | look-dev `metal_f0` (F0 из медиан концепта и якоря skin, `worn.y_ratio` ≈ 2,5; HANDBOOK §4.4); эффект виден только в UE | `h2_bake/lookdev.py` |
+| T (из UE-съёмки этапа 7): кольцо команды на двухъярусной подставке пятнами (F143, F150) | `textures.team_mask.base_band.height_m` `[z0, z1]` + ключи профиля импорта UE (HANDBOOK §2.9) | `h2_bake/st_uv.py`, `base_ops.py` |
 | G-TEX: покрытие TeamAccent вне нормы | профиль TeamAccent | `h2_bake/lookdev_accent.py`, `st_team.py` |
 | D: плащ, подол или рукав растянуты клином за контур позы (своя кость, §5.4) | `rig.weights` для части ткани (переход весов с бедра или плеча на `hips`/`spine`), `rig.junctions`; веса не сглаживать (HANDBOOK §7.4) | `h2_bake/st_rig.py` |
 | D: кость тянет чужую зону, растяжение; G-RIG | `rig.bones` (по геометрии героя), `rig.weights`, `rig.junctions`, `rig.seam_pairs`; веса не сглаживать (HANDBOOK §7.4) | `h2_bake/st_rig.py`, `candidate_build/rig.py` |
+| F/D: рваная кромка руки под плащом или кирасой, видная при руке вперёд со спины (Achilles, «вырез плаща» — на деле срез руки Tripo; F129, F148) | `rig.junctions` рука\|плащ и рука\|кираса, полоса 0,03–0,04 м | `h2_bake/st_rig.py` |
+| D: одинарный лист ткани показывает изнанку в позах | сначала веса и стыки, затем `rig.cloth_shell` (HANDBOOK §4.2, П3-3) | `h2_bake/st_rig.py` |
 | G-NAMES: имена, слот | `exports`, `materials.atlas`, `textures.prefix`; look-dev `prefix`, `exports` | `h2_bake/st_rig.py`, `lookdev.py` |
 | F: тонкий элемент (тетива, древко, стрелы) оборван или не читается, хват в порядке | сначала средства профиля: `retopo.target_tris` и `retopo.dense_regions` для части оружия (`st_retopo.py:217-227`), `uv.texel_priority` (`st_uv.py:417`); режима утолщения в генерическом `h2_bake` нет | `h2_bake/st_retopo.py`, `st_uv.py` |
 | F/G-RIG: оружие без хвата — рукояти нет внутри кулака или древка нет в кисти | профилем не лечится: нужен мост-цилиндр (HANDBOOK §4.2 «Оружие», §7.1) | `candidate_build/weapon.py`, `h2_bake_arthur/repairs.py` (примеры) |
@@ -1255,7 +1380,8 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 .agents/skills/3d-model-pipeline/references/acceptance-and-blender.md §9 (прочитать целиком).
 
 ## Вход
-- Карточка: {{SOURCE_CARD}} (verdict rework_blender; при паре — source_card из {{E}}/final.json) и кадры {{E}}/frames/.
+- Карточка: {{SOURCE_CARD}} (verdict rework_blender; при паре — source_card из {{E}}/final.json; поздний фикс —
+  карточка клипа, только пункты с tool «этап 5 модели») и кадры {{E}}/frames/.
 - Заявка: {{ASSET_DIR}}/asset-card.yaml.
 - Текущие профили: {{BAKE_PROFILE}}, {{LOOKDEV_PROFILE}}, {{TEAMACCENT_PROFILE}}.
 - Текущие прогоны (только чтение): {{BAKE}}, {{LD}}.
@@ -1267,6 +1393,7 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 - Ничего вне списка (known_issues — не задача). Силуэт, пропорции, палитру, якоря и новые детали не трогать (§9.4).
 - Новые файлы профилей …-r{{N_NEXT}}.json с history.previous_profiles; новые run-каталоги
   {{DATE}}-h2-bake-r{{N_NEXT}} / {{DATE}}-h2-lookdev-r{{N_NEXT}}; прежние прогоны и закоммиченные профили не менять.
+  Bake-run — с --reuse-from {{BAKE}} (пересчёт с первой изменённой стадии, план work/reuse-plan.json; ДС-7).
 - Только headless run_h2_bake.py, по одной стадии, отчёт после каждой. Живой Blender — только осмотр.
 - Общий код tools/tripo-pipeline/** — только опцией профиля со старым дефолтом + детерминизм Medusa (HANDBOOK §0.1).
 - Образцы — h2_bake/*, candidate_build/*. blender/ASSET-MEDUSA-001/build_tripo_medusa.py и build_*.py — НЕ образец.
@@ -1278,32 +1405,44 @@ git (например, `art/pipeline-candidates/ASSET-MEDUSA-001/.gitignore`), �
 - Свои Blender-процессы остановить по PID.
 
 ## Готово, если
-- Все стадии нового bake-run (если он нужен), look-dev и TeamAccent дали маркер и код 0, probes 7/7, отчёты passed.
-- Повтор детерминизма по HANDBOOK §4.3 совпал.
-- Каждый пункт списка закрыт либо явно помечен «не закрыто: <причина>».
+- Все стадии нового bake-run (если он нужен), look-dev и TeamAccent дали маркер и код 0, отчёты passed.
+- Пройден чек-лист HANDBOOK §4.4 «Сдача модели» целиком — тот же, что на выходе этапа 3: тон (_tone.py код 0),
+  свои крупные планы (scratch-съёмка, Read каждого кадра), base_seethrough /2, зазор «наездников», дымовой прогон
+  клипов, детерминизм по ДС-7 (на r{{N_NEXT}} с --reuse-from — повтор только пересчитанных стадий, --compare-with
+  код 0; полный повтор — один раз на фигуру, на прогоне, который идёт в UE), пробы n/N, pytest зелёные.
+- Каждый пункт списка закрыт — это видно на кадре того же вида, что в пункте, — либо явно помечен «не закрыто:
+  <причина>».
 
 ## Отчёт (последнее сообщение)
+- Как ты запущен: механизм (workflow или subagent), модель, effort, id сессии.
 - Пути новых профилей и run-каталогов.
-- По каждому пункту: что изменено (ключ профиля: было → стало), какой отчёт и какое число это подтверждает.
+- По каждому пункту: что изменено (ключ профиля: было → стало), какой отчёт и какое число это подтверждает, какой
+  кадр scratch-съёмки это показывает.
+- Числа чек-листа «Сдача модели».
 - Что не закрыто и почему.
 Баллы и вердикт не ставь: повторная приёмка — новый агент-приёмщик, этап 4.
 ```
 
 После брифа запускающий:
 - проверяет, что изменились только новые профили и новые run-каталоги (`git status --short`);
-- снимает кадры новой приёмки `r<N+1>` по §3, указав в `BAKE`/`LD` новые каталоги;
+- пишет в `STAGE5[]` заявки цикл, run, профиль, `reuse_from`, `late_fix`, `source_card` и фактического исполнителя
+  (SKILL.md §7.2, RA-21);
+- снимает кадры новой приёмки `r<N+1>` по §3, указав в `BAKE`/`LD` новые каталоги (съёмка сама пишет
+  `changed_vs_previous` против `r<N>`);
 - вызывает нового приёмщика (§8);
-- коммитит профили, run-каталоги по HANDBOOK §8 и каталог приёмки.
+- коммитит профили, run-каталоги по HANDBOOK §8 и каталог приёмки; удаляет каталог повтора и scratch-съёмку
+  исполнителя (HANDBOOK §8, «Очистка»).
 
 ## 11. Эскалация после r3
 
-Срабатывает, если `r3` дал `escalate_user` — гейт стопа SKILL.md §5 п.4 (исчерпаны циклы модели). Тот же пакет
+Срабатывает, если `r3` (или `r4` позднего фикса, §6) дал `escalate_user` — гейт стопа SKILL.md §5 п.4 (исчерпаны
+циклы модели; второй дефект модели из клипов — тоже). Тот же пакет
 собирается при гейте стопа §5 п.2 на вызове приёмщика или исполнителя и при стопе SKILL.md §5 п.5 из §9.3 п.2 (оружие без хвата).
 Остановиться и передать решение пользователю. Третий цикл доработки не запускается.
 
 Пакет: `art/pipeline-candidates/<ASSET_ID>/evidence/acceptance/ESCALATION-<YYYYMMDD>.md` (решение скилла):
 
-1. Таблица по циклам r1–r3: гейты, S/F/T/D, `score`, `verdict`, профиль приёмщика (при паре — обе карточки и итог).
+1. Таблица по циклам r1–r3 (r4): гейты, S/F/T/D, `score`, `verdict`, профиль приёмщика (при паре — обе карточки и итог).
 2. Пары кадров «до/после» одних имён (`turn-*`, `close-*`, `pose-*`) по измерениям, которые не поднялись.
 3. Какие пункты `rework_fix_list` закрыты, какие нет и почему (из отчётов брифа).
 4. Потрачено: кредиты Tripo по журналу (`docs/game-design/visual/credits-ledger.json`), число вызовов приёмщика и
@@ -1466,7 +1605,7 @@ Medusa — по таблице §4 без замен (отчёты генери�
 Правила §6, устойчивый pass для трёх видов, пара карточек, сверка входа, тон и набор калибровки покрыты тестами:
 
 ```bash
-python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 2026-10-09, раунд 4: 142 passed
+python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 2026-10-14: 205 passed (раунд 4 — 142)
 ```
 
 `tests/test_validate_card.py` — правила вердикта и сверки полей; `tests/test_rules_round2.py` — раунд 2 (покрытие
@@ -1478,6 +1617,16 @@ python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 20
 диске = `frames.json#files`, обязательные кадры, `key_match`, зазоры оружия во всех позах). `tests/test_rules_round4.py` —
 раунд 4: `wire-back` у инструмента и валидатора, тени в `frames.json#render`, мост G-TEX для скопированной N на
 отчётах Medusa и пример карточки §7, который проходит `validate_card.py --check-files` против `medusa-r1`.
+
+Пилот 2026-10-13/14 (волны 1–2 доработки скилла):
+- `tests/test_rules_pilot.py` (W1-c, f14ffced) — оттенок только у хроматических медиан и CLI `_tone.py` (RB-06,
+  RB-19), `tone.json` и `frames.json` модели читаются всегда (RB-16), пересчёт гейтов по отчётам и заявке (RB-05);
+- `tests/test_probe_total.py` (f04ee771) — G-RIG: пробы против `probes-report.json#total` (`n/N`), отчёт без `total` —
+  7/7;
+- `tests/test_acceptor_inputs.py` (W2-d, 42ed7951) — выдержка `acceptor_inputs.py`: ключи G-NAMES без заметок
+  исполнителя, отчёт TeamAccent по sha карты, `ANCHORS_EN`, список прежнего цикла (F38, F39, F99, F147, F152);
+- `tests/test_capture_review.py` (W2-d) — кадры приёмщика не больше 1200 px (ДС-8) и
+  `frames.json#changed_vs_previous` (F151, RC-19); без Blender.
 
 ## 13. Та же механика у концепта и клипов
 
@@ -1499,8 +1648,9 @@ python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 20
 
 - Инструменты есть и проверены 2026-10-09 (раунды 3–4): `tools/art/acceptance/capture_acceptance_set.py`,
   `validate_card.py`, `asset-acceptance-2.schema.json`, `_tone.py`, `_framing.py` (описание —
-  `tools/art/acceptance/README.md`, тесты — `tools/art/acceptance/tests` и `tools/art/concept/tests`, 142 passed;
-  строгие схемы вывода `asset-acceptance-2.output-<kind>.schema.json` — `_output_schema.py`) и
+  `tools/art/acceptance/README.md`, тесты — `tools/art/acceptance/tests` и `tools/art/concept/tests`, 205 passed на
+  2026-10-14; строгие схемы вывода `asset-acceptance-2.output-<kind>.schema.json` — `_output_schema.py`; выдержка
+  входов приёмщика — `acceptor_inputs.py`) и
   `tools/art/concept/check_concept_views.py`. Поля карточки в §7 сверены со схемой: пример §7 проходит валидатор с
   кодом 0, а с каталогом кадров `medusa-r1` калибровки — и `--check-files` (sha256 `accepted_object`, `frames.json`).
   При расхождении этого файла со схемой выигрывает схема.
@@ -1511,8 +1661,12 @@ python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 20
   `compare-*`), форк (King Arthur H2LD, текстуры `*_BC_2K.png`: код 0 с `--allow-no-tone`, 31 файл; без флага —
   код 1) и проп (бочка `ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx` с `--no-base`, раунд 4 —
   код 0, 14 кадров + `uv-layout.png`; позы, `close-hands/torso/head-back/torso-back/legs/legs-back` не снимаются).
-  Кадры раундов 3–4 осмотрены 2026-10-09 (§12.1). Код 1 съёмки по-прежнему стоп HANDBOOK §0.3 п.3 (SKILL.md §5 п.6),
-  исправление — в инструменте, не в рубрике.
+  Кадры раундов 3–4 осмотрены 2026-10-09 (§12.1). Код 1 съёмки — разбор оркестратором, не вопрос пользователю
+  (HANDBOOK §0.3 п.3, SKILL.md §5 п.6; ДС-2), исправление — в инструменте, не в рубрике.
+- Съёмка не умеет (код-пробелы пилота, не в очереди волн 1–2): позу «рука вперёд» со спины или сбоку — кромку руки под
+  плащом Achilles нашла только приёмка клипов (F129); второй ракурс `pose-04` в сторону от щита (F77); крупный план
+  атакующей кисти или когтей при `WEAPON_HAND: none` (F74). До них эти зоны проверяет дымовой прогон клипов чек-листа
+  HANDBOOK §4.4 «Сдача модели».
 - Допуски тона (`_tone.py`: 10 % доли, 0,80–1,25, 15°, leave-one-out с опорой ≥ 10 % пикселей, семейство: 0,15 / 30° /
   0,20) откалиброваны на одном ассете (Medusa). Первый новый герой с `tone.json` — повод сверить `t_cap` с
   UE-съёмкой этапа 7.
@@ -1526,9 +1680,10 @@ python -m pytest tools/art/acceptance/tests tools/art/concept/tests -q      # 20
   повтор `-i` с `--` перед `-` работает; первое событие `--json` — `thread.started` с `thread_id`; 732–940 с на приёмку.
   `--ignore-user-config` проверен пробой и полной приёмкой (r4: Sol = Opus на `medusa-r1`, 8,1).
 - Не проверено на живом вызове:
-  - `agent()` Workflow со сложной JSON Schema (`$ref`, `$defs`, `allOf` с `if/then`) — калибровочные приёмщики «Opus
-    xhigh» раунда 3 вернули карточки, но их файлы в каталог калибровки не записаны (итог — только в README). Если схема
-    отвергнута, вызов делается без `schema`, с требованием «только JSON», а затем `validate_card.py`;
+  - `agent()` Workflow с выходной схемой `…output-<kind>.schema.json` (§8.3, с 2026-10-14) в репозитории не записан:
+    пилот (F102) ссылается на workflow `model-second-acceptor`, его скрипта в `tools/` нет — скрипт §8.3 и есть
+    эталон. С полной схемой Workflow отвечал строками `"null"` (F6, §8.5 п.6). Если схема отвергнута, вызов делается
+    без `schema`, с требованием «только JSON», а затем `validate_card.py`;
   - отказ строгой схемы и запасной вызов без `--output-schema` (§8.4) — отказа не было.
 - Насколько EEVEE-рендер кадров (BC + N с инвертированным для Blender зелёным + ORM, AgX) совпадает с тем, как
   материал увидит UE, не проверялось. Окончательная проверка материала и тона — UE-съёмка этапа 7 (HANDBOOK §4.4, §4.6).
