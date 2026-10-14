@@ -1,11 +1,18 @@
-# Этап 6: анимация, VFX и SFX — глобальный стандарт, производство, приёмка клипов
+# Этап 6: анимация, VFX и SFX — глобальный стандарт, производство, приёмка клипов (шаг 7a.2)
 
 Документ решает две задачи. Часть A — глобальный стандарт скелетной анимации, VFX и SFX проекта (требование №4); он
 действует для всех фигур. Часть B — производство этапа 6 для нового ассета и приёмка клипов с коэффициентом (`kind=anim`).
 
 Карта этапов скилла (`SKILL.md`): 0 заявка → 1 концепт-лист → 2 Tripo H2 → 3 сборка в Blender (регистрация персонажа →
-H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 доработка модели → **6 анимация + VFX + SFX** → 7 упаковка,
-импорт в UE, подключение S08, кадры в игре (`references/ue-import-package.md`).
+H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 доработка модели → **6 анимация (headless-авторинг) + VFX +
+SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)** → 7b подключение S08, упаковка, кадры в игре
+(`references/ue-import-package.md`).
+
+Порядок 6 → 7a (ДС-1, `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`). Приёмке клипа
+нужен UE-импорт: гейт `G-MANIFEST` требует статус `technically_imported`, кадры приёмки — UE-кадры редактора. Поэтому
+этап 6 только авторит 4 клипа и гоняет валидаторы, а приёмка клипов (§10) идёт на шаге 7a.2 после импорта
+(`references/ue-import-package.md` §4.5). Пилот шёл так же (F43, RA-01). Находки пилота F —
+`docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`, исследование RA/RB/RC — там же `research/`.
 
 Норма производства — `docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md` (дальше «HANDBOOK»). Он главнее этого файла. Числа
 рига и клипов здесь не копируются: даются ссылки на разделы §2.6 (риг), §2.7 (сокеты), §2.8 (клипы), §4.5 (H2Anim),
@@ -74,7 +81,7 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
 колени. Кадры, роли, длительности, допуски и правила ключей — HANDBOOK §2.8. fps 24 (`ClipFps`,
 `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.h:143`). Длины LungeAttack, HitReact и DeathSettle одинаковы у всех
 героев (`ExpectedClipSeconds`, `S08HeroesV2.cpp:157`). Пер-геройные величины зашиты в `Specs()`
-(`S08HeroesV2.cpp:105-108`):
+(`S08HeroesV2.cpp:105-116`):
 
 | Герой (`<Key>` / `<Character>`) | Оружие, кость | Idle, с | Контакт LungeAttack (24 fps) |
 |---|---|---|---|
@@ -82,6 +89,9 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
 | Merlin / Merlin | посох, `weapon.R` | 3,0 | к. 8 = 333 мс (выброс посоха) |
 | Medusa / Medusa | лук, `weapon.L` | 56/24 | к. 8 = 333 мс (выпуск стрелы) |
 | Harpy / Harpy | когти, нет | 2,0 | к. 7 = 292 мс (окно удара 7–9, контакт — первый кадр окна) |
+| Angel / Angel (пилот) | меч, `weapon.R` | 2,5 | к. 7 = 292 мс (образец — клипы меча KingArthur) |
+| AncientLeshen / AncientLeshen (пилот) | когти правой кисти, нет; ствол без ног | 56/24 | к. 8 = 333 мс |
+| Achilles / Achilles (пилот) | копьё `weapon.R` (две части, П3-1) + щит на `arm_lower.L` (П3-2) | 2,5 | к. 7 = 292 мс (укол) |
 
 Источник контактов — поле `design` клипа LungeAttack в `ASSET-*/build-profiles/*-h2anim.json`. Те же числа стоят в
 `S08HeroesV2.h:115-118`, `tools/art/de010/de010.py:12-15` и автотесте `Unmatched.S08.HeroesV2.Contact`
@@ -123,8 +133,9 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
   (`S08HeroesV2.cpp:167`, `:177-180`), так что тайминг боя без notify не ломается.
 - От контакта отсчитываются HitReact цели, звёзда удара, «−N», HP, звук удара и запуск CUE-013. Сроки — блоки
   CUE-011 и CUE-013 в `docs/unreal/contracts/cue-dispatcher/cue-table.json`.
-- Notify ставит `tools/art/de010/de010.py apply` на шаге 7b (`SKILL.md` §6, этап 7b п.1; регистрация Р7-1). На этапе 6
-  он не нужен: гейты приёмки клипа его не проверяют (§10.2), редакторные кадры его не показывают.
+- Notify ставит `tools/art/de010/de010.py apply --only <Key>` на шаге 7b (`SKILL.md` §6, этап 7b п.1; регистрация
+  Р7-1). На этапе 6 и в приёмке клипов 7a.2 он не нужен: гейты приёмки клипа его не проверяют (§10.2), редакторные
+  кадры его не показывают.
 - `h2anim_ue.py import` удаляет клип перед импортом (`import_clips.py`), notify при этом пропадает. Поэтому
   `de010.py apply` повторяется после **каждого** импорта LungeAttack, сделанного после шага 7b (§7).
 
@@ -252,7 +263,12 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
 - `SK_<Key>_H2.fbx` и `SM_<Key>_H2_Base.fbx` из прогона H2-bake. Клипы авторятся на bake-меше; look-dev не меняет риг и
   rest (HANDBOOK §4.5 п.1).
 - Карточка этапа 4 с `verdict: pass`.
-- Заявка с полями из таблицы плейсхолдеров.
+- Заявка с полями из таблицы плейсхолдеров и `MOTION_SOURCE` (§6.1).
+
+**Выход** (ДС-1) — 4 клипа авторены: `h2anim_run.py` код 0 (validate и contact PASS, WARN разобраны), проверки
+исполнителя §6.3, `clip_manifest.py build` → `MANIFEST_CHECK PASS` (клипы `measured`), заготовки промптов приёмки
+`<ASSET_DIR>/evidence/acceptance-anim-prompts/<Clip>/acceptor-prompt.md` по шаблону §10, слоты VFX и SFX (§8, §9).
+Карточек клипов на этапе 6 нет: их даёт шаг 7a.2 (§10, §11).
 
 **Регистрация этапа 6** выполняется до первого `h2anim_run.py` по `references/new-character-registration.md` §4
 (строки Р6-1…Р6-4). В неё входят только данные, которым не нужны ассеты UE (Р6-4 — строка `HEROES` листа и 4 карточки клипов, ниже):
@@ -271,9 +287,10 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
 
 Регистрация этапа 3 (`rig-contract.json` и `tools/tripo-pipeline/tests/test_rig_rules.py`) к этому моменту уже сделана.
 
-**Карточки задач 06-tasks.** Траты SYNTX без карточки запрещены: `tools/art/visual/ledger.py add` отказывает, если
-`--task` не найден в `docs/game-design/visual/06-tasks/*.csv`. Поэтому до видео-референсов в `anim.csv` заводятся 4
-карточки клипов нового героя. Формат — как у AN-01…AN-16; id — следующие свободные `AN-NN`.
+**Карточки задач 06-tasks.** 4 карточки клипов нового героя в `anim.csv` нужны всегда: по ним строится лист AN-18
+(Р6-4), а траты SYNTX без карточки запрещены (`tools/art/visual/ledger.py add` отказывает, если `--task` не найден в
+`docs/game-design/visual/06-tasks/*.csv`). Формат — как у AN-01…AN-16; id — следующие свободные `AN-NN`, в пачке их
+выдаёт один писатель (RC-13), иначе две фигуры возьмут один номер.
 
 **Blender** — только headless. Скрипты `validate_clip.py`, `clip_contact_check.py` и `clip_author.py` в живом Blender
 бросают RuntimeError (`validate_clip.py:1-9`). Рабочий путь — только `h2anim_run.py` (§6.3): он передаёт полный набор
@@ -289,23 +306,27 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
     --root-policy=in_place --min-pose-change=0.02 [--loop=true] --out=C:/tmp/skill-<content-key>/<Clip>.validation.json
 ```
 
-**Среда UE** (шаги §6.4 и §7):
-- Работает GUI-редактор пользователя с MCP `127.0.0.1:8123`. Проверка:
-  `netstat -ano | grep ':8123 .*LISTEN'`. Редактор пользователя не закрывать. Если порт не слушает — как в
-  `references/ue-import-package.md` «Правила среды» п.1: агент запускает свой редактор командой HANDBOOK §0.2,
-  записывает PID и в конце закрывает только его, при 0 dirty-пакетов.
-- Импорт клипов идёт в `Content` того чекаута, чей редактор открыт (обычно основной чекаут пользователя). Всё, что
-  проверяет `.uasset` на диске (`cue_contract.py validate-table`, §12.1), запускать в этом же чекауте.
+**Среда UE** (шаги §6.4 и §7 — это этап 7, не 6):
+- Шаги §6.4 идут на шаге 7a в агентском скрытом редакторе пачки (ДС-3): его поднимает и закрывает оркестратор, 7a —
+  строго один герой за раз, агент героя свой редактор не запускает и чужой не закрывает. Рецепт запуска
+  (`-RenderOffScreen -unattended -nosplash -ModelContextProtocolPort=8123`, без Live Coding, `UE_CONSOLE_DROP`, PID в
+  `$W/editor.pid`, опознание по командной строке) — `references/ue-import-package.md` §1 п.1. Проверка MCP:
+  `netstat -ano | grep ':8123 .*LISTEN'`. Интерактивный редактор пользователя (без флагов агентского запуска) агент не
+  закрывает — гейт `SKILL.md` §5 п.7; пользователь UE сам не открывает (2026-10-14), так что в автономном прогоне гейт
+  не срабатывает.
+- Импорт клипов идёт в `Content` того чекаута, чей редактор открыт. Всё, что проверяет `.uasset` на диске
+  (`cue_contract.py validate-table`, §12.1), запускать в этом же чекауте.
 - Каждая UE-команда выполняется под блокировкой `C:/tmp/ue-editor.lock`, по одному герою на блокировку:
-  `MSYS_NO_PATHCONV=1 UE_LOCK_OWNER=<ASSET_ID>-s6 python tools/art/material_library/ue_lock.py --step "<шаг>" -- <команда>`
-  (`ue_lock.py:13-14`). Сами скрипты `tools/tripo-pipeline/*` блокировку не берут.
+  `MSYS_NO_PATHCONV=1 UE_LOCK_OWNER=<ASSET_ID>-7a python tools/art/material_library/ue_lock.py --step "<шаг>" -- <команда>`
+  (`ue_lock.py:13-14`; heartbeat держит шаг дольше 25 мин, RB-21). Сами скрипты `tools/tripo-pipeline/*` блокировку не
+  берут.
 - `h2anim_ue.py frames` отказывает, если в открытом уровне есть несохранённые изменения или если открыт сам
   `L_P17ControlScene` (`h2anim_ue.py:205-212`).
 - Headless-коммандлеты (`UnrealEditor-Cmd`: `ue_import_audio.py`, `ue_verify_audio.py`, `fx_ability.py`) запускаются
   только когда на этом чекауте нет GUI-редактора (`fx_ability.py:4`: «the editor of THIS checkout must be closed»;
   HANDBOOK §0.1). Поэтому они выполняются в окне шага 7b вместе с `de010`/`de011` (`SKILL.md` §6, этап 7b), а не
-  между MCP-шагами. Worktree это не обходит (`references/ue-import-package.md` §1 п.4). Открыт редактор пользователя —
-  гейт стопа `SKILL.md` §5 п.7; сам агент его не закрывает.
+  между MCP-шагами. Worktree это не обходит (`references/ue-import-package.md` §1 п.4). Агентский редактор 7a к окну
+  7b закрывает оркестратор; открыт интерактивный редактор — гейт стопа `SKILL.md` §5 п.7, его агент не закрывает.
 - Свои процессы Blender и UnrealEditor-Cmd после шага проверять и завершать по PID (`SKILL.md`).
 
 **Проп.** Этап 6 нужен пропу, только если у него есть CUE-строка или звук. Иначе этап пропускается с записью
@@ -313,10 +334,32 @@ H2-bake → look-dev → TeamAccent) → 4 приёмка модели → 5 д�
 
 ## 6. Клипы: шаги
 
-### 6.1 Видео-референсы движения (SYNTX)
+### 6.1 Источник движения: паттерн библиотеки или видео-референсы SYNTX (ДС-6)
 
-HANDBOOK §4.5 требует строить движение по видео-референсам, а не по памяти. Траты SYNTX идут без подтверждения каждой
-генерации, по карточке и в лимитах ВР-04 и ВР-PR04 (`docs/game-design/visual/00-VISUAL-BRIEF.md:21-22`, §5.3).
+**По умолчанию — паттерн библиотеки** (ДС-6; RA-18, RC-02, F44). Движение строится по принятым клипам D-11 героя с
+тем же классом оружия, а не по памяти:
+
+| Класс оружия | Образец (папка `art/animation-refs/` и спека `build-profiles/*-h2anim.json`) |
+|---|---|
+| меч, рубящее в правой руке | KingArthur (`ASSET-KING-ARTHUR-001/ARTH-*`); пилот — Angel ← Arthur |
+| лук, стрелковое в левой | Medusa (`ASSET-MEDUSA-001/MED-*`) |
+| посох, копьё, древковое | Merlin (`ASSET-MERLIN-001/MER-*`); пилот — Achilles ← Merlin (подготовка и выброс) + Arthur (контакт к.7) |
+| без оружия: когти, крылья | Harpy (`ASSET-HARPY-001/HAR-*`); фигура без ног — пилот AncientLeshen ← Medusa/Merlin |
+
+- В спеке: `clips.*.reference` — папка образца (`art/animation-refs/<ASSET_ID образца>/<PRE>-<Clip>`), рядом
+  `clips.*.reference_kind` — «library pattern (D-11, <герой и клип>), not a <Key> video» (так пилот, Angel и Achilles).
+  Заметка манифеста `clip_manifest.py` всё ещё пишет «по видео-референсу» и для паттерна (F50) — источник смотреть по
+  `reference_kind` спеки.
+- В заявке: `MOTION_SOURCE: "library: <Key образца>"` (`SKILL.md` §7.2).
+- Отступление от HANDBOOK §4.5 («по видео-референсам») — решение ДС-6: записать строкой в README evidence этапа 7
+  («Отступления от хендбука»).
+- Почему: визуального лимита SYNTX (54 на журнал, ≤ 10 на видео, 4 клипа — до 40) хватает примерно на одного героя;
+  весь пилот шёл на паттернах, и все 12 его клипов приняты (часть — со второго цикла).
+
+**Видео-референсы SYNTX — только нестандартное движение** (нет образца того же класса оружия: двуручное или парное
+оружие, полёт, необычная анатомия в пределах контракта). Причина — в `MOTION_SOURCE: "syntx: <причина>"`. Дальше —
+шаги ниже. Траты SYNTX идут без подтверждения каждой генерации, по карточке, в лимитах и сроке журнала (ВР-04,
+ВР-PR04; `docs/game-design/visual/00-VISUAL-BRIEF.md:21-22`, §5.3).
 Порядок вызовов — `docs/game-design/visual/07-prompt-templates.md` §2.4 (create-chat → upload-files → цена → баланс →
 генерация → журнал). Вызовы SYNTX идут через CLI-клиент MCP `node $SYNTX_MCP <tool> '<json>'`
 (`C:/Users/ren/.claude/mcp-servers/clients/syntx_mcp.cjs`, он же дефолт `SYNTX_MCP` в `gen.sh`); токен клиент берёт сам.
@@ -385,7 +428,8 @@ HANDBOOK §4.5 требует строить движение по видео-р
    node $SYNTX_MCP get-balance '{}'          # свежий баланс → <баланс>
    python tools/art/visual/ledger.py check --balance <баланс> --next-cost 10 --next-kind video
    ```
-7. **Запуск** (тратит токены; без подтверждения каждой генерации, в лимитах ВР-04/ВР-PR04). Сначала один вариант на клип:
+7. **Запуск** (тратит токены; без подтверждения каждой генерации, в лимитах и сроке журнала, ВР-04/ВР-PR04).
+   Сначала один вариант на клип:
    ```bash
    SYNTX_MAX_COST=10 bash tools/art/syntx_video_refs/gen.sh <PRE>-<Clip> art/animation-refs/<ASSET_ID>/<PRE>-<Clip>/prompt.txt
    ```
@@ -424,6 +468,8 @@ HANDBOOK §4.5 требует строить движение по видео-р
 | оружие в левой руке, стрелковое | `art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json` |
 | древковое или посох | `art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json` |
 | без оружия, крылья или когти | `art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json` |
+| копьё из двух частей + щит без кости (пилот) | `art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json` |
+| без оружия и без ног, когти (пилот) | `art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json` |
 
 Заменить в копии:
 
@@ -437,17 +483,36 @@ HANDBOOK §4.5 требует строить движение по видео-р
 | `target.rest_generation` | `H2` |
 | `meshes.body`, `meshes.weapon` | имена объектов в FBX (`null`, если оружия нет) |
 | `weapon.bone`, `weapon.side`, `weapon.note` | из `WEAPON_BONE` (`null`, если оружия нет) |
+| `weapon.extra_parts` | части оружия внутри меша body (П3-1: вторая часть Tripo на кости оружия) и щит без своей кости (П3-2): имя кости или `{"bone", "islands"}` — `["weapon.R", {"bone": "arm_lower.L", "islands": true}]` у Achilles. `clip_contact_check` проверяет их как оружие; без ключа пересечение такой части с телом не проверяется (RB-09, F127; парное и двуручное оружие — так же) |
 | `run_dir` | `<ASSET_DIR>/<YYYYMMDD>-h2anim` |
 | `ue.skeleton` | `/Game/PipelineCandidates/<Key>/Rig/SK_<Key>_Skeleton` |
 | `ue.mesh_for_preview` | `/Game/PipelineCandidates/<Key>/Rig/SK_<Key>` — меш-носитель из шага skeleton. Так сделано у Harpy; H2LD-меш появится в UE только на этапе 7 |
 | `ue.clips_folder` | `/Game/PipelineCandidates/<Key>/H2Anim` |
 | `clips.Idle.frames` | `IDLE_SECONDS × 24` |
-| `clips.*.reference` | папка референса из §6.1 |
+| `clips.*.reference`, `clips.*.reference_kind` | папка образца библиотеки или своего видео-референса и вид источника (§6.1, ДС-6) |
 | `clips.*.design`, `keys`, `waves`, `key_frames`, `ik_feet`, `hand_follow`, `amplitude_scale` | авторский слой под нового героя. Кадр `LUNGE_CONTACT_FRAME` записывается в `design` LungeAttack, входит в `key_frames` и имеет ключ в `keys` (§2.1) |
 | `clips.*.template` | черновики `blender/ASSET-MEDUSA-001/export/AM_Medusa_*.fbx` (в git). `mirror: true`, если сторона оружия противоположна Medusa |
 
 Длины LungeAttack, HitReact и DeathSettle не менять: это константы C++ (§2.1). Пределы, которые не чинятся в клипе
 (жёстко скиненный подол, наплечник, поворот головы, IK), описаны в HANDBOOK §4.5 п.4.
+
+Уроки пилота для авторского слоя (до первых ключей):
+- **Сначала замер, потом ключи.** Кости rest, след стоп, верх подставки и пределы скина руки с оружием — до ключей:
+  смещения кисти Arthur на другую фигуру не переносятся (F48); у Angel разгибание локтя > ~141° и скрутка предплечья
+  > ~20° рвут скин, поэтому рубящий удар с мечом, жёстко зажатым в кулаке, идёт подъёмом плеча и поворотом плечевой
+  кости (F122). Хват, кисть и локоть по кадрам — `grip_check.py` (§6.3).
+- **Ноги.** Прямые ноги в rest при повороте таза дают скольжение стоп: таз опускать на 0,3–0,5 см, когда он
+  движется (F48). Журнал IK про недотянутые кадры важен, только когда нога несёт вес (F114).
+- **Закреплённая рука** (`hand_follow`/пин на оружии): полюс локтя брать в осях арматуры rest, а не в осях корпуса —
+  иначе локоть переворачивается назад и кисть крутится на 26–45° (F126).
+- **Оружие, упёртое пяткой в подставку** (копьё Achilles): режим `weapon_tip` для него не годится, смещения шарнира —
+  вручную; прямой опорной руке кулак под прямым углом стоит 40–45° излома кисти (F128, опции в инструменте нет).
+- **Наездники** — жёсткие части на кости руки (ворона Leshen): при подъёме руки они переворачиваются (F115) и могут
+  висеть с зазором ещё в rest (F137) — это дефект модели, не клипа (§10.5). Отрыв наездника от деформируемой руки
+  валидаторы этапа 6 не ловят (F133): смотреть Blender-листы и крупные планы.
+- **Кость `hips` на оси `root`** (Leshen 0, 0, 25): импорт FBX в Blender соединяет `hips` и теряет её ключи
+  положения — проверка чтения автором падает (F112, в инструменте не исправлено). Такой FAIL — эта причина; разбор
+  оркестратором (`SKILL.md` §5 п.6).
 
 ### 6.3 Авторинг и валидация (headless)
 
@@ -465,34 +530,67 @@ python tools/tripo-pipeline/anim/h2anim_run.py <ASSET_DIR>/build-profiles/<conte
 
 Код 0 — всё PASS. Код 3 — sha цели не совпал со спекой: цель перепечена, спеку нужно обновить. Условия PASS — HANDBOOK
 §4.5 п.3. PASS валидатора означает соответствие контракту, а не художественную приёмку
-(`docs/art-pipeline/animation-library/VALIDATION.md`).
+(`docs/art-pipeline/animation-library/VALIDATION.md`). Точки входа сами пишут UTF-8 — `PYTHONIOENCODING` для «×» в
+трубе cp1251 больше не нужен (F47, 70905fa2).
 
-### 6.4 UE: скелет, импорт, notify, замер, кадры
+Что читать в отчётах контактов (`reports/contact-<Clip>.json`):
+- `foot_slide_<L|R>` со статусом WARN и `measured: false` — у фигуры нет вершин подошвы (ствол, корни, змеиный
+  хвост): скольжение не измерено, а не PASS. Опору проверить отдельно — по кадрам и своим замером (Leshen —
+  `roots-planted.json`; F113).
+- Оружие — меш `meshes.weapon` и части `weapon.extra_parts` (§6.2): `weapon_body` и `weapon_below_base_top_outside`
+  считают их отдельно по каждой части.
+- `skin_stretch` FAIL — только видимые рваные рёбра; закрытые — WARN `skin_stretch_hidden`.
 
-Каждая команда — под `ue_lock.py` (§5). Подкоманды — `h2anim_ue.py:3-8`.
+**Проверки исполнителя** (не гейт и не приёмка: числа для правки ключей и для приёмщика, §10.3):
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup \
+    --python tools/tripo-pipeline/anim/grip_check.py -- <run>/export/AM_<Key>_<Clip>.fbx <run>/reports/grip-<Clip>.json \
+    --side R [--base <SM_<Key>_H2_Base.fbx>] [--shield-bone arm_lower.L] [--weapon-suffix _Spear]
+python tools/tripo-pipeline/anim/clip_closeups.py --spec <spec> --clip <Clip>     # §10.3; у Idle — с парой шва
+```
+
+`grip_check.py`: поворот оружия в кулаке (`weapon_in_hand_deg`, 0 — оружие жёстко в руке), излом кисти, локоть,
+колени, пересечение оружия и щита с телом, пятка оружия у подставки. Поворот оружия на 60–90° внутри неподвижного
+кулака валидаторы этапа 6 не ловят, а приёмка клипа ставит за него вето D (Angel LungeAttack, F95).
+
+### 6.4 UE: скелет, импорт, замер, кадры (шаг 7a, не этап 6)
+
+Эти команды выполняет этап 7a (`references/ue-import-package.md` §4.1 шаги 3, 5 и §4.5; ДС-1) в агентском редакторе
+(§5). Каждая — под `ue_lock.py`. Подкоманды — `h2anim_ue.py:3-8`.
 
 ```bash
 L="python tools/art/material_library/ue_lock.py"; S=<ASSET_DIR>/build-profiles/<content-key>-h2anim.json
-export MSYS_NO_PATHCONV=1 UE_LOCK_OWNER=<ASSET_ID>-s6
+PIN=art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json   # свет, F81
+export MSYS_NO_PATHCONV=1 UE_LOCK_OWNER=<ASSET_ID>-7a
 $L --step "<Key> state"    -- python tools/tripo-pipeline/anim/h2anim_ue.py state
-$L --step "<Key> skeleton" -- python tools/tripo-pipeline/anim/h2anim_ue.py skeleton $S   # идемпотентно
+$L --step "<Key> skeleton" -- python tools/tripo-pipeline/anim/h2anim_ue.py skeleton $S [--refresh-preview]
 $L --step "<Key> import"   -- python tools/tripo-pipeline/anim/h2anim_ue.py import $S [--clips=LungeAttack]
-# notify Contact здесь не ставится: его ставит de010.py apply на шаге 7b (§2.3, §7)
+# notify Contact здесь не ставится: его ставит de010.py apply --only <Key> на шаге 7b (§2.3, §7)
 $L --step "<Key> measure"  -- python tools/tripo-pipeline/anim/h2anim_ue.py measure $S
-$L --step "<Key> frames"   -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=<Clip>   # по клипу за вызов
-$L --step "<Key> closeup"  -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=LungeAttack --frames=<a,b,c> --closeup
+$L --step "<Key> frames"   -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=<Clip> --light-pinned $PIN   # по клипу за вызов
+$L --step "<Key> closeup"  -- python tools/tripo-pipeline/anim/h2anim_ue.py frames $S --clips=LungeAttack --frames=<a,b,c> --closeup --light-pinned $PIN
 python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S                                      # без редактора
 ```
+
+- `skeleton` идемпотентен для скелета, а меш превью `Rig/SK_<Key>` переимпортирует сам, если sha `SK_<Key>_H2.fbx`
+  спеки изменился (новая модель после этапа 5); `--refresh-preview` — принудительно (перезапись FBX на месте по sha
+  не видна). `frames` и `measure` на устаревшем меше отказывают (F145, 172fd4f1).
+- `frames`: без `--light-pinned` — `SystemExit` (профиль `cobble-probe` удалён ND-5, F81). Подставка по умолчанию —
+  `SM_<Key>_H2LD_Base` импорта 7a (`--base <пакет>` — другая, `--no-base` — без неё, F96). Фигура выше ~59 uu —
+  камера отходит и центрирует её (`camera.mode fit`, F136). Троттлинг фонового редактора выключается на время съёмки;
+  прогрев не сошёлся — `settle.status: not_settled`, кадры переснять (F153).
 
 Отчёты: `reports/ue-canonical-skeleton.json`, `ue-import-clips.json`, `ue-measure-clips.json`, `ue-frames.json`,
 `ue-frames-closeup.json`. Кадры: `preview/ue/<Key>-<Clip>-fNN-{front,q34}-ue-editor.jpg` и лист
 `preview/<Key>-H2Anim-ue-sheet.jpg`. Условия замера — HANDBOOK §4.6 п.5. Кадры редактора нужны для диагностики и приёмки
-этапа 6. Это не K1/K2 и не evidence SHOT: отпечатка RENDER у них нет (`h2anim_ue.py:214-218`).
+клипов 7a.2. Это не K1/K2 и не evidence SHOT: отпечатка RENDER у них нет (`h2anim_ue.py:214-218`).
 
 **После импорта.** Когда `AM_<Key>_HitReact` и `AM_<Key>_DeathSettle` лежат в `Content` (`ue-import-clips.json`),
 можно добавлять ключи `<Key>` в CUE-011/013 и гонять `validate-table` (§12.1) — в чекауте этого `Content` (§5). Шаг
-относится к регистрации этапа 7 (Р7-6), раньше импорта его не делать. Если этап 7 снова импортирует клипы
-(`SKILL.md`, этап 7a п.2), это происходит до шага 7b, и notify ставит обычный `de010.py apply` (§7).
+относится к регистрации этапа 7 (Р7-6), раньше импорта его не делать. Повторный импорт клипов (доработка клипа или
+модели, `references/ue-import-package.md` §4.4) до шага 7b — notify ставит обычный `de010.py apply --only <Key>` (§7);
+после 7b — повторить его.
 
 ### 6.5 Манифест библиотеки
 
@@ -501,20 +599,55 @@ python tools/tripo-pipeline/anim/clip_manifest.py build && python tools/tripo-pi
 ```
 
 Статус `technically_imported` ставит только `build` и только при трёх сходящихся свидетельствах: validate PASS,
-контакты PASS, UE-импорт с тем же sha256 FBX (`clip_manifest.py:9-16`). Статус `artistically_accepted` сборка не пишет
-никогда, а ручную правку перезапишет. Художественная приёмка фиксируется в `03-asset-registry.csv` (§12.2) и в
-карточке §10.
+контакты PASS, UE-импорт с тем же sha256 FBX (`clip_manifest.py:9-16`). На этапе 6 клипы получают `measured`,
+`technically_imported` — после импорта 7a, тогда `build` ещё раз (`references/ue-import-package.md` §4.1 шаг 8).
+Статус `artistically_accepted` сборка не пишет никогда, а ручную правку перезапишет. Художественная приёмка
+фиксируется в `03-asset-registry.csv` (§12.2) и в карточке §10.
+
+- `check` требует 4 записи h2anim у каждого героя `H2ANIM` (спека, FBX, отчёт) и называет героя с битой
+  регистрацией (RB-07): раньше ошибка в `H2ANIM` давала пустой слот и `MANIFEST_CHECK PASS`, а дефект всплывал FAIL
+  `G-MANIFEST` на приёмке и съедал цикл клипа.
+- Доработанный клип со своей спекой регистрируется строкой `H2ANIM_CLIP["<Character>", "<Clip>"] =
+  "<ASSET_DIR>/build-profiles/<content-key>-h2anim-r<N>.json"` (Р6-1, F103); без неё `G-MANIFEST` падает: sha проверки
+  ≠ зарегистрированного прогона. Новая спека на все 4 клипа (новая модель) — правка `H2ANIM["<Character>"]` и снятие
+  строк `H2ANIM_CLIP` героя.
+- `build` пересобирает все слоты и заберёт чужие недоделанные доработки: один сборщик за раз, манифест коммитится
+  сразу после доработки (F117).
+
+### 6.6 Дымовой прогон клипов на выходе этапа 3 (RC-06)
+
+В пилоте дефекты модели нашла только приёмка клипов: ворона Leshen висела с зазором 2,9 см (вето D HitReact, F137),
+срез руки Achilles под плащом открывался при руке вперёд со спины (вето D DeathSettle, F129, F148). Обе модели уже
+прошли приёмку и сожгли на позднем фиксе последний цикл (RC-06). Поэтому сдача модели (этапы 3 и 5) включает дымовой
+прогон — пункт чек-листа HANDBOOK §4.4 «Сдача модели». Это не авторинг и не приёмка: чужие ключи на новой модели.
+
+1. Спека дыма — копия спеки образца того же класса оружия (§6.1, §6.2) в `<bake run>/work/smoke/` (`work/` закрыт
+   `.gitignore` ассета; `h2anim_run.py` требует спеку и `run_dir` внутри репозитория — пути он пишет от его корня,
+   `C:/tmp` не годится). Поля — по таблице §6.2, но `run_dir` = `<bake run>/work/smoke/run`, `ue_hero` = `<Key>Smoke`:
+   по `ue_hero` `h2anim_run.py` называет FBX и отчёт validate в `docs/art-pipeline/animation-library/validation-h2anim/`,
+   и дым не должен перезаписать отчёты гейта настоящих клипов. Ключи и волны образца не менять; `mirror` у `template`
+   — по стороне оружия.
+2. `python tools/tripo-pipeline/anim/h2anim_run.py <bake run>/work/smoke/<content-key>-h2anim-smoke.json`, затем
+   `grip_check.py` по LungeAttack и DeathSettle (§6.3).
+3. Что смотреть: `contact-*.json` — `limb_body`, `skin_stretch` (видимые рёбра), `weapon_body` с `extra_parts`;
+   Blender-листы — кромки и срезы при руке вперёд со спины, зазор «наездников» к телу. Найденное — пункт доработки
+   модели до приёмки, а не на клипах. Числа и вывод — строкой в отчёт сдачи модели.
+4. После прогона — удалить свои `AM_<Key>Smoke_*.validation.json` из `validation-h2anim/` (временные файлы этого
+   прогона, в git не идут) и каталог `<bake run>/work/smoke/` — свой временный выход (`SKILL.md` §11.5).
 
 ## 7. Notify `Contact` для нового героя
 
-**Основной путь — `tools/art/de010/de010.py apply` на шаге 7b** (`SKILL.md` §6, этап 7b п.1). Он ставит ровно один
-`Contact` на LungeAttack каждого героя своего списка `HEROES`, идемпотентно (`tools/art/de010/de010_apply_ue.py:9-11`).
-Для нового героя нужна строка `HEROES` (регистрация Р7-1, `references/new-character-registration.md` §5.1). Ограничения:
-он запускает свой `UnrealEditor-Cmd` (GUI-редактор этого чекаута закрыт, гейт `SKILL.md` §5 п.7) и заново собирает
-`M_UM_Figure_v2` текущим графом. После любого повторного импорта LungeAttack `de010.py apply` повторить.
+**Основной путь — `tools/art/de010/de010.py apply --only <Key>` на шаге 7b** (`SKILL.md` §6, этап 7b п.1; сначала
+`--dry-run`). Он ставит ровно один `Contact` на LungeAttack героев `--only`, идемпотентно
+(`tools/art/de010/de010_apply_ue.py:9-11`). Без `--only` он переставляет notify всем героям списка `HEROES` и
+пересохраняет их клипы (в пилоте — MVP, F157). Для нового героя нужна строка `HEROES` (регистрация Р7-1,
+`references/new-character-registration.md` §5.1). Ограничения: он запускает свой `UnrealEditor-Cmd` (GUI-редактор этого
+чекаута закрыт: агентский — оркестратором, интерактивный — гейт `SKILL.md` §5 п.7), а `M_UM_Figure_v2` пересобирает
+только при смене графа (`tools/art/de010/master-builds.json`). После любого повторного импорта LungeAttack
+`de010.py apply --only <Key>` повторить.
 
 **Запасной путь — задача живого редактора ниже**: только notify одного клипа, без пересборки материала, под
-`ue_lock.py`. Применять, когда notify нужен до шага 7b в открытом редакторе. Строку Р7-1 и шаг 7b он не заменяет.
+`ue_lock.py`. Применять, когда notify нужен до шага 7b в редакторе 7a. Строку Р7-1 и шаг 7b он не заменяет.
 Задача собрана из вызовов, которые DE-010 уже проверил (`tools/art/de010/de010_apply_ue.py:57-70`), и запускается через
 `ue_live.Ue().run_task` (`tools/tripo-pipeline/review/ue_live.py:190`). Отдельным шагом она ещё не прогонялась (не
 проверено): первый прогон сверить по JSON-отчёту.
@@ -556,9 +689,9 @@ MSYS_NO_PATHCONV=1 python tools/art/material_library/ue_lock.py --step "<Key> Co
 Критерий успеха — в `ue-contact-notify.json` ровно один `Contact` с `time = LUNGE_CONTACT_FRAME / 24` (± 0,5 кадра) и
 `play_length`, равный N/24. Если запасная задача упала — дождаться шага 7b (`de010.py apply`). Пока notify нет, рантайм
 берёт `ProfileContactSeconds` и тайминг удара верен, но автотест `Unmatched.S08.HeroesV2.Contact` этапа 7 падает.
-Если и `de010.py apply` не ставит notify — гейт стопа `SKILL.md` §5 п.6 (HANDBOOK §0.3 п.3 — FAIL проверки, п.6 —
-если упал или завис редактор) с пакетом шагов пользователю: путь клипа, кадр, вывод `de010.py`. Обходной путь не
-придумывать.
+Если и `de010.py apply` не ставит notify — разбор оркестратором, а не вопрос пользователю (`SKILL.md` §5 п.6, ДС-2;
+HANDBOOK §0.3 п.3 — FAIL проверки, п.6 — если упал или завис редактор): путь клипа, кадр и вывод `de010.py` — в строку
+F; исправление — фиксом или опцией `de010` с тестом, а не ручной правкой ассета в редакторе.
 
 ## 8. VFX нового ассета: слоты
 
@@ -633,19 +766,60 @@ python -c "import json,sys; m=json.load(open(sys.argv[1])); json.dump([x for x i
 `python tools/art/acceptance/validate_card.py <card.json> --print-verdict --check-files`. Если поле в этом разделе
 расходится со схемой, права схема.
 
+Когда: шаг 7a.2, после импорта клипов, `measure`, `clip_manifest.py build` и UE-кадров (ДС-1;
+`references/ue-import-package.md` §4.5). Не на этапе 6: без UE-импорта гейт `G-MANIFEST` даёт FAIL, а `validate_card.py`
+не принимает `n/a` у клипа — карточка сожгла бы цикл (F43).
+
 Промпт приёмщика клипа — шаблон acceptance-and-blender.md §8.2 с такими заменами: заголовок «Приёмка клипа
-AM_<Key>_<Clip>, цикл <rN> (этап 6)»; рубрика — этот файл §10.2–§10.5; «Вход» — кадры и материалы §10.3; «Порядок» —
-гейты `G-VALIDATE`, `G-CONTACT`, `G-MANIFEST` по отчётам, баллы R, C, D, L по кадрам; константы
-`schema "unmatched.anim-acceptance/1"`, `kind "anim"`, `clip "<Clip>"`. Вызов — §8.3 (или §8.4) того же файла, label
-`acceptor-<ASSET_ID>-<Clip>-r<N>`.
+AM_<Key>_<Clip>, цикл <rN> (шаг 7a.2)»; рубрика — этот файл §2.1, §2.3, §10.2–§10.5, механика формулы и полей карточки
+— acceptance-and-blender.md §6, §7; «Вход» — кадры и материалы §10.3; «Порядок» — гейты `G-VALIDATE`, `G-CONTACT`,
+`G-MANIFEST` по отчётам, баллы R, C, D, L по кадрам; константы `schema "unmatched.anim-acceptance/1"`, `kind "anim"`,
+`clip "<Clip>"`. Вызов — §8.3 (или §8.4) того же файла, label `acceptor-<ASSET_ID>-<Clip>-r<N>`; Workflow-приёмщику
+— строгая схема `tools/art/acceptance/asset-acceptance-2.output-anim.schema.json` (RA-11). Образец заполненного
+промпта — `art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r2/LungeAttack/acceptor-prompt.md`.
+
+Заготовку промпта на каждый клип пишет этап 6: `<ASSET_DIR>/evidence/acceptance-anim-prompts/<Clip>/acceptor-prompt.md`
+с плейсхолдерами `{{E}}`, `{{DATE}}`, `{{CYCLE}}`, `{{PREVIOUS_CARD_JSON}}`, `{{FRAMES_FILES_JSON}}` и служебным
+комментарием `<!-- … -->`; на шаге 7a.2 их заполняет `tools/tripo-pipeline/ue7a/prep_acceptance.py` (сверяет sha клипа
+и спеки, вставляет заметку о меше-носителе UE-кадров). Обязательные блоки каждого промпта приёмщика клипа:
+
+1. Цитата делегирования пользователя (2026-10-06) дословно и «траты на этом шаге: нет».
+2. Роль: приёмщик ничего не правит и не запускает, выдача — только JSON карточки.
+3. **Блок чтения кириллицы (RA-03) — дословно, как в `references/concept-sheet.md` §11**; меняется только строка
+   рубрики. Без него Sol читал рубрику кракозябрами при коде 0 (F36), а без строки «рубрика — только эти файлы»
+   открывал SKILL.md вне входов (F75):
+
+   ```text
+   Текстовые файлы читай так, чтобы кириллица дошла целой. В песочнице codex PowerShell работает в Constrained
+   Language Mode и пишет вывод в OEM-кодировке: `Get-Content -Encoding UTF8` даёт кракозябры, смена
+   `[Console]::OutputEncoding` запрещена, `rg` нет. Рабочие способы (проверено пробой 2026-10-13): читай КАЖДЫЙ
+   текстовый файл (рубрику, JSON-отчёты, предыдущую карточку) командой
+   `Get-Content <файл> -Raw -Encoding OEM` (байты UTF-8 проходят без перекодировки и читаются верно) или
+   `cmd /c type <файл>`. Кодовые точки (`[int[]][char[]]`) не нужны. Если кириллица рубрики всё равно пришла
+   кракозябрами — это сбой окружения: не оценивай по догадкам, верни карточку, где verdict_reason начинается со слов
+   «СБОЙ ОКРУЖЕНИЯ: кириллица не читается».
+   Рубрика (обязательна к прочтению целиком): .agents/skills/3d-model-pipeline/references/animation-vfx-sfx.md §2.1,
+   §2.3, §10 (гейты §10.2, кадры §10.3, измерения и якоря §10.4, вердикт §10.5); механика формулы, вердикта и полей
+   карточки — .agents/skills/3d-model-pipeline/references/acceptance-and-blender.md §6 и §7 (где они расходятся с §10 —
+   прав §10 и схема). Рубрика — ТОЛЬКО эти два файла: SKILL.md и другие файлы скилла (.agents/skills/**, кроме
+   animation-vfx-sfx.md и acceptance-and-blender.md) не открывай и не учитывай.
+   ```
+
+   Карточка, где `verdict_reason` начинается со «СБОЙ ОКРУЖЕНИЯ», — сбой окружения, а не приёмка: цикл клипа не
+   тратится, балл не пишется; разбор оркестратором (ДС-2), затем тот же вызов заново (acceptance-and-blender.md §8.4).
+4. «Вход» — список §10.3 и блок «Известные пределы этой фигуры» (§10.5): один список на фигуру, одинаковый во всех
+   четырёх промптах героя, а не свободный текст в каждом (F156).
+5. «Порядок», константы карточки и «Запрещено» — как в образце выше.
 
 ### 10.1 Единица, циклы, путь
 
 - Единица приёмки — **один клип**. Вердикт героя — pass, когда все 4 клипа pass.
 - Циклы на клип: r1 → доработка → r2 → доработка → r3, то есть не больше 2 доработок. После r3 без pass —
-  `escalate_user` (`SKILL.md` §5 п.4).
+  `escalate_user` (`SKILL.md` §5 п.4). Перепринятие после позднего фикса модели с неизменными ключами цикла не
+  тратит (§10.5).
 - Путь (решение скилла): `<ASSET_DIR>/evidence/acceptance-anim/<YYYYMMDD>-r<N>/<Clip>/card.json` и рядом `frames/`. Если
-  в цикле r2 переделывается один клип, в каталоге r2 лежит только он.
+  в цикле r2 переделывается один клип, в каталоге r2 лежит только он. Перепринятие после позднего фикса —
+  `…/<YYYYMMDD>-r<N>-m<M>/<Clip>/` (`SKILL.md` §9, словарь суффиксов).
 
 ### 10.2 Гейты (PASS/FAIL из отчётов, не баллы)
 
@@ -653,25 +827,42 @@ AM_<Key>_<Clip>, цикл <rN> (этап 6)»; рубрика — этот фа�
 |---|---|---|
 | `G-VALIDATE` | `result: pass` | `docs/art-pipeline/animation-library/validation-h2anim/AM_<Key>_<Clip>.validation.json` |
 | `G-CONTACT` | `result: pass` | `<run>/reports/contact-<Clip>.json` |
-| `G-MANIFEST` | `clip_manifest.py check` прошёл и у клипа статус `technically_imported` (то есть есть UE-импорт с тем же sha256) | `clip-manifest.json` |
+| `G-MANIFEST` | `clip_manifest.py check` прошёл и у клипа статус `technically_imported` (то есть есть UE-импорт 7a с тем же sha256; доработанный клип — со строкой `H2ANIM_CLIP`, §6.5) | `clip-manifest.json` |
 
-Notify `Contact` в приёмку клипа не входит: его ставит `de010.py apply` на шаге 7b, проверяет автотест
+Notify `Contact` в приёмку клипа не входит: его ставит `de010.py apply --only <Key>` на шаге 7b, проверяет автотест
 `Unmatched.S08.HeroesV2.Contact` (§2.3, §7). Время контакта клипа проверяют `G-CONTACT` и измерение C.
 
 ### 10.3 Кадры приёмщика
 
-Кадры копируются в `frames/`; имена — как у источника:
+Кадры копируются в `frames/` инструментом `tools/tripo-pipeline/ue7a/prep_acceptance.py` (шаг 7a.2); имена — как у
+источника, длинная сторона не больше 1200 px (ДС-8):
 - Blender-лист `<Key>-<Clip>-blender-sheet.jpg` (§6.3);
+- крупные планы Blender (RA-27, F146): `python tools/tripo-pipeline/anim/clip_closeups.py --spec <S> --clip <Clip>` →
+  `<run>/preview/closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера каждого кадра — в
+  `<Key>-<Clip>-closeups.json`; на r2/r3 — `--shots-from <отчёт прежнего цикла>`, те же камеры числами (у пилота разовый
+  скрипт камеру не записывал, и r2 нельзя было снять один в один);
+- у Idle — пара шва цикла `<Key>-Idle-seam-fNN-f00-{front,q34}.jpg`: последний кадр и кадр 0 одной камерой, разница —
+  `seam.views.*.diff_px` отчёта (F154: по ключам 0/15/30/45 приёмщик шва не видел, и L держался на 1,5);
 - UE-кадры `<Key>-<Clip>-fNN-front-ue-editor.jpg` и `<Key>-<Clip>-fNN-q34-ue-editor.jpg` (§6.4);
 - у LungeAttack — крупный план `*-closeup-ue-editor.jpg` кадров вокруг контакта;
 - лист `<Key>-H2Anim-ue-sheet.jpg`.
 
 Кроме кадров приёмщик получает:
-- `design` клипа из спеки;
+- `design` клипа из спеки — цитатой в промпте; саму спеку с заметками исполнителя он не открывает;
 - `LUNGE_CONTACT_FRAME`;
 - отчёты validate, contact и `ue-measure-clips.json`;
-- референс §6.1 (`contact-sheet-2fps.png`, если есть);
-- лист концепта и QUALITY_REFERENCE для характера героя.
+- заметку о меше-носителе UE-кадров (серый, без look-dev материалов, подставка `SM_<Key>_H2LD_Base`; вставляет
+  `prep_acceptance.py`): цвет и материал в приёмке клипа не оцениваются;
+- референс §6.1 (`contact-sheet-2fps.png` образца библиотеки или своего видео, если есть) и `reference_kind`;
+- лист концепта и QUALITY_REFERENCE для характера героя;
+- блок известных пределов фигуры (§10.5).
+
+Отчёты исполнителя — только машинные JSON инструментов репозитория, с числами, без текста исполнителя (RA-27; правило
+независимости acceptance-and-blender.md §1 п.3): `grip-<Clip>.json` (`grip_check.py`, §6.3), `author-<Clip>.json`
+(журнал IK), `contact-<Clip>.json`, отчёт validate, `ue-measure-clips.json`. Свободный текст исполнителя («закрыто»,
+«читается лучше»), его заметки в спеке (`status_note`, `note`) и отчёт доработки приёмщику не идут (F118, F147). На
+r ≥ 2 приёмщик получает пункты прежней карточки — пункт, кадр, текст прежнего приёмщика — и в rationale отмечает по
+каждому «rN п.K: закрыт» или «не закрыт — что видно, кадр» (F99, как у модели).
 
 Игровые листы K1/K2 (`tools/art/anim/clip_review_sheet.py`, с отпечатком RENDER) появляются на этапе 7, после
 подключения S08. Ниже сказано, как они связаны с этим вердиктом (§11).
@@ -717,24 +908,67 @@ Notify `Contact` в приёмку клипа не входит: его став
 FAIL-гейт и каждое измерение < 1,0 (схема и `validate_card.py`). Пункты списка (`item`, `frame`, `fix`, `tool`)
 ссылаются только на измерения ниже 2 и на FAIL-гейты. При pass в `status_note` пишется «художественно принято, по
 делегированию» со ссылкой на `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`.
-`acceptor.profile`: «Opus xhigh» или «Sol 6.1 xhigh». Сессия приёмщика ≠ `executor_session_id`.
+`acceptor.profile`: «Opus xhigh» или «Sol 6.1 xhigh» — профиль фактического запуска (RA-17, F119). Сессия
+приёмщика ≠ `executor_session_id`.
+
+**Известные пределы фигуры** (F141, F156; правило скилла). Пределы, которые клипом не чинятся (HANDBOOK §4.5 п.4:
+жёсткий подол, наплечник, поворот головы, IK; у фигуры — свои: щит без кости, наездник на руке, F115), — один список на
+фигуру: `<ASSET_DIR>/evidence/acceptance-anim-prompts/known-limits.md`. Этап 6 пишет его и вставляет одним и тем же
+блоком «Известные пределы этой фигуры» во все 4 заготовки; правка списка — в файле и во всех заготовках сразу
+(`prep_acceptance.py --replace`). Оценка одна на все клипы (в пилоте один и тот же срез у подмышки получил D 1,5 в
+LungeAttack и D 0 в DeathSettle, F141):
+- предел без видимого разрыва — в `rationale` и `known_issues`, не в `rework_fix_list`; балл за него не ниже 1,0 (вето
+  пределом не ставится);
+- если на крупном плане предел даёт разрыв, дыру или отрыв части (якорь D 0), это уже не предел, а дефект модели:
+  пункт `rework_fix_list` с `tool: "этап 5 модели: <ключ профиля bake или стадия>"` и маршрут ниже.
+
+**Клип вскрыл дефект модели — поздний фикс** (RA-08, RC-06; правило скилла, `SKILL.md` §5 п.4). Дефект модели —
+то, что видно в rest или при допустимой амплитуде и ключами клипа не чинится: зазор «наездника» к телу (Leshen,
+`prepare.part_offsets_m`, F137), рваный срез конечности под плащом (Achilles, `rig.junctions`, F129, F148), рвущийся
+скин (веса).
+1. **Список правок пишет приёмщик клипа**: пункт с `tool: "этап 5 модели: …"` в его карточке. Этап 5 идёт только по
+   карточке `rework_blender` (acceptance-and-blender.md §9.1); оркестратор пунктов не составляет и не добавляет — в
+   пилоте его пункт оказался ложным FAIL инструмента (F149). Свои наблюдения оркестратор передаёт следующему
+   приёмщику модели кадрами, а не текстом брифа.
+2. **Цикл модели тратится**: этап 5 по этой карточке (`source_card` в `STAGE5[]` заявки) → новый прогон модели
+   `…-r<N+1>` с `--reuse-from` (ДС-7) → сдача модели (HANDBOOK §4.4) → приёмка модели цикла r<N+1> (на r ≥ 2 второй
+   приёмщик видит `changed_vs_previous`). Циклов модели не осталось — один поздний фикс сверх лимита, приёмка `r4`;
+   второй дефект модели из клипов — `escalate_user`.
+3. **Что перепринимается** после pass модели. Новый `SK_<Key>_H2.fbx` меняет sha цели, поэтому все 4 клипа авторятся
+   заново по новой спеке `<content-key>-h2anim-r<N>.json` (тот же блок `clips`, новый `target`; `H2ANIM` → новая
+   спека, строки `H2ANIM_CLIP` героя снять, §6.5). В UE (7a): переимпорт меша (`references/ue-import-package.md` §4.4),
+   меш превью через `skeleton` по sha (п.4 там же), клипы `import` и `measure`, `verify.clips_reference`,
+   `clip_manifest.py build`, UE-кадры — и приёмка всех 4 клипов: прежние карточки описывают другой FBX.
+4. **Цикл клипа не тратится**, если ключи клипа не менялись. Карточка перепринятия — с тем же `cycle`, что у
+   последней карточки клипа, в каталоге `evidence/acceptance-anim/<YYYYMMDD>-r<N>-m<M>/<Clip>/` (M — номер прогона
+   модели); `previous_card` — по правилу `validate_card.py` (у r1 `null`, у r2+ — карточка цикла r<N-1>); прежняя
+   карточка этого цикла — в `rationale` и `status_note` («перепринятие после позднего фикса модели r<M>, ключи те
+   же»). Клип, ключи которого менялись, — обычный следующий цикл r<N+1>.
+5. Поздний фикс отмечает в списке известных пределов, какие пункты закрыты (F156).
 
 ### 10.6 Доработка клипа (лично «Opus xhigh», бриф ниже)
 
 Бриф модели (`references/acceptance-and-blender.md` §10) для клипа не годится: он разрешает только `run_h2_bake.py` и
 профили bake/look-dev. Клип дорабатывается по брифу ниже. Работа делится так:
 - исполнитель «Opus xhigh» (агент Workflow `{model: 'opus', effort: 'xhigh'}`, как в acceptance-and-blender.md §1) —
-  только правка спеки и headless `h2anim_run.py`, без Unreal;
-- запускающий агент — после отчёта исполнителя: шаги §6.4 (импорт, measure, frames, sheet) под
-  `ue_lock.py`, §6.5 (манифест), кадры §10.3 в каталог нового цикла и вызов **нового** приёмщика.
+  только правка новой спеки и headless `h2anim_run.py`, без Unreal. Фактический механизм, модель и effort — в
+  `STAGE6.executor` заявки и в `executor_session_id` следующей карточки (RA-21);
+- запускающий агент — до брифа: новая спека; после отчёта исполнителя: регистрация `H2ANIM_CLIP` (§6.5), шаги §6.4
+  на шаге 7a под `ue_lock.py`, `verify.clips_reference` (`references/ue-import-package.md` §4.4 п.5),
+  `clip_manifest.py build`, каталог нового цикла `prep_acceptance.py --previous …` и вызов **нового** приёмщика.
 
 Правила:
-- Разрешено править только блок клипа в спеке: `keys`, `waves`, `key_frames`, `ik_feet`, `hand_follow`, вес и `mirror` у
-  `template`, `amplitude_scale`.
+- **Новая спека и новый прогон на доработку** (одно правило, F123, F103): копия прежней спеки —
+  `<ASSET_DIR>/build-profiles/<content-key>-h2anim-r<N>.json` с `run_dir` `<ASSET_DIR>/<YYYYMMDD>-h2anim-r<N>` (номер —
+  следующий свободный, `SKILL.md` §9); прежние спека и прогон не трогаются. Так шёл пилот
+  (Angel `angel-h2anim-r2.json`).
+- Разрешено править только блок клипа в новой спеке: `keys`, `waves`, `key_frames`, `ik_feet`, `hand_follow`, вес и
+  `mirror` у `template`, `amplitude_scale`.
 - `target`, `fps`, длины кадров (§2.1) и `LUNGE_CONTACT_FRAME` не менять. Новые кости не добавлять.
+- Пункт с `tool: "этап 5 модели…"` клипом не чинится: маршрут позднего фикса (§10.5).
 
 ```markdown
-# Доработка клипа AM_{{KEY}}_{{CLIP}}: приёмка {{CYCLE}} → r{{N_NEXT}} (этап 6 скилла 3d-model-pipeline)
+# Доработка клипа AM_{{KEY}}_{{CLIP}}: приёмка {{CYCLE}} → r{{N_NEXT}} (этап 6 скилла 3d-model-pipeline; приёмка — шаг 7a.2)
 
 Делегирование пользователя (2026-10-06, дословно): «Не знаю. Делай сам, меня это не касается. Все решения
 принимай». Траты: нет — кредиты Tripo/SYNTX, Unreal и упаковка на этом шаге запрещены.
@@ -745,41 +979,45 @@ FAIL-гейт и каждое измерение < 1,0 (схема и `validate_
 
 ## Вход
 - Карточка: {{E}}/{{CLIP}}/card.json (verdict rework_blender) и кадры {{E}}/{{CLIP}}/frames/.
-- Спека: {{SPEC}} (править только clips.{{CLIP}}); референс: {{REF_DIR}}.
-- Отчёты прошлого прогона (только чтение): {{RUN}}/reports/h2anim-run.json, contact-{{CLIP}}.json,
+- Спека: {{SPEC_NEXT}} — копия {{SPEC}} с run_dir {{RUN_NEXT}} (готовит запускающий); править только
+  clips.{{CLIP}}. Референс: {{REF_DIR}}.
+- Отчёты прошлого прогона (только чтение): {{RUN}}/reports/h2anim-run.json, contact-{{CLIP}}.json, grip-{{CLIP}}.json,
+  {{RUN}}/preview/closeups-blender/{{KEY}}-{{CLIP}}-closeups.json,
   docs/art-pipeline/animation-library/validation-h2anim/AM_{{KEY}}_{{CLIP}}.validation.json.
 
 ## Правки — только эти пункты rework_fix_list
 {{FIX_LIST — по пункту: item · frame · fix · tool}}
 
 ## Границы
-- Только ключи clips.{{CLIP}}: keys, waves, key_frames, ik_feet, hand_follow, template (вес, mirror),
-  amplitude_scale. target, fps, frames, design-кадр контакта {{CONTACT_FRAME}} и другие клипы не трогать.
-- Только headless: python tools/tripo-pipeline/anim/h2anim_run.py {{SPEC}} --clips={{CLIP}}.
+- Только ключи clips.{{CLIP}} в {{SPEC_NEXT}}: keys, waves, key_frames, ik_feet, hand_follow, template (вес, mirror),
+  amplitude_scale. target, fps, frames, design-кадр контакта {{CONTACT_FRAME}}, другие клипы и прежнюю спеку
+  {{SPEC}} не трогать.
+- Только headless: python tools/tripo-pipeline/anim/h2anim_run.py {{SPEC_NEXT}} --clips={{CLIP}}; свои проверки —
+  grip_check.py (по LungeAttack и DeathSettle — всегда) и clip_closeups.py --spec {{SPEC_NEXT}} --clip {{CLIP}}
+  --shots-from <отчёт closeups прошлого прогона> (animation-vfx-sfx.md §6.3, §10.3).
   Живой Blender — только осмотр. Код tools/tripo-pipeline/** не менять.
 - Без Unreal, без кредитов, без коммитов, без git add/stash/reset/checkout. Свои Blender-процессы — остановить по PID.
-- Пункт с tool «h2_bake профиль (веса), этап 5 модели» не делать: пометить «не закрыто: веса скина, этап 5».
+- Пункт с tool «этап 5 модели…» не делать: пометить «не закрыто: дефект модели, поздний фикс §10.5».
 
 ## Готово, если
 - h2anim_run.py дал код 0; validate и contact клипа — pass; новых FAIL нет.
-- Каждый пункт списка закрыт по листу preview/{{KEY}}-{{CLIP}}-blender-sheet.jpg (открыть и посмотреть) либо
-  помечен «не закрыто: <причина>».
+- Каждый пункт списка закрыт по листу preview/{{KEY}}-{{CLIP}}-blender-sheet.jpg и крупным планам того же типа, что у
+  приёмщика (открыть и посмотреть; числовое закрытие без кадра — не закрытие, F100), либо помечен
+  «не закрыто: <причина>».
 
 ## Отчёт (последнее сообщение)
-- Ключи спеки: было → стало, по пункту списка; sha256 нового FBX клипа; что не закрыто и почему.
-Баллы и вердикт не ставь: повторная приёмка — новый агент-приёмщик.
+- Ключи спеки: было → стало, по пункту списка; sha256 нового FBX клипа и новой спеки; что не закрыто и почему.
+- Механизм запуска, модель и effort этого исполнителя.
+Баллы и вердикт не ставь: повторная приёмка — новый агент-приёмщик. Твой отчёт приёмщику не передаётся.
 ```
 
-После брифа запускающий проверяет `git status --short` (изменились только спека, `export/AM_<Key>_<Clip>.fbx`,
-отчёты и листы прогона, отчёт validate), выполняет §6.4 и §6.5 для этого клипа (после шага 7b — ещё `de010.py apply`, §7), собирает кадры §10.3 в
-`evidence/acceptance-anim/<YYYYMMDD>-r<N+1>/<Clip>/frames/` и вызывает нового приёмщика (§10).
+После брифа запускающий проверяет `git status --short` (изменились только новая спека, новый run-каталог —
+`export/AM_<Key>_<Clip>.fbx`, отчёты и листы — и отчёт validate), дописывает `H2ANIM_CLIP` (§6.5), на шаге 7a
+выполняет §6.4 для этого клипа (после шага 7b — ещё `de010.py apply --only <Key>`, §7), собирает каталог цикла
+`prep_acceptance.py --cycle r<N+1> --previous <каталог прошлого цикла> --run <новый run> --replace "<старый run>/=<новый
+run>/" --refresh-sha` (`references/ue-import-package.md` §4.5) и вызывает нового приёмщика (§10).
 - Историю правок хранит git. В карточке нового цикла `accepted_object` содержит FBX клипа и спеку с sha256, а
   `previous_card` указывает на карточку прошлого цикла.
-- Дефект весов скина (рвётся одежда при допустимой амплитуде) клипом не чинится. Пункт `tool: "h2_bake профиль
-  (веса), этап 5 модели"` уходит в новый bake-прогон. Новый `SK_<Key>_H2.fbx` меняет sha цели, поэтому все 4 клипа
-  авторятся заново (`clip_author.py`, код 3).
-- Известные пределы HANDBOOK §4.5 п.4 приёмщик учитывает как ограничение: их записывают в `rationale`, а не в
-  `rework_fix_list`.
 
 ### 10.7 Калибровка (smoke-тест оркестратора)
 
@@ -790,24 +1028,38 @@ FAIL-гейт и каждое измерение < 1,0 (схема и `validate_
 
 ## 11. Выход этапа 6 и связь с этапом 7
 
-Этап 6 закрыт, когда выполнено всё ниже.
-- 4 клипа: карточки `verdict: pass` (`validate_card.py` код 0), `clip_manifest.py check` PASS. Notify `Contact` —
-  выход этапа 7 (`de010.py apply`, §7), не этапа 6.
+Этап 6 закрыт — это вход 7.0 (`references/ue-import-package.md` §2), — когда выполнено всё ниже.
+- 4 клипа авторены (ДС-1): `h2anim_run.py` код 0 (validate и contact PASS, WARN разобраны), проверки исполнителя §6.3
+  сняты, `clip_manifest.py build` → `MANIFEST_CHECK PASS` (клипы `measured`). Карточек клипов на этапе 6 нет.
+- Заготовки промптов приёмки 4 клипов и список известных пределов фигуры — в
+  `<ASSET_DIR>/evidence/acceptance-anim-prompts/` (§10, §10.5).
+- `MOTION_SOURCE` записан в заявку; паттерн библиотеки — строка «Отступления от хендбука» для README этапа 7 (§6.1).
 - VFX: слоты §8 с решением по каждому (по умолчанию «работает сразу» или «нет, фолбэк», запись в заявке).
 - SFX: `hit_type` записан в заявку (`HIT_TYPE`) и звук смерти выбран по §9; новый рецепт (если был) собран
   `sfx_build.py`, банк пересоздан `ue_bank.py` без удалённых строк; строки `03-sound-registry.csv` с пометкой о
   прослушивании. Импорт и проверка новых звуков в UE — в окне шага 7b (§5, §9).
-- Строки `AM_<Key>_<Clip>` в `03-asset-registry.csv` (§12.2) со статусом «технически импортировано»; художественный
-  статус ставится после листа K1/K2.
 
-На этапе 7 (`references/ue-import-package.md`) после подключения S08 и упаковки делается лист K1/K2 обеих настоящих досок
-через `tools/art/anim/clip_review_sheet.py run` и `sheet`. Новый герой — запись `HEROES` с явными карточками клипов
-(`"<Key>": Hero("<Character>", "<PRE>", <IDLE_SECONDS>, ("AN-…", "AN-…", "AN-…", "AN-…"))`, регистрация Р6-4) и
-запуск на вариантах фикстуры: `run --packaged --heroes <Key> --fixture marmoreal=S08BenchMarmoreal-<Key>.json,sarpedon=S08BenchSarpedon-<Key>.json`
-(новый герой — первым ключом: K1 снимает первый ключ `--heroes`), затем `sheet --cards <4 карточки>`. Бойца лист
-узнаёт по фокусу запуска (§2.1). Кадры обязаны нести `RENDER … reference=1`
-(`clip_review_sheet.py:501-502`). Дефект клипа на листе означает возврат клипа в доработку §10.6 (новый цикл). Чистый лист
-означает строку реестра 03 «художественно принято, по делегированию» (ВР-17, ВР-60).
+Дальше, на этапе 7:
+- **Шаг 7a.2** (`references/ue-import-package.md` §4.5): импорт клипов, `measure`, `clip_manifest.py build`
+  (`technically_imported`), UE-кадры, приёмка §10 → 4 карточки `pass`. Это выход 7a, а не этапа 6.
+- **Notify `Contact`** — шаг 7b, `de010.py apply --only <Key>` (§7).
+- **Реестры** — по таблице `references/new-character-registration.md` §10 (RA-26). Строки `AM_<Key>_<Clip>` в
+  `03-asset-registry.csv` (§12.2) пишутся на шаге 7.8, когда у клипов есть путь в UE: «технически импортировано», после
+  осмотра листа K1/K2 — «художественно принято, по делегированию» (ВР-17, ВР-60). На этапе 6 строк 03 нет.
+- **Лист K1/K2 AN-18** — после подключения S08 и упаковки, обе настоящие доски,
+  `tools/art/anim/clip_review_sheet.py run` и `sheet`. Новый герой — запись `HEROES` с явными карточками клипов
+  (регистрация Р6-4): `"<Key>": Hero("<Character>", "<PRE>", <IDLE_SECONDS>, ("AN-…", "AN-…", "AN-…", "AN-…"))`.
+  Запуск — на вариантах фикстуры:
+  `run --packaged --heroes <Key> --fixture marmoreal=S08BenchMarmoreal-<Key>.json,sarpedon=S08BenchSarpedon-<Key>.json`,
+  затем `sheet --heroes <Key>` (или `--cards <4 карточки>`). `--heroes` обязателен: по умолчанию инструмент снял бы
+  всех героев и переписал бы их закоммиченные листы (RB-12). Несколько новых героев — одним вызовом с картой фикстур на
+  героя (`--fixture "<Key1>:marmoreal=…,sarpedon=…;<Key2>:…"`, F159; регистрация Д-3). K1 — объединение кадров группы
+  запуска, не всех `HEROES` (76168867). Бойца лист узнаёт по фокусу запуска (§2.1). Кадры обязаны нести
+  `RENDER … reference=1` (`clip_review_sheet.py:501-502`); после переупаковки запуски переснимаются сами по штампу
+  сборки, `--force` не нужен.
+- Дефект клипа на листе означает возврат клипа в доработку §10.6 (новый цикл). Чистый лист означает строку реестра
+  03 «художественно принято, по делегированию» (ВР-17, ВР-60). Лист доказывает, что клип играет в игре, но с K1/K2
+  сверху плохо видно, как читается DeathSettle (F163): суть движения судит приёмка 7a.2.
 
 ## 12. Шаблоны
 
@@ -821,9 +1073,9 @@ FAIL-гейт и каждое измерение < 1,0 (схема и `validate_
 `fx_row`) добавляется только при FX способности (§8).
 
 Когда: только после `h2anim_ue.py import` (§6.4), когда оба `.uasset` уже в `unreal/Unmatched/Content/`. Иначе
-`validate-table` даёт FAIL `…sequence_by_fighter.<Key>: нет ассета …` (`cue_contract.py:257-260`), это гейт стопа
-`SKILL.md` §5 п.6. Где: в чекауте, в чей `Content` импортированы клипы (редактор, §5). Строка регистрации — Р7-6
-(`references/new-character-registration.md` §5.4). После правки:
+`validate-table` даёт FAIL `…sequence_by_fighter.<Key>: нет ассета …` (`cue_contract.py:257-260`) — разбор
+оркестратором (`SKILL.md` §5 п.6, ДС-2): ключ добавлен раньше импорта. Где: в чекауте, в чей `Content` импортированы
+клипы (редактор, §5). Строка регистрации — Р7-6 (`references/new-character-registration.md` §5.4). После правки:
 
 ```bash
 python tools/s08/cue_contract/cue_contract.py validate-table        # → CUE_TABLE PASS
@@ -840,16 +1092,21 @@ AM_<Key>_<Clip>,anim,"<событие и момент запуска>","Клип
 
 ## 13. Открытые пункты (честно)
 
-- Notify `Contact` нового героя ставит `de010.py apply` после строки `HEROES` (Р7-1); на новом герое этот шаг ещё не
-  прогонялся. Запасная задача живого редактора §7 собрана из проверенных вызовов DE-010, но отдельным шагом не
-  прогонялась.
+Закрыто пилотом 2026-10-13/14 (RA-24): notify `Contact` нового героя `de010.py apply` поставил трём героям пилота
+(автотесты S08 PASS в 7b, F157 — с откатом пересохранённых MVP, теперь `--only`); лист K1/K2 AN-18 снят живым
+packaged-прогоном на вариантах фикстуры, packaged-клиент читает loose-вариант (F158).
+
+- Запасная задача живого редактора §7 собрана из проверенных вызовов DE-010, но отдельным шагом не прогонялась.
 - Шаги SYNTX §6.1 (create-chat, upload-files, разбор `fileobj.json`) собраны по заголовку `gen.sh`, 07 §2.4 и
-  сохранённым ответам сессии King Arthur; сквозным платным прогоном для нового героя не проверялись.
-- Лист K1/K2 на новом герое (вариант фикстуры, фокус запуска, явные карточки — Д-2/Д-3) проверен тестами и
-  синтетическими трассами, но живым packaged-прогоном ещё не снимался; чтение loose-варианта фикстуры
-  packaged-клиентом тоже не подтверждено (при `BENCH FAILED fixture load` — путь пака, регистрация Д-2).
-- `ue_h5cb1.py`, `de010.py`, `fx_ability.py` и `build_manifest.py` зашиты на существующих героев: новому нужны строки
-  регистрации (`references/new-character-registration.md`).
+  сохранённым ответам сессии King Arthur; сквозным платным прогоном для нового героя не проверялись. Пилот шёл на
+  паттернах библиотеки (ДС-6), SYNTX — только для нестандартного движения.
+- Заметка манифеста `clip_manifest.py` пишет «по видео-референсу» и для паттерна библиотеки (F50); дата валидации в
+  манифесте зашита 2026-09-29 (F130). Источник движения — по `reference_kind` спеки.
+- Крупные планы и пара шва Idle (`clip_closeups.py`), `grip_check.py` и `weapon.extra_parts` в `clip_contact_check`
+  появились после пилота (42ed7951, ee301065, 00f358c7) и на новом герое целиком ещё не прогонялись.
+- Дымовой прогон §6.6 — правило после пилота (RC-06); на фигуре ещё не прогонялся.
+- `ue_h5cb1.py`, `fx_ability.py` и `build_manifest.py` зашиты на существующих героев: новому нужны строки регистрации
+  или новый код (`references/new-character-registration.md`).
 - Контракт рига, сокеты и `ik_chains` имеют статус «предложено». Общий ретаргет в UE не доказан. Сокет Harpy
   `Weapon` (профиль `foot.R` против «кисти» контракта) — расхождение из HANDBOOK §2.7 и §10.
 - `MS_*` (MetaSound) спроектированы, но в Content их нет. Прослушивание звука пользователем не проводилось
