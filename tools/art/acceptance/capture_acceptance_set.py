@@ -3,7 +3,8 @@
 
     python tools/art/acceptance/capture_acceptance_set.py --fbx <SK_*.fbx> --textures <dir> --out <evidence>/frames \
         [--key <Key>] [--sheet <sheet-<key>.png>] [--side-view left|right] [--measure <measure-report.json>] \
-        [--allow-no-tone] [--blender <exe>] [--base <SM_*_Base.fbx> | --no-base] [--previous <frames dir> | none]
+        [--allow-no-tone] [--blender <exe>] [--base <SM_*_Base.fbx> | --no-base] [--previous <frames dir> | none] \
+        [--asset-card <asset-card.yaml>] [--attack-bone <кость> | none]
 
 Вход: отгружаемый скелетный FBX (UM_FBX_v1, `HANDBOOK §2.2`) и каталог его текстур. Из каталога берутся BC, N
 (DirectX, `HANDBOOK §2.4`) и ORM: `*_BC.png` / `*_2K_BC.png` / `*_BC_2K.png` (последнее — раскладка форков Arthur и
@@ -32,6 +33,13 @@ Merlin), то же для `_N` (не `_N_OpenGL`) и `_ORM`; при нескол
                                 не больше 1200 px по длинной стороне, PNG с палитрой 256 цветов
   pose-01.jpg … pose-04.jpg     только при арматуре: позы из тестов tools/tripo-pipeline/anim/rig_deform_probe.py
   pose-03b.jpg                  поза pose-03 со второго ракурса (где оружие и голова разведены сильнее всего)
+  pose-04b.jpg                  при арматуре: поза pose-04 со второго ракурса — азимут (шаг 30°, не ближе 60° к az 70
+                                pose-04), где таз и поднятое бедро видны лучше всего (F77: у Achilles их закрывал щит)
+  pose-05.jpg                   при арматуре: рука оружия (без оружия — атакующая, иначе правая) вперёд (плечо X −70°,
+                                предплечье X −20°), со спины 3/4 этой стороны (R az 225, L az 135); рамка — верх фигуры
+                                от тазобедренного сустава, оружие не в рамке (F129: кромка проймы плаща за подмышкой)
+  close-attack.jpg              только при кости атаки (WEAPON_HAND none заявки → WEAPON_SOCKET_BONE, или --attack-bone):
+                                две панели 600x1200 по группе этой кости — бок и спина 3/4 (F74: когти/кисть без оружия)
   sheet.png                     копия --sheet, не больше 1200 px по длинной стороне (оригинал — frames.json#sheet.source)
   compare-front.jpg, compare-side.jpg, compare-back.jpg
                                 вид листа | turn-000 / turn-090|270 (--side-view) / turn-180 в одном росте фигуры
@@ -40,7 +48,13 @@ Merlin), то же для `_N` (не `_N_OpenGL`) и `_ORM`; при нескол
                                 берутся из оригинала листа, не из sheet.png)
   tone.json                     тон классов против концепта (если есть measure-report.json)
   frames.json                   schema unmatched.acceptance-frames/1: входы с sha256, accepted_object (SK, SM и 2K-карты
-                                для карточки), камеры, позы, pose_checks, лист, проверки, changed_vs_previous
+                                для карточки), камеры, позы, pose_checks, лист, проверки, changed_vs_previous, roles
+                                (файл → что на нём смотреть; у каждого кадра frames[].role), attack
+Новые кадры пилота 2026-10-14 (pose-04b, pose-05, close-attack) — добавочные: имена прежних не менялись, validate_card.py
+их не требует (старые карточки без них проходят); pose-05 обрезан намеренно (проверка края кадра его не касается).
+Кость атаки: --attack-bone (none — не снимать), иначе asset-card.yaml ассета (--asset-card, по умолчанию ближайший
+asset-card.yaml вверх от --fbx): WEAPON_HAND none и WEAPON_SOCKET_BONE не null → эта кость. У героя с оружием
+close-attack не снимается (хват — close-weapon), если кость не задана флагом.
 Кадры приёмщика — не больше 1200 px по длинной стороне (HANDBOOK §8; RC-22/F97: приёмщик Sol получает все файлы
 frames.json#files картинками, лишние мегабайты — переподключения WebSocket): JPEG 1200 px, качество 92; sheet.png и
 uv-layout.png остаются PNG (имена требует validate_card.py). Blender — headless (`-b --factory-startup`), процесс
@@ -88,6 +102,45 @@ FIXED = TURNS + ["close-head.jpg", "close-weapon.jpg", "close-base.jpg", "wire-f
                  "wire-back.jpg"]
 RIG_ONLY = (["close-hands.jpg", "close-torso.jpg", "close-head-back.jpg", "close-torso-back.jpg", "close-legs.jpg",
              "close-legs-back.jpg"] + ["pose-%02d.jpg" % i for i in range(1, 5)] + ["pose-03b.jpg"])
+# Добавочные кадры пилота 2026-10-14 (F77, F129) — при арматуре; close-attack (F74) — при кости атаки. validate_card.py
+# их не требует: карточки наборов до 2026-10-14 остаются валидными.
+RIG_EXTRA = ["pose-04b.jpg", "pose-05.jpg"]
+ATTACK_FRAME = "close-attack.jpg"
+CROPPED = {"pose-05.jpg"}  # обрезан намеренно (верх фигуры): проверка «фигура касается края» не применяется
+PANELS = {"close-hands-": ("close-hands.jpg", "две панели 600x1200: hand.R слева, hand.L справа"),
+          "close-attack-": ("close-attack.jpg", "две панели 600x1200: бок слева, спина 3/4 справа")}
+# Что смотреть на кадре (frames.json#roles и frames[].role): вход запускающего и приёмщика, не основание балла
+ROLES = {
+    **{t: "поворот %s°: силуэт, пропорции, палитра против листа" % t[5:8] for t in TURNS},
+    "close-head.jpg": "голова 3/4 спереди: лицо, волосы, головной убор",
+    "close-head-back.jpg": "голова со спины: затылок, волосы/змеи сзади",
+    "close-weapon.jpg": "хват оружия: кисть и рукоять (без кости оружия — верх фигуры)",
+    "close-hands.jpg": "обе кисти 3/4 спереди (hand.R | hand.L): пальцы, когти, наручи",
+    "close-torso.jpg": "корпус 3/4 спереди: доспех, ткань, стыки плеч",
+    "close-torso-back.jpg": "спина: задняя сторона плеч, колчан, верх плаща",
+    "close-legs.jpg": "ноги и низ одежды 3/4 спереди",
+    "close-legs-back.jpg": "ноги и низ одежды со спины",
+    "close-base.jpg": "подставка со стопами: края, просвет, контакт",
+    "wire-front.jpg": "сетка спереди: плотность и потоки",
+    "wire-34.jpg": "сетка 3/4 сверху",
+    "wire-back.jpg": "сетка сзади: спина, затылок, плащ",
+    "uv-layout.png": "развёртка UV0 поверх BC: острова, покрытие",
+    "pose-01.jpg": "поза: левая рука поднята, предплечье согнуто — плечо, локоть, стык с корпусом",
+    "pose-02.jpg": "поза: правая рука поднята — плечо, подмышка",
+    "pose-03.jpg": "поза: наклон корпуса и поворот головы — шея, талия, оружие у головы",
+    "pose-03b.jpg": "pose-03 со второго ракурса: оружие и голова разведены",
+    "pose-04.jpg": "поза: левое бедро поднято — таз, юбка/подол",
+    "pose-04b.jpg": "pose-04 со второго ракурса: таз, поднятое бедро и юбка/подол без заслона (F77)",
+    "pose-05.jpg": "рука оружия вперёд, спина 3/4: пройма плаща, подмышка, задняя сторона плеча (F129)",
+    ATTACK_FRAME: "атакующая конечность без оружия, бок и спина 3/4: когти/кисть целиком (F74)",
+    "sheet.png": "лист концепта (эталон S)",
+    "compare-front.jpg": "лист | turn-000 в одном росте",
+    "compare-side.jpg": "лист | боковой turn в одном росте",
+    "compare-back.jpg": "лист | turn-180 в одном росте",
+    "tone.json": "тон классов против концепта, потолок T",
+    "frames.json": "манифест набора",
+}
+CARD_KEY = re.compile(r"^(?P<k>[A-Z_]+):\s*(?P<v>\"[^\"]*\"|[^#\n]*?)\s*(#.*)?$", re.MULTILINE)
 COMPARE = {"front": "compare-front.jpg", "side": "compare-side.jpg", "back": "compare-back.jpg"}
 STALE = re.compile(r"(turn-\d{3}|close-[a-z]+(-[a-z]+)?|wire-\w+|pose-\d{2}b?|compare-[a-z]+)\.jpg|uv-layout\.png"
                    r"|sheet\.png|frames\.json|tone\.json")
@@ -295,6 +348,39 @@ def sheet_info(sheet: Path, key: str | None = None) -> dict:
     return info
 
 
+def card_scalars(text: str, keys=("WEAPON_HAND", "WEAPON_SOCKET_BONE")) -> dict:
+    """Скаляры верхнего уровня asset-card.yaml (первое вхождение ключа в начале строки): строки без кавычек, null → None."""
+    out = {}
+    for m in CARD_KEY.finditer(text):
+        k = m.group("k")
+        if k in keys and k not in out:
+            v = m.group("v").strip().strip('"')
+            out[k] = None if v in ("", "null", "~") else v
+    return out
+
+
+def find_asset_card(start: Path) -> Path | None:
+    """Ближайший asset-card.yaml вверх от start (каталог ассета art/pipeline-candidates/<ASSET>/)."""
+    for d in [start] + list(start.parents):
+        p = d / "asset-card.yaml"
+        if p.is_file():
+            return p
+        if d == REPO:
+            break
+    return None
+
+
+def resolve_attack(flag: str | None, card: dict | None) -> tuple[str | None, str | None]:
+    """Кость атаки для close-attack (F74) и её источник: --attack-bone (none — не снимать); иначе заявка: WEAPON_HAND
+    none и WEAPON_SOCKET_BONE не null. Иначе (None, None)."""
+    if flag is not None:
+        return (None, "--attack-bone none") if flag.lower() == "none" else (flag, "--attack-bone")
+    card = card or {}
+    if (card.get("WEAPON_HAND") or "").lower() == "none" and card.get("WEAPON_SOCKET_BONE"):
+        return card["WEAPON_SOCKET_BONE"], "asset-card WEAPON_HAND none → WEAPON_SOCKET_BONE"
+    return None, None
+
+
 def find_measure(fbx: Path) -> Path | None:
     """<run>/reports/measure-report.json для FBX в <run>/export/ (генерический look-dev, стадия ld_measure)."""
     p = fbx.parent.parent / "reports" / "measure-report.json"
@@ -472,6 +558,10 @@ def main(argv=None) -> int:
     g.add_argument("--no-base", action="store_true", help="без подставки")
     ap.add_argument("--previous", help="каталог frames прежнего цикла для frames.json#changed_vs_previous (F151); "
                                        "по умолчанию — <дата>-r<N-1>/frames рядом с --out; none — не сравнивать")
+    ap.add_argument("--asset-card", help="asset-card.yaml ассета (кость атаки для close-attack; по умолчанию — "
+                                         "ближайший вверх от --fbx)")
+    ap.add_argument("--attack-bone", help="кость атакующей конечности для close-attack (F74), например hand.R; none — "
+                                          "не снимать; по умолчанию — WEAPON_SOCKET_BONE заявки при WEAPON_HAND none")
     a = ap.parse_args(argv)
 
     fbx = Path(a.fbx).resolve()
@@ -515,6 +605,12 @@ def main(argv=None) -> int:
     elif not a.previous:
         previous = find_previous(out)
         previous_source = "auto: <дата>-r<N-1>/frames рядом с --out" if previous else None
+    card_path = Path(a.asset_card).resolve() if a.asset_card else find_asset_card(fbx.parent)
+    if a.asset_card and not card_path.is_file():
+        print("FAIL: нет asset-card %s" % card_path, file=sys.stderr)
+        return 1
+    card_vals = card_scalars(card_path.read_text(encoding="utf-8")) if card_path is not None else {}
+    attack_bone, attack_source = resolve_attack(a.attack_bone, card_vals)
     out.mkdir(parents=True, exist_ok=True)
     stale = [p for p in out.iterdir() if STALE.fullmatch(p.name)]
     for p in stale:  # повторный прогон в тот же каталог: старые кадры не должны смешаться с новыми
@@ -523,7 +619,8 @@ def main(argv=None) -> int:
     work = Path(tempfile.mkdtemp(prefix="accept-capture-"))
     try:
         cfg = {"fbx": str(fbx), "base_fbx": str(base) if base else None, "textures": {k: str(v) for k, v in tex.items()},
-               "work_dir": str(work), "size": SIZE, "probe_source": str(PROBE_SOURCE)}
+               "work_dir": str(work), "size": SIZE, "probe_source": str(PROBE_SOURCE),
+               "attack_bone": attack_bone, "attack_source": attack_source}
         (work / "cfg.json").write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
         cmd = [a.blender, "-b", "--factory-startup", "--python-exit-code", "1",
                "--python", str(BLENDER_SCRIPT), "--", str(work / "cfg.json")]
@@ -536,11 +633,17 @@ def main(argv=None) -> int:
             return 1
         info = json.loads((work / "capture.json").read_text(encoding="utf-8"))
         uv = draw_uv_layout(work / "uv-data.npz", tex["bc"], out / "uv-layout.png", info["meshes"])
-        expected = FIXED + (RIG_ONLY if info["armature"] else [])
+        expected = (FIXED + (RIG_ONLY + RIG_EXTRA if info["armature"] else [])
+                    + ([ATTACK_FRAME] if info.get("attack") else []))
         checks, errors = {}, []
         raw_l, raw_r = work / "raw" / "close-hands-L.png", work / "raw" / "close-hands-R.png"
         if raw_l.is_file() and raw_r.is_file():
             compose_panels(raw_r, raw_l, work / "raw" / "close-hands.png")
+        raw_s, raw_b = work / "raw" / "close-attack-side.png", work / "raw" / "close-attack-back.png"
+        if raw_s.is_file() and raw_b.is_file():
+            bone = (info.get("attack") or {}).get("bone", "")
+            compose_panels(raw_s, raw_b, work / "raw" / "close-attack.png",
+                           labels=("%s: бок" % bone, "%s: спина 3/4" % bone))
         for name in expected:
             raw = work / "raw" / (name[:-4] + ".png")
             if not raw.is_file():
@@ -550,23 +653,25 @@ def main(argv=None) -> int:
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
-    # frames.json#frames: панели close-hands-R/L склеены в один кадр close-hands.jpg (имена = frames.json#files)
-    frames_meta, panels = [], []
+    # frames.json#frames: панели close-hands-R/L и close-attack-side/back склеены в кадры close-hands.jpg и
+    # close-attack.jpg (имена = frames.json#files); у каждого кадра role (ROLES)
+    frames_meta, panels = [], {}
     for f in info["frames"]:
-        if f["name"].startswith("close-hands-"):
-            panels.append(dict(f, panel=f["name"][len("close-hands-"):-4]))
+        pre = next((k for k in PANELS if f["name"].startswith(k)), None)
+        if pre:
+            panels.setdefault(pre, []).append(dict(f, panel=f["name"][len(pre):-4]))
         else:
-            frames_meta.append(f)
-    if panels:
-        frames_meta.append({"name": "close-hands.jpg", "material": "preview",
-                            "note": "две панели 600x1200: hand.R слева, hand.L справа", "panels": panels})
+            frames_meta.append(dict(f, role=ROLES.get(f["name"])))
+    for pre, pl in panels.items():
+        name, note = PANELS[pre]
+        frames_meta.append({"name": name, "material": "preview", "note": note, "panels": pl, "role": ROLES.get(name)})
 
     for name, c in checks.items():
         if c["size"] != [SIZE, SIZE]:
             errors.append("%s: размер %s" % (name, c["size"]))
         if c["foreground_share"] < 0.02:
             errors.append("%s: фигура не видна (доля переднего плана %.3f)" % (name, c["foreground_share"]))
-        if (name in TURNS or name.startswith(("wire-", "pose-"))) and c["touches_border"]:
+        if (name in TURNS or name.startswith(("wire-", "pose-"))) and name not in CROPPED and c["touches_border"]:
             errors.append("%s: фигура касается края кадра (обрезана)" % name)
     if uv["coverage"] < 0.005:
         errors.append("uv-layout.png: покрытие UV %.4f — UV пустые или вырождены" % uv["coverage"])
@@ -674,12 +779,18 @@ def main(argv=None) -> int:
                               "где стопа поднята)",
                    "wire": "Wireframe node 1 px на глине 0,55"},
         "bounds_m": info["bounds_m"], "meshes": info["meshes"], "armature": info["armature"],
-        "frames": frames_meta + [{"name": "uv-layout.png", **uv}],
+        "frames": frames_meta + [{"name": "uv-layout.png", **uv, "role": ROLES["uv-layout.png"]}],
         "compare": compare_meta or None,
         "side_view": a.side_view,
         "poses": info["poses"] or "n/a: нет арматуры",
         "pose_source": repo_rel(PROBE_SOURCE),
         "pose_checks": info.get("pose_checks") or {},
+        "attack": (dict(info["attack"], asset_card=repo_rel(card_path) if card_path else None)
+                   if info.get("attack") else
+                   {"bone": None, "requested": attack_bone, "source": attack_source,
+                    "asset_card": repo_rel(card_path) if card_path else None,
+                    "note": "close-attack не снят: %s" % ("нет кости в арматуре" if attack_bone else
+                                                         "нет кости атаки (оружие или WEAPON_HAND не none)")}),
         "sheet": sheet_meta,
         "tone": ({"file": "tone.json", "t_cap": tone["t_cap"], "out_of_tolerance": tone["out_of_tolerance"],
                   "floor_limited": tone["floor_limited"], "family_changed_main": tone["family_changed_main"],
@@ -687,6 +798,7 @@ def main(argv=None) -> int:
         "checks": checks, "warnings": warnings, "errors": errors,
         "changed_vs_previous": cvp,
         "files": files,
+        "roles": {f: ROLES.get(f) for f in files},
     }
     (out / "frames.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     for w in warnings:

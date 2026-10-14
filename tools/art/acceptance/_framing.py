@@ -27,6 +27,36 @@ def view_fit_scale(points, target, az_deg, el_deg, margin=1.10):
     return 2.0 * half * margin
 
 
+def panel_fit_scale(points, target, az_deg, el_deg, aspect=0.5, margin=1.15):
+    """ortho_scale портретной панели (ширина = aspect × высота; Blender относит ortho_scale к большей стороне — высоте),
+    при котором все точки видны с запасом margin: половина высоты = max(|вверх|, |вправо| / aspect)."""
+    pts = np.asarray(points, dtype=float).reshape(-1, 3) - np.asarray(target, dtype=float).reshape(1, 3)
+    d = view_dir(az_deg, el_deg)
+    up = np.array([0.0, 0.0, 1.0]) - d[2] * d
+    n = float(np.linalg.norm(up))
+    up = up / n if n > 1e-9 else np.array([0.0, 1.0, 0.0])
+    right = np.cross(up, d)
+    half = max(float(np.abs(pts @ up).max()), float(np.abs(pts @ right).max()) / aspect)
+    return 2.0 * half * margin
+
+
+def ang_diff(a, b):
+    """Угол между азимутами, 0…180°."""
+    return abs((float(a) - float(b) + 180.0) % 360.0 - 180.0)
+
+
+def best_visible_azimuth(visible, avoid_deg, min_sep=60.0):
+    """Азимут второго ракурса позы (pose-04b, F77): из {азимут: доля видимых вершин цели} — с наибольшей долей среди
+    азимутов не ближе min_sep к avoid_deg (ракурс основного кадра); при равенстве — ближе к фронту (az 0), затем меньший
+    азимут. (az, доля) или (None, None), если подходящих нет."""
+    cands = [(float(v), -ang_diff(az, 0.0), -int(az), int(az)) for az, v in visible.items()
+             if ang_diff(az, avoid_deg) >= min_sep]
+    if not cands:
+        return None, None
+    best = max(cands)
+    return best[3], best[0]
+
+
 CLOSE_MIN, CLOSE_MAX = 0.12, 0.25  # крупный план кисти/хвата: рамка 12–25 % роста (решение скилла)
 
 

@@ -5,11 +5,26 @@
   blender -b --factory-startup --python tools/art/acceptance/_blender_capture.py -- <cfg.json>
 
 Запускается обёрткой capture_acceptance_set.py; cfg.json пишет обёртка:
-  {"fbx", "base_fbx"|null, "textures": {"bc","n","orm"}, "work_dir", "size", "probe_source"}
+  {"fbx", "base_fbx"|null, "textures": {"bc","n","orm"}, "work_dir", "size", "probe_source",
+   "attack_bone"|null, "attack_source"|null}
 Выход (всё в work_dir; JPEG и uv-layout.png собирает обёртка): raw/{turn-000..turn-315, close-head, close-weapon,
 close-torso, close-head-back, close-torso-back, close-legs, close-legs-back, close-base, close-hands-R, close-hands-L
-(две панели 1:2, склеивает обёртка), wire-front, wire-34, wire-back, pose-01..04, pose-03b}.png (RGBA, прозрачный фон),
-uv-data.npz (UV0 треугольников), capture.json (pose_checks: 3D-зазоры оружие–голова и оружие–тело в каждой позе).
+(две панели 1:2, склеивает обёртка), close-attack-side, close-attack-back (две панели 1:2, только при attack_bone),
+wire-front, wire-34, wire-back, pose-01..04, pose-03b, pose-04b, pose-05}.png (RGBA, прозрачный фон),
+uv-data.npz (UV0 треугольников), capture.json (pose_checks: 3D-зазоры оружие–голова и оружие–тело в каждой позе,
+ракурс pose-04b по видимости, attack).
+
+Кадры пилота 2026-10-14 (добавочные, прежние не меняются):
+- pose-04b (F77): поза pose-04 со второго ракурса — азимут (шаг 30°, не ближе 60° к az pose-04), где из вершин таза и
+  поднятого бедра (доминирующие группы thigh_l и её родителя) видно больше всего (луч от вершины к камере ни во что не
+  упирается): у Achilles щит закрывал бедро и юбку с az 70, оболочка юбки П3-3 осталась без оценки.
+- pose-05 (F129): рука оружия (без оружия — атакующая, иначе правая) вперёд — плечо X −70°, предплечье X −20° (как
+  выпад/бросок; оси и знаки — rig_deform_probe) — со спины 3/4 этой стороны (R: az 225, L: az 135), рамка — верх
+  фигуры от тазобедренного сустава (оружие в рамку не входит): кромка проймы плаща Achilles за правой подмышкой
+  раскрывалась только в клипах этапа 6.
+- close-attack (F74): при attack_bone (WEAPON_HAND none: сокет-кость атаки, когти/кисть/лапа) — две панели 600×1200 по
+  группе этой кости: бок (R: az 270, L: az 90) и спина 3/4 (R: az 215, L: az 145); рамка — вся группа с запасом 15 %,
+  не меньше 12 % роста. Фронт 3/4 атакующей кисти даёт close-hands; close-weapon без кости оружия показывает верх фигуры.
 
 Сцена: FBX UM_FBX_v1 (лицо +X) поворачивается на -90 deg вокруг Z обратно в авторский кадр (лицо -Y, сторона .L = +X),
 как st_preview.py h2_bake. Материал превью: BC (sRGB) -> Base Color; N (Non-Color, DirectX) -> зелёный канал
@@ -28,8 +43,8 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _framing import (best_separating_azimuth, clamp_close_scale,  # noqa: E402  (только numpy;
-                      view_fit_scale)  # тестируется без Blender)
+from _framing import (CLOSE_MIN, best_separating_azimuth, best_visible_azimuth,  # noqa: E402  (только numpy;
+                      clamp_close_scale, panel_fit_scale, view_fit_scale)  # тестируется без Blender)
 
 if not bpy.app.background:
     raise RuntimeError("_blender_capture.py: только headless (blender -b)")
@@ -45,17 +60,49 @@ POSES = [
 # Ноги и низ одежды для close-legs / close-legs-back (кости UM_HUMANOID_17_v2, docs/art-pipeline/rig/rig-contract.json)
 LEG_GROUPS = ["hips", "leg_upper.L", "leg_upper.R", "leg_lower.L", "leg_lower.R", "foot.L", "foot.R"]
 CONTACT_M = 0.003  # 3D-зазор оружия меньше 3 мм на модели ~0,6 м — касание или проникновение (решение скилла)
+# pose-05 (F129): рука вперёд — повороты вокруг мировой оси X через голову кости, как тесты rig_deform_probe
+# (X − сгибает вперёд: forearm_l_bend −40, thigh_l_flex −35); ракурс — спина 3/4 стороны руки
+ARM_FORWARD = (("arm", "X", -70), ("fore", "X", -20))
+POSE05_AZ, POSE05_EL = {"R": 225, "L": 135}, 10
+# pose-04b (F77): кандидаты азимута и отступ от ракурса pose-04
+POSE04B_CANDIDATES, POSE04B_MIN_SEP, POSE04B_SAMPLE = range(0, 360, 30), 60, 400
+# close-attack (F74): бок и спина 3/4 атакующей конечности
+ATTACK_AZ = {"R": (("side", 270), ("back", 215)), "L": (("side", 90), ("back", 145))}
 
 
 def probe_definitions(path):
-    """FAMILIES и TESTS из rig_deform_probe.py без импорта (модуль при импорте сразу запускает main())."""
+    """FAMILIES и TESTS из rig_deform_probe.py без импорта (модуль при импорте сразу запускает main()); третьим —
+    FAMILIES_EXT (кости расширенных проб: fore_r, hand_*), {} если их нет."""
     tree = ast.parse(open(path, encoding="utf-8").read())
     out = {}
     for node in tree.body:
         if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
-            if node.targets[0].id in ("FAMILIES", "TESTS"):
+            if node.targets[0].id in ("FAMILIES", "TESTS", "FAMILIES_EXT"):
                 out[node.targets[0].id] = ast.literal_eval(node.value)
-    return out["FAMILIES"], out["TESTS"]
+    return out["FAMILIES"], out["TESTS"], out.get("FAMILIES_EXT", {})
+
+
+def visible_share(bvh, pts, az, el, eps):
+    """Доля точек pts (вершины поверхности), из которых луч к камере (az, el) ни во что не упирается."""
+    d = direction(az, el)
+    seen = 0
+    for p in pts:
+        loc, _n, _i, _dist = bvh.ray_cast(Vector(p.tolist()) + d * eps, d)
+        seen += loc is None
+    return seen / max(len(pts), 1)
+
+
+def figure_bvh(meshes, coords_by_mesh):
+    """BVH всех мешей в текущей позе (окклюзия для видимости)."""
+    from mathutils.bvhtree import BVHTree
+
+    verts, polys, off = [], [], 0
+    for o in meshes:
+        co = coords_by_mesh[o.name]
+        verts += [Vector(p.tolist()) for p in co]
+        polys += [tuple(off + v for v in p.vertices) for p in o.data.polygons]
+        off += len(co)
+    return BVHTree.FromPolygons(verts, polys, all_triangles=False)
 
 
 def rotate_bone(arm, bone, axis, deg):
@@ -411,6 +458,32 @@ def main():
                 warnings.append("close-hands: " + src)
             shot("close-hands-" + side, tgt, az_h, 10, ortho, "preview", src, res=(size // 2, size))
 
+    # close-attack (F74): атакующая конечность без оружия (attack_bone — сокет-кость заявки) — бок и спина 3/4,
+    # две портретные панели; рамка — вся группа кости (когти целиком) с запасом 15 %, не меньше 12 % роста
+    attack = None
+    ab = cfg.get("attack_bone")
+    if arm is not None and ab:
+        if ab not in arm.data.bones:
+            warnings.append("close-attack: нет кости %s в арматуре — кадр не снят" % ab)
+        else:
+            side = ab[-1] if ab[-2:] in (".L", ".R") else "R"
+            pts = group_coords(meshes, rest, ab)
+            if pts is not None and len(pts) >= 10:
+                tgt = Vector(((pts.min(axis=0) + pts.max(axis=0)) / 2).tolist())
+                src = "vertex group %s (%d вершин, вес >= 0,5)" % (ab, len(pts))
+            else:
+                pts = None
+                tgt = arm.matrix_world @ arm.data.bones[ab].head_local
+                src = "нет группы %s: голова кости, 12 %% роста" % ab
+                warnings.append("close-attack: " + src)
+            for tag, az_a in ATTACK_AZ[side]:
+                ortho = (max(panel_fit_scale(pts, tgt, az_a, 10), CLOSE_MIN * h) if pts is not None
+                         else clamp_close_scale(0.0, h))
+                shot("close-attack-" + tag, tgt, az_a, 10, ortho, "preview",
+                     "%s, %s (az %d)" % (src, {"side": "бок", "back": "спина 3/4"}[tag], az_a), res=(size // 2, size))
+            attack = {"bone": ab, "source": cfg.get("attack_source"), "side": side,
+                      "panels": [{"panel": t, "azimuth_deg": a} for t, a in ATTACK_AZ[side]], "framing": src}
+
     # close-torso: группа spine (вес >= 0,5), рамка не больше 45 % роста
     if arm is not None:
         sp = group_coords(meshes, rest, "spine")
@@ -474,13 +547,36 @@ def main():
     poses_out = []
     pose_checks = {}
     if arm is not None:
-        families, tests = probe_definitions(cfg["probe_source"])
+        families, tests, families_ext = probe_definitions(cfg["probe_source"])
         names = set(arm.data.bones.keys())
         fam = max(families, key=lambda f: sum(1 for v in families[f].values() if v in names))
-        fmap = families[fam]
+        fmap = dict(families_ext.get(fam, {}), **families[fam])
         tmap = {t[0]: t for t in tests}
         fig_meshes = [o for o in meshes if o.name not in base_objs]
         dom = dominant_groups(fig_meshes)
+
+        def weapon_check(posed_by):
+            """3D-зазоры жёсткого оружия в КАЖДОЙ позе (калибровка 2026-10-09, раунд 3): с головой (вместе с волосами,
+            змеями, короной — группа head) и с телом (вершины фигуры без подставки, чья главная группа не оружие, не
+            кисть и не предплечье руки с оружием — их оружие касается по построению хвата). На орто-кадре не понять,
+            перед головой клинок или сквозь неё; число решает. → (chk, вершины head, вершины оружия)."""
+            hd = group_coords(meshes, posed_by, "head")
+            wp = group_coords(meshes, posed_by, wbone) if wbone else None
+            chk = {"weapon_bone": wbone}
+            if wp is not None and len(wp):
+                side = wbone[-1]
+                body = body_coords(fig_meshes, posed_by, dom,
+                                   {wbone, "hand." + side, "arm_lower." + side, "head"})
+                if hd is not None and len(hd):
+                    dh = kd_min_distance(wp, hd)
+                    chk.update({"weapon_head_min_distance_m": round(dh, 5), "weapon_head_contact": dh < CONTACT_M})
+                if body is not None and len(body):
+                    db = kd_min_distance(wp, body)
+                    chk.update({"weapon_body_min_distance_m": round(db, 5), "weapon_body_contact": db < CONTACT_M})
+                chk["contact_threshold_m"] = CONTACT_M
+            else:
+                chk["note"] = "нет кости или группы оружия: зазоры не считаются"
+            return chk, hd, wp
 
         def pose_shot(pname, az, el, note, posed):
             pmn, pmx = posed.min(axis=0), posed.max(axis=0)
@@ -504,26 +600,7 @@ def main():
             posed = np.concatenate(list(posed_by.values()))
             pose_shot(pname, az, el, "+".join(combo), posed)
             poses_out.append({"name": pname + ".jpg", "family": fam, "rotations": applied})
-            # 3D-зазоры жёсткого оружия в КАЖДОЙ позе (калибровка 2026-10-09, раунд 3): с головой (вместе с волосами,
-            # змеями, короной — группа head) и с телом (вершины фигуры без подставки, чья главная группа не оружие,
-            # не кисть и не предплечье руки с оружием — их оружие касается по построению хвата). На орто-кадре не
-            # понять, перед головой клинок или сквозь неё; число решает.
-            hd = group_coords(meshes, posed_by, "head")
-            wp = group_coords(meshes, posed_by, wbone) if wbone else None
-            chk = {"weapon_bone": wbone}
-            if wp is not None and len(wp):
-                side = wbone[-1]
-                body = body_coords(fig_meshes, posed_by, dom,
-                                   {wbone, "hand." + side, "arm_lower." + side, "head"})
-                if hd is not None and len(hd):
-                    dh = kd_min_distance(wp, hd)
-                    chk.update({"weapon_head_min_distance_m": round(dh, 5), "weapon_head_contact": dh < CONTACT_M})
-                if body is not None and len(body):
-                    db = kd_min_distance(wp, body)
-                    chk.update({"weapon_body_min_distance_m": round(db, 5), "weapon_body_contact": db < CONTACT_M})
-                chk["contact_threshold_m"] = CONTACT_M
-            else:
-                chk["note"] = "нет кости или группы оружия: зазоры не считаются"
+            chk, hd, wp = weapon_check(posed_by)
             pose_checks[pname] = chk
             if pname == "pose-03":
                 # Второй ракурс той же позы: длинное жёсткое оружие в сочетании проб (корпус + голова) может встать
@@ -538,6 +615,58 @@ def main():
                 pose_shot("pose-03b", az_b, 10, "+".join(combo) + ", второй ракурс", posed)
                 poses_out.append({"name": "pose-03b.jpg", "family": fam, "rotations": applied,
                                   "note": "та же поза, что pose-03, другой ракурс"})
+            if pname == "pose-04":
+                # pose-04b (F77): второй ракурс — где таз и поднятое бедро видны лучше всего (у Achilles с az 70 их
+                # закрывал щит): доля вершин цели, из которых луч к камере ни во что не упирается
+                thigh = arm.data.bones.get(applied[0]["bone"]) if applied else None
+                groups = ({thigh.name} | ({thigh.parent.name} if thigh.parent else set())) if thigh else set()
+                tp = [posed_by[o.name][np.isin(dom[o.name], list(groups))] for o in fig_meshes]
+                tp = np.concatenate([x for x in tp if len(x)]) if any(len(x) for x in tp) else np.zeros((0, 3))
+                if len(tp):
+                    tp = tp[np.linspace(0, len(tp) - 1, min(len(tp), POSE04B_SAMPLE)).astype(int)]
+                    bvh = figure_bvh(meshes, posed_by)
+                    vis = {a: visible_share(bvh, tp, a, el, 1e-4 * h) for a in POSE04B_CANDIDATES}
+                    az_b, share = best_visible_azimuth(vis, az, POSE04B_MIN_SEP)
+                    chk.update({"pose-04b_azimuth_deg": az_b, "pose-04b_visible_share": round(share, 4),
+                                "pose-04b_visibility": {str(a): round(v, 4) for a, v in vis.items()},
+                                "pose-04b_target_groups": sorted(groups), "pose-04b_target_vertices": int(len(tp))})
+                else:
+                    az_b = (360 - az) % 360
+                    chk["note_04b"] = "нет вершин групп %s: pose-04b — зеркальный ракурс" % sorted(groups)
+                    chk["pose-04b_azimuth_deg"] = az_b
+                pose_shot("pose-04b", az_b, el, "+".join(combo) + ", второй ракурс (видимость таза и бедра)", posed)
+                poses_out.append({"name": "pose-04b.jpg", "family": fam, "rotations": applied,
+                                  "note": "та же поза, что pose-04, ракурс с наибольшей видимостью таза и бедра"})
+
+        # pose-05 (F129): рука оружия (без оружия — атакующая, иначе правая) вперёд, со спины 3/4 этой стороны; рамка —
+        # верх фигуры от тазобедренного сустава, оружие в рамку не входит (кадр обрезан намеренно)
+        side5 = (wbone[-1] if wbone else None) or ((attack or {}).get("side")) or "R"
+        reset_pose(arm)
+        applied = []
+        for key, axis, deg in ARM_FORWARD:
+            bone = fmap.get("%s_%s" % (key, side5.lower()))
+            if bone not in arm.pose.bones:
+                warnings.append("pose-05: нет кости %s_%s (%s)" % (key, side5.lower(), bone))
+                continue
+            rotate_bone(arm, bone, axis, deg)
+            applied.append({"bone": bone, "axis": axis, "deg": deg})
+        posed_by = evaluated_coords(meshes)
+        hip = arm.data.bones.get(fmap.get("thigh_" + side5.lower()) or "")
+        hip_z = float((arm.matrix_world @ hip.head_local).z) if hip else float(mn[2]) + 0.45 * h
+        up = [posed_by[o.name][(posed_by[o.name][:, 2] >= hip_z) & ~np.isin(dom[o.name], [wbone] if wbone else [])]
+              for o in fig_meshes]
+        up = np.concatenate([x for x in up if len(x)]) if any(len(x) for x in up) else \
+            np.concatenate(list(posed_by.values()))
+        az5 = POSE05_AZ[side5]
+        tgt5 = Vector(((up.min(axis=0) + up.max(axis=0)) / 2).tolist())
+        shot("pose-05", tgt5, az5, POSE05_EL, view_fit_scale(up, tgt5, az5, POSE05_EL), "preview",
+             "рука %s вперёд (плечо X %d, предплечье X %d), спина 3/4 az %d; рамка — верх фигуры от z %.3f м, без оружия"
+             % (side5, ARM_FORWARD[0][2], ARM_FORWARD[1][2], az5, hip_z))
+        chk5, _hd, _wp = weapon_check(posed_by)
+        chk5.update({"arm_side": side5, "frame_from_z_m": round(hip_z, 4)})
+        pose_checks["pose-05"] = chk5
+        poses_out.append({"name": "pose-05.jpg", "family": fam, "rotations": applied,
+                          "note": "рука %s вперёд, вид со спины 3/4: кромки проймы и плаща за подмышкой (F129)" % side5})
         reset_pose(arm)
 
     # UV0 для uv-layout.png (рисует обёртка): треугольники в UV, острова, границы островов
@@ -615,6 +744,7 @@ def main():
         "bounds_m": {"min": [round(float(v), 4) for v in mn], "max": [round(float(v), 4) for v in mx],
                      "height": round(h, 4), "radius_from_pivot": round(radius, 4)},
         "frames": frames, "poses": poses_out, "pose_checks": pose_checks, "warnings": warnings,
+        "attack": attack,
     }
     with open(os.path.join(work_dir, "capture.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
