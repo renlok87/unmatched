@@ -1,0 +1,902 @@
+{
+  "ao_distance_m": 0.044,
+  "checks": {
+    "cage_miss_share": {
+      "expected": "<= 0.01 per part",
+      "measured": {
+        "tripo_part_0": 0.001563,
+        "tripo_part_1": 0.000446,
+        "tripo_part_10": 0.0038,
+        "tripo_part_11": 0.000959,
+        "tripo_part_12": 0.001977,
+        "tripo_part_13": 0.00169,
+        "tripo_part_2": 0.004971,
+        "tripo_part_3": 0.006647,
+        "tripo_part_4": 0.003589,
+        "tripo_part_5": 0.0011,
+        "tripo_part_6": 0.002241,
+        "tripo_part_7": 0.002232,
+        "tripo_part_8": 0.003766,
+        "tripo_part_9": 0.000926
+      },
+      "note": "non-cap UV texels whose cage ray found no high-poly (filled by dilation from neighbours); cap texels (parts.<part>.HIT.cap_texels) are filled from their rim by the textures stage",
+      "passed": true
+    },
+    "texels_outside_own_islands_share": {
+      "expected": "<= 0.1 % of the part's baked texels",
+      "measured": {
+        "tripo_part_0": 66,
+        "tripo_part_1": 15,
+        "tripo_part_10": 12,
+        "tripo_part_11": 0,
+        "tripo_part_12": 4,
+        "tripo_part_13": 56,
+        "tripo_part_2": 31,
+        "tripo_part_3": 17,
+        "tripo_part_4": 12,
+        "tripo_part_5": 19,
+        "tripo_part_6": 10,
+        "tripo_part_7": 7,
+        "tripo_part_8": 8,
+        "tripo_part_9": 8
+      },
+      "note": "edge texels Cycles covered but the UV raster (pixel centres) did not; dropped from the composite, refilled by the textures stage dilation",
+      "passed": true
+    }
+  },
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "normal": {
+    "includes_tripo_normal_map": true,
+    "space": "TANGENT",
+    "swizzle": "POS_X POS_Y POS_Z (OpenGL)"
+  },
+  "note": "per-part bakes, margin 0; high-poly = the textured Tripo twin (identical geometry, prepare stage)",
+  "parts": {
+    "tripo_part_0": {
+      "AO": {
+        "baked_texels": 2400788,
+        "cage_extrusion_m": 0.000628,
+        "max_ray_distance_m": 0.001571,
+        "outside_own_islands": 66
+      },
+      "BC": {
+        "baked_texels": 2400788,
+        "cage_extrusion_m": 0.000628,
+        "max_ray_distance_m": 0.001571,
+        "outside_own_islands": 66
+      },
+      "HIT": {
+        "baked_texels": 2400788,
+        "cage_extrusion_m": 0.000628,
+        "cap_texels": 171644,
+        "hit_texels": 2399451,
+        "max_ray_distance_m": 0.001571,
+        "miss_share_of_uv_texels": 0.001563,
+        "outside_own_islands": 66,
+        "uv_texels": 2403208
+      },
+      "NORMAL": {
+        "baked_texels": 2400788,
+        "cage_extrusion_m": 0.000628,
+        "max_ray_distance_m": 0.001571,
+        "outside_own_islands": 66
+      },
+      "RM": {
+        "baked_texels": 2400788,
+        "cage_extrusion_m": 0.000628,
+        "max_ray_distance_m": 0.001571,
+        "outside_own_islands": 66
+      }
+    },
+    "tripo_part_1": {
+      "AO": {
+        "baked_texels": 609390,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 15
+      },
+      "BC": {
+        "baked_texels": 609390,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 15
+      },
+      "HIT": {
+        "baked_texels": 609390,
+        "cage_extrusion_m": 0.004,
+        "cap_texels": 20467,
+        "hit_texels": 609250,
+        "max_ray_distance_m": 0.01,
+        "miss_share_of_uv_texels": 0.000446,
+        "outside_own_islands": 15,
+        "uv_texels": 609522
+      },
+      "NORMAL": {
+        "baked_texels": 609390,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 15
+      },
+      "RM": {
+        "baked_texels": 609390,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 15
+      }
+    },
+    "tripo_part_10": {
+      "AO": {
+        "baked_texels": 247751,
+        "cage_extrusion_m": 0.000689,
+        "max_ray_distance_m": 0.001723,
+        "outside_own_islands": 12
+      },
+      "BC": {
+        "baked_texels": 247751,
+        "cage_extrusion_m": 0.000689,
+        "max_ray_distance_m": 0.001723,
+        "outside_own_islands": 12
+      },
+      "HIT": {
+        "baked_texels": 247751,
+        "cage_extrusion_m": 0.000689,
+        "cap_texels": 0,
+        "hit_texels": 247751,
+        "max_ray_distance_m": 0.001723,
+        "miss_share_of_uv_texels": 0.0038,
+        "outside_own_islands": 12,
+        "uv_texels": 248696
+      },
+      "NORMAL": {
+        "baked_texels": 247751,
+        "cage_extrusion_m": 0.000689,
+        "max_ray_distance_m": 0.001723,
+        "outside_own_islands": 12
+      },
+      "RM": {
+        "baked_texels": 247751,
+        "cage_extrusion_m": 0.000689,
+        "max_ray_distance_m": 0.001723,
+        "outside_own_islands": 12
+      }
+    },
+    "tripo_part_11": {
+      "AO": {
+        "baked_texels": 175358,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "BC": {
+        "baked_texels": 175358,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "HIT": {
+        "baked_texels": 175358,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 11620,
+        "hit_texels": 173986,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.000959,
+        "outside_own_islands": 0,
+        "uv_texels": 174153
+      },
+      "NORMAL": {
+        "baked_texels": 175358,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "RM": {
+        "baked_texels": 175358,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      }
+    },
+    "tripo_part_12": {
+      "AO": {
+        "baked_texels": 148427,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "BC": {
+        "baked_texels": 148427,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "HIT": {
+        "baked_texels": 148427,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 148427,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001977,
+        "outside_own_islands": 4,
+        "uv_texels": 148721
+      },
+      "NORMAL": {
+        "baked_texels": 148427,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "RM": {
+        "baked_texels": 148427,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      }
+    },
+    "tripo_part_13": {
+      "AO": {
+        "baked_texels": 296623,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 56
+      },
+      "BC": {
+        "baked_texels": 296623,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 56
+      },
+      "HIT": {
+        "baked_texels": 296623,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 119,
+        "hit_texels": 296590,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.00169,
+        "outside_own_islands": 56,
+        "uv_texels": 297092
+      },
+      "NORMAL": {
+        "baked_texels": 296623,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 56
+      },
+      "RM": {
+        "baked_texels": 296623,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 56
+      }
+    },
+    "tripo_part_2": {
+      "AO": {
+        "baked_texels": 724560,
+        "cage_extrusion_m": 0.001237,
+        "max_ray_distance_m": 0.003092,
+        "outside_own_islands": 31
+      },
+      "BC": {
+        "baked_texels": 724560,
+        "cage_extrusion_m": 0.001237,
+        "max_ray_distance_m": 0.003092,
+        "outside_own_islands": 31
+      },
+      "HIT": {
+        "baked_texels": 724560,
+        "cage_extrusion_m": 0.001237,
+        "cap_texels": 0,
+        "hit_texels": 724560,
+        "max_ray_distance_m": 0.003092,
+        "miss_share_of_uv_texels": 0.004971,
+        "outside_own_islands": 31,
+        "uv_texels": 728180
+      },
+      "NORMAL": {
+        "baked_texels": 724560,
+        "cage_extrusion_m": 0.001237,
+        "max_ray_distance_m": 0.003092,
+        "outside_own_islands": 31
+      },
+      "RM": {
+        "baked_texels": 724560,
+        "cage_extrusion_m": 0.001237,
+        "max_ray_distance_m": 0.003092,
+        "outside_own_islands": 31
+      }
+    },
+    "tripo_part_3": {
+      "AO": {
+        "baked_texels": 493186,
+        "cage_extrusion_m": 0.000894,
+        "max_ray_distance_m": 0.002234,
+        "outside_own_islands": 17
+      },
+      "BC": {
+        "baked_texels": 493186,
+        "cage_extrusion_m": 0.000894,
+        "max_ray_distance_m": 0.002234,
+        "outside_own_islands": 17
+      },
+      "HIT": {
+        "baked_texels": 493186,
+        "cage_extrusion_m": 0.000894,
+        "cap_texels": 12305,
+        "hit_texels": 493135,
+        "max_ray_distance_m": 0.002234,
+        "miss_share_of_uv_texels": 0.006647,
+        "outside_own_islands": 17,
+        "uv_texels": 496435
+      },
+      "NORMAL": {
+        "baked_texels": 493186,
+        "cage_extrusion_m": 0.000894,
+        "max_ray_distance_m": 0.002234,
+        "outside_own_islands": 17
+      },
+      "RM": {
+        "baked_texels": 493186,
+        "cage_extrusion_m": 0.000894,
+        "max_ray_distance_m": 0.002234,
+        "outside_own_islands": 17
+      }
+    },
+    "tripo_part_4": {
+      "AO": {
+        "baked_texels": 414017,
+        "cage_extrusion_m": 0.000695,
+        "max_ray_distance_m": 0.001737,
+        "outside_own_islands": 12
+      },
+      "BC": {
+        "baked_texels": 414017,
+        "cage_extrusion_m": 0.000695,
+        "max_ray_distance_m": 0.001737,
+        "outside_own_islands": 12
+      },
+      "HIT": {
+        "baked_texels": 414017,
+        "cage_extrusion_m": 0.000695,
+        "cap_texels": 34760,
+        "hit_texels": 413395,
+        "max_ray_distance_m": 0.001737,
+        "miss_share_of_uv_texels": 0.003589,
+        "outside_own_islands": 12,
+        "uv_texels": 414884
+      },
+      "NORMAL": {
+        "baked_texels": 414017,
+        "cage_extrusion_m": 0.000695,
+        "max_ray_distance_m": 0.001737,
+        "outside_own_islands": 12
+      },
+      "RM": {
+        "baked_texels": 414017,
+        "cage_extrusion_m": 0.000695,
+        "max_ray_distance_m": 0.001737,
+        "outside_own_islands": 12
+      }
+    },
+    "tripo_part_5": {
+      "AO": {
+        "baked_texels": 684830,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 19
+      },
+      "BC": {
+        "baked_texels": 684830,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 19
+      },
+      "HIT": {
+        "baked_texels": 684830,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 684830,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.0011,
+        "outside_own_islands": 19,
+        "uv_texels": 685584
+      },
+      "NORMAL": {
+        "baked_texels": 684830,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 19
+      },
+      "RM": {
+        "baked_texels": 684830,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 19
+      }
+    },
+    "tripo_part_6": {
+      "AO": {
+        "baked_texels": 263522,
+        "cage_extrusion_m": 0.00063,
+        "max_ray_distance_m": 0.001575,
+        "outside_own_islands": 10
+      },
+      "BC": {
+        "baked_texels": 263522,
+        "cage_extrusion_m": 0.00063,
+        "max_ray_distance_m": 0.001575,
+        "outside_own_islands": 10
+      },
+      "HIT": {
+        "baked_texels": 263522,
+        "cage_extrusion_m": 0.00063,
+        "cap_texels": 0,
+        "hit_texels": 263522,
+        "max_ray_distance_m": 0.001575,
+        "miss_share_of_uv_texels": 0.002241,
+        "outside_own_islands": 10,
+        "uv_texels": 264114
+      },
+      "NORMAL": {
+        "baked_texels": 263522,
+        "cage_extrusion_m": 0.00063,
+        "max_ray_distance_m": 0.001575,
+        "outside_own_islands": 10
+      },
+      "RM": {
+        "baked_texels": 263522,
+        "cage_extrusion_m": 0.00063,
+        "max_ray_distance_m": 0.001575,
+        "outside_own_islands": 10
+      }
+    },
+    "tripo_part_7": {
+      "AO": {
+        "baked_texels": 264686,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "BC": {
+        "baked_texels": 264686,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "HIT": {
+        "baked_texels": 264686,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 264686,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.002232,
+        "outside_own_islands": 7,
+        "uv_texels": 265278
+      },
+      "NORMAL": {
+        "baked_texels": 264686,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "RM": {
+        "baked_texels": 264686,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      }
+    },
+    "tripo_part_8": {
+      "AO": {
+        "baked_texels": 429896,
+        "cage_extrusion_m": 0.000653,
+        "max_ray_distance_m": 0.001632,
+        "outside_own_islands": 8
+      },
+      "BC": {
+        "baked_texels": 429896,
+        "cage_extrusion_m": 0.000653,
+        "max_ray_distance_m": 0.001632,
+        "outside_own_islands": 8
+      },
+      "HIT": {
+        "baked_texels": 429896,
+        "cage_extrusion_m": 0.000653,
+        "cap_texels": 33085,
+        "hit_texels": 427242,
+        "max_ray_distance_m": 0.001632,
+        "miss_share_of_uv_texels": 0.003766,
+        "outside_own_islands": 8,
+        "uv_texels": 428857
+      },
+      "NORMAL": {
+        "baked_texels": 429896,
+        "cage_extrusion_m": 0.000653,
+        "max_ray_distance_m": 0.001632,
+        "outside_own_islands": 8
+      },
+      "RM": {
+        "baked_texels": 429896,
+        "cage_extrusion_m": 0.000653,
+        "max_ray_distance_m": 0.001632,
+        "outside_own_islands": 8
+      }
+    },
+    "tripo_part_9": {
+      "AO": {
+        "baked_texels": 324302,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "BC": {
+        "baked_texels": 324302,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "HIT": {
+        "baked_texels": 324302,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 13174,
+        "hit_texels": 322706,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.000926,
+        "outside_own_islands": 8,
+        "uv_texels": 323005
+      },
+      "NORMAL": {
+        "baked_texels": 324302,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "RM": {
+        "baked_texels": 324302,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      }
+    }
+  },
+  "passed": true,
+  "passes": [
+    "NORMAL",
+    "AO",
+    "BC",
+    "RM",
+    "HIT"
+  ],
+  "resolution": 4096,
+  "samples": {
+    "AO": 128,
+    "BC": 1,
+    "HIT": 1,
+    "NORMAL": 1,
+    "RM": 1
+  },
+  "source_images": {
+    "tripo_part_0": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_0_basecolor.jpg",
+        [
+          4096,
+          4096
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_0_normal.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_0_rm.png",
+        [
+          1024,
+          1024
+        ]
+      ]
+    },
+    "tripo_part_1": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_1_basecolor.jpg",
+        [
+          4096,
+          4096
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_1_normal.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_1_rm.png",
+        [
+          1024,
+          1024
+        ]
+      ]
+    },
+    "tripo_part_10": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_10_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_10_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_10_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_11": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_11_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_11_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_11_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_12": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_12_basecolor.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_12_normal.jpg",
+        [
+          128,
+          128
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_12_rm.png",
+        [
+          128,
+          128
+        ]
+      ]
+    },
+    "tripo_part_13": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_13_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_13_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_13_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_2": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_2_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_2_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_2_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_3": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_3_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_3_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_3_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_4": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_4_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_4_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_4_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_5": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_5_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_5_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_5_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_6": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_6_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_6_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_6_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_7": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_7_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_7_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_7_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_8": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_8_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_8_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_8_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_9": {
+      "BC": [
+        "ancient+warrior+3d+model_tripo_part_9_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "ancient+warrior+3d+model_tripo_part_9_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "ancient+warrior+3d+model_tripo_part_9_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    }
+  },
+  "stage": "bake",
+  "status": "измерено"
+}

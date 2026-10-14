@@ -1,0 +1,2157 @@
+{
+  "bc_mean_srgb_in_islands": [
+    146.82,
+    87.35,
+    64.56
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 297174,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 5154,
+        "cap_vertices": 3452,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 297174,
+        "rim_samples": 35313
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "h21_metal_basecolor_plausible": {
+      "expected": "metal BaseColor = reflectance: linear max channel median >= 0.5 (cavities darker by the Tripo detail)",
+      "measured": {
+        "linear_max_channel_p5_p50_p95": [
+          0.1845,
+          0.7231,
+          1.0
+        ],
+        "srgb_mean": [
+          209.3,
+          156.0,
+          98.7
+        ]
+      },
+      "passed": true
+    },
+    "h21_metal_core_metallic": {
+      "expected": "metal core (mask >= 0.99): metallic p1 >= 0.89",
+      "measured": {
+        "median": 0.9647,
+        "p1": 0.902,
+        "texels": 1819349
+      },
+      "passed": true
+    },
+    "h21_metal_core_roughness": {
+      "expected": "metal core roughness p1..p99 within 0.3..0.46 (varied, not a constant)",
+      "measured": {
+        "p1": 0.3216,
+        "p50": 0.3725,
+        "p99": 0.4353
+      },
+      "passed": true
+    },
+    "h21_non_metal_metallic_zero": {
+      "expected": "cloth, skin, leather, wood, snakes, base (mask 0): metallic <= 1/255",
+      "measured": {
+        "max_8bit": 0,
+        "texels": 5776779
+      },
+      "passed": true
+    },
+    "h21_rim_filters_applied": {
+      "expected": "every filtered contact cap found, with kept rim samples",
+      "measured": [
+        {
+          "label": 5,
+          "rim_samples": 2064,
+          "rim_samples_kept": 1989,
+          "vertices": 93,
+          "vertices_without_kept_sample": 0
+        },
+        {
+          "label": 5,
+          "rim_samples": 162,
+          "rim_samples_kept": 149,
+          "vertices": 199,
+          "vertices_without_kept_sample": 1
+        }
+      ],
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.00243,
+        "BC": 0.00243,
+        "NORMAL": 0.00243,
+        "RM": 0.00243
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0055
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0052
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.8443,
+        "p1": 6.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.9768,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "materials": {
+    "config": {
+      "checks": {
+        "metal_core_bc_linear_max_channel_p50_min": 0.5,
+        "metal_core_metallic_min": 0.89,
+        "metal_core_roughness": [
+          0.3,
+          0.46
+        ],
+        "non_metal_metallic_max_8bit": 1
+      },
+      "cloth_roughness": {
+        "apply": false,
+        "hi": 0.9,
+        "lo": 0.8,
+        "note": "не применяется (как у Medusa)"
+      },
+      "metal": {
+        "basecolor": {
+          "detail_clip": [
+            0.25,
+            1.4
+          ],
+          "detail_gamma": 1.0,
+          "note": "цветность бронзы ближе к концепту #A9773A: линейное R:G:B ≈ 1 : 0,53 : 0,19 (первая попытка #E7BF87 1 : 0,65 : 0,30 — светлее и «латуннее» концепта по превью), R 0,72 linear — в диапазоне металла; деталь = яркость BC Tripo / медиана по маске",
+          "target_srgb": "#DCA468"
+        },
+        "blur": 1,
+        "close_px": 2,
+        "hue_deg": [
+          27,
+          45
+        ],
+        "hue_ramp_deg": 2,
+        "local_radius_px": 6,
+        "metallic": {
+          "max": 1.0,
+          "min": 0.9
+        },
+        "min_component_px": 60,
+        "parts": {
+          "tripo_part_0": {
+            "boxes": [
+              {
+                "max_m": [
+                  -0.015,
+                  0.005,
+                  0.44
+                ],
+                "min_m": [
+                  -0.055,
+                  -0.045,
+                  0.4
+                ],
+                "name": "fibula_r_shoulder"
+              }
+            ],
+            "note": "круглая фибула-брошь плаща на правом плече",
+            "terms": [
+              {
+                "hue_deg": [
+                  26,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "fibula",
+                "radius_px": 6,
+                "s_min": 0.35,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_10": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.56
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.462
+                ],
+                "name": "spearhead"
+              }
+            ],
+            "note": "наконечник копья целиком (втулка z 0,462–0,476 м + перо 0,476–0,537 м); древко и кожаные обмотки (кольца z 0,440–0,461 м) — не металл. r2 (приёмка r1, п.3: верх пера коричневый и матовый): коробка была z 0,476–0,5 м — верх пера (0,5–0,537 м) и втулка уходили в класс wood; стала z 0,462–0,56 м (сечения части 10 по z: кольцо обмотки до 0,461, втулка r 5,2→3,2 мм, перо до r 11,5 мм, остриё 0,537)",
+            "terms": [
+              {
+                "hue_deg": [
+                  26,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "spearhead",
+                "radius_px": 6,
+                "s_min": 0.35,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_11": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.345
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.285
+                ],
+                "name": "bracer_l"
+              }
+            ],
+            "terms": [
+              {
+                "hue_deg": [
+                  27,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "bracer_l",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_12": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.5
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.29
+                ],
+                "name": "bracer_l_lower"
+              }
+            ],
+            "terms": [
+              {
+                "hue_deg": [
+                  27.5,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "bracer_l_lower",
+                "radius_px": 6,
+                "s_min": 0.42,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_13": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.085
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  -0.5
+                ],
+                "name": "butt_spike"
+              }
+            ],
+            "note": "пятка копья",
+            "terms": [
+              {
+                "hue_deg": [
+                  26,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "butt_spike",
+                "radius_px": 6,
+                "s_min": 0.35,
+                "v_min": 0.4
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_2": {
+            "note": "щит целиком бронза (h p5 26°)",
+            "terms": [
+              {
+                "hue_deg": [
+                  24,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "shield",
+                "radius_px": 6,
+                "s_min": 0.33,
+                "v_min": 0.2
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.1
+            }
+          },
+          "tripo_part_3": {
+            "note": "бронзовые полосы и бляхи птеруг; красная ткань (h 0–8°) — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  26,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "kilt_plaques",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_4": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.178
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.085
+                ],
+                "name": "greave_r"
+              }
+            ],
+            "note": "поножь; бедро (h 23°) и сандалия (h 24°, кожа) — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  28,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "greave_r",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_5": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  -0.078,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.08,
+                  0.49555
+                ],
+                "name": "helmet_above_rim_00"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.076,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.078,
+                  0.49492
+                ],
+                "name": "helmet_above_rim_01"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.074,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.076,
+                  0.4943
+                ],
+                "name": "helmet_above_rim_02"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.072,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.074,
+                  0.49367
+                ],
+                "name": "helmet_above_rim_03"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.07,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.072,
+                  0.49304
+                ],
+                "name": "helmet_above_rim_04"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.068,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.07,
+                  0.49241
+                ],
+                "name": "helmet_above_rim_05"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.066,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.068,
+                  0.49178
+                ],
+                "name": "helmet_above_rim_06"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.064,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.066,
+                  0.49115
+                ],
+                "name": "helmet_above_rim_07"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.062,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.064,
+                  0.49052
+                ],
+                "name": "helmet_above_rim_08"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.06,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.062,
+                  0.48989
+                ],
+                "name": "helmet_above_rim_09"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.058,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.06,
+                  0.48926
+                ],
+                "name": "helmet_above_rim_10"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.056,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.058,
+                  0.48864
+                ],
+                "name": "helmet_above_rim_11"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.054,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.056,
+                  0.48801
+                ],
+                "name": "helmet_above_rim_12"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.052,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.054,
+                  0.48738
+                ],
+                "name": "helmet_above_rim_13"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.05,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.052,
+                  0.48675
+                ],
+                "name": "helmet_above_rim_14"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.048,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.05,
+                  0.48612
+                ],
+                "name": "helmet_above_rim_15"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.046,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.048,
+                  0.48549
+                ],
+                "name": "helmet_above_rim_16"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.044,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.046,
+                  0.48486
+                ],
+                "name": "helmet_above_rim_17"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.042,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.044,
+                  0.48423
+                ],
+                "name": "helmet_above_rim_18"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.04,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.042,
+                  0.4836
+                ],
+                "name": "helmet_above_rim_19"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.038,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.04,
+                  0.48297
+                ],
+                "name": "helmet_above_rim_20"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.036,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.038,
+                  0.48235
+                ],
+                "name": "helmet_above_rim_21"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.034,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.036,
+                  0.48172
+                ],
+                "name": "helmet_above_rim_22"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.032,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.034,
+                  0.48109
+                ],
+                "name": "helmet_above_rim_23"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.03,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.032,
+                  0.48046
+                ],
+                "name": "helmet_above_rim_24"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.028,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.03,
+                  0.47983
+                ],
+                "name": "helmet_above_rim_25"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.026,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.028,
+                  0.4792
+                ],
+                "name": "helmet_above_rim_26"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.024,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.026,
+                  0.47857
+                ],
+                "name": "helmet_above_rim_27"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.022,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.024,
+                  0.47794
+                ],
+                "name": "helmet_above_rim_28"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.02,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.022,
+                  0.47731
+                ],
+                "name": "helmet_above_rim_29"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.018,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.02,
+                  0.47669
+                ],
+                "name": "helmet_above_rim_30"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.016,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.018,
+                  0.47606
+                ],
+                "name": "helmet_above_rim_31"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.014,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.016,
+                  0.47543
+                ],
+                "name": "helmet_above_rim_32"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.012,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.014,
+                  0.4748
+                ],
+                "name": "helmet_above_rim_33"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.01,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.012,
+                  0.47417
+                ],
+                "name": "helmet_above_rim_34"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.008,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.01,
+                  0.47354
+                ],
+                "name": "helmet_above_rim_35"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.006,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.008,
+                  0.47291
+                ],
+                "name": "helmet_above_rim_36"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.004,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.006,
+                  0.47228
+                ],
+                "name": "helmet_above_rim_37"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  -0.002,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.004,
+                  0.47165
+                ],
+                "name": "helmet_above_rim_38"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.0,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.002,
+                  0.47103
+                ],
+                "name": "helmet_above_rim_39"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.002,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.0,
+                  0.4704
+                ],
+                "name": "helmet_above_rim_40"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.004,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.002,
+                  0.46977
+                ],
+                "name": "helmet_above_rim_41"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.006,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.004,
+                  0.46914
+                ],
+                "name": "helmet_above_rim_42"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.008,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.006,
+                  0.46851
+                ],
+                "name": "helmet_above_rim_43"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.01,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.008,
+                  0.46788
+                ],
+                "name": "helmet_above_rim_44"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.012,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.01,
+                  0.46725
+                ],
+                "name": "helmet_above_rim_45"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.014,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.012,
+                  0.46662
+                ],
+                "name": "helmet_above_rim_46"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.016,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.014,
+                  0.46599
+                ],
+                "name": "helmet_above_rim_47"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.018,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.016,
+                  0.46536
+                ],
+                "name": "helmet_above_rim_48"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.02,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.018,
+                  0.46474
+                ],
+                "name": "helmet_above_rim_49"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.022,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.02,
+                  0.46411
+                ],
+                "name": "helmet_above_rim_50"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.024,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.022,
+                  0.46348
+                ],
+                "name": "helmet_above_rim_51"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.026,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.024,
+                  0.46285
+                ],
+                "name": "helmet_above_rim_52"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.028,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.026,
+                  0.46222
+                ],
+                "name": "helmet_above_rim_53"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.03,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.028,
+                  0.46159
+                ],
+                "name": "helmet_above_rim_54"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.032,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.03,
+                  0.46096
+                ],
+                "name": "helmet_above_rim_55"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.034,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.032,
+                  0.46033
+                ],
+                "name": "helmet_above_rim_56"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.036,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.034,
+                  0.4597
+                ],
+                "name": "helmet_above_rim_57"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.038,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.036,
+                  0.45908
+                ],
+                "name": "helmet_above_rim_58"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.04,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.038,
+                  0.45845
+                ],
+                "name": "helmet_above_rim_59"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.042,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.04,
+                  0.45782
+                ],
+                "name": "helmet_above_rim_60"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.044,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.042,
+                  0.45719
+                ],
+                "name": "helmet_above_rim_61"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.046,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.044,
+                  0.45656
+                ],
+                "name": "helmet_above_rim_62"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.048,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.046,
+                  0.45593
+                ],
+                "name": "helmet_above_rim_63"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.05,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.048,
+                  0.4553
+                ],
+                "name": "helmet_above_rim_64"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.052,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.05,
+                  0.45467
+                ],
+                "name": "helmet_above_rim_65"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.054,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.052,
+                  0.45404
+                ],
+                "name": "helmet_above_rim_66"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.056,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.054,
+                  0.45342
+                ],
+                "name": "helmet_above_rim_67"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.058,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.056,
+                  0.45279
+                ],
+                "name": "helmet_above_rim_68"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.06,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.058,
+                  0.45216
+                ],
+                "name": "helmet_above_rim_69"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.062,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.06,
+                  0.45153
+                ],
+                "name": "helmet_above_rim_70"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.064,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.062,
+                  0.4509
+                ],
+                "name": "helmet_above_rim_71"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.066,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.064,
+                  0.45027
+                ],
+                "name": "helmet_above_rim_72"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.068,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.066,
+                  0.44964
+                ],
+                "name": "helmet_above_rim_73"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.07,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.068,
+                  0.44901
+                ],
+                "name": "helmet_above_rim_74"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.072,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.07,
+                  0.44838
+                ],
+                "name": "helmet_above_rim_75"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.074,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.072,
+                  0.44775
+                ],
+                "name": "helmet_above_rim_76"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.076,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.074,
+                  0.44713
+                ],
+                "name": "helmet_above_rim_77"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.078,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.076,
+                  0.4465
+                ],
+                "name": "helmet_above_rim_78"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.08,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.078,
+                  0.44587
+                ],
+                "name": "helmet_above_rim_79"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.082,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.08,
+                  0.44524
+                ],
+                "name": "helmet_above_rim_80"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.084,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.082,
+                  0.44461
+                ],
+                "name": "helmet_above_rim_81"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.086,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.084,
+                  0.44398
+                ],
+                "name": "helmet_above_rim_82"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.088,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.086,
+                  0.44335
+                ],
+                "name": "helmet_above_rim_83"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.09,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.088,
+                  0.44272
+                ],
+                "name": "helmet_above_rim_84"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.092,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.09,
+                  0.44209
+                ],
+                "name": "helmet_above_rim_85"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.094,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.092,
+                  0.44147
+                ],
+                "name": "helmet_above_rim_86"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.096,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.094,
+                  0.44084
+                ],
+                "name": "helmet_above_rim_87"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.098,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.096,
+                  0.44021
+                ],
+                "name": "helmet_above_rim_88"
+              },
+              {
+                "max_m": [
+                  0.5,
+                  0.1,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  0.098,
+                  0.43958
+                ],
+                "name": "helmet_above_rim_89"
+              },
+              {
+                "max_m": [
+                  0.011,
+                  -0.0225,
+                  0.482
+                ],
+                "min_m": [
+                  -0.007,
+                  -0.04,
+                  0.4585
+                ],
+                "name": "helmet_nasal"
+              }
+            ],
+            "note": "шлем: металл выше края шлема + носовая пластина. r2 (приёмка r1, п.4: центр носовой пластины телесный и матовый): прежние ворота — полупространство над краем (лоб z 0,477 м → затылок 0,455 м, нормаль (0; 0,3; 0,954)); носовая пластина висит ниже края (z 0,459–0,48 м, x −0,001…0,011, y −0,030…−0,023 м, впереди брови на 4–8 мм), а ворота materials.gate_3d — объединение коробок И пересечение полупространств, так что «над краем ИЛИ пластина» одним полупространством не задать: полупространство заменено лестницей из 90 коробок по y (шаг 2 мм, z-порог = та же плоскость в середине шага, ±0,3 мм) плюс коробка helmet_nasal. Центр пластины в BC Tripo телесного тона (локальная медиана оттенка 23–27°): нижняя граница оттенка терма 27 → 23° (пластина 71–79 % → 99 % текселей); побочно металлом стали ≈ 9,6 тыс. текселей шлема с оттенком 23–27° над плоскостью края (нижняя кромка изнутри, тёмные полости) — симуляция маски C:/tmp/achilles-r2/simmetal.py по work/bake/BC.npy прогона 20261013-h2-bake-2",
+            "terms": [
+              {
+                "hue_deg": [
+                  23.0,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "helmet",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_7": {
+            "note": "кираса; перевязь (кожа, h ≈ 19°) — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  26,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "cuirass",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.25
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_8": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.178
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.085
+                ],
+                "name": "greave_l"
+              }
+            ],
+            "terms": [
+              {
+                "hue_deg": [
+                  28,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "greave_l",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_9": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  -0.024,
+                  0.5
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.056,
+                  -0.5
+                ],
+                "name": "bracer_r"
+              }
+            ],
+            "note": "правый наруч у запястья",
+            "terms": [
+              {
+                "hue_deg": [
+                  27,
+                  45
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "bracer_r",
+                "radius_px": 6,
+                "s_min": 0.4,
+                "v_min": 0.3
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          }
+        },
+        "ramp": 0.04,
+        "roughness": {
+          "detail_weight": 0.6,
+          "max": 0.45,
+          "min": 0.32
+        }
+      },
+      "note": "Проход материалов H2.1 по образцу Medusa (HANDBOOK §2.4): Tripo дал бронзе metallic ≈ 0,17–0,29 и roughness ≈ 0,7 (замер разведки по bake BC/RM), а дереву древка — metallic ≈ 0,5. Маска металла по данным: оттенок/насыщенность/яркость локального среднего BC внутри части (бронза h 28–36°, кожа персонажа h 21–25°, кожа ремней h ≤ 22°, дерево древка h 26–30°, красная ткань h 355–8°) + 3D-ворота по карте положений стадии aux: поножи — коробка по z, наручи — коробки, шлем — полупространство над краем шлема (волосы того же золотого цвета остаются не металлом), наконечник и пятка копья — коробки по z. Металл: BC → target_srgb × яркостная деталь BC Tripo, metallic 0,9–1,0, roughness 0,32–0,45; вне маски metallic 0. Статус — предложено, художественно не принято",
+      "rim_filters": [
+        {
+          "contact": "collar",
+          "keep_hsv": {
+            "s_min": 0.6
+          },
+          "note": "образцы границы следа и крышки collar — только насыщенная красная ткань (s ≥ 0,6): кожа шеи и кудри на кромке ворота отбрасываются"
+        }
+      ]
+    },
+    "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, художественно не принято",
+    "stats": {
+      "metal_mask": {
+        "tripo_part_0": {
+          "gate": {
+            "texels_kept": 8919,
+            "texels_tested": 10591
+          },
+          "mask_mean": 0.0034,
+          "metal_share": 0.0034,
+          "small_component_texels_removed": 35,
+          "term_texels": [
+            10632
+          ]
+        },
+        "tripo_part_10": {
+          "gate": {
+            "texels_kept": 88100,
+            "texels_tested": 213652
+          },
+          "mask_mean": 0.3374,
+          "metal_share": 0.3501,
+          "small_component_texels_removed": 950,
+          "term_texels": [
+            213089
+          ]
+        },
+        "tripo_part_11": {
+          "gate": {
+            "texels_kept": 56429,
+            "texels_tested": 56489
+          },
+          "mask_mean": 0.3005,
+          "metal_share": 0.3034,
+          "small_component_texels_removed": 39,
+          "term_texels": [
+            56430
+          ]
+        },
+        "tripo_part_12": {
+          "gate": {
+            "texels_kept": 30095,
+            "texels_tested": 62298
+          },
+          "mask_mean": 0.2005,
+          "metal_share": 0.2023,
+          "small_component_texels_removed": 17,
+          "term_texels": [
+            62223
+          ]
+        },
+        "tripo_part_13": {
+          "gate": {
+            "texels_kept": 28517,
+            "texels_tested": 246115
+          },
+          "mask_mean": 0.0939,
+          "metal_share": 0.096,
+          "small_component_texels_removed": 0,
+          "term_texels": [
+            245452
+          ]
+        },
+        "tripo_part_2": {
+          "gate": null,
+          "mask_mean": 0.981,
+          "metal_share": 0.9942,
+          "small_component_texels_removed": 201,
+          "term_texels": [
+            724546
+          ]
+        },
+        "tripo_part_3": {
+          "gate": null,
+          "mask_mean": 0.372,
+          "metal_share": 0.377,
+          "small_component_texels_removed": 488,
+          "term_texels": [
+            191637
+          ]
+        },
+        "tripo_part_4": {
+          "gate": {
+            "texels_kept": 131175,
+            "texels_tested": 135999
+          },
+          "mask_mean": 0.2887,
+          "metal_share": 0.2917,
+          "small_component_texels_removed": 59,
+          "term_texels": [
+            135804
+          ]
+        },
+        "tripo_part_5": {
+          "gate": {
+            "texels_kept": 307490,
+            "texels_tested": 517031
+          },
+          "mask_mean": 0.4381,
+          "metal_share": 0.447,
+          "small_component_texels_removed": 589,
+          "term_texels": [
+            516573
+          ]
+        },
+        "tripo_part_7": {
+          "gate": null,
+          "mask_mean": 0.8144,
+          "metal_share": 0.8254,
+          "small_component_texels_removed": 1050,
+          "term_texels": [
+            220134
+          ]
+        },
+        "tripo_part_8": {
+          "gate": {
+            "texels_kept": 130810,
+            "texels_tested": 136206
+          },
+          "mask_mean": 0.2806,
+          "metal_share": 0.2833,
+          "small_component_texels_removed": 38,
+          "term_texels": [
+            135854
+          ]
+        },
+        "tripo_part_9": {
+          "gate": {
+            "texels_kept": 49554,
+            "texels_tested": 87754
+          },
+          "mask_mean": 0.1461,
+          "metal_share": 0.1474,
+          "small_component_texels_removed": 2,
+          "term_texels": [
+            87578
+          ]
+        }
+      },
+      "remap": {
+        "after": {
+          "cloth": {
+            "bc_srgb_mean": [
+              126.5,
+              38.8,
+              39.2
+            ],
+            "metallic_mean": 0.0,
+            "metallic_p5_p95": [
+              0.0,
+              0.0
+            ],
+            "roughness_mean": 0.9536,
+            "roughness_p5_p95": [
+              0.8788,
+              0.9843
+            ],
+            "texels": 2558529
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              207.9,
+              155.0,
+              98.4
+            ],
+            "metallic_mean": 0.9429,
+            "metallic_p5_p95": [
+              0.7778,
+              1.0
+            ],
+            "roughness_mean": 0.3772,
+            "roughness_p5_p95": [
+              0.3235,
+              0.4387
+            ],
+            "texels": 1956583
+          },
+          "metal_core_m_ge_0.99": {
+            "bc_srgb_mean": [
+              209.4,
+              156.1,
+              99.0
+            ],
+            "metallic_mean": 0.9618,
+            "metallic_p5_p95": [
+              0.9006,
+              1.0
+            ],
+            "roughness_mean": 0.3707,
+            "roughness_p5_p95": [
+              0.3227,
+              0.421
+            ],
+            "texels": 1817224
+          },
+          "non_metal_metallic_max": 0.0
+        },
+        "before": {
+          "cloth": {
+            "bc_srgb_mean": [
+              126.5,
+              38.8,
+              39.2
+            ],
+            "metallic_mean": 0.0173,
+            "roughness_mean": 0.9536,
+            "texels": 2558529
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              133.9,
+              102.0,
+              65.1
+            ],
+            "metallic_mean": 0.2937,
+            "roughness_mean": 0.7044,
+            "texels": 1956583
+          }
+        },
+        "luminance_reference_linear": 0.13148,
+        "metal_bc_linear_max_channel_p5_p50_p95": [
+          0.1789,
+          0.7066,
+          1.0
+        ],
+        "target_linear": [
+          0.7157,
+          0.3712,
+          0.1384
+        ],
+        "target_srgb": "#DCA468",
+        "tripo_roughness_rank_q5_q95": {
+          "cloth": null,
+          "metal": [
+            0.5343,
+            0.9678
+          ]
+        }
+      },
+      "rim_filters_caps": [
+        {
+          "fallback": "mean of the region's kept samples",
+          "keep": {
+            "s_min": 0.6
+          },
+          "label": 5,
+          "rim_samples": 2064,
+          "rim_samples_kept": 1989,
+          "vertices": 93,
+          "vertices_without_kept_sample": 0
+        }
+      ],
+      "rim_filters_footprints": [
+        {
+          "fallback": "mean of the region's kept samples",
+          "keep": {
+            "s_min": 0.6
+          },
+          "label": 5,
+          "rim_samples": 162,
+          "rim_samples_kept": 149,
+          "vertices": 199,
+          "vertices_without_kept_sample": 1
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "T_Achilles_H2_2K_BC.png": {
+      "bytes": 4950903,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3786512167cf96c981916b7854f663a053554e449ed1c5d13bcd251f11c75535"
+    },
+    "T_Achilles_H2_2K_N.png": {
+      "bytes": 4810476,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "6c8deba25ebd209a0fe5a180af5cf684b913fad55b4727cab1f69b04d3baef1a"
+    },
+    "T_Achilles_H2_2K_N_OpenGL.png": {
+      "bytes": 4810775,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "57b623f617fd8edfa5851d4661b2b30b6150f6181f436f6ff2ef566116b61974"
+    },
+    "T_Achilles_H2_2K_ORM.png": {
+      "bytes": 4071379,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "877b6886b6f4e7f8da97e1f9eeb235a912a8a4a86df3f61b612201b574b6e590"
+    },
+    "T_Achilles_H2_2K_TeamMask.png": {
+      "bytes": 588703,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "697eb5664ab0fe2418f8901e9d8bae99b510d60a0038a31d15dfa1bae200af69"
+    },
+    "T_Achilles_H2_BC.png": {
+      "bytes": 15884588,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "c73ff7b362e3384945c03eb8b4214ea10103448699a81cfe1dd59cd78775ab1d"
+    },
+    "T_Achilles_H2_N.png": {
+      "bytes": 14240703,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a3ee83010b84eb3c4b59350a04e6ae1774d3ccdf36f7e2bcd917781abe7450d4"
+    },
+    "T_Achilles_H2_N_OpenGL.png": {
+      "bytes": 14243225,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "8a102f953f721fcead7d66d360d6a7375cab781c353fc05d1528008adde94a6f"
+    },
+    "T_Achilles_H2_ORM.png": {
+      "bytes": 12608974,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "425872d8346222973b98ed1dea736363c28deb8f135fb3a5aef452494e7c9960"
+    },
+    "T_Achilles_H2_TeamMask.png": {
+      "bytes": 1596153,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "43e03d4cedead59322e9360a22e2f781e1a6d3bdbe9916c468da54659b87bdb0"
+    }
+  },
+  "passed": true,
+  "prefix": "T_Achilles_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7477336,
+      "BC": 7477336,
+      "HIT": 7477336,
+      "NORMAL": 7477336,
+      "RM": 7477336
+    },
+    "caps": {
+      "cap_texels": 297174,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 5154,
+      "cap_vertices": 3452,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 297174,
+      "rim_samples": 35313
+    },
+    "footprints": {
+      "painted_texels": 53941,
+      "rim_samples": 394,
+      "triangles": 337,
+      "vertices": 326
+    },
+    "in_island_unbaked_texels": {
+      "AO": 307567,
+      "BC": 307567,
+      "HIT": 307567,
+      "NORMAL": 307567,
+      "RM": 307567
+    },
+    "size": 4096,
+    "uv_texels": 7784903
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 148374,
+    "cloth_parts": [
+      "tripo_part_0"
+    ],
+    "cloth_share_of_cloth_texels": 0.9768,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "красный плащ (часть 0): h ≈ 358°, s p50 0,71, v p50 0,49 (замер разведки) — пороги Medusa (v ≤ 0,4, s ≤ 0,34, тёмное платье) дали бы долю ≈ 0 и FAIL team_mask_cloth_share",
+      "ramp": 0.04,
+      "s_max": 0.95,
+      "v_max": 0.75
+    }
+  }
+}

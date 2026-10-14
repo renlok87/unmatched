@@ -1,0 +1,176 @@
+{
+ "schema": "scratch.base-seethrough-diag/1",
+ "tool": "C:/tmp/achilles-r3/seethrough_diag.py (scratch of the stage-5 r3 executor; imports tools/tripo-pipeline/review/base_seethrough.py: same grid, plane, directions and covered rule)",
+ "files": {
+  "SM_Achilles_H2LD_Base.fbx": "2df7459219b63aad62e3662a6cfc2a2fb3bcbb3a7b55b63bde6673ac9680d934",
+  "SK_Achilles_H2LD.fbx": "da46314f4fd1a8a9b2241a34c351c3785d58f6fb3e9c37f5b72d8f12f18ac34f"
+ },
+ "question": "where do the uncovered rays of base_seethrough.py go?",
+ "runs": {
+  "with_figure": {
+   "top_down": {
+    "uncovered_rays": 0,
+    "grid_radius_uu": null,
+    "top_surface_below_grid_point_uu": null,
+    "min_distance_to_a_hole_rim_uu": null,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_+X": {
+    "uncovered_rays": 11,
+    "grid_radius_uu": [
+     13.87,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.57,
+     5.65
+    ],
+    "min_distance_to_a_hole_rim_uu": 4.94,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_-X": {
+    "uncovered_rays": 16,
+    "grid_radius_uu": [
+     13.89,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.58,
+     5.65
+    ],
+    "min_distance_to_a_hole_rim_uu": 3.42,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_+Y": {
+    "uncovered_rays": 10,
+    "grid_radius_uu": [
+     13.88,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.62,
+     5.64
+    ],
+    "min_distance_to_a_hole_rim_uu": 5.83,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_-Y": {
+    "uncovered_rays": 98,
+    "grid_radius_uu": [
+     13.81,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.55,
+     5.69
+    ],
+    "min_distance_to_a_hole_rim_uu": 2.7,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   }
+  },
+  "base_only": {
+   "top_down": {
+    "uncovered_rays": 0,
+    "grid_radius_uu": null,
+    "top_surface_below_grid_point_uu": null,
+    "min_distance_to_a_hole_rim_uu": null,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_+X": {
+    "uncovered_rays": 131,
+    "grid_radius_uu": [
+     13.86,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.55,
+     5.67
+    ],
+    "min_distance_to_a_hole_rim_uu": 4.94,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_-X": {
+    "uncovered_rays": 24,
+    "grid_radius_uu": [
+     13.89,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.58,
+     5.66
+    ],
+    "min_distance_to_a_hole_rim_uu": 2.51,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_+Y": {
+    "uncovered_rays": 11,
+    "grid_radius_uu": [
+     13.88,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.62,
+     5.64
+    ],
+    "min_distance_to_a_hole_rim_uu": 5.83,
+    "rays_with_any_hit": 0,
+    "rays_with_a_base_back_face_hit": 0
+   },
+   "cam55_from_-Y": {
+    "uncovered_rays": 182,
+    "grid_radius_uu": [
+     6.1,
+     13.93
+    ],
+    "top_surface_below_grid_point_uu": [
+     5.55,
+     5.76
+    ],
+    "min_distance_to_a_hole_rim_uu": 0.08,
+    "rays_with_any_hit": 1,
+    "rays_with_a_base_back_face_hit": 1
+   }
+  }
+ },
+ "plane_z_uu": 5.805,
+ "sampled_radius_uu": 13.935,
+ "radial_top_profile_uu": {
+  "12.0": [
+   5.7,
+   5.72
+  ],
+  "12.5": [
+   5.7,
+   5.72
+  ],
+  "13.0": [
+   5.68,
+   5.72
+  ],
+  "13.5": [
+   5.65,
+   5.71
+  ],
+  "14.0": [
+   5.44,
+   5.63
+  ],
+  "14.5": [
+   3.38,
+   3.45
+  ],
+  "15.0": [
+   null,
+   null
+  ]
+ },
+ "reading": "every uncovered ray aims at the outer rim of the sampled disc (r 13.8-13.9 of 13.935 uu) where the real top of the upper tier is 0.17-0.24 uu below the disc plane (z = max of the base, 5.805): the ray passes over the far edge of the top and hits nothing at all (no base face, no back face) -- it is outside the base silhouette, not a hole. With the figure no uncovered ray lies within 2.7 uu of a hole rim; top_down = 0. Base only: 1 ray of 182 from -Y (grid (-0.01, -6.09), 0.08 uu from the rim of base_hole_2) slips through the cap/rim seam (one 0.1 x 0.1 uu sample, the single-ray edge slip the tool doc names); the right sandal covers it with the figure. The 4 hole loops of the base top are closed by the caps base_hole_1..4 (closure.rebuild_retopo_caps, close-report.json loops_after); the 8 boundary loops the tool lists are 4 rims + 4 coincident cap borders (caps are separate vertices on the exact rim, st_close.py)."
+}

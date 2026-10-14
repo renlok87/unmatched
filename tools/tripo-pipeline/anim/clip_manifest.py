@@ -52,7 +52,7 @@ CHARS["AncientLeshen"] = ("LESH", "ASSET-ANCIENT-LESHEN-001")
 H2ANIM["AncientLeshen"] = "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json"
 # пилот 2026-10-14, этап 6 Achilles (регистрация Р6-1 отдельными строками)
 CHARS["Achilles"] = ("ACH", "ASSET-ACHILLES-001")
-H2ANIM["Achilles"] = "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim.json"
+H2ANIM["Achilles"] = "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json"
 VAL2 = os.path.join(LIB, "validation-h2anim")
 V2_KEY = "UM_HUMANOID_17_v2"
 NO_LICENSE = {"terms": "нет файла", "commercial_use": "n/a"}
