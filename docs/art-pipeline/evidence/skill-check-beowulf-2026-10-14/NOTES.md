@@ -176,3 +176,25 @@ table; pytest 931 passed / 3 xfailed. ≈ 50 min.
 | 7b game | 16:55–17:45 | packaged, both boards, AN-18 |
 
 ≈ 6 h wall clock for one figure from 1b to the game (pilot: 7–10 h per figure with r2/r3 reworks). 62 findings.
+
+## Fix wave after the check run (2026-10-14 17:55–19:10)
+
+Packs A da5f11ce (concept / Codex / acceptance flow), B 885806b3 (h2_bake / capture), C 2696d7de (animation / smoke),
+D 7701fd74 (UE / stage-7 tools) — each C row above carries its «fixed:» / «doc:» mark; determinism C38/C39 68c94912;
+Tripo decision docs a921b502. `registration_check` 8 heroes PASS; full suite 1656 passed / 3 xfailed.
+
+Backlog (not in the wave, by priority):
+
+| # | Finding | Why later |
+|---|---|---|
+| C63 | Re-run with the robust base top (C40): accepted DeathSettle of **Angel r2** and **King Arthur** now FAIL `weapon_tip` — the sword tips float 3.0 / 2.4 mm above the visible base (raycast) | real but tiny defect in accepted clips; a clip rework of accepted heroes is its own task |
+| C32 | Stage-4 acceptance launcher still writes an assumed executor id (`acceptance/*` was outside the packs) | small; fix with the next acceptance tool change |
+| C25 | H2.1 metal pass: one `target_srgb` per hero (iron / steel / gold) | needs a design of per-part targets |
+| C29 | small chromatic accent classes (< 10 % share) not checked by tone | Blender-preview effect on Beowulf (UE showed gold); keep watching |
+| C44 | library sword DeathSettle turns the sword in the fist (F95) | library change affects accepted heroes |
+| C48 | UE look-dev ID decoding confuses chainmail with fur; small gold unstable | palette change touches every hero's MatID |
+| C54 | toothed upper edge of the height team band on close frames | fine at K2; geometry split along the height plane |
+| C62 | AN-18 sheet is the longest 7b step (563 s per board per hero) | batch `--k1-from` helps from the second hero |
+| — | live check of «do not load skills» in the Codex 1c task (pack A) | needs a real Codex run |
+| — | Smart Mesh prop route not yet run on a real prop | first prop is its check |
+| — | C49 F139 start values make the Blender preview fur ≈ 16 % darker → t_cap 1.0 on a new hero at first; grade gains must be re-tuned once | expected stage-3 iteration; watch on the next hero |
