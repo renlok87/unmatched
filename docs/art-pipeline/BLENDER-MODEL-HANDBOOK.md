@@ -380,7 +380,10 @@ front; нет лишних конечностей и голов. Риск: се�
      фантомы (второй меч, вторая рука и лицо у Arthur, двуликая голова у Harpy);
    - «по частям» Balance, ultra mesh 2M, triangles, без текстуры (60 кредитов);
    - затем текстура 8K с «убрать освещение» (30), затем PBR (5).
-4. Настройки **пропса**: multi-view, H3.1, текстура 2K, PBR, Triangle, 8K и «по частям» выключены.
+4. Настройки **пропса**: по умолчанию — «Умная сетка» (P2.0 или P1.0 Fast, приватность переключать с «Sharing Only»),
+   затем текстура 2K и PBR той же задачи (решение `docs/game-design/decisions/2026-10-14-tripo-smart-mesh-props-anim-presets.md`;
+   `references/tripo3d-stages.md` §5.3 скилла). Запасной маршрут — multi-view, H3.1, текстура 2K, PBR, Triangle, 8K и
+   «по частям» выключены.
 5. После каждой операции — баланс и строка истории в `evidence/<asset>-<дата>/tripo-run.json` и строка в единый
    журнал визуала `docs/game-design/visual/credits-ledger.json` через `python tools/art/visual/ledger.py add`
    (`docs/game-design/visual/07-prompt-templates.md` §4.1, ВР-PR06; нужна карточка `--task` в
@@ -834,6 +837,11 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 ---
 
 ## 5. Статический пропс
+
+**Вход из «Умной сетки» Tripo** (маршрут пропа по умолчанию с 2026-10-14,
+`.agents/skills/3d-model-pipeline/references/tripo3d-stages.md` §5.3): геометрия — одна сварная сетка без частей, UV — из
+шага текстуры Tripo; сборка ниже берёт её как обычный GLB в `source_glb` — один материал, BC/RM/N одного размера,
+кратного `texture_size` (`static_prop_candidate.py`, `gltf_images` и проверка размеров текстур).
 
 1. **Params**: скопировать `reports/candidate-params.json` прогона того же вида (бочка, фонарь —
    `art/pipeline-candidates/ASSET-DECOR-KIT-001/<run>/reports/`) в `$R/reports/candidate-params.json`, поменять

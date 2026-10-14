@@ -56,7 +56,7 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 |---|---|---|
 | `humanoid` (герой или помощник) | 0–7 | риг `UM_HUMANOID_17_v2`, 17 костей; новый персонаж — это рутинная регистрация (`references/new-character-registration.md`), а не эскалация |
 | `winged-biped` (образец — Harpy) | 0–7 | крылья = цепочки `arm_upper → arm_lower → hand` базового скелета, как у Harpy; оружия нет (`WEAPON_BONE: null`), 16 костей (HANDBOOK §2.6, §0.3 п.4); `wing_tip.L/R` — только по решению (стоп §5 п.5); широкий кадр концепта (HANDBOOK §3.1) |
-| `prop` | 0, 1, 2, 3, 4, 6?, 7 | Tripo — multi-view: front+side у осесимметричного, front+back у асимметричного; этап 3 — путь статического пропса (HANDBOOK §5, §6 «Этап 3 — проп»), регистрации персонажа нет; на этапе 4 `D = null` и `G-RIG = n/a`, съёмка `capture_acceptance_set.py --no-base` работает и на широком пропе (`references/acceptance-and-blender.md` §14); этап 6 только при CUE или звуке, иначе пропуск с записью «нет слотов» в `STAGE6_SLOTS`; этап 7 — статический импорт (HANDBOOK §5 п.7); проп с осевой симметрией может пропустить шаг 1b |
+| `prop` | 0, 1, 2, 3, 4, 6?, 7 | Tripo — умная сетка (решение 2026-10-14, `docs/game-design/decisions/2026-10-14-tripo-smart-mesh-props-anim-presets.md`; на пропе ещё не проверена — первый проп её проверяет, multi-view — запасной маршрут, `references/tripo3d-stages.md` §5.3), слоты: front+side у осесимметричного, front+back у асимметричного; этап 3 — путь статического пропса (HANDBOOK §5, §6 «Этап 3 — проп»), регистрации персонажа нет; на этапе 4 `D = null` и `G-RIG = n/a`, съёмка `capture_acceptance_set.py --no-base` работает и на широком пропе (`references/acceptance-and-blender.md` §14); этап 6 только при CUE или звуке, иначе пропуск с записью «нет слотов» в `STAGE6_SLOTS`; этап 7 — статический импорт (HANDBOOK §5 п.7); проп с осевой симметрией может пропустить шаг 1b |
 | `non-humanoid` (четвероногое, многоголовое, змеевидное) | **стоп на этапе 0** | гейт §5 п.1: пользователю уходит готовая постановка `<ASSET_DIR>/STOP-RIG-CONTRACT-3.md` по шаблону `references/intake-and-evidence.md` §2. До стопа пишется только `asset-card.yaml` (`ANATOMY: non-humanoid`, анатомия в `NOTES`); запись реестра, строка `anim.csv` и траты — нет. Правила поз четвероногих в справочниках действуют только после принятия rig-contract/3 |
 
 Блок `optional_extensions` в `docs/art-pipeline/rig/rig-contract.json:169-184` (`crown_snakes`, `cloak`, `harpy_wings`)
@@ -183,7 +183,9 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
      если выбран в `ACCEPTOR_PROFILE`) — проба `exec` выше тем же exe с `--ignore-user-config -m gpt-6.1-sol`.
    - **Claude in Chrome** (шаги 1b и 2). Инструменты загрузить одним `ToolSearch`
      (`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__get_page_text,mcp__claude-in-chrome__computer`).
-     Критерий 1: `tabs_context_mcp` возвращает подключённый браузер и список вкладок. Критерий 2: в своей новой
+     Критерий 1: `tabs_context_mcp` возвращает подключённый браузер и список вкладок; молчит — сначала
+     `list_connected_browsers` и `select_browser` браузера с `onThisComputer: true` (сессия могла быть привязана к
+     чужому браузеру, C1 проверки Beowulf), и только потом Windows-MCP. Критерий 2: в своей новой
      вкладке (`tabs_create_mcp`) `navigate` на `https://studio.tripo3d.ai/`, затем `get_page_text` или скриншот —
      открыта Studio под учётной записью пользователя и виден баланс кредитов (записать число в `NOTES`). Чужие
      вкладки не трогать. Расширение не подключено, но Studio открыта и залогинена в Chrome пользователя — клики через
@@ -351,9 +353,11 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    `HEROES` в `tools/art/anim/clip_review_sheet.py` (`Hero(...)` с этими карточками, Р6-4) →
    `clip_review_sheet.py --check` PASS. FX способности `tools/art/fx/fx_ability.py` — только если у героя есть CUE-014
    (там же §6). `HIT_TYPE` выбрать и записать в заявку (`references/animation-vfx-sfx.md` §9).
-2. Источник движения (ДС-6): по умолчанию — паттерн библиотеки героя с тем же классом оружия
-   (`references/animation-vfx-sfx.md` §6.1); видеорефы SYNTX — только для нестандартного движения, с причиной в поле
-   `MOTION_SOURCE` заявки. Новый `<key>-h2anim.json` и 4 клипа D-11: Idle, LungeAttack, HitReact, DeathSettle.
+2. Источник движения (ДС-6 и решение 2026-10-14,
+   `docs/game-design/decisions/2026-10-14-tripo-smart-mesh-props-anim-presets.md`; порядок и шаги —
+   `references/animation-vfx-sfx.md` §6.1): по умолчанию — паттерн библиотеки героя с тем же классом оружия; нет
+   образца — бесплатный пресет Tripo как образец тайминга и ключевых поз, а не клип; видеорефы SYNTX — только для
+   нестандартного движения, с причиной в поле `MOTION_SOURCE` заявки. Новый `<key>-h2anim.json` и 4 клипа D-11: Idle, LungeAttack, HitReact, DeathSettle.
    Затем `python tools/tripo-pipeline/anim/h2anim_run.py <spec>` → код 0.
 3. Проверки исполнителя (не приёмка): `validate_clip.py` и `clip_contact_check.py` идут внутри `h2anim_run.py`;
    `grip_check.py` — хват, кисть, локоть (`references/animation-vfx-sfx.md` §6.3); крупные планы `clip_closeups.py`
@@ -450,7 +454,7 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 | Описание и имя бойца | `DESCRIPTION`, `ANCHORS`, `FIGHTER_NAME` — из `scraped-data/api/heroes/<slug>.json` и эталонной БД (имя, оружие, помощники) текстом; аватар и сканы в генератор не подаются. Персонажа там нет (новый помощник, например Sir Gawain) — пишутся по заявке пользователя с `decided_by: delegated (ВР-реестр 2026-10-06)`; это не гейт стопа | `07-prompt-templates.md` §3.1, ВР-PR08; решение скилла |
 | Помощник без нового героя | `OWNER_HERO_SLUG` — слаг героя-владельца (из заявки; не задан — ближайший по сюжету герой ростера, решение по делегированию); `HERO_SLUG` = он же; вариант bench-фикстуры: `--hero-name "<FighterName владельца>" --hero-slug <OWNER_HERO_SLUG> --sidekick-name "<FIGHTER_NAME>"`; `S08FighterNames.json` не трогается (формат держит одного помощника на героя), строка в NOTES | решение скилла; `references/new-character-registration.md` §0, Д-2, Р7-8 |
 | SYNTX и Codex | SYNTX — без подтверждения каждой генерации, в лимитах и сроке журнала (ВР-04/ВР-PR04); Codex — по подписке, строка журнала `ledger.py add --service Codex` на каждый пакет-запуск и на каждую приёмку Sol (квота общая, RC-12); бюджет сессий пачки — §11 | `07-prompt-templates.md` §4 |
-| Источник движения клипов | паттерн библиотеки героя с тем же классом оружия (`MOTION_SOURCE: "library: <Key образца>"`); видеорефы SYNTX — только нестандартное движение, причина в `MOTION_SOURCE` (визуального лимита SYNTX хватает примерно на одного героя) | ДС-6; `references/animation-vfx-sfx.md` §6.1 |
+| Источник движения клипов | паттерн библиотеки героя с тем же классом оружия (`MOTION_SOURCE: "library: <Key образца>"`); нет образца — бесплатный пресет Tripo как образец тайминга и поз (`"tripo-preset: <имя>"`, решение 2026-10-14); видеорефы SYNTX — только нестандартное движение, причина в `MOTION_SOURCE` (визуального лимита SYNTX хватает примерно на одного героя) | ДС-6; `references/animation-vfx-sfx.md` §6.1 |
 | Редактор UE 7a | агентский скрытый редактор пачки, его поднимает и закрывает оркестратор; 7a — один герой за раз; гейт §5 п.7 — только интерактивный редактор | ДС-3; `references/ue-import-package.md` §1 п.1 |
 | Кадры приёмки, листы, бенч | кадры приёмщику модели и клипа — 1200 px по длинной стороне, JPEG q92 (клипа — копии `prep_acceptance.py`, листы уменьшаются целиком); PNG листов K1/K2 и бенча — в рабочий каталог вне git, JPEG-листы инструментов — в git | ДС-8; HANDBOOK §8 |
 | Бюджет полигонов | ≤ 45 000 tris LOD0 фигура с оружием, подставка ≤ 2 500 | `docs/game-design/evidence/GD-058/final-2026-10-03/README.md`; практика — HANDBOOK §2.10 |
@@ -580,7 +584,9 @@ STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", v
                                     # проп без CUE/звука: "нет слотов"
 MOTION_SOURCE: "library: <Key образца>"   # ДС-6: паттерн библиотеки героя с тем же классом оружия (меч — KingArthur,
                                     #   Angel; лук — Medusa; посох, копьё — Merlin, Achilles; когти — Harpy, AncientLeshen);
-                                    #   | "syntx: <причина — нестандартное движение>"; проп: null
+                                    #   | "tripo-preset: <имя пресета>" (нет образца в библиотеке; только образец
+                                    #   тайминга и поз, не клип — решение 2026-10-14)
+                                    #   | "syntx: <причина — нестандартное движение>"; смешанные — через «;»; проп: null
 CREDITS:
   ledger: "docs/game-design/visual/credits-ledger.json"   # tools/art/visual/ledger.py add/check
   tripo_limit: "лимит и срок — из журнала (решение 2026-10-13; until: null = окно открыто); граница — баланс Studio"
