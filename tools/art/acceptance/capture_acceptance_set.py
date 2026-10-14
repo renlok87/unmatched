@@ -3,13 +3,13 @@
 
     python tools/art/acceptance/capture_acceptance_set.py --fbx <SK_*.fbx> --textures <dir> --out <evidence>/frames \
         [--key <Key>] [--sheet <sheet-<key>.png>] [--side-view left|right] [--measure <measure-report.json>] \
-        [--allow-no-tone] [--blender <exe>] [--base <SM_*_Base.fbx> | --no-base]
+        [--allow-no-tone] [--blender <exe>] [--base <SM_*_Base.fbx> | --no-base] [--previous <frames dir> | none]
 
 Вход: отгружаемый скелетный FBX (UM_FBX_v1, `HANDBOOK §2.2`) и каталог его текстур. Из каталога берутся BC, N
 (DirectX, `HANDBOOK §2.4`) и ORM: `*_BC.png` / `*_2K_BC.png` / `*_BC_2K.png` (последнее — раскладка форков Arthur и
 Merlin), то же для `_N` (не `_N_OpenGL`) и `_ORM`; при нескольких кандидатах — 2K (рантайм-набор героя), при `--key` —
 только `T_<Key>_*`. Подставка: `--base`, иначе соседний `SM_<имя SK без SK_>_Base.fbx` в каталоге FBX (атлас общий),
-`--no-base` — без неё. Лист концепта `--sheet` копируется в `frames/sheet.png` шириной не больше 2000 px (свотчи и виды —
+`--no-base` — без неё. Лист концепта `--sheet` копируется в `frames/sheet.png` не больше 1200 px по длинной стороне (свотчи и виды —
 по соседнему `checks-report.json`, если есть). Тон классов — `--measure`, иначе `<run>/reports/measure-report.json`
 рядом с `<run>/export/` FBX, если есть → `frames/tone.json` (`_tone.py`). У героя (есть арматура) без measure-report
 съёмка — код 1; `--allow-no-tone` — только ассет старше `ld_measure` (форки Arthur/Merlin/Harpy, калибровка).
@@ -28,18 +28,28 @@ Merlin), то же для `_N` (не `_N_OpenGL`) и `_ORM`; при нескол
   close-base.jpg                подставка сверху-сбоку (без подставки — нижние 22 % модели)
   wire-front.jpg, wire-34.jpg, wire-back.jpg
                                 сетка треугольников на глине: спереди, 3/4 сверху (az 45, el 15) и сзади (az 180)
-  uv-layout.png                 UV0 атласа поверх затемнённого BC (не больше 2000 px по любой стороне)
+  uv-layout.png                 UV0 атласа поверх затемнённого BC: рисуется 1600 px (покрытие считается на нём), файл —
+                                не больше 1200 px по длинной стороне, PNG с палитрой 256 цветов
   pose-01.jpg … pose-04.jpg     только при арматуре: позы из тестов tools/tripo-pipeline/anim/rig_deform_probe.py
   pose-03b.jpg                  поза pose-03 со второго ракурса (где оружие и голова разведены сильнее всего)
-  sheet.png                     копия --sheet, ширина не больше 2000 px
+  sheet.png                     копия --sheet, не больше 1200 px по длинной стороне (оригинал — frames.json#sheet.source)
   compare-front.jpg, compare-side.jpg, compare-back.jpg
                                 вид листа | turn-000 / turn-090|270 (--side-view) / turn-180 в одном росте фигуры
                                 (верх фигуры и низ подставки совпадают), направляющие через 10 % роста; если у листа
-                                есть checks-report.json с видами
+                                есть checks-report.json с видами; не больше 1200 px по длинной стороне (виды листа
+                                берутся из оригинала листа, не из sheet.png)
   tone.json                     тон классов против концепта (если есть measure-report.json)
   frames.json                   schema unmatched.acceptance-frames/1: входы с sha256, accepted_object (SK, SM и 2K-карты
-                                для карточки), камеры, позы, pose_checks, лист, проверки
-JPEG 1200 px, качество 92. Blender — headless (`-b --factory-startup`), процесс завершается сам.
+                                для карточки), камеры, позы, pose_checks, лист, проверки, changed_vs_previous
+Кадры приёмщика — не больше 1200 px по длинной стороне (HANDBOOK §8; RC-22/F97: приёмщик Sol получает все файлы
+frames.json#files картинками, лишние мегабайты — переподключения WebSocket): JPEG 1200 px, качество 92; sheet.png и
+uv-layout.png остаются PNG (имена требует validate_card.py). Blender — headless (`-b --factory-startup`), процесс
+завершается сам.
+Повторный цикл (F151, RC-19): `--previous <каталог frames прежнего цикла>`; без флага — сам, если `--out` лежит в
+`<YYYYMMDD>-r<N>/frames` и рядом есть `<дата>-r<N-1>/frames/frames.json` (N ≥ 2); `--previous none` — не сравнивать.
+Каждый кадр сравнивается попиксельно с одноимённым кадром прежнего цикла → frames.json#changed_vs_previous (кадр →
+max/mean разницы, число пикселей выше шума, рамка, changed). Это вход запускающего (какие кадры смотрит второй
+приёмщик), а не основание балла.
 Код выхода: 0 — все кадры есть и автопроверки прошли; 1 — ошибка входа, Blender или проверки кадров.
 """
 from __future__ import annotations
@@ -61,8 +71,18 @@ BLENDER_SCRIPT = HERE / "_blender_capture.py"
 PROBE_SOURCE = REPO / "tools" / "tripo-pipeline" / "anim" / "rig_deform_probe.py"
 DEFAULT_BLENDER = os.environ.get("BLENDER", "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe")
 SIZE, QUALITY, UV_SIZE = 1200, 92, 1600
-MAX_REVIEW_PX = 2000  # Read показывает картинку больше 2000 px уменьшенной: лист и uv-layout не шире (решение скилла)
+# Кадр приёмщика не больше 1200 px по длинной стороне (HANDBOOK §8 «JPEG 1200 px q92»; RC-22/F97, пилот 2026-10-13:
+# лист 2000 px, uv-layout 1600×1776 и compare 1376 px — PNG по 1,8–3,1 МБ на каждую приёмку Sol). Раньше — 2000.
+REVIEW_PX = 1200
+MAX_REVIEW_PX = 2000  # предел наборов до 2026-10-14 (Read уменьшает картинку больше 2000 px); новые — REVIEW_PX
+UV_FOOTER_MAX = 400  # подпись под атласом UV_SIZE (до уменьшения)
 BG = (72, 72, 72)  # нейтральный тёмно-серый фон кадров (решение скилла)
+# Сравнение с прежним циклом (F151, RC-19). Пиксель изменён, если разница какого-либо канала больше NOISE_LEVEL из
+# 255; кадр изменён, если таких пикселей не меньше NOISE_MIN_PX. Основание: Achilles r2 → r3 (правка только весов,
+# тот же рендер) — 29 кадров из 30 с разницей канала ≤ 7 и 0 пикселей > 8, pose-02 — 6267 пикселей > 16;
+# r1 → r2 (крышки ворота) — wire-front 14 пикселей > 16.
+NOISE_LEVEL, NOISE_MIN_PX = 12, 4
+CYCLE_DIR = re.compile(r"^(\d{8})-r(\d+)$")
 TURNS = ["turn-%03d.jpg" % a for a in range(0, 360, 45)]
 FIXED = TURNS + ["close-head.jpg", "close-weapon.jpg", "close-base.jpg", "wire-front.jpg", "wire-34.jpg",
                  "wire-back.jpg"]
@@ -186,7 +206,7 @@ def draw_uv_layout(npz_path: Path, bc_path: Path, out_png: Path, meshes_info: di
     legend = ["UV0 atlas (%s), coverage %.1f %%" % (bc_path.name, coverage * 100)]
     legend += ["%s: %d tris, %d islands" % (n, s["triangles"], s["uv_islands"]) for n, s in stats.items()]
     legend += ["yellow = island border, fill colour = island, dim background = BaseColor"]
-    footer = min(16 + 32 * len(legend), MAX_REVIEW_PX - S)  # подпись под атласом, чтобы не закрывать острова
+    footer = min(16 + 32 * len(legend), UV_FOOTER_MAX)  # подпись под атласом, чтобы не закрывать острова
     img = Image.new("RGBA", (S, S + footer), (24, 24, 24, 255))
     img.paste(atlas, (0, 0))
     d = ImageDraw.Draw(img)
@@ -196,8 +216,23 @@ def draw_uv_layout(npz_path: Path, bc_path: Path, out_png: Path, meshes_info: di
             break
         d.text((14, y), t, fill=(255, 255, 255, 255), font=font)
         y += 32
-    img.convert("RGB").save(out_png, optimize=True)
-    return {"size_px": [S, S + footer], "coverage": round(coverage, 4), "meshes": stats}
+    # покрытие посчитано на UV_SIZE (как раньше); файл приёмщика — не больше REVIEW_PX, палитра 256 цветов (схема, не
+    # фото: 1600×1776 RGB весил 3,1 МБ)
+    review = fit_long_side(img.convert("RGB"), REVIEW_PX)
+    review.quantize(colors=256, method=Image.Quantize.MEDIANCUT).save(out_png, optimize=True)
+    return {"size_px": list(review.size), "drawn_px": [S, S + footer], "coverage": round(coverage, 4),
+            "meshes": stats}
+
+
+def fit_long_side(im, px: int = REVIEW_PX):
+    """Картинка не больше px по длинной стороне (LANCZOS); меньшая не увеличивается."""
+    from PIL import Image
+
+    w, h = im.size
+    s = px / max(w, h)
+    if s >= 1.0:
+        return im
+    return im.resize((max(1, round(w * s)), max(1, round(h * s))), Image.LANCZOS)
 
 
 def compose_panels(left_png: Path, right_png: Path, out_png: Path, labels=("hand.R", "hand.L")) -> None:
@@ -218,15 +253,16 @@ def compose_panels(left_png: Path, right_png: Path, out_png: Path, labels=("hand
 
 
 def copy_sheet(sheet: Path, out_png: Path) -> dict:
-    """Лист -> frames/sheet.png шириной не больше MAX_REVIEW_PX (Read показывает больше — уменьшенным, 1:1 нельзя)."""
+    """Лист -> frames/sheet.png не больше REVIEW_PX по длинной стороне (RC-22; раньше — ширина 2000). Остаётся PNG:
+    имя sheet.png требует validate_card.py. Оригинал — frames.json#sheet.source (виды compare-* берутся из него)."""
     from PIL import Image
 
     im = Image.open(sheet)
     w, h = im.size
-    if w > MAX_REVIEW_PX:
-        nh = round(h * MAX_REVIEW_PX / w)
-        im.convert("RGB").resize((MAX_REVIEW_PX, nh), Image.LANCZOS).save(out_png, optimize=True)
-        return {"size_px": [MAX_REVIEW_PX, nh], "resized_from_px": [w, h]}
+    if max(w, h) > REVIEW_PX:
+        small = fit_long_side(im.convert("RGB"), REVIEW_PX)
+        small.save(out_png, optimize=True)
+        return {"size_px": list(small.size), "resized_from_px": [w, h]}
     shutil.copyfile(sheet, out_png)
     return {"size_px": [w, h], "resized_from_px": None}
 
@@ -290,7 +326,8 @@ COMPARE_MARGIN = 100
 
 def compare_frame(view_png: Path, view_bbox, turn_jpg: Path, turn_bbox, out_jpg: Path, labels) -> dict:
     """Вид листа | кадр turn-* в одном росте фигуры: обе фигуры от верха до низа подставки = COMPARE_FIG_PX, низ на
-    одной линии, направляющие через 10 % роста (подписи 0 % сверху … 100 % у низа подставки). Ширина <= 2000 px."""
+    одной линии, направляющие через 10 % роста (подписи 0 % сверху … 100 % у низа подставки). Готовый кадр — не больше
+    REVIEW_PX по длинной стороне (RC-22; раньше — ширина 2000), figure_px — рост фигуры после уменьшения."""
     from PIL import Image, ImageDraw
 
     panels = []
@@ -316,11 +353,102 @@ def compare_frame(view_png: Path, view_bbox, turn_jpg: Path, turn_bbox, out_jpg:
     d.line([(pw, 0), (pw, H)], fill=(170, 170, 170, 255), width=2)
     for i, t in enumerate(labels):
         d.text((i * pw + 70, 12), t, fill=(240, 240, 240, 255), font=_font(28))
-    scale = min(1.0, MAX_REVIEW_PX / W)
+    scale = min(1.0, REVIEW_PX / max(W, H))
     if scale < 1.0:
         canvas = canvas.resize((round(W * scale), round(H * scale)), Image.LANCZOS)
     canvas.save(out_jpg, "JPEG", quality=QUALITY, subsampling=0, optimize=True)
     return {"size": list(canvas.size), "figure_px": round(COMPARE_FIG_PX * scale), "labels": list(labels)}
+
+
+# ---------------------------------------------------------------------- сравнение с прежним циклом (F151, RC-19)
+
+def find_previous(out: Path) -> Path | None:
+    """Каталог кадров прежнего цикла: --out = …/<YYYYMMDD>-r<N>/frames (N ≥ 2) → …/<любая дата>-r<N-1>/frames с
+    frames.json (несколько дат — последняя по имени). Иначе None."""
+    run = out.parent
+    m = CYCLE_DIR.match(run.name)
+    if not m or int(m.group(2)) < 2 or not run.parent.is_dir():
+        return None
+    want = int(m.group(2)) - 1
+    cands = sorted(p / out.name for p in run.parent.iterdir()
+                   if p.is_dir() and CYCLE_DIR.match(p.name) and int(CYCLE_DIR.match(p.name).group(2)) == want
+                   and (p / out.name / "frames.json").is_file())
+    return cands[-1] if cands else None
+
+
+def frame_diff(prev: Path, cur: Path, level: int = NOISE_LEVEL, min_px: int = NOISE_MIN_PX) -> dict:
+    """Попиксельная разница двух кадров (RGB, 0–255): max и mean по каналам, changed_px — пиксели, где разница
+    какого-либо канала больше level, их доля и рамка [x0, y0, x1, y1]; changed — changed_px ≥ min_px. Разный размер —
+    changed true, comparable false (кадры не сравнить попиксельно: смотреть оба)."""
+    import numpy as np
+    from PIL import Image
+
+    a = np.asarray(Image.open(prev).convert("RGB"), dtype=np.int16)
+    b = np.asarray(Image.open(cur).convert("RGB"), dtype=np.int16)
+    if a.shape != b.shape:
+        return {"changed": True, "comparable": False,
+                "reason": "размер %dx%d → %dx%d" % (a.shape[1], a.shape[0], b.shape[1], b.shape[0])}
+    d = np.abs(a - b)
+    m = d.max(axis=2) > level
+    n = int(m.sum())
+    bbox = None
+    if n:
+        ys, xs = np.nonzero(m)
+        bbox = [int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())]
+    return {"changed": n >= min_px, "comparable": True, "max": int(d.max()), "mean": round(float(d.mean()), 5),
+            "changed_px": n, "changed_share": round(n / m.size, 6), "bbox_px": bbox}
+
+
+def _json_body(p: Path):
+    """JSON без блока sources (пути прогонов меняются от цикла к циклу, содержимое — нет)."""
+    data = json.loads(p.read_text(encoding="utf-8"))
+    if isinstance(data, dict):
+        data = {k: v for k, v in data.items() if k != "sources"}
+    return data
+
+
+def changed_vs_previous(prev_dir: Path, out: Path, files: list, fbx_sha: str | None = None,
+                        source: str = "--previous") -> dict:
+    """Блок frames.json#changed_vs_previous: каждый файл frames.json#files (кроме самого frames.json) против
+    одноимённого файла прежнего цикла. Картинки — frame_diff, JSON (tone.json) — содержимое без sources."""
+    prev_man = None
+    if (prev_dir / "frames.json").is_file():
+        try:
+            prev_man = json.loads((prev_dir / "frames.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            prev_man = None
+    prev_fbx = ((prev_man or {}).get("inputs") or {}).get("fbx") or {}
+    per, changed, unchanged, not_comparable = {}, [], [], []
+    for name in files:
+        if name == "frames.json":
+            continue
+        cur, old = out / name, prev_dir / name
+        if not old.is_file():
+            rec = {"changed": True, "comparable": False, "reason": "нет в прежнем цикле"}
+        elif name.lower().endswith((".jpg", ".jpeg", ".png")):
+            rec = frame_diff(old, cur)
+        else:
+            try:
+                rec = {"changed": _json_body(old) != _json_body(cur), "comparable": True, "kind": "json без sources"}
+            except (OSError, ValueError) as e:
+                rec = {"changed": True, "comparable": False, "reason": "не читается: %s" % e}
+        per[name] = rec
+        (changed if rec["changed"] else unchanged).append(name)
+        if not rec.get("comparable", True):
+            not_comparable.append(name)
+    prev_files = (prev_man or {}).get("files") or sorted(p.name for p in prev_dir.iterdir() if p.is_file())
+    return {
+        "previous": {"dir": repo_rel(prev_dir), "source": source, "frames_json": prev_man is not None,
+                     "fbx_sha256": prev_fbx.get("sha256"),
+                     "same_fbx": (prev_fbx.get("sha256") == fbx_sha) if prev_fbx.get("sha256") and fbx_sha else None},
+        "noise": {"pixel_level": NOISE_LEVEL, "min_pixels": NOISE_MIN_PX,
+                  "rule": "пиксель изменён, если разница канала > pixel_level из 255; кадр изменён, если таких "
+                          "пикселей ≥ min_pixels; разный размер — изменён (comparable false)"},
+        "purpose": "вход запускающего (какие кадры смотрит второй приёмщик и проверка пунктов фикса), не основание "
+                   "балла (F151, RC-19)",
+        "frames": per, "changed": changed, "unchanged": unchanged, "not_comparable": not_comparable,
+        "removed": sorted(set(prev_files) - set(files) - {"frames.json"}),
+    }
 
 
 def main(argv=None) -> int:
@@ -342,6 +470,8 @@ def main(argv=None) -> int:
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--base", help="SM_<Key>_<Stage>_Base.fbx (по умолчанию — соседний файл, если есть)")
     g.add_argument("--no-base", action="store_true", help="без подставки")
+    ap.add_argument("--previous", help="каталог frames прежнего цикла для frames.json#changed_vs_previous (F151); "
+                                       "по умолчанию — <дата>-r<N-1>/frames рядом с --out; none — не сравнивать")
     a = ap.parse_args(argv)
 
     fbx = Path(a.fbx).resolve()
@@ -373,6 +503,18 @@ def main(argv=None) -> int:
     if measure is not None and not measure.is_file():
         print("FAIL: нет measure-report %s" % measure, file=sys.stderr)
         return 1
+    previous, previous_source = None, None
+    if a.previous and a.previous.lower() != "none":
+        previous, previous_source = Path(a.previous).resolve(), "--previous"
+        if not previous.is_dir():
+            print("FAIL: нет каталога прежнего цикла %s" % previous, file=sys.stderr)
+            return 1
+        if previous == out:
+            print("FAIL: --previous совпадает с --out (повтор в тот же каталог стирает прежние кадры)", file=sys.stderr)
+            return 1
+    elif not a.previous:
+        previous = find_previous(out)
+        previous_source = "auto: <дата>-r<N-1>/frames рядом с --out" if previous else None
     out.mkdir(parents=True, exist_ok=True)
     stale = [p for p in out.iterdir() if STALE.fullmatch(p.name)]
     for p in stale:  # повторный прогон в тот же каталог: старые кадры не должны смешаться с новыми
@@ -493,7 +635,8 @@ def main(argv=None) -> int:
         warnings.append("нет measure-report.json (прогон старше ld_measure или проп): tone.json не создан, тон T "
                         "по кадрам не снижается")
 
-    accepted = [{"path": repo_rel(fbx), "sha256": sha256(fbx)}]
+    fbx_sha = sha256(fbx)
+    accepted = [{"path": repo_rel(fbx), "sha256": fbx_sha}]
     if base:
         accepted.append({"path": repo_rel(base), "sha256": sha256(base)})
     maps_found, maps_missing = accepted_maps(tdir, a.key)
@@ -501,18 +644,27 @@ def main(argv=None) -> int:
     if maps_missing and info["armature"]:
         warnings.append("accepted_object: нет 2K-карт %s в %s" % (", ".join(maps_missing), repo_rel(tdir)))
 
+    files = sorted(expected + ["uv-layout.png", "frames.json"] + extra)
+    cvp, cyc = None, CYCLE_DIR.match(out.parent.name)
+    if previous is not None:
+        cvp = changed_vs_previous(previous, out, files, fbx_sha, previous_source)
+    elif a.previous is None and cyc and int(cyc.group(2)) > 1:
+        warnings.append("changed_vs_previous: рядом с %s нет кадров цикла r%d (frames/frames.json) — сравнения нет; "
+                        "--previous <каталог> задаёт его явно" % (out.parent.name, int(cyc.group(2)) - 1))
+
     manifest = {
         "schema": "unmatched.acceptance-frames/1",
         "tool": "tools/art/acceptance/capture_acceptance_set.py",
         "inputs": {
-            "fbx": {"path": repo_rel(fbx), "sha256": sha256(fbx)},
+            "fbx": {"path": repo_rel(fbx), "sha256": fbx_sha},
             "base_fbx": {"path": repo_rel(base), "sha256": sha256(base)} if base else None,
             "textures": {k: {"path": repo_rel(v), "sha256": sha256(v)} for k, v in tex.items()},
         },
         "accepted_object": accepted,
         "accepted_object_missing_maps": maps_missing,
         "render": {"blender": info["blender"], "engine": info["engine"], "view_transform": info["view_transform"],
-                   "size_px": SIZE, "jpeg_quality": QUALITY, "background_rgb": list(BG), "camera": "ortho",
+                   "size_px": SIZE, "jpeg_quality": QUALITY, "review_max_px": REVIEW_PX,
+                   "background_rgb": list(BG), "camera": "ortho",
                    "scene_frame": "UM_FBX_v1 (лицо +X) повёрнут на -90 deg Z: лицо -Y, сторона .L = +X",
                    "azimuth": "0 = спереди, 90 = левый бок фигуры (.L), 180 = сзади, 270 = правый бок",
                    "material": "BC sRGB; N DirectX -> G инвертирован для Blender (OpenGL); ORM: G roughness, "
@@ -533,7 +685,8 @@ def main(argv=None) -> int:
                   "floor_limited": tone["floor_limited"], "family_changed_main": tone["family_changed_main"],
                   "anchor_class": tone["anchor_class"]} if tone else None),
         "checks": checks, "warnings": warnings, "errors": errors,
-        "files": sorted(expected + ["uv-layout.png", "frames.json"] + extra),
+        "changed_vs_previous": cvp,
+        "files": files,
     }
     (out / "frames.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     for w in warnings:
@@ -542,6 +695,10 @@ def main(argv=None) -> int:
         for e in errors:
             print("FAIL: %s" % e, file=sys.stderr)
         return 1
+    if cvp is not None:
+        print("changed_vs_previous (%s): изменены %s; без изменений %d" % (cvp["previous"]["dir"],
+                                                                        ", ".join(cvp["changed"]) or "—",
+                                                                        len(cvp["unchanged"])))
     print("OK: %d кадров + uv-layout.png%s -> %s" % (len(expected), "".join(" + " + x for x in extra), out))
     return 0
 

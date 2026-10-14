@@ -265,10 +265,14 @@ def test_copy_sheet_limits_width_and_compare_frame(tmp_path):
     wide = tmp_path / "sheet-x.png"
     Image.new("RGB", (2645, 1138), (30, 30, 30)).save(wide)
     meta = cap.copy_sheet(wide, tmp_path / "sheet.png")
-    assert meta["size_px"][0] == 2000 and meta["resized_from_px"] == [2645, 1138]
-    assert Image.open(tmp_path / "sheet.png").size[0] == 2000
+    # RC-22 (2026-10-14): лист приёмщика — не больше REVIEW_PX (1200) по длинной стороне, раньше — ширина 2000
+    assert meta["size_px"] == [cap.REVIEW_PX, 516] and meta["resized_from_px"] == [2645, 1138]
+    assert Image.open(tmp_path / "sheet.png").size == (cap.REVIEW_PX, 516)
+    tall = tmp_path / "sheet-t.png"
+    Image.new("RGB", (900, 1500)).save(tall)
+    assert cap.copy_sheet(tall, tmp_path / "s3.png")["size_px"] == [720, cap.REVIEW_PX]
     small = tmp_path / "sheet-y.png"
-    Image.new("RGB", (1500, 900)).save(small)
+    Image.new("RGB", (1100, 900)).save(small)
     assert cap.copy_sheet(small, tmp_path / "s2.png")["resized_from_px"] is None
     view = tmp_path / "front.png"
     Image.new("RGB", (1000, 1500), (40, 40, 40)).save(view)
@@ -276,7 +280,7 @@ def test_copy_sheet_limits_width_and_compare_frame(tmp_path):
     Image.new("RGB", (1200, 1200), (72, 72, 72)).save(turn)
     m = cap.compare_frame(view, [100, 50, 900, 1450], turn, [300, 60, 900, 1140], tmp_path / "c.jpg", ("a", "b"))
     w, h = Image.open(tmp_path / "c.jpg").size
-    assert w <= cap.MAX_REVIEW_PX and h <= cap.MAX_REVIEW_PX and m["size"] == [w, h]
+    assert max(w, h) <= cap.REVIEW_PX and m["size"] == [w, h]
 
 
 def test_finish_frame_bbox(tmp_path):
