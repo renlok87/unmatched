@@ -13,3 +13,9 @@ Effect:
 - providerTerms row for Tripo Studio H3.1 recorded 2026-10-13 (ВР-05).
 - Stage-0 cards AN-37…AN-121 added to `docs/game-design/visual/06-tasks/anim.csv` for the 85 figures whose design front
   is accepted (Sol pass or the user's decision `2026-10-13-licensed-concepts-user-accepted.md`).
+
+## 2026-10-14 — the window is lifted too
+
+**Decision (user, 2026-10-14):** asked whether «На триппо нет лимита» also lifts the ВР-04 window (2026-10-28), the user
+answered «Да, снять срок». `limits.tripo.until` = `null` in `credits-ledger.json`; `ledger.py` treats null as an open
+window (70905fa2). The Studio balance stays the only bound. The SYNTX window (2026-10-28) is unchanged.
