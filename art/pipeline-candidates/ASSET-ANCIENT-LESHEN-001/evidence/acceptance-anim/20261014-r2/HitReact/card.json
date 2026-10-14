@@ -1,0 +1,145 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": "HitReact",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-anim/20261014-r1/HitReact/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_HitReact.fbx",
+      "sha256": "93493738378e55e8db90a25a962b3013f4b455dfbd9ebf37419f967762a5aafb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json",
+      "sha256": "63deedf9058b596983ed85a6549c1f743bd21ab480d98db573f0752b01c85673"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-anim/20261014-r2/HitReact/frames",
+    "files": [
+      "AncientLeshen-HitReact-blender-sheet.jpg",
+      "AncientLeshen-HitReact-f02-front.jpg",
+      "AncientLeshen-HitReact-f02-left.jpg",
+      "AncientLeshen-HitReact-f02-q34.jpg",
+      "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+      "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+      "AncientLeshen-HitReact-f02-front-ue-editor.jpg",
+      "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+      "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+      "AncientLeshen-HitReact-f04-q34-ue-editor.jpg",
+      "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+      "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+      "AncientLeshen-HitReact-f10-front-ue-editor.jpg",
+      "AncientLeshen-HitReact-f10-q34-ue-editor.jpg",
+      "AncientLeshen-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/roots-planted.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_HitReact.validation.json",
+      "note": "AM_AncientLeshen_HitReact.validation.json#result = pass; AM_AncientLeshen_HitReact.validation.json#fails = []; AM_AncientLeshen_HitReact.validation.json#clip_sha256 = 93493738378e55e8db90a25a962b3013f4b455dfbd9ebf37419f967762a5aafb",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-HitReact.json",
+      "note": "contact-HitReact.json#result = pass; contact-HitReact.json#fails = []; contact-HitReact.json#checks[check=foot_slide_L].foot_vertices = 0; contact-HitReact.json#checks[check=foot_slide_R].foot_vertices = 0; roots-planted.json#clips.HitReact.r_gt_6_cm = 0.127; roots-planted.json#height_cm = 67.93",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=LESH-HitReact].status = technically_imported; clip-manifest.json#clips[id=LESH-HitReact].validation.result = pass; contact-HitReact.json#result = pass; clip-manifest.json#clips[id=LESH-HitReact].source.files[0].sha256 = 93493738378e55e8db90a25a962b3013f4b455dfbd9ebf37419f967762a5aafb; ue-import-clips.json#fbx_sha256.AM_AncientLeshen_HitReact = 93493738378e55e8db90a25a962b3013f4b455dfbd9ebf37419f967762a5aafb; ue-import-clips.json#clips[name=AM_AncientLeshen_HitReact].imported_object_paths[0] = /Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_HitReact.AM_AncientLeshen_HitReact",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "На AncientLeshen-HitReact-blender-sheet.jpg и UE front/q34 к.0→2 ясно читается вздрагивание: череп с рогами откидывается с доворотом, длинные руки поднимаются наружу, раскрытые когти меняют силуэт. На к.4 амплитуда уменьшается, к.7 даёт небольшой перехлёст, к.10 возвращает rest. Корневой ствол, рога и вороны сохраняют характер героя; спиной к камере он не разворачивается. Цвет и материалы серого носителя не оцениваются.",
+      "frames": [
+        "AncientLeshen-HitReact-blender-sheet.jpg",
+        "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f02-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f04-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f10-q34-ue-editor.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На AncientLeshen-HitReact-blender-sheet.jpg в left к.0→2 середина ствола и череп уходят назад над неподвижным основанием, руки выносятся вперёд: реакция соответствует удару спереди и имеет вес. На UE front/q34 к.0/2/4/7/10 внешние корни сохраняют посадку на подставке без видимого скольжения, отрыва или провала. Ног у фигуры нет; внутренние кости ног и отсутствие сдвига hips учитываются как ограничения рига, опора оценена по видимым корням.",
+      "frames": [
+        "AncientLeshen-HitReact-blender-sheet.jpg",
+        "AncientLeshen-HitReact-f02-left.jpg",
+        "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f10-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 2,
+      "rationale": "r1 п.1: закрыт. На AncientLeshen-HitReact-f02-q34.jpg ворона на правом предплечье сохраняет контакт с поверхностью руки; полностью отделённой птицы со сквозным просветом у посадки нет. Крупные планы к.2 front/left/q34 показывают целую оболочку ствола, шеи, плеч, локтей и кистей без дыр, разрывов и заметных заломов. Руки остаются ниже рогов, пересечений с ними нет. Жёсткое следование ворон костям учитывается как ограничение; видимого разрыва посадки или пробивания деталей на пике нет.",
+      "frames": [
+        "AncientLeshen-HitReact-f02-front.jpg",
+        "AncientLeshen-HitReact-f02-left.jpg",
+        "AncientLeshen-HitReact-f02-q34.jpg",
+        "AncientLeshen-HitReact-f02-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f02-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "На AncientLeshen-HitReact-blender-sheet.jpg и UE front/q34 отдача последовательно затухает от к.2 к к.4, на к.7 остаётся небольшой перехлёст около исходной позы. Переход к.7→10 мал; на AncientLeshen-HitReact-f10-front-ue-editor.jpg и f10-q34 контуры черепа, кистей, ствола и посадка корней совпадают с к.0. По представленным ключевым кадрам oneshot мягко садится в rest без видимого скачка финала.",
+      "frames": [
+        "AncientLeshen-HitReact-blender-sheet.jpg",
+        "AncientLeshen-HitReact-f04-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f04-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f07-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f07-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f10-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f10-q34-ue-editor.jpg",
+        "AncientLeshen-HitReact-f00-front-ue-editor.jpg",
+        "AncientLeshen-HitReact-f00-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 10,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "AncientLeshen-HitReact-f02-q34-ue-editor.jpg",
+      "note": "foot_slide при foot_vertices=0 не проверяет опору этой анатомии. Отдельный замер roots-planted.json для HitReact: внешние корни r>6 см смещаются на 0,127 см при допуске 0,34 см. На игровых листах этапа 7 сохранять визуальную проверку корней у подставки."
+    },
+    {
+      "item": "R",
+      "frame": "AncientLeshen-HitReact-f00-q34-ue-editor.jpg",
+      "note": "Верх рогов обрезан рамкой диагностической UE-камеры; это кадрирование, балл клипа не снижает. На листах K1/K2 этапа 7 показать полный силуэт на обеих реальных досках."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a137dd-412c-7a90-b4d8-7e69102b5ccf"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6r2-leshen",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

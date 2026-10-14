@@ -1,0 +1,141 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": "DeathSettle",
+  "cycle": "r2",
+  "date": "2026-10-14",
+  "previous_card": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-anim/20261014-r1/DeathSettle/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/export/AM_AncientLeshen_DeathSettle.fbx",
+      "sha256": "d17cf6f3b593a51a7b27f6c09473fd2f23ad7c77a9ddd05f5623ed3355ad58af"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json",
+      "sha256": "63deedf9058b596983ed85a6549c1f743bd21ab480d98db573f0752b01c85673"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance-anim/20261014-r2/DeathSettle/frames",
+    "files": [
+      "AncientLeshen-DeathSettle-blender-sheet.jpg",
+      "AncientLeshen-DeathSettle-f13-q34r.jpg",
+      "AncientLeshen-DeathSettle-f21-front.jpg",
+      "AncientLeshen-DeathSettle-f21-left.jpg",
+      "AncientLeshen-DeathSettle-f21-q34.jpg",
+      "AncientLeshen-DeathSettle-f00-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f00-q34-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f03-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f03-q34-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f08-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f08-q34-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f13-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f13-q34-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f17-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f17-q34-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f21-front-ue-editor.jpg",
+      "AncientLeshen-DeathSettle-f21-q34-ue-editor.jpg",
+      "AncientLeshen-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/roots-planted.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_AncientLeshen_DeathSettle.validation.json",
+      "note": "AM_AncientLeshen_DeathSettle.validation.json#result = pass; #clip_sha256 = d17cf6f3b593a51a7b27f6c09473fd2f23ad7c77a9ddd05f5623ed3355ad58af; #clip_role = terminal; #fps = 24; #duration_s = 0.875; #fails = []",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; #fails = []; #checks[0].foot_vertices = 0; #checks[1].foot_vertices = 0 — проверки стоп не подтверждают опору этой фигуры; отдельно roots-planted.json#clips.DeathSettle.frame = 17; #clips.DeathSettle.r_gt_6_cm = 0.334, около 0.49 % роста, в пределах 0.5 %",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=LESH-DeathSettle].status = technically_imported; #clips[id=LESH-DeathSettle].validation.result = pass; #clips[id=LESH-DeathSettle].ue.status = technically_imported; #clips[id=LESH-DeathSettle].source.files[0].sha256 = d17cf6f3b593a51a7b27f6c09473fd2f23ad7c77a9ddd05f5623ed3355ad58af; ue-import-clips.json#fbx_sha256.AM_AncientLeshen_DeathSettle = d17cf6f3b593a51a7b27f6c09473fd2f23ad7c77a9ddd05f5623ed3355ad58af; contact-DeathSettle.json#result = pass",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 2,
+      "rationale": "На Blender-листе и UE front/q34 читаются отдельные фазы: f03 — отшатывание назад и подъём кистей; f08–f13 — складывание ствола вперёд с боковым креном; f17–f21 — опущенный череп, наклонённые рога и безвольные длинные руки. Финал заметно отличается от короткой реакции HitReact на UE-листе. Характер увядающего древообразного героя сохранён, поворота спиной к камере нет. Неподвижный таз и отсутствие приседа соответствуют ограничению рига и анатомии.",
+      "frames": [
+        "AncientLeshen-DeathSettle-blender-sheet.jpg",
+        "AncientLeshen-DeathSettle-f03-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f03-q34-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f08-q34-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f13-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f13-q34-ue-editor.jpg",
+        "AncientLeshen-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "При сравнении f00 с f17/f21 front и q34 внешние корни сохраняют посадку на верхней плоскости подставки: видимого скольжения, отрыва или провала нет. На f21-left изгиб начинается выше корневой опоры; когти и рога остаются над подставкой. Ног у фигуры нет, поэтому foot_vertices = 0 и недостижение IK внутренней цепи ног не используются как доказательство скольжения; балл основан на видимой опоре корней.",
+      "frames": [
+        "AncientLeshen-DeathSettle-f00-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f17-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f21-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f21-q34-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f21-left.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "На крупных планах f13-q34r и f21-front/left/q34 видны лёгкое уплощение и сближение корневых жгутов на внутренней стороне сгиба ствола под грудью — следы деформации без разрывов. Контур ствола и шеи непрерывен, открытых дыр нет; кисти и рога сохраняют форму и не пересекаются. Жёсткое следование ворон костям учитывается как заданное ограничение посадки и отдельно балл не снижает.",
+      "frames": [
+        "AncientLeshen-DeathSettle-f13-q34r.jpg",
+        "AncientLeshen-DeathSettle-f21-front.jpg",
+        "AncientLeshen-DeathSettle-f21-left.jpg",
+        "AncientLeshen-DeathSettle-f21-q34.jpg",
+        "AncientLeshen-DeathSettle-f17-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "На Blender-листе f08→f13→f17 поклон последовательно углубляется. UE front/q34 f17 и f21 показывают небольшое завершающее оседание при сохранении положения опущенной головы и висящих кистей; признаков рывка или дрожи на представленных кадрах нет. f21 сохраняет терминальную позу, возврата в rest нет, что соответствует DeathSettle.",
+      "frames": [
+        "AncientLeshen-DeathSettle-blender-sheet.jpg",
+        "AncientLeshen-DeathSettle-f17-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f17-q34-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f21-front-ue-editor.jpg",
+        "AncientLeshen-DeathSettle-f21-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "AncientLeshen-DeathSettle-f21-front.jpg",
+      "note": "Лёгкое уплощение корневых жгутов под грудью в глубоком поклоне учтено в D = 1.5; оболочка остаётся целой. На листе K1/K2 этапа 7 проверить видимость этой зоны с игрового ракурса."
+    },
+    {
+      "item": "R",
+      "frame": "AncientLeshen-DeathSettle-f00-q34-ue-editor.jpg",
+      "note": "Верх рогов обрезан диагностической камерой; это кадрирование, балл клипа не снижает. Для кадров этапа 7 нужен полный силуэт с запасом вокруг рогов."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a137dd-413b-72e3-a800-40f1320ebb57"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6r2-leshen",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

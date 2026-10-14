@@ -1,0 +1,243 @@
+{
+ "hero": "AncientLeshen",
+ "note": "3d-model-pipeline stage 7a (pilot 2026-10-14): Ancient Leshen H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the three crows), teams P1/P2 of the active C-11 palette, model r3 (look-dev run 20261014-h2-lookdev-r3: right-forearm crow seated), LUT = the r3 look-dev LUT as is, MI knobs of import profile rev 5 (= rev 4). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = wood (bark: trunk and arms, the largest zone, as the Blender ld_measure); hue is not checked below concept saturation 0.1 (the crows are near-black grey).",
+ "run_dir": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2ld-ue-import-r5",
+ "concept": {
+  "front": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-front.png",
+  "side": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-side.png",
+  "back": "art/imagegen/concept-ancient-leshen-codex/ancient-leshen-back.png"
+ },
+ "concept_zones": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2-lookdev-r3/reports/measure-report.json",
+ "side_camera": "+X",
+ "side_camera_note": "SIDE_VIEW left (asset card): on the concept side view the skull faces the LEFT of the frame (the figure's left side and the shoulder crow face the camera) -> camera at +X looking -X (ue_hero_lookdev.views, Medusa convention); Angel used -X against his concept (pilot F98)",
+ "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+ "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+ "teams": [
+  "P1",
+  "P2"
+ ],
+ "variants": {
+  "neutral": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Neutral",
+  "P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P1",
+  "P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_P2",
+  "debug": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_DebugClass"
+ },
+ "base_mi": {
+  "neutral": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+  "P1": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P1",
+  "P2": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base_P2",
+  "debug": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base"
+ },
+ "zones": [
+  "wood",
+  "legacy_bake",
+  "feathers"
+ ],
+ "key_zones": [
+  "wood"
+ ],
+ "tolerance_zones": [
+  "wood",
+  "legacy_bake",
+  "feathers"
+ ],
+ "never_dye_zones": [
+  "wood",
+  "legacy_bake"
+ ],
+ "anchor_zone": "wood",
+ "tolerance": {
+  "luma_ratio": 0.15,
+  "hue_deg": 12.0,
+  "sat": 0.1,
+  "hue_min_sat": 0.1
+ },
+ "render_gates": {
+  "legacy_bake": {
+   "hue_deg": [
+    [
+     15,
+     60
+    ]
+   ],
+   "s_max": 0.5,
+   "v_min": 0.4
+  }
+ },
+ "render_gates_note": "legacy_bake = bone (deer skull, antlers, pale claws; MatID 0 = the dark catch-all that also takes the base top): the same HSV gate as the concept side (ancient-leshen-h2-lookdev-r2.json measure.concept_gates.legacy_bake: hue 15-60, s <= 0.5, v >= 0.4)",
+ "min_px": 150,
+ "reading_bias_ev": -0.75,
+ "restore_level": "/Game/S08/S08Arena",
+ "verify": {
+  "skeleton": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton",
+  "folder": "/Game/PipelineCandidates/AncientLeshen/H2LD",
+  "hero_root": "/Game/PipelineCandidates/AncientLeshen",
+  "clips_folder": "/Game/PipelineCandidates/AncientLeshen/H2Anim",
+  "height_uu": 73.5601,
+  "default_mi_key": "team:figure:P1",
+  "expect": {
+   "bones": 17,
+   "bone_names": [
+    "SKEL_UM_Humanoid",
+    "root",
+    "hips",
+    "spine",
+    "head",
+    "arm_upper_L",
+    "arm_lower_L",
+    "hand_L",
+    "arm_upper_R",
+    "arm_lower_R",
+    "hand_R",
+    "leg_upper_L",
+    "leg_lower_L",
+    "foot_L",
+    "leg_upper_R",
+    "leg_lower_R",
+    "foot_R"
+   ],
+   "triangles": 44438,
+   "base_uv_channels": 2,
+   "clips": 4
+  },
+  "textures": {
+   "BC": {
+    "srgb": "True",
+    "compression_settings": "TC_DEFAULT"
+   },
+   "N": {
+    "srgb": "False",
+    "compression_settings": "TC_NORMALMAP"
+   },
+   "ORM": {
+    "srgb": "False",
+    "compression_settings": "TC_MASKS"
+   },
+   "TeamAccent": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE",
+    "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "MatID": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE",
+    "filter": "TF_NEAREST",
+    "mip_gen_settings": "TMGS_NO_MIPMAPS",
+    "never_stream": "True"
+   },
+   "LUT": {
+    "srgb": "False",
+    "compression_settings": "TC_HDR",
+    "filter": "TF_NEAREST",
+    "mip_gen_settings": "TMGS_NO_MIPMAPS",
+    "never_stream": "True",
+    "size": [
+     16,
+     16
+    ]
+   },
+   "Edge": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE"
+   }
+  },
+  "instances": {
+   "figure_instance": {
+    "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+    "textures": {
+     "TeamAccentTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_TeamAccent",
+     "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black",
+     "MatIDTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_MatID",
+     "MatLUT": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_UM_MatLUT_AncientLeshen",
+     "EdgeMaskTexture": "/Game/PipelineCandidates/AncientLeshen/H2LD/Textures/T_AncientLeshen_H2LD_Edge"
+    },
+    "scalars": {
+     "TeamDye": 1.0,
+     "TeamDyeGain": 29.355,
+     "TeamDyeCeiling": 15.0905
+    },
+    "switches": {
+     "UseTeamAccent": true,
+     "UseUV1Metres": true
+    }
+   },
+   "team:figure:P1": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+    "vectors": {
+     "TeamColor": [
+      0.807,
+      0.5271,
+      0.1441,
+      1.0
+     ]
+    },
+    "switches": {
+     "UseTeamAccent": true
+    }
+   },
+   "team:figure:P2": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+    "vectors": {
+     "TeamColor": [
+      0.1022,
+      0.2122,
+      0.3467,
+      1.0
+     ]
+    },
+    "switches": {
+     "UseTeamAccent": true
+    }
+   },
+   "extra:MI_AncientLeshen_H2LD_Neutral": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+    "scalars": {
+     "TeamDye": 0.0
+    },
+    "vectors": {
+     "TeamColor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "extra:MI_AncientLeshen_H2LD_DebugClass": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD",
+    "scalars": {
+     "DebugView": 1.0
+    }
+   },
+   "team:base:P1": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+    "vectors": {
+     "TeamColor": [
+      0.807,
+      0.5271,
+      0.1441,
+      1.0
+     ]
+    }
+   },
+   "team:base:P2": {
+    "parent": "/Game/PipelineCandidates/AncientLeshen/H2LD/Materials/MI_AncientLeshen_H2LD_Base",
+    "vectors": {
+     "TeamColor": [
+      0.1022,
+      0.2122,
+      0.3467,
+      1.0
+     ]
+    }
+   }
+  },
+  "clips_reference": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2anim-r3/reports/ue-measure-clips.json",
+  "height_uu_note": "skill decision (ue-import-package §3.2): top of the mesh bounds from ue-import-report.json (antler tips 73.5601 uu; skull top 55.003 uu)",
+  "instances_scalars_note": "verify reads only the scalars of ldc_verify_ue.SCALARS (TeamDye, TeamDyeGain, TeamDyeCeiling, DebugView, DebugBakeFromLUT); the rev-3 knobs Saturation and FixClassA/FixGainA/FixSpecA are read back separately: review/verify/mi-scalars-v3.json (v4, v5)"
+ }
+}

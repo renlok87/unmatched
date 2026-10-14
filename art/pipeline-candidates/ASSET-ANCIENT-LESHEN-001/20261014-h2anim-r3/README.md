@@ -50,3 +50,43 @@
 2. Шаги §6.4 под `ue_lock.py` со спекой r3: `skeleton`, `import`, `measure`, `frames`, `sheet`. Затем `clip_manifest.py build`.
 3. Приёмка клипов. Для HitReact — r2 с `previous_card` = карточка r1; остальные клипы получили новые FBX, их приёмку
    решает оркестратор.
+
+## UE (этап 7a, свой скрытый редактор), 2026-10-14
+Редактор `-RenderOffScreen` + `ue_py/console_drop.py` (`UE_CONSOLE_DROP`), MCP :8123, каждый шаг под `ue_lock.py`;
+закрыт по `quit-editor`, грязных пакетов 0 (`M_UM_Figure_v2`, грязный после импорта MI, перезагружен —
+`../evidence/stage7a-20261014/discard-master-r5.json`).
+
+**Обход пилота: носитель превью клипов (пробел инструмента F145).** `h2anim_ue.py skeleton` ничего не делает, если скелет
+уже есть (`canonical_skeleton.py`). Поэтому меш-носитель `/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen`
+(его спека называет `ue.mesh_for_preview`, на нём снимают `frames` и `measure`) оставался с геометрией bake r2: ворона
+висела отдельно от предплечья. По разрешению оркестратора носитель переимпортирован из `../20261014-h2-bake-r3/export/SK_AncientLeshen_H2.fbx`
+на существующий скелет задачей `../evidence/stage7a-20261014/tasks/refresh_carrier.py`. Отчёт: `reports/ue-carrier-refresh.json`.
+- Опции импорта те же, что в `canonical_skeleton.py`, плюс `options.skeleton` и `replace_existing`.
+- Источник носителя теперь bake r3 (было bake r2).
+- Скелет не изменился: опорная поза 17 костей до и после совпадает (`ref_pose_equal: true`), `.uasset` скелета не изменён.
+  Сохранён только носитель.
+- Число вершин и габариты прежние: ворона сдвигается внутри габарита.
+- Проверка на кадре: на HitReact к. 2 (`preview/ue/*-f02-*`) больше нет висящей вороны, как в r1.
+
+**Клипы** (спека `ancient-leshen-h2anim-r3.json`):
+- `skeleton` — скелет уже есть, 17 костей.
+- `import` — все 4 клипа, legacy-импорт, root lock. sha256 FBX = `export/` этого прогона.
+- `measure` — длительности 2,333 / 0,583 / 0,417 / 0,875 с. Кость 0 неподвижна, масштаб 1,0, смещение кадра 0 равно 0.
+  Пики те же, что в r1.
+- `frames` по клипу: `--base …/SM_AncientLeshen_H2LD_Base` и `--light-pinned ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json`.
+  Плюс крупный план LungeAttack к. 5, 7, 8, 10 (`--closeup`) и `sheet`.
+- Отчёты: `reports/ue-*.json`, кадры: `preview/ue/`, лист: `preview/AncientLeshen-H2Anim-ue-sheet.jpg`.
+- Манифест: `clip_manifest.py build` → `MANIFEST_CHECK PASS clips 35 production 28`, LESH-* `technically_imported`.
+
+**Крупные планы Blender** `preview/closeups-blender/` — для приёмки клипов r2 (те же кадры и виды, что в r1):
+- Рендер: Workbench 1100 px, `C:/tmp/leshen-anim-s6/closeup_probe.py` (скрипт r1).
+- Центр и размер кадра в r1 не записаны, поэтому выбраны заново (см. команды ниже).
+- Замер корней совпал с r1.
+- Кадры и центры (см, оси арматуры) / ширина кадра (см):
+  - HitReact к. 2 front/left/q34: (0, 0, 42) / 60.
+  - LungeAttack:
+    - к. 4 q34r, к. 5 front/q34r/back: (0, 0, 52) / 55;
+    - к. 8 front/q34/right: (5, 0, 44) / 60;
+    - к. 10 front: (0, 0, 40) / 60.
+  - DeathSettle к. 21 front/left/q34: (0, 0, 33) / 75; к. 13 q34r: (0, 0, 40) / 65.
+  - Idle к. 14 и к. 42 q34: (0, 0, 50) / 45; к. 14 front: (0, 0, 22) / 45.
