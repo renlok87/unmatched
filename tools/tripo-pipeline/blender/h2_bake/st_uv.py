@@ -14,7 +14,17 @@ boundary vertices), work/uv/caps.npz, and the cap raster work/uv/cap_ids.npy (pa
 Contact footprints (closure.contact_caps[].repaint_footprint): faces of a part hidden at rest under the covering part
 near the capped loop get the same rim transfer for BC/RM/AO (their normal map stays baked), work/uv/footprints.npz.
 Reads work/lp_closed.blend. Writes work/lp_uv.blend, work/uv/{island_ids,part_ids,base_band,cap_ids}.npy,
-work/uv/{caps,footprints}.npz, reports/uv-report.json, preview/uv-layout-1024.png."""
+work/uv/{caps,footprints}.npz, reports/uv-report.json, preview/uv-layout-1024.png.
+
+Team band of the base: faces of textures.team_mask.base_band.part with |n_z| <= normal_z_abs_max (TeamMask.G, raster
+work/uv/base_band.npy). With the optional textures.team_mask.base_band.height_m = [z0, z1] (profile.base_band_height,
+base_ops.height_band_faces; W2-c, pilot F143 / F150) the band is instead the base faces whose centroid z lies in [z0, z1]
+and that do not face down (n_z >= -0.5): one slab, e.g. the lower tier of a two-tier Tripo base, where the normal rule of
+M_UM_BaseMarker (SideBand |n_z| < 0.35) paints the upper tier in patches. The same faces are written into the base mesh
+as the vertex mask that M_UM_BaseMarker reads (VertexMaskWeight x VertexColor.R): byte colour attribute UM_Mask, CORNER
+domain, (1, 0, 0, 1) on band faces and (0, 0, 0, 1) elsewhere (G = B = 0: no instance pips), carried by lp_uv.blend into
+the rig stage, the FBX of the base (colors_type SRGB; 0 and 1 survive any colour-space conversion) and the look-dev FBX.
+Report block base_band (absent without the key)."""
 
 import json
 import math
@@ -26,6 +36,7 @@ import numpy as np
 
 from mathutils.kdtree import KDTree
 
+from . import base_ops as B
 from . import bl_util as U
 from . import charts
 from . import profile as PR
@@ -408,6 +419,41 @@ def discrete_gap(labels, max_steps):
     return best  # None: no two islands within 2*max_steps
 
 
+def write_base_mask(obj, band_faces, height_m):
+    """UM_Mask (BYTE_COLOR, CORNER) on the base mesh: R = 1 on the band faces (module docstring); -> report block."""
+    me = obj.data
+    n = len(me.polygons)
+    if band_faces is None or len(band_faces) != n:
+        raise RuntimeError("base_band.height_m: band faces of %s not computed (%s)" % (obj.name, None if band_faces is None
+                                                                                      else len(band_faces)))
+    lt = np.empty(n, np.int64)
+    me.polygons.foreach_get("loop_total", lt)
+    ls = np.empty(n, np.int64)
+    me.polygons.foreach_get("loop_start", ls)
+    loop_idx = np.repeat(ls, lt) + (np.arange(int(lt.sum())) - np.repeat(np.cumsum(lt) - lt, lt))
+    face_cols = B.mask_corner_colours(band_faces, lt)  # corners in polygon order
+    cols = np.zeros((len(me.loops), 4), np.float32)
+    cols[loop_idx] = face_cols
+    if me.color_attributes.get(B.MASK_ATTRIBUTE) is not None:
+        me.color_attributes.remove(me.color_attributes[B.MASK_ATTRIBUTE])
+    attr = me.color_attributes.new(B.MASK_ATTRIBUTE, "BYTE_COLOR", "CORNER")
+    attr.data.foreach_set("color", cols.ravel())
+    me.color_attributes.active_color = attr
+    me.update()
+    area = np.empty(n, np.float64)
+    me.polygons.foreach_get("area", area)
+    cen = np.empty(n * 3, np.float64)
+    me.polygons.foreach_get("center", cen)
+    cz = cen.reshape(-1, 3)[:, 2][band_faces]
+    return {"height_m": list(height_m), "rule": "base faces with centroid z in height_m and n_z >= %s" % B.DOWN_NORMAL_Z,
+            "faces": int(band_faces.sum()), "faces_total": n, "area_cm2": U.r(area[band_faces].sum() * 1e4, 3),
+            "centroid_z_mm": [U.r(cz.min() * 1000, 2), U.r(cz.max() * 1000, 2)] if len(cz) else None,
+            "vertex_mask": {"attribute": B.MASK_ATTRIBUTE, "type": "BYTE_COLOR", "domain": "CORNER",
+                            "band": [1, 0, 0, 1], "elsewhere": [0, 0, 0, 1],
+                            "ue": "M_UM_BaseMarker: band = VertexColor.R x VertexMaskWeight + SideBand x SideBandWeight"},
+            "team_mask_g": "the same faces (work/uv/base_band.npy)"}
+
+
 def run(params, profile):
     run_dir = Path(params["run_dir"])
     bpy.ops.wm.open_mainfile(filepath=str(run_dir / "work" / "lp_closed.blend"))
@@ -463,6 +509,8 @@ def run(params, profile):
     per_part = {}
     uv_min, uv_max = np.array([9.0, 9.0]), np.array([-9.0, -9.0])
     band_cfg = profile["textures"]["team_mask"]["base_band"]
+    band_height = PR.base_band_height(profile)  # None: the normal rule (old path)
+    band_faces = None
     for pi, (n, obj) in enumerate(zip(names, objs)):
         me = obj.data
         bm = bmesh.new()
@@ -470,6 +518,10 @@ def run(params, profile):
         uv_layer = bm.loops.layers.uv.active
         islands = uv_islands(bm, uv_layer)
         cap_layer = bm.faces.layers.int.get(CAP_ATTR)
+        if band_height is not None and n == band_cfg["part"]:
+            bm.faces.ensure_lookup_table()
+            band_faces = B.height_band_faces(np.array([f.calc_center_median().z for f in bm.faces]),
+                                             np.array([f.normal.z for f in bm.faces]), band_height)
         tris_px, vals, band_tris = [], [], []
         uv_area = cap_uv_area = cap_area = 0.0
         for faces in islands:
@@ -487,7 +539,8 @@ def run(params, profile):
                         cap_uv_area += a_uv
                     else:
                         uv_area += a_uv
-                    if n == band_cfg["part"] and abs(f.normal.z) <= band_cfg["normal_z_abs_max"]:
+                    if n == band_cfg["part"] and (band_faces[f.index] if band_height is not None
+                                                  else abs(f.normal.z) <= band_cfg["normal_z_abs_max"]):
                         band_tris.append(t)
                 for l in f.loops:
                     uv = l[uv_layer].uv
@@ -571,6 +624,9 @@ def run(params, profile):
     prev.file_format = "PNG"
     prev.save()
     bpy.data.images.remove(prev)
+    band_rep = None
+    if band_height is not None:  # UM_Mask on the base mesh (carried by lp_uv.blend into the rig stage and the FBX)
+        band_rep = write_base_mask(bpy.data.objects["LP_" + band_cfg["part"]], band_faces, band_height)
     bpy.ops.wm.save_as_mainfile(filepath=str(run_dir / "work" / "lp_uv.blend"), compress=False)
     min_gap = int(cfg["min_gap_px"])
     ref_part = PR.uv_density_reference_part(profile)  # uv.density_reference_part, default tripo_part_0 (Medusa's dress)
@@ -603,6 +659,9 @@ def run(params, profile):
                              "note": "BC/RM/AO of faces hidden at rest under the covering part, from the visible surface around "
                                      "them (footprints.npz); their normal map stays baked"},
               "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
+    if band_rep is not None:  # profiles without base_band.height_m keep their report bytes
+        band_rep["texels_4k"] = int((base_band > 0).sum())
+        report["base_band"] = band_rep
     U.write_json(run_dir / "reports" / "uv-report.json", report)
     if not report["passed"]:
         raise RuntimeError("uv checks failed: %s" % [k for k, c in checks.items() if not c["passed"]])

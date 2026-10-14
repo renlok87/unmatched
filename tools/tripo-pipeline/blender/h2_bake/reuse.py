@@ -47,14 +47,15 @@ BLENDER_COMMON = (PKG + "blender_entry.py", PKG + "bl_util.py", PKG + "profile.p
 # profile: top-level keys or dotted sub-keys the stage reads; code: files it runs; files: other inputs ("@exports.fbx_preset"
 # = the path in that key, "@preview" = every existing repo file named in the preview block); blender: runs Blender.
 STAGE_INPUTS = {
-    "prepare": {"profile": ("schema", "asset_id", "expected_part_count", "sources", "parts", "scale", "prepare", "orientation"),
-                "code": BLENDER_COMMON + (PKG + "st_prepare.py",), "blender": True},
-    "retopo": {"profile": ("parts", "orientation", "retopo"),
-               "code": BLENDER_COMMON + (PKG + "st_retopo.py", CB + "closure.py"), "blender": True},
+    "prepare": {"profile": ("schema", "asset_id", "expected_part_count", "sources", "parts", "scale", "prepare", "orientation",
+                            "base.flatten_bottom"),
+                "code": BLENDER_COMMON + (PKG + "st_prepare.py", PKG + "base_ops.py"), "blender": True},
+    "retopo": {"profile": ("parts", "orientation", "retopo", "base.rim_smooth"),
+               "code": BLENDER_COMMON + (PKG + "st_retopo.py", CB + "closure.py", PKG + "base_ops.py"), "blender": True},
     "close": {"profile": ("parts", "closure"),
               "code": BLENDER_COMMON + (PKG + "st_close.py", PKG + "raycam.py", CB + "closure.py"), "blender": True},
     "uv": {"profile": ("parts", "closure", "uv", "textures.team_mask.base_band"),
-           "code": BLENDER_COMMON + (PKG + "st_uv.py", PKG + "charts.py"), "blender": True},
+           "code": BLENDER_COMMON + (PKG + "st_uv.py", PKG + "charts.py", PKG + "base_ops.py"), "blender": True},
     "bake": {"profile": ("parts", "bake"), "code": BLENDER_COMMON + (PKG + "st_bake.py",), "blender": True},
     "aux": {"profile": ("parts", "bake"), "code": BLENDER_COMMON + (PKG + "st_aux.py", PKG + "st_bake.py"), "blender": True},
     "textures": {"profile": ("parts", "textures"),
@@ -228,15 +229,19 @@ def chain(fps):
     return out
 
 
+UNSET = sha_json(None)  # fingerprint of a profile key the profile does not set
+
+
 def differences(new, old):
     """-> (changes, code_drift): what differs between two fingerprints of one stage. changes block reuse; code_drift
-    blocks it unless --reuse-allow-code-drift."""
+    blocks it unless --reuse-allow-code-drift. A key one fingerprint does not list counts as unset (W2-c: a sub-key newly
+    mapped to a stage, e.g. base.flatten_bottom, does not recompute a ledger run whose profile does not set it)."""
     changes, drift = [], []
     for k, v in new["profile"].items():
-        if old["profile"].get(k, "<absent>") != v:
+        if old["profile"].get(k, UNSET if v == UNSET else "<absent>") != v:
             changes.append("profile %s" % k)
-    for k in old["profile"]:
-        if k not in new["profile"]:
+    for k, v in old["profile"].items():
+        if k not in new["profile"] and v != UNSET:
             changes.append("profile %s (no longer read)" % k)
     for f, v in new["files"].items():
         o = old["files"].get(f)

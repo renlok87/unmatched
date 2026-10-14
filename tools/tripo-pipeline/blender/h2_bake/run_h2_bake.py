@@ -93,6 +93,45 @@ def blender_stage(exe, stage, profile_path, run_dir):
     blender(exe, HERE / "blender_entry.py", [pfile], run_dir / "logs" / ("%s.log" % stage))
 
 
+def probe_counts(data, extended_gate=True):
+    """Gate of one rig_deform_probe report (RB-08, W1-e). extended_gate (profile_version >= 2, a new hero): n/N of its
+    `probes` block — the 7 legacy and the extended probes, skipped ones out of N. Otherwise (profile_version 1: Medusa
+    and the pilot, whose committed profiles do not change) only the 7 legacy tests gate; the extended ones are counted
+    (`summary`) and a failed one is a warning (`extended_failed`). A report without the block (probe older than the
+    extended tests): the 7 legacy tests."""
+    n7 = sum(1 for t in data["tests"] if t.get("status") == "plausible")
+    pb = data.get("probes")
+    full = pb if isinstance(pb, dict) and "total" in pb else None
+    failed = [t["test"] for t in data.get("extended_tests", []) if t.get("status") not in ("plausible", "skipped")]
+    if extended_gate and full:
+        out = {"plausible": int(full["plausible"]), "total": int(full["total"]), "passed": bool(full.get("passed")),
+               "gate": "legacy + extended"}
+    else:
+        out = {"plausible": n7, "total": 7, "passed": n7 == 7, "gate": "legacy 7"}
+    out.update(summary=full.get("summary") if full else "%d/7" % n7, extended_failed=failed)
+    return out
+
+
+def probe_verdict(datas, profile, skip, validate):
+    """probes-report.json of the probes stage: datas = {label: rig_deform_probe report}, validate = validate_clip v2
+    report. plausible / total = the gating n/N per label (validate_card G-RIG compares them), probes = n/N of every
+    probe, extended_warnings = failed extended probes that do not gate (profile_version 1)."""
+    gate_ext = load_local("profile").is_new_hero_profile(profile)
+    counts = {k: probe_counts(d, gate_ext) for k, d in datas.items()}
+    results = {k: {t["test"]: t["status"] for t in d["tests"] + d.get("extended_tests", [])} for k, d in datas.items()}
+    out = {"stage": "probes", "rig_deform_probe": results,
+           "plausible": {k: c["plausible"] for k, c in counts.items()}, "total": {k: c["total"] for k, c in counts.items()},
+           "probes": {k: c["summary"] for k, c in counts.items()}, "skipped": skip,
+           "gate": "legacy + extended (profile_version >= 2)" if gate_ext else "legacy 7 (profile_version 1)",
+           "validate_clip_v2": {"result": validate.get("result"), "fails": validate.get("fails"),
+                                "warnings": validate.get("warnings")},
+           "passed": all(c["passed"] for c in counts.values()) and validate.get("result") == "pass", "status": "измерено"}
+    warn = {k: c["extended_failed"] for k, c in counts.items() if c["extended_failed"] and not gate_ext}
+    if warn:
+        out["extended_warnings"] = warn
+    return out
+
+
 def probes(exe, profile, run_dir):
     anim = REPO / "tools" / "tripo-pipeline" / "anim"
     work = run_dir / "work"
@@ -103,10 +142,13 @@ def probes(exe, profile, run_dir):
     sk = run_dir / "export" / profile["exports"]["skeletal_fbx"]
     fbx_blend = work / "probe-fbx-authored.blend"
     blender(exe, HERE / "fbx_authored.py", [sk, fbx_blend], run_dir / "logs" / "probe-fbx-authored.log")
-    results = {}
-    key = load_local("profile").content_key(profile)  # ASSET-MEDUSA-001 -> medusa (labels medusa-h2-blend / -fbx as before)
+    datas = {}
+    prof_mod = load_local("profile")
+    key = prof_mod.content_key(profile)  # ASSET-MEDUSA-001 -> medusa (labels medusa-h2-blend / -fbx as before)
+    skip = prof_mod.probe_skip(profile)  # rig.probe_skip: extended probes out of N (Leshen: shins, feet)
+    extra = ["--skip=%s" % ",".join(skip)] if skip else []
     for src, label in ((work / "sk_authored.blend", "%s-h2-blend" % key), (fbx_blend, "%s-h2-fbx" % key)):
-        blender(exe, anim / "rig_deform_probe.py", [src, deform, label], run_dir / "logs" / ("probe-%s.log" % label))
+        blender(exe, anim / "rig_deform_probe.py", [src, deform, label] + extra, run_dir / "logs" / ("probe-%s.log" % label))
         subprocess.run([sys.executable, str(anim / "overlay_bones.py"), str(deform), label], check=True,
                        stdout=subprocess.DEVNULL)
         data = json.loads((deform / ("%s-deform.json" % label)).read_text(encoding="utf-8"))
@@ -114,7 +156,7 @@ def probes(exe, profile, run_dir):
         out = run_dir / "reports" / "deform" / ("%s-deform.json" % label)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        results[label] = {t["test"]: t["status"] for t in data["tests"]}
+        datas[label] = data
     vout = run_dir / "reports" / "validate-skeletal-mesh-v2.json"
     blender(exe, anim / "validate_clip.py", [sk, "--kind=skeletal-mesh", "--character=%s" % profile["rig"]["character"],
                                              "--skeleton=%s" % profile["rig"]["skeleton"], "--out=%s" % vout],
@@ -124,10 +166,10 @@ def probes(exe, profile, run_dir):
         if isinstance(v.get(key), str):
             v[key] = "<run>/export/%s" % Path(v[key]).name  # a second run elsewhere writes another path
     vout.write_text(json.dumps(v, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    plausible = {k: sum(1 for s in r.values() if s == "plausible") for k, r in results.items()}
-    summary = {"stage": "probes", "rig_deform_probe": results, "plausible": plausible,
-               "validate_clip_v2": {"result": v.get("result"), "fails": v.get("fails"), "warnings": v.get("warnings")},
-               "passed": all(n == 7 for n in plausible.values()) and v.get("result") == "pass", "status": "измерено"}
+    summary = probe_verdict(datas, profile, skip, v)
+    if summary.get("extended_warnings"):
+        print("[h2-bake] WARN probes: extended probes failed, not gating (profile_version 1): %s"
+              % summary["extended_warnings"], flush=True)
     (run_dir / "reports" / "probes-report.json").write_text(json.dumps(summary, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
                                                             encoding="utf-8")
     if not summary["passed"]:

@@ -4,7 +4,15 @@ is split along UV seams and would open cracks when decimated).
 Per part: collapse decimation (QEM, silhouette-preserving) to retopo.target_tris; a dense region (face) is kept
 denser by two steps: (1) the whole part to the region's density, (2) a masked collapse (region protected) down to
 the part budget. Then cleanup (merge 1e-6 m, degenerate dissolve, loose geometry, triangulate, tiny islands),
-smooth shading, ray-escape orientation of the low-poly, deviation low <-> high in mm. Saves work/lp.blend."""
+smooth shading, ray-escape orientation of the low-poly, deviation low <-> high in mm. Saves work/lp.blend.
+
+Rim smoothing (optional base.rim_smooth, profile.base_rim_smooth, base_ops.smooth_loop_z; W2-c, pilot F104): after the
+cleanup and before the base-top caps, every closed boundary loop of the listed parts (default: every part) that lies
+inside z_band_m and is at least min_perimeter_cm long gets its z smoothed along the loop (circular Gaussian over the arc
+length, sigma = window_m / 2, shift clamped to max_shift_m); the vertices one edge away from the loop follow with
+ring_weight x the mean shift of their loop neighbours. The Tripo sole rims and the base-top hole rims standing in each
+other (teeth 1-2.4 mm) become smooth; the caps of this stage and of the close stage are built on the smoothed rims.
+Report: parts.<part>.rim_smooth (absent without the key)."""
 
 from pathlib import Path
 
@@ -14,7 +22,9 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+from . import base_ops as B
 from . import bl_util as U
+from . import profile as PR
 
 
 def decimate(obj, ratio, mask_group=None):
@@ -96,6 +106,55 @@ def cleanup(mesh, cfg):
     bm.free()
     mesh.update()
     return stats
+
+
+def rim_smooth(mesh, cfg):
+    """base.rim_smooth on one low-poly part (module docstring); -> report block."""
+    from candidate_build.closure import ordered_boundary_loops
+
+    c = B.rim_cfg(cfg)
+    z_band = cfg["z_band_m"]
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    shifts, rows, skipped = {}, [], {"open": 0, "outside_band": 0, "short": 0, "shared_vertices": 0}
+    for lp in ordered_boundary_loops(bm):
+        pts = np.array([tuple(v.co) for v in lp["verts"]])
+        if not lp["closed"] or len(pts) < 3:
+            skipped["open"] += 1
+            continue
+        if not B.loop_in_band(pts, z_band):
+            skipped["outside_band"] += 1
+            continue
+        if B.loop_arclength(pts)[1] * 100.0 < float(c["min_perimeter_cm"]):
+            skipped["short"] += 1
+            continue
+        z_new, st = B.smooth_loop_z(pts, float(c["window_m"]), float(c["max_shift_m"]))
+        for v, zn in zip(lp["verts"], z_new):
+            if v.index in shifts:  # a pinch vertex of two loops keeps the first shift
+                skipped["shared_vertices"] += 1
+                continue
+            shifts[v.index] = float(zn) - v.co.z
+        st["centre_xy_m"] = [U.r(x, 4) for x in pts[:, :2].mean(0)]
+        rows.append(st)
+    bm.verts.ensure_lookup_table()
+    ring = {}
+    for vi, dz in shifts.items():
+        v = bm.verts[vi]
+        for e in v.link_edges:
+            w = e.other_vert(v)
+            if w.index not in shifts:
+                ring.setdefault(w.index, []).append(dz)
+    for vi, dz in shifts.items():
+        bm.verts[vi].co.z += dz
+    rw = float(c["ring_weight"])
+    for vi, dzs in ring.items():
+        bm.verts[vi].co.z += rw * float(np.mean(dzs))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    return {"config": c, "z_band_m": list(z_band), "loops": rows, "loops_smoothed": len(rows),
+            "loop_vertices_moved": len(shifts), "ring_vertices_moved": len(ring), "skipped": skipped,
+            "max_shift_mm": U.r(max([abs(d) for d in shifts.values()] + [0.0]) * 1000, 3)}
 
 
 def convex_hull_2d(pts):
@@ -211,6 +270,8 @@ def run(params, profile):
     col = bpy.data.collections.new("LP")
     scene.collection.children.link(col)
     rng = np.random.default_rng(rcfg.get("seed", 0))
+    rim_cfg = PR.base_rim_smooth(profile)  # None for every profile without base.rim_smooth: old path, no report key
+    rim_parts = set(rim_cfg.get("parts") or names) if rim_cfg is not None else set()
     parts = {}
     for n in names:
         hi = bpy.data.objects["HPG_" + n]
@@ -241,6 +302,8 @@ def run(params, profile):
         elif target < hi_tris:
             decimate(lo, target / hi_tris)
         info["cleanup"] = cleanup(lo.data, cfg_clean)
+        if n in rim_parts:
+            info["rim_smooth"] = rim_smooth(lo.data, rim_cfg)
         cap = next((c for c in rcfg.get("caps", []) if c["part"] == n), None)
         if cap:
             info["caps"] = cap_holes(lo.data, cap)

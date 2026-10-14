@@ -20,7 +20,16 @@ Driven by profile textures.materials (absent -> the stage is byte-for-byte the H
                  leather, wood, snakes, base). Cloth (TeamMask rule of the cloth part, minus metal): roughness remapped
                  into cloth_roughness [lo, hi] by its Tripo rank (no sheen in M_UM_Figure: a fully rough dielectric
                  spreads its 4 % specular over the whole dark cloth as a grey veil).
-All numbers go to textures-report.json -> materials. Deterministic: no randomness, fixed filter order."""
+All numbers go to textures-report.json -> materials. Deterministic: no randomness, fixed filter order.
+
+band_repaint (textures.band_repaint, W2-c, pilot F107; runs with or without textures.materials, before the footprints
+and caps read their rim): a visible band of a part at a contact line whose Tripo texture carries the neighbour's colour
+(Achilles: olive-beige smears of the neck and curls on the red collar) is repainted from the same part just outside the
+band. Texels of `part` (UV raster, rest position of stage aux, caps excluded) whose 3D distance to the nearest texel of
+the `near` parts is <= band_m form the band (union of include_boxes_m when given, minus exclude_boxes_m); texels at
+band_m .. band_m + ring_m that pass keep_hsv form the source ring. Every band texel takes the inverse-distance mean of
+its k nearest ring texels (3D) for each map of `keys` (default BC), times an optional luminance detail of its own BC
+(own / local mean of the band, clipped to `detail`); the last feather_m of the band blends into the original."""
 
 import numpy as np
 from scipy import ndimage
@@ -138,6 +147,89 @@ def filter_rim(region, maps, alpha, exclude, labels, rules, tx):
                       "keep": rule})
     out["w_vals"] = vals
     return out, stats
+
+
+# ---------------------------------------------------------------- band repaint (W2-c)
+def boxes_mask(pts, boxes):
+    inside = np.zeros(len(pts), bool)
+    for b in boxes:
+        inside |= np.all((pts >= np.array(b["min_m"])) & (pts <= np.array(b["max_m"])), axis=1)
+    return inside
+
+
+def band_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs, tx):
+    """Repaints the bands of textures.band_repaint in place (module docstring); returns the report rows."""
+    from scipy.spatial import cKDTree
+
+    rows = []
+    for cfg in cfgs:
+        band_m = float(cfg["band_m"])
+        ring_m = float(cfg.get("ring_m", 0.006))
+        feather = float(cfg.get("feather_m", 0.002))
+        keys = list(cfg.get("keys", ["BC"]))
+        k = int(cfg.get("k", 8))
+        pi = part_names.index(cfg["part"])
+        mine = (part_ids == pi) & pos_ok & ~exclude
+        near = np.isin(part_ids, [part_names.index(n) for n in cfg["near"]]) & pos_ok
+        ya, xa = np.nonzero(mine)
+        pa = pos[ya, xa].astype(np.float64)
+        pn = pos[near].astype(np.float64)
+        row = {"name": cfg["name"], "part": cfg["part"], "near": list(cfg["near"]), "band_m": band_m, "ring_m": ring_m,
+               "part_texels": int(len(pa))}
+        if not len(pa) or not len(pn):
+            rows.append(dict(row, band_texels=0, note="no texels of the part or of the near parts"))
+            continue
+        d, _i = cKDTree(pn).query(pa, distance_upper_bound=band_m + ring_m + 1e-6)
+        ok = np.ones(len(pa), bool)
+        if cfg.get("include_boxes_m"):
+            ok &= boxes_mask(pa, cfg["include_boxes_m"])
+        if cfg.get("exclude_boxes_m"):
+            ok &= ~boxes_mask(pa, cfg["exclude_boxes_m"])
+        band = ok & (d <= band_m)
+        ring = ok & (d > band_m) & (d <= band_m + ring_m) & alpha["BC"][ya, xa]
+        ring_all = int(ring.sum())
+        if cfg.get("keep_hsv"):
+            ring &= hsv_keep(maps["BC"][ya, xa], cfg["keep_hsv"], tx)
+        row.update(band_texels=int(band.sum()), ring_texels=ring_all, ring_texels_kept=int(ring.sum()))
+        if not band.any() or ring.sum() < k:
+            rows.append(dict(row, note="nothing repainted (empty band or fewer kept ring texels than k)"))
+            continue
+        bi, ri = np.nonzero(band)[0], np.nonzero(ring)[0]
+        dd, ii = cKDTree(pa[ri]).query(pa[bi], k=k)
+        dd, ii = dd.reshape(len(bi), -1), ii.reshape(len(bi), -1)
+        w = 1.0 / (dd + 1e-4)
+        w /= w.sum(1, keepdims=True)
+        f = np.clip((band_m - d[bi]) / feather, 0.0, 1.0) if feather > 0 else np.ones(len(bi))
+        f = f * f * (3 - 2 * f)
+        by, bx = ya[bi], xa[bi]
+        before_keep = hsv_keep(maps["BC"][by, bx], cfg["keep_hsv"], tx) if cfg.get("keep_hsv") else None
+        stats = {}
+        for key in keys:
+            src = maps[key][ya[ri], xa[ri]].astype(np.float64)
+            new = (w[..., None] * src[ii]).sum(1)
+            if key == "BC" and cfg.get("detail"):
+                lo, hi = cfg["detail"]
+                own = luminance(lin(maps["BC"][by, bx].astype(np.float64)))
+                # own luminance over its local mean among the 4k nearest band texels (3D): the fold / weave detail stays,
+                # the smear's colour does not
+                _dn, inb = cKDTree(pa[bi]).query(pa[bi], k=min(4 * k, len(bi)))
+                inb = inb.reshape(len(bi), -1)
+                ratio = np.clip(own / np.maximum(own[inb].mean(1), 1e-6), lo, hi)
+                new = srgb(np.clip(lin(new) * ratio[:, None], 0.0, 1.0))
+            old = maps[key][by, bx].astype(np.float64)
+            out = old * (1 - f[:, None]) + new * f[:, None]
+            stats[key] = {"mean_abs_change": round(float(np.abs(out - old).mean()), 4),
+                          "p95_abs_change": round(float(np.percentile(np.abs(out - old).max(1), 95)), 4)}
+            maps[key][by, bx] = out.astype(maps[key].dtype)
+        row.update(maps=stats, feathered_texels=int((f < 1).sum()), k=k,
+                   distance_mm_p50_max=[round(float(np.median(d[bi]) * 1000), 2), round(float(d[bi].max() * 1000), 2)])
+        if before_keep is not None:
+            after_keep = hsv_keep(maps["BC"][by, bx], cfg["keep_hsv"], tx)
+            row["band_share_outside_keep_hsv"] = {"before": round(float((~before_keep).mean()), 4),
+                                                  "after": round(float((~after_keep).mean()), 4),
+                                                  "ring_reference": round(float(1 - ring.sum() / max(ring_all, 1)), 4)}
+        rows.append(row)
+    return rows
 
 
 # ---------------------------------------------------------------- metal mask

@@ -19,7 +19,16 @@ textures, sha256-checked) and writes a NEW run directory. Stages of the mode:
   ld_measure  (this module) per-zone medians concept | H2.1 | H2LD (luma, hue, saturation) on the class-ID pass,
               suggested gains (concept / H2LD render) -> reports/measure-report.json.
   ld_compose  (this module) sheets concept | H2.1 | H2LD and the class-ID overlay.
-Everything is deterministic (no randomness; Pillow PNG without metadata); Cycles frames are editor frames only."""
+Everything is deterministic (no randomness; Pillow PNG without metadata); Cycles frames are editor frames only.
+
+Metal F0 from the concept (optional look-dev `metal_f0`, W2-c, pilot F138): the LUT F0 of a metal class is by default the
+graded class median of the H2.1 BC (Achilles bronze: luminance 0.63) with the preset worn-edge colour; in UE it rendered
+pale ivory (F110/F120). With `metal_f0` = {"concept_report": <measure-report.json of an earlier look-dev run of this
+hero>, "anchor_class": <a plain dielectric class, e.g. skin>, "classes": {<metal class>: {"y_scale", "sat_scale",
+"hue_shift_deg", "worn": {"y_ratio", "sat_scale"}}}} ld_maps sets the F0 (LUT `bc`) of each listed class to the colour of
+the concept's class median hue and saturation whose linear luminance is Y = Yconcept(class) / Yconcept(anchor) x
+Y(LUT bc of the anchor) x y_scale, and with `worn` the worn-edge colour (LUT `wornBC`) to the same hue, saturation x
+worn.sat_scale and Y x worn.y_ratio. Report block metal_f0 and check lut_metal_f0_from_concept (absent without the key)."""
 
 import hashlib
 import importlib.util
@@ -106,6 +115,130 @@ def srgb(x):
 
 def luma(rgb_lin):
     return rgb_lin[..., 0] * 0.2126 + rgb_lin[..., 1] * 0.7152 + rgb_lin[..., 2] * 0.0722
+
+
+METAL_F0_CLASS_KEYS = ("y_scale", "sat_scale", "hue_shift_deg", "worn", "note")
+
+
+def hsv_to_srgb(h_deg, s, v):
+    h = (float(h_deg) % 360.0) / 60.0
+    c = v * s
+    x = c * (1 - abs(h % 2 - 1))
+    i = int(h) % 6
+    r, g, b = [(c, x, 0), (x, c, 0), (0, c, x), (0, x, c), (x, 0, c), (c, 0, x)][i]
+    m = v - c
+    return np.array([r + m, g + m, b + m], np.float64)
+
+
+def colour_of_luma(hue_deg, sat, y_target):
+    """Linear RGB of the sRGB colour with HSV hue / saturation whose linear luminance is y_target (bisection on the HSV
+    value; luminance grows with it). -> (linear rgb, hsv value, reached)."""
+    lo, hi = 0.0, 1.0
+    if float(luma(lin(hsv_to_srgb(hue_deg, sat, 1.0)))) < y_target:
+        return lin(hsv_to_srgb(hue_deg, sat, 1.0)), 1.0, False
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if float(luma(lin(hsv_to_srgb(hue_deg, sat, mid)))) < y_target:
+            lo = mid
+        else:
+            hi = mid
+    v = 0.5 * (lo + hi)
+    return lin(hsv_to_srgb(hue_deg, sat, v)), v, True
+
+
+def _in(v, lo, hi, open_lo=True):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and (lo < v if open_lo else lo <= v) and v <= hi
+
+
+def metal_f0_problems(ld, presets):
+    cfg = ld.get("metal_f0")
+    if cfg is None:
+        return []
+    if not isinstance(cfg, dict):
+        return ["metal_f0 must be an object {concept_report, anchor_class, classes}"]
+    byid = {c["id"]: c for c in presets["classes"]}
+    problems = ["metal_f0: unknown key %s" % k for k in cfg if k not in ("concept_report", "anchor_class", "classes", "note")]
+    if not isinstance(cfg.get("concept_report"), str) or not cfg["concept_report"]:
+        problems.append("metal_f0.concept_report must name a measure-report.json of an earlier look-dev run of the hero")
+    anchor = cfg.get("anchor_class")
+    if anchor not in byid or not byid[anchor]["index"] or byid[anchor].get("metallic") == 1:
+        problems.append("metal_f0.anchor_class must be a dielectric library class (got %r)" % (anchor,))
+    classes = cfg.get("classes")
+    if not isinstance(classes, dict) or not classes:
+        return problems + ["metal_f0.classes must be a non-empty object {metal class: {...}}"]
+    ovr = ld.get("lut_overrides") or {}
+    for cid, cc in classes.items():
+        if cid not in byid or byid[cid].get("metallic") != 1:
+            problems.append("metal_f0.classes: %s is not a metal class of the library" % cid)
+            continue
+        if not isinstance(cc, dict):
+            problems.append("metal_f0.classes.%s must be an object" % cid)
+            continue
+        problems += ["metal_f0.classes.%s: unknown key %s" % (cid, k) for k in cc if k not in METAL_F0_CLASS_KEYS]
+        if not _in(cc.get("y_scale", 1.0), 0.0, 4.0):
+            problems.append("metal_f0.classes.%s.y_scale must be in (0, 4] (got %r)" % (cid, cc.get("y_scale")))
+        if not _in(cc.get("sat_scale", 1.0), 0.0, 2.0):
+            problems.append("metal_f0.classes.%s.sat_scale must be in (0, 2] (got %r)" % (cid, cc.get("sat_scale")))
+        if not _in(cc.get("hue_shift_deg", 0.0), -30.0, 30.0, open_lo=False):
+            problems.append("metal_f0.classes.%s.hue_shift_deg must be in [-30, 30] (got %r)" % (cid, cc.get("hue_shift_deg")))
+        worn = cc.get("worn")
+        if worn is not None:
+            if not isinstance(worn, dict) or set(worn) - {"y_ratio", "sat_scale", "note"}:
+                problems.append("metal_f0.classes.%s.worn must be {y_ratio, sat_scale}" % cid)
+            else:
+                if not _in(worn.get("y_ratio"), 0.0, 6.0):
+                    problems.append("metal_f0.classes.%s.worn.y_ratio must be in (0, 6] (got %r)" % (cid, worn.get("y_ratio")))
+                if not _in(worn.get("sat_scale", 1.0), 0.0, 2.0):
+                    problems.append("metal_f0.classes.%s.worn.sat_scale must be in (0, 2] (got %r)"
+                                    % (cid, worn.get("sat_scale")))
+        for key in ("bc",) + (("wornBC",) if worn is not None else ()):
+            if key in (ovr.get(cid) or {}):
+                problems.append("metal_f0.classes.%s and lut_overrides.%s.%s both set the %s" % (cid, cid, key, key))
+    return problems
+
+
+def metal_f0(ld, repo, area, ov_classes):
+    """The F0 (and worn colour) of the metal classes of `metal_f0` (module docstring): writes ov_classes[cid]["bc"] /
+    ["wornBC"] in place; -> report block."""
+    cfg = ld["metal_f0"]
+    path = Path(repo) / cfg["concept_report"]
+    zones = json.loads(path.read_text(encoding="utf-8"))["zones"]
+    anchor = cfg["anchor_class"]
+    if anchor not in zones or anchor not in area:
+        raise RuntimeError("metal_f0: anchor class %s has no concept zone in %s or no texels in this run"
+                           % (anchor, cfg["concept_report"]))
+    a_bc = ov_classes.get(anchor, {}).get("bc") or area[anchor]["bc_linear_median"]
+    a_y = float(luma(np.array(a_bc, np.float64)))
+    a_c = float(zones[anchor]["concept"]["luma_Y_linear"])
+    rows = {}
+    for cid, cc in sorted(cfg["classes"].items()):
+        if cid not in zones:
+            raise RuntimeError("metal_f0: class %s has no concept zone in %s" % (cid, cfg["concept_report"]))
+        con = zones[cid]["concept"]
+        hue = float(con["hue_deg"]) + float(cc.get("hue_shift_deg", 0.0))
+        sat = min(float(con["sat"]) * float(cc.get("sat_scale", 1.0)), 1.0)
+        y = float(con["luma_Y_linear"]) / a_c * a_y * float(cc.get("y_scale", 1.0))
+        f0, v, reached = colour_of_luma(hue, sat, y)
+        before = ov_classes.get(cid, {}).get("bc")
+        row = {"concept": {"hue_deg": con["hue_deg"], "sat": con["sat"], "Y_linear": con["luma_Y_linear"]},
+               "anchor": {"class": anchor, "concept_Y_linear": a_c, "lut_bc_Y": round(a_y, 5)},
+               "target": {"hue_deg": round(hue, 3), "sat": round(sat, 4), "Y": round(y, 5)},
+               "f0_linear": [round(float(x), 4) for x in f0], "f0_srgb_value": round(v, 4), "reached": reached,
+               "replaced_bc": before, "replaced_bc_Y": round(float(luma(np.array(before))), 5) if before else None,
+               "scales": {k: cc.get(k) for k in ("y_scale", "sat_scale", "hue_shift_deg") if k in cc}}
+        ov_classes.setdefault(cid, {})["bc"] = row["f0_linear"]
+        worn = cc.get("worn")
+        if worn is not None:
+            wsat = min(sat * float(worn.get("sat_scale", 1.0)), 1.0)
+            wy = y * float(worn["y_ratio"])
+            wc, wv, wreached = colour_of_luma(hue, wsat, wy)
+            row["worn"] = {"target": {"hue_deg": round(hue, 3), "sat": round(wsat, 4), "Y": round(wy, 5)},
+                           "linear": [round(float(x), 4) for x in wc], "srgb_value": round(wv, 4), "reached": wreached}
+            ov_classes[cid]["wornBC"] = row["worn"]["linear"]
+        rows[cid] = row
+    return {"concept_report": {"path": cfg["concept_report"], "sha256": sha256(path)}, "classes": rows,
+            "rule": "F0 = sRGB colour of the concept class median hue / saturation with linear luminance "
+                    "Yconcept(class) / Yconcept(anchor) x Y(LUT bc of the anchor) x y_scale (pilot F138)"}
 
 
 def read_png(path):
@@ -313,6 +446,9 @@ def run_maps(run_dir, ld, repo):
     UI = ue_inputs(repo)
     presets = UI.load_presets()
     byid = {c["id"]: c for c in presets["classes"]}
+    mf_problems = metal_f0_problems(ld, presets)
+    if mf_problems:
+        raise ValueError("look-dev profile: %s" % "; ".join(mf_problems))
     src_run = repo / ld["source"]["run"]
     sp = ld["source"]["prefix"]
     tdir = src_run / "textures"
@@ -486,6 +622,7 @@ def run_maps(run_dir, ld, repo):
         # dielectric: typical BC = the class tone after the concept grade (debug view / BakeFromLUT); metal (preset-f0):
         # the hero F0 = the graded class median (antique gold of the concept instead of the table F0 of gold)
         ov["classes"][cid].setdefault("bc", area[cid]["bc_linear_median"])
+    mf_rep = metal_f0(ld, repo, area, ov["classes"]) if ld.get("metal_f0") is not None else None  # W2-c, F138
     ov_doc = {"schema": "unmatched.um-v2-hero-overrides/1", "hero": ld["lut_hero"], "asset_id": ld["asset_id"],
               "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
               "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero %s --overrides <this file>"
@@ -540,9 +677,17 @@ def run_maps(run_dir, ld, repo):
     mt = {c["id"]: [round(float(x), 4) for x in lut[0, c["index"], :3]] for c in presets["classes"] if c["index"] and c["metallic"] == 1}
     checks["lut_metal_f0_plausible"] = {
         "passed": all(float(luma(np.array(v))) >= 0.45 or byid[k]["baseColor"].get("luminanceBandLinear") or k == "steel_blued"
+                      or (mf_rep is not None and k in mf_rep["classes"])
                       for k, v in mt.items() if k in area) and all(max(v) <= 1.0 for v in mt.values()),
         "measured": {k: {"bc": v, "Y": round(float(luma(np.array(v))), 4)} for k, v in mt.items() if k in area},
         "expected": "metal classes used by the hero: Y(F0) >= 0.45, channels <= 1 (library rule; oxide films excepted)"}
+    if mf_rep is not None:  # the concept F0 classes are exempt from the Y >= 0.45 table rule; they match their target
+        got = {k: round(float(luma(np.array(mt[k]))), 5) for k in mf_rep["classes"]}
+        checks["lut_metal_f0_from_concept"] = {
+            "passed": all(abs(got[k] - r["target"]["Y"]) <= 0.002 and r["reached"] and max(mt[k]) <= 1.0
+                          for k, r in mf_rep["classes"].items()),
+            "measured": {k: {"bc": mt[k], "Y": got[k]} for k in mf_rep["classes"]},
+            "expected": {k: {"Y": r["target"]["Y"], "tolerance": 0.002} for k, r in mf_rep["classes"].items()}}
     report = {"stage": "ld_maps", "prefix": prefix, "pins": pins, "classify_steps": steps,
               "small_components_relabelled": {byidx[k]: v for k, v in removed.items()},
               "reclass_from_baseline_texels": int(reclass.sum()),
@@ -553,6 +698,8 @@ def run_maps(run_dir, ld, repo):
                             "G": "полоса подставки (без изменений)", "B": "0 (без изменений)", "A": 255},
               "edge_texture": "%s_{,2K_}Edge.png: R8 (L), маска рёбер для EdgeMaskTexture v2 (линейная, sRGB выкл.)" % prefix,
               "outputs": outputs, "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
+    if mf_rep is not None:  # look-dev profiles without metal_f0 keep their report bytes
+        report["metal_f0"] = mf_rep
     np.save(run_dir / "work" / "labels_4k.npy", lab_g)
     (run_dir / "reports").mkdir(parents=True, exist_ok=True)
     (run_dir / "reports" / "ld-maps-report.json").write_text(json.dumps(report, indent=2, sort_keys=True, ensure_ascii=False) + "\n",

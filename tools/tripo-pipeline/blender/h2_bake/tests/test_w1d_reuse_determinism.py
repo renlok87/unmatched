@@ -456,3 +456,81 @@ def test_failed_lookdev_fbx_publishes_nothing(tmp_path):
     staged = sorted(p.name for p in (run / "work" / "ld_fbx" / "export-staging").glob("*.fbx"))
     assert staged == sorted([ld["exports"]["skeletal_fbx"], ld["exports"]["base_fbx"]])
     assert rep["exports"]["skeletal_fbx"]["path"].endswith("/export/" + ld["exports"]["skeletal_fbx"])
+
+
+# ------------------------------------------------------------------ RB-08 integration (W1-e probes): rig.probe_skip, n/N
+def test_probe_skip_key():
+    p = medusa()
+    assert PR.probe_skip(p) == [] and PR.validate(p) == []  # absent: the probe command line stays as before
+    p["rig"]["probe_skip"] = ["shin_l_bend", "shin_r_bend", "foot_l_flex", "foot_r_flex"]  # Ancient Leshen
+    assert PR.validate(p) == [] and PR.probe_skip(p) == p["rig"]["probe_skip"]
+    wb = next(b[0] for b in p["rig"]["bones"] if b[0].startswith("weapon"))
+    p["rig"]["probe_skip"] = ["weapon_turn_" + wb, "hand_l_twist"]
+    assert PR.validate(p) == []
+    for bad, msg in ((["thigh_l_flex"], "legacy probes"), (["shin_bend"], "unknown probe"),
+                     (["weapon_turn_weapon.X"], "unknown probe"), (["foot_l_flex", "foot_l_flex"], "duplicates"),
+                     ("shin_l_bend", "must be a list")):
+        p["rig"]["probe_skip"] = bad
+        assert any(msg in m for m in PR.validate(p)), (bad, PR.validate(p))
+
+
+def test_probe_skip_recomputes_from_rig():
+    p = medusa()
+    q = copy.deepcopy(p)
+    q["rig"]["probe_skip"] = ["foot_l_flex"]
+    assert first_changed(p, q) == "rig"
+
+
+LESHEN_R3 = REPO / "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2-bake-h2-r3.json"
+LEGS = ("shin_l_bend", "shin_r_bend", "foot_l_flex", "foot_r_flex")
+
+
+def driver():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("h2t_run_h2_bake", PKG / "run_h2_bake.py")
+    drv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(drv)
+    return drv
+
+
+def legless_probe(skip=()):
+    """A rig_deform_probe report of a trunk without legs (Ancient Leshen): the 7 legacy probes plausible, shins and
+    feet unweighted (or skipped), the right forearm and hand twist plausible."""
+    legacy = [{"test": n, "status": "plausible"} for n in PR.PROBE_LEGACY]
+    ext = [{"test": n, "status": "skipped" if n in skip else "unweighted"} for n in LEGS]
+    ext += [{"test": "forearm_r_bend", "status": "plausible"}, {"test": "hand_r_twist", "status": "plausible"}]
+    live = [t for t in legacy + ext if t["status"] != "skipped"]
+    n = sum(1 for t in live if t["status"] == "plausible")
+    return {"tests": legacy, "extended_tests": ext,
+            "probes": {"plausible": n, "total": len(live), "summary": "%d/%d" % (n, len(live)), "passed": n == len(live)}}
+
+
+def test_probes_v1_extended_failures_warn_only():
+    """profile_version 1 (the committed Leshen r3 profile, no probe_skip): a rerun passes on the legacy 7, the legless
+    extended probes are written to the report and warned about."""
+    drv, prof = driver(), PR.load(LESHEN_R3)
+    assert PR.profile_version(prof) == 1 and PR.probe_skip(prof) == []
+    datas = {"ancient-leshen-h2-blend": legless_probe(), "ancient-leshen-h2-fbx": legless_probe()}
+    rep = drv.probe_verdict(datas, prof, [], {"result": "pass"})
+    assert rep["passed"] is True and rep["gate"].startswith("legacy 7")
+    assert rep["plausible"] == {k: 7 for k in datas} and rep["total"] == {k: 7 for k in datas}
+    assert rep["probes"]["ancient-leshen-h2-fbx"] == "9/13"
+    assert rep["extended_warnings"]["ancient-leshen-h2-blend"] == list(LEGS)
+    assert rep["rig_deform_probe"]["ancient-leshen-h2-blend"]["shin_l_bend"] == "unweighted"
+    datas["ancient-leshen-h2-fbx"]["tests"][0]["status"] = "implausible"  # a legacy probe still gates
+    assert drv.probe_verdict(datas, prof, [], {"result": "pass"})["passed"] is False
+
+
+def test_probes_v2_extended_gate_and_skip():
+    """profile_version 2 (a new hero): the same legless figure fails without rig.probe_skip and passes with it."""
+    drv, prof = driver(), PR.load(LESHEN_R3)
+    prof["profile_version"] = 2
+    datas = {"x-h2-blend": legless_probe(), "x-h2-fbx": legless_probe()}
+    rep = drv.probe_verdict(datas, prof, [], {"result": "pass"})
+    assert rep["passed"] is False and rep["gate"].startswith("legacy + extended")
+    assert rep["plausible"]["x-h2-fbx"] == 9 and rep["total"]["x-h2-fbx"] == 13 and "extended_warnings" not in rep
+    datas = {"x-h2-blend": legless_probe(LEGS), "x-h2-fbx": legless_probe(LEGS)}
+    rep = drv.probe_verdict(datas, prof, list(LEGS), {"result": "pass"})
+    assert rep["passed"] is True and rep["total"]["x-h2-blend"] == 9 and rep["skipped"] == list(LEGS)
+    assert drv.probe_counts({"tests": datas["x-h2-blend"]["tests"]}) == {
+        "plausible": 7, "total": 7, "passed": True, "gate": "legacy 7", "summary": "7/7", "extended_failed": []}

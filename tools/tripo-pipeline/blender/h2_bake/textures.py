@@ -18,6 +18,10 @@ H2.1 (profile textures.materials, module materials.py): AO of the listed parts f
 before the footprints/caps read their rim; rim filters of named contacts (keep only the rim samples of the surface
 that continues under the contact); after the caps, the metal mask and the BC/ORM remap (metal, cloth roughness).
 Without textures.materials the stage is the H2 stage unchanged.
+W2-c (pilot F107): optional textures.band_repaint (materials.band_repaint) repaints a band of a part at a contact line
+(BC by default; rest positions of stage aux, work/uv/position.npy) from the same part just outside the band, after the
+AO exclusions and before the footprints and caps take their rim samples; report block band_repaint (absent without the
+key).
 Metal-free hero (no materials.metal parts): no metal mask, no remap, the H2.1 metal checks are not run, and
 work/uv/metal_mask.npy is written all-zero (look-dev reads it). Empty team_mask.cloth_parts (no cloth): TeamMask R = 0
 and the check team_mask_cloth_share is reported as not applicable (pilot 2026-10-13, F51, F52).
@@ -282,11 +286,18 @@ def run(run_dir, profile):
     cap_mask = np.load(w / "uv" / "cap_ids.npy") > 0 if (w / "uv" / "cap_ids.npy").exists() else np.zeros_like(uv_cov)
     cap_stats = None
     mcfg = tcfg.get("materials")
-    mat = load_sibling("materials") if mcfg else None
+    bands = tcfg.get("band_repaint") or []
+    mat = load_sibling("materials") if (mcfg or bands) else None
     tx = SimpleNamespace(rgb_to_hsv=rgb_to_hsv, bilinear=bilinear, dilate=dilate, blur3=blur3)
     mstats = {}
     if mcfg and mcfg.get("ao_exclusions"):
         mstats["ao_exclusions"] = mat.ao_exclusions(maps, alpha, part_ids, part_names, run_dir, mcfg["ao_exclusions"])
+    band_rows = None
+    if bands:  # W2-c: before the footprints / caps read their rim (they then sample the repainted band)
+        pos = np.load(w / "uv" / "position.npy")
+        pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
+        band_rows = mat.band_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, bands, tx)
+        del pos, pos_ok
     rim_filters = (mcfg or {}).get("rim_filters", [])
     fp_path = w / "uv" / "footprints.npz"
     fp_stats = None
@@ -449,6 +460,8 @@ def run(run_dir, profile):
                             "cloth_parts": tm["cloth_parts"], "hsv": hsv, "cloth_share_of_cloth_texels": round(cloth_share, 4),
                             "base_band_texels": int(base_band.sum())},
               "outputs": outputs, "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
+    if band_rows is not None:  # profiles without textures.band_repaint keep their report bytes
+        report["band_repaint"] = {"config": bands, "bands": band_rows}
     if mcfg:
         report["materials"] = {"config": mcfg, "stats": mstats,
                                "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, "

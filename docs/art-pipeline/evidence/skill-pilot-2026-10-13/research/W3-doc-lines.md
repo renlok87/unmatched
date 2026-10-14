@@ -112,3 +112,18 @@
   `closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера в `<Key>-<Clip>-closeups.json`, на r2/r3 — `--shots-from`
   отчёта прежнего цикла. У Idle — пара шва `<Key>-Idle-seam-fNN-f00-{front,q34}.jpg` (последний кадр / кадр 0, разница
   `seam.views.*.diff_px`)»; `ue7a/prep_acceptance.py` копирует их приёмщику.
+
+## W2-c · арт-опции h2_bake (коммит вместе с интеграцией проб W1-d, h2-bake/0.8.0)
+- HANDBOOK §2.9: «Двухъярусная подставка Tripo: кольцо — `textures.team_mask.base_band.height_m: [z0, z1]` (грани
+  подставки с центром в слое высот, кроме обращённых вниз → TeamMask.G и вершинная маска `UM_Mask.R`) + в UE профиле
+  импорта `ue.base_material_mode: "vertex-mask"`, `ue.base_marker.textures: true`, `ue.base_marker.parameters:
+  {VertexMaskWeight: 1.0, SideBandWeight: 0.0}` и те же скаляры в `review-config` `verify.instances` (мастер
+  `M_UM_BaseMarker` не меняется, прецедент Harpy H3LD). Простой подставке ключ не нужен (правило по нормали чистое)».
+- HANDBOOK §4.2: «`base.flatten_bottom` {} — рваный или провисший низ подставки (F83; дефолты floor_quantile 0.5,
+  band_m 0.008, falloff_m 0.012); `base.rim_smooth.z_band_m` [z0, z1] — зубцы подошв и дыр (F104); после него проверить
+  close `caps_hidden_at_rest` — сглаживание рядом с крышкой ломает гейт, тогда сузить `parts`»; «`textures.band_repaint`
+  — пятна соседа на полосе стыка (F107), не `bake.cage`».
+- HANDBOOK §4.4: «металл: `metal_f0` из медиан концепта и якоря skin (F138), worn `y_ratio` ≈ 2,5; проверка
+  `lut_metal_f0_from_concept`; эффект виден только в UE (Blender-превью берёт металл из BC)».
+- `acceptance-and-blender.md` §9.3 (доработка): «F: рваный низ или зубцы кромки подставки/подошв → `base.*`»; «T: мазки
+  цвета соседа у стыка → `textures.band_repaint`»; «T (этап 7): металл бледный в UE → look-dev `metal_f0`».

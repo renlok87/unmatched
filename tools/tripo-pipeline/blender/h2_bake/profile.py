@@ -94,6 +94,8 @@ def validate(p):
     problems.extend(figure_top_part_problems(p))
     problems.extend(part_offsets_problems(p))
     problems.extend(new_hero_problems(p))
+    problems.extend(probe_skip_problems(p))
+    problems.extend(w2c_problems(p))
     return problems
 
 
@@ -285,6 +287,44 @@ def seams_grid_bounds(rest_lo, rest_hi, posed_lo, posed_hi, rcfg):
     if np.array_equal(lo, lo0) and np.array_equal(hi, hi0):
         return lo0, hi0, None
     return lo, hi, [[round(float(x), 4) for x in lo0 - lo], [round(float(x), 4) for x in hi - hi0]]
+
+
+# ------------------------------------------------------------------ rig probe skip list (W1-d integration of W1-e, RB-08)
+# Names of tools/tripo-pipeline/anim/rig_deform_probe.py (EXT_TESTS, HAND_TWIST, "weapon_turn_" + weapon bone): only the
+# extended probes may be skipped; the 7 legacy probes are the contract (the probe refuses to skip them as well).
+PROBE_LEGACY = ("head_turn", "spine_bend_fwd", "arm_l_raise", "arm_r_raise", "forearm_l_bend", "thigh_l_flex",
+                "thigh_r_flex")
+PROBE_EXTENDED = ("forearm_r_bend", "shin_l_bend", "shin_r_bend", "foot_l_flex", "foot_r_flex", "hand_l_twist",
+                  "hand_r_twist")
+PROBE_WEAPON_TURN = "weapon_turn_"
+
+
+def probe_skip(p):
+    """Optional `rig.probe_skip` = [probe names]: extended probes the probes stage passes to rig_deform_probe.py as
+    --skip (status skipped, out of N). [] when absent — the probe command line of every older profile is unchanged.
+    Use: a figure without the probed limb (Ancient Leshen, legless trunk F53: shin_l_bend, shin_r_bend, foot_l_flex,
+    foot_r_flex)."""
+    return list(p.get("rig", {}).get("probe_skip") or [])
+
+
+def probe_skip_problems(p):
+    cfg = p.get("rig", {}).get("probe_skip")
+    if cfg is None:
+        return []
+    if not isinstance(cfg, list) or not all(isinstance(n, str) and n for n in cfg):
+        return ["rig.probe_skip must be a list of probe names (got %r)" % (cfg,)]
+    problems = []
+    weapon_turns = {PROBE_WEAPON_TURN + b[0] for b in p["rig"].get("bones", []) if str(b[0]).lower().startswith("weapon")}
+    for name in cfg:
+        if name in PROBE_LEGACY:
+            problems.append("rig.probe_skip: %s is one of the 7 legacy probes (the rig contract), it cannot be skipped"
+                            % name)
+        elif name not in PROBE_EXTENDED and name not in weapon_turns:
+            problems.append("rig.probe_skip: unknown probe %s (extended probes: %s)"
+                            % (name, ", ".join(PROBE_EXTENDED + tuple(sorted(weapon_turns)))))
+    if len(set(cfg)) != len(cfg):
+        problems.append("rig.probe_skip: duplicates")
+    return problems
 
 
 # ------------------------------------------------------------------ cloth shell (decision П3-3, Achilles pilot 2026-10-13)
@@ -496,3 +536,176 @@ def rel(path, repo):
         return Path(path).resolve().relative_to(Path(repo).resolve()).as_posix()
     except ValueError:
         return Path(path).as_posix()
+
+
+# ------------------------------------------------------------------ W2-c opt-in options (skill pilot F83, F104, F107, F150)
+# base.flatten_bottom (prepare), base.rim_smooth (retopo), textures.team_mask.base_band.height_m (uv: TeamMask.G and the
+# base vertex mask UM_Mask.R), textures.band_repaint (textures). Absent key = the old code path, byte-identical outputs.
+# Numbers and rules: base_ops.py (the bpy-free helpers); validation here (no import: the driver loads this file by path).
+BASE_KEYS = ("flatten_bottom", "rim_smooth", "note")
+FLATTEN_KEYS = ("floor_quantile", "band_m", "falloff_m", "down_normal_z", "note")
+RIM_SMOOTH_KEYS = ("z_band_m", "parts", "window_m", "max_shift_m", "min_perimeter_cm", "ring_weight", "note")
+BAND_REPAINT_KEYS = ("name", "part", "near", "band_m", "ring_m", "feather_m", "keep_hsv", "keys", "detail", "k",
+                     "include_boxes_m", "exclude_boxes_m", "note")
+BAND_REPAINT_MAPS = ("BC", "RM", "AO")
+
+
+def _num(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x)
+
+
+def _pair(x):
+    return isinstance(x, list) and len(x) == 2 and all(_num(v) for v in x) and x[0] < x[1]
+
+
+def base_flatten(p):
+    """Optional `base.flatten_bottom` (object, {} = defaults of base_ops.FLATTEN_DEFAULTS): the prepare stage flattens the
+    underside of the base part (both GLB twins) to a plane at z = 0 (pilot F83: ragged Tripo underside). None when absent."""
+    b = p.get("base")
+    return b.get("flatten_bottom") if isinstance(b, dict) else None
+
+
+def base_rim_smooth(p):
+    """Optional `base.rim_smooth` = {"z_band_m": [z0, z1], ...}: the retopo stage smooths the z of the boundary loops that
+    lie inside the band (the base-top holes and the sole rims standing in them: pilot F104, teeth of 1-2.4 mm). None
+    when absent."""
+    b = p.get("base")
+    return b.get("rim_smooth") if isinstance(b, dict) else None
+
+
+def base_band_height(p):
+    """Optional `textures.team_mask.base_band.height_m` = [z0, z1] (metres above the base bottom): the team band of the base
+    is the base faces whose centroid lies in that slab (not facing down) instead of |n_z| <= normal_z_abs_max; the uv
+    stage also writes it as the base vertex mask UM_Mask.R (pilot F143, F150). None when absent."""
+    tm = p.get("textures", {}).get("team_mask")
+    band = tm.get("base_band") if isinstance(tm, dict) else None
+    return band.get("height_m") if isinstance(band, dict) else None
+
+
+def band_repaint(p):
+    """Optional `textures.band_repaint` = [{name, part, near, band_m, ...}]: the textures stage repaints the texels of
+    `part` within band_m (3D, rest pose) of the `near` parts from the ring just outside the band (pilot F107: collar
+    smears of the Tripo texture). [] when absent."""
+    return list(p.get("textures", {}).get("band_repaint") or [])
+
+
+def _boxes_problems(where, boxes):
+    if not isinstance(boxes, list) or not boxes:
+        return ["%s must be a non-empty list of {min_m: [x, y, z], max_m: [x, y, z]}" % where]
+    for i, b in enumerate(boxes):
+        if not (isinstance(b, dict) and all(isinstance(b.get(k), list) and len(b[k]) == 3 and all(_num(v) for v in b[k])
+                                            for k in ("min_m", "max_m"))
+                and all(lo < hi for lo, hi in zip(b["min_m"], b["max_m"]))):
+            return ["%s[%d] must be {min_m: [x, y, z], max_m: [x, y, z]} with min < max" % (where, i)]
+    return []
+
+
+def _rim_smooth_problems(rs, parts):
+    if not isinstance(rs, dict):
+        return ["base.rim_smooth must be an object {z_band_m: [z0, z1], ...}"]
+    problems = ["base.rim_smooth: unknown key %s" % k for k in rs if k not in RIM_SMOOTH_KEYS]
+    if not _pair(rs.get("z_band_m")):
+        problems.append("base.rim_smooth.z_band_m must be [z0, z1] in metres, z0 < z1 (got %r)" % (rs.get("z_band_m"),))
+    names = rs.get("parts")
+    if names is not None:
+        if not isinstance(names, list) or not names:
+            problems.append("base.rim_smooth.parts must be a non-empty list of parts (absent = every part)")
+        else:
+            problems += ["base.rim_smooth.parts: unknown part %s" % n for n in names if n not in parts]
+    for key, hi, dflt in (("window_m", 0.03, 0.006), ("max_shift_m", 0.004, 0.002)):
+        v = rs.get(key, dflt)
+        if not (_num(v) and 0.0 < v <= hi):
+            problems.append("base.rim_smooth.%s must be in (0, %s] m (got %r)" % (key, hi, v))
+    mp = rs.get("min_perimeter_cm", 1.0)
+    if not (_num(mp) and mp >= 0):
+        problems.append("base.rim_smooth.min_perimeter_cm must be >= 0 (got %r)" % (mp,))
+    rw = rs.get("ring_weight", 0.5)
+    if not (_num(rw) and 0.0 <= rw <= 1.0):
+        problems.append("base.rim_smooth.ring_weight must be in [0, 1] (got %r)" % (rw,))
+    return problems
+
+
+def _flatten_problems(fl):
+    if not isinstance(fl, dict):
+        return ["base.flatten_bottom must be an object ({} = defaults)"]
+    problems = ["base.flatten_bottom: unknown key %s" % k for k in fl if k not in FLATTEN_KEYS]
+    q = fl.get("floor_quantile", 0.5)
+    if not (_num(q) and 0.0 <= q <= 1.0):
+        problems.append("base.flatten_bottom.floor_quantile must be in [0, 1] (got %r)" % (q,))
+    band = fl.get("band_m", 0.008)
+    if not (_num(band) and 0.0 <= band <= 0.015):
+        problems.append("base.flatten_bottom.band_m must be in [0, 0.015] m (got %r)" % (band,))
+    fo = fl.get("falloff_m", 0.012)
+    if not (_num(fo) and 0.0 <= fo <= 0.03):
+        problems.append("base.flatten_bottom.falloff_m must be in [0, 0.03] m (got %r)" % (fo,))
+    dz = fl.get("down_normal_z", -0.5)
+    if not (_num(dz) and -1.0 < dz < 0.0):
+        problems.append("base.flatten_bottom.down_normal_z must be in (-1, 0) (got %r)" % (dz,))
+    return problems
+
+
+def _band_repaint_problems(br, parts):
+    if not isinstance(br, list) or not br:
+        return ["textures.band_repaint must be a non-empty list of bands"]
+    problems, seen = [], set()
+    for i, b in enumerate(br):
+        w = "textures.band_repaint[%d]" % i
+        if not isinstance(b, dict):
+            problems.append("%s must be an object" % w)
+            continue
+        problems += ["%s: unknown key %s" % (w, k) for k in b if k not in BAND_REPAINT_KEYS]
+        if not isinstance(b.get("name"), str) or not b["name"] or b["name"] in seen:
+            problems.append("%s.name must be a unique non-empty string" % w)
+        seen.add(b.get("name"))
+        if b.get("part") not in parts:
+            problems.append("%s.part: unknown part %r" % (w, b.get("part")))
+        near = b.get("near")
+        if not isinstance(near, list) or not near or any(n not in parts for n in near) or b.get("part") in near:
+            problems.append("%s.near must be a non-empty list of other parts (got %r)" % (w, near))
+        for key, dflt in (("band_m", None), ("ring_m", 0.006)):
+            v = b.get(key, dflt)
+            if not (_num(v) and 0.0 < v <= 0.05):
+                problems.append("%s.%s must be in (0, 0.05] m (got %r)" % (w, key, v))
+        fe = b.get("feather_m", 0.002)
+        if not (_num(fe) and 0.0 <= fe <= (b["band_m"] if _num(b.get("band_m")) else 0.0)):
+            problems.append("%s.feather_m must be in [0, band_m] (got %r)" % (w, fe))
+        keys = b.get("keys", ["BC"])
+        if not (isinstance(keys, list) and keys and all(k in BAND_REPAINT_MAPS for k in keys) and len(set(keys)) == len(keys)):
+            problems.append("%s.keys must be a non-empty subset of %s (got %r)" % (w, list(BAND_REPAINT_MAPS), keys))
+        det = b.get("detail")
+        if det is not None and not (_pair(det) and 0.0 < det[0] <= 1.0 <= det[1]):
+            problems.append("%s.detail must be [lo, hi] with 0 < lo <= 1 <= hi (got %r)" % (w, det))
+        k = b.get("k", 8)
+        if not (isinstance(k, int) and not isinstance(k, bool) and 1 <= k <= 64):
+            problems.append("%s.k must be an integer in [1, 64] (got %r)" % (w, k))
+        kh = b.get("keep_hsv")
+        if kh is not None and not (isinstance(kh, dict) and kh and all(
+                key in ("v_min", "v_max", "s_min", "s_max") and _num(v) and 0.0 <= v <= 1.0 for key, v in kh.items())):
+            problems.append("%s.keep_hsv must be an object of v_min / v_max / s_min / s_max in [0, 1] (got %r)" % (w, kh))
+        for key in ("include_boxes_m", "exclude_boxes_m"):
+            if key in b:
+                problems += _boxes_problems("%s.%s" % (w, key), b[key])
+    return problems
+
+
+def w2c_problems(p):
+    problems = []
+    base = p.get("base")
+    if base is not None:
+        if not isinstance(base, dict):
+            return ["base must be an object {flatten_bottom, rim_smooth}"]
+        problems += ["base: unknown key %s (allowed: %s)" % (k, ", ".join(BASE_KEYS)) for k in base if k not in BASE_KEYS]
+        if base.get("flatten_bottom") is not None:
+            problems += _flatten_problems(base["flatten_bottom"])
+        if base.get("rim_smooth") is not None:
+            problems += _rim_smooth_problems(base["rim_smooth"], p["parts"])
+    hm = base_band_height(p)
+    if hm is not None:
+        top = float(p.get("scale", {}).get("base_height_m", 0.06))
+        if not (_pair(hm) and hm[0] >= 0.0 and hm[1] <= top + 0.01):
+            problems.append("textures.team_mask.base_band.height_m must be [z0, z1] with 0 <= z0 < z1 <= base_height_m + "
+                            "0.01 (metres above the base bottom; got %r)" % (hm,))
+    br = p.get("textures", {}).get("band_repaint")
+    if br is not None:
+        problems += _band_repaint_problems(br, p["parts"])
+    return problems
