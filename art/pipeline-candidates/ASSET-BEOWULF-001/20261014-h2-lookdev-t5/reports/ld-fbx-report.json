@@ -1,0 +1,690 @@
+{
+  "checks": {
+    "bone_heads_tails_as_h21": {
+      "expected": "equal (5 decimals, export frame)",
+      "measured": "equal",
+      "passed": true
+    },
+    "bones_and_parents_as_h21": {
+      "expected": 17,
+      "measured": 17,
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front_ue_plus_x": {
+      "expected": "dot > 0.5, front = +X",
+      "measured": {
+        "face_normal": [
+          0.7045,
+          -0.0144,
+          0.144
+        ],
+        "face_polygons": 1044,
+        "rotated_front": [
+          1.0,
+          -0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "positions_and_uv0_per_loop_as_h21": {
+      "expected": "<= 1e-6 m / 1e-7 UV",
+      "measured": {
+        "SK_Beowulf_H2_Body": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SK_Beowulf_H2_Sword": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SM_Beowulf_H2_Base": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        }
+      },
+      "passed": true
+    },
+    "triangles_as_h21": {
+      "expected": {
+        "SK_Beowulf_H2_Body": 42462,
+        "SK_Beowulf_H2_Sword": 1399,
+        "SM_Beowulf_H2_Base": 1430
+      },
+      "measured": {
+        "SK_Beowulf_H2_Body": 42462,
+        "SK_Beowulf_H2_Sword": 1399,
+        "SM_Beowulf_H2_Base": 1430
+      },
+      "passed": true
+    },
+    "uv1_metres_density_readback": {
+      "expected": "area(UV1) / area3D = 1 +- 0.02 (p1..p99 of islands)",
+      "measured": {
+        "SK_Beowulf_H2_Body": {
+          "islands": 670,
+          "ratio_p1_p50_p99": [
+            0.99999,
+            1.0,
+            1.00002
+          ]
+        },
+        "SK_Beowulf_H2_Sword": {
+          "islands": 19,
+          "ratio_p1_p50_p99": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "SM_Beowulf_H2_Base": {
+          "islands": 72,
+          "ratio_p1_p50_p99": [
+            0.99997,
+            1.0,
+            1.00001
+          ]
+        }
+      },
+      "passed": true
+    },
+    "uv_layers_order": {
+      "expected": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "measured": {
+        "SK_Beowulf_H2_Body": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SK_Beowulf_H2_Sword": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SM_Beowulf_H2_Base": [
+          "UVMap",
+          "UV1_m"
+        ]
+      },
+      "passed": true
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 89948,
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SM_Beowulf_H2LD_Base.fbx",
+      "sha256": "e57edc1fea17c63eb6f60779dbfa719ae48296c87255dc98adb0082eb8d98ea8"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 2114444,
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/export/SK_Beowulf_H2LD.fbx",
+      "sha256": "0a63bfc05cbe96280a3d450c0d8b387cd449b81d3c28a3fba8651c6ce982068a"
+    }
+  },
+  "failed": [],
+  "meshes_pre_export": {
+    "SK_Beowulf_H2_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Beowulf_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 1,
+      "polygons": 42462,
+      "triangles": 42462,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 23536
+    },
+    "SK_Beowulf_H2_Sword": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Beowulf_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1399,
+      "triangles": 1399,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 728
+    },
+    "SM_Beowulf_H2_Base": {
+      "color_attributes": [
+        "UM_Mask"
+      ],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Beowulf_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1430,
+      "triangles": 1430,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 925
+    }
+  },
+  "passed": true,
+  "roundtrip": {
+    "ld": {
+      "base": {
+        "armature_objects": [],
+        "armatures": 0,
+        "bones": {},
+        "meshes": {
+          "SM_Beowulf_H2_Base": {
+            "bounds_m": {
+              "max": [
+                0.14993,
+                0.15001,
+                0.06
+              ],
+              "min": [
+                -0.15006,
+                -0.15006,
+                2e-05
+              ]
+            },
+            "color_attributes": [
+              "UM_Mask"
+            ],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Beowulf_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 0,
+            "polygons": 1430,
+            "triangles": 1430,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 925,
+            "weights": null
+          }
+        }
+      },
+      "skeletal": {
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "armatures": 1,
+        "bones": {
+          "arm_lower.L": {
+            "head_m": [
+              -0.02,
+              0.105,
+              0.352
+            ],
+            "parent": "arm_upper.L",
+            "tail_m": [
+              0.006,
+              0.134,
+              0.329
+            ]
+          },
+          "arm_lower.R": {
+            "head_m": [
+              -0.018,
+              -0.104,
+              0.35
+            ],
+            "parent": "arm_upper.R",
+            "tail_m": [
+              0.021,
+              -0.121,
+              0.329
+            ]
+          },
+          "arm_upper.L": {
+            "head_m": [
+              -0.022,
+              0.065,
+              0.4
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.02,
+              0.105,
+              0.352
+            ]
+          },
+          "arm_upper.R": {
+            "head_m": [
+              -0.022,
+              -0.065,
+              0.4
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.018,
+              -0.104,
+              0.35
+            ]
+          },
+          "foot.L": {
+            "head_m": [
+              -0.014,
+              0.071,
+              0.085
+            ],
+            "parent": "leg_lower.L",
+            "tail_m": [
+              0.07268,
+              0.08493,
+              0.0494
+            ]
+          },
+          "foot.R": {
+            "head_m": [
+              -0.014,
+              -0.071,
+              0.085
+            ],
+            "parent": "leg_lower.R",
+            "tail_m": [
+              0.07268,
+              -0.08493,
+              0.0494
+            ]
+          },
+          "hand.L": {
+            "head_m": [
+              0.006,
+              0.134,
+              0.329
+            ],
+            "parent": "arm_lower.L",
+            "tail_m": [
+              0.04309,
+              0.12505,
+              0.3047
+            ]
+          },
+          "hand.R": {
+            "head_m": [
+              0.021,
+              -0.121,
+              0.329
+            ],
+            "parent": "arm_lower.R",
+            "tail_m": [
+              0.03815,
+              -0.12622,
+              0.32378
+            ]
+          },
+          "head": {
+            "head_m": [
+              0.0,
+              0.0,
+              0.445
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.00286,
+              -0.0,
+              0.57373
+            ]
+          },
+          "hips": {
+            "head_m": [
+              -0.004,
+              -0.0,
+              0.245
+            ],
+            "parent": "root",
+            "tail_m": [
+              -0.004,
+              -0.0,
+              0.29
+            ]
+          },
+          "leg_lower.L": {
+            "head_m": [
+              -0.008,
+              0.054,
+              0.178
+            ],
+            "parent": "leg_upper.L",
+            "tail_m": [
+              -0.014,
+              0.071,
+              0.085
+            ]
+          },
+          "leg_lower.R": {
+            "head_m": [
+              -0.008,
+              -0.054,
+              0.178
+            ],
+            "parent": "leg_upper.R",
+            "tail_m": [
+              -0.014,
+              -0.071,
+              0.085
+            ]
+          },
+          "leg_upper.L": {
+            "head_m": [
+              -0.004,
+              0.04,
+              0.245
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.008,
+              0.054,
+              0.178
+            ]
+          },
+          "leg_upper.R": {
+            "head_m": [
+              -0.004,
+              -0.04,
+              0.245
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.008,
+              -0.054,
+              0.178
+            ]
+          },
+          "root": {
+            "head_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "parent": null,
+            "tail_m": [
+              0.0,
+              0.0,
+              0.24503
+            ]
+          },
+          "spine": {
+            "head_m": [
+              -0.004,
+              -0.0,
+              0.3
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.004,
+              -0.0,
+              0.42876
+            ]
+          },
+          "weapon.R": {
+            "head_m": [
+              0.0378,
+              -0.1269,
+              0.3234
+            ],
+            "parent": "hand.R",
+            "tail_m": [
+              0.04191,
+              -0.13049,
+              0.34125
+            ]
+          }
+        },
+        "meshes": {
+          "SK_Beowulf_H2_Body": {
+            "bounds_m": {
+              "max": [
+                0.11717,
+                0.17787,
+                0.55015
+              ],
+              "min": [
+                -0.08945,
+                -0.14991,
+                0.0567
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Beowulf_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 1,
+            "polygons": 42462,
+            "triangles": 42462,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 23536,
+            "weights": {
+              "bones_used": {
+                "arm_lower.L": 2285,
+                "arm_lower.R": 754,
+                "arm_upper.L": 1307,
+                "arm_upper.R": 1397,
+                "foot.L": 488,
+                "foot.R": 523,
+                "hand.L": 834,
+                "hand.R": 551,
+                "head": 3444,
+                "hips": 5954,
+                "leg_lower.L": 1184,
+                "leg_lower.R": 1195,
+                "leg_upper.L": 2147,
+                "leg_upper.R": 2111,
+                "spine": 5498,
+                "weapon.R": 276
+              },
+              "max_influences": 3,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 23536,
+              "weight_share": {
+                "arm_lower.L": 0.0886,
+                "arm_lower.R": 0.0261,
+                "arm_upper.L": 0.0508,
+                "arm_upper.R": 0.0518,
+                "foot.L": 0.0177,
+                "foot.R": 0.0188,
+                "hand.L": 0.0297,
+                "hand.R": 0.0203,
+                "head": 0.1361,
+                "hips": 0.2077,
+                "leg_lower.L": 0.0391,
+                "leg_lower.R": 0.0389,
+                "leg_upper.L": 0.0383,
+                "leg_upper.R": 0.0376,
+                "spine": 0.1867,
+                "weapon.R": 0.0117
+              }
+            }
+          },
+          "SK_Beowulf_H2_Sword": {
+            "bounds_m": {
+              "max": [
+                0.0964,
+                -0.10307,
+                0.54684
+              ],
+              "min": [
+                0.03025,
+                -0.1785,
+                0.32627
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Beowulf_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 0,
+            "polygons": 1399,
+            "triangles": 1399,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 728,
+            "weights": {
+              "bones_used": {
+                "weapon.R": 728
+              },
+              "max_influences": 1,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 728,
+              "weight_share": {
+                "weapon.R": 1.0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "stage": "ld_fbx",
+  "status": "измерено",
+  "ue_import_notes": [
+    "UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs или DstLightmapIndex >= 2, иначе UE перезапишет UV1 картой освещения",
+    "материальный слот тот же (M_Beowulf_H2_Atlas), назначается MI v2"
+  ],
+  "uv1": {
+    "density_tolerance": 0.02,
+    "layer_name": "UV1_m",
+    "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+    "per_mesh": {
+      "SK_Beowulf_H2_Body": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 670,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.59432,
+          1.04006,
+          1.18812
+        ],
+        "uv1_abs_max_m": 0.1047,
+        "uv1_extent": [
+          [
+            -0.1047,
+            -0.0816
+          ],
+          [
+            0.1047,
+            0.0816
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SK_Beowulf_H2_Sword": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 19,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.69337,
+          0.69337,
+          0.69337
+        ],
+        "uv1_abs_max_m": 0.0837,
+        "uv1_extent": [
+          [
+            -0.0837,
+            -0.0301
+          ],
+          [
+            0.0837,
+            0.0301
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SM_Beowulf_H2_Base": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 72,
+        "metres_per_uv_unit_p5_p50_p95": [
+          2.31103,
+          2.31124,
+          2.31137
+        ],
+        "uv1_abs_max_m": 0.1099,
+        "uv1_extent": [
+          [
+            -0.1099,
+            -0.1053
+          ],
+          [
+            0.1099,
+            0.1053
+          ]
+        ],
+        "zero_area_islands": 0
+      }
+    }
+  }
+}

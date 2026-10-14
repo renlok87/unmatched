@@ -1,0 +1,103 @@
+{
+ "asset_id": "ASSET-BEOWULF-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.2869,
+    0.1498,
+    0.0665
+   ],
+   "wornBC": [
+    0.7289,
+    0.3719,
+    0.1586
+   ],
+   "ymedClassHero": 0.45321
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0513,
+    0.0252,
+    0.0116
+   ],
+   "ymedClassHero": 0.02956
+  },
+  "leather_worn": {
+   "bc": [
+    0.0529,
+    0.0222,
+    0.011
+   ],
+   "ymedClassHero": 0.0275
+  },
+  "linen": {
+   "bc": [
+    0.1022,
+    0.0823,
+    0.0666
+   ],
+   "ymedClassHero": 0.0849
+  },
+  "metal_forged": {
+   "bc": [
+    0.2228,
+    0.191,
+    0.181
+   ],
+   "wornBC": [
+    0.5595,
+    0.4768,
+    0.451
+   ],
+   "ymedClassHero": 0.29684
+  },
+  "skin": {
+   "bc": [
+    0.4125,
+    0.2086,
+    0.1046
+   ],
+   "ymedClassHero": 0.24625
+  },
+  "steel_blued": {
+   "bc": [
+    0.0422,
+    0.0355,
+    0.033
+   ],
+   "wornBC": [
+    0.1067,
+    0.0885,
+    0.0818
+   ],
+   "ymedClassHero": 0.07476
+  },
+  "stone_base": {
+   "bc": [
+    0.0284,
+    0.0262,
+    0.0273
+   ],
+   "ymedClassHero": 0.02678
+  },
+  "wood": {
+   "bc": [
+    0.107,
+    0.0343,
+    0.0091
+   ],
+   "ymedClassHero": 0.0475
+  },
+  "wool_coarse": {
+   "ymedClassHero": 0.0598
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Beowulf",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Beowulf --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

@@ -1,0 +1,619 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "beowulf-h2-lookdev/5",
+ "asset_id": "ASSET-BEOWULF-001",
+ "status": "предложено",
+ "status_note": "Look-dev этапа 3 (фигура-проверка 3d-model-pipeline 2026-10-14), прогон t5: профиль t3/t4 (усиления всех классов, металлы демпфированно, F0 металлов из концепта по measure-report прогона 1 20261014-h2-lookdev) на bake-прогоне 20261014-h2-bake-t4 (t3 + кольцо команды по высоте на двухъярусной подставке, base_band.height_m). Изменены только пины источника. Не художественная приёмка.",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t4.json",
+  "run": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4",
+  "prefix": "T_Beowulf_H2",
+  "files": {
+   "BC": "textures/T_Beowulf_H2_BC.png",
+   "ORM": "textures/T_Beowulf_H2_ORM.png",
+   "TeamMask": "textures/T_Beowulf_H2_TeamMask.png",
+   "N": "textures/T_Beowulf_H2_N.png",
+   "N_OpenGL": "textures/T_Beowulf_H2_N_OpenGL.png",
+   "2K_N": "textures/T_Beowulf_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_Beowulf_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_Beowulf_H2_BC.png",
+   "baseline_ORM": "textures/T_Beowulf_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_Beowulf_H2.fbx",
+   "base_fbx": "export/SM_Beowulf_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "0cebca1f5873bb15602ec7ff2aa362598d84e9c6ed473468923a3242648ba9e7",
+   "ORM": "74a2dd2fd50b7b7251262d653889af796247f97caec0d2e59267c064aea56920",
+   "TeamMask": "a1f3c841ba8fe3de6f2fcfe765f0c0f29183657d6c6b3bf5cdf7265dbeb9f135",
+   "N": "e109f51034f600b58d81c36be70182aa8fe8ee96b91a1bb0ae8dc6f640c46c6d",
+   "N_OpenGL": "7dce9ed31ae0970534650c6f2cf25fdb9abf7d2a5217a35b29287338b665b483",
+   "2K_N": "a445248df1248b6d72eeced0c374fff068ec22cb33b43e8ed6e9dc13560b729f",
+   "2K_N_OpenGL": "e5d3ab9fa9ffa8dc2c05823769cd284d96f85b0122d7f2e71ebb3c777e979ef9",
+   "baseline_BC": "0cebca1f5873bb15602ec7ff2aa362598d84e9c6ed473468923a3242648ba9e7",
+   "baseline_ORM": "74a2dd2fd50b7b7251262d653889af796247f97caec0d2e59267c064aea56920",
+   "part_ids": "dd09b5f32fedef4f1431f49b4cf8d5d322453caa6679795f1350631d4e6b7a92",
+   "metal_mask": "8e5208fd5105c082c2091950153b77eb923c13df2965851c1f37a548b5c21bf0",
+   "position": "b6643254eccdd8cf95e7af5382182d43641c8c74ddcfc6aef0de0903d40db127",
+   "island_ids": "c11d1b6bf583445d0800a6c3dc0d2f0b8b0002ce48b64eac24f6d6b94e4fbc00",
+   "sk_authored": "7cd434a3eb07565ac588967642e7d3d4d2a9436c05ca863d2ec58a9c15971659",
+   "skeletal_fbx": "f86c7b02a616daa8814650352ac226391443af16b49c3c6cc4884995c3e3eab0",
+   "base_fbx": "679f09fb25b5c71d30bf95046db4f996bbaacbed23c7cb13cfe99b00ea3c33b6"
+  }
+ },
+ "prefix": "T_Beowulf_H2LD",
+ "lut_name": "T_UM_MatLUT_Beowulf",
+ "lut_hero": "Beowulf",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_Beowulf_H2LD.fbx",
+  "base_fbx": "SM_Beowulf_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [
+  "wool_coarse"
+ ],
+ "team_dye_note": "TeamMask.R (устаревшая маска W4-B: мех мантии по HSV стадии textures) остаётся только на классе мантии; цвет команды героя — TeamAccent (профиль beowulf-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1: мех мантии — wool_coarse (правило ткани/плаща, HANDBOOK); кольчуга туники и рукавов — steel_blued (тёмное железо концепта; кольца — деталь BC); купол шлема, клинок, умбон и кромка щита — metal_forged (маска металла H2.1; матовая светлая сталь концепта — не steel_polished, F34); гривна, кант туники и рукавов, полосы шлема, пряжка, гарда, рукоять и навершие — gold_antique; пояс и перевязь — leather_smooth; сапоги, обмотки, наручи и обмотка рукояти — leather_worn; штаны — linen; лицо, шея, кисти и предплечья — skin; борода и глаза — legacy_bake; доски щита — wood; подставка — stone_base",
+  "part_default": {
+   "0": "wool_coarse",
+   "1": "steel_blued",
+   "2": "wood",
+   "3": "legacy_bake",
+   "4": "leather_worn",
+   "5": "leather_worn",
+   "6": "leather_smooth",
+   "7": "metal_forged",
+   "8": "linen",
+   "9": "skin",
+   "10": "skin",
+   "11": "steel_blued",
+   "12": "skin",
+   "13": "stone_base",
+   "14": "steel_blued",
+   "15": "steel_blued",
+   "16": "linen",
+   "17": "gold_antique",
+   "18": "metal_forged",
+   "19": "skin"
+  },
+  "rules": [
+   {
+    "name": "face_skin",
+    "parts": [
+     3
+    ],
+    "hsv": {
+     "hue_deg": [
+      8,
+      34
+     ],
+     "s_min": 0.18,
+     "s_max": 0.56,
+     "v_min": 0.5
+    },
+    "class": "skin",
+    "note": "лицо под шлемом (передняя полуплоскость y < −0,012, z 0,452–0,505): светлые тексели кожи; борода (v ≤ 0,45) остаётся legacy_bake",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.012,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       -1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.452
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.505
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "min_m": 0.0
+     }
+    ]
+   },
+   {
+    "name": "bracer_leather",
+    "parts": [
+     9,
+     12
+    ],
+    "hsv": {
+     "v_max": 0.42
+    },
+    "class": "leather_worn",
+    "note": "наручи и тёмные ремешки предплечий; кожа рук светлее (v p50 0,59)"
+   },
+   {
+    "name": "mail_leather",
+    "parts": [
+     1,
+     14,
+     11,
+     15,
+     6
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      40
+     ],
+     "s_min": 0.3,
+     "v_max": 0.45
+    },
+    "class": "leather_smooth",
+    "note": "перевязь через грудь, ремни и кожаные концы на кольчуге; пояс — тот же класс"
+   },
+   {
+    "name": "grip_leather",
+    "parts": [
+     7,
+     17
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      40
+     ],
+     "s_min": 0.25,
+     "v_max": 0.38
+    },
+    "class": "leather_worn",
+    "note": "обмотка рукояти меча"
+   },
+   {
+    "name": "gold",
+    "parts": [
+     1,
+     6,
+     7,
+     11,
+     14,
+     15,
+     17
+    ],
+    "hsv": {
+     "hue_deg": [
+      28,
+      56
+     ],
+     "s_min": 0.42,
+     "v_min": 0.42
+    },
+    "class": "gold_antique",
+    "note": "кант с плетёнкой, пряжка, гарда, навершие"
+   },
+   {
+    "name": "gold_helmet_torc",
+    "parts": [
+     3
+    ],
+    "hsv": {
+     "hue_deg": [
+      28,
+      56
+     ],
+     "s_min": 0.42,
+     "v_min": 0.5
+    },
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.47
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "class": "gold_antique",
+    "note": "золотые полосы шлема и наносник (выше z 0,47 м)"
+   },
+   {
+    "name": "gold_torc",
+    "parts": [
+     3
+    ],
+    "hsv": {
+     "hue_deg": [
+      28,
+      56
+     ],
+     "s_min": 0.42,
+     "v_min": 0.5
+    },
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.445
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       -0.02,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       -1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "class": "gold_antique",
+    "note": "гривна на груди (ниже z 0,445 м, спереди)"
+   },
+   {
+    "name": "mail_grey",
+    "parts": [
+     1,
+     14,
+     11,
+     15
+    ],
+    "hsv": {
+     "s_max": 0.22
+    },
+    "class": "steel_blued",
+    "note": "кольчуга (серые тексели) — после ремней и золота: серые блики на коже остаются кольчугой"
+   },
+   {
+    "name": "steel",
+    "metal_min": 0.5,
+    "class": "metal_forged",
+    "note": "маска металла H2.1: купол шлема, клинок, умбон, кромка щита"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [
+   "gold_antique",
+   "metal_forged"
+  ],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "leather_smooth": {
+    "rgb": [
+     0.1593,
+     0.144,
+     0.1041
+    ],
+    "scout_iter1": [
+     0.3279,
+     0.299,
+     0.2461
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "leather_worn": {
+    "rgb": [
+     0.493,
+     0.4103,
+     0.3298
+    ],
+    "scout_iter1": [
+     0.5729,
+     0.519,
+     0.4555
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "legacy_bake": {
+    "rgb": [
+     0.6416,
+     0.5975,
+     0.4981
+    ],
+    "scout_iter1": [
+     0.7352,
+     0.7102,
+     0.657
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "linen": {
+    "rgb": [
+     1.048,
+     1.0828,
+     1.0731
+    ],
+    "scout_iter1": [
+     1.0365,
+     1.0704,
+     1.0359
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "skin": {
+    "rgb": [
+     1.7711,
+     1.7563,
+     1.5684
+    ],
+    "scout_iter1": [
+     1.666,
+     1.7361,
+     1.6415
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "stone_base": {
+    "rgb": [
+     0.4192,
+     0.3843,
+     0.3507
+    ],
+    "scout_iter1": [
+     0.5276,
+     0.4841,
+     0.4544
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "wood": {
+    "rgb": [
+     0.6071,
+     0.4096,
+     0.214
+    ],
+    "scout_iter1": [
+     0.6933,
+     0.5483,
+     0.3775
+    ],
+    "note": "разведка C:/tmp/beowulf-scout ld1→ld3 (2 итерации ld_measure на bake разведки, якорь мех; t_cap 2,0 на ld3)"
+   },
+   "gold_antique": {
+    "rgb": [
+     2.8095,
+     3.1194,
+     3.5764
+    ],
+    "note": "полная подсказка (золото H2.1 — бледный крем Tripo, концепт — насыщенное золото: класс темнее концепта, усиление вверх не даёт бледной латуни F71); значения — итерация 2 разведки C:/tmp/beowulf-scout (ld3: gold 0,965, metal_forged 1,208, steel_blued 0,871)"
+   },
+   "metal_forged": {
+    "rgb": [
+     0.6916,
+     0.589,
+     0.5323
+    ],
+    "note": "металл — демпфированно: среднее геометрическое прежнего и подсказанного усиления (HANDBOOK §4.4: металл концепта — краска, не PBR); значения — итерация 2 разведки C:/tmp/beowulf-scout (ld3: gold 0,965, metal_forged 1,208, steel_blued 0,871)"
+   },
+   "steel_blued": {
+    "rgb": [
+     1.5693,
+     1.5843,
+     1.5804
+    ],
+    "note": "металл — демпфированно: среднее геометрическое прежнего и подсказанного усиления; значения — итерация 2 разведки C:/tmp/beowulf-scout (ld3: gold 0,965, metal_forged 1,208, steel_blued 0,871)"
+   }
+  },
+  "gains_note": "итерации ld_measure (лёгкий режим, ≤ 3): подсказка concept / H2LD; металл — демпфированно (HANDBOOK §4.4)"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+  "side": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+  "back": "art/imagegen/concept-beowulf-codex/beowulf-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "exposure": {
+   "mode": "anchor_class",
+   "class": "wool_coarse",
+   "note": "экспозиция концепт/кадр Blender — по меху мантии (самая большая зона, 36 %, главный цвет; как плащ Achilles). Якорь по коже (2,4 % площади) дал k 2,09 против среднего по всем классам 0,92: кожа H2 вдвое темнее концепта, а прочие классы в пределах 0,6–1,3 — по ней вне допуска вышли бы 9 классов из 11 (проход разведки C:/tmp/beowulf-scout/ld1)"
+  },
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по зонам Beowulf: бурый мех, тёмная кольчуга, светлая сталь, золото, кожа ремней и сапог, серо-бежевые штаны, кожа персонажа, доски щита, камень подставки",
+   "wool_coarse": {
+    "mask_px": -4,
+    "hue_deg": [
+     [
+      15,
+      40
+     ]
+    ],
+    "s_min": 0.35,
+    "v_min": 0.18
+   },
+   "steel_blued": {
+    "mask_px": -2,
+    "s_max": 0.22,
+    "v_max": 0.6
+   },
+   "metal_forged": {
+    "mask_px": 2,
+    "s_max": 0.2,
+    "v_min": 0.25
+   },
+   "gold_antique": {
+    "mask_px": 3,
+    "hue_deg": [
+     [
+      26,
+      55
+     ]
+    ],
+    "s_min": 0.4,
+    "v_min": 0.35
+   },
+   "leather_smooth": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      5,
+      35
+     ]
+    ],
+    "s_min": 0.3,
+    "v_min": 0.08,
+    "v_max": 0.5
+   },
+   "leather_worn": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      5,
+      35
+     ]
+    ],
+    "s_min": 0.25,
+    "v_min": 0.08,
+    "v_max": 0.55
+   },
+   "linen": {
+    "mask_px": -4,
+    "s_max": 0.35,
+    "v_min": 0.25
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      8,
+      35
+     ]
+    ],
+    "s_min": 0.15,
+    "s_max": 0.6,
+    "v_min": 0.4
+   },
+   "wood": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      15,
+      40
+     ]
+    ],
+    "s_min": 0.3,
+    "v_min": 0.25
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.5
+   },
+   "legacy_bake": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.3,
+    "render_gate": true,
+    "note": "борода (рыжевато-бурая): ворота с обеих сторон"
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "helmet",
+   "torc_beard",
+   "hand_r_grip",
+   "shield_front",
+   "boot_l",
+   "cloak_back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-beowulf-codex/checks-report.json",
+  "side": "left"
+ },
+ "history": {
+  "previous_profiles": [
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev.json",
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t2.json",
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t3.json",
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-lookdev-t4.json"
+  ],
+  "note": "t5 = пины bake-прогона t4; прогоны 20261014-h2-lookdev, -t2, -t3, -t4 не тронуты"
+ },
+ "metal_f0": {
+  "concept_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev/reports/measure-report.json",
+  "anchor_class": "skin",
+  "note": "F0 металлов из концепта (h2-bake 0.8.0, W2-c, F138): усиление металлических классов опускает медиану ниже правила Y(F0) ≥ 0,45 (lut_metal_f0_plausible), F0 берётся по оттенку и насыщенности медианы концепта, яркость — от якоря skin; concept_report — прогон look-dev 1 этого героя (20261014-h2-lookdev)",
+  "classes": {
+   "metal_forged": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   },
+   "steel_blued": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   },
+   "gold_antique": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   }
+  }
+ }
+}

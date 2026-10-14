@@ -1,0 +1,740 @@
+{
+  "band_repaint": {
+    "bands": [
+      {
+        "band_m": 0.015,
+        "band_share_outside_keep_hsv": {
+          "after": 0.0406,
+          "before": 0.2426,
+          "ring_reference": 0.0381
+        },
+        "band_texels": 69148,
+        "distance_mm_p50_max": [
+          8.48,
+          15.0
+        ],
+        "feathered_texels": 17134,
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0823,
+            "p95_abs_change": 0.3196
+          }
+        },
+        "name": "fur_sleeve_l",
+        "near": [
+          "tripo_part_15"
+        ],
+        "part": "tripo_part_0",
+        "part_texels": 2175963,
+        "ring_m": 0.006,
+        "ring_texels": 39993,
+        "ring_texels_kept": 38471
+      },
+      {
+        "band_m": 0.008,
+        "band_share_outside_keep_hsv": {
+          "after": 0.0008,
+          "before": 0.0709,
+          "ring_reference": 0.0142
+        },
+        "band_texels": 46366,
+        "distance_mm_p50_max": [
+          4.37,
+          8.0
+        ],
+        "feathered_texels": 12983,
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0479,
+            "p95_abs_change": 0.2293
+          }
+        },
+        "name": "fur_chest",
+        "near": [
+          "tripo_part_14"
+        ],
+        "part": "tripo_part_0",
+        "part_texels": 2175963,
+        "ring_m": 0.006,
+        "ring_texels": 42174,
+        "ring_texels_kept": 41577
+      },
+      {
+        "band_m": 0.006,
+        "band_share_outside_keep_hsv": {
+          "after": 0.0019,
+          "before": 0.0893,
+          "ring_reference": 0.0049
+        },
+        "band_texels": 18984,
+        "distance_mm_p50_max": [
+          3.3,
+          6.0
+        ],
+        "feathered_texels": 7174,
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0467,
+            "p95_abs_change": 0.2244
+          }
+        },
+        "name": "fur_sleeve_r",
+        "near": [
+          "tripo_part_11"
+        ],
+        "part": "tripo_part_0",
+        "part_texels": 2175963,
+        "ring_m": 0.006,
+        "ring_texels": 24190,
+        "ring_texels_kept": 24072
+      }
+    ],
+    "config": [
+      {
+        "band_m": 0.015,
+        "detail": [
+          0.6,
+          1.4
+        ],
+        "feather_m": 0.003,
+        "k": 8,
+        "keep_hsv": {
+          "s_min": 0.3,
+          "v_min": 0.1
+        },
+        "keys": [
+          "BC"
+        ],
+        "name": "fur_sleeve_l",
+        "near": [
+          "tripo_part_15"
+        ],
+        "note": "мех мантии над левым рукавом: серо-синие мазки кольчуги (текстура Tripo) в 15 мм от рукава — 11,9 тыс. серых текселей меха (s < 0,22); источник — кольцо меха 15–21 мм с s ≥ 0,3",
+        "part": "tripo_part_0",
+        "ring_m": 0.006
+      },
+      {
+        "band_m": 0.008,
+        "detail": [
+          0.6,
+          1.4
+        ],
+        "feather_m": 0.002,
+        "k": 8,
+        "keep_hsv": {
+          "s_min": 0.3,
+          "v_min": 0.1
+        },
+        "keys": [
+          "BC"
+        ],
+        "name": "fur_chest",
+        "near": [
+          "tripo_part_14"
+        ],
+        "note": "мех воротника на груди: 2,6 тыс. серых текселей в 10 мм от груди",
+        "part": "tripo_part_0",
+        "ring_m": 0.006
+      },
+      {
+        "band_m": 0.006,
+        "detail": [
+          0.6,
+          1.4
+        ],
+        "feather_m": 0.002,
+        "k": 8,
+        "keep_hsv": {
+          "s_min": 0.3,
+          "v_min": 0.1
+        },
+        "keys": [
+          "BC"
+        ],
+        "name": "fur_sleeve_r",
+        "near": [
+          "tripo_part_11"
+        ],
+        "note": "мех над правым рукавом: 1,1 тыс. серых текселей в 6 мм",
+        "part": "tripo_part_0",
+        "ring_m": 0.006
+      }
+    ]
+  },
+  "bc_mean_srgb_in_islands": [
+    100.98,
+    81.89,
+    68.44
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 195705,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 2397,
+        "cap_vertices": 1881,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 195705,
+        "rim_samples": 25564
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "h21_metal_basecolor_plausible": {
+      "expected": "metal BaseColor = reflectance: linear max channel median >= 0.5 (cavities darker by the Tripo detail)",
+      "measured": {
+        "linear_max_channel_p5_p50_p95": [
+          0.1384,
+          0.5583,
+          0.7758
+        ],
+        "srgb_mean": [
+          175.4,
+          181.1,
+          186.9
+        ]
+      },
+      "passed": true
+    },
+    "h21_metal_core_metallic": {
+      "expected": "metal core (mask >= 0.99): metallic p1 >= 0.89",
+      "measured": {
+        "median": 0.9647,
+        "p1": 0.902,
+        "texels": 647001
+      },
+      "passed": true
+    },
+    "h21_metal_core_roughness": {
+      "expected": "metal core roughness p1..p99 within 0.3..0.46 (varied, not a constant)",
+      "measured": {
+        "p1": 0.3216,
+        "p50": 0.3647,
+        "p99": 0.451
+      },
+      "passed": true
+    },
+    "h21_non_metal_metallic_zero": {
+      "expected": "cloth, skin, leather, wood, snakes, base (mask 0): metallic <= 1/255",
+      "measured": {
+        "max_8bit": 0,
+        "texels": 7394007
+      },
+      "passed": true
+    },
+    "h21_rim_filters_applied": {
+      "expected": "every filtered contact cap found, with kept rim samples",
+      "measured": [],
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.003885,
+        "BC": 0.003885,
+        "NORMAL": 0.003885,
+        "RM": 0.003885
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0002,
+        "p99.9_abs_dev": 0.0055
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0002,
+        "p99.9_abs_dev": 0.0053
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.8644,
+        "p1": 8.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.936,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "materials": {
+    "config": {
+      "ao_exclusions": [],
+      "checks": {
+        "metal_core_bc_linear_max_channel_p50_min": 0.5,
+        "metal_core_metallic_min": 0.89,
+        "metal_core_roughness": [
+          0.3,
+          0.46
+        ],
+        "non_metal_metallic_max_8bit": 1
+      },
+      "cloth_roughness": {
+        "apply": false,
+        "hi": 0.9,
+        "lo": 0.8,
+        "note": "не применяется (как Medusa)"
+      },
+      "metal": {
+        "basecolor": {
+          "detail_clip": [
+            0.25,
+            1.4
+          ],
+          "detail_gamma": 1.0,
+          "note": "сталь клинка и железо шлема/щита концепта — светлый холодный серый; деталь = яркость BC Tripo / медиана по маске (тёмный купол шлема остаётся темнее клинка); #B8BEC4 как у Angel — гейт metal_core_bc_linear_max_channel_p50_min 0,5 требует линейный максимум канала ≥ 0,5 (#A8ADB2 дал бы 0,44)",
+          "target_srgb": "#B8BEC4"
+        },
+        "blur": 1,
+        "close_px": 2,
+        "hue_deg": [
+          -10,
+          370
+        ],
+        "hue_ramp_deg": 1,
+        "local_radius_px": 3,
+        "metallic": {
+          "max": 1.0,
+          "min": 0.9
+        },
+        "parts": {
+          "tripo_part_18": {
+            "min_component_px": 60,
+            "note": "умбон целиком железо (серый 85 %)",
+            "terms": [
+              {
+                "hue_deg": [
+                  -10,
+                  370
+                ],
+                "hue_ramp_deg": 1,
+                "kind": "local",
+                "name": "boss_iron",
+                "radius_px": 3,
+                "s_max": 0.25,
+                "s_min": -1.0,
+                "v_min": 0.12
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.08
+            }
+          },
+          "tripo_part_2": {
+            "min_component_px": 60,
+            "note": "железная кромка и заклёпки щита; доски (бурое дерево s ≈ 0,45) — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  -10,
+                  370
+                ],
+                "hue_ramp_deg": 1,
+                "kind": "local",
+                "name": "shield_rim_iron",
+                "radius_px": 3,
+                "s_max": 0.18,
+                "s_min": -1.0,
+                "v_min": 0.25
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_3": {
+            "boxes": [
+              {
+                "max_m": [
+                  0.5,
+                  0.5,
+                  0.6
+                ],
+                "min_m": [
+                  -0.5,
+                  -0.5,
+                  0.484
+                ],
+                "name": "helmet_dome"
+              }
+            ],
+            "min_component_px": 60,
+            "note": "купол шлема (серые тексели части 3 выше z 0,484 м — кромка шлема по разведке); золотые полосы и наносник — не металл H2.1; лицо и борода ниже кромки",
+            "terms": [
+              {
+                "hue_deg": [
+                  -10,
+                  370
+                ],
+                "hue_ramp_deg": 1,
+                "kind": "local",
+                "name": "helmet_iron",
+                "radius_px": 3,
+                "s_max": 0.2,
+                "s_min": -1.0,
+                "v_min": 0.15
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.08
+            }
+          },
+          "tripo_part_7": {
+            "min_component_px": 60,
+            "note": "клинок — сталь; золотая гарда (s > 0,4) и кожа рукояти — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  -10,
+                  370
+                ],
+                "hue_ramp_deg": 1,
+                "kind": "local",
+                "name": "blade_steel",
+                "radius_px": 3,
+                "s_max": 0.2,
+                "s_min": -1.0,
+                "v_min": 0.18
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.1
+            }
+          }
+        },
+        "parts_note": "цветовое правило + 3D-коробка шлема; кольчуга и золото — классы look-dev",
+        "ramp": 0.04,
+        "roughness": {
+          "detail_weight": 0.6,
+          "max": 0.45,
+          "min": 0.32,
+          "note": "как металл Medusa/Angel"
+        }
+      },
+      "note": "проход металла H2.1 (HANDBOOK §2.4, образец Angel): маска металла для look-dev (work/uv/metal_mask.npy) — железо и сталь: клинок (часть 7, серый s ≤ 0,2; гарда и рукоять — золото и кожа, не металл), умбон (часть 18), железная кромка и заклёпки щита (часть 2, серые; дерево s ≈ 0,45 — не металл), купол шлема (часть 3, серый выше кромки шлема z ≥ 0,484 м). Замер BC разведки: клинок s p50 0,06, v 0,55; умбон s 0,06, v 0,41; шлем серый с z 0,489. Кольчуга туники (части 1, 11, 14, 15) в маску H2.1 не входит: target_srgb один на героя, а кольчуга концепта — тёмное железо против светлой стали клинка; её класс задаёт look-dev по цвету (тёмный серый), как и золото гривны, кант и рукоять (золото — не металл H2.1, класс gold_antique look-dev)",
+      "rim_filters": []
+    },
+    "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, художественно не принято",
+    "stats": {
+      "metal_mask": {
+        "tripo_part_18": {
+          "gate": null,
+          "mask_mean": 0.9297,
+          "metal_share": 0.9368,
+          "small_component_texels_removed": 3,
+          "term_texels": [
+            56703
+          ]
+        },
+        "tripo_part_2": {
+          "gate": null,
+          "mask_mean": 0.3129,
+          "metal_share": 0.3184,
+          "small_component_texels_removed": 154,
+          "term_texels": [
+            272737
+          ]
+        },
+        "tripo_part_3": {
+          "gate": {
+            "texels_kept": 63562,
+            "texels_tested": 64848
+          },
+          "mask_mean": 0.1006,
+          "metal_share": 0.1015,
+          "small_component_texels_removed": 633,
+          "term_texels": [
+            64479
+          ]
+        },
+        "tripo_part_7": {
+          "gate": null,
+          "mask_mean": 0.7386,
+          "metal_share": 0.7466,
+          "small_component_texels_removed": 157,
+          "term_texels": [
+            300408
+          ]
+        }
+      },
+      "remap": {
+        "after": {
+          "cloth": {
+            "bc_srgb_mean": [
+              91.7,
+              65.4,
+              45.7
+            ],
+            "metallic_mean": 0.0,
+            "metallic_p5_p95": [
+              0.0,
+              0.0
+            ],
+            "roughness_mean": 0.9421,
+            "roughness_p5_p95": [
+              0.5827,
+              0.9865
+            ],
+            "texels": 2052058
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              174.1,
+              179.6,
+              185.4
+            ],
+            "metallic_mean": 0.9433,
+            "metallic_p5_p95": [
+              0.7778,
+              1.0
+            ],
+            "roughness_mean": 0.3711,
+            "roughness_p5_p95": [
+              0.3241,
+              0.4423
+            ],
+            "texels": 693362
+          },
+          "metal_core_m_ge_0.99": {
+            "bc_srgb_mean": [
+              175.6,
+              181.3,
+              187.2
+            ],
+            "metallic_mean": 0.9619,
+            "metallic_p5_p95": [
+              0.9,
+              1.0
+            ],
+            "roughness_mean": 0.3665,
+            "roughness_p5_p95": [
+              0.3238,
+              0.4342
+            ],
+            "texels": 646495
+          },
+          "non_metal_metallic_max": 0.0
+        },
+        "before": {
+          "cloth": {
+            "bc_srgb_mean": [
+              91.7,
+              65.4,
+              45.7
+            ],
+            "metallic_mean": 0.0512,
+            "roughness_mean": 0.9421,
+            "texels": 2052058
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              130.9,
+              125.1,
+              126.0
+            ],
+            "metallic_mean": 0.4071,
+            "roughness_mean": 0.5408,
+            "texels": 693362
+          }
+        },
+        "luminance_reference_linear": 0.20064,
+        "metal_bc_linear_max_channel_p5_p50_p95": [
+          0.138,
+          0.5461,
+          0.7728
+        ],
+        "target_linear": [
+          0.4793,
+          0.5149,
+          0.552
+        ],
+        "target_srgb": "#B8BEC4",
+        "tripo_roughness_rank_q5_q95": {
+          "cloth": null,
+          "metal": [
+            0.3982,
+            0.8248
+          ]
+        }
+      }
+    }
+  },
+  "outputs": {
+    "T_Beowulf_H2_2K_BC.png": {
+      "bytes": 5883882,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "7664928a34c5eec6b4d3f3d7c03ad839577fee8efb764cba0ea55cddbd08a38a"
+    },
+    "T_Beowulf_H2_2K_N.png": {
+      "bytes": 5557999,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "a445248df1248b6d72eeced0c374fff068ec22cb33b43e8ed6e9dc13560b729f"
+    },
+    "T_Beowulf_H2_2K_N_OpenGL.png": {
+      "bytes": 5558394,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "e5d3ab9fa9ffa8dc2c05823769cd284d96f85b0122d7f2e71ebb3c777e979ef9"
+    },
+    "T_Beowulf_H2_2K_ORM.png": {
+      "bytes": 3868418,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "929aab22ecac1e018a2f8914eed00bf7ab39b30aa5c12109dc531bed442ce1ff"
+    },
+    "T_Beowulf_H2_2K_TeamMask.png": {
+      "bytes": 574489,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "02aa5d03bd8d793744962901f50c08408b8b932c5a295663f73bcce34e101ebb"
+    },
+    "T_Beowulf_H2_BC.png": {
+      "bytes": 19144142,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "0cebca1f5873bb15602ec7ff2aa362598d84e9c6ed473468923a3242648ba9e7"
+    },
+    "T_Beowulf_H2_N.png": {
+      "bytes": 16882627,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "e109f51034f600b58d81c36be70182aa8fe8ee96b91a1bb0ae8dc6f640c46c6d"
+    },
+    "T_Beowulf_H2_N_OpenGL.png": {
+      "bytes": 16884542,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "7dce9ed31ae0970534650c6f2cf25fdb9abf7d2a5217a35b29287338b665b483"
+    },
+    "T_Beowulf_H2_ORM.png": {
+      "bytes": 11834742,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "74a2dd2fd50b7b7251262d653889af796247f97caec0d2e59267c064aea56920"
+    },
+    "T_Beowulf_H2_TeamMask.png": {
+      "bytes": 1613097,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a1f3c841ba8fe3de6f2fcfe765f0c0f29183657d6c6b3bf5cdf7265dbeb9f135"
+    }
+  },
+  "passed": true,
+  "prefix": "T_Beowulf_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7911663,
+      "BC": 7911663,
+      "HIT": 7911663,
+      "NORMAL": 7911663,
+      "RM": 7911663
+    },
+    "caps": {
+      "cap_texels": 195705,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 2397,
+      "cap_vertices": 1881,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 195705,
+      "rim_samples": 25564
+    },
+    "footprints": {
+      "painted_texels": 9141,
+      "rim_samples": 543,
+      "triangles": 187,
+      "vertices": 220
+    },
+    "in_island_unbaked_texels": {
+      "AO": 221226,
+      "BC": 221226,
+      "HIT": 221226,
+      "NORMAL": 221226,
+      "RM": 221226
+    },
+    "size": 4096,
+    "uv_texels": 8132889
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 84935,
+    "cloth_parts": [
+      "tripo_part_0"
+    ],
+    "cloth_share_of_cloth_texels": 0.936,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "бурый мех мантии (часть 0): h p50 26°, s p10–p90 0,42–0,57, v 0,22–0,57 (замер BC разведки); v_max 0,75 давал долю 0,983 > 0,98 (светлые кончики меха)",
+      "ramp": 0.04,
+      "s_max": 0.95,
+      "v_max": 0.62
+    }
+  }
+}

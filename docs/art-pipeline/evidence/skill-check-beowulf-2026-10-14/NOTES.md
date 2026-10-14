@@ -37,3 +37,27 @@ Stage 2 result: task ada45143 — generate 60 (20895 → 20835), texture 8K + re
 (→ 20800), 95 credits, three ledger rows; 20 parts, 1 993 213 tris in both GLBs; `post_h2.py` exit 0 (register-source,
 previews). Previews checked by eye: one figure, one two-tier base, sword in the right hand, shield on the left arm, all
 views consistent. Whole stage 2 through Claude in Chrome in ≈ 12 min without the user's cursor.
+
+## Stage 3 findings (executor, 2026-10-14 ≈ 12:45–15:05)
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C17 | 3 | `h2_bake/tests/test_w1d_reuse_determinism.py:65` asserted `profile_version == 1` for every committed profile — fails on the first v2 hero | fixed by the orchestrator: v1 only for `LEGACY_ASSETS` |
+| C18 | 3 | HANDBOOK §4.4 `metal_f0` needs the `measure-report` of an earlier look-dev: a hero with boosted metals needs ≥ 2 look-dev runs, else `lut_metal_f0_plausible` FAIL | take the concept zones from the run's own measure pass |
+| C19 | 3 | `lookdev_accent.py:686` `gold_unchanged_by_dye` fails on a view without trim pixels and always with `trim_class: none`; worked around with `trim_class: wool_coarse` | «not measured», as for cloth (cf. `dress_min_px`) |
+| C20 | 3 | Skin anchor in `ld_measure` gave k 2.09 vs mean 0.92 — 9 of 11 classes out of tolerance | anchor `ld_measure` on the largest main class |
+| C21 | 3 | `st_seams` loop gate measures «opening» to one covering neighbour: the hem cut-out of the mantle gave false 11–12 mm at vertices 1.3–6.8 cm from the belt | nearest neighbour per vertex |
+| C22 | 3 | `st_close`: a cap seen only from its back face (`neck_top`, 1163 px, does not close the gap) passes; the acceptance capture draws the back face, UE culls it | flag such caps; backface culling in the capture |
+| C23 | 3 | HANDBOOK §4.2 junction table: no cap is built for a thick shell with a saddle cut-out or a chest «ribbon» | write `rig.cloth_shell` as the fallback and its cost (≈ +7k tris) |
+| C24 | 3 | `--reuse-from` needs `--stages all` (against «one stage at a time», HANDBOOK §4.3), copies foreign `work/smoke` into the new run; a `base_band.height_m` change recomputes the whole bake from uv although only the base mask changes | per-stage reuse; skip `work/smoke`; finer fingerprint for the team mask |
+| C25 | 3 | H2.1 metal pass: one `target_srgb` per hero — iron, steel and gold cannot all be coloured | target per part or per term |
+| C26 | 3 | Scout scripts (parts sheet in own colours, sections, loops, back-face search) were rewritten in a temp folder again | move to `tools/` (RA-12) |
+| C27 | 0 | `make_tasks` writes `decided_by` as a string, SKILL.md §7.2 wants a mapping | write the mapping |
+| C28 | 3/6 | `animation-vfx-sfx.md` §6.6 smoke run: the sample's `weapon_tip` / `hand_follow` targets are tied to its proportions → always FAIL on another hero | exclude them from the smoke verdict |
+
+Stage 3 result: bake `20261014-h2-bake-t4` (profile_version 2), look-dev `20261014-h2-lookdev-t5`, TeamAccent t4; 20 parts
+(mantle, tunic hem, shield + boss rigid on `arm_lower.L` (П3-2), sword `weapon` + pommel on `weapon.R` (П3-1), two-tier
+base with the height team band [0.003, 0.029]); `rig.cloth_shell` on mantle/chest/neck (cap failed visibility); tris body
+42 462 + sword 1 399 = 43 861, base 1 430. Handover checklist: tone code 0 / t_cap 2.0; 34 own frames looked at, 2 defects
+fixed; base see-through 0.00 uu²; rider gap shield 0.00 mm / 0.12 mm in rest and 4 smoke clips; smoke clips PASS except
+the sample-tied `weapon_tip` (C28); probes 14/14; TeamAccent 3.48 % (П3-4). Scouting ≈ 1.5 h of the 2 h 20 min stage.

@@ -62,9 +62,11 @@ def test_every_committed_h2_profile_still_validates():
         if p.get("schema") != PR.SCHEMA:
             continue
         found += 1
-        assert PR.profile_version(p) == 1, f.name
+        # v1 only for the legacy heroes (Medusa and the pilot); every later hero is v2 (skill check Beowulf 2026-10-14)
+        want = 1 if p.get("asset_id") in PR.LEGACY_ASSETS else PR.NEW_HERO_PROFILE_VERSION
+        assert PR.profile_version(p) == want, f.name
         assert PR.validate(p) == [], (f.name, PR.validate(p))
-    assert found >= 9  # Medusa + Achilles x4 + Angel + Ancient Leshen x3
+    assert found >= 9  # Medusa + Achilles x4 + Angel + Ancient Leshen x3 (+ new v2 heroes)
 
 
 def new_hero():

@@ -1,0 +1,1728 @@
+{
+ "schema": "unmatched.h2-bake-profile/1",
+ "profile_id": "beowulf-h2-bake/3",
+ "profile_version": 2,
+ "asset_id": "ASSET-BEOWULF-001",
+ "status": "предложено",
+ "status_note": "Этап 3 скилла 3d-model-pipeline (фигура-проверка 2026-10-14), прогон t3 (правка профиля до приёмки): дымовой прогон клипов сдачи модели (HANDBOOK §4.4 п.5; паттерн Angel r2, меч в правой) на прогоне t2 дал skin_stretch FAIL в DeathSettle к.12–21 — 2 видимых рваных ребра по центру подола мантии сзади (x −6,8, y 1,2, z 12,6 см кадра FBX; область hips|hips, рост ребра до 8,1×, 4,9 см): у подола центр мантии делится между бёдрами L/R в полосе ±2 см (side_band_m 0,02), и при разных поворотах бёдер ребро на шве рвётся. Полоса расширена до ±6 см. Остальное как в t2 (band_repaint меха, без крышки neck_top). Не художественная приёмка и не бюджет.",
+ "expected_part_count": 20,
+ "sources": {
+  "source_spec": "art/pipeline-candidates/ASSET-BEOWULF-001/source-specs/tripo-ada45143-h2.json",
+  "parts_glb": {
+   "role": "h2-parts-glb",
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-parts20.glb",
+   "sha256": "4431493e4e5d58c85c35fc06fd583baddcdac081104ecbe41f294cf375024839",
+   "bytes": 48004692
+  },
+  "tex_glb": {
+   "role": "h2-tex8k-pbr-glb",
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-tex8k-pbr.glb",
+   "sha256": "f66a1b93620b0368024d8fa92f549e7ccb45c1c9e53ba054cdadabf0232019cd",
+   "bytes": 81569420
+  }
+ },
+ "parts": {
+  "tripo_part_0": {
+   "mesh": "body",
+   "role": "меховая мантия: воротник на плечах, спина и бока до икр",
+   "cloth": true
+  },
+  "tripo_part_1": {
+   "mesh": "body",
+   "role": "подол кольчужной туники от пояса до середины бедра (кайма с плетёнкой)",
+   "cloth": true
+  },
+  "tripo_part_2": {
+   "mesh": "body",
+   "role": "круглый деревянный щит с железной кромкой (левое предплечье); жёстко на arm_lower.L, без новой кости (П3-2)"
+  },
+  "tripo_part_3": {
+   "mesh": "body",
+   "role": "голова целиком: лицо, железный шлем с золотыми полосами и наносником, борода с косами, золотая гривна"
+  },
+  "tripo_part_4": {
+   "mesh": "body",
+   "role": "левая голень (+X): сапог и обмотки до колена"
+  },
+  "tripo_part_5": {
+   "mesh": "body",
+   "role": "правая голень (−X): сапог и обмотки до колена"
+  },
+  "tripo_part_6": {
+   "mesh": "body",
+   "role": "кожаный пояс с золотой пряжкой и свисающими концами"
+  },
+  "tripo_part_7": {
+   "mesh": "weapon",
+   "role": "меч: клинок, гарда и рукоять над кулаком (меш weapon, жёстко weapon.R)"
+  },
+  "tripo_part_8": {
+   "mesh": "body",
+   "role": "правая штанина (−X) от подола туники до колена"
+  },
+  "tripo_part_9": {
+   "mesh": "body",
+   "role": "правое предплечье с наручем и кулак на рукояти (−X)"
+  },
+  "tripo_part_10": {
+   "mesh": "body",
+   "role": "левая кисть за щитом на ручке (+X)"
+  },
+  "tripo_part_11": {
+   "mesh": "body",
+   "role": "правое плечо: кольчужный рукав с золотой каймой (−X)"
+  },
+  "tripo_part_12": {
+   "mesh": "body",
+   "role": "левое предплечье с наручем (+X)"
+  },
+  "tripo_part_13": {
+   "mesh": "base",
+   "role": "подставка (двухъярусный тёмный камень)"
+  },
+  "tripo_part_14": {
+   "mesh": "body",
+   "role": "грудь и плечевой пояс кольчужной туники с перевязью"
+  },
+  "tripo_part_15": {
+   "mesh": "body",
+   "role": "левое плечо: кольчужный рукав с золотой каймой (+X)"
+  },
+  "tripo_part_16": {
+   "mesh": "body",
+   "role": "левая штанина (+X) от подола туники до колена"
+  },
+  "tripo_part_17": {
+   "mesh": "body",
+   "role": "меч: низ рукояти и навершие под кулаком; меш тела, жёстко на weapon.R (П3-1)"
+  },
+  "tripo_part_18": {
+   "mesh": "body",
+   "role": "железный умбон щита; жёстко на arm_lower.L, как щит (П3-2)"
+  },
+  "tripo_part_19": {
+   "mesh": "body",
+   "role": "шея (кожа под бородой)"
+  }
+ },
+ "scale": {
+  "figure_top_m": 0.55,
+  "base_diameter_m": 0.3,
+  "base_height_m": 0.06,
+  "note": "верх фигуры — купол шлема (tripo_part_3, источник 0,9801); кончик меча ниже (0,9741), figure_top_part не нужен (HANDBOOK §2.10)"
+ },
+ "orientation": {
+  "method": "ray-escape",
+  "samples_per_part": 4000,
+  "seed": 0,
+  "flip_below_score": -0.5,
+  "expected_inside_out_parts": [],
+  "min_score_after_fix": 0.5
+ },
+ "retopo": {
+  "method": "decimate-collapse",
+  "seed": 0,
+  "deviation_samples": 40000,
+  "target_tris": {
+   "tripo_part_0": 4000,
+   "tripo_part_1": 2300,
+   "tripo_part_2": 2200,
+   "tripo_part_3": 5300,
+   "tripo_part_4": 2100,
+   "tripo_part_5": 2100,
+   "tripo_part_6": 1500,
+   "tripo_part_7": 1400,
+   "tripo_part_8": 900,
+   "tripo_part_9": 2600,
+   "tripo_part_10": 1200,
+   "tripo_part_11": 1300,
+   "tripo_part_12": 1500,
+   "tripo_part_13": 1200,
+   "tripo_part_14": 1700,
+   "tripo_part_15": 1300,
+   "tripo_part_16": 900,
+   "tripo_part_17": 500,
+   "tripo_part_18": 500,
+   "tripo_part_19": 400
+  },
+  "dense_regions": [
+   {
+    "part": "tripo_part_3",
+    "name": "face",
+    "box_m": [
+     [
+      -0.022,
+      -0.05,
+      0.458
+     ],
+     [
+      0.022,
+      -0.02,
+      0.5
+     ]
+    ],
+    "target_tris": 1600,
+    "note": "лицо под шлемом (глаза, нос, губы над бородой)"
+   }
+  ],
+  "cleanup": {
+   "merge_distance_m": 1e-06,
+   "degenerate_distance_m": 1e-07,
+   "tiny_island_area_m2": 2e-07,
+   "degenerate_area_m2": 1e-10
+  },
+  "target_tris_note": "мантия 4000, грудь 1700 и шея 400: rig.cloth_shell удваивает их треугольники (+ мост кромки 243 / 502 / 206 рёбер), голова 5300 (лицо 1600 плотной зоной), сапоги 2100, щит 2200, подол 2300, пояс 1500 — итог тела с мечом на экспорте под POLY_BUDGET 45 000 с запасом ≈ 0,9k (разведка C:/tmp/beowulf-scout: 44 984 при голове 5600, сапогах 2300 и щите 2400 — запас 16)",
+  "caps": [
+   {
+    "part": "tripo_part_13",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "note": "верх подставки Tripo вырезан под сапогами (4 петли, z 0,0568–0,0573 м, инвентарь close разведки): закрываются плоскими крышками, затем rebuild_retopo_caps"
+   }
+  ]
+ },
+ "closure": {
+  "note": "контактные крышки по инвентарю петель разведки close (C:/tmp/beowulf-scout): петли, которые открываются в позах проб (верх рукавов под меховым воротником, верх штанин под подолом туники и вырезы подола над ними, подошвы, затылок под краем шлема у воротника), закрываются отдельной крышкой (HANDBOOK §4.2). Не закрываются: стыки одной цепочки весов (рукав/предплечье, предплечье/кисть, штанина/сапог), щит/умбон/левая кисть (жёстко arm_lower.L и цепочка той же руки), кулак/рукоять (hand.R и дочерняя weapon.R), голова/шея (одно правило zblend), верх подола под поясом (одно правило cloth). Внутренний вырез мантии (петля 99 см: спина, бока, верх плеч и полоса на груди — седло вокруг плеч) крышкой не закрывается: крышка cloak_back разведки закрывала в покое 202–273 px лицевых граней (blob 11–18 > 9 при bulge 0 … −0,02) — вместо неё rig.cloth_shell (П3-3)",
+  "spacing_m": 0.006,
+  "bulge_m": -0.001,
+  "ring_m": 0.008,
+  "min_perimeter_cm": 3.0,
+  "max_median_mm": 1.0,
+  "inventory_min_perimeter_cm": 1.0,
+  "degenerate_area_m2": 1e-10,
+  "texel_priority": 0.7,
+  "rest_visibility": {
+   "pitch_m": 0.001,
+   "max_covers_front_share": 0.0001,
+   "max_covers_front_blob_px": 9
+  },
+  "contact_caps": [
+   {
+    "name": "shoulder_top_r",
+    "part": "tripo_part_11",
+    "covered_by": "tripo_part_0",
+    "note": "верх правого рукава под меховым воротником (петля 25,8 см, 0,54 мм): arm_r_raise",
+    "repaint_footprint": {
+     "max_distance_m": 0.025,
+     "max_ray_m": 0.1,
+     "max_escape_share": 0.1,
+     "min_cover_share": 0.4
+    },
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "shoulder_top_l",
+    "part": "tripo_part_15",
+    "covered_by": "tripo_part_0",
+    "note": "верх левого рукава под меховым воротником (25,6 см, 0,39 мм): arm_l_raise",
+    "repaint_footprint": {
+     "max_distance_m": 0.025,
+     "max_ray_m": 0.1,
+     "max_escape_share": 0.1,
+     "min_cover_share": 0.4
+    },
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "thigh_top_r",
+    "part": "tripo_part_8",
+    "covered_by": "tripo_part_1",
+    "note": "верх правой штанины под подолом туники (21,7 см, 0,07 мм): thigh_r_flex",
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "thigh_top_l",
+    "part": "tripo_part_16",
+    "covered_by": "tripo_part_1",
+    "note": "верх левой штанины под подолом (21,8 см, 0,09 мм): thigh_l_flex",
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "kilt_leg_r",
+    "part": "tripo_part_1",
+    "covered_by": "tripo_part_8",
+    "note": "вырез подола над правой штаниной (21,1 см, 0,06 мм)",
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "kilt_leg_l",
+    "part": "tripo_part_1",
+    "covered_by": "tripo_part_16",
+    "note": "вырез подола над левой штаниной (21,1 см, 0,06 мм)",
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "sole_r",
+    "part": "tripo_part_5",
+    "covered_by": "tripo_part_13",
+    "note": "подошва правого сапога (две петли 17,4 и 10,0 см, 0,7–0,85 мм)",
+    "expect": 2,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "head_nape",
+    "part": "tripo_part_3",
+    "covered_by": "tripo_part_0",
+    "note": "затылок и низ шлема у мехового воротника (петля 35,8 см, 0,67 мм): head_turn уводит голову от воротника — открытая полость головы; min_perimeter_cm 10 — петля косы у меха 3,5 см (z 0,434, правило spine) не берётся",
+    "min_perimeter_cm": 10.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "sole_l",
+    "part": "tripo_part_4",
+    "covered_by": "tripo_part_13",
+    "note": "подошва левого сапога (две петли 16,4 и 9,6 см, 0,53–0,66 мм)",
+    "expect": 2,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   }
+  ],
+  "rebuild_retopo_caps": [
+   {
+    "name": "base_hole",
+    "part": "tripo_part_13",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "expect": 4,
+    "shape": "harmonic",
+    "bulge_m": 0.0,
+    "min_perimeter_cm": 0.0,
+    "spacing_m": 0.012,
+    "note": "дыры верха подставки под сапогами (по две на сапог): веера retopo заменены крышками по точной кромке, как у Medusa"
+   }
+  ],
+  "rim_sample_fraction": 0.35
+ },
+ "uv": {
+  "atlas_px": 4096,
+  "runtime_px": 2048,
+  "min_gap_px": 8,
+  "pack_margin_fraction": 0.0013,
+  "max_overlap_px": 0,
+  "density_reference_part": "tripo_part_14",
+  "charts": {
+   "unwrap_method": "MINIMUM_STRETCH",
+   "normal_penalty": 3.0,
+   "max_rounds": 6,
+   "max_overlap_share": 0.0,
+   "max_stretch_log_p95": 0.5,
+   "chart_area_cm2": {
+    "default": 18,
+    "tripo_part_0": 55,
+    "tripo_part_13": 180,
+    "tripo_part_3": 9
+   },
+   "regions": [
+    {
+     "part": "tripo_part_3",
+     "name": "face",
+     "box_m": [
+      [
+       -0.022,
+       -0.05,
+       0.458
+      ],
+      [
+       0.022,
+       -0.02,
+       0.5
+      ]
+     ],
+     "chart_area_cm2": 40
+    }
+   ],
+   "stretch_min_faces": 12,
+   "smooth_iterations": 4
+  },
+  "texel_priority": {
+   "default": 1.0,
+   "parts": {
+    "tripo_part_7": 1.5,
+    "tripo_part_17": 1.5,
+    "tripo_part_10": 1.75,
+    "tripo_part_13": 0.45
+   },
+   "regions": [
+    {
+     "part": "tripo_part_3",
+     "name": "face",
+     "box_m": [
+      [
+       -0.022,
+       -0.05,
+       0.458
+      ],
+      [
+       0.022,
+       -0.02,
+       0.5
+      ]
+     ],
+     "factor": 2.0
+    }
+   ]
+  }
+ },
+ "bake": {
+  "device": "GPU",
+  "resolution": 4096,
+  "ao": {
+   "samples": 128,
+   "distance_m": 0.044,
+   "seed": 0,
+   "note": "0,08 × рост 0,55 м, как Medusa"
+  },
+  "normal": {
+   "space": "TANGENT",
+   "include_tripo_normal_map": true,
+   "samples": 1
+  },
+  "emission": {
+   "samples": 1
+  },
+  "cage": {
+   "extrusion_from": "retopo lo_to_hi p99 и hi_to_lo p99 части",
+   "factor": 1.5,
+   "min_m": 0.0006,
+   "max_m": 0.004,
+   "max_ray_factor": 2.5
+  },
+  "hit_check": {
+   "max_miss_share_warn": 0.01
+  },
+  "ao_exclusions": []
+ },
+ "textures": {
+  "prefix": "T_Beowulf_H2",
+  "pad_fill": "8-neighbour dilation edge_extend_px, then pull-push pyramid",
+  "maps": {
+   "BC": "sRGB RGB 8 бит (BaseColor Tripo, освещение удалено Tripo)",
+   "N": "DirectX (G инвертирован) для UE",
+   "N_OpenGL": "OpenGL для Blender",
+   "ORM": "R = AO (Cycles), G = Roughness, B = Metallic (из PBR Tripo)",
+   "TeamMask": "RGBA: R = одежда (мантия), G = подставка (полоса), B = 0, A = 255 (deprecated W4-B)"
+  },
+  "ao_gate": {
+   "min_range_p1_p99": 32,
+   "min_occluded_fraction": 0.02,
+   "occluded_below": 250
+  },
+  "team_mask": {
+   "cloth_parts": [
+    "tripo_part_0"
+   ],
+   "cloth_hsv": {
+    "v_max": 0.62,
+    "s_max": 0.95,
+    "ramp": 0.04,
+    "note": "бурый мех мантии (часть 0): h p50 26°, s p10–p90 0,42–0,57, v 0,22–0,57 (замер BC разведки); v_max 0,75 давал долю 0,983 > 0,98 (светлые кончики меха)"
+   },
+   "base_band": {
+    "part": "tripo_part_13",
+    "normal_z_abs_max": 0.35
+   },
+   "blur": 3
+  },
+  "edge_extend_px": 16,
+  "materials": {
+   "note": "проход металла H2.1 (HANDBOOK §2.4, образец Angel): маска металла для look-dev (work/uv/metal_mask.npy) — железо и сталь: клинок (часть 7, серый s ≤ 0,2; гарда и рукоять — золото и кожа, не металл), умбон (часть 18), железная кромка и заклёпки щита (часть 2, серые; дерево s ≈ 0,45 — не металл), купол шлема (часть 3, серый выше кромки шлема z ≥ 0,484 м). Замер BC разведки: клинок s p50 0,06, v 0,55; умбон s 0,06, v 0,41; шлем серый с z 0,489. Кольчуга туники (части 1, 11, 14, 15) в маску H2.1 не входит: target_srgb один на героя, а кольчуга концепта — тёмное железо против светлой стали клинка; её класс задаёт look-dev по цвету (тёмный серый), как и золото гривны, кант и рукоять (золото — не металл H2.1, класс gold_antique look-dev)",
+   "ao_exclusions": [],
+   "rim_filters": [],
+   "metal": {
+    "hue_deg": [
+     -10,
+     370
+    ],
+    "hue_ramp_deg": 1,
+    "ramp": 0.04,
+    "local_radius_px": 3,
+    "close_px": 2,
+    "blur": 1,
+    "parts": {
+     "tripo_part_7": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         -10,
+         370
+        ],
+        "hue_ramp_deg": 1,
+        "s_min": -1.0,
+        "s_max": 0.2,
+        "v_min": 0.18,
+        "name": "blade_steel"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.1
+      },
+      "min_component_px": 60,
+      "note": "клинок — сталь; золотая гарда (s > 0,4) и кожа рукояти — не металл"
+     },
+     "tripo_part_18": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         -10,
+         370
+        ],
+        "hue_ramp_deg": 1,
+        "s_min": -1.0,
+        "s_max": 0.25,
+        "v_min": 0.12,
+        "name": "boss_iron"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.08
+      },
+      "min_component_px": 60,
+      "note": "умбон целиком железо (серый 85 %)"
+     },
+     "tripo_part_2": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         -10,
+         370
+        ],
+        "hue_ramp_deg": 1,
+        "s_min": -1.0,
+        "s_max": 0.18,
+        "v_min": 0.25,
+        "name": "shield_rim_iron"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.12
+      },
+      "min_component_px": 60,
+      "note": "железная кромка и заклёпки щита; доски (бурое дерево s ≈ 0,45) — не металл"
+     },
+     "tripo_part_3": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         -10,
+         370
+        ],
+        "hue_ramp_deg": 1,
+        "s_min": -1.0,
+        "s_max": 0.2,
+        "v_min": 0.15,
+        "name": "helmet_iron"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.08
+      },
+      "min_component_px": 60,
+      "boxes": [
+       {
+        "name": "helmet_dome",
+        "min_m": [
+         -0.5,
+         -0.5,
+         0.484
+        ],
+        "max_m": [
+         0.5,
+         0.5,
+         0.6
+        ]
+       }
+      ],
+      "note": "купол шлема (серые тексели части 3 выше z 0,484 м — кромка шлема по разведке); золотые полосы и наносник — не металл H2.1; лицо и борода ниже кромки"
+     }
+    },
+    "parts_note": "цветовое правило + 3D-коробка шлема; кольчуга и золото — классы look-dev",
+    "basecolor": {
+     "target_srgb": "#B8BEC4",
+     "detail_gamma": 1.0,
+     "detail_clip": [
+      0.25,
+      1.4
+     ],
+     "note": "сталь клинка и железо шлема/щита концепта — светлый холодный серый; деталь = яркость BC Tripo / медиана по маске (тёмный купол шлема остаётся темнее клинка); #B8BEC4 как у Angel — гейт metal_core_bc_linear_max_channel_p50_min 0,5 требует линейный максимум канала ≥ 0,5 (#A8ADB2 дал бы 0,44)"
+    },
+    "metallic": {
+     "min": 0.9,
+     "max": 1.0
+    },
+    "roughness": {
+     "min": 0.32,
+     "max": 0.45,
+     "detail_weight": 0.6,
+     "note": "как металл Medusa/Angel"
+    }
+   },
+   "cloth_roughness": {
+    "apply": false,
+    "lo": 0.8,
+    "hi": 0.9,
+    "note": "не применяется (как Medusa)"
+   },
+   "checks": {
+    "metal_core_metallic_min": 0.89,
+    "metal_core_roughness": [
+     0.3,
+     0.46
+    ],
+    "non_metal_metallic_max_8bit": 1,
+    "metal_core_bc_linear_max_channel_p50_min": 0.5
+   }
+  },
+  "band_repaint": [
+   {
+    "name": "fur_sleeve_l",
+    "part": "tripo_part_0",
+    "near": [
+     "tripo_part_15"
+    ],
+    "band_m": 0.015,
+    "ring_m": 0.006,
+    "feather_m": 0.003,
+    "keep_hsv": {
+     "s_min": 0.3,
+     "v_min": 0.1
+    },
+    "keys": [
+     "BC"
+    ],
+    "detail": [
+     0.6,
+     1.4
+    ],
+    "k": 8,
+    "note": "мех мантии над левым рукавом: серо-синие мазки кольчуги (текстура Tripo) в 15 мм от рукава — 11,9 тыс. серых текселей меха (s < 0,22); источник — кольцо меха 15–21 мм с s ≥ 0,3"
+   },
+   {
+    "name": "fur_chest",
+    "part": "tripo_part_0",
+    "near": [
+     "tripo_part_14"
+    ],
+    "band_m": 0.008,
+    "ring_m": 0.006,
+    "feather_m": 0.002,
+    "keep_hsv": {
+     "s_min": 0.3,
+     "v_min": 0.1
+    },
+    "keys": [
+     "BC"
+    ],
+    "detail": [
+     0.6,
+     1.4
+    ],
+    "k": 8,
+    "note": "мех воротника на груди: 2,6 тыс. серых текселей в 10 мм от груди"
+   },
+   {
+    "name": "fur_sleeve_r",
+    "part": "tripo_part_0",
+    "near": [
+     "tripo_part_11"
+    ],
+    "band_m": 0.006,
+    "ring_m": 0.006,
+    "feather_m": 0.002,
+    "keep_hsv": {
+     "s_min": 0.3,
+     "v_min": 0.1
+    },
+    "keys": [
+     "BC"
+    ],
+    "detail": [
+     0.6,
+     1.4
+    ],
+    "k": 8,
+    "note": "мех над правым рукавом: 1,1 тыс. серых текселей в 6 мм"
+   }
+  ]
+ },
+ "rig": {
+  "skeleton": "UM_HUMANOID_17_v2",
+  "armature_object": "SKEL_UM_Humanoid",
+  "character": "Beowulf",
+  "max_influences": 4,
+  "clean_below": 0.01,
+  "bones": [
+   [
+    "root",
+    null,
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0.045
+    ]
+   ],
+   [
+    "hips",
+    "root",
+    [
+     0,
+     0.004,
+     0.245
+    ],
+    [
+     0,
+     0.004,
+     0.3
+    ]
+   ],
+   [
+    "spine",
+    "hips",
+    [
+     0,
+     0.004,
+     0.3
+    ],
+    [
+     0,
+     0.004,
+     0.438
+    ]
+   ],
+   [
+    "head",
+    "spine",
+    [
+     0,
+     0.0,
+     0.445
+    ],
+    [
+     0,
+     0.002,
+     0.535
+    ]
+   ],
+   [
+    "arm_upper.L",
+    "spine",
+    [
+     0.065,
+     0.022,
+     0.4
+    ],
+    [
+     0.105,
+     0.02,
+     0.352
+    ]
+   ],
+   [
+    "arm_lower.L",
+    "arm_upper.L",
+    [
+     0.105,
+     0.02,
+     0.352
+    ],
+    [
+     0.134,
+     -0.006,
+     0.329
+    ]
+   ],
+   [
+    "hand.L",
+    "arm_lower.L",
+    [
+     0.134,
+     -0.006,
+     0.329
+    ],
+    [
+     0.127,
+     -0.035,
+     0.31
+    ]
+   ],
+   [
+    "arm_upper.R",
+    "spine",
+    [
+     -0.065,
+     0.022,
+     0.4
+    ],
+    [
+     -0.104,
+     0.018,
+     0.35
+    ]
+   ],
+   [
+    "arm_lower.R",
+    "arm_upper.R",
+    [
+     -0.104,
+     0.018,
+     0.35
+    ],
+    [
+     -0.121,
+     -0.021,
+     0.329
+    ]
+   ],
+   [
+    "hand.R",
+    "arm_lower.R",
+    [
+     -0.121,
+     -0.021,
+     0.329
+    ],
+    [
+     -0.128,
+     -0.044,
+     0.322
+    ]
+   ],
+   [
+    "leg_upper.L",
+    "hips",
+    [
+     0.04,
+     0.004,
+     0.245
+    ],
+    [
+     0.054,
+     0.008,
+     0.178
+    ]
+   ],
+   [
+    "leg_lower.L",
+    "leg_upper.L",
+    [
+     0.054,
+     0.008,
+     0.178
+    ],
+    [
+     0.071,
+     0.014,
+     0.085
+    ]
+   ],
+   [
+    "foot.L",
+    "leg_lower.L",
+    [
+     0.071,
+     0.014,
+     0.085
+    ],
+    [
+     0.08,
+     -0.042,
+     0.062
+    ]
+   ],
+   [
+    "leg_upper.R",
+    "hips",
+    [
+     -0.04,
+     0.004,
+     0.245
+    ],
+    [
+     -0.054,
+     0.008,
+     0.178
+    ]
+   ],
+   [
+    "leg_lower.R",
+    "leg_upper.R",
+    [
+     -0.054,
+     0.008,
+     0.178
+    ],
+    [
+     -0.071,
+     0.014,
+     0.085
+    ]
+   ],
+   [
+    "foot.R",
+    "leg_lower.R",
+    [
+     -0.071,
+     0.014,
+     0.085
+    ],
+    [
+     -0.08,
+     -0.042,
+     0.062
+    ]
+   ],
+   [
+    "weapon.R",
+    "hand.R",
+    [
+     -0.1269,
+     -0.0378,
+     0.3234
+    ],
+    [
+     -0.1365,
+     -0.0488,
+     0.3712
+    ]
+   ]
+  ],
+  "weights": {
+   "tripo_part_0": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.3,
+     0.345
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.24,
+    "leg_full_z": 0.12,
+    "leg_max": 0.55,
+    "side_band_m": 0.06,
+    "note": "мантия: hips, выше 0,30–0,345 м (голова кости spine) — spine; к подолу у икр плавно до 55 % на бедро своей стороны; side_band_m 0,06 (t3): при 0,02 центр подола сзади рвался в DeathSettle дыма (2 видимых ребра, 8,1×) — раздел L/R растянут на ±6 см"
+   },
+   "tripo_part_1": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.36,
+     0.4
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.25,
+    "leg_full_z": 0.17,
+    "leg_max": 0.6,
+    "side_band_m": 0.02,
+    "note": "подол туники: целиком hips (верх 0,331 м ниже перехода 0,36–0,40), к кромке до 60 % на бедро своей стороны (вырезы над штанинами). Переход spine выше подола и пояса — разведка C:/tmp/beowulf-scout, варианты V1–V6 (rig/probes/seams на одном bake): при общем переходе мантии, подола и пояса [0,28; 0,31] / [0,30; 0,345] гейт петель в spine_bend_fwd меряет «раскрытие» выреза подола по спине до пояса (вершины в 1,3–6,8 см от пояса, 11–12 мм, 9–16 %) и петли пояса до подола (4,4–9,0 мм, 12 %); крышка на петлю подола не строится (контур пересекает себя)"
+   },
+   "tripo_part_2": {
+    "kind": "rigid",
+    "bone": "arm_lower.L"
+   },
+   "tripo_part_3": {
+    "kind": "zblend",
+    "stops": [
+     [
+      "spine",
+      0.438
+     ],
+     [
+      "head",
+      0.455
+     ]
+    ],
+    "note": "голова со шлемом, бородой и гривной: выше 0,455 м — head; низ бороды с косами и гривна ниже 0,438 м остаются на spine (лежат на груди и меховом воротнике); то же правило, что у шеи (части 3 и 19 касаются: одинаковые веса в общих точках)"
+   },
+   "tripo_part_4": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.L",
+     "leg_lower.L",
+     "foot.L"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_5": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_6": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.36,
+     0.4
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.25,
+    "leg_full_z": 0.17,
+    "leg_max": 0.6,
+    "side_band_m": 0.02,
+    "note": "пояс со свисающими концами — то же правило, что у подола (совпадающие точки — одинаковые веса)"
+   },
+   "tripo_part_7": {
+    "kind": "rigid",
+    "bone": "weapon.R"
+   },
+   "tripo_part_8": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_9": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.R",
+     "arm_lower.R",
+     "hand.R"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_10": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_11": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.R",
+     "arm_lower.R",
+     "hand.R"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_12": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_14": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.36,
+     0.4
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.24,
+    "leg_full_z": 0.12,
+    "leg_max": 0.55,
+    "side_band_m": 0.02,
+    "note": "грудь туники: низ (0,352–0,36 м) с поясом на hips, выше 0,40 — spine (ног ниже 0,24 у части нет). Жёстко на spine (как кираса Achilles) в spine_bend_fwd низ груди отходил от пояса, и сквозь щель сверху-слева видна изнанка подола (пятно 20 px > 8, вариант V2 разведки); вариант V6 — 7 px"
+   },
+   "tripo_part_15": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_16": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.L",
+     "leg_lower.L",
+     "foot.L"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_17": {
+    "kind": "rigid",
+    "bone": "weapon.R"
+   },
+   "tripo_part_18": {
+    "kind": "rigid",
+    "bone": "arm_lower.L"
+   },
+   "tripo_part_19": {
+    "kind": "zblend",
+    "stops": [
+     [
+      "spine",
+      0.438
+     ],
+     [
+      "head",
+      0.455
+     ]
+    ],
+    "note": "шея: spine → head по z, как голова (часть 3)"
+   }
+  },
+  "seam_radius_m": 0.001,
+  "seam_pairs": [
+   [
+    "tripo_part_11",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_15",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_11",
+    "tripo_part_9"
+   ],
+   [
+    "tripo_part_15",
+    "tripo_part_12"
+   ],
+   [
+    "tripo_part_12",
+    "tripo_part_10"
+   ],
+   [
+    "tripo_part_8",
+    "tripo_part_1"
+   ],
+   [
+    "tripo_part_16",
+    "tripo_part_1"
+   ],
+   [
+    "tripo_part_5",
+    "tripo_part_8"
+   ],
+   [
+    "tripo_part_4",
+    "tripo_part_16"
+   ],
+   [
+    "tripo_part_3",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_3",
+    "tripo_part_19"
+   ],
+   [
+    "tripo_part_14",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_6"
+   ],
+   [
+    "tripo_part_14",
+    "tripo_part_6"
+   ],
+   [
+    "tripo_part_2",
+    "tripo_part_10"
+   ],
+   [
+    "tripo_part_2",
+    "tripo_part_18"
+   ],
+   [
+    "tripo_part_9",
+    "tripo_part_7"
+   ],
+   [
+    "tripo_part_9",
+    "tripo_part_17"
+   ]
+  ],
+  "continuity_radius_m": 0.0015,
+  "junctions": [],
+  "cloth_shell": {
+   "parts": [
+    "tripo_part_0",
+    "tripo_part_14",
+    "tripo_part_19"
+   ],
+   "offset_mm": 0.3,
+   "note": "П3-3: мантия — толстая оболочка Tripo с внутренним вырезом-седлом (петля 99 см вокруг плеч, спины и полосы на груди); в arm_r_raise / arm_l_raise сквозь вырез видна изнанка внешней стенки (пятна 173 / 94 px > 8, разведка), крышка cloak_back не проходит caps_hidden_at_rest — внутренняя копия 0,3 мм с обратной намоткой делает изнанку лицевой (тот же UV меха). Грудь туники (часть 14) — лента с одной петлёй 77,6 см (низ у пояса, подмышки, спина под мантией, ворот): в arm_l_raise / arm_r_raise / head_turn сквозь подмышку и ворот видна её изнанка (35 / 19 / 16 px, разведка 2), крышка на такую петлю не строится (седло) — та же оболочка. Шея (часть 19) — открытый лист под бородой: в head_turn сверху-справа видна её изнанка (63 px; крышка neck_top не помогла) — та же оболочка"
+  }
+ },
+ "seams": {
+  "exposure_threshold_mm": 1.5,
+  "max_open_share": 0.05,
+  "loop_min_perimeter_cm": 1.0,
+  "raycast": {
+   "pitch_m": 0.0015,
+   "margin_m": 0.1,
+   "posed_clearance_m": 0.005
+  },
+  "frames_label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+  "note": "пробы seams по позам st_seams.TESTS; кадры — стыки Beowulf (верх рукавов под меховым воротником, подмышки, верх штанин под подолом, ворот и затылок, левое предплечье со щитом, подошва)",
+  "frames": [
+   {
+    "name": "shoulder_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.065,
+     0.02,
+     0.4
+    ],
+    "dir": [
+     -1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "shoulder_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.065,
+     0.02,
+     0.4
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "armpit_back_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.06,
+     0.04,
+     0.37
+    ],
+    "dir": [
+     0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.15
+   },
+   {
+    "name": "armpit_back_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.06,
+     0.04,
+     0.37
+    ],
+    "dir": [
+     -0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.15
+   },
+   {
+    "name": "thigh_r",
+    "pose": "thigh_r_flex",
+    "target_m": [
+     -0.04,
+     -0.01,
+     0.21
+    ],
+    "dir": [
+     -0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.18
+   },
+   {
+    "name": "thigh_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.04,
+     -0.01,
+     0.21
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.18
+   },
+   {
+    "name": "collar_back",
+    "pose": "head_turn",
+    "target_m": [
+     0.0,
+     0.02,
+     0.45
+    ],
+    "dir": [
+     0.2,
+     1,
+     0.5
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "collar_front",
+    "pose": "head_turn",
+    "target_m": [
+     0.0,
+     -0.03,
+     0.44
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.4
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "forearm_l",
+    "pose": "forearm_l_bend",
+    "target_m": [
+     0.12,
+     -0.01,
+     0.33
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "spine_side",
+    "pose": "spine_bend_fwd",
+    "target_m": [
+     0.0,
+     0.0,
+     0.3
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.2
+    ],
+    "ortho_m": 0.62
+   },
+   {
+    "name": "sole_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.075,
+     -0.03,
+     0.07
+    ],
+    "dir": [
+     0.3,
+     -1,
+     -0.3
+    ],
+    "ortho_m": 0.12
+   }
+  ],
+  "k2_frames": [
+   "arm_r_raise",
+   "arm_l_raise",
+   "head_turn",
+   "thigh_r_flex",
+   "thigh_l_flex",
+   "spine_bend_fwd"
+  ],
+  "max_new_blob_px": 8
+ },
+ "sockets": [
+  {
+   "name": "Weapon",
+   "bone": "weapon.R",
+   "target": "bone_head",
+   "location_uu": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "name": "Head",
+   "bone": "head",
+   "target_m": [
+    0.0,
+    0.0,
+    0.49
+   ],
+   "location_uu": null,
+   "note": "центр головы под шлемом; смещение — прогноз в UE bone space (x, −y, z), живой замер — задача UE-этапа"
+  }
+ ],
+ "exports": {
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "skeletal_fbx": "SK_Beowulf_H2.fbx",
+  "base_fbx": "SM_Beowulf_H2_Base.fbx"
+ },
+ "meshes": {
+  "body": "SK_Beowulf_H2_Body",
+  "weapon": "SK_Beowulf_H2_Sword",
+  "base": "SM_Beowulf_H2_Base"
+ },
+ "materials": {
+  "atlas": "M_Beowulf_H2_Atlas",
+  "slots_note": "один слот на фигуре (тело+меч) и один на подставке — тот же атлас; ≤ 2 слота"
+ },
+ "axes": {
+  "blender_front": "-Y",
+  "blender_bow_side": "-X",
+  "expected_ue_front": "+X",
+  "expected_ue_bow_side": "+Y",
+  "note": "blender_bow_side / expected_ue_bow_side описательные (код их не читает): правша, меч на −X (new-character-registration.md Д-1)"
+ },
+ "preview": {
+  "concepts": {
+   "front": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+   "side": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+   "back": "art/imagegen/concept-beowulf-codex/beowulf-back.png"
+  },
+  "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+  "k2": {
+   "fov_deg_horizontal": 35,
+   "pitch_deg": -55,
+   "distances_uu": {
+    "k2-5x": 386.0,
+    "k2-1p6": 1207.0
+   },
+   "focus_z_m": 0.28,
+   "resolution": [
+    1920,
+    1080
+   ],
+   "source": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/frames/p17-k2-5x-medusa-ue-editor.evidence.json, p17-k2-1p6-medusa-ue-editor.evidence.json"
+  },
+  "samples": 64,
+  "label": "blender (Cycles), не игровой свет; у H2 задние грани отсечены (как UE one-sided)",
+  "closeups": [
+   {
+    "name": "face_front",
+    "target_m": [
+     0.0,
+     -0.035,
+     0.478
+    ],
+    "dir": [
+     0,
+     -1,
+     0.05
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "face_3q",
+    "target_m": [
+     0.0,
+     -0.03,
+     0.478
+    ],
+    "dir": [
+     -0.6,
+     -0.8,
+     0.1
+    ],
+    "ortho_m": 0.1
+   },
+   {
+    "name": "helmet",
+    "target_m": [
+     0.0,
+     0.0,
+     0.515
+    ],
+    "dir": [
+     0.6,
+     -0.8,
+     0.3
+    ],
+    "ortho_m": 0.11
+   },
+   {
+    "name": "torc_beard",
+    "target_m": [
+     0.0,
+     -0.04,
+     0.425
+    ],
+    "dir": [
+     0,
+     -1,
+     0.15
+    ],
+    "ortho_m": 0.1
+   },
+   {
+    "name": "hand_r_grip",
+    "target_m": [
+     -0.127,
+     -0.038,
+     0.323
+    ],
+    "dir": [
+     -0.3,
+     -1,
+     0.3
+    ],
+    "ortho_m": 0.08
+   },
+   {
+    "name": "sword_upper",
+    "target_m": [
+     -0.155,
+     -0.075,
+     0.47
+    ],
+    "dir": [
+     0,
+     -1,
+     0
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "shield_front",
+    "target_m": [
+     0.15,
+     -0.03,
+     0.318
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.05
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "shield_inner_hand_l",
+    "target_m": [
+     0.125,
+     -0.02,
+     0.32
+    ],
+    "dir": [
+     -0.4,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "belt_buckle",
+    "target_m": [
+     0.0,
+     -0.045,
+     0.32
+    ],
+    "dir": [
+     0,
+     -1,
+     0.05
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "boot_l",
+    "target_m": [
+     0.065,
+     -0.01,
+     0.12
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.14
+   },
+   {
+    "name": "cloak_back",
+    "target_m": [
+     0.0,
+     0.07,
+     0.3
+    ],
+    "dir": [
+     0,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.42
+   }
+  ],
+  "backface_culling": true,
+  "pose_closeups": [],
+  "channel_views": [
+   {
+    "name": "metallic",
+    "channel": "Blue",
+    "view": "front"
+   },
+   {
+    "name": "metallic",
+    "channel": "Blue",
+    "view": "back"
+   },
+   {
+    "name": "roughness",
+    "channel": "Green",
+    "view": "front"
+   }
+  ],
+  "frame": {
+   "checks_report": "art/imagegen/concept-beowulf-codex/checks-report.json",
+   "side": "left"
+  }
+ },
+ "proposed_budget": {
+  "status": "предложено",
+  "hero_triangles": [
+   30000,
+   45000
+  ],
+  "atlas_master_px": 4096,
+  "atlas_runtime_px": 2048,
+  "material_slots_max": 2,
+  "source": "asset-card.yaml POLY_BUDGET (figure ≤ 45 000, base ≤ 2 500), HANDBOOK §2.10"
+ },
+ "history": {
+  "previous_profiles": [
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2.json",
+   "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t2.json"
+  ],
+  "note": "t3: веса подола мантии (side_band_m) по дыму клипов; прежние прогоны 20261014-h2-bake и -t2 не тронуты, стадии до rig взяты --reuse-from t2"
+ }
+}

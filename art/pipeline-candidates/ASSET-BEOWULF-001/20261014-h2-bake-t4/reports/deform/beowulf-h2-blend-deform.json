@@ -1,0 +1,493 @@
+{
+ "source": "<run>/work/sk_authored.blend",
+ "label": "beowulf-h2-blend",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.49345,
+ "bbox_min": [
+  -0.1499,
+  -0.1172,
+  0.0567
+ ],
+ "bbox_max": [
+  0.1779,
+  0.0895,
+  0.5501
+ ],
+ "frame": {
+  "kind": "body_without_weapon",
+  "body_meshes": [
+   "SK_Beowulf_H2_Body"
+  ],
+  "weapon_meshes": [
+   "SK_Beowulf_H2_Sword"
+  ],
+  "weapon_bones": [
+   "weapon.R"
+  ],
+  "weapon_vertices": 1004,
+  "height_all": 0.49345,
+  "bbox_all_min": [
+   -0.1785,
+   -0.1172,
+   0.0567
+  ],
+  "bbox_all_max": [
+   0.1779,
+   0.0895,
+   0.5501
+  ],
+  "note": "z_norm/x_norm и порог сдвига 1 % — по телу без оружия (F59); камера — по всей фигуре"
+ },
+ "weapon_sides": [
+  "R"
+ ],
+ "weapon_side_source": "weapon_bone",
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 3221,
+   "centroid_z_norm": 0.855,
+   "centroid_x_norm": -0.087,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.1369
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.855,
+   "own_moved": 3169,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 15171,
+   "centroid_z_norm": 0.687,
+   "centroid_x_norm": -0.045,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Sword",
+     1.0
+    ],
+    [
+     "SK_Beowulf_H2_Body",
+     0.6137
+    ]
+   ],
+   "centroid_z_norm_all": 0.687,
+   "own_moved": 4399,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 3969,
+   "centroid_z_norm": 0.573,
+   "centroid_x_norm": 0.652,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.1686
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.573,
+   "own_moved": 1174,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 3326,
+   "centroid_z_norm": 0.607,
+   "centroid_x_norm": -0.777,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Sword",
+     1.0
+    ],
+    [
+     "SK_Beowulf_H2_Body",
+     0.1104
+    ]
+   ],
+   "centroid_z_norm_all": 0.607,
+   "own_moved": 1183,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2756,
+   "centroid_z_norm": 0.537,
+   "centroid_x_norm": 0.746,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.1171
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.537,
+   "own_moved": 2068,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 2768,
+   "centroid_z_norm": 0.199,
+   "centroid_x_norm": 0.235,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.1176
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.199,
+   "own_moved": 609,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 2759,
+   "centroid_z_norm": 0.196,
+   "centroid_x_norm": -0.406,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.1172
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.196,
+   "own_moved": 614,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  }
+ ],
+ "extended_tests": [
+  {
+   "test": "forearm_r_bend",
+   "bone": "arm_lower.R",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2079,
+   "centroid_z_norm": 0.581,
+   "centroid_x_norm": -0.878,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_max": -0.2,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Sword",
+     1.0
+    ],
+    [
+     "SK_Beowulf_H2_Body",
+     0.0574
+    ]
+   ],
+   "centroid_z_norm_all": 0.581,
+   "own_moved": 609,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.4829
+  },
+  {
+   "test": "shin_l_bend",
+   "bone": "leg_lower.L",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 1377,
+   "centroid_z_norm": 0.125,
+   "centroid_x_norm": 0.31,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_min": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.0585
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.125,
+   "own_moved": 889,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "shin_r_bend",
+   "bone": "leg_lower.R",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 1399,
+   "centroid_z_norm": 0.122,
+   "centroid_x_norm": -0.484,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_max": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.0594
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.122,
+   "own_moved": 882,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_l_flex",
+   "bone": "foot.L",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 426,
+   "centroid_z_norm": 0.016,
+   "centroid_x_norm": 0.397,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_min": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.0181
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.016,
+   "own_moved": 426,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_r_flex",
+   "bone": "foot.R",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 454,
+   "centroid_z_norm": 0.015,
+   "centroid_x_norm": -0.575,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_max": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Body",
+     0.0193
+    ],
+    [
+     "SK_Beowulf_H2_Sword",
+     0.0
+    ]
+   ],
+   "centroid_z_norm_all": 0.015,
+   "own_moved": 454,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "hand_r_twist",
+   "bone": "hand.R",
+   "axis": "BONE",
+   "deg": 35,
+   "moved_vertices": 1327,
+   "centroid_z_norm": 0.592,
+   "centroid_x_norm": -0.916,
+   "expect": {
+    "z_norm_min": 0.15,
+    "x_norm_max": -0.1,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Sword",
+     0.9931
+    ],
+    [
+     "SK_Beowulf_H2_Body",
+     0.0257
+    ]
+   ],
+   "centroid_z_norm_all": 0.592,
+   "own_moved": 345,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.7347
+  },
+  {
+   "test": "weapon_turn_weapon.R",
+   "bone": "weapon.R",
+   "axis": "PERP",
+   "deg": 30,
+   "moved_vertices": 964,
+   "centroid_z_norm": 0.615,
+   "centroid_x_norm": -0.928,
+   "expect": {
+    "weapon_share_min": 0.9,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Beowulf_H2_Sword",
+     0.9821
+    ],
+    [
+     "SK_Beowulf_H2_Body",
+     0.0106
+    ]
+   ],
+   "centroid_z_norm_all": 0.615,
+   "own_moved": 964,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 1.0
+  }
+ ],
+ "probes": {
+  "plausible": 14,
+  "total": 14,
+  "summary": "14/14",
+  "legacy": "7/7",
+  "extended": "7/7",
+  "skipped": [],
+  "passed": true
+ }
+}

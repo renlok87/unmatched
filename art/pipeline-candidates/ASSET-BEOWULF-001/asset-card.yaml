@@ -20,7 +20,6 @@ PALETTE:
 QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
 ASSET_DIR: art/pipeline-candidates/ASSET-BEOWULF-001
-decided_by: delegated (ВР-реестр 2026-10-06)
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
 POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}
 CREDITS:
@@ -28,3 +27,62 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-45"
+# --- Поля этапа 3 (исполнитель этапа 3, 2026-10-14; на этапе 0 не записаны — дефолты П3-5,
+#     docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md; основания — decided_by ниже)
+CHARACTER: "Beowulf"                # rig-contract.json skeletons.UM_HUMANOID_17_v2.characters (revision v2-2026-10-14)
+FIGHTER_NAME: "Beowulf"             # scraped-data/api/heroes/beowulf.json (melee, health 17, move 2, помощник Wiglaf)
+FIGHTER_NAME_RU: "Беовульф"
+HERO_SLUG: "beowulf"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: "weapon.R"             # меч в правой руке; щит на левом предплечье без своей кости (П3-2)
+WEAPON_SOCKET_BONE: null
+FIGURE_HEIGHT_M: 0.55               # верх купола шлема = scale.figure_top_m профиля bake (кончик меча ниже)
+FIGURE_BOUNDS_TOP_M: 0.55015        # rig-report.json#bounds_authored_m.skeletal[1][2] прогона 20261014-h2-bake-t4 (купол шлема; кончик меча ниже; t4 — тот же)
+FIGURE_HEIGHT_RANGE_M: [0.52, 0.56] # герой ближнего боя (меч) — как Arthur
+CLIP_PREFIX: "BEO"
+AUDIO_KEY: "BEOWULF"
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_Beowulf_H2LD"
+  base: "SM_Beowulf_H2LD_Base"
+  materials:
+    - "MI_Beowulf_H2LD"
+    - "MI_Beowulf_H2LD_Base"
+    - "MI_Beowulf_H2LD_P1"
+    - "MI_Beowulf_H2LD_P2"
+    - "MI_Beowulf_H2LD_Base_P1"
+    - "MI_Beowulf_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_Beowulf_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/Beowulf/Rig/SK_Beowulf_Skeleton"
+  clips: "/Game/PipelineCandidates/Beowulf/H2Anim/AM_Beowulf_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_Beowulf_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_Beowulf_H2LD_Edge"
+    - "T_UM_MatLUT_Beowulf"
+  prop_name: null
+# --- блок этапа 3 (исполнитель этапа 3, 2026-10-14; RA-22) ---
+STAGE3:
+  profile_version: 2
+  bake_run: "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4"
+  lookdev_run: "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5"
+  teamaccent_run: null              # TeamAccent записан в lookdev_run (профиль beowulf-h2-lookdev-teamaccent-t4.json)
+  profiles: ["build-profiles/beowulf-h2-bake-h2-t4.json", "build-profiles/beowulf-h2-lookdev-t5.json",
+             "build-profiles/beowulf-h2-lookdev-teamaccent-t4.json"]
+  superseded_runs: "до приёмки (суффикс -t, SKILL.md §9): bake 20261014-h2-bake (профиль beowulf-h2-bake-h2.json) → -t2 (band_repaint меха, без крышки neck_top; --reuse-from) → -t3 (веса подола мантии по дыму; --reuse-from t2) → -t4 (живой: кольцо команды по высоте на двухъярусной подставке, base_band.height_m; --reuse-from t3); look-dev 20261014-h2-lookdev (металлы без усиления, t_cap 1,5; его measure-report — concept_report metal_f0) → -t2 → -t3 → -t4 → -t5 (живой); TeamAccent — профили beowulf-h2-lookdev-teamaccent.json, -t2, -t3, -t4 (живой, в look-dev -t5)"
+  handover: "HANDBOOK §4.4: тон _tone.py код 0, t_cap 2,0 (out нет; floor leather_smooth, leather_worn, stone_base; якорь wool_coarse); крупные планы capture_acceptance_set осмотрены (C:/tmp/beowulf-stage3-check, 34 кадра, warnings 0) — найдено и исправлено: мазки кольчуги на мехе у левого рукава (band_repaint, серые тексели меха 24,7k → 11,5k), плоская изнанка крышки neck_top под бородой (крышка снята); base_seethrough /2 with_figure 0,00 uu², base_only 0,00; rider_gap рукоять щита 0,00 мм зазор / 0,12 мм проникновение PASS (в rest и во всех 4 клипах дыма), щит–предплечье 5,6 мм (щит держит кисть, ремня на предплечье нет — не наездник предплечья); дым клипов (паттерн Angel r2): Idle/LungeAttack/HitReact contact PASS, DeathSettle — weapon_tip FAIL (цель острия Angel, 3,7 см над подставкой — ключ образца, не модель), skin_stretch только WARN скрытых; grip_check LungeAttack оружие в кулаке 0°, кисть 31°, локоть 112–145°, пересечений меча/щита с телом 0; DeathSettle — поворот меча в кулаке 170° (режим weapon_tip образца); пробы 14/14 на .blend и FBX (extended гейтят, v2); треугольники тело 42 462 + меч 1 399 = 43 861 ≤ 45 000, подставка 1 430; TeamAccent 3,48 % (П3-4: диапазон 0,03–0,12), K2 5× спереди 0,0534, сзади 0 (П3-4b), TeamDyeGain 11,0"
+  determinism: "после pass приёмки, до 7a (ДС-7): полный повтор — на прогоне, который пойдёт в UE"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "не записан (агент оркестратора)", session: "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage3-beowulf"}
+decided_by:                         # один ключ на файл (SKILL.md §7.2, F49); прежнее значение этапа 0 — ключ stage0
+  "stage0": "delegated (ВР-реестр 2026-10-06)"
+  "CHARACTER": "delegated (П3-5): PascalCase ключа контента; титула нет, имя свободно в rig-contract"
+  "FIGHTER_NAME": "delegated (П3-5): имя бойца из scraped-data/api/heroes/beowulf.json"
+  "FIGHTER_NAME_RU": "delegated (ВР-реестр 2026-10-06): общепринятое русское имя"
+  "FIGURE_HEIGHT_M": "delegated (П3-5): 0,55 м, как Medusa/Arthur; лист 1c: верх шлема 3,9–4,2 %, земля 94 % кадра — пропорции иного не требуют"
+  "FIGURE_HEIGHT_RANGE_M": "delegated (§7.1 «Рост»): ближайший по роли и оружию — Arthur (меч, ближний бой) 52–56"
+  "CLIP_PREFIX": "delegated (§7.2): 3 заглавные от CHARACTER, не занятые в clip_manifest CHARS"
+  "AUDIO_KEY": "delegated (§7.2): CHARACTER заглавными"
+  "UE_NAMES": "delegated (§7.2): из KEY и поколения H2"
+  "stage3.weights": "delegated (П3-2, П3-3): щит и умбон жёстко на arm_lower.L без новой кости; мантия, грудь туники и шея — rig.cloth_shell (крышка на седло выреза мантии и петлю груди не строится); подол, пояс и грудь — переход spine 0,36–0,40 м (разведка V1–V6 seams); side_band_m мантии 0,06 по дыму клипов"
+  "stage3.metal": "delegated (HANDBOOK §2.4, §4.4): маска металла H2.1 — сталь/железо (клинок, умбон, кромка щита, купол шлема, target #B8BEC4); кольчуга — класс steel_blued look-dev по цвету; золото — gold_antique по цвету; F0 металлов из концепта (metal_f0)"
+  "stage3.teamaccent": "delegated (П3-4, П3-4b): ribbon leather_smooth (пояс, перевязь) 3,48 % — нижняя граница 0,03; спина под мантией — screen_share_min 0"
+  "stage3.base": "delegated (W2-c, F143/F150): подставка двухъярусная — кольцо по высоте base_band.height_m [0,003; 0,029] (боковина нижнего яруса; 158 граней, UM_Mask.R); в профиле импорта 7a — ue.base_material_mode vertex-mask, VertexMaskWeight 1, SideBandWeight 0; flatten_bottom/rim_smooth не понадобились (base_seethrough 0,00)"
