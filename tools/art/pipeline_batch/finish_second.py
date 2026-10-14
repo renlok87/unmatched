@@ -70,7 +70,7 @@ def main(argv=None) -> int:
             continue
         (ev / "card-2.json").write_text(json.dumps(card, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         v = b.run([sys.executable, "tools/art/acceptance/validate_card.py", str(ev / "card.json"), "--second",
-                   str(ev / "card-2.json"), "--final-json", str(ev / "final.json"), "--print-verdict"], repo)
+                   str(ev / "card-2.json"), "--final-json", str(ev / "final.json"), "--check-files", "--print-verdict"], repo)
         fin = json.loads((ev / "final.json").read_text(encoding="utf-8")) if (ev / "final.json").exists() else {}
         tail = (v.stdout + v.stderr).strip().splitlines()[-1:] if v.returncode else ""
         print(r.get("asset"), "opus", card.get("score"), card.get("verdict"), "| exit", v.returncode, "| final",

@@ -31,7 +31,7 @@ FULL = HERE / "asset-acceptance-2.schema.json"
 KINDS = ("model", "concept", "anim")
 SCHEMA_ID = {"model": "unmatched.asset-acceptance/2", "concept": "unmatched.concept-acceptance/1",
              "anim": "unmatched.anim-acceptance/1"}
-CYCLES = {"model": ["r1", "r2", "r3"], "concept": ["r1", "r2", "r3", "r4"], "anim": ["r1", "r2", "r3"]}
+CYCLES = {"model": ["r1", "r2", "r3", "r4"], "concept": ["r1", "r2", "r3", "r4"], "anim": ["r1", "r2", "r3"]}
 GATES = {"model": ["G-TOPO", "G-UV", "G-TEX", "G-RIG", "G-NAMES"], "concept": ["G-CHECKS"],
          "anim": ["G-VALIDATE", "G-CONTACT", "G-MANIFEST"]}
 DIMS = {"model": ["S", "F", "T", "D"], "concept": ["S", "C", "Q", "P"], "anim": ["R", "C", "D", "L"]}
