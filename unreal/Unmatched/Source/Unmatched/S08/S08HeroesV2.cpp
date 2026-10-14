@@ -106,6 +106,13 @@ const TArray<FHeroSpec>& Specs() {
       {TEXT("Merlin"), TEXT("Merlin"), TEXT("H2LD"), false, 45.0f, 40.0f, 48.0f, 44.986f, 49.42f, 3.0f, 8},
       {TEXT("Medusa"), TEXT("Medusa"), TEXT("H2LD"), true, 55.0f, 50.0f, 55.0f, 55.009f, 55.01f, 56.0f / 24.0f, 8},
       {TEXT("Harpies"), TEXT("Harpy"), TEXT("H3LD"), false, 42.0f, 35.0f, 42.0f, 42.0f, 42.0f, 2.0f, 7},
+      // Skill pilot 2026-10-14 (3d-model-pipeline stage 7b): asset-card budgets, tops from ue-import-report.json of
+      // the live import runs (Angel r3: head 55.0 / sword 55.909; Ancient Leshen r5: skull 55.003 / antlers 73.56;
+      // Achilles r4: crest 55.0 / mesh bounds 54.9931), Idle and contact frame from the clip specs in UE.
+      {TEXT("Angel"), TEXT("Angel"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 55.909f, 2.5f, 7},
+      {TEXT("Ancient Leshen"), TEXT("AncientLeshen"), TEXT("H2LD"), true, 55.0f, 50.0f, 55.0f, 55.003f, 73.56f,
+       56.0f / 24.0f, 8},
+      {TEXT("Achilles"), TEXT("Achilles"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 54.9931f, 2.5f, 7},
   };
   return Table;
 }

@@ -99,7 +99,8 @@ bool FS08HeroesV2MappingTest::RunTest(const FString&) {
     FFlagScope On(true);
     TestTrue("override on", FlagEnabled());
   }
-  for (const TCHAR* Name : {TEXT("King Arthur"), TEXT("Merlin"), TEXT("Medusa"), TEXT("Harpies")}) {
+  for (const TCHAR* Name : {TEXT("King Arthur"), TEXT("Merlin"), TEXT("Medusa"), TEXT("Harpies"), TEXT("Angel"),
+                            TEXT("Ancient Leshen"), TEXT("Achilles")}) {
     TestNull(FString::Printf(TEXT("%s: no mapping with -S08HeroesLegacy"), Name), Find(true, false, Name));
     TestNull(FString::Printf(TEXT("%s: no mapping on the grey board"), Name), Find(false, true, Name));
     TestNotNull(FString::Printf(TEXT("%s: mapped on an art board (default)"), Name), Find(true, true, Name));
@@ -107,7 +108,7 @@ bool FS08HeroesV2MappingTest::RunTest(const FString&) {
   TestNull("unmapped hero stays legacy", Find(true, true, TEXT("Sinbad")));
   TestNull("a Harpy label is not a fighter name", Find(true, true, TEXT("Harpies 2")));
   TestNotNull("case-insensitive name", Find(true, true, TEXT("king arthur")));
-  TestEqual("four heroes", Specs().Num(), 4);
+  TestEqual("seven heroes", Specs().Num(), 7);
 
   const FHeroSpec* Arthur = Find(true, true, TEXT("King Arthur"));
   const FHeroSpec* Merlin = Find(true, true, TEXT("Merlin"));
@@ -512,7 +513,9 @@ bool FS08HeroesV2ContactTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
   // Build profiles (*-h2anim.json, 24 fps): Arthur k.7 = 292 ms, Merlin k.8 = 333, Medusa k.8 = 333, Harpy k.7 = 292.
   const TMap<FString, float> WantMs = {{TEXT("KingArthur"), 291.667f}, {TEXT("Merlin"), 333.333f},
-                                       {TEXT("Medusa"), 333.333f}, {TEXT("Harpy"), 291.667f}};
+                                       {TEXT("Medusa"), 333.333f}, {TEXT("Harpy"), 291.667f},
+                                       {TEXT("Angel"), 291.667f}, {TEXT("AncientLeshen"), 333.333f},
+                                       {TEXT("Achilles"), 291.667f}};
   const FName Contact(ContactNotifyName);
   for (const FHeroSpec& Spec : Specs()) {
     const float* Want = WantMs.Find(Spec.Key);
@@ -719,7 +722,9 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
 #endif
   // 01 F-09: hero 500 ms, sidekick 400 ms.
   const TMap<FString, float> WantSeconds = {{TEXT("KingArthur"), 0.5f}, {TEXT("Merlin"), 0.4f},
-                                            {TEXT("Medusa"), 0.5f}, {TEXT("Harpy"), 0.4f}};
+                                            {TEXT("Medusa"), 0.5f}, {TEXT("Harpy"), 0.4f},
+                                            {TEXT("Angel"), 0.5f}, {TEXT("AncientLeshen"), 0.5f},
+                                            {TEXT("Achilles"), 0.5f}};
   for (const FHeroSpec& Spec : Specs()) {
     const float* Want = WantSeconds.Find(Spec.Key);
     TestNotNull(FString::Printf(TEXT("%s has a dissolve length"), Spec.Key), Want);

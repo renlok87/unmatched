@@ -37,7 +37,9 @@ EVIDENCE = REPO / "docs" / "art-pipeline" / "evidence" / "de011-2026-10-04"
 DISSOLVE_ROOT = vm.ROOT + "/Dissolve"
 LOOKS = ("P1", "P2")
 # capture: both team colours side by side (Arthur P1, Merlin P2, Medusa P1, Harpy P2)
-CAPTURE_LOOKS = {"KingArthur": "P1", "Merlin": "P2", "Medusa": "P1", "Harpy": "P2"}
+CAPTURE_LOOKS = {"KingArthur": "P1", "Merlin": "P2", "Medusa": "P1", "Harpy": "P2",
+                 # skill pilot 2026-10-14, stage 7b (registration R7-2)
+                 "Angel": "P1", "AncientLeshen": "P2", "Achilles": "P1"}
 
 
 def stage_root(key: str, stage: str) -> str:

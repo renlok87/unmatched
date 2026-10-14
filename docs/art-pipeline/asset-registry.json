@@ -3503,24 +3503,65 @@
       "backlog": [],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "planned",
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
       "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "pipeline"},
       "sourceImages": {"recommended": []},
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "ue-editor-import H2LD 20261014-h2ld-ue-import-r4 + de010/de011 (этапы 7a–7b скилла 3d-model-pipeline)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261014-h2ld-ue-import-r4/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, 26/26 checks (живой импорт этапа 7a)", "sha256": "c9027b7464f44095ea0b2a41ab3df323a5a68b9f6edfc8eb664d8cf9fe5082d5"},
+            {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2ld-lookdev-ue-import-r4.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта живого прогона 20261014-h2ld-ue-import-r4", "sha256": "5951f6e3b5dd101ac565b7b0e11e12d2220683a83ac3771c82bb2c4fb5cd0f14"},
+            {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спека клипов H2Anim, импортированных в UE (20261014-h2anim-r3): кадр контакта LungeAttack", "sha256": "f73d4c434774033cf3f6ad1da917b4f9e0d10a8440b858da1d4b8ee9da646d78"},
+            {"path": "/Game/PipelineCandidates/Achilles/H2LD/Meshes/SK_Achilles_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "SkeletalMesh H2LD (Specs(): бюджет 55 uu)", "sha256": "afc9132979088d3e38c4285b6ee805e4ce79da3254185637c4e3debbd7e4eac2"},
+            {"path": "/Game/PipelineCandidates/Achilles/H2LD/Meshes/SM_Achilles_H2LD_Base", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "подставка", "sha256": "eda36abe2cb8478db23ae7fcdd979cb00860514cd6a67d77f3a3a6d753ed995a"},
+            {"path": "/Game/PipelineCandidates/Achilles/Rig/SK_Achilles_Skeleton", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "канонический скелет UM_HUMANOID_17_v2", "sha256": "a4c9d115a8b6b61fe9dbd9a67c1c19a3240c8d2f0d88fbfceb77acb81f8b2ca0"},
+            {"path": "/Game/PipelineCandidates/Achilles/H2Anim/AM_Achilles_LungeAttack", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "LungeAttack с notify Contact (de010.py apply, этап 7b)", "sha256": "a7baae4b53d19857ae11460bd6a3e235c538c9594931938652f526f9caf3d003"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_Achilles_H2LD_P1_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P1 (de011.py apply, этап 7b)", "sha256": "4da991be6e9090f9e08c08e6c8efb70b8275c247c33ecba89dfe6e89c25e5856"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_Achilles_H2LD_P2_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P2 (de011.py apply, этап 7b)", "sha256": "24ad73f1c1fcc33c877bcb4b7224c4405321a2170cbcc555224e0413236fc6e1"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/de010-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de010 apply: один Contact на LungeAttack, длина и кадры до/после равны", "sha256": "aa41ba1e02027ca985f8ae2fffecec681b1ce14c821b760c9bd5ccb1b1031d39"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/de011-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de011 apply: MIC Masked, родитель — MI тела", "sha256": "bd58304cf6b5ae32d4fe9b8deb47312a7cea53d0b69247937e1813e9d571c211"}
+          ],
+          "note": "Этап 7a: импорт 20261014-h2ld-ue-import-r4 (CLI skeletal-adopt, профиль achilles-h2ld-lookdev-ue-import-r4.json), клипы 20261014-h2anim-r3; этап 7b (2026-10-14, без GUI-редактора): de010/de011 apply (notify Contact, MIC растворения P1/P2), строка Specs() и тесты HeroesV2/Audio, сборка UnmatchedEditor Succeeded, Unmatched.S08 393/393. В этом реестре художественной приёмки нет; этап 4 r3 pass 8.1 (пара Sol 8.1 + Opus 8.8); клипы r2 pass: Idle 8.8, LungeAttack 9.4, HitReact 10.0, DeathSettle 9.4 — по делегированию (ВР-17), записано в 03-asset-registry.csv."
+        },
+        {
+          "layer": "live-packaged-probe -Bench Marmoreal/Sarpedon original (этап 7b, 2026-10-14)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "README этапа 7 (HANDBOOK §9)"},
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp", "root": "repo", "kind": "file", "expect": "exists", "role": "строка Specs() героя (11 полей FHeroSpec)"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchMarmoreal-Achilles.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Marmoreal (Р7-11)", "sha256": "2e995eecd391d2387138fa017bf46e19a5037f7dbd2deef1bbeb304ca6c4b6a4"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchSarpedon-Achilles.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Sarpedon (Р7-11)", "sha256": "6ae9f8f41ebd8df5d93422b66d36115f514aa8131501d3c61441980f5e10b4da"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/bench-marmoreal/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Marmoreal original, K2×2,5 на герое (RENDER код 0)", "sha256": "21ec0d543ac673fc6fa814b2da0ccdfd010b85e7a22b0b61c25ba6a33dcc3f73"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/bench-sarpedon/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Sarpedon original, K2×2,5 на герое (RENDER код 0)", "sha256": "1aa05410ad7c202878e6094f15d4a897889fb2195bde1a4bc076908e34e2628e"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/bench-marmoreal/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=paste(default), clips=4/4, без fallback", "sha256": "24dbfeef41c764c67ffbb497ec9a6cc44bf0b3c8d8f5dd08a16b227f69065fcc"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/bench-sarpedon/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=lit3d(default), clips=4/4, без fallback", "sha256": "95de3f02893284cf958aed547ef45ed5b85830a74670c296fc7a17f55be13fbf"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/game-sheet/sheet-manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "лист K1/K2 обеих досок: цвет, серый Rec.709, дейтеранопия", "sha256": "10f1ef9d1ae27213bbc010bf0b3196ef28a868db2d91c465c95309c04e4f9ebd"},
+            {"path": "docs/art-pipeline/evidence/achilles-20261014/ue-tests-s08.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "Unmatched.S08 393/393, EXIT CODE 0 (выписка)", "sha256": "9721f4b89d59865111f4ea23078b0c19a1182a36e5f8c268e75814bf0c530de3"}
+          ],
+          "note": "Одна упаковка 7b (BuildStamp commit c2432557 + рабочие правки 7b); .utoc содержит H2LD/Rig/H2Anim и MIC растворения. -Bench packaged на Marmoreal original и Sarpedon original с вариантом фикстуры и -BenchFocusFighter=Achilles: 6 кадров осмотрены глазами (реальная доска, верный задник, 6/6 фигур v2, герой на K2 в цветах концепта), RENDER код 0 на каждом; лист клипов AN-18 (AN-141…AN-144)."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": null, "drift": null, "proposedChange": null},
-      "nextStep": "Этап 1a скилла 3d-model-pipeline: концепт в работе (Codex, art/imagegen/concept-achilles-codex/); затем 1b/1c — виды front/side/back и лист.",
-      "blocker": "Нет: заявка этапа 0 заполнена (asset-card.yaml), гейты стопа не сработали. Этапы 2+ отложены пользователем 2026-10-13.",
+      "nextStep": "Этап 7 скилла 3d-model-pipeline закрыт (7b 2026-10-14). Дальше вне скилла: боец в эталонной БД сервера; FX и звук способности — отдельной задачей; «художественно принято» в этом реестре — только актом (ART|GD)-NNN.",
+      "blocker": "Нет. Открыто (не блокер): полоса команды на двухъярусной подставке — по кромке каждого яруса (F143/F150; на K2×2,5 читается, рваных пятен нет); у помощника Patroclus нет v2-фигуры (F135); FX и звук способности не делались; боец Achilles в эталонной БД сервера — вне скилла.",
       "doneCriteria": "Этапы 0–7 скилла 3d-model-pipeline: ue-import-report passed, автотесты S08 PASS, кадры -Bench обеих досок осмотрены.",
       "acceptanceEvidence": [],
       "evidence": [
-        {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"}
+        {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"},
+        {"path": "art/imagegen/concept-achilles-codex", "root": "repo", "kind": "file", "expect": "exists", "role": "концепт-лист этапа 1"},
+        {"path": "/Game/PipelineCandidates/Achilles/H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "импорт этапа 7"},
+        {"path": "art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance/20261014-r3/final.json", "root": "repo", "kind": "file", "expect": "exists", "role": "приёмка модели: этап 4 r3 pass 8.1 (пара Sol 8.1 + Opus 8.8)"},
+        {"path": "docs/art-pipeline/evidence/achilles-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "evidence этапа 7 (UE и игра)"}
       ],
-      "plannedPaths": [
-        {"path": "art/imagegen/concept-achilles-codex", "root": "repo", "kind": "file", "expect": "planned", "role": "концепт-лист этапа 1"},
-        {"path": "/Game/PipelineCandidates/Achilles/H2LD", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "импорт этапа 7"}
-      ]
+      "plannedPaths": []
     },
     {
       "id": "ASSET-ALICE-001",
@@ -6191,24 +6232,65 @@
       "backlog": [],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "planned",
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
       "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "pipeline"},
       "sourceImages": {"recommended": []},
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "ue-editor-import H2LD 20261014-h2ld-ue-import-r5 + de010/de011 (этапы 7a–7b скилла 3d-model-pipeline)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/20261014-h2ld-ue-import-r5/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, 26/26 checks (живой импорт этапа 7a)", "sha256": "d5c40ad09cd073559687d7fd186c88b9fc88b5f811b450e75d9505ba81c5545c"},
+            {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r5.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта живого прогона 20261014-h2ld-ue-import-r5", "sha256": "7154a5ce89df625ad0adde4f96217ff8245bf7a508c3a9bfea541bea53b69115"},
+            {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спека клипов H2Anim, импортированных в UE (20261014-h2anim-r3): кадр контакта LungeAttack", "sha256": "63deedf9058b596983ed85a6549c1f743bd21ab480d98db573f0752b01c85673"},
+            {"path": "/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SK_AncientLeshen_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "SkeletalMesh H2LD (Specs(): бюджет 55 uu)", "sha256": "426c8860819294c7b2cd5c61555042b62b47e306e3947278f6657fcd9ca92b0a"},
+            {"path": "/Game/PipelineCandidates/AncientLeshen/H2LD/Meshes/SM_AncientLeshen_H2LD_Base", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "подставка", "sha256": "c24381b8b2486f2a74386464fbbb63cedec66f34e2c02bd8650c11b1f033e791"},
+            {"path": "/Game/PipelineCandidates/AncientLeshen/Rig/SK_AncientLeshen_Skeleton", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "канонический скелет UM_HUMANOID_17_v2", "sha256": "f913722167702940110805e4702c1f1c58a85bf5ac2351f1491f49d8c489c6b2"},
+            {"path": "/Game/PipelineCandidates/AncientLeshen/H2Anim/AM_AncientLeshen_LungeAttack", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "LungeAttack с notify Contact (de010.py apply, этап 7b)", "sha256": "024666ffb0b057a1f59f54fc01f0346217ab209fe0ebd9558bcc4dd4042aed3e"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_AncientLeshen_H2LD_P1_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P1 (de011.py apply, этап 7b)", "sha256": "c3e4a4f90f2955d316a13ef89cb4e82c71090040abeafb5de2bd07dfa6600adf"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_AncientLeshen_H2LD_P2_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P2 (de011.py apply, этап 7b)", "sha256": "2388db3f5415d3f9b4c43c037e38e0d9fee440d431a2e8eeb967c64b809c7fd4"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/de010-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de010 apply: один Contact на LungeAttack, длина и кадры до/после равны", "sha256": "aa41ba1e02027ca985f8ae2fffecec681b1ce14c821b760c9bd5ccb1b1031d39"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/de011-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de011 apply: MIC Masked, родитель — MI тела", "sha256": "bd58304cf6b5ae32d4fe9b8deb47312a7cea53d0b69247937e1813e9d571c211"}
+          ],
+          "note": "Этап 7a: импорт 20261014-h2ld-ue-import-r5 (CLI skeletal-adopt, профиль ancient-leshen-h2ld-lookdev-ue-import-r5.json), клипы 20261014-h2anim-r3; этап 7b (2026-10-14, без GUI-редактора): de010/de011 apply (notify Contact, MIC растворения P1/P2), строка Specs() и тесты HeroesV2/Audio, сборка UnmatchedEditor Succeeded, Unmatched.S08 393/393. В этом реестре художественной приёмки нет; этап 4 r3 pass 8.1 (пара Sol 8.1 + Opus 8.8); клипы r2 pass: Idle 9.4, LungeAttack 9.4, HitReact 10.0, DeathSettle 9.4 — по делегированию (ВР-17), записано в 03-asset-registry.csv."
+        },
+        {
+          "layer": "live-packaged-probe -Bench Marmoreal/Sarpedon original (этап 7b, 2026-10-14)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "README этапа 7 (HANDBOOK §9)"},
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp", "root": "repo", "kind": "file", "expect": "exists", "role": "строка Specs() героя (11 полей FHeroSpec)"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchMarmoreal-AncientLeshen.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Marmoreal (Р7-11)", "sha256": "53b1454e61d6973b2c40c7e6ef5fb76b72184d453d8be8a3b9af0a13f5a03ac9"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchSarpedon-AncientLeshen.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Sarpedon (Р7-11)", "sha256": "deac67c5c0fb5f2e44b688328dbfc9c5d2a937d8bd0fca06025286f689c1471e"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/bench-marmoreal/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Marmoreal original, K2×2,5 на герое (RENDER код 0)", "sha256": "3a70b216165ab0769801910c2b3b53d547e01a84124bc2c2167bf3d892815ed5"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/bench-sarpedon/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Sarpedon original, K2×2,5 на герое (RENDER код 0)", "sha256": "9d90c491fececd2347eb94e382926ebbbbf3515eb598e8168f58545a71501691"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/bench-marmoreal/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=paste(default), clips=4/4, без fallback", "sha256": "fac34ceee6e48bd3d49eeb34478e2af4d3f5f41a6d728f09a8548a2971709e2d"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/bench-sarpedon/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=lit3d(default), clips=4/4, без fallback", "sha256": "b8283311de6fafd77615dbb97b704d54b1ccf9f72e14c7bc7a7ed500d6644194"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/game-sheet/sheet-manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "лист K1/K2 обеих досок: цвет, серый Rec.709, дейтеранопия", "sha256": "6bedcc693eac2acea37eec591d57f49826a0ae3baee6989bf5b43c09d513335e"},
+            {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/ue-tests-s08.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "Unmatched.S08 393/393, EXIT CODE 0 (выписка)", "sha256": "6e03591875bdfb7f8873f222dfabac8ff96d73fca21b867484847743e87946ac"}
+          ],
+          "note": "Одна упаковка 7b (BuildStamp commit c2432557 + рабочие правки 7b); .utoc содержит H2LD/Rig/H2Anim и MIC растворения. -Bench packaged на Marmoreal original и Sarpedon original с вариантом фикстуры и -BenchFocusFighter=AncientLeshen: 6 кадров осмотрены глазами (реальная доска, верный задник, 6/6 фигур v2, герой на K2 в цветах концепта), RENDER код 0 на каждом; лист клипов AN-18 (AN-137…AN-140)."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": null, "drift": null, "proposedChange": null},
-      "nextStep": "Этап 1a скилла 3d-model-pipeline: концепт в работе (Codex, art/imagegen/concept-ancient-leshen-codex/); затем 1b/1c — виды front/side/back и лист.",
-      "blocker": "Нет: заявка этапа 0 заполнена (asset-card.yaml), гейты стопа не сработали. Этапы 2+ отложены пользователем 2026-10-13.",
+      "nextStep": "Этап 7 скилла 3d-model-pipeline закрыт (7b 2026-10-14). Дальше вне скилла: боец в эталонной БД сервера; FX и звук способности — отдельной задачей; «художественно принято» в этом реестре — только актом (ART|GD)-NNN.",
+      "blocker": "Нет. Открыто (не блокер): насыщенность дерева на осевших кадрах UE чуть выше концепта (F153); у помощника Wolf нет v2-фигуры — на кадрах место f-1-sk0 занимает Merlin v2 (F135); FX и звук способности не делались; боец Ancient Leshen в эталонной БД сервера — вне скилла.",
       "doneCriteria": "Этапы 0–7 скилла 3d-model-pipeline: ue-import-report passed, автотесты S08 PASS, кадры -Bench обеих досок осмотрены.",
       "acceptanceEvidence": [],
       "evidence": [
-        {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"}
+        {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"},
+        {"path": "art/imagegen/concept-ancient-leshen-codex", "root": "repo", "kind": "file", "expect": "exists", "role": "концепт-лист этапа 1"},
+        {"path": "/Game/PipelineCandidates/AncientLeshen/H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "импорт этапа 7"},
+        {"path": "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/evidence/acceptance/20261014-r3/final.json", "root": "repo", "kind": "file", "expect": "exists", "role": "приёмка модели: этап 4 r3 pass 8.1 (пара Sol 8.1 + Opus 8.8)"},
+        {"path": "docs/art-pipeline/evidence/ancient-leshen-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "evidence этапа 7 (UE и игра)"}
       ],
-      "plannedPaths": [
-        {"path": "art/imagegen/concept-ancient-leshen-codex", "root": "repo", "kind": "file", "expect": "planned", "role": "концепт-лист этапа 1"},
-        {"path": "/Game/PipelineCandidates/AncientLeshen/H2LD", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "импорт этапа 7"}
-      ]
+      "plannedPaths": []
     },
     {
       "id": "ASSET-CIRI-001",
@@ -6247,24 +6329,65 @@
       "backlog": [],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "planned",
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
       "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "pipeline"},
       "sourceImages": {"recommended": []},
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "ue-editor-import H2LD 20261014-h2ld-ue-import-r3 + de010/de011 (этапы 7a–7b скилла 3d-model-pipeline)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ue-import-r3/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, 26/26 checks (живой импорт этапа 7a)", "sha256": "a200d88567d81c44767de915d4ef07be5abe5d67218ce9a5a7f88037701021ca"},
+            {"path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2ld-lookdev-ue-import-r3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта живого прогона 20261014-h2ld-ue-import-r3", "sha256": "639edfb135acd190bba8977cae7d15d348bee42b6fa73f1b9cc799109ccb167b"},
+            {"path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спека клипов H2Anim, импортированных в UE (20261014-h2anim-r2): кадр контакта LungeAttack", "sha256": "73d705b3931de589424b63d2f0aac26cf318e2eb1b104f1512e5c5a7e7d35731"},
+            {"path": "/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "SkeletalMesh H2LD (Specs(): бюджет 55 uu)", "sha256": "bfc871175c15a4abff5fa29e0788a55f68d96f71952c8c8c27bb16e71fd59891"},
+            {"path": "/Game/PipelineCandidates/Angel/H2LD/Meshes/SM_Angel_H2LD_Base", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "подставка", "sha256": "7ce15f35c842489af3c07f80f09f2c6ef16335bb49a2451ab3da7a2f7c1f2815"},
+            {"path": "/Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "канонический скелет UM_HUMANOID_17_v2", "sha256": "e5671266b8f7b93e840394c872a3897d783d4ed818744b67d7faa73584544320"},
+            {"path": "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_LungeAttack", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "LungeAttack с notify Contact (de010.py apply, этап 7b)", "sha256": "d015117087fbabf1285b3a65650ef38d7f44ff5e2b1788a92b0266ce0e7e5d2f"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_Angel_H2LD_P1_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P1 (de011.py apply, этап 7b)", "sha256": "42c3b26e350495b89569d93e1a5ecd9af561cefe34a669df6f63c1e30d94a165"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_Angel_H2LD_P2_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P2 (de011.py apply, этап 7b)", "sha256": "4dc0882a2d94d560e03c2068e166ca7ba473fcf69386f7749d30b8c0ecfd75b6"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/de010-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de010 apply: один Contact на LungeAttack, длина и кадры до/после равны", "sha256": "aa41ba1e02027ca985f8ae2fffecec681b1ce14c821b760c9bd5ccb1b1031d39"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/de011-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de011 apply: MIC Masked, родитель — MI тела", "sha256": "bd58304cf6b5ae32d4fe9b8deb47312a7cea53d0b69247937e1813e9d571c211"}
+          ],
+          "note": "Этап 7a: импорт 20261014-h2ld-ue-import-r3 (CLI skeletal-adopt, профиль angel-h2ld-lookdev-ue-import-r3.json), клипы 20261014-h2anim-r2; этап 7b (2026-10-14, без GUI-редактора): de010/de011 apply (notify Contact, MIC растворения P1/P2), строка Specs() и тесты HeroesV2/Audio, сборка UnmatchedEditor Succeeded, Unmatched.S08 393/393. В этом реестре художественной приёмки нет; этап 4 r1 pass 8.8 (Sol); клипы pass: Idle 8.8 и HitReact 9.4 (r1), LungeAttack 8.8 и DeathSettle 8.8 (r2) — по делегированию (ВР-17), записано в 03-asset-registry.csv."
+        },
+        {
+          "layer": "live-packaged-probe -Bench Marmoreal/Sarpedon original (этап 7b, 2026-10-14)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/art-pipeline/evidence/angel-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "README этапа 7 (HANDBOOK §9)"},
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp", "root": "repo", "kind": "file", "expect": "exists", "role": "строка Specs() героя (11 полей FHeroSpec)"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchMarmoreal-Angel.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Marmoreal (Р7-11)", "sha256": "59fa4559f1585f6ffedf214f62a7af38e6516a9a1b5e27af8e76b45e8e5d4117"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchSarpedon-Angel.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Sarpedon (Р7-11)", "sha256": "43a876e887f2697f7fd0f977e47bc6e2bb3409d0b1642d244285121e3be58b0f"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/bench-marmoreal/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Marmoreal original, K2×2,5 на герое (RENDER код 0)", "sha256": "20565fdca93ac321bf5c644ccaf1e56f6baf6f42f399593bf984ad6ed5896d68"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/bench-sarpedon/bench-K2x2p5-1920x1080.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "packaged -Bench Sarpedon original, K2×2,5 на герое (RENDER код 0)", "sha256": "88dff746103d22a9842742f256075e5f906f5ec4e12062e81d519e8b89f2b7f9"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/bench-marmoreal/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=paste(default), clips=4/4, без fallback", "sha256": "05cff4ed2470e59eeb8baa177746df2115305f3cf38c69d582009115cfc36d0b"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/bench-sarpedon/bench.trace.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "трасса: ARTLOOK heroes=v2, backdrop=lit3d(default), clips=4/4, без fallback", "sha256": "317600b52f338ed5d705f506c57c6e67bc4a5bc4a031f32f1441fd788e50207c"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/game-sheet/sheet-manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "лист K1/K2 обеих досок: цвет, серый Rec.709, дейтеранопия", "sha256": "487c8ab210afcbb91fd002d48d55ba7b144802f64bb4f0dffdb11c322ccb117e"},
+            {"path": "docs/art-pipeline/evidence/angel-20261014/ue-tests-s08.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "Unmatched.S08 393/393, EXIT CODE 0 (выписка)", "sha256": "bf9c55601df69fe31276c4aa2c8ce93dc77a08a39cc398ca7b2fe00d138d800c"}
+          ],
+          "note": "Одна упаковка 7b (BuildStamp commit c2432557 + рабочие правки 7b); .utoc содержит H2LD/Rig/H2Anim и MIC растворения. -Bench packaged на Marmoreal original и Sarpedon original с вариантом фикстуры и -BenchFocusFighter=Angel: 6 кадров осмотрены глазами (реальная доска, верный задник, 6/6 фигур v2, герой на K2 в цветах концепта), RENDER код 0 на каждом; лист клипов AN-18 (AN-133…AN-136)."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": null, "drift": null, "proposedChange": null},
-      "nextStep": "Этап 1a скилла 3d-model-pipeline: концепт в работе (Codex, art/imagegen/concept-angel-codex/); затем 1b/1c — виды front/side/back и лист.",
-      "blocker": "Нет: заявка этапа 0 заполнена (asset-card.yaml), гейты стопа не сработали. Этапы 2+ отложены пользователем 2026-10-13.",
+      "nextStep": "Этап 7 скилла 3d-model-pipeline закрыт (7b 2026-10-14). Дальше вне скилла: боец в эталонной БД сервера; FX и звук способности — отдельной задачей; «художественно принято» в этом реестре — только актом (ART|GD)-NNN.",
+      "blocker": "Нет. Открыто (не блокер): тёмная кожа плаща на экспозиции доски 1,2–1,3× концепта (board light, F93); FX и звук способности не делались (решение скилла: по умолчанию нет, CUE-014 — иконка в HUD); боец Angel в эталонной БД сервера — вне скилла.",
       "doneCriteria": "Этапы 0–7 скилла 3d-model-pipeline: ue-import-report passed, автотесты S08 PASS, кадры -Bench обеих досок осмотрены.",
       "acceptanceEvidence": [],
       "evidence": [
-        {"path": "art/pipeline-candidates/ASSET-ANGEL-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"}
+        {"path": "art/pipeline-candidates/ASSET-ANGEL-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"},
+        {"path": "art/imagegen/concept-angel-codex", "root": "repo", "kind": "file", "expect": "exists", "role": "концепт-лист этапа 1"},
+        {"path": "/Game/PipelineCandidates/Angel/H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "импорт этапа 7"},
+        {"path": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance/20261013-r1/card.json", "root": "repo", "kind": "file", "expect": "exists", "role": "приёмка модели: этап 4 r1 pass 8.8 (Sol)"},
+        {"path": "docs/art-pipeline/evidence/angel-20261014/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "evidence этапа 7 (UE и игра)"}
       ],
-      "plannedPaths": [
-        {"path": "art/imagegen/concept-angel-codex", "root": "repo", "kind": "file", "expect": "planned", "role": "концепт-лист этапа 1"},
-        {"path": "/Game/PipelineCandidates/Angel/H2LD", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "импорт этапа 7"}
-      ]
+      "plannedPaths": []
     },
     {
       "id": "ASSET-SPIKE-001",

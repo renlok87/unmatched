@@ -175,6 +175,13 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F154 | 6 | Idle L stuck at 1.5 (r1, r2): acceptor frames never show the loop seam (keys 0/15/30/45 only); `loop_seam` PASS is in a report the acceptor does not score from | clip frames: a last-frame/frame-0 pair for Idle |
 | F155 | 7 | Settled UE review frames on byte-identical inputs vary ~4 % in the exposure anchor between editor sessions (bronze 1.159 → 1.118 flips a luma verdict) | ue_hero_lookdev: noise band / margin |
 | F156 | 6 | Known limits are free text repeated in every clip prompt; closing one item meant four exact-string edits | prompt template takes a list; stage-5 rework writes the closures |
+| F157 | 7b | `de010.py apply` / `de011.py apply` rewrite every hero in their lists: the MVP `AM_{KingArthur,Merlin,Medusa,Harpy}_LungeAttack`, their 8 dissolve MICs and `M_UM_Figure_v2` were re-saved (same notify, same graph `d86ac8fa…`) and `validate_registry` went from 1 to 5 ERROR on the MVP sha pins; the orchestrator reverted the 12 MVP files before the commit | tool: `--only <Key>` or skip when Contact already sits on the right frame (`de010_apply_ue.py:63-70`), same for the MICs in de011; skill: take the `validate_registry` baseline at the start of 7b, before de010 |
+| F158 | 7b | The packaged client reads loose bench fixture variants (`BENCH scene fixture=S08BenchMarmoreal-Angel.json`) — confirmed live | skill: drop «not confirmed» in Д-2 and `ue-import-package.md` §6.2 |
+| F159 | 7b | `clip_review_sheet.py run --heroes A,B,C --fixture …` does not work for several new heroes at once: each fixture variant holds one new fighter | skill: one `run` per hero with its own `--frames`; or tool: per-hero fixture map |
+| F160 | 7b | The §6.5 cost command lacks `--repeats 1` (default 3 runs) and the GPU token `C:/tmp/unmatched-gpu.lock` (REFUSED without it); without `-BenchFocusFighter` K2 measures Medusa, not the new hero; `--out $E/bench` commits PNGs against HANDBOOK §8 | skill `ue-import-package.md` §6.5 |
+| F161 | 0–7a | `asset-registry.json` entries of the new heroes stayed «planned / предложено» until 7b: no stage before 7b updates them | skill: per-stage status update, or say that 7b is the first writer |
+| F162 | 7b | Bench fixture variants are not RuntimeDependencies, so they need no `Unmatched.Build.cs` touch before packaging | skill §6.1 packaging-trap wording |
+| F163 | 7b | Orchestrator's look: the AN-18 sheets (K1 / K2×1.6, top-down) barely show DeathSettle motion (Achilles k.0 and k.21 look almost the same) — the sheet proves the clip plays in the packaged game, not how it reads | sheet: a low three-quarter column for HitReact/DeathSettle |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

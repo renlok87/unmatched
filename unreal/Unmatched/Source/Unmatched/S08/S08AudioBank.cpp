@@ -56,6 +56,10 @@ FString S08AudioBank::CharacterKey(const FString& Name) {
   if (Name.Contains(TEXT("merlin"), ESearchCase::IgnoreCase)) return TEXT("MERLIN");
   if (Name.Contains(TEXT("medusa"), ESearchCase::IgnoreCase)) return TEXT("MEDUSA");
   if (Name.Contains(TEXT("harp"), ESearchCase::IgnoreCase)) return TEXT("HARPY");
+  // skill pilot 2026-10-14 (3d-model-pipeline stage 7b, registration R7-5): AUDIO_KEY of the asset cards
+  if (Name.Contains(TEXT("angel"), ESearchCase::IgnoreCase)) return TEXT("ANGEL");
+  if (Name.Contains(TEXT("leshen"), ESearchCase::IgnoreCase)) return TEXT("ANCIENTLESHEN");
+  if (Name.Contains(TEXT("achilles"), ESearchCase::IgnoreCase)) return TEXT("ACHILLES");
   return FString();
 }
 
@@ -64,6 +68,9 @@ FString S08AudioBank::HitType(const FString& Key) {
   if (Key == TEXT("HARPY")) return TEXT("CLAW");
   if (Key == TEXT("MEDUSA")) return TEXT("ARROW");
   if (Key == TEXT("MERLIN")) return TEXT("MAGIC");
+  if (Key == TEXT("ANGEL")) return TEXT("BLADE");
+  if (Key == TEXT("ANCIENTLESHEN")) return TEXT("MAGIC");
+  if (Key == TEXT("ACHILLES")) return TEXT("BLADE");
   return TEXT("BLUNT");
 }
 

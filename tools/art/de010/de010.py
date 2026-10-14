@@ -39,7 +39,11 @@ PROFILES = REPO / "art" / "pipeline-candidates"
 HEROES = [("KingArthur", "H2LD", "ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json", 7),
           ("Merlin", "H2LD", "ASSET-MERLIN-001/build-profiles/merlin-h2anim.json", 8),
           ("Medusa", "H2LD", "ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json", 8),
-          ("Harpy", "H3LD", "ASSET-HARPY-001/build-profiles/harpy-h2anim.json", 7)]
+          ("Harpy", "H3LD", "ASSET-HARPY-001/build-profiles/harpy-h2anim.json", 7),
+          # skill pilot 2026-10-14, stage 7b (registration R7-1): the spec of the clips imported into UE
+          ("Angel", "H2LD", "ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json", 7),
+          ("AncientLeshen", "H2LD", "ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json", 8),
+          ("Achilles", "H2LD", "ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json", 7)]
 
 
 def now() -> str:
