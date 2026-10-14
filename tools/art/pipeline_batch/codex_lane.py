@@ -1,0 +1,258 @@
+"""Полоса пакета Codex: берёт задания из списка по claim-файлу, гоняет `codex exec` и завершает задание по ответу, а не по выходу процесса (RC-11).
+
+Был C:/tmp/concept-wave/run-claim-loop.ps1 (полосы 1a/1c, concept-sheet.md §13). Несколько полос делят один список
+и каталог логов: задание берёт та полоса, которой удалось создать `<logs>/<id>.claim` (O_EXCL), id = имя файла
+задания без расширения. Полоса крутится, пока нет STOP-файла (--stop-file, по умолчанию <logs>/STOP), и раз в
+--idle-sleep с перечитывает список (новые задания можно дописывать на ходу); --once — выйти, когда брать нечего.
+
+Готовность (RC-11): процесс генератора после ответа висит до 23 мин (хуки пользователя держат канал), поэтому
+задание считается выполненным, когда файл `-o` (`<logs>/<id>-last.txt`) не пуст И в stderr/stdout есть строка
+«tokens used». Через --grace с после этого полоса гасит СВОЁ дерево процессов — по PID запущенного codex
+(psutil: дети рекурсивно, затем сам процесс; без psutil — taskkill /PID <pid> /T /F), никогда по имени. Обычный выход
+процесса — тоже конец задания. --timeout с (0 — нет) — аварийный предел на задание.
+
+Файлы задания в <logs>: <id>.claim, <id>.out, <id>.err (байты как есть), <id>-last.txt (-o), <id>.done
+(«<exit> <reason>»: exit | done-killed | timeout); журнал полосы <logs>/<name>.log (START/END/LANE STOP).
+
+    python tools/art/pipeline_batch/codex_lane.py --tasks <tasks.txt> --name d1 --logs <dir> [--stop-file <path>] \
+        [--exe <codex.exe>] [--codex-home <dir>] [--grace 10] [--poll 2] [--idle-sleep 60] [--timeout 0] [--once]
+    python tools/art/pipeline_batch/codex_lane.py --tasks t.txt --name d1 --logs L --dry-run   # команды, без claim
+
+Команда: <exe> exec -C <repo> -s workspace-write -c windows.sandbox="unelevated" --skip-git-repo-check -o <last> -
+(stdin — файл задания); свои аргументы вместо `exec …` — --codex-args-json '[...]' (заглушка в тестах). Генератору
+--ignore-user-config ставить нельзя (concept-sheet.md §5.2); отдельный CODEX_HOME без хуков — --codex-home (RC-11,
+перед боевой волной проверить пробой, что image_gen работает). Код выхода: 0 — полоса остановлена, 2 — ошибка входа.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _batch as b  # noqa: E402
+
+DONE_MARK = "tokens used"
+_MARKS = (DONE_MARK.encode("utf-8"), DONE_MARK.encode("utf-16-le"))
+TAIL_BYTES = 1 << 16
+
+
+def default_exe() -> str | None:
+    """Свежий codex.exe приложения Codex (как exec-проба concept-sheet.md §5.2)."""
+    base = Path(os.environ.get("LOCALAPPDATA", "")) / "OpenAI" / "Codex" / "bin"
+    exes = sorted(base.glob("*/codex.exe"), key=lambda p: p.stat().st_mtime, reverse=True) if base.is_dir() else []
+    return str(exes[0]) if exes else None
+
+
+def default_codex_args(repo: Path) -> list[str]:
+    return ["exec", "-C", str(repo), "-s", "workspace-write", "-c", 'windows.sandbox="unelevated"',
+            "--skip-git-repo-check"]
+
+
+def task_ids(tasks_file: Path) -> list[tuple[str, Path]]:
+    lines = [ln.strip() for ln in tasks_file.read_text(encoding="utf-8-sig").splitlines()]
+    return [(Path(ln).stem, Path(ln)) for ln in lines if ln and not ln.startswith("#")]
+
+
+def claim(logs: Path, task_id: str) -> bool:
+    try:
+        fd = os.open(logs / f"{task_id}.claim", os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        return False
+    os.close(fd)
+    return True
+
+
+def _tail(path: Path) -> bytes:
+    try:
+        with open(path, "rb") as fh:
+            fh.seek(0, 2)
+            n = fh.tell()
+            fh.seek(max(0, n - TAIL_BYTES))
+            return fh.read()
+    except OSError:
+        return b""
+
+
+def answered(last: Path, logs: list[Path]) -> bool:
+    """Задание отвечено: -o не пуст и в хвосте stderr/stdout есть «tokens used» (UTF-8 или UTF-16-LE)."""
+    try:
+        if last.stat().st_size == 0:
+            return False
+    except OSError:
+        return False
+    return any(m in _tail(p) for p in logs for m in _MARKS)
+
+
+def kill_tree(pid: int) -> list[int]:
+    """Погасить дерево процессов, корень — pid (дети рекурсивно, потом корень). Возвращает погашенные PID."""
+    try:
+        import psutil
+    except ImportError:
+        psutil = None
+    if psutil is not None:
+        try:
+            root = psutil.Process(pid)
+        except psutil.NoSuchProcess:
+            return []
+        procs = root.children(recursive=True) + [root]
+        for p in procs:
+            try:
+                p.kill()
+            except psutil.NoSuchProcess:
+                pass
+        psutil.wait_procs(procs, timeout=10)
+        return [p.pid for p in procs]
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True)
+    else:
+        try:
+            os.kill(pid, 9)
+        except OSError:
+            pass
+    return [pid]
+
+
+def _now() -> str:
+    return dt.datetime.now().replace(microsecond=0).isoformat()
+
+
+class Lane:
+    def __init__(self, a):
+        self.a = a
+        self.repo = Path(a.repo)
+        self.logs = Path(a.logs)
+        self.stop = Path(a.stop_file) if a.stop_file else self.logs / "STOP"
+        self.journal = self.logs / f"{a.name}.log"
+        self.args = json.loads(a.codex_args_json) if a.codex_args_json else default_codex_args(self.repo)
+
+    def log(self, line: str) -> None:
+        with open(self.journal, "a", encoding="utf-8") as fh:
+            fh.write(f"{_now()} {line}\n")
+
+    def command(self, task_id: str) -> list[str]:
+        return [self.a.exe, *self.args, "-o", str(self.logs / f"{task_id}-last.txt"), "-"]
+
+    def env(self) -> dict:
+        env = b.utf8_env()
+        if self.a.codex_home:
+            env["CODEX_HOME"] = str(self.a.codex_home)
+        return env
+
+    def run_task(self, task_id: str, task: Path) -> tuple[int | None, str]:
+        last, out, err = (self.logs / f"{task_id}-last.txt", self.logs / f"{task_id}.out", self.logs / f"{task_id}.err")
+        start = time.monotonic()
+        self.log(f"START {task_id}")
+        if not task.is_file():
+            self.log(f"END {task_id} exit=None reason=missing-task sec=0")
+            (self.logs / f"{task_id}.done").write_text("None missing-task\n", encoding="utf-8")
+            return None, "missing-task"
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        with open(task, "rb") as fin, open(out, "wb") as fo, open(err, "wb") as fe:
+            p = subprocess.Popen(self.command(task_id), stdin=fin, stdout=fo, stderr=fe, cwd=self.repo, env=self.env(),
+                                 creationflags=flags)
+            self.log(f"PID {task_id} {p.pid}")
+            done_at, reason = None, "exit"
+            while True:
+                if p.poll() is not None:
+                    break
+                now = time.monotonic()
+                if answered(last, [err, out]):
+                    done_at = done_at if done_at is not None else now
+                    if now - done_at >= self.a.grace:
+                        killed = kill_tree(p.pid)
+                        reason = "done-killed"
+                        self.log(f"KILL {task_id} pid={p.pid} tree={killed} after answer +{int(now - done_at)}s")
+                        break
+                if self.a.timeout and now - start > self.a.timeout:
+                    kill_tree(p.pid)
+                    reason = "timeout"
+                    break
+                time.sleep(self.a.poll)
+            code = p.wait()
+        sec = int(time.monotonic() - start)
+        self.log(f"END {task_id} exit={code} reason={reason} sec={sec}")
+        (self.logs / f"{task_id}.done").write_text(f"{code} {reason}\n", encoding="utf-8")
+        return code, reason
+
+    def stopped(self) -> bool:
+        return self.stop.exists()
+
+    def loop(self) -> list[dict]:
+        self.logs.mkdir(parents=True, exist_ok=True)
+        results = []
+        while not self.stopped():
+            did = False
+            for task_id, task in task_ids(Path(self.a.tasks)):
+                if self.stopped():
+                    break
+                if not claim(self.logs, task_id):
+                    continue
+                did = True
+                code, reason = self.run_task(task_id, task)
+                results.append({"id": task_id, "exit": code, "reason": reason})
+            if not did:
+                if self.a.once:
+                    break
+                for _ in range(int(self.a.idle_sleep)):
+                    if self.stopped():
+                        break
+                    time.sleep(1)
+        self.log("LANE STOP")
+        return results
+
+
+def main(argv=None) -> int:
+    b.utf8_streams()
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
+                                 formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
+    ap.add_argument("--tasks", required=True, help="список файлов заданий (по строке; # — комментарий)")
+    ap.add_argument("--name", required=True, help="имя полосы (журнал <logs>/<name>.log)")
+    ap.add_argument("--logs", required=True, help="каталог логов и claim-файлов (общий у полос одной волны)")
+    ap.add_argument("--stop-file", default=None, help="STOP-файл (по умолчанию <logs>/STOP)")
+    ap.add_argument("--repo", default=str(b.REPO), help="рабочий каталог codex (-C)")
+    ap.add_argument("--exe", default=None, help="codex.exe (по умолчанию свежий из %%LOCALAPPDATA%%/OpenAI/Codex/bin)")
+    ap.add_argument("--codex-args-json", default=None, help="аргументы вместо exec … (JSON-список; -o и - добавляются)")
+    ap.add_argument("--codex-home", default=None, help="CODEX_HOME процесса (профиль без hooks/plugins, RC-11)")
+    ap.add_argument("--grace", type=float, default=10.0, help="с после ответа до гашения дерева (10)")
+    ap.add_argument("--poll", type=float, default=2.0, help="опрос процесса и файлов, с (2)")
+    ap.add_argument("--idle-sleep", type=float, default=60.0, help="пауза, когда брать нечего, с (60)")
+    ap.add_argument("--timeout", type=float, default=0.0, help="предел на задание, с (0 — нет)")
+    ap.add_argument("--once", action="store_true", help="выйти, когда свободных заданий нет")
+    ap.add_argument("--dry-run", action="store_true", help="напечатать команды свободных заданий, ничего не брать")
+    try:
+        a = ap.parse_args(argv)
+    except SystemExit as exc:
+        return int(exc.code or 0)
+    a.exe = a.exe or default_exe()
+    tasks = Path(a.tasks)
+    if not tasks.is_file():
+        print(f"ERROR: нет списка заданий {tasks}", file=sys.stderr)
+        return 2
+    if not a.exe:
+        print("ERROR: нет codex.exe (--exe)", file=sys.stderr)
+        return 2
+    try:
+        lane = Lane(a)
+    except ValueError as exc:
+        print(f"ERROR: --codex-args-json: {exc}", file=sys.stderr)
+        return 2
+    if a.dry_run:
+        free = [(i, t) for i, t in task_ids(tasks) if not (Path(a.logs) / f"{i}.claim").exists()]
+        for i, t in free:
+            print(json.dumps({"id": i, "task": t.as_posix(), "exists": t.is_file(), "cmd": lane.command(i)},
+                             ensure_ascii=False))
+        print(f"free {len(free)}, stop-file {lane.stop.as_posix()} {'EXISTS' if lane.stopped() else 'absent'}")
+        return 0
+    res = lane.loop()
+    print(json.dumps({"lane": a.name, "tasks": res}, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

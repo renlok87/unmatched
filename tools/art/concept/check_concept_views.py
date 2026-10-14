@@ -10,6 +10,10 @@
 
 --min-top-pct N — рамка ядра (шаг 1a: «верхняя точка не выше y 4 %»): верх маски выше y N % → WARN `view.frame_top`
 (не FAIL и не повод для ретрая; видят приёмщик и запускающий агент). Без флага проверки нет.
+--side-ortho <ortho_<SIDE_VIEW>.png> — ракурс бокового вида (F8, шаг 1c): силуэт вида `--side-view` (по умолчанию
+side), растянутый на кадр ортопроекции черновика 1b, сравнивается по IoU с силуэтом орто и с его зеркалом. Зеркало
+лучше на `facing_margin` → FAIL `view.facing` (вид нарисован с другой стороны); разница меньше порога или оба IoU
+ниже `facing_iou_warn` → WARN. Без флага проверки нет. Пилот 2026-10-14: прямо 0,96–0,97, зеркало 0,56–0,67.
 Код выхода: 0 = 0 FAIL, 1 = есть FAIL, 2 = ошибка входа. Допуски и их калибровка — tools/art/concept/README.md.
 Зависимости: numpy, Pillow, scipy (как у остальных инструментов арт-пайплайна).
 """
@@ -58,6 +62,8 @@ TOLERANCES = {
     "mask_area_max_pct": 90.0,         # маска больше → фон не отделился (FAIL)
     "segment_tone": 14,                # порог отделения фигуры от модели фона (уровни 0–255, макс. по каналам)
     "segment_min_component_pct": 0.02,  # компоненты меньше — шум, в маску фигуры не входят
+    "facing_margin": 0.05,             # --side-ortho: IoU зеркала больше прямого на столько → FAIL view.facing
+    "facing_iou_warn": 0.5,            # --side-ortho: оба IoU ниже → WARN (силуэт не совпал с орто ни так, ни так)
 }
 
 HEX_RE = re.compile(r"^#?([0-9A-Fa-f]{6})$")
@@ -196,6 +202,39 @@ def measure_view(img: Image.Image, tol: dict) -> dict:
     out["_mask"] = mask  # для палитры; в отчёт не попадает
     out["_rgb"] = rgb
     return out
+
+
+# ------------------------------------------------------------------------------------------------ ракурс (F8)
+def _iou(a: np.ndarray, b: np.ndarray) -> float:
+    return float((a & b).sum()) / max(1.0, float((a | b).sum()))
+
+
+def facing_check(side_mask: np.ndarray | None, ortho: Image.Image, tol: dict) -> dict:
+    """Боковой вид против ортопроекции черновика 1b: силуэты (маска инструмента, дыры залиты), вид растянут на кадр
+    орто; IoU прямо и с зеркалом орто. verdict OK | MIRRORED | UNCLEAR | NO_MASK."""
+    om = measure_view(ortho, tol)
+    if side_mask is None or om.get("mask") is None:
+        return {"verdict": "NO_MASK", "iou_direct": None, "iou_mirror": None}
+    o = ndi.binary_fill_holes(om["_mask"])
+    h, w = o.shape
+    s = ndi.binary_fill_holes(side_mask).astype(np.uint8) * 255
+    s = np.asarray(Image.fromarray(s).resize((w, h), Image.Resampling.NEAREST)) > 127
+    direct, mirror = _iou(s, o), _iou(s, o[:, ::-1])
+    m = tol["facing_margin"]
+    verdict = "MIRRORED" if mirror > direct + m else ("OK" if direct > mirror + m else "UNCLEAR")
+    return {"verdict": verdict, "iou_direct": round(direct, 4), "iou_mirror": round(mirror, 4),
+            "ortho_size": [w, h], "margin": m}
+
+
+def facing_row(facing: dict, scope: str, tol: dict, ortho_path: str) -> dict:
+    v = facing["verdict"]
+    low = v != "NO_MASK" and max(facing["iou_direct"], facing["iou_mirror"]) < tol["facing_iou_warn"]
+    res = "FAIL" if v == "MIRRORED" else ("WARN" if v in ("UNCLEAR", "NO_MASK") or low else "PASS")
+    return {"id": "view.facing", "scope": scope, "result": res,
+            "value": {"verdict": v, "iou_direct": facing["iou_direct"], "iou_mirror": facing["iou_mirror"],
+                      "ortho": ortho_path},
+            "limit": f"IoU прямо > зеркало + {tol['facing_margin']} (WARN: оба < {tol['facing_iou_warn']})",
+            "message": "боковой вид смотрит в ту же сторону, что ортопроекция SIDE_VIEW черновика (F8)"}
 
 
 # ------------------------------------------------------------------------------------------------------- палитра
@@ -469,6 +508,9 @@ def parse_args(argv=None):
     ap.add_argument("--out", default=None, help="куда писать отчёт и лист (по умолчанию --set)")
     ap.add_argument("--min-top-pct", type=float, default=None,
                     help="рамка ядра: верх маски выше y N %% кадра → WARN view.frame_top (шаг 1a: 4)")
+    ap.add_argument("--side-ortho", default=None,
+                    help="ortho_<SIDE_VIEW>.png черновика 1b: проверка ракурса бокового вида view.facing (F8)")
+    ap.add_argument("--side-view", default="side", help="имя бокового вида в --views для --side-ortho (по умолчанию side)")
     return ap.parse_args(argv)
 
 
@@ -521,6 +563,15 @@ def _run(args) -> int:
         pal_path = set_dir / "palette.json"
     if pal_path:
         palette = load_palette(pal_path)
+    ortho = None
+    if args.side_ortho:
+        if args.side_view not in names:
+            raise InputError(f"--side-ortho: вида {args.side_view!r} нет в --views {args.views!r}")
+        try:
+            ortho = Image.open(args.side_ortho)
+            ortho.load()
+        except OSError as exc:
+            raise InputError(f"--side-ortho: не читается {args.side_ortho}: {exc}") from exc
 
     images, inputs, views = {}, [], {}
     for v in names:
@@ -538,6 +589,13 @@ def _run(args) -> int:
         views[v] = measure_view(im, tol)
 
     checks = run_checks(views, tol, args.min_top_pct)
+    facing = None
+    if ortho is not None:
+        sv = views[args.side_view]
+        facing = facing_check(sv.get("_mask"), ortho, tol)
+        facing.update({"view": args.side_view, "ortho": Path(args.side_ortho).as_posix(),
+                       "ortho_sha256": sha256(Path(args.side_ortho))})
+        checks.append(facing_row(facing, args.side_view, tol, facing["ortho"]))
     if palette:
         palette_presence(palette, views)
     summary = {r: sum(c["result"] == r for c in checks) for r in ("PASS", "WARN", "FAIL")}
@@ -562,6 +620,7 @@ def _run(args) -> int:
         "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — "
                            "tools/art/concept/README.md",
         "frame": {"min_top_pct": args.min_top_pct},
+        **({"facing": facing} if facing is not None else {}),
         "measurements": views,
         "checks": checks,
         "summary": summary,
