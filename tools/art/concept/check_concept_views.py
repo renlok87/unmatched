@@ -279,6 +279,16 @@ def load_palette(path: Path) -> list:
     return out
 
 
+def palette_asset_id(path: Path) -> str | None:
+    """`asset_id` palette.json (форма concept-sheet.md §4.5, пишет make_tasks.py); нет поля или другая форма — None."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    aid = data.get("asset_id") if isinstance(data, dict) else None
+    return aid if isinstance(aid, str) and aid else None
+
+
 def palette_presence(palette: list, views: dict) -> None:
     """Справочно: доля пикселей фигуры (все виды) в RGB-расстоянии ≤ 40 от свотча. Не проверка."""
     px = [m["_rgb"][m["_mask"]] for m in views.values() if m.get("_mask") is not None]
@@ -401,6 +411,29 @@ def _dashed_v(d, x, y0, y1, fill, width=2, dash=14, gap=8):
         y += dash + gap
 
 
+SWATCH_W, SWATCH_PITCH_MIN, SWATCH_LABEL_GAP = 110, 150, 12
+
+
+def fit_text(text: str, font, max_w: float) -> str:
+    """Текст, укороченный с «…» до ширины max_w px этим шрифтом (целиком, если влезает)."""
+    if font.getlength(text) <= max_w:
+        return text
+    while text and font.getlength(text.rstrip() + "…") > max_w:
+        text = text[:-1]
+    return text.rstrip() + "…"
+
+
+def swatch_layout(palette: list, font, avail_w: float) -> tuple[int, list]:
+    """Шаг свотчей и подписи (hex, имя) в две строки (C13: длинные имена в одну строку с hex налезали на соседний
+    свотч). Шаг — по самой широкой подписи, но все свотчи в ряду avail_w; имя укорачивается до шага − зазор."""
+    n = max(1, len(palette))
+    widest = max([font.getlength(sw["hex"]) for sw in palette] + [font.getlength(sw["name"]) for sw in palette] + [0])
+    pitch = int(max(SWATCH_PITCH_MIN, widest + SWATCH_LABEL_GAP))
+    pitch = max(SWATCH_W + SWATCH_LABEL_GAP, min(pitch, int(avail_w // n)))
+    labels = [(sw["hex"], fit_text(sw["name"], font, pitch - SWATCH_LABEL_GAP)) for sw in palette]
+    return pitch, labels
+
+
 def draw_sheet(key: str, role: str, images: dict, views: dict, checks: list, palette: list, verdict: str,
                out_path: Path, cell_h: int = 900) -> None:
     names = list(images)
@@ -480,13 +513,15 @@ def draw_sheet(key: str, role: str, images: dict, views: dict, checks: list, pal
     if palette:
         py = y0 + cell_h + info_h + 10
         px = x0
-        for sw in palette:
-            rgb = tuple(int(sw["hex"][i:i + 2], 16) for i in (1, 3, 5))
-            d.rectangle([px, py, px + 110, py + 70], fill=rgb, outline=(230, 230, 230), width=2)
-            d.text((px, py + 76), f"{sw['hex']} {sw['name'][:14]}", font=f_small, fill=(220, 220, 220))
-            px += 150
-            if px + 110 > W - pad:
+        pitch, labels = swatch_layout(palette, f_small, W - pad - x0)
+        for sw, (hx, name) in zip(palette, labels):
+            if px + SWATCH_W > W - pad:
                 break
+            rgb = tuple(int(sw["hex"][i:i + 2], 16) for i in (1, 3, 5))
+            d.rectangle([px, py, px + SWATCH_W, py + 70], fill=rgb, outline=(230, 230, 230), width=2)
+            d.text((px, py + 74), hx, font=f_small, fill=(220, 220, 220))
+            d.text((px, py + 96), name, font=f_small, fill=(220, 220, 220))
+            px += pitch
     out_path.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out_path, format="PNG", optimize=True)
 
@@ -625,7 +660,8 @@ def _run(args) -> int:
         "checks": checks,
         "summary": summary,
         "verdict": verdict,
-        "palette": {"path": pal_path.as_posix() if pal_path else None, "swatches": palette},
+        "palette": {"path": pal_path.as_posix() if pal_path else None,
+                    "asset_id": palette_asset_id(pal_path) if pal_path else None, "swatches": palette},
         "sheet": sheet_path.as_posix() if args.sheet else None,
     }
     out_dir.mkdir(parents=True, exist_ok=True)

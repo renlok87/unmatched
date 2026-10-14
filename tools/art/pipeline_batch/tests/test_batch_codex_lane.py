@@ -26,6 +26,17 @@ mode, last = argv[0], argv[argv.index("-o") + 1]
 prompt = sys.stdin.buffer.read()
 if mode == "silent":
     time.sleep(60); sys.exit(0)
+if mode in ("429", "429once", "fail"):
+    cnt = last + ".count"
+    n = int(open(cnt).read()) if os.path.exists(cnt) else 0
+    open(cnt, "w").write(str(n + 1))
+    sys.stderr.write("user\nRetry the view; sha 9f429ab1\n")  # эхо промпта: «retry» и 429 внутри хэша — не лимит
+    if mode == "fail":
+        sys.stderr.write("ERROR: something else broke\n"); sys.exit(1)
+    if mode == "429" or n == 0:
+        sys.stderr.write("ERROR: exceeded retry limit, last status: 429 Too Many Requests, request id: x\n")
+        sys.exit(1)
+    mode = "exit"
 time.sleep(0.3)
 open(last, "w", encoding="utf-8").write("answer %d\n" % len(prompt))
 enc = "utf-16-le" if mode == "hang16" else "utf-8"
@@ -117,6 +128,68 @@ def test_stop_file_ends_lane_and_missing_task(tmp_path):
     logs = tmp_path / "logs"
     assert done(logs, "T0-concept.codex") == "0 exit" and done(logs, "missing.codex") == "None missing-task"
     assert (logs / "w.log").read_text(encoding="utf-8").rstrip().endswith("LANE STOP")
+
+
+def test_429_is_retried_after_pause_and_attempt_kept(tmp_path):
+    """C4: отказ по лимиту — копия попытки в attempts/, пауза, повтор той же полосой; .done по последней попытке."""
+    _lst, args = setup(tmp_path, n=1, mode="429once")
+    assert L.main(args + ["--name", "r", "--once", "--retry-429", "2", "--retry-pause", "0.2"]) == 0
+    logs = tmp_path / "logs"
+    assert done(logs, "T0-concept.codex") == "0 exit"
+    journal = (logs / "r.log").read_text(encoding="utf-8")
+    assert journal.count(" START ") == 2 and "RATE-LIMIT T0-concept.codex attempt=1 exit=1 retry-in=0s" in journal
+    a1 = logs / "attempts/T0-concept.codex/a1"
+    assert "429 Too Many Requests" in (a1 / "T0-concept.codex.err").read_text(encoding="utf-8")
+    assert (logs / "T0-concept.codex-last.txt").read_text(encoding="utf-8").startswith("answer")
+
+
+def test_429_gives_up_keeps_claim_and_release_frees_it(tmp_path, capsys):
+    _lst, args = setup(tmp_path, n=1, mode="429")
+    assert L.main(args + ["--name", "g", "--once", "--retry-429", "1", "--retry-pause", "0"]) == 0
+    logs = tmp_path / "logs"
+    assert done(logs, "T0-concept.codex") == "1 rate-limited"
+    assert (logs / "T0-concept.codex.claim").exists()  # другая полоса задание не возьмёт
+    assert sorted(p.name for p in (logs / "attempts/T0-concept.codex").iterdir()) == ["a1", "a2"]
+    capsys.readouterr()
+    assert L.main(args + ["--name", "g", "--release", "T0-concept.codex"]) == 0
+    rel = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert rel["released"] and not (logs / "T0-concept.codex.claim").exists()
+    assert not (logs / "T0-concept.codex.done").exists()
+    assert (Path(rel["archive"]) / "T0-concept.codex.done").read_text(encoding="utf-8").strip() == "1 rate-limited"
+    assert L.main(args + ["--name", "g", "--release", "T0-concept.codex"]) == 0  # повтор — без ошибки
+    assert json.loads(capsys.readouterr().out.splitlines()[-1])["released"] is False
+
+
+def test_other_failure_and_prompt_echo_are_not_429(tmp_path):
+    _lst, args = setup(tmp_path, n=1, mode="fail")
+    assert L.main(args + ["--name", "f", "--once", "--retry-429", "3", "--retry-pause", "0"]) == 0
+    logs = tmp_path / "logs"
+    assert done(logs, "T0-concept.codex") == "1 exit" and "RATE-LIMIT" not in (logs / "f.log").read_text(encoding="utf-8")
+    err = tmp_path / "x.err"
+    err.write_bytes("ERROR: exceeded retry limit, last status: 429 Too Many Requests".encode("utf-16-le"))
+    assert L.rate_limited([err])
+    err.write_bytes(b"You've hit your usage limit. Try again later.")
+    assert L.rate_limited([err])
+    err.write_bytes(b"Retry the view; sha 9f429ab1; status 4290")
+    assert not L.rate_limited([err])
+
+
+def test_stop_during_429_pause_releases_claim(tmp_path):
+    lst, args = setup(tmp_path, n=1, mode="429")
+    stop = tmp_path / "STOP-429"
+    th = threading.Thread(target=lambda: L.main(args + ["--name", "p", "--stop-file", str(stop), "--retry-429", "5",
+                                                        "--retry-pause", "30", "--idle-sleep", "1"]))
+    th.start()
+    logs = tmp_path / "logs"
+    t0 = time.monotonic()
+    while "RATE-LIMIT" not in ((logs / "p.log").read_text(encoding="utf-8") if (logs / "p.log").exists() else ""):
+        assert time.monotonic() - t0 < 20
+        time.sleep(0.1)
+    stop.write_text("stop", encoding="utf-8")
+    th.join(20)
+    assert not th.is_alive()
+    assert not (logs / "T0-concept.codex.claim").exists() and not (logs / "T0-concept.codex.done").exists()
+    assert "RELEASE T0-concept.codex" in (logs / "p.log").read_text(encoding="utf-8")
 
 
 def test_answered_needs_both_signals(tmp_path):

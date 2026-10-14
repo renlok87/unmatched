@@ -39,6 +39,16 @@ VIEWBLOCK = {
 }
 
 
+PEDESTAL_1C = ("PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with "
+               "plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no "
+               "coloured ring and no metal band.")
+
+
+def clause(sentence: str) -> str:
+    """Фраза для строки CHECKLIST «…; back - …;»: без конечной точки (C13: было «view.; back»)."""
+    return sentence.strip().rstrip(".")
+
+
 def templates(text: str) -> tuple[str, str, str]:
     """(B-CONCEPT-PACKAGE §5.4, файл задания 1c §8.1, ядро CORE-1C §8.2)."""
     return (b.skill_block(text, "### 5.4 Блок B-CONCEPT-PACKAGE"), b.skill_block(text, "### 8.1 Файл задания"),
@@ -77,7 +87,7 @@ def build_task(repo: Path, framing: Path, core_tpl: str, task_tpl: str, pkg_tpl:
             "DESCRIPTION_EN": b.scalar(card, "DESCRIPTION_EN"), "ANCHORS_EN": b.scalar(card, "ANCHORS_EN"),
             "PALETTE_EN": pal_en, "ASPECT_EN": "landscape aspect ratio 4:3" if winged else "portrait aspect ratio 3:4",
             "KEEP_EN": "silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing",
-            "WHOLE_EN": "The whole subject and the whole pedestal visible.",
+            "WHOLE_EN": "The whole subject and the whole pedestal visible.", "PEDESTAL_1C_EN": PEDESTAL_1C,
             "TOP_Y": f"{pp['figure_top_y']:.1f}", "BASE_TOP_Y": f"{pp['base_top_y_est']:.1f}",
             "BASE_BOTTOM_Y": f"{pp['base_bottom_y']:.1f}"}
     cores = {}
@@ -90,8 +100,10 @@ def build_task(repo: Path, framing: Path, core_tpl: str, task_tpl: str, pkg_tpl:
                                       "pedestal bottom y{{BASE_BOTTOM_Y}}%", m)
         cc = "\n".join(ln for ln in b.fill(core_tpl, m).split("\n") if ln.strip() != "")  # пустой IMAGE3 — без строки
         cores[slot] = cc.replace(" \n", "\n").rstrip()
+    # В тексте задания (8.1) сторона оружия стоит только в строке CHECKLIST «front and side - …; back - …;» — там фразы
+    # без конечной точки; у WEAPON_HAND none пустой back заменяется той же фразой «No weapon or held object».
     m = dict(base, B_CONCEPT_PACKAGE=b.fill(pkg_tpl, base), CORE_1C_FRONT=cores["FRONT"], CORE_1C_SIDE=cores["SIDE"],
-             CORE_1C_BACK=cores["BACK"])
+             CORE_1C_BACK=cores["BACK"], WEAPON_SIDE_EN=clause(ws), BACK_WEAPON_EN=clause(bw or ws))
     body = b.fill(task_tpl, m)
     inputs = [(f"{orth}/ortho_front.png", "draft render FRONT (image 1 of the front view)"),
               (f"{orth}/ortho_{side}.png", f"draft render {side.upper()} SIDE (image 1 of the side view)"),
@@ -102,9 +114,9 @@ def build_task(repo: Path, framing: Path, core_tpl: str, task_tpl: str, pkg_tpl:
     rows = "\n".join(f"| {i} | `{p}` | {w} | {b.sha256(repo / p)} |" for i, (p, w) in enumerate(inputs, 1))
     head = f"""# {aid} concept 1c - Codex task (views over the draft orthos)
 
-Written by Claude from {base['ASSET_DIR']}/asset-card.yaml and the step-1b orthos by the 3d-model-pipeline skill
-(references/concept-sheet.md §8; tools/art/pipeline_batch/make_1c.py). The task to execute is the text in the section
-**Task**. The header is provenance only.
+Written by Claude from {base['ASSET_DIR']}/asset-card.yaml and the step-1b orthos (template concept-sheet.md §8.1;
+tools/art/pipeline_batch/make_1c.py). The task to execute is the text in the section **Task**. The header is
+provenance only.
 
 | field | value |
 |---|---|

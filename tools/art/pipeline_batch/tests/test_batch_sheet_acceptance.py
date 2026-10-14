@@ -132,11 +132,119 @@ def test_prepare_refuses_changed_package(tmp_path, capsys):
     assert S.main(["prepare", "nobody", "1", *args(repo, work)]) == 2
 
 
-def test_accept_blocks_without_claimed_folder(tmp_path):
+def sheet(repo: Path, work: Path, **extra):
+    return S.Sheet(type("A", (), {"repo": str(repo), "work": str(work), "date": "2026-10-14", "log": None,
+                                  "exe": "codex-not-used", "model": "m", "effort": "low", "user_quote": [], **extra})())
+
+
+def test_preflight_creates_missing_cycle_folder(tmp_path):
+    """C8: каталог цикла заводит сам инструмент; неизвестный ассет — по-прежнему ошибка, без каталогов-сирот."""
+    repo = make_repo(tmp_path)
+    e = repo / f"art/pipeline-candidates/{AID}/evidence/acceptance-concept/20261014-sheet-r1"
+    shutil.rmtree(e)
+    s = sheet(repo, tmp_path / "work")
+    s.preflight({"asset_id": AID, "key": K, "package": f"art/imagegen/concept-{K}-codex"}, 1)
+    assert (e / "launcher-preflight.json").is_file()
+    with pytest.raises(RuntimeError, match="нет каталога ассета"):
+        s.preflight({"asset_id": "ASSET-NOBODY-001", "key": "nobody", "package": f"art/imagegen/concept-{K}-codex"}, 1)
+    assert not (repo / "art/pipeline-candidates/ASSET-NOBODY-001").exists()
+
+
+def test_prepare_without_owned_file_and_executor_id(tmp_path, capsys):
+    """C8: одна фигура без --owned; C9: --executor-session-id в константы карточки, без флага — прежняя строка
+    и предупреждение; C13: пустой limit_reached — без строки в промпте."""
     repo = make_repo(tmp_path)
     work = tmp_path / "work"
-    shutil.rmtree(repo / f"art/pipeline-candidates/{AID}/evidence/acceptance-concept/20261014-sheet-r1")
-    s = S.Sheet(type("A", (), {"repo": str(repo), "work": str(work), "date": "2026-10-14", "log": None,
-                               "exe": "codex-not-used", "model": "m", "effort": "low", "user_quote": []})())
-    with pytest.raises(RuntimeError, match="взятого каталога"):
-        s.preflight({"asset_id": AID, "key": K, "package": f"art/imagegen/concept-{K}-codex"}, 1)
+    sid = "claude-code:0f1e/agent:beowulf-1c"
+    assert S.main(["prepare", K, "1", *args(repo, work, "--executor-session-id", sid)]) == 0
+    e = repo / json.loads(capsys.readouterr().out)["evidence"]
+    const = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
+    assert const["executor_session_id"] == sid
+    prompt = (e / "acceptor-prompt.md").read_text(encoding="utf-8")
+    assert "исчерпал генерации" not in prompt and sid in prompt
+    assert S.main(["prepare", K, "1", *args(repo, work)]) == 0
+    assert "WARN: --executor-session-id" in capsys.readouterr().err
+    assert S.main(["all", *args(repo, work)]) == 2  # пачке нужен файл своих фигур
+    assert S.main(["prepare", "Bad_Key", "1", *args(repo, work)]) == 2
+
+
+def test_limit_line_only_when_limit_reached(tmp_path):
+    assert S.limit_line([]) == "" and S.limit_line(None) == ""
+    line = S.limit_line([{"view": "back", "failed_items": ["weapon side", "framing"]}, {"view": "side",
+                                                                                     "failed_items": "pose"}])
+    assert line.startswith("Codex исчерпал генерации запуска; проваленные пункты CHECKLIST: back: weapon side, framing; "
+                           "side: pose; оцени их по рубрике")
+    repo = make_repo(tmp_path)
+    p = repo / f"art/imagegen/concept-{K}-codex"
+    (p / "verification.json").write_text(json.dumps({"limit_reached": [{"view": "back", "failed_items": ["x"]}]}),
+                                         encoding="utf-8")
+    m = json.loads((p / "manifest-sha256.json").read_text(encoding="utf-8"))
+    m["files"]["verification.json"] = {"sha256": b.sha256(p / "verification.json"),
+                                       "bytes": (p / "verification.json").stat().st_size}
+    (p / "manifest-sha256.json").write_text(json.dumps(m), encoding="utf-8")
+    e, _p, prompt, _i = sheet(repo, tmp_path / "work").prepare({"asset_id": AID, "key": K, "package": b.rel(p, repo)}, 1)
+    assert "проваленные пункты CHECKLIST: back: x;" in prompt
+
+
+def test_prepare_second_writes_opus_prompt_and_ascii_args(tmp_path, capsys):
+    """C10/C34: промпт второго приёмщика того же листа (профиль Opus, session workflow:…, изображения — Read) и
+    ASCII-аргументы workflow second-acceptor со схемой concept; без первой карточки и при изменённом пакете — отказ."""
+    repo = make_repo(tmp_path)
+    work = tmp_path / "work"
+    row = {"asset_id": AID, "key": K, "package": f"art/imagegen/concept-{K}-codex"}
+    assert S.main(["prepare-second", K, "1", *args(repo, work)]) == 2  # нет card.json
+    assert "нет первой карточки" in capsys.readouterr().err
+    s = sheet(repo, work)
+    e, _p, first, _i = s.prepare(row, 1)
+    (e / "card.json").write_text("{}", encoding="utf-8")
+    assert S.main(["prepare-second", K, "1", *args(repo, work)]) == 0
+    out = json.loads(capsys.readouterr().out)
+    p2 = (e / "acceptor-prompt-2.md").read_text(encoding="utf-8")
+    assert (e / "acceptor-prompt.md").read_text(encoding="utf-8") == first  # промпт Sol не тронут
+    assert "«Opus xhigh»" in p2 and "workflow:acceptor2-ASSET-TEST-HERO-001-r1" in p2 and "инструментом Read" in p2
+    assert "отдельными -i" not in p2 and "codex:pending" not in p2
+    c1 = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
+    c2 = json.loads((e / "launcher-inputs-2.json").read_text(encoding="utf-8"))["constants"]
+    assert c2["frames"] == c1["frames"] and c2["accepted_object"] == c1["accepted_object"]
+    assert c2["acceptor"] == {"profile": "Opus xhigh", "session_id": "workflow:acceptor2-ASSET-TEST-HERO-001-r1"}
+    raw = (e / "second-acceptor-args.json").read_bytes()
+    assert raw.isascii()
+    wa = json.loads(raw)
+    assert wa["kind"] == "concept" and wa["schema"]["properties"]["kind"]["enum"] == ["concept"]
+    assert "description" not in json.dumps(wa["schema"]) and "title" not in wa["schema"]
+    assert wa["items"] == [{"asset": AID, "evidence": s.rel(e), "label": "acceptor2-ASSET-TEST-HERO-001-r1",
+                            "prompt": s.rel(e / "acceptor-prompt-2.md")}]
+    batch = json.loads((work / "second-acceptor-args-20261014.json").read_text(encoding="ascii"))
+    assert batch["items"] == wa["items"] and out["args"].endswith("second-acceptor-args.json")
+    (e / "card-2.json").write_text("{}", encoding="utf-8")
+    assert S.main(["prepare-second", K, "1", *args(repo, work)]) == 2  # вторая карточка уже есть
+    (e / "card-2.json").unlink()
+    p = repo / f"art/imagegen/concept-{K}-codex"
+    (p / "README.md").write_text("правка после первой приёмки\n", encoding="utf-8")  # пакет цел, но уже другой
+    m = json.loads((p / "manifest-sha256.json").read_text(encoding="utf-8"))
+    m["files"]["README.md"] = {"sha256": b.sha256(p / "README.md"), "bytes": (p / "README.md").stat().st_size}
+    (p / "manifest-sha256.json").write_text(json.dumps(m), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="пакет изменился после первой приёмки"):
+        s.prepare(row, 1, second=True)
+
+
+def test_codex_accept_ledger_template_is_described(tmp_path):
+    """C11: строка журнала приёмки Sol — ledger.py add --template T-CODEX-ACCEPT по живому 07-prompt-templates.md."""
+    sys.path.insert(0, str(b.REPO / "tools/art/visual"))
+    import ledger
+
+    root = tmp_path / "root"
+    (root / "docs/game-design/visual/06-tasks").mkdir(parents=True)
+    (root / "docs/game-design/visual/06-tasks/anim.csv").write_text("id,area,title\nAN-145,hero,x\n", encoding="utf-8")
+    shutil.copy2(b.REPO / "docs/game-design/visual/07-prompt-templates.md",
+                 root / "docs/game-design/visual/07-prompt-templates.md")
+    led = root / "ledger.json"
+    led.write_text(json.dumps({"schema": ledger.SCHEMA, "entries": [], "totals": {}}), encoding="utf-8")
+    rc = ledger.main(["--root", str(root), "--ledger", str(led), "add", "--task", "AN-145", "--template",
+                      "T-CODEX-ACCEPT", "--service", "Codex", "--model", "codex exec gpt-6.1-sol xhigh", "--units",
+                      "пакет приёмки Sol, 0 генераций image_gen", "--result", "art/x/card.json"])
+    assert rc == 0
+    e = json.loads(led.read_text(encoding="utf-8"))["entries"][-1]
+    assert e["template"] == "T-CODEX-ACCEPT" and e["cost"] is None
+    assert ledger.main(["--root", str(root), "--ledger", str(led), "add", "--task", "AN-145", "--template",
+                        "T-CODEX-NOPE", "--service", "Codex", "--model", "m", "--image-gen", "0"]) != 0

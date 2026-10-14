@@ -235,6 +235,30 @@ def test_palette_from_set_dir_is_drawn(tmp_path):
     assert (sheet == np.array([0, 255, 0], np.uint8)).all(2).sum() > 1000  # свотч нарисован
 
 
+def test_palette_asset_id_in_report_and_long_swatch_names_fit(tmp_path):
+    """C13: asset_id palette.json (§4.5) попадает в отчёт; длинные имена свотчей не налезают на соседний свотч,
+    все свотчи нарисованы."""
+    set_dir = make_set(tmp_path)
+    long_names = ["weathered oak shield wood", "iron grey chainmail rings", "fur brown wolf mantle", "gold torc"]
+    pal = {"asset_id": "ASSET-TEST-HERO-001",
+           "main": [{"name": n, "hex": h} for n, h in zip(long_names[:3], ("#8B6A43", "#5E6266", "#6E5236"))],
+           "accent": {"name": long_names[3], "hex": "#00FF00"}}
+    (set_dir / "palette.json").write_text(json.dumps(pal), encoding="utf-8")
+    code, rep, out = run(set_dir, "test-hero", "--sheet")
+    assert code == 0 and rep["palette"]["asset_id"] == "ASSET-TEST-HERO-001"
+    sheet = np.asarray(Image.open(out / "sheet-test-hero.png").convert("RGB"))
+    assert (sheet == np.array([0, 255, 0], np.uint8)).all(2).sum() > 1000  # последний (акцент) свотч нарисован
+    font = C._font(17)
+    pitch, labels = C.swatch_layout(C.load_palette(set_dir / "palette.json"), font, 2000)
+    assert pitch >= C.SWATCH_PITCH_MIN
+    for hx, name in labels:
+        assert font.getlength(hx) <= pitch - C.SWATCH_LABEL_GAP and font.getlength(name) <= pitch - C.SWATCH_LABEL_GAP
+    tight, cut = C.swatch_layout([{"hex": "#000000", "name": "x" * 80}] * 4, font, 4 * 140)
+    assert tight == 140 and cut[0][1].endswith("…") and font.getlength(cut[0][1]) <= 140 - C.SWATCH_LABEL_GAP
+    (set_dir / "palette.json").write_text(json.dumps({"main": [{"name": "a", "hex": "#112233"}]}), encoding="utf-8")
+    assert run(set_dir, "test-hero")[1]["palette"]["asset_id"] is None
+
+
 def test_cli_subprocess_exit_code(tmp_path):
     import subprocess
     set_dir = make_set(tmp_path, overrides={"side": {"top": 0.15}})

@@ -34,6 +34,11 @@ WSIDE = {"right": "The weapon is held in the figure's own RIGHT hand, which appe
          "left": "The weapon is held in the figure's own LEFT hand, which appears on the viewer's RIGHT in the front view.",
          "none": "No weapon or held object."}
 POSE_CHECK = "(both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+DELEGATED = "delegated (ВР-реестр 2026-10-06)"
+# Поля этапа 1, которые пишет пачка (ростер и дефолты §7.1): каждое — ключом в ОДНОМ блоке decided_by (SKILL.md §7.2,
+# C27; второй ключ decided_by YAML молча затирает первый, F49).
+DELEGATED_FIELDS = ("ROLE", "ANATOMY", "GAME_ROLE", "WEAPON_HAND", "SIDE_VIEW", "DESCRIPTION_EN", "ANCHORS_EN", "PALETTE",
+                    "QUALITY_REFERENCE")
 PEDESTAL = ("PEDESTAL: one round dark stone pedestal under the feet, two low stacked discs with plain bevelled edges, "
             "diameter about 0.55 of the figure height, flat top, no cobbles, no scenery, no coloured ring and no metal "
             "band. The camera is level with the pedestal: the pedestal is seen exactly edge-on, its top surface is not "
@@ -76,7 +81,13 @@ def card_text(row: dict, aid: str, adir: str, date: str, qref: str) -> str:
         "ANCHORS_EN: " + json.dumps(row["anchors_en"], ensure_ascii=False),
         "PALETTE:", "  main:"] + ["    - {name: %s, hex: \"%s\"}" % (n, h) for n, h in pal] + [
         "  accent: {name: %s, hex: \"%s\"}" % row["accent"], "QUALITY_REFERENCE:", "  - " + qref,
-        "ASSET_DIR: " + adir, "decided_by: delegated (ВР-реестр 2026-10-06)", ""])
+        "ASSET_DIR: " + adir, "decided_by:"] + ['  "%s": "%s"' % (f, DELEGATED) for f in DELEGATED_FIELDS] + [""])
+
+
+def palette_data(row: dict, aid: str) -> dict:
+    """palette.json в форме concept-sheet.md §4.5: asset_id, main, accent (C13: asset_id не писался)."""
+    return {"asset_id": aid, "main": [{"name": n, "hex": h} for n, h in row["palette"]],
+            "accent": {"name": row["accent"][0], "hex": row["accent"][1]}}
 
 
 def task_mapping(row: dict, aid: str, adir: str, date: str, card_sha: str, qref: str, qref_sha: str,
@@ -131,8 +142,7 @@ def main(argv=None) -> int:
                 continue
             card.parent.mkdir(parents=True, exist_ok=True)
             pdir.mkdir(parents=True, exist_ok=True)
-            palette = {"main": [{"name": n, "hex": h} for n, h in row["palette"]],
-                       "accent": {"name": row["accent"][0], "hex": row["accent"][1]}}
+            palette = palette_data(row, aid)
             (pdir / "palette.json").write_text(json.dumps(palette, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             card.write_text(card_text(row, aid, adir, a.date, a.quality_ref), encoding="utf-8")
             m = task_mapping(row, aid, adir, a.date, b.sha256(card), a.quality_ref, qref_sha,

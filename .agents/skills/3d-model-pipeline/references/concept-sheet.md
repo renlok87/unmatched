@@ -284,7 +284,9 @@ REPO="C:/Users/ren/WebstormProjects/unmached/unmached"
 # 1. Кандидаты. Приложение запускает свою копию из %LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/codex.exe. Каталог и
 #    версия меняются с обновлением (2026-10-09 — 9691020b…, 0.162.0-alpha.2; 2026-10-13 — 2e5e00daee91c61d,
 #    0.162.0-alpha.17.2): путь только глобом, хэш и версию не закреплять (F37). npm-codex не работает (07 §1.1).
-EXE=$(ls -t /c/Users/ren/AppData/Local/OpenAI/Codex/bin/*/codex.exe | head -1); echo "$EXE"   # самый свежий exe
+#    `command ls`, не `ls`: в Git Bash `ls` — алиас `ls -F`, он дописывает к exe «*», и проба падает с кодом 127
+#    ложным «PROBE FAIL» (C3, проверочный прогон 2026-10-14)
+EXE=$(command ls -t /c/Users/ren/AppData/Local/OpenAI/Codex/bin/*/codex.exe | head -1); echo "$EXE"   # самый свежий exe
 # 2. Проба exec С КОМАНДОЙ (не «Reply OK»: модель ответит и без песочницы, сбой останется скрытым). Флаг
 #    windows.sandbox="unelevated" обязателен на этой машине (ниже). Проба прошла, если в событиях есть
 #    command_execution с "exit_code":0.
@@ -350,10 +352,17 @@ Codex недоступен после попытки обоими путями �
 Package contract.
 - Write ONLY inside art/imagegen/concept-{{CONTENT_KEY}}-codex/. Nothing else on disk changes. Files there that you
   did not create (palette.json, earlier runs) stay as they are unless this task says otherwise.
+- The records of an earlier run in this package (for example stage 1a before 1c) are history: append, never drop.
+  README.md and prompts.md: add a section for this run on top and keep the earlier sections below unchanged;
+  generation-records.json and prompts/concept-prompts.json: add entries, keep the earlier ones as they are;
+  verification.json: the fields of this run at the top level, the whole earlier object kept in previous_runs [...];
+  source-hashes-before.json: a new block. manifest-sha256.json is rewritten last.
 - No git commands at all (no add, commit, stash, reset, checkout, branch). Claude reviews and commits.
 - Do not open, edit or build anything under unreal/. No Unreal, no Tripo, no SYNTX, no downloads.
 - Inputs are only the files listed in this task. Card scans, hero avatars, card art and frames of commercial digital
   editions are never inputs.
+- Do not load or read skills: no npx openskills read, no SKILL.md files (the AGENTS.md skill table, superpowers, the
+  imagegen skill). This task is complete as written; use the built-in image_gen tool directly.
 - Before work, record sha256 of every input in source-hashes-before.json (a corrective run appends a new block and
   keeps the old one); after work, prove in verification.json that the inputs are unchanged.
 - One image_gen call = one image = one view. Do not pass a size: the tool chooses the pixels; ask for the aspect ratio
@@ -460,7 +469,8 @@ python tools/art/visual/ledger.py check
 (SKILL.md §6, этап 0 п. 3). `ledger.py add` отклоняет id, которого нет в таблицах задач (`tools/art/visual/ledger.py:409`).
 `--model` — путь и модель этого запуска. Основной путь 5.2: `"codex exec <модель>"`, модель рабочего запуска берётся
 из `~/.codex/config.toml` (`model`; 2026-10-09 — `gpt-6.1-sol`, отсюда `"codex exec gpt-6.1-sol"`). Путь через
-приложение (5.3): `"Codex app"`.
+приложение (5.3): `"Codex app"`. Каждая приёмка Sol (п.6) — своя строка с шаблоном `T-CODEX-ACCEPT` (07 §3.4;
+команда — 5.6, C11).
 5. **Генерации запуска исчерпаны, пункт CHECKLIST провален** (`verification.json#limit_reached` не пуст). Если
    проверка `check_concept_views.py` дала 0 FAIL — лист всё равно идёт к приёмке (п.6): провал чек-листа — осмотр
    самого Codex, решает приёмщик. Запускающий добавляет к промпту приёмщика строку «Codex исчерпал генерации запуска;
@@ -480,14 +490,25 @@ python tools/art/visual/ledger.py check
 python tools/art/pipeline_batch/make_tasks.py --roster <roster.json> --tasks-out $W/tasks-1a.txt [--dry-run]
 # полоса Codex: берёт задание по claim-файлу <logs>/<id>.claim, запускает codex exec (команда 5.2, шаг 4);
 # 4–5 полос — каждая отдельным фоновым процессом со своим --name; остановка всех — файл <logs>/STOP
-python tools/art/pipeline_batch/codex_lane.py --tasks $W/tasks-1a.txt --name d1 --logs $W/logs [--once] [--grace 10]
+python tools/art/pipeline_batch/codex_lane.py --tasks $W/tasks-1a.txt --name d1 --logs $W/logs [--once] [--grace 10] \
+    [--retry-429 3] [--retry-pause 120]
+# перезапуск задания вручную (лимит исчерпан и после повторов, .done «… rate-limited»): файлы попытки уходят в
+# $W/logs/attempts/<id>/manual-<время>/, claim и .done снимаются — работающая полоса возьмёт задание сама
+python tools/art/pipeline_batch/codex_lane.py --tasks $W/tasks-1a.txt --name d1 --logs $W/logs --release <id>[,<id>…]
 # 1c: задания по орто 1b; лицензионные фигуры с решением пользователя — в отдельный список (сначала Codex, F7/F8)
 python tools/art/pipeline_batch/make_1c.py --tasks-out $W/tasks-1c.txt --ust-out $W/tasks-1c-ust.txt [--only …]
 # приёмка листов 1c пачкой (Sol): предпроверка пакета, промпт по разделу 11, codex exec, validate_card
 python tools/art/pipeline_batch/sheet_acceptance.py all --work $W --date YYYY-MM-DD [--workers 3] \
-    --user-quote "<дословная цитата задачи пользователя>"
-# второй приёмщик Opus: сохранённый workflow second-acceptor (acceptance-and-blender.md §8.3) со схемой
-# …output-concept…; его вывод {"result": [...]} → снять строки "null" (F6) и посчитать пару validate_card --second
+    --executor-session-id "<id запускающего>" --user-quote "<дословная цитата задачи пользователя>"
+# одна фигура (файл --owned не нужен): sheet_acceptance.py accept <key> <N> --work $W --date … --executor-session-id …
+# строка журнала на каждую приёмку Sol (07 §3.4, C11)
+python tools/art/visual/ledger.py add --task <VISUAL_CARD_ID> --template T-CODEX-ACCEPT --service Codex \
+    --model "codex exec gpt-6.1-sol xhigh" --units "пакет приёмки Sol, 0 генераций image_gen" \
+    --prompt-file <каталог приёмки>/acceptor-prompt.md --result <каталог приёмки>/card.json --note "лист 1c <ASSET_ID> r<N>"
+# второй приёмщик Opus (код 3 validate_card): промпт acceptor-prompt-2.md и ASCII-аргументы workflow
+python tools/art/pipeline_batch/sheet_acceptance.py prepare-second <key> <N> --work $W --date YYYY-MM-DD
+# → Workflow({name: "second-acceptor", args: <JSON из $W/second-acceptor-args-<YYYYMMDD>.json>}) (acceptance-and-blender.md
+#   §8.3); его вывод (голый список или {"result": [...]}) — в файл → снять строки "null" (F6) и посчитать пару
 python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]
 ```
 
@@ -496,9 +517,30 @@ python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-r
 - **Готовность задания** (RC-11). `codex_lane.py` считает задание готовым, когда файл `-o` не пуст и в выводе есть
   «tokens used», и через `--grace` гасит своё дерево процессов по PID. Отдельный `CODEX_HOME` без хуков
   (`--codex-home`) пробой не проверен: перед боевой волной одна проба, что `image_gen` в нём работает.
+- **Отказ по лимиту Codex (429)** (C4, проверочный прогон 2026-10-14: первая полоса умерла через 6 с, «1 exit», claim
+  держал задание). Процесс вышел с кодом ≠ 0 без ответа, а в хвосте stderr/stdout — «exceeded retry limit»,
+  «429 Too Many Requests», «status: 429» или «usage limit»: полоса копирует файлы попытки в
+  `<logs>/attempts/<id>/a<N>/`, ждёт `--retry-pause` (120 с) и запускает задание снова, до `--retry-429` (3) повторов.
+  STOP во время паузы снимает claim (задание возьмёт следующая полоса). Повторы кончились — `.done` «`<код> rate-limited`»,
+  claim остаётся; перезапуск — `--release <id>` (не переносить claim и `.done` руками). Это не генерация и не цикл.
+- **Файл своих фигур `--owned`** (C8; по умолчанию `$W/sheet-acceptance-owned.json`) — JSON-список
+  `[{"asset_id": "ASSET-BEOWULF-001", "key": "beowulf", "package": "art/imagegen/concept-beowulf-codex", "status": "claimed"}]`;
+  берутся только строки `"status": "claimed"` (так полосы приёмки делят пачку). `all` без файла — код 2; `prepare`,
+  `accept`, `prepare-second` одной фигуры без файла строят строку из `<key>` сами. Каталог цикла
+  `…/acceptance-concept/<YYYYMMDD>-sheet-r<N>/` инструмент создаёт сам (заводить заранее не нужно); вторую карточку
+  он не пишет поверх первой (`card.json` есть — отказ).
+- **`executor_session_id`** карточки (§11, F40, C9) — `--executor-session-id`: фактическая сессия запускающего
+  (субагент — `claude-code:<uuid>/agent:<name>`). Без флага — прежнее `launcher:stage-1c-sheet-<YYYYMMDD>` и WARN.
+- **Второй приёмщик листа** (код 3, §11 «Устойчивый pass»; C10). `prepare-second` пишет рядом с `card.json`
+  `acceptor-prompt-2.md` (те же константы `frames`/`accepted_object`, профиль «Opus xhigh», `session_id`
+  `workflow:acceptor2-<ASSET_ID>-r<N>`, изображения — инструментом Read, напоминание «`item` — только S, C, Q, P,
+  G-CHECKS; пустое поле — JSON null»), `launcher-inputs-2.json`, `second-acceptor-args.json` и сводный
+  `$W/second-acceptor-args-<YYYYMMDD>.json` (все фигуры пачки одним вызовом). Аргументы — ASCII, схема `…output-concept…`
+  без `description`/`title` (C34: кириллица описаний ломалась в печати cp1251). Пакет с первой приёмки изменился — отказ.
 - **Квота Codex общая** для генерации и приёмщика Sol (RC-12): пилот — 11–15 сессий Codex на фигуру (1a, 1c, приёмки
   листа, модели и клипов). Перед волной — остаток лимита; строка журнала `ledger.py add --service Codex` на каждый
-  пакет-запуск и на каждую приёмку (5.5 п.4). Квоты не хватает — приёмщик Opus (другая квота).
+  пакет-запуск (5.5 п.4) и на каждую приёмку Sol — шаблон `T-CODEX-ACCEPT` (07 §3.4, команда выше; C11). Квоты не
+  хватает — приёмщик Opus (другая квота).
 - **Шаблоны читаются из этого файла дословно.** `make_tasks.py` и `make_1c.py` берут блоки 5.4, 6.1, 6.2, 8.1, 8.2 по
   заголовкам. После правки этих блоков или заголовков — `--dry-run` обоих: новый плейсхолдер без значения — код 2.
 - Промпт пакетной приёмки несёт блок чтения кириллицы раздела 11 (OEM, `cmd /c type`, «СБОЙ ОКРУЖЕНИЯ»):
@@ -524,7 +566,7 @@ edge-on».
 ````markdown
 # {{ASSET_ID}} concept 1a - Codex task (design front)
 
-Written by Claude from {{ASSET_DIR}}/asset-card.yaml by the 3d-model-pipeline skill (references/concept-sheet.md).
+Written by Claude from {{ASSET_DIR}}/asset-card.yaml (template concept-sheet.md §6.1).
 The task to execute is the text in the section **Task**. The header is provenance only.
 
 | field | value |
@@ -662,7 +704,8 @@ python tools/art/concept/draft_orthos.py \
 
 Пишется как 6.1: каждый `{{…}}` подставлен, файл — из Python в UTF-8, `grep -n '{{' <файл>` → пусто. Шапка и
 таблица входов — как в 6.1 (id `{{ASSET_ID}}-concept-views (stage 1c)`; строка лимита — по каждому виду:
-`front 2, side 2, back 2` = `min(2, 4 − генераций вида в generation-records.json)`). Входы — пути от корня репо и
+`front 2, side 2, back 2` = `min(2, 4 − генераций вида в generation-records.json)`). Имени скилла в шапке нет: по нему
+генератор Codex грузил таблицу скиллов AGENTS.md, superpowers и imagegen (C5; запрет — строка блока 5.4). Входы — пути от корня репо и
 sha256: `{{ORTHO_DIR}}/ortho_front.png`, `{{ORTHO_DIR}}/ortho_{{SIDE_VIEW}}.png`, `{{ORTHO_DIR}}/ortho_back.png`,
 `{{ORTHO_DIR}}/ortho-framing.json`, `art/imagegen/concept-{{CONTENT_KEY}}-codex/design/{{CONTENT_KEY}}-front.png`,
 `art/imagegen/concept-{{CONTENT_KEY}}-codex/palette.json`; `{{ORTHO_DIR}}` =
@@ -711,6 +754,11 @@ CHECKLIST (per view, passed/failed with a note in verification.json):
 - weapon side: front and side - {{WEAPON_SIDE_EN}}; back - {{BACK_WEAPON_EN}};
 - framing as in image 1: {{FRAME_CHECK_EN}}; the same highest point; the whole subject visible;
 - the same plain flat dark gray background in every view.
+Framing and background are measured by check_concept_views.py (view.top_margin, view.side_margin, view.bottom_margin,
+view.border_uniform, view.bg_neutral, view.bg_dark; in the final run also set.base_bottom, set.base_center,
+set.height, set.bg_same): PASS or WARN there means these CHECKLIST items pass. By eye fail them only for a gross
+defect the script cannot measure (a cropped part, a visible floor, gradient or vignette, a camera that is visibly not
+level). A difference of a few pixels, a few tenths of a percent or a few RGB levels is never a reason to regenerate.
 CORE-FRONT:
 {{CORE_1C_FRONT}}
 CORE-SIDE:
@@ -736,6 +784,7 @@ ornament and painted detail level onto image 1. Do not copy its pose, proportion
 SUBJECT: {{DESCRIPTION_EN}}
 IDENTITY ANCHORS, where visible from this side: {{ANCHORS_EN}}.
 PALETTE: {{PALETTE_EN}}. {{WEAPON_SIDE_EN}}
+{{PEDESTAL_1C_EN}}
 VIEW: {{VIEW_BLOCK_EN}}
 FRAMING: the same {{ASPECT_EN}} and the same framing as image 1, uniform scale only: {{FRAMING_BASE_EN}}, highest point
 y{{TOP_Y}}%. {{WHOLE_EN}}
@@ -764,8 +813,11 @@ side with all its hardware.`; back — `BACK: camera directly behind the object,
 | `{{KEEP_EN}}` | `silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing` | `silhouette, proportions, positions of handles and hardware, scale and framing` |
 | `{{FRAMING_BASE_EN}}` | `pedestal x{{BASE_X0}}%-{{BASE_X1}}%, pedestal top y{{BASE_TOP_Y}}%, pedestal bottom y{{BASE_BOTTOM_Y}}%` | `the bottom of the object x{{BASE_X0}}%-{{BASE_X1}}% at y{{BASE_BOTTOM_Y}}%, no pedestal` |
 | `{{WHOLE_EN}}` | `The whole subject and the whole pedestal visible.` | `The whole object visible.` |
+| `{{PEDESTAL_1C_EN}}` | `PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.` | пусто (строка удаляется) |
 
 У пропа `{{BASE_TOP_Y}}` не используется: `base_top_y_est` — верх широкого нижнего слоя, у пропа это не подставка.
+`{{PEDESTAL_1C_EN}}` (C7, проверочный прогон 2026-10-14): без него front g1 Beowulf пришёл с белой подставкой
+черновика — материал орто перерисовка держит так же, как форму.
 
 ### 8.3 Ядро PROP-ROTATE (осесимметричный проп без 1b, только вид side)
 
@@ -815,7 +867,7 @@ No perspective, text, labels, watermark, cropping, collage or extra objects. Out
 | `{{ANCHORS_EN}}` | `ANCHORS_EN` | 3–6 видимых признаков через `; `, со стороной и числом: `longbow in the figure's own LEFT hand; quiver over the RIGHT shoulder; exactly three feathers on the hood`. **Сторона колчана и ножен** (решение оркестратора 2026-10-09): не задана заявкой — на стороне натягивающей или свободной руки, то есть противоположной `WEAPON_HAND`: лук в левой → колчан за ПРАВЫМ плечом или на правом бедре; меч в правой → ножны на ЛЕВОМ бедре. `WEAPON_HAND: none` — сторона из заявки, иначе не упоминается. Сторона пишется в `DESCRIPTION_EN` и в якорь |
 | `{{PALETTE_EN}}` | `PALETTE` | `<name> #RRGGBB` через `, `, акцент последним с префиксом `accent `: `midnight blue #1F2A5A, antique gold #B08A3E, accent sapphire blue #2F5FD0`; имена — `PALETTE.main[].name`, `PALETTE.accent.name` |
 | `{{POSE_EN}}` | `ANATOMY` | таблица раздела 4.4 |
-| `{{WEAPON_SIDE_EN}}`, `{{BACK_WEAPON_EN}}` | `WEAPON_HAND` | таблица раздела 4.4 |
+| `{{WEAPON_SIDE_EN}}`, `{{BACK_WEAPON_EN}}` | `WEAPON_HAND` | таблица раздела 4.4; в строке CHECKLIST задания 1c (8.1) — без точки в конце, пустой `{{BACK_WEAPON_EN}}` (`none`) там — `No weapon or held object` (`make_1c.py`, C13) |
 | `{{POSE_CHECK_EN}}` | `ANATOMY` | humanoid — `(both arms clearly apart from the torso, not a T-pose, not an A-pose)`; winged-biped — `(exactly two wings, clearly apart from the body, no separate human arms)`; prop — `(upright, in its natural resting orientation)` |
 | `{{ASPECT_EN}}`; `--aspect` | `ANATOMY` | `portrait aspect ratio 3:4`; winged-biped — `landscape aspect ratio 4:3` |
 | `{{PEDESTAL_EN}}` | `ROLE` | фигура: `PEDESTAL: one round dark stone pedestal under the feet, two low stacked discs with plain bevelled edges, diameter about 0.55 of the figure height, flat top, no cobbles, no scenery, no coloured ring and no metal band. The camera is level with the pedestal: the pedestal is seen exactly edge-on, its top surface is not visible, its front edge is a straight horizontal line.` (Ø 0,30 м при росте 0,55 м — HANDBOOK §2.10; точный масштаб задаёт этап 3); prop: `PEDESTAL: none; the object stands on its own flat bottom, seen exactly edge-on.` |
@@ -826,7 +878,7 @@ No perspective, text, labels, watermark, cropping, collage or extra objects. Out
 | `{{SIDE_VIEW}}` | `SIDE_VIEW` | `left` (дефолт этапа 0) или `right` по правилу раздела 4.1 |
 | `{{ORTHO_DIR}}` | шаг 1b | `art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-draft-tripo/orthos`, путь от корня репо |
 | `{{VIEW_NAME_EN}}`, `{{VIEW_BLOCK_EN}}`, `{{IMAGE3_EN}}` | вид + `SIDE_VIEW` | таблица раздела 8.2 |
-| `{{KEEP_EN}}`, `{{FRAMING_BASE_EN}}`, `{{WHOLE_EN}}`, `{{FRAME_CHECK_EN}}` | `ROLE` | таблица ролей раздела 8.2 и строка под шаблоном 8.1 (у пропа без слова «pedestal») |
+| `{{KEEP_EN}}`, `{{FRAMING_BASE_EN}}`, `{{WHOLE_EN}}`, `{{PEDESTAL_1C_EN}}`, `{{FRAME_CHECK_EN}}` | `ROLE` | таблица ролей раздела 8.2 и строка под шаблоном 8.1 (у пропа без слова «pedestal») |
 | `{{BASE_X0}}`, `{{BASE_X1}}`, `{{BASE_TOP_Y}}`, `{{BASE_BOTTOM_Y}}`, `{{TOP_Y}}` | `ortho-framing.json` шага 1b | маппинг полей — раздел 7, п. 5; в % кадра, одна цифра после запятой |
 
 Не плейсхолдеры задания, а значения команд запускающего агента: `<VISUAL_CARD_ID>` — id строки `06-tasks/anim.csv`

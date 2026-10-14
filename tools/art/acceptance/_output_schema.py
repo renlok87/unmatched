@@ -18,11 +18,20 @@ gates.*.source_defect): null = поля нет (`validate_card.strip_output_null
 
     python tools/art/acceptance/_output_schema.py --write    # пересобрать три файла из полной схемы
     python tools/art/acceptance/_output_schema.py --check    # код 1, если файлы устарели
+    python tools/art/acceptance/_output_schema.py --workflow-args <model|concept|anim> \
+        [--item <ASSET_ID>=<каталог приёмки>[=<label>]]… [--out <args.json>]
+
+--workflow-args — аргументы workflow `second-acceptor` (acceptance-and-blender.md §8.3) одним ASCII-JSON:
+{"kind", "items": [{asset, evidence, label, prompt}], "schema"}; схема — та же строгая выходная схема вида, но без
+`description`/`title` (кириллица описаний ломалась при печати через cp1251, C34 проверочного прогона 2026-10-14;
+модели они не нужны — поля и enum те же). label по умолчанию — acceptor2-<ASSET_ID>-r<N> (клип —
+acceptor2-<ASSET_ID>-<Clip>-r<N>) по имени каталога; prompt — <каталог>/acceptor-prompt-2.md. Без --out — в stdout.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -156,12 +165,83 @@ def dumps(schema: dict) -> str:
     return json.dumps(schema, ensure_ascii=False, indent=2) + "\n"
 
 
+STRIP_KEYWORDS = ("description", "title")
+
+
+def ascii_schema(schema):
+    """Схема без ключевых слов description/title (имена свойств не трогаются); остальное — как есть."""
+    if isinstance(schema, list):
+        return [ascii_schema(x) for x in schema]
+    if not isinstance(schema, dict):
+        return schema
+    out = {}
+    for k, v in schema.items():
+        if k in STRIP_KEYWORDS:
+            continue
+        if k == "properties" and isinstance(v, dict):
+            out[k] = {name: ascii_schema(sub) for name, sub in v.items()}
+        else:
+            out[k] = ascii_schema(v)
+    return out
+
+
+def default_label(asset: str, evidence: str) -> str:
+    """acceptor2-<ASSET_ID>-r<N> по каталогу приёмки …/<YYYYMMDD>[-sheet|-front]-r<N>[/<Clip>] (§8.3)."""
+    parts = [p for p in str(evidence).replace("\\", "/").split("/") if p]
+    for i in range(len(parts) - 1, -1, -1):
+        m = re.search(r"-(r\d+)$", parts[i])
+        if m:
+            clip = parts[i + 1] if i + 1 < len(parts) else None
+            return "acceptor2-%s-%s%s" % (asset, clip + "-" if clip else "", m.group(1))
+    return "acceptor2-%s" % asset
+
+
+def workflow_args(kind: str, items: list | None = None) -> dict:
+    """{"kind", "items", "schema"} для workflow second-acceptor; ASCII-безопасно (json.dumps(ensure_ascii=True))."""
+    items = [dict(it) for it in (items or [])]
+    for it in items:
+        if not it.get("asset") or not it.get("evidence"):
+            raise ValueError("item needs asset and evidence: %r" % (it,))
+        it["evidence"] = str(it["evidence"]).replace("\\", "/").rstrip("/")
+        it.setdefault("label", default_label(it["asset"], it["evidence"]))
+        it.setdefault("prompt", it["evidence"] + "/acceptor-prompt-2.md")
+    return {"kind": kind, "items": items, "schema": ascii_schema(build(kind))}
+
+
+def parse_item(text: str) -> dict:
+    parts = text.split("=")
+    if len(parts) not in (2, 3) or not all(parts):
+        raise ValueError("--item expects <ASSET_ID>=<evidence dir>[=<label>], got %r" % text)
+    item = {"asset": parts[0], "evidence": parts[1]}
+    if len(parts) == 3:
+        item["label"] = parts[2]
+    return item
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--workflow-args", choices=KINDS, metavar="KIND",
+                   help="ASCII-аргументы workflow second-acceptor для вида карточки (model, concept, anim)")
+    ap.add_argument("--item", action="append", default=[], help="<ASSET_ID>=<каталог приёмки>[=<label>] (повторяется)")
+    ap.add_argument("--out", default=None, help="файл аргументов (по умолчанию stdout)")
     a = ap.parse_args(argv)
+    if a.workflow_args:
+        try:
+            text = json.dumps(workflow_args(a.workflow_args, [parse_item(x) for x in a.item]), ensure_ascii=True,
+                              indent=2) + "\n"
+        except ValueError as exc:
+            print("ERROR: %s" % exc, file=sys.stderr)
+            return 2
+        if a.out:
+            Path(a.out).parent.mkdir(parents=True, exist_ok=True)
+            Path(a.out).write_text(text, encoding="ascii", newline="\n")
+            print("wrote", Path(a.out).as_posix())
+        else:
+            sys.stdout.write(text)
+        return 0
     bad = 0
     for kind in KINDS:
         text = dumps(build(kind))

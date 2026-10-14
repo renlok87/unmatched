@@ -1,23 +1,33 @@
 """Приёмка листов 1c пачкой (Sol-приёмщик Codex): предпроверка пакета, промпт по рубрике §11, запуск codex exec, проверка карточки validate_card.
 
 concept-sheet.md §11 (рубрика 1c), acceptance-and-blender.md §8.4 (команда приёмщика). На фигуру из списка «своих»
-(--owned: [{asset_id, key, package, status: "claimed"}, …]) в каталоге
-<asset-dir>/evidence/acceptance-concept/<YYYYMMDD>-sheet-r<N>/ (создаёт тот, кто взял фигуру):
+(--owned, по умолчанию <work>/sheet-acceptance-owned.json: JSON-список [{"asset_id": "ASSET-BEOWULF-001", "key":
+"beowulf", "package": "art/imagegen/concept-beowulf-codex", "status": "claimed"}, …]; берутся только строки
+status "claimed"; без файла prepare/accept/prepare-second одной фигуры строят такую строку из <key> сами, C8) в
+каталоге <asset-dir>/evidence/acceptance-concept/<YYYYMMDD>-sheet-r<N>/ (нет — создаётся, C8):
   1. preflight — выбранные записи 1c и их копии, ссылки, полный manifest-sha256, UTF-8 без BOM/«????», повтор
      check_concept_views.py --sheet совпадает с checks-report.json пакета, G-CHECKS без FAIL;
   2. prompt — константы карточки, рубрика §11 дословно, изображения отдельными -i;
   3. accept — codex exec (--ignore-user-config, read-only, --output-schema), session_id из thread.started,
      validate_card.py --check-files (0 или 3 = нужен второй приёмщик), запись в журнал --log.
+  4. prepare-second (код 3, C10) — промпт второго приёмщика «Opus xhigh» acceptor-prompt-2.md (те же константы и
+     файлы, изображения открываются инструментом Read), ASCII-аргументы workflow second-acceptor:
+     <каталог приёмки>/second-acceptor-args.json и сводный <work>/second-acceptor-args-<YYYYMMDD>.json (C34);
+     пакет не изменился с первой приёмки. Вывод workflow → finish_second.py.
 Пакет во время приёмки не меняется (хэши до/после). Был C:/tmp/concept-wave/sheet_acceptance.py.
 
     python tools/art/pipeline_batch/sheet_acceptance.py prepare <key> <cycle> --work <dir> --date YYYY-MM-DD   # без Codex
     python tools/art/pipeline_batch/sheet_acceptance.py probe --work <dir>
     python tools/art/pipeline_batch/sheet_acceptance.py accept <key> <cycle> --work <dir> --date YYYY-MM-DD
     python tools/art/pipeline_batch/sheet_acceptance.py all --work <dir> --date YYYY-MM-DD [--workers 3]
+    python tools/art/pipeline_batch/sheet_acceptance.py prepare-second <key> <cycle> --work <dir> --date YYYY-MM-DD
     общие: [--owned <json>] [--log <jsonl>] [--exe <codex.exe>] [--model gpt-6.1-sol] [--effort xhigh]
-           [--user-quote "дословная цитата задачи"]…
+           [--executor-session-id <id запускающего>] [--user-quote "дословная цитата задачи"]…
 
-Траты: каждая приёмка — сессия Codex (квота ChatGPT, RC-12): строку журнала трат пишет оркестратор.
+--executor-session-id — фактическая сессия запускающего (concept-sheet.md §11, F40, C9: субагент —
+claude-code:<uuid>/agent:<name>); без флага — прежнее launcher:stage-1c-sheet-<YYYYMMDD> и предупреждение.
+Траты: каждая приёмка — сессия Codex (квота ChatGPT, RC-12): строку журнала трат пишет оркестратор
+(ledger.py add --template T-CODEX-ACCEPT, concept-sheet.md §5.6, C11).
 Код выхода: 0 — команда выполнена (итог каждой фигуры — в журнале), 1 — проба не прошла, 2 — ошибка входа.
 """
 from __future__ import annotations
@@ -41,6 +51,49 @@ DELEGATION = ("Делегирование пользователя (2026-10-06, 
               "принимай».")
 SCHEMA = "tools/art/acceptance/asset-acceptance-2.output-concept.schema.json"
 LOCK = threading.Lock()
+ACCEPTANCE_TOOLS = Path(__file__).resolve().parents[1] / "acceptance"
+
+
+def default_row(key: str) -> dict:
+    """Строка «своей» фигуры без файла --owned (C8): ASSET_ID и пакет — по правилу этапа 0 из content-key."""
+    return {"asset_id": b.asset_id(key), "key": key, "package": f"art/imagegen/concept-{key}-codex", "status": "claimed"}
+
+
+def second_label(aid: str, cycle: int) -> str:
+    """label workflow второго приёмщика (acceptance-and-blender.md §8.3): acceptor2-<ASSET_ID>-r<N>."""
+    return f"acceptor2-{aid}-r{cycle}"
+
+
+def limit_line(limit) -> str:
+    """Строка промпта о `verification.json#limit_reached` (concept-sheet.md §5.5 п.5) — только когда список не пуст
+    (C13); «<вид>: <пункты>; …»."""
+    if not limit:
+        return ""
+    parts = []
+    for x in limit if isinstance(limit, list) else [limit]:
+        if isinstance(x, dict):
+            items = x.get("failed_items", x.get("items", []))
+            items = ", ".join(str(i) for i in items) if isinstance(items, list) else str(items)
+            parts.append(f"{x.get('view', '?')}: {items}")
+        else:
+            parts.append(str(x))
+    return ("Codex исчерпал генерации запуска; проваленные пункты CHECKLIST: " + "; ".join(parts)
+            + "; оцени их по рубрике, без автоматического снижения из-за записи исполнителя.\n")
+
+
+def workflow_args(items: list, kind: str = "concept") -> dict:
+    """Аргументы workflow second-acceptor: items + строгая выходная схема вида без description/title (ASCII, C34)."""
+    if str(ACCEPTANCE_TOOLS) not in sys.path:
+        sys.path.insert(0, str(ACCEPTANCE_TOOLS))
+    import _output_schema  # noqa: E402
+
+    return _output_schema.workflow_args(kind, items)
+
+
+def write_ascii_json(p, obj) -> None:
+    p = Path(p)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(obj, ensure_ascii=True, indent=2) + "\n", encoding="ascii")
 
 
 def read(p) -> str:
@@ -105,6 +158,8 @@ class Sheet:
         self.d8 = a.date.replace("-", "")
         self.log = Path(a.log) if a.log else self.work / "acceptance-log-1c.jsonl"
         self.exe = a.exe
+        # C9: фактический id запускающего (§11, F40); без флага — прежняя строка (обратная совместимость)
+        self.executor_session_id = getattr(a, "executor_session_id", None) or f"launcher:stage-1c-sheet-{self.d8}"
 
     def rel(self, p) -> str:
         return b.rel(p, self.repo)
@@ -137,11 +192,12 @@ class Sheet:
         return code, ev, err
 
     # ---------------------------------------------------------------------------------------------- 1. preflight
-    def preflight(self, row: dict, cycle: int):
+    def preflight(self, row: dict, cycle: int, tag: str = ""):
         aid, key = row["asset_id"], row["key"]
         p, e = self.repo / row["package"], self.ev_dir(aid, cycle)
-        if not e.is_dir():
-            raise RuntimeError(f"нет взятого каталога приёмки {self.rel(e)}")
+        if not (self.repo / "art/pipeline-candidates" / aid).is_dir():
+            raise RuntimeError(f"нет каталога ассета art/pipeline-candidates/{aid}")
+        e.mkdir(parents=True, exist_ok=True)  # C8: каталог цикла создаётся здесь, заранее его заводить не нужно
         card = self.repo / "art/pipeline-candidates" / aid / "asset-card.yaml"
         cardtext = read(card)
         gens, prompts = data(p / "generation-records.json"), data(p / "prompts/concept-prompts.json")
@@ -194,14 +250,25 @@ class Sheet:
             raise RuntimeError("повтор check_concept_views расходится с checks-report.json пакета")
         if chk.returncode != 0:
             raise RuntimeError("G-CHECKS FAIL до приёмки")
-        write(e / "launcher-preflight.json", dict(selected_records=True, manifest=True, utf8=True, recheck_exit=0,
-                                                  recheck_same=True, package_hashes={self.rel(f): b.sha256(f) for f in
-                                                                                     p.rglob("*") if f.is_file()}))
+        hashes = {self.rel(f): b.sha256(f) for f in p.rglob("*") if f.is_file()}
+        if tag and (e / "launcher-preflight.json").is_file() \
+                and data(e / "launcher-preflight.json").get("package_hashes") != hashes:
+            raise RuntimeError("пакет изменился после первой приёмки: второй приёмщик судил бы другие файлы")
+        write(e / f"launcher-preflight{tag}.json", dict(selected_records=True, manifest=True, utf8=True, recheck_exit=0,
+                                                        recheck_same=True, package_hashes=hashes))
         return p, e, card, cardtext, gens, old
 
     # ------------------------------------------------------------------------------------------------- 2. prompt
-    def prepare(self, row: dict, cycle: int):
-        p, e, card, cardtext, gens, checks = self.preflight(row, cycle)
+    def prepare(self, row: dict, cycle: int, second: bool = False):
+        """Промпт приёмщика. second=False — Sol (acceptor-prompt.md, изображения через -i); second=True — второй
+        приёмщик Opus через workflow second-acceptor (acceptor-prompt-2.md, изображения — инструментом Read; C10)."""
+        if second:
+            e0 = self.ev_dir(row["asset_id"], cycle)
+            if not (e0 / "card.json").is_file():
+                raise RuntimeError(f"нет первой карточки {self.rel(e0 / 'card.json')}: второй приёмщик — после неё")
+            if (e0 / "card-2.json").exists():
+                raise RuntimeError(f"карточка второго приёмщика уже есть: {self.rel(e0 / 'card-2.json')}")
+        p, e, card, cardtext, gens, checks = self.preflight(row, cycle, "-2" if second else "")
         aid, key = row["asset_id"], row["key"]
         orthodirs = list((self.repo / "art/pipeline-candidates" / aid).glob("*-draft-tripo/orthos"))
         if len(orthodirs) != 1:
@@ -214,6 +281,19 @@ class Sheet:
         if missing:
             raise RuntimeError(f"нет изображений {missing}")
         prev = (self.rel(e.parent / f"{self.d8}-sheet-r{cycle - 1}" / "card.json") if cycle > 1 else None)
+        if second:
+            profile, session = "Opus xhigh", "workflow:" + second_label(aid, cycle)
+            who = (f"Ты — второй независимый приёмщик «{profile}», не исполнитель; первую карточку (card.json) ты не "
+                   "видишь и не открываешь.")
+            how_images = ("Открой каждый файл как картинку инструментом Read, каждый целиком: к этому промпту "
+                          "изображения не приложены. Список изображений:")
+            session_line = (f"acceptor.session_id — ровно {session}. Пункт item в rework_fix_list и known_issues — только "
+                            "S, C, Q, P или G-CHECKS; пустое необязательное поле — JSON null, не строка \"null\".")
+        else:
+            profile, session = "Sol 6.1 xhigh", "codex:pending"
+            who = f"Ты — отдельный приёмщик «{profile}», не исполнитель."
+            how_images = "Открой каждый файл как картинку: все изображения переданы отдельными -i. Порядок приложенных изображений:"
+            session_line = "Acceptor session_id codex:pending запускающий заменит на thread_id; другой правки не будет."
         constants = dict(schema="unmatched.concept-acceptance/1", kind="concept", asset_id=aid, clip=None,
                          cycle=f"r{cycle}", date=self.date, previous_card=prev,
                          accepted_object=[dict(path=self.rel(f), sha256=b.sha256(f)) for f in views],
@@ -221,19 +301,19 @@ class Sheet:
                                      + ["checks-report.json"]),
                          reports=[self.rel(p / f) for f in ("checks-report.json", "generation-records.json",
                                                             "verification.json")],
-                         acceptor=dict(profile="Sol 6.1 xhigh", session_id="codex:pending"),
-                         executor_session_id=f"launcher:stage-1c-sheet-{self.d8}",
+                         acceptor=dict(profile=profile, session_id=session),
+                         executor_session_id=self.executor_session_id,
                          decided_by="delegated (ВР-реестр 2026-10-06)")
         rubric = read(self.repo / b.SKILL)
         rubric = rubric[rubric.index("## 11."):rubric.index("## 12.")]
         quotes = "".join(f"Задача пользователя (дословно): «{q}».\n" for q in self.a.user_quote)
-        limit = json.dumps(data(p / "verification.json").get("limit_reached", []), ensure_ascii=False)
+        limit = limit_line(data(p / "verification.json").get("limit_reached", []))
         prompt = f"""# Приёмка 1c sheet {aid}, цикл r{cycle}
 {DELEGATION}
-{quotes}Траты на приёмке: нет. Ты — отдельный приёмщик «Sol 6.1 xhigh», не исполнитель. Файлы не правишь, ничего не генерируешь, не запускаешь validate_card.py, Blender, git, Unreal, Tripo, SYNTX, браузер или других агентов.
+{quotes}Траты на приёмке: нет. {who} Файлы не правишь, ничего не генерируешь, не запускаешь validate_card.py, Blender, git, Unreal, Tripo, SYNTX, браузер или других агентов.
 Твоя единственная выдача — JSON-карточка. Её сохраняет CLI. Текстовые файлы читай так, чтобы кириллица дошла целой: песочница пишет вывод в OEM-кодировке, `Get-Content -Encoding UTF8` даёт кракозябры, смена `[Console]::OutputEncoding` запрещена. Читай каждый текстовый файл командой `Get-Content <файл> -Raw -Encoding OEM` или `cmd /c type <файл>`. Если кириллица всё равно пришла кракозябрами — это сбой окружения: не оценивай по догадкам, верни карточку, где verdict_reason начинается со слов «СБОЙ ОКРУЖЕНИЯ: кириллица не читается» (concept-sheet.md §11, RA-03). Не читай посторонние карточки, чаты или пакеты.
 Ты — приёмщик этапа 1 скилла 3d-model-pipeline (концепт-лист). Объект: 1c виды {key}-front/side/back.png и лист sheet-{key}.png пакета {self.rel(p)}.
-Открой каждый файл как картинку: все изображения переданы отдельными -i. Порядок приложенных изображений:
+{how_images}
 {json.dumps([self.rel(f) for f in images], ensure_ascii=False, indent=2)}
 Эталон качества: {qref}. Для 1c — утверждённый дизайн {self.rel(p / 'design' / f'{key}-front.png')} и ортопроекции 1b {self.rel(orthodirs[0])}. ortho_right — дополнительный вид того же черновика; SIDE_VIEW заявки задаёт сторону принимаемого side.
 Прочитай {self.rel(p / 'checks-report.json')}, {self.rel(p / 'generation-records.json')}, {self.rel(p / 'verification.json')}, {self.rel(p / 'palette.json')}, {self.rel(card)} и {self.rel(orthodirs[0] / 'ortho-framing.json')}. Предыдущая карточка: {prev}; на r2 проверь закрытие её списка, а баллы ставь заново.
@@ -249,14 +329,23 @@ score half-up: sum(S,C,Q,P)/8*10. Гейт FAIL, любое значение <1 
 Заполни все поля таблицы Карточка §11; обязательные константы (скопировать без изменения):
 {json.dumps(constants, ensure_ascii=False, indent=2)}
 При pass status_note содержит «художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)».
-В строгой схеме необязательные поля представлены null. Acceptor session_id codex:pending запускающий заменит на thread_id; другой правки не будет.
-Codex исчерпал генерации запуска; проваленные пункты CHECKLIST: {limit}; оцени их по рубрике, без автоматического снижения из-за записи исполнителя.
-Верни только JSON карточки по {SCHEMA}.
+В строгой схеме необязательные поля представлены null. {session_line}
+{limit}Верни только JSON карточки по {SCHEMA}.
 """
         if "{{" in prompt:
             raise RuntimeError("незаполненный плейсхолдер")
-        write(e / "acceptor-prompt.md", prompt)
-        write(e / "launcher-inputs.json", dict(images=[self.rel(f) for f in images], constants=constants))
+        tag = "-2" if second else ""
+        write(e / f"acceptor-prompt{tag}.md", prompt)
+        write(e / f"launcher-inputs{tag}.json", dict(images=[self.rel(f) for f in images], constants=constants))
+        if second:
+            item = dict(asset=aid, evidence=self.rel(e), label=second_label(aid, cycle),
+                        prompt=self.rel(e / "acceptor-prompt-2.md"))
+            write_ascii_json(e / "second-acceptor-args.json", workflow_args([item]))
+            batch = self.work / f"second-acceptor-args-{self.d8}.json"
+            with LOCK:
+                items = json.loads(batch.read_text(encoding="ascii"))["items"] if batch.is_file() else []
+                items = [i for i in items if i.get("evidence") != item["evidence"]] + [item]
+                write_ascii_json(batch, workflow_args(items))
         return e, p, prompt, images
 
     # ------------------------------------------------------------------------------------------------- 3. accept
@@ -363,17 +452,22 @@ def main(argv=None) -> int:
     b.utf8_streams()
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
                                  formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    ap.add_argument("command", choices=("prepare", "probe", "accept", "all"))
-    ap.add_argument("key", nargs="?", help="content-key (prepare/accept)")
-    ap.add_argument("cycle", nargs="?", type=int, help="номер цикла N (prepare/accept)")
+    ap.add_argument("command", choices=("prepare", "probe", "accept", "all", "prepare-second"))
+    ap.add_argument("key", nargs="?", help="content-key (prepare/accept/prepare-second)")
+    ap.add_argument("cycle", nargs="?", type=int, help="номер цикла N (prepare/accept/prepare-second)")
     ap.add_argument("--work", required=True, help="рабочий каталог пачки (журнал, перепроверки, проба)")
-    ap.add_argument("--owned", default=None, help="список своих фигур (по умолчанию <work>/sheet-acceptance-owned.json)")
+    ap.add_argument("--owned", default=None,
+                    help="JSON-список своих фигур [{asset_id, key, package, status: \"claimed\"}] (по умолчанию "
+                         "<work>/sheet-acceptance-owned.json; для одной фигуры можно без файла)")
     ap.add_argument("--log", default=None, help="журнал приёмок (по умолчанию <work>/acceptance-log-1c.jsonl)")
     ap.add_argument("--date", default=dt.date.today().isoformat(), help="дата цикла YYYY-MM-DD (<YYYYMMDD>-sheet-rN)")
     ap.add_argument("--exe", default=None)
     ap.add_argument("--model", default="gpt-6.1-sol")
     ap.add_argument("--effort", default="xhigh")
     ap.add_argument("--workers", type=int, default=3)
+    ap.add_argument("--executor-session-id", default=None,
+                    help="фактическая сессия запускающего для executor_session_id карточки (§11, F40; "
+                         "субагент — claude-code:<uuid>/agent:<name>)")
     ap.add_argument("--user-quote", action="append", default=[], help="дословная цитата задачи пользователя (в промпт)")
     ap.add_argument("--repo", default=str(b.REPO))
     try:
@@ -381,15 +475,21 @@ def main(argv=None) -> int:
     except SystemExit as exc:
         return int(exc.code or 0)
     a.exe = a.exe or default_exe()
-    if a.command != "prepare" and not a.exe:
+    if a.command not in ("prepare", "prepare-second") and not a.exe:
         print("ERROR: нет codex.exe (--exe)", file=sys.stderr)
         return 2
     s = Sheet(a)
     if a.command == "probe":
         return 0 if s.probe() else 1
+    if not a.executor_session_id:
+        print(f"WARN: --executor-session-id не задан: executor_session_id = {s.executor_session_id} (§11 ждёт "
+              "фактический id запускающего, F40)", file=sys.stderr)
     owned = Path(a.owned) if a.owned else Path(a.work) / "sheet-acceptance-owned.json"
     try:
-        rows = [r for r in data(owned) if r.get("status") == "claimed"]
+        if not owned.is_file() and not a.owned and a.command != "all" and a.key:
+            rows = [default_row(a.key)]  # C8: одна фигура без файла своих
+        else:
+            rows = [r for r in data(owned) if r.get("status") == "claimed"]
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
@@ -402,13 +502,18 @@ def main(argv=None) -> int:
     if row is None or not a.cycle:
         print(f"ERROR: {a.command}: нужен ключ из своих фигур и номер цикла ({a.key!r}, {a.cycle!r})", file=sys.stderr)
         return 2
-    if a.command == "prepare":
+    if a.command in ("prepare", "prepare-second"):
+        second = a.command == "prepare-second"
         try:
-            e, _p, prompt, images = s.prepare(row, a.cycle)
+            e, _p, prompt, images = s.prepare(row, a.cycle, second=second)
         except (RuntimeError, OSError, KeyError, ValueError) as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 2
-        print(json.dumps({"evidence": s.rel(e), "images": len(images), "prompt_chars": len(prompt)}, ensure_ascii=False))
+        out = {"evidence": s.rel(e), "images": len(images), "prompt_chars": len(prompt)}
+        if second:
+            out.update(prompt=s.rel(e / "acceptor-prompt-2.md"), args=s.rel(e / "second-acceptor-args.json"),
+                       batch_args=(Path(a.work) / f"second-acceptor-args-{s.d8}.json").as_posix())
+        print(json.dumps(out, ensure_ascii=False))
         return 0
     s.accept(row, a.cycle)
     return 0

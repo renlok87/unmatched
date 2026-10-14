@@ -103,6 +103,37 @@ def test_nulls_do_not_hide_real_errors():
     assert any("clip" in e for e in errs)
 
 
+@pytest.mark.parametrize("kind", osch.KINDS)
+def test_workflow_args_ascii_without_descriptions(kind, tmp_path, capsys):
+    """C34: аргументы workflow second-acceptor — ASCII, без description/title, те же поля и enum, что у схемы вида."""
+    args = osch.workflow_args(kind, [{"asset": "ASSET-X-001", "evidence": "art/x/evidence/acceptance/20261014-r2/"}])
+    text = json.dumps(args, ensure_ascii=True)
+    assert text.isascii() and '"description"' not in text and '"title"' not in text
+    full = osch.build(kind)
+    assert args["schema"]["required"] == full["required"] and args["kind"] == kind
+    assert args["schema"]["properties"]["kind"]["enum"] == [kind]
+    assert osch.strict_problems(args["schema"]) == []
+    assert args["items"] == [{"asset": "ASSET-X-001", "evidence": "art/x/evidence/acceptance/20261014-r2",
+                              "label": "acceptor2-ASSET-X-001-r2",
+                              "prompt": "art/x/evidence/acceptance/20261014-r2/acceptor-prompt-2.md"}]
+    card = strict_form({"model": model_card, "concept": concept_card, "anim": anim_card}[kind]())
+    errs = [e.message for e in jsonschema.Draft202012Validator(args["schema"]).iter_errors(card)]
+    assert errs == []
+    out = tmp_path / "wa.json"
+    assert osch.main(["--workflow-args", kind, "--item", "ASSET-X-001=art/x/acc/20261014-r1/Idle", "--item",
+                      "ASSET-Y-001=art/y/acc/20261014-sheet-r3=my-label", "--out", str(out)]) == 0
+    got = json.loads(out.read_bytes().decode("ascii"))
+    assert [i["label"] for i in got["items"]] == ["acceptor2-ASSET-X-001-Idle-r1", "my-label"]
+    capsys.readouterr()
+    assert osch.main(["--workflow-args", kind]) == 0 and json.loads(capsys.readouterr().out)["items"] == []
+    assert osch.main(["--workflow-args", kind, "--item", "no-evidence"]) == 2
+
+
+def test_ascii_schema_keeps_property_named_description():
+    s = {"type": "object", "description": "x", "properties": {"description": {"type": "string", "title": "t"}}}
+    assert osch.ascii_schema(s) == {"type": "object", "properties": {"description": {"type": "string"}}}
+
+
 def test_strip_output_nulls_keeps_the_file_dict():
     c = strict_form(model_card())
     before = copy.deepcopy(c)

@@ -1103,14 +1103,35 @@ label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"accepto
 
 **Второй приёмщик «Opus xhigh» — сохранённый workflow** `.claude/workflows/second-acceptor.js` (dfb4e81d; перенесён
 из сессии пилота, RA-11, F102):
-`Workflow({name: "second-acceptor", args: {items: [{asset, evidence, label, prompt?}], schema: <JSON …output-<kind>.schema.json>}})`.
+`Workflow({name: "second-acceptor", args: {kind?, items: [{asset, evidence, label, prompt?}], schema: <JSON …output-<kind>.schema.json>}})`.
 Элемент — одна карточка (в пачке их несколько, агенты идут параллельно); `prompt` по умолчанию —
 `<evidence>/acceptor-prompt-2.md`, `label` — `acceptor2-<ASSET_ID>-r<N>` (клип — `acceptor2-<ASSET_ID>-<Clip>-r<N>`),
-`acceptor.session_id = "workflow:" + label`, при `null` — один повтор внутри workflow. Результат — список
-`{asset, evidence, card}`: сохранить его как `{"result": [...]}` и передать
-`python tools/art/pipeline_batch/finish_second.py <файл>` (§8.5 п.6): он пишет `card-2.json` и считает пару. Валидатор
-`finish_second.py` зовёт без `--check-files`, поэтому затем — `validate_card.py card.json --second card-2.json
---final-json final.json --print-verdict --check-files` (§8.1 п.5а).
+`acceptor.session_id = "workflow:" + label`, при `null` — один повтор внутри workflow.
+
+- **Вид карточки** (C10, проверочный прогон 2026-10-14): `kind` — `model` | `concept` | `anim`; без него берётся из
+  `enum` поля `kind` схемы, без схемы вида — `model` (прежние вызовы не меняются); `kind`, расходящийся со схемой, —
+  ошибка. От вида зависят две строки задания агента: какие кадры открыть (модель — `<evidence>/frames/frames.json#files`;
+  лист — изображения из списка промпта: виды, лист, дизайн, орто 1b, эталон качества; клип — `frames.files` промпта) и
+  допустимые `item` (S/F/T/D и гейты модели; S/C/Q/P и G-CHECKS; R/C/D/L и G-VALIDATE/G-CONTACT/G-MANIFEST).
+  Остальное — файл промпта: модель — `acceptor-prompt.md` со сменой профиля и `session_id` (§8.5 п.1); лист —
+  `python tools/art/pipeline_batch/sheet_acceptance.py prepare-second <key> <N> --work $W --date <YYYY-MM-DD>`
+  (`acceptor-prompt-2.md`, `launcher-inputs-2.json` и готовые аргументы; `references/concept-sheet.md` §5.6); клип —
+  заготовка своего цикла (`references/animation-vfx-sfx.md` §10) с той же сменой профиля.
+- **Аргументы одним ASCII-файлом** (C34: `description` схемы по-русски ломались при печати через cp1251, оркестратор
+  вырезал их руками):
+  ```bash
+  python tools/art/acceptance/_output_schema.py --workflow-args <model|concept|anim> \
+      --item <ASSET_ID>=<каталог приёмки от корня>[=<label>] [--item …] --out $E/second-acceptor-args.json
+  ```
+  Файл — `{"kind", "items", "schema"}`: схема вида без `description`/`title` (поля, `required` и `enum` те же),
+  `label` и `prompt` по умолчанию — как выше; содержимое файла целиком — `args` вызова.
+- **Вход `finish_second.py`** (C35): возврат workflow — голый список `[{asset, evidence, card}, …]` (так его отдаёт и
+  журнал); уведомление — `{"result": [...]}` (`result` бывает и JSON-строкой). Принимаются обе формы и один объект
+  `{asset, evidence, card}`; BOM (файл из PowerShell `Out-File`) не мешает. Иначе — код 2.
+  `python tools/art/pipeline_batch/finish_second.py <файл> [--dry-run]` (§8.5 п.6) снимает строки `"null"`, пишет
+  `card-2.json` и сам считает пару `validate_card.py card.json --second card-2.json --final-json final.json
+  --check-files --print-verdict` (§8.1 п.5а); код 1 — хотя бы одна пара с ошибкой (последняя строка вывода валидатора
+  в печати).
 
 ### 8.4 Вызов «Sol 6.1 xhigh» (по явному выбору запускающего)
 
@@ -1210,6 +1231,15 @@ WebSocket, вызов продолжается и завершается (кал
   xhigh» (§1 п.4), а на r2–r3 срабатывает гейт стопа SKILL.md §5 п.2.
 - Codex идёт по подписке (ВР-04); кредиты Tripo и SYNTX этот шаг не тратит. Процессы `codex.exe` вызова завершаются
   сами; оставшиеся `codex.exe` с родителем `ChatGPT.exe` — приложение пользователя, их не трогать.
+- Квота Codex общая с генерацией (RC-12): строка журнала трат на **каждую** приёмку Sol (модель, лист, клип; второй
+  приёмщик Sol — своя строка), шаблон `T-CODEX-ACCEPT` (`docs/game-design/visual/07-prompt-templates.md` §3.4; C11 —
+  шаблона не было, `ledger.py add` отвергал id):
+  ```bash
+  python tools/art/visual/ledger.py add --task <VISUAL_CARD_ID> --template T-CODEX-ACCEPT --service Codex \
+      --model "codex exec gpt-6.1-sol xhigh" --units "пакет приёмки Sol, 0 генераций image_gen" \
+      --prompt-file $E/acceptor-prompt.md --result $E/card.json --note "модель <ASSET_ID> r<N>"
+  ```
+  Приёмщик «Opus xhigh» (Workflow) квоту Codex не тратит — строки нет.
 
 ### 8.5 Второй приёмщик (код 3, `needs_second_acceptor`)
 

@@ -32,6 +32,7 @@
 | T-SYNTX-VID-KLING, -SEEDANCE | SYNTX | `anim.csv`, `vfx.csv`, `env.csv` | видео-референс движения или тайминга |
 | T-SYNTX-UPSCALE | SYNTX | `env.csv` | ×2 только своей сгенерированной плиты (ВР-48) |
 | T-CODEX-HEROVIEWS, T-TRIPO-PART, T-BLENDER-FIG | Codex, Tripo, Blender | `anim.csv` (`hero`) | только после MVP (ВР-18) |
+| T-CODEX-ACCEPT | Codex (приёмщик «Sol 6.1 xhigh») | `anim.csv` (`hero`, строка `VISUAL_CARD_ID` фигуры) | приёмка листа концепта, модели или клипа скиллом 3d-model-pipeline: строка журнала трат на каждую приёмку (§3.4) |
 
 Если карточке нужен шаблон, которого нет, — сначала строка в этом документе, потом генерация.
 
@@ -585,6 +586,28 @@ Tripo Studio, DCC Bridge, «из нескольких видов в модель
 TeamAccent; слоты материала ≤ 3; 4 клипа D-11 24 fps с notify `Contact`, длины ±0,05 с, RM ≈ 0; сокеты `Weapon`,
 `Head`, `Root`, `Base` ([PIPELINE.md](../../art-pipeline/PIPELINE.md)); проверка `mesh_report.py`.
 
+### 3.4 T-CODEX-ACCEPT — приёмка Sol (codex exec, только чтение)
+
+Строка журнала трат на каждую приёмку приёмщиком «Sol 6.1 xhigh» скилла 3d-model-pipeline: лист концепта 1a/1c,
+модель (этап 4), клип (7a.2). Квота Codex общая с генерацией (RC-12), поэтому приёмка пишется так же, как пакет
+(найдено проверочным прогоном 2026-10-14, C11: шаблона не было, `ledger.py add` отвергал id). Генераций нет.
+
+- Промпт — не текст этого документа, а файл приёмки: `<каталог приёмки>/acceptor-prompt.md`, собранный по рубрике вида
+  (`.agents/skills/3d-model-pipeline/references/concept-sheet.md` §11, `acceptance-and-blender.md` §8.2,
+  `animation-vfx-sfx.md` §10; лист пачкой — `tools/art/pipeline_batch/sheet_acceptance.py`).
+- Вызов — `codex exec --ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -s read-only
+  --output-schema …output-<kind>.schema.json -o <каталог>/card.json` (`acceptance-and-blender.md` §8.4).
+- Строка журнала — сразу после ответа, одна на приёмку (второй приёмщик Sol — своя строка):
+
+```bash
+python tools/art/visual/ledger.py add --task <VISUAL_CARD_ID> --template T-CODEX-ACCEPT --service Codex \
+    --model "codex exec gpt-6.1-sol xhigh" --units "пакет приёмки Sol, 0 генераций image_gen" \
+    --prompt-file <каталог приёмки>/acceptor-prompt.md --result <каталог приёмки>/card.json \
+    --note "<вид: лист 1c | модель | клип <Clip>> <ASSET_ID> r<N>"
+```
+
+Приёмщик «Opus xhigh» (Workflow) квоту Codex не тратит — строки нет.
+
 ## 4. Журнал трат
 
 ### 4.1 Файл
@@ -633,7 +656,8 @@ TeamAccent; слоты материала ≤ 3; 4 клипа D-11 24 fps с not
 - Балансы — свежий `get-balance` или баланс в UI Tripo, без id аккаунта. `seed` — число или `null`.
 - Пути — от корня репозитория или `C:/tmp/...`. `status` — `ok`, `failed`, `refunded`; неудача тоже пишется.
 
-У Codex строка пишется на пакет: `units` — «пакет, N генераций image_gen», `cost` и балансы — `null`.
+У Codex строка пишется на пакет: `units` — «пакет, N генераций image_gen», `cost` и балансы — `null`. Приёмка Sol —
+тоже строка Codex, шаблон T-CODEX-ACCEPT (§3.4).
 
 ### 4.3 Скрипт
 

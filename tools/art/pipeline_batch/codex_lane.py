@@ -12,11 +12,21 @@
 процесса — тоже конец задания. --timeout с (0 — нет) — аварийный предел на задание.
 
 Файлы задания в <logs>: <id>.claim, <id>.out, <id>.err (байты как есть), <id>-last.txt (-o), <id>.done
-(«<exit> <reason>»: exit | done-killed | timeout); журнал полосы <logs>/<name>.log (START/END/LANE STOP).
+(«<exit> <reason>»: exit | done-killed | timeout | rate-limited); журнал полосы <logs>/<name>.log
+(START/END/RATE-LIMIT/RELEASE/LANE STOP).
+
+Лимит Codex (429, C4 проверочного прогона 2026-10-14): процесс вышел с кодом ≠ 0 без ответа, а в хвосте stderr/stdout
+«exceeded retry limit», «429 Too Many Requests», «status: 429» или «usage limit» — это не результат задания. Полоса
+копирует файлы попытки в <logs>/attempts/<id>/a<N>/ и через --retry-pause с запускает задание заново, не больше
+--retry-429 раз (claim остаётся у неё; STOP во время паузы снимает claim — задание возьмёт следующая полоса).
+Повторы кончились — .done «<exit> rate-limited», claim остаётся. Перезапуск вручную — --release <id>[,<id>…]: файлы
+попытки уходят в attempts/<id>/manual-<время>/, claim и .done снимаются; запущенная полоса возьмёт задание сама.
 
     python tools/art/pipeline_batch/codex_lane.py --tasks <tasks.txt> --name d1 --logs <dir> [--stop-file <path>] \
-        [--exe <codex.exe>] [--codex-home <dir>] [--grace 10] [--poll 2] [--idle-sleep 60] [--timeout 0] [--once]
+        [--exe <codex.exe>] [--codex-home <dir>] [--grace 10] [--poll 2] [--idle-sleep 60] [--timeout 0] [--once] \
+        [--retry-429 3] [--retry-pause 120]
     python tools/art/pipeline_batch/codex_lane.py --tasks t.txt --name d1 --logs L --dry-run   # команды, без claim
+    python tools/art/pipeline_batch/codex_lane.py --tasks t.txt --name d1 --logs L --release <id>   # снять claim
 
 Команда: <exe> exec -C <repo> -s workspace-write -c windows.sandbox="unelevated" --skip-git-repo-check -o <last> -
 (stdin — файл задания); свои аргументы вместо `exec …` — --codex-args-json '[...]' (заглушка в тестах). Генератору
@@ -29,6 +39,8 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -40,6 +52,10 @@ import _batch as b  # noqa: E402
 DONE_MARK = "tokens used"
 _MARKS = (DONE_MARK.encode("utf-8"), DONE_MARK.encode("utf-16-le"))
 TAIL_BYTES = 1 << 16
+# Отказ по лимиту Codex (C4). Только узкие фразы ошибки CLI: хвост stderr несёт и эхо промпта задания (там бывают
+# «retry», хэши с цифрами 429), поэтому голые «429» и «retry» не ищутся.
+RATE_LIMIT_RE = re.compile(r"exceeded retry limit|429 Too Many Requests|status:? ?429\b|usage limit", re.I)
+ATTEMPT_SUFFIXES = (".out", ".err", "-last.txt", ".done")
 
 
 def default_exe() -> str | None:
@@ -87,6 +103,39 @@ def answered(last: Path, logs: list[Path]) -> bool:
     except OSError:
         return False
     return any(m in _tail(p) for p in logs for m in _MARKS)
+
+
+def rate_limited(logs: list[Path]) -> bool:
+    """В хвосте stderr/stdout — отказ по лимиту Codex (429, «exceeded retry limit», «usage limit»); UTF-8 или UTF-16-LE."""
+    for p in logs:
+        raw = _tail(p)
+        for enc in ("utf-8", "utf-16-le"):
+            if RATE_LIMIT_RE.search(raw.decode(enc, errors="replace")):
+                return True
+    return False
+
+
+def archive_attempt(logs: Path, task_id: str, tag: str) -> Path:
+    """Копии файлов попытки (out, err, -o, done) в <logs>/attempts/<id>/<tag>/ — следующая попытка их перезапишет."""
+    dest = logs / "attempts" / task_id / tag
+    dest.mkdir(parents=True, exist_ok=True)
+    for suf in ATTEMPT_SUFFIXES:
+        src = logs / f"{task_id}{suf}"
+        if src.is_file():
+            shutil.copy2(src, dest / src.name)
+    return dest
+
+
+def release(logs: Path, task_id: str) -> dict:
+    """Ручной перезапуск задания: файлы попытки — в attempts/<id>/manual-<время>/, claim и .done снимаются."""
+    claim_f, done_f = logs / f"{task_id}.claim", logs / f"{task_id}.done"
+    if not claim_f.exists() and not done_f.exists():
+        return {"id": task_id, "released": False, "note": "нет claim и .done"}
+    dest = archive_attempt(logs, task_id, "manual-" + dt.datetime.now().strftime("%Y%m%dT%H%M%S"))
+    for f in (done_f, claim_f):  # claim последним: полоса не возьмёт задание с незакрытым .done
+        if f.exists():
+            f.unlink()
+    return {"id": task_id, "released": True, "archive": dest.as_posix()}
 
 
 def kill_tree(pid: int) -> list[int]:
@@ -145,13 +194,49 @@ class Lane:
         return env
 
     def run_task(self, task_id: str, task: Path) -> tuple[int | None, str]:
+        """Задание с повтором при отказе по лимиту Codex (C4); .done пишется один раз, по последней попытке."""
+        retries = max(0, int(getattr(self.a, "retry_429", 0) or 0))
+        attempt = 0
+        while True:
+            attempt += 1
+            code, reason = self.run_once(task_id, task)
+            if reason != "exit" or code in (0, None) or not rate_limited(
+                    [self.logs / f"{task_id}.err", self.logs / f"{task_id}.out"]):
+                break
+            if answered(self.logs / f"{task_id}-last.txt", [self.logs / f"{task_id}.err", self.logs / f"{task_id}.out"]):
+                break
+            dest = archive_attempt(self.logs, task_id, f"a{attempt}")
+            if attempt > retries:
+                reason = "rate-limited"
+                self.log(f"RATE-LIMIT {task_id} attempt={attempt} exit={code} give-up copy={dest.as_posix()}")
+                break
+            pause = float(getattr(self.a, "retry_pause", 0) or 0)
+            self.log(f"RATE-LIMIT {task_id} attempt={attempt} exit={code} retry-in={int(pause)}s copy={dest.as_posix()}")
+            if not self.wait(pause):
+                (self.logs / f"{task_id}.claim").unlink(missing_ok=True)
+                self.log(f"RELEASE {task_id} stop-file during the 429 pause: the claim is free for the next lane")
+                return code, "released"
+        (self.logs / f"{task_id}.done").write_text(f"{code} {reason}\n", encoding="utf-8")
+        return code, reason
+
+    def wait(self, seconds: float) -> bool:
+        """Пауза с проверкой STOP раз в секунду (и в конце); False — появился STOP."""
+        end = time.monotonic() + seconds
+        while time.monotonic() < end:
+            if self.stopped():
+                return False
+            time.sleep(min(1.0, max(0.0, end - time.monotonic())))
+        return not self.stopped()
+
+    def run_once(self, task_id: str, task: Path) -> tuple[int | None, str]:
         last, out, err = (self.logs / f"{task_id}-last.txt", self.logs / f"{task_id}.out", self.logs / f"{task_id}.err")
         start = time.monotonic()
         self.log(f"START {task_id}")
         if not task.is_file():
             self.log(f"END {task_id} exit=None reason=missing-task sec=0")
-            (self.logs / f"{task_id}.done").write_text("None missing-task\n", encoding="utf-8")
             return None, "missing-task"
+        if last.exists():  # -o прежней попытки: иначе «ответ» нашёлся бы в старом файле
+            last.unlink()
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         with open(task, "rb") as fin, open(out, "wb") as fo, open(err, "wb") as fe:
             p = subprocess.Popen(self.command(task_id), stdin=fin, stdout=fo, stderr=fe, cwd=self.repo, env=self.env(),
@@ -177,7 +262,6 @@ class Lane:
             code = p.wait()
         sec = int(time.monotonic() - start)
         self.log(f"END {task_id} exit={code} reason={reason} sec={sec}")
-        (self.logs / f"{task_id}.done").write_text(f"{code} {reason}\n", encoding="utf-8")
         return code, reason
 
     def stopped(self) -> bool:
@@ -224,11 +308,21 @@ def main(argv=None) -> int:
     ap.add_argument("--idle-sleep", type=float, default=60.0, help="пауза, когда брать нечего, с (60)")
     ap.add_argument("--timeout", type=float, default=0.0, help="предел на задание, с (0 — нет)")
     ap.add_argument("--once", action="store_true", help="выйти, когда свободных заданий нет")
+    ap.add_argument("--retry-429", type=int, default=3,
+                    help="повторов задания после отказа по лимиту Codex (429; 0 — без повтора), по умолчанию 3")
+    ap.add_argument("--retry-pause", type=float, default=120.0, help="пауза перед повтором после 429, с (120)")
+    ap.add_argument("--release", default=None,
+                    help="id заданий через запятую: файлы попытки в attempts/, снять claim и .done (перезапуск) и выйти")
     ap.add_argument("--dry-run", action="store_true", help="напечатать команды свободных заданий, ничего не брать")
     try:
         a = ap.parse_args(argv)
     except SystemExit as exc:
         return int(exc.code or 0)
+    if a.release:
+        logs = Path(a.logs)
+        for task_id in (x.strip() for x in a.release.split(",") if x.strip()):
+            print(json.dumps(release(logs, task_id), ensure_ascii=False))
+        return 0
     a.exe = a.exe or default_exe()
     tasks = Path(a.tasks)
     if not tasks.is_file():

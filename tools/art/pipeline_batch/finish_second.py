@@ -6,7 +6,9 @@ tools/art/acceptance/validate_card.py <card.json> --second <card-2.json> --final
 Был C:/tmp/concept-wave/finish_second.py.
 
     python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]
-    # вход: {"result": [{"asset": "...", "evidence": "<каталог приёмки от корня репо>", "card": {...}}, ...]}
+    # вход — любая из форм (C35): возврат workflow / журнал — голый список
+    #   [{"asset": "...", "evidence": "<каталог приёмки от корня репо>", "card": {...}}, ...];
+    # уведомление workflow — {"result": [...]} (result может быть и JSON-строкой); один элемент — объект {asset, evidence, card}
 
 --dry-run: напечатать очищенные карточки, ничего не писать и validate_card не запускать.
 Код выхода: 0 — все пары посчитаны (validate_card 0), 1 — хотя бы одна пара с ошибкой, 2 — ошибка входа.
@@ -38,6 +40,23 @@ def second_card(card: dict) -> dict:
     return out
 
 
+def results_of(obj) -> list:
+    """Список {asset, evidence, card} из вывода workflow в любой форме (C35): голый список (возврат workflow, журнал),
+    {"result": [...]} или {"result": "<JSON-строка>"} (уведомление), один объект-элемент."""
+    if isinstance(obj, dict) and "result" in obj:
+        obj = obj["result"]
+        if isinstance(obj, str):
+            obj = json.loads(obj)
+    if isinstance(obj, dict) and "evidence" in obj and "card" in obj:
+        obj = [obj]
+    if not isinstance(obj, list):
+        raise ValueError("ожидается список [{asset, evidence, card}] или {\"result\": [...]}")
+    bad = [i for i, r in enumerate(obj) if not (isinstance(r, dict) and r.get("evidence") and isinstance(r.get("card"), dict))]
+    if bad:
+        raise ValueError(f"элементы без evidence или card (объект): {bad}")
+    return obj
+
+
 def main(argv=None) -> int:
     b.utf8_streams()
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0],
@@ -51,9 +70,7 @@ def main(argv=None) -> int:
         return int(exc.code or 0)
     repo = Path(a.repo)
     try:
-        res = json.loads(Path(a.result).read_text(encoding="utf-8"))["result"]
-        if not isinstance(res, list):
-            raise ValueError("result должен быть списком")
+        res = results_of(json.loads(Path(a.result).read_text(encoding="utf-8-sig")))
     except (OSError, ValueError, KeyError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
