@@ -1,6 +1,7 @@
 """Прогон H2Anim одного героя (волна 5c): авторинг -> validate_clip v2 -> контакты -> контактный лист Blender.
 
     python tools/tripo-pipeline/anim/h2anim_run.py <spec.json> [--clips=Idle,LungeAttack] [--no-author] [--no-probe]
+        [--out-dir <каталог отчётов validate>]
 
 Системный Python; Blender запускается только headless (`-b --factory-startup`), по одному процессу за раз,
 процесс завершается сам (os._exit) — фоновых процессов не остаётся. Шаги на клип:
@@ -8,11 +9,17 @@
      при несовпадении — код 3, клип не пишется: цель изменилась, перезапечь по новой спеке);
   2. anim/validate_clip.py --skeleton=UM_HUMANOID_17_v2 --character=<Hero> --clip-role --expect-fps 24
      --expect-duration N/24 --root-policy in_place --min-pose-change 0.02 [--loop true] ->
-     docs/art-pipeline/animation-library/validation-h2anim/AM_<Hero>_<Clip>.validation.json;
+     <out-dir>/AM_<Hero>_<Clip>.validation.json (по умолчанию docs/art-pipeline/animation-library/validation-h2anim —
+     отчёт гейта G-VALIDATE настоящих клипов);
   3. anim/clip_contact_check.py -> reports/contact-<Clip>.json;
   4. anim/clip_pose_probe.py (кадры key_frames спеки, виды front/left/q34) + overlay_bones.py ->
      preview/<Hero>-<Clip>-blender-sheet.jpg (покадровые PNG удаляются, 2D-кости в preview/frames/*.json).
 Итог — reports/h2anim-run.json (коды выхода и вердикты). Код выхода 0 только если всё PASS.
+
+Пути (ревью 2026-10-14, R-13): спека, run_dir (относительный — от корня репозитория, абсолютный — как есть), цели спеки
+и --out-dir могут лежать вне репозитория; пути в отчётах — от корня репозитория, вне его — абсолютные. Дымовой прогон
+этапа 3 (animation-vfx-sfx.md §6.6) кладёт всё в <bake run>/work/smoke/: --out-dir <bake run>/work/smoke/validation,
+отчёты validate настоящих клипов в docs/ не трогаются.
 """
 import argparse
 import json
@@ -26,6 +33,15 @@ REPO = HERE.parents[2]
 BLENDER = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 VAL_DIR = REPO / "docs/art-pipeline/animation-library/validation-h2anim"
 NO_WINDOW = 0x08000000 if sys.platform == "win32" else 0
+
+
+def rel(path):
+    """Путь для отчёта: от корня репозитория, вне его — абсолютный (R-13: спека и прогон могут лежать вне репозитория)."""
+    p = Path(path).resolve()
+    try:
+        return p.relative_to(Path(REPO).resolve()).as_posix()
+    except ValueError:
+        return p.as_posix()
 
 
 def blender(script, *args, timeout=1800):
@@ -51,7 +67,7 @@ def compact_sheet(run, label):
         png.unlink()
     for f in frames.glob("%s-f*.png" % label):
         f.unlink()
-    return jpg.relative_to(REPO).as_posix()
+    return rel(jpg)
 
 
 def main():
@@ -63,13 +79,17 @@ def main():
     ap.add_argument("--clips")
     ap.add_argument("--no-author", action="store_true")
     ap.add_argument("--no-probe", action="store_true")
+    ap.add_argument("--out-dir", "--val-dir", dest="out_dir", default=None,
+                    help="каталог отчётов validate AM_<Hero>_<Clip>.validation.json (по умолчанию "
+                         "docs/art-pipeline/animation-library/validation-h2anim; дымовой прогон — свой каталог)")
     a = ap.parse_args()
     spec_path = Path(a.spec).resolve()
     spec = json.loads(spec_path.read_text(encoding="utf-8"))
-    run = REPO / spec["run_dir"]
+    run = Path(REPO) / spec["run_dir"]       # абсолютный run_dir — как есть
     (run / "reports").mkdir(parents=True, exist_ok=True)
     (run / "preview").mkdir(parents=True, exist_ok=True)
-    VAL_DIR.mkdir(parents=True, exist_ok=True)
+    val_dir = Path(a.out_dir).resolve() if a.out_dir else VAL_DIR
+    val_dir.mkdir(parents=True, exist_ok=True)
     clips = a.clips.split(",") if a.clips else list(spec["clips"])
     out_path = run / "reports" / "h2anim-run.json"
     summary = json.loads(out_path.read_text(encoding="utf-8")) if out_path.exists() else {"clips": {}}
@@ -88,7 +108,7 @@ def main():
         n = int(clip["frames"])
         fbx = run / "export" / ("AM_%s_%s.fbx" % (spec["ue_hero"], name))
         stem = "AM_%s_%s" % (spec["ue_hero"], name)
-        val_out = VAL_DIR / (stem + ".validation.json")
+        val_out = val_dir / (stem + ".validation.json")
         vargs = [fbx, "--skeleton=UM_HUMANOID_17_v2", "--character=" + spec["character"],
                  "--clip-role=" + clip["role"], "--expect-fps=24", "--expect-duration=%.4f" % (n / 24.0),
                  "--root-policy=in_place", "--min-pose-change=0.02", "--out=" + str(val_out)]
@@ -100,9 +120,9 @@ def main():
         c = blender("clip_contact_check.py", fbx, "--spec=" + str(spec_path), "--clip=" + name, "--out=" + str(c_out))
         crep = json.loads(c_out.read_text(encoding="utf-8")) if c_out.exists() else {}
         entry = {"validate": {"code": v["code"], "result": vrep.get("result"), "fails": vrep.get("fails"),
-                              "warnings": vrep.get("warnings"), "report": val_out.relative_to(REPO).as_posix()},
+                              "warnings": vrep.get("warnings"), "report": rel(val_out)},
                  "contact": {"code": c["code"], "result": crep.get("result"), "fails": crep.get("fails"),
-                             "report": c_out.relative_to(REPO).as_posix(),
+                             "report": rel(c_out),
                              "summary": {k["check"]: {kk: vv for kk, vv in k.items() if kk not in ("check",)}
                                          for k in crep.get("checks", [])}}}
         vpc = next((x for x in vrep.get("checks", []) if x["check"] == "visible_pose_change"), {})
@@ -118,7 +138,7 @@ def main():
             frames = ",".join(str(f) for f in clip.get("key_frames", [0, n // 2, n]))
             p = blender("clip_pose_probe.py", fbx, run / "preview" / "frames", "%s-%s" % (spec["ue_hero"], name),
                         "--frames=" + frames, "--views=" + clip.get("views", "front,left,q34"),
-                        "--base=" + str(REPO / spec["target"]["base_fbx"]), "--res=420")
+                        "--base=" + str(Path(REPO) / spec["target"]["base_fbx"]), "--res=420")
             ov = subprocess.run([sys.executable, str(HERE / "overlay_bones.py"), str(run / "preview" / "frames"),
                                  "%s-%s" % (spec["ue_hero"], name)], capture_output=True, text=True,
                                 creationflags=NO_WINDOW)
@@ -130,7 +150,8 @@ def main():
         entry["passed"] = ok
         ok_all &= ok
         summary["clips"][name] = entry
-    summary["spec"] = spec_path.relative_to(REPO).as_posix()
+    summary["spec"] = rel(spec_path)
+    summary["validation_dir"] = rel(val_dir)
     out_path.write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     sys.exit(0 if ok_all else 1)
 

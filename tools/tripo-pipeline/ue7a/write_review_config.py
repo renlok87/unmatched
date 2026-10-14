@@ -10,13 +10,16 @@ make_review_config_r4.py «r4 = r3 на модели r3»):
      (--import-profile); verify.expect.triangles — сумма checks.triangles_as_h21.measured тела и оружия
      ld-fbx-report (без подставки SM_*), если дан --lookdev-run;
   4. зоны, ворота, сторона камеры и заметки героя — --set / --set-json / --drop (debug_calibration и т. п.);
+     якорь экспозиции из шаблона чужого героя не наследуется: без --set anchor_zone=<зона героя из zones> — отказ
+     (ревью 2026-10-14, R-09; шаблон — свой прошлый конфиг: якорь остаётся как был);
   5. проверить, что имя героя-шаблона нигде не осталось (кроме --allow-leftover), и записать.
 
     python tools/tripo-pipeline/ue7a/write_review_config.py --template <…ASSET-ANGEL-001/20261014-h2ld-ldc-ue/review-config.json> \
         --asset-dir art/pipeline-candidates/ASSET-ACHILLES-001 --run-dir <asset-dir>/20261014-h2ld-ue-import-r3 \
         --height-uu 54.9931 --lookdev-run <asset-dir>/20261014-h2-lookdev-r2 --clips-run <asset-dir>/20261014-h2anim \
         --import-profile <asset-dir>/build-profiles/achilles-h2ld-lookdev-ue-import-r3.json \
-        --set side_camera=+X --set-json 'zones=["wool_coarse","linen"]' --drop debug_calibration --set note=… \
+        --set side_camera=+X --set-json 'zones=["wool_coarse","linen"]' --set anchor_zone=wool_coarse \
+        --drop debug_calibration --set note=… \
         --out <asset-dir>/20261014-h2ld-ldc-ue/review-config.json
 
 Код выхода: 0 — записан (или напечатан с --dry-run), 2 — ошибка входа или остались имена шаблона.
@@ -50,6 +53,19 @@ def template_identity(cfg: dict) -> tuple[str, str | None]:
     if m:
         ck = m.group(1)
     return key, ck
+
+
+def check_anchor_zone(cfg: dict, tpl: dict, key: str, t_key: str, sets=(), set_jsons=()) -> None:
+    """R-09 (ревью 2026-10-14): шаблон чужого героя несёт его якорь экспозиции (anchor_zone), а ue_hero_lookdev без ключа
+    брал «linen» Medusa. Конфиг из чужого шаблона — только с явным --set anchor_zone=<зона героя> из его zones."""
+    explicit = any(s.partition("=")[0].strip() == "anchor_zone" for s in [*sets, *set_jsons])
+    zones = list(cfg.get("zones") or [])
+    if not explicit:
+        raise ConfigError(f"anchor_zone: шаблон героя {t_key!r} несёт свой якорь экспозиции "
+                          f"{tpl.get('anchor_zone')!r} — задайте --set anchor_zone=<зона {key}>"
+                          + (f" (одна из zones: {', '.join(map(str, zones))})" if zones else ""))
+    if zones and cfg.get("anchor_zone") not in zones:
+        raise ConfigError(f"anchor_zone {cfg.get('anchor_zone')!r} не из zones героя {key}: {zones}")
 
 
 def figure_triangles(fbx_report: dict) -> int | None:
@@ -104,6 +120,7 @@ def build(tpl: dict, *, repo: Path, key: str, content_key: str, asset_id: str | 
         fi["scalars"] = dict(fp)
     c.apply_sets(cfg, sets, set_jsons, drops)
     if not same:
+        check_anchor_zone(cfg, tpl, key, t_key, sets, set_jsons)
         bad = c.leftovers(cfg, t_key, allow_leftover)
         if bad:
             raise ConfigError(f"остались имена шаблона {t_key!r} ({len(bad)}): {bad[:5]} — --set или --allow-leftover")

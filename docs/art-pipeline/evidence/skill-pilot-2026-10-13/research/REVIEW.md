@@ -42,6 +42,7 @@ Achilles r3 с `cycle: r4`: `validate_card.py --print-verdict` → `FAIL: $.cycl
 - Код-пробел: `tools/art/acceptance/asset-acceptance-2.schema.json:105` (ветка `model`, `cycle` enum) и
   `asset-acceptance-2.output-model.schema.json:24-31` (генератор `_output_schema.py`) — добавить `r4`; `validate_card.py`
   уже даёт `escalate_user` на не-pass при `n >= LAST_CYCLE` (`:266`). Плюс тест на `r4` pass / не-pass.
+- **Закрыто** (1f4dfdba, оркестратор): `cycle` модели `r1`–`r4`, тесты; оговорки «пока схема не исправлена» сняты (W4, §9).
 
 **R-02 · `ue_lock` heartbeat: зависший живой шаг держит блокировку вечно.** `tools/art/material_library/ue_lock.py:41-52`
 обновляет mtime, пока жив процесс; предела удержания нет, `subprocess.call` без таймаута (`:133`), ждущий цикл без
@@ -50,6 +51,8 @@ Achilles r3 с `cycle: r4`: `validate_card.py --print-verdict` → `FAIL: $.cycl
   дерево по PID), п.3 (`apply-mi` тоже берёт блокировку сам), HB §0.2, AN §5.
 - Код-пробел: `ue_lock.py` — PID и командная строка в содержимом файла; предел удержания (`UE_LOCK_MAX_HOLD_S`, после
   него heartbeat перестаёт обновлять); `--timeout` у ожидания и у команды; устаревание по мёртвому PID без 25 мин.
+- **Закрыто** (W4, §9): `pid`/`host`/`since`/`max_hold_s`/`cmd` в файле, `--max-hold` (2 ч), `--wait-timeout` (код 124),
+  `dead_pid`; таймаута у самой команды нет — зависший процесс гасит оркестратор по PID из файла.
 
 **R-03 · кадры приёмки клипа не 1200 px.** AN §10.3 утверждал «длинная сторона не больше 1200 px (ДС-8)»;
 `tools/tripo-pipeline/ue7a/prep_acceptance.py` копирует как есть (пилот: UE-кадры 1920 × 1080, Blender-лист 1680 × 2520,
@@ -57,6 +60,7 @@ UE-лист 4200 × 1860). ДС-8 касается кадров модели.
 - Исправлено: AN §10.3 (что на деле и почему), S §7.1 строка «Кадры приёмки».
 - Код-пробел: `prep_acceptance.py` — уменьшать копии до 1200 px JPEG q92 (как `capture_acceptance_set.fit_long_side`), с
   тестом; либо решение «клипам не нужно» (у клипов было 0–2 переподключения WebSocket, RC-22).
+- **Закрыто** (W4, §9): копии ≤ 1200 px JPEG q92 (`--max-px`, 0 — как есть), листы уменьшаются целиком.
 
 **R-04 · второй приёмщик Workflow.** До dfb4e81d скрипта в репозитории не было (A&B §14 «скрипт не найден»). Теперь —
 `.claude/workflows/second-acceptor.js` (сообщение оркестратора во время ревью).
@@ -64,6 +68,7 @@ UE-лист 4200 × 1860). ДС-8 касается кадров модели.
   `{"result": [...]}` → `finish_second.py`), §8.5 таблица, §14; CS §5.6, §11 п.1; AN §10.5 п.1; S §4, §11.3; NOTES F6, F102.
 - Код-пробел: `tools/art/pipeline_batch/finish_second.py:72-73` зовёт `validate_card.py --second` без `--check-files` —
   документы велят повторить с `--check-files`; лучше флаг в инструменте. Живой прогон workflow после переноса не записан.
+- **Закрыто** (1f4dfdba, оркестратор): `finish_second.py` зовёт `validate_card.py --second … --check-files`.
 
 **R-05 · HB §8 убирал из git JPEG-листы, которые инструменты пишут в репозиторий.** «листы (`h2anim_ue.py sheet`, лист
 AN-18) … в `$W`, не в git» противоречил AN §6.4/§10.3 (UE-лист — вход приёмки клипа), `clip_review_sheet.py`
@@ -91,7 +96,7 @@ AN-18) … в `$W`, не в git» противоречил AN §6.4/§10.3 (UE-�
 **R-09 · `anchor_zone` обязателен в документе, но не в коде.** `ue_hero_lookdev.py:1220` молча берёт `linen`,
 `write_review_config.py` ключ не проверяет, а шаблон чужого героя несёт его якорь (RB-15 закрыт для bake-профиля, не для
 review-config). Исправлено: UE §3.2 (оговорка). Код-пробел: `write_review_config.py` — отказ без `--set anchor_zone`, если
-шаблон чужого героя; или `ue_hero_lookdev` — отказ без ключа у не-Medusa.
+шаблон чужого героя; или `ue_hero_lookdev` — отказ без ключа у не-Medusa. **Закрыто** (W4, §9): оба отказа (код 2).
 
 **R-10 · детерминизм позднего фикса не описан** (ДС-7 «один раз на фигуру, на прогоне для UE», а после позднего фикса в UE
 идёт другой прогон). Исправлено: HB §4.3 «Когда повторять» — прогон позднего фикса с `--reuse-from` от прогона с полным
@@ -106,9 +111,11 @@ UE §7.3.
 **R-13 · дымовой прогон пишет отчёты validate в `docs/…/validation-h2anim/`** (подтверждаю код-пробел D2a):
 `tools/tripo-pipeline/anim/h2anim_run.py:27` (`VAL_DIR` фиксирован), `:69`, `:114` (`relative_to(REPO)`): спека и `run_dir`
 вне репозитория роняют прогон, а `ue_hero = <Key>Smoke` — обход. Код-пробел: `--val-dir` и пути вне репозитория.
+**Закрыто** (W4, §9): `--out-dir` (синоним `--val-dir`), пути вне репозитория.
 
 **R-14 · известные пределы фигуры вставляются руками** (подтверждаю код-пробел D2a): `prep_acceptance.py` не знает
 плейсхолдера `known-limits.md`. Код-пробел: плейсхолдер `{{KNOWN_LIMITS}}` из `<ASSET_DIR>/evidence/acceptance-anim-prompts/known-limits.md`.
+**Закрыто** (W4, §9): `{{KNOWN_LIMITS}}` из этого файла (`--known-limits`).
 
 ### Мелочи
 
@@ -273,3 +280,19 @@ discard_master, refresh_carrier, prep_acceptance}.py` с флагами из UE 
 Готов к одной следующей фигуре (не пачке) при условиях: поздний фикс без оставшегося цикла — сразу `escalate_user` до
 правки схемы (R-01); зависшую блокировку UE снимает оркестратор вручную (R-02); бриф исполнителей 3/6/7a/7b пишет
 оркестратор по образцу A&B §10 (R-06). Код-пробелы R-01 и R-02 желательно закрыть до неё — оба малые.
+Обновление (W4, §9): все 7 код-пробелов закрыты; из условий осталось только R-06 (брифы 3/6/7a/7b).
+
+## 9. Закрытие код-пробелов (2026-10-14)
+
+| Пробел | Находки | Закрыто | Что в коде | Документы |
+|---|---|---|---|---|
+| 1 · `r4` позднего фикса | R-01 | 1f4dfdba | схема модели и `output-model`: `cycle` `r1`–`r4`; не-pass на `r4` → `escalate_user` | S §5 п.4; A&B §6, §7 `cycle`, §9.1, §11; AN §10.5 п.2 — оговорки «пока схема не исправлена» сняты (W4) |
+| 2 · вечная блокировка UE | R-02, RB-21 | W4 | `ue_lock.py`: `pid`/`host`/`since`/`max_hold_s`/`cmd` в файле (первая строка прежняя); `--max-hold` / `max_hold_s` (2 ч, `UE_LOCK_MAX_HOLD_S`, 0 — без предела; heartbeat после него не обновляет, ждущий перехватывает по `max_hold`); `--wait-timeout` / `wait_timeout_s` (по умолчанию без предела, `UE_LOCK_WAIT_TIMEOUT_S`; `UeLockTimeout`, CLI код 124, с владельцем и PID); мёртвый PID на этой машине — `dead_pid` сразу; старый формат — по mtime 25 мин | UE §1 п.2–3, таблица ловушек; HB §0.2; AN §5 |
+| 3 · кадры клипа 1200 px, известные пределы | R-03, R-14 (F141, F156) | W4 | `prep_acceptance.py`: копии ≤ 1200 px, JPEG q92, PNG — PNG, имена прежние, оригиналы не трогаются (`--max-px`, 0 — как есть); листы шире (UE-лист 4200 × 1860) уменьшаются целиком (решение: лист — обзор, детали — покадровые кадры; одно имя держит r2+); `{{KNOWN_LIMITS}}` ← `<ASSET_DIR>/evidence/acceptance-anim-prompts/known-limits.md` (`--known-limits`; выбран файл рядом с заготовками, как уже велел AN §10.5, а не поле заявки) | AN §10 (плейсхолдеры), §10.3, §10.5; UE §4.5; S §7.1 «Кадры приёмки» |
+| 4 · `finish_second --check-files` | R-04 | 1f4dfdba | `validate_card.py --second … --check-files` | — |
+| 5 · `anchor_zone` Medusa | R-09, RB-15 | W4 | `ue_hero_lookdev.py`: `anchor_zone()` — без ключа `linen` только у MVP и пилота (`ANCHOR_DEFAULT_HEROES`), иначе `review`/`measure` код 2 до съёмки; якорь нового героя — из его `zones`. `write_review_config.py`: из шаблона чужого героя — только с `--set anchor_zone=<зона из zones>`, иначе код 2; свой прошлый конфиг — как раньше | UE §3 (пример), §3.2, таблица ловушек |
+| 6 · `h2anim_run` вне репозитория | R-13 | W4 | `h2anim_run.py --out-dir` (синоним `--val-dir`; по умолчанию `validation-h2anim/`); спека, `run_dir` (абсолютный — как есть), цели и `--out-dir` вне репозитория; пути в отчётах — от корня, вне его — абсолютные; `h2anim-run.json#validation_dir` | AN §6.6 (дым: `--out-dir <bake run>/work/smoke/validation`, удалять из `docs/` больше нечего), §2.2; HB §4.4 п.5 |
+
+Номера строк, сдвинутые этими правками, обновлены: `ue_hero_lookdev.py:448/:733/:1041/:778`, `h2anim_run.py:34/:88,141/
+:112-116`, `ue_lock.py:54`. Тесты: `test_ue_lock.py` (18), `test_ue7a.py`, `test_ue_hero_lookdev.py` (`AnchorZoneTest`,
+11 закоммиченных конфигов съёмки разрешаются), `test_h2anim_run_paths.py`.

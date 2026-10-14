@@ -115,7 +115,7 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F94 | 7 | 7a evidence location (`$E` under docs/art-pipeline/evidence) conflicts with the 7a write scope; the asset's own evidence folder was used | ue-import-package §1: one place |
 | F95 | 6/7 | Stage-6 validators miss the weapon rotating 60–90° inside a fixed fist (aim keys): Angel LungeAttack D=0 veto at clip acceptance | **fixed** `ee301065` (`tools/tripo-pipeline/anim/grip_check.py` (`weapon_in_hand_deg`)); was: animation-vfx-sfx §6.3: weapon-to-hand rotation check + grip close-up on the Blender sheets |
 | F96 | 7 | `h2anim_ue frames` shoots the grey carrier mesh without the base — acceptors notice | **fixed** `172fd4f1` (default base `SM_<Hero>_H2LD_Base`, `--no-base`); was: default `--base`; prompt template line |
-| F97 | 7 | Acceptance frame copies 1920 px q88 (12.7 MB) vs HANDBOOK 1200 px q92 rule | **fixed** `42ed7951` (model acceptor frames ≤ 1200 px (clip frames: `prep_acceptance.py` still copies as is)); was: tool/HANDBOOK: one rule |
+| F97 | 7 | Acceptance frame copies 1920 px q88 (12.7 MB) vs HANDBOOK 1200 px q92 rule | **fixed** `42ed7951` (model acceptor frames ≤ 1200 px; clip frames: `prep_acceptance.py` too, REVIEW §9 W4); was: tool/HANDBOOK: one rule |
 | F98 | 7 | UE look-dev side frame is shot from the opposite side to the concept's side view (concept faces left; UE side shows the right side) — side-by-side comparison misleads | review-config: side from `SIDE_VIEW` |
 | F99 | 4 r2 | §8.2 template has no slot for the previous fix list and per-item closure; executor's claimed status conflicts with §1 п.3 (executor reports not shown) — passed as one line «claim proves nothing» | **fixed** `42ed7951` (`{{PREV_FIX_LIST}}` from `acceptor_inputs.py`); was: §8.2: `{{PREV_FIX_LIST}}` + rule «r1 п.N: закрыт / не закрыт» in F/T rationale |
 | F100 | 4 r2 | Executor said «claws closed» (dihedral p90 49→37°), the acceptor still saw facets on close-ups: numeric closure ≠ visual closure | §9: executor closes an item only on the acceptor's frame type |
@@ -249,7 +249,7 @@ Abbreviations: S = `SKILL.md`; A&B, AN, UE, REG, CS, TR, IN = `references/accept
 | F93, F139, F140, F110, F120 | HB §4.4 (norm); UE §4.3 (excerpt) | applied |
 | F94 | UE §1 (`$E7`); S §9 | applied |
 | F95, F122 | AN §6.2–6.3; HB §4.5 п.4 | applied |
-| F97 | A&B §2.3, §3, §8.4; HB §8; S §7.1 | applied for model frames; clip frames are copied unscaled by `prep_acceptance.py` — code gap (REVIEW) |
+| F97 | A&B §2.3, §3, §8.4; HB §8; S §7.1 | applied for model frames; clip frames ≤ 1200 px q92 in `prep_acceptance.py` (`--max-px`, REVIEW §9, W4) |
 | F100 | A&B §8.2, §9.2 п.1, §10; AN §10.6; HB §4.4 п.2 | applied |
 | F101 | A&B §8.4 («Сбой песочницы»: only `command_execution` items with `status: failed`) | applied |
 | F103, F117, F123 | AN §6.5, §10.6; REG Р6-1 | applied (F117: one manifest builder at a time) |
@@ -261,7 +261,7 @@ Abbreviations: S = `SKILL.md`; A&B, AN, UE, REG, CS, TR, IN = `references/accept
 | F135 | REG Д-2 | documented; a numbered sidekick for any hero (C++) — before the roster (RB-10) |
 | F137 | A&B §5.2, §9.3; HB §4.2, §4.4 п.4 | applied (`prepare.part_offsets_m`, 8e00e5f0); the rest gap measurement tool — code gap, separate executor (orchestrator, 2026-10-14) |
 | F138, F143, F150 | HB §2.9, §4.2, §4.4; A&B §9.3 | applied |
-| F141, F156 | AN §10.5 («Известные пределы фигуры»: one `known-limits.md` per figure) | applied; no placeholder for it in `prep_acceptance.py` (manual block, `--replace`) — code gap |
+| F141, F156 | AN §10.5 («Известные пределы фигуры»: one `known-limits.md` per figure) | applied; `prep_acceptance.py` fills `{{KNOWN_LIMITS}}` from it (`--known-limits`, REVIEW §9, W4) |
 | F146, F154 | AN §10.3 | applied |
 | F148 | HB §4.2 closure table; A&B §9.3 | applied |
 | F151 | A&B §3, §8.5 п.1; S §6 stage 4 п.1 | partly: the second acceptor gets the changed frames first; re-scoring only changed frames rejected (A&B §2.3 п.5) |

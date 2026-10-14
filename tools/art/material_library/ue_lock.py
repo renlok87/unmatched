@@ -2,24 +2,36 @@
 look-dev C and anim-v2 captures in L_P17ControlScene).
 
 Every UE step (import, level load, capture, restore) runs under C:/tmp/ue-editor.lock:
-  - the lock is created atomically (os.open O_CREAT | O_EXCL) with the content "<owner> <ISO time> <step>";
-  - an existing lock -> wait and retry every 20 s; a lock older than 25 min is stale: it is recorded and taken over;
+  - the lock is created atomically (os.open O_CREAT | O_EXCL); content (first line unchanged since 2026-09-30):
+        <owner> <ISO time> <step>
+        pid=<PID> host=<hostname> since=<epoch s> max_hold_s=<s>
+        cmd=<command line>                       (CLI only)
+  - an existing lock -> wait and retry every 20 s. The lock is stale (recorded and taken over) when
+      * dead_pid: its PID is not alive and its host is this machine (no 25 min wait after a crash), or
+      * max_hold: it is held longer than the max_hold_s written in it (the holder's limit), or
+      * mtime: its mtime is older than 25 min (also an old-format lock without the PID line);
   - while the lock is held, a daemon thread refreshes its mtime every POLL_S (heartbeat, RB-21), so a live step longer
-    than 25 min is not judged stale; it never touches a lock whose content is no longer ours;
+    than 25 min is not judged stale; it never touches a lock whose content is no longer ours. The heartbeat stops after
+    max_hold_s (default 2 h, UE_LOCK_MAX_HOLD_S; 0 = no limit): a hung but live step no longer holds the editor forever
+    (review gap R-02, 2026-10-14);
+  - a waiter gives up after wait_timeout_s (default: wait forever; UE_LOCK_WAIT_TIMEOUT_S) with UeLockTimeout naming
+    the owner, PID, host and step of the lock;
   - the lock is deleted in a finally block (only if it is still ours).
 Keep each locked step short (one hero / one scene part per lock).
 
     from ue_lock import ue_lock
     with ue_lock("accent wall") as info:
-        ...                                   # info["waited_s"], info["stale_taken"]
+        ...                                   # info["waited_s"], info["stale_taken"], info["max_hold_exceeded"]
 
-    python tools/art/material_library/ue_lock.py --step "<step>" -- <command ...>   # run a command under the lock
+    python tools/art/material_library/ue_lock.py --step "<step>" [--wait-timeout S] [--max-hold S] -- <command ...>
+        # runs a command under the lock; exit code = the command's, 124 = gave up waiting (--wait-timeout)
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
 import os
+import socket
 import subprocess
 import sys
 import threading
@@ -27,22 +39,174 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
+
+def _env_float(name: str, default: float | None) -> float | None:
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
 LOCK = Path(os.environ.get("UE_EDITOR_LOCK", "C:/tmp/ue-editor.lock"))  # one lock file per live editor
 OWNER = os.environ.get("UE_LOCK_OWNER", "look-dev-C")  # parallel groups name themselves (e.g. look-dev-C-A)
 POLL_S = 20.0
 STALE_S = 25 * 60.0
+MAX_HOLD_S = _env_float("UE_LOCK_MAX_HOLD_S", 2 * 3600.0)   # heartbeat limit of a held lock; 0 or less = no limit
+WAIT_TIMEOUT_S = _env_float("UE_LOCK_WAIT_TIMEOUT_S", None)  # None = wait forever
+EXIT_WAIT_TIMEOUT = 124  # CLI: gave up waiting (as coreutils timeout)
+HOST = socket.gethostname()
 EVENTS = []   # stale takeovers etc. of this process (for the reports)
+
+
+class UeLockTimeout(TimeoutError):
+    """The lock stayed busy longer than wait_timeout_s; .holder = parse_lock() of the busy lock."""
+
+    def __init__(self, message: str, holder: dict, waited_s: float):
+        super().__init__(message)
+        self.holder = holder
+        self.waited_s = waited_s
 
 
 def _now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
-def _heartbeat(lock: Path, stamp: str, every_s: float, stop: threading.Event, info: dict) -> None:
-    """RB-21: refresh the mtime of our held lock every every_s until stop is set; stop on a foreign or missing lock."""
-    while not stop.wait(every_s):
+def _same_host(host: str | None) -> bool:
+    return bool(host) and host.lower() == HOST.lower()
+
+
+_K32 = None
+
+
+def _kernel32():
+    global _K32
+    if _K32 is None:
+        import ctypes
+        from ctypes import wintypes
+
+        k = ctypes.WinDLL("kernel32", use_last_error=True)
+        k.OpenProcess.restype = wintypes.HANDLE
+        k.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+        k.GetExitCodeProcess.restype = wintypes.BOOL
+        k.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+        k.CloseHandle.argtypes = (wintypes.HANDLE,)
+        _K32 = k
+    return _K32
+
+
+def pid_alive(pid: int | None) -> bool:
+    """Is the process PID alive on THIS machine? Unknown -> True (never judge a lock dead on a guess)."""
+    if not pid or pid <= 0:
+        return False
+    if pid == os.getpid():
+        return True
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes import wintypes
+
+        k = _kernel32()
+        h = k.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h:
+            return ctypes.get_last_error() != 87  # ERROR_INVALID_PARAMETER = no such process; access denied = alive
         try:
-            if lock.read_text(encoding="utf-8", errors="replace").strip() != stamp:
+            code = wintypes.DWORD()
+            if not k.GetExitCodeProcess(h, ctypes.byref(code)):
+                return True
+            return code.value == 259  # STILL_ACTIVE
+        finally:
+            k.CloseHandle(h)
+    try:
+        os.kill(pid, 0)  # POSIX only: on Windows signal 0 is CTRL_C_EVENT
+    except ProcessLookupError:
+        return False
+    except OSError:
+        return True
+    return True
+
+
+def lock_content(owner: str, step: str, max_hold_s: float | None, cmd: str | None = None, since: float | None = None,
+                 pid: int | None = None, host: str | None = None) -> str:
+    """The text of a lock file (without the final newline)."""
+    stamp = "%s %s %s" % (owner, _now(), step)
+    meta = "pid=%d host=%s since=%.3f max_hold_s=%g" % (os.getpid() if pid is None else pid, host or HOST,
+                                                       time.time() if since is None else since,
+                                                       max_hold_s if max_hold_s and max_hold_s > 0 else 0)
+    lines = [stamp, meta]
+    if cmd:
+        lines.append("cmd=" + " ".join(str(cmd).split())[:500])
+    return "\n".join(lines).strip()  # compared with read_text().strip() by the heartbeat and the finally block
+
+
+def parse_lock(text: str) -> dict:
+    """{stamp, owner, step, pid, host, since, max_hold_s, cmd} of a lock's text; an old-format lock (first line only)
+    gives pid / host / since / max_hold_s None."""
+    lines = [ln.strip() for ln in (text or "").strip().splitlines()]
+    stamp = lines[0] if lines else ""
+    parts = stamp.split(" ", 2)
+    out = {"stamp": stamp, "owner": parts[0] if parts else "", "step": parts[2] if len(parts) > 2 else "",
+           "pid": None, "host": None, "since": None, "max_hold_s": None, "cmd": None}
+    for ln in lines[1:]:
+        if ln.startswith("cmd="):
+            out["cmd"] = ln[4:]
+            continue
+        for tok in ln.split():
+            k, sep, v = tok.partition("=")
+            if not sep:
+                continue
+            try:
+                if k == "pid":
+                    out["pid"] = int(v)
+                elif k == "host":
+                    out["host"] = v
+                elif k == "since":
+                    out["since"] = float(v)
+                elif k == "max_hold_s":
+                    out["max_hold_s"] = float(v) if float(v) > 0 else None
+            except ValueError:
+                pass
+    return out
+
+
+def stale_reason(holder: dict, age_s: float, stale_s: float, now: float | None = None) -> str | None:
+    """Why a busy lock may be taken over: "dead_pid", "max_hold", "mtime" or None (still held)."""
+    now = time.time() if now is None else now
+    if holder.get("pid") and _same_host(holder.get("host")) and not pid_alive(holder["pid"]):
+        return "dead_pid"
+    if holder.get("max_hold_s") and holder.get("since") is not None and now - holder["since"] > holder["max_hold_s"]:
+        return "max_hold"
+    if age_s > stale_s:
+        return "mtime"
+    return None
+
+
+def describe(holder: dict, age_s: float | None = None) -> str:
+    s = "owner %r, pid %s on %s, step %r" % (holder.get("owner"), holder.get("pid") or "?", holder.get("host") or "?",
+                                            holder.get("step"))
+    if age_s is not None:
+        s += ", mtime age %.0f s" % age_s
+    if holder.get("cmd"):
+        s += ", cmd %s" % holder["cmd"]
+    return s
+
+
+def _heartbeat(lock: Path, content: str, every_s: float, stop: threading.Event, info: dict,
+               deadline: float | None) -> None:
+    """RB-21: refresh the mtime of our held lock every every_s until stop is set; stop on a foreign or missing lock and
+    after the max hold (deadline, time.monotonic)."""
+    while True:
+        wait = every_s if deadline is None else min(every_s, max(0.0, deadline - time.monotonic()))
+        if stop.wait(wait):
+            return
+        if deadline is not None and time.monotonic() >= deadline:
+            info["max_hold_exceeded"] = True
+            print("UE LOCK: held longer than max_hold_s %.0f s: heartbeat stopped, waiters may take the lock over (%s)"
+                  % (info["max_hold_s"], info["stamp"]), flush=True)
+            return
+        try:
+            if lock.read_text(encoding="utf-8", errors="replace").strip() != content:
                 return                  # taken over or replaced: never refresh someone else's lock
             os.utime(str(lock), None)
         except OSError:                 # vanished (FileNotFoundError) or not accessible: the finally block reports it
@@ -52,11 +216,21 @@ def _heartbeat(lock: Path, stamp: str, every_s: float, stop: threading.Event, in
 
 @contextmanager
 def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: float = STALE_S, lock: Path = LOCK,
-            heartbeat_s: float | None = None):
-    """heartbeat_s: how often the held lock's mtime is refreshed (default poll_s; 0 or less turns it off)."""
+            heartbeat_s: float | None = None, max_hold_s: float | None = None, wait_timeout_s: float | None = None,
+            cmd: str | None = None):
+    """heartbeat_s: how often the held lock's mtime is refreshed (default poll_s; 0 or less turns it off).
+    max_hold_s: the heartbeat stops after this hold time and waiters judge the lock stale (default MAX_HOLD_S = 2 h or
+    UE_LOCK_MAX_HOLD_S; 0 or less = no limit). wait_timeout_s: give up waiting with UeLockTimeout (default
+    WAIT_TIMEOUT_S = UE_LOCK_WAIT_TIMEOUT_S or wait forever; a negative value = wait forever). cmd: written to the lock."""
+    lock = Path(lock)
     lock.parent.mkdir(parents=True, exist_ok=True)
+    hold = MAX_HOLD_S if max_hold_s is None else max_hold_s
+    hold = hold if hold and hold > 0 else None
+    wait_limit = WAIT_TIMEOUT_S if wait_timeout_s is None else wait_timeout_s
+    wait_limit = wait_limit if wait_limit is not None and wait_limit >= 0 else None
     t0 = time.time()
-    info = {"step": step, "owner": owner, "waited_s": 0.0, "stale_taken": None, "waits": 0}
+    info = {"step": step, "owner": owner, "waited_s": 0.0, "stale_taken": None, "waits": 0, "pid": os.getpid(),
+            "host": HOST, "max_hold_s": hold, "max_hold_exceeded": False}
     while True:
         try:
             fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
@@ -66,7 +240,9 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
                 held = lock.read_text(encoding="utf-8", errors="replace").strip()
             except FileNotFoundError:
                 continue
-            if age > stale_s:
+            holder = parse_lock(held)
+            reason = stale_reason(holder, age, stale_s)
+            if reason:
                 # take over atomically: rename the stale file away, then check it was the one we judged stale
                 aside = lock.with_name(lock.name + ".stale.%d.%d" % (os.getpid(), int(time.time())))
                 try:
@@ -80,20 +256,27 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
                     except OSError:
                         pass
                     continue
-                ev = {"at": _now(), "step": step, "stale_lock": held, "age_s": round(age, 1), "kept_as": str(aside)}
+                ev = {"at": _now(), "step": step, "stale_lock": held, "reason": reason, "holder": holder,
+                      "age_s": round(age, 1), "kept_as": str(aside)}
                 EVENTS.append(ev)
                 info["stale_taken"] = ev
-                print("UE LOCK: stale lock taken over: %r (age %.0f s)" % (held, age), flush=True)
+                print("UE LOCK: stale lock taken over (%s): %s" % (reason, describe(holder, age)), flush=True)
                 continue
+            waited = time.time() - t0
+            if wait_limit is not None and waited >= wait_limit:
+                raise UeLockTimeout("UE LOCK: still busy after %.0f s (wait timeout %.0f s): %s"
+                                    % (waited, wait_limit, describe(holder, age)), holder, round(waited, 1))
             if info["waits"] % 3 == 0:
-                print("UE LOCK: busy (%r, age %.0f s); waiting" % (held, age), flush=True)
+                print("UE LOCK: busy (%s); waiting" % describe(holder, age), flush=True)
             info["waits"] += 1
-            time.sleep(poll_s)
+            time.sleep(poll_s if wait_limit is None else max(0.0, min(poll_s, t0 + wait_limit - time.time())))
             continue
-        stamp = "%s %s %s" % (owner, _now(), step)
+        content = lock_content(owner, step, hold, cmd)
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(stamp + "\n")
+            handle.write(content + "\n")
+        stamp = content.splitlines()[0]
         info["stamp"] = stamp
+        info["content"] = content
         break
     info["waited_s"] = round(time.time() - t0, 1)
     info["heartbeats"] = 0
@@ -101,7 +284,8 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
     stop = threading.Event()
     beat = None
     if every > 0:
-        beat = threading.Thread(target=_heartbeat, args=(lock, stamp, every, stop, info),
+        deadline = time.monotonic() + hold if hold else None
+        beat = threading.Thread(target=_heartbeat, args=(lock, content, every, stop, info, deadline),
                                 name="ue-lock-heartbeat", daemon=True)
         beat.start()
     try:
@@ -111,7 +295,7 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
         if beat is not None:
             beat.join(timeout=5.0)
         try:
-            if lock.read_text(encoding="utf-8", errors="replace").strip() == stamp:
+            if lock.read_text(encoding="utf-8", errors="replace").strip() == content:
                 lock.unlink()
             else:
                 print("UE LOCK: lock content changed while held; not deleting it", flush=True)
@@ -119,20 +303,35 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
             print("UE LOCK: lock vanished while held", flush=True)
 
 
-def main() -> int:
+def _cmdline(cmd: list) -> str:
+    return subprocess.list2cmdline(cmd) if sys.platform == "win32" else " ".join(cmd)
+
+
+def main(argv=None) -> int:
     for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     ap = argparse.ArgumentParser(description="run one command under the shared UE editor lock")
     ap.add_argument("--step", required=True)
+    ap.add_argument("--wait-timeout", type=float, default=None,
+                    help="give up waiting for a busy lock after S seconds: exit %d with the owner and PID of the lock "
+                         "(default UE_LOCK_WAIT_TIMEOUT_S or wait forever)" % EXIT_WAIT_TIMEOUT)
+    ap.add_argument("--max-hold", type=float, default=None,
+                    help="the heartbeat stops after S seconds of hold and waiters may take the lock over "
+                         "(default UE_LOCK_MAX_HOLD_S or %.0f; 0 = no limit)" % (2 * 3600))
     ap.add_argument("cmd", nargs=argparse.REMAINDER)
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     cmd = a.cmd[1:] if a.cmd and a.cmd[0] == "--" else a.cmd
     if not cmd:
         raise SystemExit("no command")
-    with ue_lock(a.step) as info:
-        print("UE LOCK: held %s (waited %.0f s)" % (info["stamp"], info["waited_s"]), flush=True)
-        rc = subprocess.call(cmd)
+    try:
+        with ue_lock(a.step, max_hold_s=a.max_hold, wait_timeout_s=a.wait_timeout, cmd=_cmdline(cmd)) as info:
+            print("UE LOCK: held %s (pid %d, waited %.0f s)" % (info["stamp"], info["pid"], info["waited_s"]),
+                  flush=True)
+            rc = subprocess.call(cmd)
+    except UeLockTimeout as exc:
+        print(str(exc), file=sys.stderr, flush=True)
+        return EXIT_WAIT_TIMEOUT
     return rc
 
 

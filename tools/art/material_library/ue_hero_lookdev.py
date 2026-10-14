@@ -49,7 +49,9 @@ Review config (JSON): {"hero", "run_dir" (skeletal-adopt run), "concept": {"fron
 "concept_zones": <ld measure-report.json> (concept medians per class, pooled over the three concept views),
 "variants": {"neutral"|"Blue"|"Red"|"debug": MI package}, "base_mi": {variant: MI package}, "zones": [class ids],
 "key_zones": [...] (exposure anchor: geometric mean over these), "tolerance": {"luma_ratio", "hue_deg", "sat"},
-"legacy_render_gate": {...}, "previous": [{"label", "frames_dir"}] (older UE frames for the sheets)}.
+"legacy_render_gate": {...}, "previous": [{"label", "frames_dir"}] (older UE frames for the sheets),
+"anchor_zone": one of "zones" (k_anchor; required for a hero outside the MVP / pilot list ANCHOR_DEFAULT_HEROES, which
+keep the old default "linen": review / measure exit 2 before the editor capture otherwise, review gap R-09)}.
 Look-dev C (2026-09-30) keys, all optional: "zone_class" {zone: preset class id, or a list of ids = their union (ART-016:
 a class split into two columns)} (zones named apart from their MatID class, e.g. two feather zones of one class, or
 horn_claw in the brass column), "decode_classes" [class ids] (every class
@@ -1138,6 +1140,34 @@ def zone_mask(cls, cids) -> np.ndarray:
     return np.isin(cls, list(cids))
 
 
+# R-09 (review 2026-10-14): a config without anchor_zone silently took Medusa's "linen" as the exposure anchor. The MVP
+# and pilot heroes keep that default (their configs all name the zone); any other hero must name a zone of its own.
+ANCHOR_DEFAULT = "linen"
+ANCHOR_DEFAULT_HEROES = frozenset({"Medusa", "KingArthur", "Merlin", "Harpy", "Achilles", "Angel", "AncientLeshen"})
+
+
+class ConfigError(ValueError):
+    pass
+
+
+def anchor_zone(cfg: dict) -> str:
+    """Exposure anchor zone of the review config: cfg["anchor_zone"]; without it — "linen" only for the MVP / pilot
+    heroes (old behaviour), otherwise ConfigError. A new hero's anchor must also be one of its zones."""
+    hero = cfg.get("hero")
+    zones = list(cfg.get("zones") or [])
+    z = cfg.get("anchor_zone")
+    if not z:
+        if hero in ANCHOR_DEFAULT_HEROES:
+            return ANCHOR_DEFAULT
+        raise ConfigError("review config of %r has no anchor_zone: the old default %r is Medusa's exposure anchor. Name "
+                          "a zone of this hero (one of zones %s) — \"anchor_zone\" in the config, or "
+                          "write_review_config.py --set anchor_zone=<zone> (references/ue-import-package.md §3.2)"
+                          % (hero, ANCHOR_DEFAULT, zones))
+    if hero not in ANCHOR_DEFAULT_HEROES and zones and z not in zones:
+        raise ConfigError("anchor_zone %r of %r is not one of its zones %s" % (z, hero, zones))
+    return z
+
+
 def load_frame(out: Path, hero: str, tag: str, name: str):
     p = out / "frames" / ("%s-%s-%s.png" % (hero.lower(), tag, name))
     return np.asarray(Image.open(p).convert("RGB")) if p.is_file() else None
@@ -1217,8 +1247,8 @@ def cmd_measure(a, cfg) -> dict:
             continue
         lr = [math.log(zones[z]["concept"]["luma_Y_linear"] / max(zones[z][var]["luma_Y_linear"], 1e-5)) for z in key]
         k = math.exp(sum(lr) / len(lr))
-        anchor = cfg.get("anchor_zone", "linen")
-        k_anchor = (zones[anchor]["concept"]["luma_Y_linear"] / max(zones[anchor][var]["luma_Y_linear"], 1e-5)
+        anchor = anchor_zone(cfg)
+        k_anchor =(zones[anchor]["concept"]["luma_Y_linear"] / max(zones[anchor][var]["luma_Y_linear"], 1e-5)
                     if anchor in zones and var in zones[anchor] else None)
         ev = {"k_concept_over_ue_geomean_key_zones": round(k, 4), "key_zones": key,
               "k_anchor_%s" % anchor: round(k_anchor, 4) if k_anchor else None, "deltas": {}}
@@ -1452,6 +1482,12 @@ def main() -> int:
         cmd_lut(a)
         return 0
     cfg = json.loads(Path(a.config).read_text(encoding="utf-8"))
+    if a.command in ("review", "measure"):
+        try:
+            anchor_zone(cfg)  # R-09: before the editor capture, not after it
+        except ConfigError as exc:
+            print("ERROR %s" % exc, file=sys.stderr)
+            return 2
     measured = None
     if a.command == "concept":
         cmd_concept(a, cfg)

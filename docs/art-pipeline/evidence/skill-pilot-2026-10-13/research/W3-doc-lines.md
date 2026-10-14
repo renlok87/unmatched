@@ -127,3 +127,14 @@
   `lut_metal_f0_from_concept`; эффект виден только в UE (Blender-превью берёт металл из BC)».
 - `acceptance-and-blender.md` §9.3 (доработка): «F: рваный низ или зубцы кромки подставки/подошв → `base.*`»; «T: мазки
   цвета соседа у стыка → `textures.band_repaint`»; «T (этап 7): металл бледный в UE → look-dev `metal_f0`».
+
+## W2-e · зазор «наездника» и кадры приёмки (22f247cf)
+- HANDBOOK §4.4 «Сдача модели», п. зазора наездников: `python tools/tripo-pipeline/review/rider_gap.py --run <bake run>
+  [--fbx <LD>/export/SK_<Key>_H2LD.fbx] --out C:/tmp/<key>-stage3-check/rider-gap.json` — код 0 PASS, 2 FAIL (лечится
+  `prepare.part_offsets_m`); нужен `work/lp_uv.blend` прогона (после очистки `work/` — `--parts`). Пороги: зазор ≤ 2 мм и
+  проникновение ≤ 2 мм — в покое и в каждом кадре. Пилот: Leshen r2 ворона 29 мм FAIL, r3 1,6 мм PASS.
+- HANDBOOK §4.4 дымовой прогон и этап 6: `rider_gap.py ... --spec <h2anim spec> [--pair NAME=RIDER[:PERCH]]
+  [--clip-fbx Имя=AM.fbx]` — деталь не отрывается в клипах (F133).
+- `acceptance-and-blender.md` §2.3/§3: необязательные кадры `pose-04b` (второй ракурс pose-04 по видимости таза/бедра,
+  F77), `pose-05` (рука оружия вперёд, 3/4 со спины — пройма плаща, F129), `close-attack` (кисти/когти у фигуры без
+  оружия, `--attack-bone` / `--asset-card`, F74); роли кадров — `frames.json#roles`; старые карточки их не требуют.

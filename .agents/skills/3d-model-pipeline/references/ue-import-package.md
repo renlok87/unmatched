@@ -114,19 +114,24 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
      агент не закрывает (AGENTS.md «Agent and process lifecycle»).
 2. **Блокировка.** Каждая команда, которая ходит в редактор по MCP, запускается так:
    `$L --step "<шаг>" -- <команда>`. `ue_lock.py` держит `C:/tmp/ue-editor.lock`, ждёт чужую блокировку (опрос 20 с) и
-   возвращает код команды. Пока шаг жив, поток heartbeat обновляет время файла (70905fa2, RB-21): шаг дольше 25 мин не
-   перехватывается; устаревшей блокировка становится через 25 мин после смерти её процесса. На одну блокировку — один
-   шаг одного героя (HANDBOOK §0.2). Скрипты `tools/tripo-pipeline/**` блокировку сами не берут (grep `ue_lock` там
-   пуст), поэтому их надо оборачивать.
+   возвращает код команды. В файле блокировки — владелец, время и шаг (первая строка), `pid`, `host`, `since`,
+   `max_hold_s` и у CLI `cmd` (командная строка). Пока шаг жив, поток heartbeat обновляет время файла (70905fa2, RB-21):
+   шаг дольше 25 мин не перехватывается. Устаревшей (ждущий её перехватывает и пишет причину) блокировка становится:
+   сразу, если её PID на этой машине мёртв (`dead_pid`); после предела удержания `--max-hold` (по умолчанию 2 ч,
+   `UE_LOCK_MAX_HOLD_S`, 0 — без предела), после которого heartbeat перестаёт обновлять файл (`max_hold`); через 25 мин
+   без обновления (`mtime`, так же блокировка старого формата без PID). На одну блокировку — один шаг одного героя
+   (HANDBOOK §0.2). Скрипты `tools/tripo-pipeline/**` блокировку сами не берут (grep `ue_lock` там пуст), поэтому их надо
+   оборачивать.
    **Зависший шаг** (процесс жив, но MCP-вызов не возвращается: модальный диалог, упавший редактор) держит блокировку
-   бесконечно: heartbeat её обновляет, предела удержания и таймаута ожидания у `ue_lock.py` нет, PID в файле не
-   пишется (код-пробел ревью 2026-10-14). Ждущий шаг печатает `UE LOCK: busy (<владелец> <время> <шаг>)`; занятость
-   дольше обычной длины шага — разбор оркестратором: найти процесс `ue_lock.py --step "<шаг>"` по командной строке
-   (`Get-CimInstance Win32_Process`), проверить редактор (§1 п.1) и погасить дерево этого процесса по PID; блокировку
-   `finally` снимет сам, без него — удалить файл, только убедившись, что процесса нет.
+   не дольше `--max-hold`. Ждущий шаг печатает `UE LOCK: busy (owner …, pid … on <host>, step …, cmd …)`; с
+   `--wait-timeout <с>` (или `UE_LOCK_WAIT_TIMEOUT_S`) он сдаётся с кодом 124 и тем же описанием владельца (по умолчанию
+   ждёт без предела). Занятость дольше обычной длины шага — разбор оркестратором: PID и командная строка — в самом файле
+   блокировки; проверить редактор (§1 п.1) и погасить дерево процесса этого PID; блокировку `finally` снимет сам, а
+   после смерти процесса её перехватит следующий шаг (`dead_pid`) — файл руками не удалять. Сам процесс зависшего шага
+   после `max_hold` не гасится: его гасит оркестратор.
 3. **Не оборачивать** `ue_hero_lookdev.py review`, `verify` и `apply-mi`: они берут ту же блокировку сами
-   (`ue_hero_lookdev.py:446`, `:731`, `:1039`). Если обернуть, команда упрётся в собственную блокировку и простоит до её
-   «устаревания» через 25 мин (с heartbeat — вечно).
+   (`ue_hero_lookdev.py:448`, `:733`, `:1041`). Если обернуть, команда упрётся в собственную блокировку и простоит до
+   предела удержания внешней обёртки (`--max-hold`, по умолчанию 2 ч).
 4. **Шаги без редактора (7b).** Это сборка `UnmatchedEditor` (`build-editor.cjs`), автотесты (`run-ue-tests.cjs`,
    `UnrealEditor-Cmd`), `de010.py apply` и `de011.py apply` (каждый запускает свой `UnrealEditor-Cmd` проекта своего
    checkout: `de010.py:42-43`, `:195-210` `run_editor`; `de011.py` — тот же раннер) и кук упаковки. Условия:
@@ -205,7 +210,8 @@ python tools/tripo-pipeline/ue7a/write_import_profile.py --template <профи�
 python tools/tripo-pipeline/ue7a/write_review_config.py --template <review-config шаблона> \
     --asset-dir art/pipeline-candidates/<ASSET_ID> --run-dir $R --height-uu <верх bounds меша из ue-import-report> \
     --lookdev-run <lookdev run> --clips-run <h2anim run> --import-profile $P \
-    --set side_camera=+X --set-json 'zones=[…]' --out $V/review-config.json [--dry-run]
+    --set side_camera=+X --set-json 'zones=[…]' --set anchor_zone=<зона из zones> --out $V/review-config.json [--dry-run]
+#   из шаблона чужого героя без --set anchor_zone — код 2 (его якорь не наследуется, R-09)
 ```
 
 ### 3.1 Профиль импорта `$P`
@@ -256,7 +262,7 @@ docstring `tools/art/material_library/ue_hero_lookdev.py`. Блок `verify` о�
 | `teams` | `["P1", "P2"]` |
 | `variants`, `base_mi` | свои MI: `neutral`, `P1`, `P2` (и отладочный `debug`, если есть) из `/Game/PipelineCandidates/<Key>/<Stage>/Materials/` |
 | `zones` | классы MatID своего героя: значения `lookdev.zones.class_of` профиля look-dev (HANDBOOK §4.4) |
-| `key_zones`, `tolerance_zones`, `never_dye_zones`, `anchor_zone` | подмножества `zones` своего героя. `anchor_zone` задать обязательно: без него берётся `"linen"` — класс Medusa (`ue_hero_lookdev.py:1220`; ни он, ни `write_review_config.py` отсутствие ключа не ловят — код-пробел RB-15; шаблон чужого героя несёт его якорь). Значение — класс экспозиции `ld_measure` look-dev (пилот: Angel `skin`, Leshen `wood`, Achilles `wool_coarse`). Ткань с sheen — смещённый якорь (F140: плащ Achilles 1,43× кожи и после правки sheen): в README записать и отношение к `skin`. `never_dye_zones` — классы, которые TeamAccent не красит (`team_accent` профиля look-dev) |
+| `key_zones`, `tolerance_zones`, `never_dye_zones`, `anchor_zone` | подмножества `zones` своего героя. `anchor_zone` задать обязательно: у героя вне MVP и пилота (`ue_hero_lookdev.py` `ANCHOR_DEFAULT_HEROES`) `review` и `measure` без ключа или с якорем не из `zones` выходят с кодом 2 до съёмки; `write_review_config.py` из шаблона чужого героя (его якорь не наследуется) требует `--set anchor_zone=<зона из zones>`, иначе код 2 (ревью 2026-10-14, R-09). Прежний `"linen"` по умолчанию — класс Medusa — остался только у MVP и пилота. Значение — класс экспозиции `ld_measure` look-dev (пилот: Angel `skin`, Leshen `wood`, Achilles `wool_coarse`). Ткань с sheen — смещённый якорь (F140: плащ Achilles 1,43× кожи и после правки sheen): в README записать и отношение к `skin`. `never_dye_zones` — классы, которые TeamAccent не красит (`team_accent` профиля look-dev) |
 | `render_gates` | гейты своих классов или `null` (у Merlin `null`; у Medusa гейт класса `legacy_bake`) |
 | `light_profile_pinned` | **обязателен**: профиля света `cobble-probe` в `S08ArtBoardProfiles.json` больше нет (ND-5, 2026-10-04), без ключа `review` выходит с `SystemExit`. Значение пилота — `art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json` (его `light_profile.data`, cobble-probe rev 5); тот же файл — `--light-pinned` кадров клипов (§4.5; F81) |
 | `debug_calibration` | только если отладочный декод путает классы: смотреть карты классов первой съёмки (`review/<tag>/frames/<hero>-<tag>-<view>-classmap.png`). Angel: шёлк (класс 11) читался как `metal_forged` (класс 3) и мерился как 0 px, пока не добавили блок калибровки (F90). Класс 0 (`legacy_bake`: кость, волосы) на чёрном фоне не декодируется вовсе — его нет в `tolerance_zones`, он идёт через `render_gates` (F131) |
@@ -269,7 +275,7 @@ docstring `tools/art/material_library/ue_hero_lookdev.py`. Блок `verify` о�
 | `verify.expect.triangles` | треугольники LOD0 фигуры из `ld-fbx-report.json` своего look-dev run (у Medusa 43 054, у Merlin 33 967 — не копировать) |
 | `verify.expect.base_uv_channels`, `clips` | `2`, `4` |
 | `verify.textures` | настройки карт по HANDBOOK §2.4; имя ключа кромки — `Edge` (как в образцах) |
-| `verify.instances` | обязателен (`ue_hero_lookdev.py:776`): родитель, текстуры, скаляры и переключатели своих MI — пути `<Key>/<Stage>`, свои `T_UM_MatLUT_<короткий ключ>`, `T_<Key>_<Stage>_Edge` или `_EdgeMask` (§2), `TeamDyeGain`/`TeamDyeCeiling` из §3.1, цвета P1/P2 по HANDBOOK §2.9 |
+| `verify.instances` | обязателен (`ue_hero_lookdev.py:778`): родитель, текстуры, скаляры и переключатели своих MI — пути `<Key>/<Stage>`, свои `T_UM_MatLUT_<короткий ключ>`, `T_<Key>_<Stage>_Edge` или `_EdgeMask` (§2), `TeamDyeGain`/`TeamDyeCeiling` из §3.1, цвета P1/P2 по HANDBOOK §2.9 |
 | `verify.clips_reference` | `<h2anim run>/reports/ue-measure-clips.json` — его пишет §4.1 шаг 5. После доработки клипов — путь последнего прогона клипов (`…-h2anim-r<N>`): со старым `verify` падает на `h2anim_clips_play_on_mesh` (у пилота все три конфига указывали на r1, исправлено fabf5215) |
 
 ## 4. Импорт (шаг 7.3) — HANDBOOK §4.6 с блокировкой
@@ -473,7 +479,9 @@ python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S    # лист из сня
   python tools/tripo-pipeline/ue7a/prep_acceptance.py --asset-dir art/pipeline-candidates/<ASSET_ID> --key <Key> \
       --run <h2anim run> --spec $S --date <YYYY-MM-DD> --cycle r1 [--clips …] [--dry-run]
   #   r2+: --previous <каталог прошлого цикла> --run <…-h2anim-r<N>> --replace "<старый run>/=<новый run>/" --refresh-sha
-  #   код 2 — нет кадра или заготовки, плейсхолдер не заполнен, sha расходится
+  #   {{KNOWN_LIMITS}} заготовок — из <ASSET_DIR>/evidence/acceptance-anim-prompts/known-limits.md (--known-limits FILE)
+  #   копии кадров — не больше 1200 px по длинной стороне, JPEG q92 (--max-px; 0 — как есть), оригиналы не меняются
+  #   код 2 — нет кадра, заготовки или known-limits.md при {{KNOWN_LIMITS}}, плейсхолдер не заполнен, sha расходится
   ```
 
 - Приёмщики, рубрика R/C/D/L, вердикт и маршрут доработки — `references/animation-vfx-sfx.md` §10–§11; карточки —
@@ -889,8 +897,8 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 | Ловушка | Симптом | Правило |
 |---|---|---|
 | Правило памяти «`FBX_SCALE_UNITS` + import 100» | кость 0 ×100, фигура гигантская | для `UM_FBX_v1` **отменено**: патч `UnitScaleFactor 1.0` + import 1,0 (HANDBOOK §10, строка «Масштаб импорта»; `rig-contract.json` `ue_import.import_uniform_scale_conflict`). Ручной Scale при импорте — дефект |
-| Двойная блокировка | `ue_hero_lookdev` висит до 25 мин | `review`/`verify` берут `ue-editor.lock` сами — не оборачивать в `ue_lock.py` (§1 п.3) |
-| Конфиг съёмки скопирован у Medusa | `verify` сверяет чужие папки, 43 054 треугольника, кость `weapon_L`; без блока `verify` — `KeyError` | каждый ключ §3.2 пройти; `anchor_zone` по умолчанию `linen` — класс Medusa |
+| Двойная блокировка | `ue_hero_lookdev` висит до предела удержания обёртки (2 ч) | `review`/`verify` берут `ue-editor.lock` сами — не оборачивать в `ue_lock.py` (§1 п.3) |
+| Конфиг съёмки скопирован у Medusa | `verify` сверяет чужие папки, 43 054 треугольника, кость `weapon_L`; без блока `verify` — `KeyError` | каждый ключ §3.2 пройти; `anchor_zone` — своя зона из `zones` (`write_review_config.py --set anchor_zone=…`; без неё код 2) |
 | `UnrealEditor-Cmd` при открытом GUI-редакторе | порча пакетов, конфликт с редактором пользователя | автотесты, кук, `de010.py apply` и `de011.py apply` — только без GUI-редактора на этом checkout (HANDBOOK §0.1, §1 п.4) |
 | Мьютекс Live Coding | «Unable to build while Live Coding is active» в любом checkout, включая worktree | гейт SKILL.md §5 п.7 (§1 п.4); упаковка — `-SkipBuild` после сборки игрового target, но автотестам нужна собранная `UnmatchedEditor` |
 | Обход через worktree при открытом редакторе пользователя | сборка падает на мьютексе, `safe-integrate.sh` отказывает («UE/UBT processes of the main checkout are running») | не обходить; пакет пользователю (§1 п.4) |

@@ -64,7 +64,7 @@ python -c "import numpy, PIL, scipy; print('deps ok')"
 | Headless-вызов | `"$B" -b --factory-startup --python-exit-code 1 --python <script> -- <args>` |
 | Blender MCP (живой) | `127.0.0.1:9876` (иногда `:9877`), клиент `C:/Users/ren/.claude/mcp-servers/clients/blender_mcp.py`. Только осмотр (раздел 6) |
 | Unreal | UE 5.8.2, проект `unreal/Unmatched`, редактор с MCP `127.0.0.1:8123`. Проверка: `netstat -ano \| grep ':8123 .*LISTEN'`. Редактор — **агентский скрытый** (ДС-3): пользователь UE сам не открывает (2026-10-14). Рецепт запуска (`-RenderOffScreen -unattended -nosplash`, без Live Coding, консоль через `UE_CONSOLE_DROP` и `console_drop.py`), PID-файл, опознание чужого редактора по командной строке и закрытие — `.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.1; здесь не повторяется. Видимый или свёрнутый редактор как норма не годится: он не берёт фокус консоли, `py_file` падает по таймауту, модальные окна держат шаг (F121, F125). Этап 7a — один герой за раз, редактор пачки поднимает и закрывает оркестратор. Фоновый редактор троттлит CPU: `ue_hero_lookdev.py review` выключает троттлинг сам (F153, 4.6) |
-| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку. Пока шаг жив, heartbeat обновляет файл: шаг дольше 25 мин не перехватывается, устаревшей блокировка становится через 25 мин после смерти её процесса (RB-21). Зависший, но живой шаг держит её бесконечно (предела удержания и PID в файле нет) — разбор оркестратором: процесс `ue_lock.py --step` найти по командной строке и погасить по PID (`.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.2) |
+| Блокировка редактора | `C:/tmp/ue-editor.lock` через `tools/art/material_library/ue_lock.py`; одна UE-операция (один герой или один клип) на одну блокировку. Пока шаг жив, heartbeat обновляет файл: шаг дольше 25 мин не перехватывается (RB-21). В файле — владелец, шаг, `pid`, `host` и командная строка; устаревшей блокировка становится сразу после смерти её процесса на этой машине, после предела удержания `--max-hold` (по умолчанию 2 ч; heartbeat дальше не обновляет) или через 25 мин без обновления; ждущий с `--wait-timeout` сдаётся с кодом 124 и именем и PID владельца. Зависший, но живой процесс шага гасит оркестратор по PID из файла (`.agents/skills/3d-model-pipeline/references/ue-import-package.md` §1 п.2) |
 | Python | 3.10+, numpy, Pillow, scipy (scipy нужен look-dev стадиям H2) |
 
 ### 0.3 Правила остановки
@@ -690,8 +690,9 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    а не `known_issues`: в клипе часть отрывается (вето D, F137). Готового замера зазора в `tools/` нет — минимальное
    расстояние вершин части до тела хозяина меряет разовый скрипт разведки, число — в отчёт.
 5. **Дымовой прогон клипов** (RC-06): копия спеки героя библиотеки с тем же классом оружия (ДС-6; 4.5) в
-   `<bake run>/work/smoke/` (`h2anim_run.py` пишет пути от корня репозитория, `C:/tmp` не годится; `work/` не в git),
-   `ue_hero` = `<Key>Smoke`. Прогон `h2anim_run.py` (внутри `clip_contact_check`) и
+   `<bake run>/work/smoke/` (`work/` не в git), `ue_hero` = `<Key>Smoke`. Прогон `h2anim_run.py <спека дыма> --out-dir
+   <bake run>/work/smoke/validation` (отчёты validate — в дым, не в `docs/`; пути вне репозитория он принимает, R-13;
+   внутри `clip_contact_check`) и
    `"$B" -b --factory-startup --python tools/tripo-pipeline/anim/grip_check.py -- <AM_<Key>Smoke_<Clip>.fbx> <out.json>
    --side <R|L> [--shield-bone arm_lower.L] --base <SM_<Key>_H2_Base.fbx>` по LungeAttack и DeathSettle. Ищется то, что
    пробы не ловят: кромка руки под плащом при руке вперёд со спины (F129, F148), зазор наездника в движении (F133),
@@ -727,7 +728,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    python tools/tripo-pipeline/anim/h2anim_run.py art/pipeline-candidates/<ASSET>/build-profiles/<hero>-h2anim.json
    ```
    Внутри: `clip_author.py` → `validate_clip.py --skeleton=UM_HUMANOID_17_v2 --character=<character>` (поле
-   `character` spec — ключ `rig-contract.json`, например `Arthur`, а не `KingArthur`; `h2anim_run.py:92`) →
+   `character` spec — ключ `rig-contract.json`, например `Arthur`, а не `KingArthur`; `h2anim_run.py:112`) →
    `clip_contact_check.py` → листы поз (`clip_pose_probe.py`, `overlay_bones.py`).
 3. PASS-условия:
    - validate: имя арматуры, кости по стороне, лицо +X, fps 24, длительность N/24 ± 0,05 с, in place (≤ 0,5 % роста),
@@ -788,7 +789,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    Look-dev съёмка: `python tools/art/material_library/ue_hero_lookdev.py review --config <review-config.json> --out
    <dir> --tag <tag>` (образец конфига — `ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json`; допуски зон против
    концепта — блок `tolerance` конфига: яркость ± 15 %, тон ± 12°, насыщенность ± 0,10). Блокировку `ue_lock`
-   команда берёт сама (`ue_hero_lookdev.py:446`; так же `verify` и `apply-mi`) — в `ue_lock.py` не оборачивать, иначе
+   команда берёт сама (`ue_hero_lookdev.py:448`; так же `verify` и `apply-mi`) — в `ue_lock.py` не оборачивать, иначе
    ждёт сама себя.
    - **Прогрев** (F153, 172fd4f1): `review` сам выключает троттлинг CPU фонового редактора и ждёт сходимости; не
      сошёлся — код 3 (`settle.status: not_settled`), кадров нет: повторить без чужой нагрузки на GPU.

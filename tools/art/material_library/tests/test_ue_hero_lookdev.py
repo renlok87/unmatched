@@ -191,6 +191,45 @@ class MeasureTest(unittest.TestCase):
         self.assertFalse(res["settle"]["warmup_converged"])
 
 
+# ------------------------------------------------------------------ anchor_zone (review gap R-09, 2026-10-14)
+class AnchorZoneTest(unittest.TestCase):
+    def test_mvp_and_pilot_keep_the_old_default(self):
+        for hero in ("Medusa", "KingArthur", "Merlin", "Harpy", "Achilles", "Angel", "AncientLeshen"):
+            self.assertEqual(U.anchor_zone({"hero": hero, "zones": ["skin"]}), "linen", hero)
+        self.assertEqual(U.anchor_zone({"hero": "Achilles", "anchor_zone": "wool_coarse"}), "wool_coarse")
+
+    def test_new_hero_needs_an_explicit_zone_of_its_own(self):
+        with self.assertRaisesRegex(U.ConfigError, r"no anchor_zone.*one of zones \['fur', 'bronze'\].*--set anchor_zone"):
+            U.anchor_zone({"hero": "Hercules", "zones": ["fur", "bronze"]})
+        with self.assertRaisesRegex(U.ConfigError, "not one of its zones"):
+            U.anchor_zone({"hero": "Hercules", "zones": ["fur", "bronze"], "anchor_zone": "linen"})
+        self.assertEqual(U.anchor_zone({"hero": "Hercules", "zones": ["fur", "bronze"], "anchor_zone": "fur"}), "fur")
+
+    def test_committed_review_configs_resolve(self):
+        root = U.REPO / "art/pipeline-candidates"
+        found = sorted(root.glob("ASSET-*/*/review-config*.json"))
+        for p in found:
+            cfg = json.loads(p.read_text(encoding="utf-8"))
+            with self.subTest(config=p.name, hero=cfg.get("hero")):
+                self.assertEqual(U.anchor_zone(cfg), cfg["anchor_zone"])
+
+    def test_measure_command_refuses_before_any_work(self):
+        cfg = self.tmp_cfg({"hero": "Hercules", "zones": ["fur"], "run_dir": "nowhere"})
+        err = io.StringIO()
+        argv = ["ue_hero_lookdev.py", "measure", "--config", str(cfg), "--out", str(cfg.parent / "out")]
+        with mock.patch.object(sys, "argv", argv), contextlib.redirect_stderr(err), \
+                mock.patch.object(U, "cmd_measure", side_effect=AssertionError("measured")):
+            self.assertEqual(U.main(), 2)
+        self.assertIn("anchor_zone", err.getvalue())
+
+    def tmp_cfg(self, cfg: dict) -> Path:
+        d = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, d, True)
+        p = d / "review-config.json"
+        p.write_text(json.dumps(cfg), encoding="utf-8")
+        return p
+
+
 # ------------------------------------------------------------------ apply-mi (RC-10)
 F = "/Game/PipelineCandidates/Hero/H2LD"
 

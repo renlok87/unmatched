@@ -156,27 +156,36 @@ TEMPLATE = """# Приёмка клипа AM_Testo_{clip}, цикл {{{{CYCLE}}}
 """
 
 
-def make_clip_repo(root: Path, clips=("Idle", "LungeAttack")):
+def jpg(path: Path, size=(64, 48), colour=(120, 90, 60)) -> Path:
+    from PIL import Image
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", size, colour).save(path, "JPEG", quality=90)
+    return path
+
+
+def make_clip_repo(root: Path, clips=("Idle", "LungeAttack"), template=None):
     adir = root / "art/pipeline-candidates/ASSET-TESTO-001"
     run = adir / "20261014-h2anim"
     spec = wj(adir / "build-profiles/testo-h2anim.json",
               {"ue_hero": "Testo", "clips": {cl: {"key_frames": [0, 7]} for cl in clips}})
     pv = run / "preview"
     for cl in clips:
-        for rel in (f"Testo-{cl}-blender-sheet.jpg", f"closeups-blender/Testo-{cl}-f04-q34.jpg",
-                    f"ue/Testo-{cl}-f00-front-ue-editor.jpg", f"ue/Testo-{cl}-f00-q34-ue-editor.jpg",
-                    f"ue/Testo-{cl}-f07-front-ue-editor.jpg", f"ue/Testo-{cl}-f07-q34-ue-editor.jpg"):
-            (pv / rel).parent.mkdir(parents=True, exist_ok=True)
-            (pv / rel).write_bytes(rel.encode())
-    (pv / "ue/Testo-LungeAttack-f07-closeup-ue-editor.jpg").write_bytes(b"x")
-    (pv / "Testo-H2Anim-ue-sheet.jpg").write_bytes(b"sheet")
+        jpg(pv / f"Testo-{cl}-blender-sheet.jpg", (840, 1260))          # лист Blender (пилот 1680 × 2520)
+        jpg(pv / f"closeups-blender/Testo-{cl}-f04-q34.jpg", (1100, 1100))
+        jpg(pv / f"ue/Testo-{cl}-f00-front-ue-editor.jpg", (1920, 1080))  # UE-кадр как в пилоте
+        for rel in (f"ue/Testo-{cl}-f00-q34-ue-editor.jpg", f"ue/Testo-{cl}-f07-front-ue-editor.jpg",
+                    f"ue/Testo-{cl}-f07-q34-ue-editor.jpg"):
+            jpg(pv / rel)
+    jpg(pv / "ue/Testo-LungeAttack-f07-closeup-ue-editor.jpg")
+    jpg(pv / "Testo-H2Anim-ue-sheet.jpg", (4200, 1860))                  # UE-лист пилота
     fbx_rel = "art/pipeline-candidates/ASSET-TESTO-001/20261014-h2anim/export/AM_Testo.fbx"
     (root / fbx_rel).parent.mkdir(parents=True, exist_ok=True)
     (root / fbx_rel).write_bytes(b"clip-v1")
     for cl in clips:
         t = adir / "evidence/acceptance-anim-prompts" / cl / "acceptor-prompt.md"
         t.parent.mkdir(parents=True, exist_ok=True)
-        t.write_text(TEMPLATE.format(clip=cl, fbx=fbx_rel, sha=c.sha256(root / fbx_rel)), encoding="utf-8")
+        t.write_text((template or TEMPLATE).format(clip=cl, fbx=fbx_rel, sha=c.sha256(root / fbx_rel)), encoding="utf-8")
     (adir / "evidence/acceptance-anim-prompts/run-acceptor.ps1").write_text("# ps1", encoding="utf-8")
     return adir, run, spec, fbx_rel
 
@@ -220,6 +229,98 @@ def test_prep_acceptance_dry_run_reports_missing_frame(tmp_path, capsys):
     assert any("H2Anim-ue-sheet" in p for p in json.loads(capsys.readouterr().out)["problems"])
     assert prep_acceptance.main(args) == 2
     assert not (adir / "evidence/acceptance-anim/20261014-r1").exists()
+
+
+def r1_args(adir, run, spec, root):
+    return ["--asset-dir", str(adir), "--key", "Testo", "--date", "2026-10-14", "--repo", str(root),
+            "--run", str(run), "--spec", str(spec), "--cycle", "r1"]
+
+
+def test_prep_acceptance_frames_fit_1200_px_originals_untouched(tmp_path, capsys):
+    """Ревью 2026-10-14 R-03 (ДС-8): копии кадров клипа ≤ 1200 px по длинной стороне, JPEG q92; листы — целиком."""
+    from PIL import Image
+
+    adir, run, spec, _ = make_clip_repo(tmp_path)
+    pv = run / "preview"
+    before = {p: c.sha256(p) for p in pv.rglob("*.jpg")}
+    assert prep_acceptance.main(r1_args(adir, run, spec, tmp_path)) == 0
+    assert "resized 3 to <= 1200 px" in capsys.readouterr().out          # лист Blender, UE-кадр 1920, UE-лист
+    fr = adir / "evidence/acceptance-anim/20261014-r1/LungeAttack/frames"
+    sizes = {p.name: Image.open(p).size for p in fr.iterdir()}
+    assert sizes["Testo-H2Anim-ue-sheet.jpg"] == (1200, 531)               # 4200 × 1860: уменьшен целиком
+    assert sizes["Testo-LungeAttack-blender-sheet.jpg"] == (800, 1200)
+    assert sizes["Testo-LungeAttack-f00-front-ue-editor.jpg"] == (1200, 675)
+    assert sizes["Testo-LungeAttack-f04-q34.jpg"] == (1100, 1100)
+    assert max(max(s) for s in sizes.values()) <= 1200 and len(sizes) == 8
+    assert Image.open(fr / "Testo-H2Anim-ue-sheet.jpg").format == "JPEG"
+    small = "Testo-LungeAttack-f07-q34-ue-editor.jpg"                    # не больше предела — байт в байт
+    assert c.sha256(fr / small) == c.sha256(pv / "ue" / small)
+    assert {p: c.sha256(p) for p in pv.rglob("*.jpg")} == before          # оригиналы не тронуты
+    # --max-px 0 — копия как есть (прежнее поведение)
+    assert prep_acceptance.main(r1_args(adir, run, spec, tmp_path) + ["--max-px", "0", "--evidence", "ev-asis"]) == 0
+    sheet = tmp_path / "ev-asis/Idle/frames/Testo-H2Anim-ue-sheet.jpg"
+    assert c.sha256(sheet) == c.sha256(pv / "Testo-H2Anim-ue-sheet.jpg")
+
+
+def test_copy_frame_png_and_unreadable(tmp_path):
+    from PIL import Image
+
+    src = tmp_path / "a.png"
+    Image.new("RGBA", (1600, 800), (10, 20, 30, 255)).save(src)
+    rec = prep_acceptance.copy_frame(src, tmp_path / "out.png", 1200)
+    assert rec == {"name": "out.png", "resized": True, "px": [1200, 600], "source_px": [1600, 800]}
+    with Image.open(tmp_path / "out.png") as im:
+        assert (im.format, im.size) == ("PNG", (1200, 600))
+    bad = tmp_path / "bad.jpg"
+    bad.write_bytes(b"not an image")
+    with pytest.raises(OSError):
+        prep_acceptance.copy_frame(bad, tmp_path / "bad-out.jpg", 1200)
+
+
+def test_prep_acceptance_unreadable_frame_is_an_error(tmp_path, capsys):
+    adir, run, spec, _ = make_clip_repo(tmp_path)
+    (run / "preview/ue/Testo-Idle-f07-q34-ue-editor.jpg").write_bytes(b"broken")
+    assert prep_acceptance.main(r1_args(adir, run, spec, tmp_path)) == 2
+    assert "не читается как картинка" in capsys.readouterr().err
+
+
+TEMPLATE_KL = TEMPLATE.replace("- Клип:", "- Известные пределы этой фигуры: {{{{KNOWN_LIMITS}}}}\n- Клип:")
+
+
+def test_prep_acceptance_known_limits_placeholder(tmp_path, capsys):
+    """F141/F156, ревью R-14: {{KNOWN_LIMITS}} — из <prompts>/known-limits.md, один список во все промпты героя."""
+    adir, run, spec, _ = make_clip_repo(tmp_path, template=TEMPLATE_KL)
+    args = r1_args(adir, run, spec, tmp_path)
+    assert prep_acceptance.main(args + ["--dry-run"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["known_limits"] is None and any("{{KNOWN_LIMITS}}" in p for p in out["problems"])
+    assert prep_acceptance.main(args) == 2                                 # заготовка ждёт список, файла нет
+    assert "known-limits.md" in capsys.readouterr().err
+    kl = adir / "evidence/acceptance-anim-prompts/known-limits.md"
+    kl.write_text("<!-- этап 6: один список на фигуру -->\nщит без кости; кромка плаща у подмышки\n", encoding="utf-8")
+    assert prep_acceptance.main(args) == 0
+    e1 = adir / "evidence/acceptance-anim/20261014-r1"
+    for cl in ("Idle", "LungeAttack"):
+        text = (e1 / cl / "acceptor-prompt.md").read_text(encoding="utf-8")
+        assert "- Известные пределы этой фигуры: щит без кости; кромка плаща у подмышки\n" in text
+        assert "{{" not in text and "<!--" not in text
+    own = tmp_path / "limits-empty.md"
+    own.write_text("<!-- всё закрыто поздним фиксом -->\n", encoding="utf-8")
+    assert prep_acceptance.main(args + ["--known-limits", str(own), "--evidence", "ev-own"]) == 0
+    assert "пределы этой фигуры: нет\n" in (tmp_path / "ev-own/Idle/acceptor-prompt.md").read_text(encoding="utf-8")
+    assert prep_acceptance.main(args + ["--known-limits", str(tmp_path / "missing.md")]) == 2
+    with pytest.raises(prep_acceptance.PrepError):
+        prep_acceptance.fill_prompt("- a: {{KNOWN_LIMITS}}\n- Клип: x", e_rel="e", date="d", cycle="r1",
+                                    previous_card=None, files=[], note="")
+
+
+def test_prep_acceptance_known_limits_file_without_placeholder_warns(tmp_path, capsys):
+    adir, run, spec, _ = make_clip_repo(tmp_path)                          # заготовка пилота: блок текстом
+    (adir / "evidence/acceptance-anim-prompts/known-limits.md").write_text("щит без кости", encoding="utf-8")
+    assert prep_acceptance.main(r1_args(adir, run, spec, tmp_path)) == 0
+    assert "WARNING" in capsys.readouterr().err
+    text = (adir / "evidence/acceptance-anim/20261014-r1/Idle/acceptor-prompt.md").read_text(encoding="utf-8")
+    assert "щит без кости" not in text
 
 
 # ------------------------------------------------------------------------------ профиль импорта и конфиг съёмки
@@ -306,6 +407,7 @@ def test_write_review_config(tmp_path):
     t = wj(tmp_path / "tmpl-review-config.json", {
         "hero": "Tmpl", "run_dir": "art/pipeline-candidates/ASSET-TMPL-001/run", "note": "Tmpl",
         "concept": {"front": "art/imagegen/concept-tmpl-codex/tmpl-front.png"}, "debug_calibration": {"a": 1},
+        "zones": ["linen", "skin"], "anchor_zone": "linen",
         "variants": {"P1": "/Game/PipelineCandidates/Tmpl/H2LD/Materials/MI_Tmpl_H2LD_P1"},
         "verify": {"hero_root": "/Game/PipelineCandidates/Tmpl", "expect": {"triangles": 1},
                    "instances": {"figure_instance": {"scalars": {"TeamDyeGain": 9.0}}}}})
@@ -313,8 +415,11 @@ def test_write_review_config(tmp_path):
     args = ["--template", str(t), "--asset-dir", str(adir), "--run-dir", str(run), "--height-uu", "54.99",
             "--lookdev-run", str(ld), "--clips-run", str(adir / "20261014-h2anim"), "--import-profile", str(prof),
             "--drop", "debug_calibration", "--set", "note=Testo look-dev", "--repo", str(tmp_path), "--out", str(out)]
-    assert wrc.main(args) == 0
+    assert wrc.main(args) == 2 and not out.exists()   # R-09: якорь чужого героя не наследуется
+    assert wrc.main(args + ["--set", "anchor_zone=bronze"]) == 2   # не из zones героя
+    assert wrc.main(args + ["--set", "anchor_zone=skin"]) == 0
     cfg = json.loads(out.read_text(encoding="utf-8"))
+    assert cfg["anchor_zone"] == "skin"
     assert cfg["hero"] == "Testo" and cfg["run_dir"] == "art/pipeline-candidates/ASSET-TESTO-001/20261014-h2ld-ue-import"
     assert cfg["variants"]["P1"] == "/Game/PipelineCandidates/Testo/H2LD/Materials/MI_Testo_H2LD_P1"
     assert cfg["concept"]["front"] == "art/imagegen/concept-testo-codex/testo-front.png"
@@ -324,3 +429,15 @@ def test_write_review_config(tmp_path):
     assert v["clips_reference"].endswith("20261014-h2anim/reports/ue-measure-clips.json")
     assert "debug_calibration" not in cfg and cfg["note"] == "Testo look-dev"
     assert cfg["concept_zones"].endswith("20261014-h2-lookdev-r2/reports/measure-report.json")
+    # свой прошлый конфиг как шаблон — якорь остаётся как был, --set не нужен (прежнее поведение)
+    out2 = tmp_path / "rc-r2.json"
+    assert wrc.main(["--template", str(out), "--asset-dir", str(adir), "--run-dir", str(run), "--repo", str(tmp_path),
+                     "--out", str(out2)]) == 0
+    assert json.loads(out2.read_text(encoding="utf-8"))["anchor_zone"] == "skin"
+
+
+def test_write_review_config_anchor_message(capsys):
+    with pytest.raises(wrc.ConfigError, match=r"--set anchor_zone=<зона Testo> \(одна из zones: linen, skin\)"):
+        wrc.check_anchor_zone({"zones": ["linen", "skin"], "anchor_zone": "linen"}, {"anchor_zone": "linen"},
+                              "Testo", "Tmpl", sets=["note=x"])
+    wrc.check_anchor_zone({"anchor_zone": "fur"}, {}, "Testo", "Tmpl", set_jsons=['anchor_zone="fur"'])  # без zones
