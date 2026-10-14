@@ -102,3 +102,23 @@ Verdict: keep the skill's route (H2 «по частям» + stage 3 in Blender);
 |---|---|---|---|
 | C36 | 3/4 | The experiment measured 6 099 flipped UV triangles and ~30 % UV overlap in our look-dev body while `uv-report.json` says 0. Orchestrator check: 6 099 = the `cloth_shell` inner faces (3 999 + 1 700 + 400: same UV0, reversed winding by design, П3-3) — not a defect, but any external UV measure misreads it | tag shell faces (attribute / vertex group) and exclude them in UV checks; one line in HANDBOOK §4.2 `cloth_shell` |
 | C37 | 2 | `tripo3d-stages.md` §4 is out of date (Smart Mesh row, 4K price 20, Smart UV refusal text, auto-rig and animation facts, new export options, Smart Mesh privacy reset) | update §4 from `tripo-tools-experiment/README.md`. applied: `tripo3d-stages.md` §4 (intro + rows), §3 (prop rows), §5.3 (Smart Mesh route, decision 2026-10-14); `animation-vfx-sfx.md` §6.1; SKILL §3, §6 stage 6 п.2; HANDBOOK §5 |
+
+## Stage 6 findings (executor, 2026-10-14 ≈ 15:20–15:56; orchestrator analysis)
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C38 | 3/7 | Full repeat of look-dev t5 + TeamAccent: code 1 only on `reports/measure-report.json` (one mask pixel 2176 → 2175, hue 25.2 → 24.7) with all 26 maps / LUT / FBX identical: `determinism.py` compared it as plain JSON | **fixed (orchestrator):** `measure-report.json` → render rule; test; HANDBOOK §4.3 table |
+| C39 | 3 | ДС-7 «look-dev and TeamAccent in their own repeat folders» cannot work: TeamAccent writes into the look-dev run and the comparison takes the union of files | **fixed:** HANDBOOK §4.3 — one repeat folder, `ld_manifest` + `ta_manifest` transfer |
+| C40 | 6 | `weapon_tip` check and `grip_check` take the base top from its highest vertex (a 3 mm bump at 6.00 cm vs the visible 5.68 cm surface) → the sword tip must float 2.4 mm or the gate fails | base top = robust height (percentile of the top-facing faces) |
+| C41 | 6 | Legs fully straight in rest (16.328 of 16.329 cm): frames where the leg IK cannot reach slide the foot up to 0.48 % H (limit 0.5 %); a pelvis drop fixed it | §6.2: check `ik_unreached_frames` and the foot-slide margin |
+| C42 | 6 | Copying a pattern spec needs per-hero rest axes in aim (`from`/`from2`) and anchor / tip targets within the arm's reach — not in the §6.2 table; reach shortfall `follow_*_reach_deficit_cm` should be −0.5…−1.5 cm | §6.2 table rows |
+| C43 | 3/6 | No validator catches openings uncovered by motion (top of the right sleeve from behind in LungeAttack f4 / DeathSettle f6–21; fist hole when the sword turns); only close-ups do — the §6.6 smoke run has no close-up step, so stage 3 missed them (same class as Achilles F129) | add `clip_closeups.py` on the smoke clips to the stage-3 handover checklist |
+| C44 | 6 | The library sword death pattern turns the sword 154–170° in the fist — against the F95 veto rule; exposes the grip channel of any Tripo fist | library DeathSettle with a fixed grip; orchestrator asked the executor to re-author Beowulf's |
+| C45 | 6 | `clip_closeups.py` has no default shots; the skill gives no standard shot list | default shot list per clip role |
+| C46 | 6 | The filled sample prompt in §10 (Achilles r2) still carries the old OEM block; no template had `{{KNOWN_LIMITS}}` | refresh the sample |
+| C47 | 6 | `rider_gap` auto-scan paired the shield with its own boss; the handle-to-hand pair needs a manual `--pair`; a constant non-rider gap (shield to forearm 5.6 mm) can only FAIL | exclude parts on the same bone; allow a «designed gap» per pair |
+
+Stage 6 result: Angel r2 pattern on Arthur's sword clips, shield as `extra_parts`; h2anim_run code 0, validate 4/4, contact
+4/4, foot slide ≤ 0.28 %, sword/shield through body 0, rider gap shield 0.00 / 0.12 mm in all clips; manifest and sheet
+checks PASS; HIT_TYPE BLADE; prompts + known-limits ready. Bake t4 full repeat: pass. Sleeve-top cut edge left for the
+clip acceptor at 7a.2 on purpose (test of the late-fix route).

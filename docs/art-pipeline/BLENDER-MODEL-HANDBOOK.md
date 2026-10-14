@@ -565,7 +565,7 @@ run>` → `reports/determinism-report.json` (`unmatched.h2-bake-determinism/2`, 
 | Файлы | Правило |
 |---|---|
 | `reports/run-manifest.json`, `determinism-report.json`, `decimation-curve.json`, `preview/*.jpg` (Cycles с denoise) | не сравниваются |
-| `compose-report.json`, `ld-compose-report.json`, `ld-team-*.json` (меряют кадры Cycles `ta_render`) | только `passed` совпадает |
+| `compose-report.json`, `ld-compose-report.json`, `ld-team-*.json` (меряют кадры Cycles `ta_render`), `measure-report.json` look-dev (медианы масок ID-прохода по кадрам Cycles; Beowulf: маска ±1 пиксель при одинаковых картах, LUT и FBX — C38) | только `passed` совпадает |
 | `textures-report.json` | равен без `outputs.<карта>.{sha256, bytes}` карт, прошедших правило PNG |
 | `*.png` | тот же размер, `max_abs_diff` ≤ 2 на канал, отличаются ≤ 0,01 % пикселей (шум GPU-бейка N, N_OpenGL, ORM; пилот: 11 повторов, 1–6 пикселей на 1 уровень) |
 | прочие `*.json` | побайтно или равны после замены пути прогона на `<run>` и без `reused_from` |
@@ -573,6 +573,8 @@ run>` → `reports/determinism-report.json` (`unmatched.h2-bake-determinism/2`, 
 
 Код 1 `--compare-with` — расхождение сверх таблицы: модель дальше не идёт, разбор оркестратором (§0.3 п.3). Работает
 во всех режимах (`h2`, `lookdev`, `teamaccent`).
+TeamAccent пишет в каталог look-dev, а сравнение берёт объединение файлов: повтор look-dev и TeamAccent — в **один**
+каталог повтора, перенос — `--mode lookdev --stages ld_manifest` и `--mode teamaccent --stages ta_manifest` (C39).
 
 **Когда повторять** (ДС-7; RC-08: 7 полных повторов пилота по 12–19 мин и 2,4–2,6 ГБ). Полный повтор (`scope: full`) —
 один раз на фигуру, на прогоне, который идёт в UE (после `pass` приёмки, до этапа 7a). Прогон доработки с

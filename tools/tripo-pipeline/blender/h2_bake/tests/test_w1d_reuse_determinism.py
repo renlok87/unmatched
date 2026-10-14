@@ -536,3 +536,15 @@ def test_probes_v2_extended_gate_and_skip():
     assert rep["passed"] is True and rep["total"]["x-h2-blend"] == 9 and rep["skipped"] == list(LEGS)
     assert drv.probe_counts({"tests": datas["x-h2-blend"]["tests"]}) == {
         "plausible": 7, "total": 7, "passed": True, "gate": "legacy 7", "summary": "7/7", "extended_failed": []}
+
+
+def test_lookdev_measure_report_is_render_derived(tmp_path):
+    """Beowulf 2026-10-14 (skill check C38): ld_measure medians of Cycles frames move by one mask pixel between runs
+    while every map / LUT / FBX is identical — the measure report follows the render rule (verdict must agree)."""
+    a = make_run(tmp_path / "a", extra={"reports/measure-report.json": {"passed": True, "px": 2176, "hue": 25.2}})
+    b = make_run(tmp_path / "b", extra={"reports/measure-report.json": {"passed": True, "px": 2175, "hue": 24.7}})
+    rep = DET.compare(a, b, REPO)
+    assert rep["verdict"] == "pass", rep["failures"]
+    assert rep["files"]["reports/measure-report.json"]["result"] == "render: verdict agrees"
+    c = make_run(tmp_path / "c", extra={"reports/measure-report.json": {"passed": False, "px": 2175, "hue": 24.7}})
+    assert DET.compare(a, c, REPO)["verdict"] == "fail"

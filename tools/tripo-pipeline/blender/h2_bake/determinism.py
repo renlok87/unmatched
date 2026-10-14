@@ -43,6 +43,9 @@ TOLERANCES = (
     {"pattern": "reports/ld-compose-report.json", "rule": "render", "why": "sha256 of the look-dev JPEG sheets"},
     {"pattern": "reports/ld-team-*.json", "rule": "render",
      "why": "TeamAccent report, calibration and manifest are measured on / hash the ta_render Cycles frames (F86)"},
+    {"pattern": "reports/measure-report.json", "rule": "render",
+     "why": "look-dev ld_measure: medians of the ID-pass masks on Cycles frames; Beowulf 2026-10-14 full repeat lost one "
+            "mask pixel (2176 -> 2175, hue 25.2 -> 24.7) with every map / LUT / FBX identical (skill check C38)"},
     {"pattern": "reports/textures-report.json", "rule": "textures_report",
      "why": "carries sha256 / bytes of the GPU-baked maps; the statistics must stay equal"},
     {"pattern": "*.png", "rule": "png", "max_abs_diff": PNG_MAX_ABS_DIFF, "max_differing_share": PNG_MAX_DIFFERING_SHARE,
