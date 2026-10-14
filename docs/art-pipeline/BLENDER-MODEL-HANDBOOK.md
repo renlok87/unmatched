@@ -687,15 +687,19 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    открытые петли верха подставки Leshen и Achilles нашлись только там (F134, F144).
 4. **Зазор «наездников»**: жёсткая часть на кости (ворона на руке, щит, фонарь) в rest прилегает к телу — на
    `close-*` и `turn-*` пункта 2 нет видимого зазора. Зазор (ворона Leshen — 2,9 см) — `prepare.part_offsets_m` (4.2),
-   а не `known_issues`: в клипе часть отрывается (вето D, F137). Готового замера зазора в `tools/` нет — минимальное
-   расстояние вершин части до тела хозяина меряет разовый скрипт разведки, число — в отчёт.
+   а не `known_issues`: в клипе часть отрывается (вето D, F137). Замер: `python tools/tripo-pipeline/review/rider_gap.py
+   --run <bake run> [--fbx <LD>/export/SK_<Key>_H2LD.fbx] --out C:/tmp/<key>-stage3-check/rider-gap.json` (висящие
+   части находит сам; пара вручную — `--pair NAME=RIDER[:PERCH]`): код 0 — PASS, 2 — FAIL. Пороги: зазор ≤ 2 мм и
+   проникновение ≤ 2 мм. Нужен `work/lp_uv.blend` прогона (после очистки `work/` — `--parts`). Пилот: ворона Leshen r2
+   29 мм — FAIL, r3 1,6 мм — PASS; рукоять щита Achilles 1,5 мм — PASS (22f247cf).
 5. **Дымовой прогон клипов** (RC-06): копия спеки героя библиотеки с тем же классом оружия (ДС-6; 4.5) в
    `<bake run>/work/smoke/` (`work/` не в git), `ue_hero` = `<Key>Smoke`. Прогон `h2anim_run.py <спека дыма> --out-dir
    <bake run>/work/smoke/validation` (отчёты validate — в дым, не в `docs/`; пути вне репозитория он принимает, R-13;
    внутри `clip_contact_check`) и
    `"$B" -b --factory-startup --python tools/tripo-pipeline/anim/grip_check.py -- <AM_<Key>Smoke_<Clip>.fbx> <out.json>
    --side <R|L> [--shield-bone arm_lower.L] --base <SM_<Key>_H2_Base.fbx>` по LungeAttack и DeathSettle. Ищется то, что
-   пробы не ловят: кромка руки под плащом при руке вперёд со спины (F129, F148), зазор наездника в движении (F133),
+   пробы не ловят: кромка руки под плащом при руке вперёд со спины (F129, F148), зазор наездника в движении (F133;
+   `rider_gap.py --run <bake run> --spec <спека дыма> [--clip-fbx Имя=AM.fbx]` — те же пороги в каждом кадре),
    предел разгибания скина (F122), оружие сквозь тело. FAIL `skin_stretch`/`limb_body`/`weapon_body` на паттерне —
    дефект модели, чинится до приёмки. Порядок, что смотреть и что удалить после —
    `.agents/skills/3d-model-pipeline/references/animation-vfx-sfx.md` §6.6. Клипы дыма — не клипы этапа 6.
