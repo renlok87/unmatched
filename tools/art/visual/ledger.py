@@ -27,6 +27,9 @@ With --service tripo --next-cost N [--balance B] it is the pre-flight before a T
 remainder (limits.tripo.credits minus the Tripo rows) against N, the window limits.tripo.until, the fresh Tripo
 balance (when given) against N (no purchases, ВР-04) and a Tripo providerTerms row (ВР-05; for --model when given).
 The SYNTX limits are not applied to a Tripo pre-flight. Exit code 1 on any error.
+
+Windows (RB-01): limits.syntx.until / limits.tripo.until set to null in the ledger mean an open window (no end date:
+no date check, every SYNTX row counts towards the token limit); a missing key falls back to DEFAULT_LIMITS.
 """
 from __future__ import annotations
 
@@ -49,7 +52,6 @@ from visual_common import (  # noqa: E402
     VisualError,
     load_cards,
     repo_root,
-    utf8_console,
 )
 
 SCHEMA = "unmatched.visual-credits-ledger/1"
@@ -135,6 +137,7 @@ def write_ledger(path: Path, data: dict, nl: str) -> None:
 # ---------------------------------------------------------------- model
 
 def limits_of(data: dict) -> dict:
+    """Limits of the ledger file; a missing key takes DEFAULT_LIMITS, an explicit until: null stays None (open)."""
     lim = data.get("limits") or {}
     sx = lim.get("syntx") or {}
     tr = lim.get("tripo") or {}
@@ -186,6 +189,15 @@ def terms_cover(terms: list[dict], service: str, model: str) -> bool:
 
 def _date_part(iso: str) -> str:
     return (iso or "")[:10]
+
+
+def _after(day: str, until: str | None) -> bool:
+    """day is past the window end; until None (until: null in the ledger) is an open window (RB-01)."""
+    return until is not None and day > until
+
+
+def _until_text(until: str | None) -> str:
+    return f"until {until}" if until is not None else "with an open window (until: null)"
 
 
 def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
@@ -255,7 +267,7 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
             if cap is not None and price > cap:
                 warnings.append(f"{tag}: one {kind} run at {price} is above the ВР-PR04 cap {cap}; "
                                 "allowed only by a line in the card's budget")
-            if _date_part(e["date"]) > lim["syntx_until"] and cost > 0:
+            if _after(_date_part(e["date"]), lim["syntx_until"]) and cost > 0:
                 errors.append(f"{tag}: SYNTX spend after {lim['syntx_until']} needs a new decision (ВР-04)")
         if cost > 0 and not terms_cover(terms, svc, e["model"]):
             errors.append(f"{tag}: no providerTerms row for {svc} {e['model']!r} (ВР-05: before the first spend)")
@@ -268,11 +280,11 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
 
     sx_window = round(sum(e["cost"] for e in entries if e.get("service") == "SYNTX"
                           and isinstance(e.get("cost"), (int, float))
-                          and _date_part(e.get("date", "")) <= lim["syntx_until"]), 3)
+                          and not _after(_date_part(e.get("date", "")), lim["syntx_until"])), 3)
     if totals["syntx_spent"] > lim["visual_cap"] + EPS:
         errors.append(f"SYNTX spent {totals['syntx_spent']} > visual cap {lim['visual_cap']} (ВР-PL10: new decision first)")
     if sx_window > lim["syntx_tokens"] + EPS:
-        errors.append(f"SYNTX spent {sx_window} until {lim['syntx_until']} > {lim['syntx_tokens']} (ВР-04)")
+        errors.append(f"SYNTX spent {sx_window} {_until_text(lim['syntx_until'])} > {lim['syntx_tokens']} (ВР-04)")
     if totals["tripo_spent"] > lim["tripo_credits"] + EPS:
         errors.append(f"Tripo spent {totals['tripo_spent']} > {lim['tripo_credits']} credits (ВР-04)")
     if totals["tripo_spent"] > 0:
@@ -300,7 +312,7 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
             errors.append(f"pre-flight: spent {totals['syntx_spent']} + {x} > visual cap {lim['visual_cap']} (ВР-PL10)")
         if sx_window + x > lim["syntx_tokens"] + EPS:
             errors.append(f"pre-flight: spent {sx_window} + {x} > {lim['syntx_tokens']} (ВР-04)")
-        if today > lim["syntx_until"]:
+        if _after(today, lim["syntx_until"]):
             errors.append(f"pre-flight: today {today} is after {lim['syntx_until']} (ВР-04 window closed)")
     return errors, warnings
 
@@ -324,7 +336,7 @@ def _tripo_preflight(pre: dict, lim: dict, spent: float, terms: list[dict]) -> t
         elif b < remaining:
             warnings.append(f"pre-flight Tripo: balance {b} is below the ВР-04 remainder {remaining}; "
                             "the balance is the real bound")
-    if today > until:
+    if _after(today, until):
         errors.append(f"pre-flight Tripo: today {today} is after {until} (ВР-04 window closed)")
     tripo_terms = [t for t in terms if t.get("service") == "Tripo"]
     if not tripo_terms:
@@ -482,12 +494,12 @@ def cmd_check(a, root: Path) -> int:
     t = compute_totals(data.get("entries") or [])
     lim = limits_of(data)
     print(f"ledger: {len(data.get('entries') or [])} rows; syntx_spent={t['syntx_spent']} of visual cap "
-          f"{lim['visual_cap']} (ВР-PL10) and {lim['syntx_tokens']} until {lim['syntx_until']} (ВР-04); "
+          f"{lim['visual_cap']} (ВР-PL10) and {lim['syntx_tokens']} {_until_text(lim['syntx_until'])} (ВР-04); "
           f"tripo_spent={t['tripo_spent']} of {lim['tripo_credits']}; codex_packages={t['codex_packages']}")
     if pre and pre["service"] == "Tripo":
         rem = round(lim["tripo_credits"] - t["tripo_spent"], 3)
         print(f"ledger: Tripo pre-flight: price {pre['next_cost']}; ВР-04 remainder {rem} of {lim['tripo_credits']} "
-              f"until {lim['tripo_until']}, after the run {round(rem - pre['next_cost'], 3)}"
+              f"{_until_text(lim['tripo_until'])}, after the run {round(rem - pre['next_cost'], 3)}"
               + (f"; fresh balance {pre['balance']}" if pre["balance"] is not None else ""))
     for w in warnings:
         print(f"WARN  {w}")
@@ -498,6 +510,9 @@ def cmd_check(a, root: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--root", type=Path, help=argparse.SUPPRESS)
     ap.add_argument("--ledger", type=Path, help=f"ledger file (default {LEDGER_REL})")
@@ -538,7 +553,6 @@ def main(argv: list[str] | None = None) -> int:
     ch.add_argument("--today", help=argparse.SUPPRESS)
 
     a = ap.parse_args(argv)
-    utf8_console()
     root = (a.root or repo_root()).resolve()
     try:
         return {"add": cmd_add, "terms": cmd_terms, "check": cmd_check}[a.cmd](a, root)

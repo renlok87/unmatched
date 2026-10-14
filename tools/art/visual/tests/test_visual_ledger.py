@@ -1,10 +1,13 @@
 """ledger.py: rows per 07 4.2 under a lock with an atomic replace; check verifies totals and the ВР-04/ВР-PL10 limits.
 
+The fixture ledger is synthetic (RB-03): fixed limits written here, not a copy of the live
+docs/game-design/visual/credits-ledger.json, whose limits are user decisions and change (the Tripo cap 3000 was lifted
+on 2026-10-13). Only test_real_ledger_passes_check reads the live ledger, and it asserts no particular limit.
+
   python -B -m pytest -q tools/art/visual/tests
 """
 import csv
 import json
-import shutil
 import sys
 from pathlib import Path
 
@@ -13,9 +16,23 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import ledger  # noqa: E402
-from visual_common import LEDGER_REL, repo_root  # noqa: E402
+from visual_common import LEDGER_REL  # noqa: E402
 
 FIELDS = ["id", "title", "tool", "prompt", "deliverable", "references", "status"]
+
+# the limits every test below expects; tests that need other values rewrite them with set_limits()
+LIMITS = {
+    "syntx": {"tokens": 300, "until": "2026-10-28", "source": "ВР-04", "stopBalance": 20,
+              "perRun": {"image": 8, "video": 10, "upscale": 12, "source": "ВР-PR04"}, "visualCap": 54},
+    "tripo": {"credits": 3000, "until": "2026-10-28", "source": "ВР-04"},
+    "codex": {"unit": "пакет"},
+}
+
+
+def synthetic_ledger():
+    return {"schema": ledger.SCHEMA, "title": "Журнал трат визуального чата (тестовый)", "created": "2026-10-06",
+            "status": "пустой: трат ещё нет", "limits": json.loads(json.dumps(LIMITS)), "providerTerms": [],
+            "entries": [], "totals": ledger.compute_totals([])}
 
 
 @pytest.fixture()
@@ -30,14 +47,19 @@ def root(tmp_path):
     (r / "docs/game-design/visual/07-prompt-templates.md").write_text(
         "T-SYNTX-UPSCALE T-SYNTX-IMG-BANANA T-CODEX-2D\n", encoding="utf-8")
     (r / "docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt").write_text("x", encoding="utf-8")
-    # the real ledger as the starting point: real limits, but its rows cleared (the live ledger fills up)
-    shutil.copyfile(repo_root() / LEDGER_REL, r / LEDGER_REL)
-    live = json.loads((r / LEDGER_REL).read_text(encoding="utf-8"))
-    live["entries"] = []
-    live["providerTerms"] = []
-    live["totals"] = ledger.compute_totals([])
-    (r / LEDGER_REL).write_text(json.dumps(live, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (r / LEDGER_REL).write_text(json.dumps(synthetic_ledger(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return r
+
+
+def set_limits(root, service, **values):
+    """Rewrite limits.<service> of the fixture ledger; a value of ... deletes the key (DEFAULT_LIMITS applies)."""
+    d = data(root)
+    for k, v in values.items():
+        if v is ...:
+            d["limits"][service].pop(k, None)
+        else:
+            d["limits"][service][k] = v
+    (root / LEDGER_REL).write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def run(root, *args):
@@ -242,3 +264,51 @@ def test_check_service_argument_errors(root, capsys):
     # explicit --service syntx is the old default
     assert run(root, "check", "--service", "SYNTX", "--balance", "100", "--next-cost", "55") == 1
     assert "visual cap 54 (ВР-PL10)" in capsys.readouterr().out
+
+
+# ---- RB-01: until: null is an open window (no TypeError); a missing key keeps the DEFAULT_LIMITS date
+
+def test_limits_of_until_null_and_missing_key():
+    lim = ledger.limits_of({"limits": {"syntx": {"until": None}, "tripo": {"until": None}}})
+    assert lim["syntx_until"] is None and lim["tripo_until"] is None
+    lim = ledger.limits_of({"limits": {"syntx": {}, "tripo": {}}})
+    assert lim["syntx_until"] == lim["tripo_until"] == ledger.DEFAULT_LIMITS["syntx_until"] == "2026-10-28"
+    assert ledger._after("2026-10-29", "2026-10-28") and not ledger._after("2026-10-28", "2026-10-28")
+    assert not ledger._after("2099-01-01", None)
+
+
+def test_tripo_until_null_keeps_window_open(root, capsys):
+    set_limits(root, "tripo", until=None)
+    run(root, *TRIPO_TERMS)
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--today", "2026-10-29") == 0
+    out = capsys.readouterr().out
+    assert "window closed" not in out and "None" not in out and "ERROR" not in out
+    assert "remainder 3000 of 3000 with an open window (until: null), after the run 2905" in out
+    # the SYNTX window keeps its own date
+    assert run(root, "check", "--balance", "100", "--next-cost", "3", "--today", "2026-10-29") == 1
+    assert "today 2026-10-29 is after 2026-10-28 (ВР-04 window closed)" in capsys.readouterr().out
+
+
+def test_syntx_until_null_keeps_window_open_and_counts_every_row(root, capsys):
+    set_limits(root, "syntx", until=None, tokens=20)
+    run(root, *TERMS)
+    args = list(SYNTX_ADD)
+    args[args.index("--date") + 1] = "2026-11-05T10:00:00+05:00"     # after the old window end 2026-10-28
+    assert run(root, *args) == 0
+    assert run(root, "check") == 0                                   # no "needs a new decision" for the row
+    out = capsys.readouterr().out
+    assert "needs a new decision" not in out and "None" not in out
+    assert "20 with an open window (until: null) (ВР-04)" in out
+    assert run(root, "check", "--balance", "100", "--next-cost", "3", "--today", "2099-01-01") == 0
+    assert "window closed" not in capsys.readouterr().out
+    # the row of 2026-11-05 counts towards the token limit of an open window: 12 + 12 > 20
+    assert run(root, "check", "--balance", "100", "--next-cost", "12", "--next-kind", "upscale",
+               "--today", "2099-01-01") == 1
+    assert "pre-flight: spent 12.0 + 12 > 20 (ВР-04)" in capsys.readouterr().out
+
+
+def test_missing_until_key_falls_back_to_default_date(root, capsys):
+    set_limits(root, "tripo", until=...)
+    run(root, *TRIPO_TERMS)
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--today", "2026-10-29") == 1
+    assert "today 2026-10-29 is after 2026-10-28 (ВР-04 window closed)" in capsys.readouterr().out

@@ -4,6 +4,8 @@ look-dev C and anim-v2 captures in L_P17ControlScene).
 Every UE step (import, level load, capture, restore) runs under C:/tmp/ue-editor.lock:
   - the lock is created atomically (os.open O_CREAT | O_EXCL) with the content "<owner> <ISO time> <step>";
   - an existing lock -> wait and retry every 20 s; a lock older than 25 min is stale: it is recorded and taken over;
+  - while the lock is held, a daemon thread refreshes its mtime every POLL_S (heartbeat, RB-21), so a live step longer
+    than 25 min is not judged stale; it never touches a lock whose content is no longer ours;
   - the lock is deleted in a finally block (only if it is still ours).
 Keep each locked step short (one hero / one scene part per lock).
 
@@ -20,6 +22,7 @@ import datetime as dt
 import os
 import subprocess
 import sys
+import threading
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -35,8 +38,22 @@ def _now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
+def _heartbeat(lock: Path, stamp: str, every_s: float, stop: threading.Event, info: dict) -> None:
+    """RB-21: refresh the mtime of our held lock every every_s until stop is set; stop on a foreign or missing lock."""
+    while not stop.wait(every_s):
+        try:
+            if lock.read_text(encoding="utf-8", errors="replace").strip() != stamp:
+                return                  # taken over or replaced: never refresh someone else's lock
+            os.utime(str(lock), None)
+        except OSError:                 # vanished (FileNotFoundError) or not accessible: the finally block reports it
+            return
+        info["heartbeats"] += 1
+
+
 @contextmanager
-def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: float = STALE_S, lock: Path = LOCK):
+def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: float = STALE_S, lock: Path = LOCK,
+            heartbeat_s: float | None = None):
+    """heartbeat_s: how often the held lock's mtime is refreshed (default poll_s; 0 or less turns it off)."""
     lock.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
     info = {"step": step, "owner": owner, "waited_s": 0.0, "stale_taken": None, "waits": 0}
@@ -79,9 +96,20 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
         info["stamp"] = stamp
         break
     info["waited_s"] = round(time.time() - t0, 1)
+    info["heartbeats"] = 0
+    every = poll_s if heartbeat_s is None else heartbeat_s
+    stop = threading.Event()
+    beat = None
+    if every > 0:
+        beat = threading.Thread(target=_heartbeat, args=(lock, stamp, every, stop, info),
+                                name="ue-lock-heartbeat", daemon=True)
+        beat.start()
     try:
         yield info
     finally:
+        stop.set()
+        if beat is not None:
+            beat.join(timeout=5.0)
         try:
             if lock.read_text(encoding="utf-8", errors="replace").strip() == stamp:
                 lock.unlink()
@@ -92,6 +120,9 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     ap = argparse.ArgumentParser(description="run one command under the shared UE editor lock")
     ap.add_argument("--step", required=True)
     ap.add_argument("cmd", nargs=argparse.REMAINDER)

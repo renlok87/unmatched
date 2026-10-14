@@ -55,6 +55,9 @@ def compact_sheet(run, label):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: «×» of the contact checks in a cp1251 pipe (agents' Bash)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--clips")

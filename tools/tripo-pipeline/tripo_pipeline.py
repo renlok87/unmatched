@@ -3952,6 +3952,9 @@ READ_ONLY = {"status", "snapshot"}
 
 
 def main(argv=None) -> int:
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     args = build_parser().parse_args(argv)
     try:
         ctx = Context(Path(args.run_dir), Path(args.repo_root), args.blender, getattr(args, "interrupt_at", None),

@@ -249,6 +249,9 @@ def blender_main():
 
 
 def host_main():
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     import argparse  # noqa: PLC0415
     import hashlib  # noqa: PLC0415
     ap = argparse.ArgumentParser()
