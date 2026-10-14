@@ -19,6 +19,7 @@ import delete_prev  # noqa: E402
 import discard_master  # noqa: E402
 import prep_acceptance  # noqa: E402
 import refresh_carrier  # noqa: E402
+import run_clip_acceptors as rca  # noqa: E402
 import write_import_profile as wip  # noqa: E402
 import write_review_config as wrc  # noqa: E402
 
@@ -135,7 +136,7 @@ def test_refresh_carrier_dry_run_from_spec(tmp_path, capsys):
 
 
 @pytest.mark.parametrize("tool", ["discard_master", "delete_prev", "refresh_carrier", "prep_acceptance",
-                                  "write_import_profile", "write_review_config"])
+                                  "write_import_profile", "write_review_config", "run_clip_acceptors"])
 def test_every_tool_has_help(tool, capsys):
     mod = __import__(tool)
     assert mod.main(["--help"]) == 0
@@ -441,3 +442,177 @@ def test_write_review_config_anchor_message(capsys):
         wrc.check_anchor_zone({"zones": ["linen", "skin"], "anchor_zone": "linen"}, {"anchor_zone": "linen"},
                               "Testo", "Tmpl", sets=["note=x"])
     wrc.check_anchor_zone({"anchor_zone": "fur"}, {}, "Testo", "Tmpl", set_jsons=['anchor_zone="fur"'])  # без zones
+
+
+def test_write_review_config_base_scalars_from_profile():
+    """C50: скаляры MI подставки (ue.base_marker.parameters) и её родитель — из профиля импорта, не из шаблона."""
+    tpl_inst = {"figure_instance": {"scalars": {"TeamDyeGain": 9.0}},
+                "base_instance": {"parent": "/Game/UM/Materials/M_UM_BaseMarker",
+                                  "scalars": {"VertexMaskWeight": 0.0, "SideBandWeight": 1.0}}}
+    v = {"instances": json.loads(json.dumps(tpl_inst))}
+    wrc.base_expectations(v, {"ue": {"masters": {"base": "/Game/UM/Materials/M_UM_BaseMarker"},
+                                     "base_marker": {"parameters": {"VertexMaskWeight": 1.0, "SideBandWeight": 0.0}}}})
+    assert v["instances"]["base_instance"] == {"parent": "/Game/UM/Materials/M_UM_BaseMarker",
+                                               "scalars": {"VertexMaskWeight": 1.0, "SideBandWeight": 0.0}}
+    assert v["instances"]["figure_instance"] == tpl_inst["figure_instance"]          # тело не трогается
+    v2 = {"instances": json.loads(json.dumps(tpl_inst))}
+    wrc.base_expectations(v2, {"ue": {"base_marker": {"textures": True}}})          # профиль без параметров
+    assert v2["instances"]["base_instance"] == {"parent": "/Game/UM/Materials/M_UM_BaseMarker"}
+    v3 = {"instances": {"base_instance": {"scalars": {"SideBandWeight": 1.0}}}}
+    wrc.base_expectations(v3, {"ue": {}})
+    assert "base_instance" not in v3["instances"]                                    # пустая запись не остаётся
+    v4 = {"instances": {}}
+    wrc.base_expectations(v4, {"ue": {"figure_parameters": {"TeamDye": 1.0}}})
+    assert v4 == {"instances": {}}                                                   # прежнее поведение (пилот)
+
+
+def test_write_review_config_carries_base_scalars(tmp_path):
+    adir, ld, bk, lp, tpl, tris = make_profile_repo(tmp_path)
+    run = adir / "20261014-h2ld-ue-import"
+    run.mkdir()
+    prof = wj(adir / "build-profiles/p.json", {"ue": {
+        "figure_parameters": {"TeamDye": 1.0}, "masters": {"base": "/Game/UM/Materials/M_UM_BaseMarker"},
+        "base_marker": {"parameters": {"VertexMaskWeight": 1.0, "SideBandWeight": 0.0}}}})
+    t = wj(tmp_path / "tmpl-review-config.json", {
+        "hero": "Tmpl", "run_dir": "x", "zones": ["skin"], "anchor_zone": "skin",
+        "verify": {"hero_root": "/Game/PipelineCandidates/Tmpl", "instances": {
+            "base_instance": {"parent": "/Game/UM/Materials/M_UM_BaseMarker", "scalars": {"SideBandWeight": 1.0}}}}})
+    out = tmp_path / "rc.json"
+    assert wrc.main(["--template", str(t), "--asset-dir", str(adir), "--run-dir", str(run), "--import-profile",
+                     str(prof), "--set", "anchor_zone=skin", "--repo", str(tmp_path), "--out", str(out)]) == 0
+    bi = json.loads(out.read_text(encoding="utf-8"))["verify"]["instances"]["base_instance"]
+    assert bi == {"parent": "/Game/UM/Materials/M_UM_BaseMarker",
+                  "scalars": {"VertexMaskWeight": 1.0, "SideBandWeight": 0.0}}
+
+
+# ------------------------------------------------------------------------------ приёмщики клипов (C51, C32/C55)
+FAKE_CODEX = r"""
+import json, os, re, sys
+argv = sys.argv[1:]
+card = argv[argv.index("-o") + 1]
+images = [argv[i + 1] for i, x in enumerate(argv) if x == "-i"]
+prompt = sys.stdin.buffer.read().decode("utf-8")
+ex = os.environ.get("FAKE_EXECUTOR") or re.search(r'executor_session_id "([^"]*)"', prompt).group(1)
+clip = re.search(r"AM_Testo_(\w+)", prompt).group(1)
+print(json.dumps({"type": "thread.started", "thread_id": "t-" + clip}))
+if os.environ.get("FAKE_ENV_FAIL"):
+    print(json.dumps({"type": "item.completed", "item": {"type": "command_execution", "status": "failed",
+                                                         "aggregated_output": "helper_unknown_error"}}))
+with open(card, "w", encoding="utf-8") as f:
+    json.dump({"kind": "anim", "clip": clip, "score": 9.4, "verdict": "pass", "executor_session_id": ex,
+               "acceptor": {"profile": "Sol 6.1 xhigh", "session_id": "codex:pending"}, "images": len(images)}, f)
+"""
+PROMPT = """# Приёмка клипа AM_Testo_{clip}, цикл r1
+- Кадры: {e}/{clip}/frames/
+- Референс: art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-{clip}/contact-sheet-2fps.png; лист
+  art/pipeline-candidates/ASSET-TESTO-001/evidence/acceptance/20261014-r1/frames/sheet.png, нет файла art/x/missing.png.
+   executor_session_id "claude-code:s/agent:stage6-testo",
+"""
+
+
+def make_acceptor_cycle(root: Path, clips=("Idle", "HitReact")):
+    e = root / "art/pipeline-candidates/ASSET-TESTO-001/evidence/acceptance-anim/20261014-r1"
+    for cl in clips:
+        (e / cl).mkdir(parents=True)
+        (e / cl / "acceptor-prompt.md").write_text(PROMPT.format(clip=cl, e=c.rel(e, root)), encoding="utf-8")
+        jpg(e / cl / "frames" / f"Testo-{cl}-blender-sheet.jpg")
+        jpg(e / cl / "frames" / f"Testo-{cl}-f00-front-ue-editor.jpg")
+        jpg(root / f"art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-{cl}/contact-sheet-2fps.png")
+    jpg(root / "art/pipeline-candidates/ASSET-TESTO-001/evidence/acceptance/20261014-r1/frames/sheet.png")
+    exe = root / "fake_codex.py"
+    exe.write_text(FAKE_CODEX, encoding="utf-8")
+    return e, exe
+
+
+@pytest.fixture
+def fake_validate(monkeypatch):
+    calls = []
+
+    def run_validate(card, repo):
+        calls.append(Path(card).name)
+        return 0, "pass\n", "OK: card\n"
+    monkeypatch.setattr(rca, "run_validate", run_validate)
+    return calls
+
+
+def test_run_clip_acceptors_runs_in_parallel_and_writes_the_actual_executor(tmp_path, fake_validate, capsys):
+    e, exe = make_acceptor_cycle(tmp_path)
+    hr = e / "HitReact/acceptor-prompt.md"
+    hr.write_bytes(hr.read_bytes().replace(b"\n", b"\r\n"))                  # промпт с CRLF
+    real = "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:beowulf-stage6"
+    args = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path), "--executor-session-id", real]
+    assert rca.main(args) == 0
+    raw = hr.read_bytes()
+    assert raw.count(b"\r\n") == raw.count(b"\n") > 0                       # переписан с концами строк файла
+    for cl in ("Idle", "HitReact"):
+        prompt = (e / cl / "acceptor-prompt.md").read_text(encoding="utf-8")
+        assert f'executor_session_id "{real}"' in prompt and "agent:stage6-testo" not in prompt
+        card = json.loads((e / cl / "card.json").read_text(encoding="utf-8"))
+        assert card["executor_session_id"] == real
+        assert card["acceptor"]["session_id"] == f"codex:t-{cl}"            # thread.started, не codex:pending
+        assert card["images"] == 4                                           # 2 кадра + образец + лист модели
+        launch = json.loads((e / cl / "acceptor-launch.json").read_text(encoding="utf-8"))
+        assert launch["executor_session_id"]["rewritten"] and launch["exit_code"] == 0
+        assert not any("missing.png" in i for i in launch["images"])
+        assert (e / cl / "validator-output.txt").read_text(encoding="utf-8") == "OK: card\npass\n"
+    run = json.loads((e / "acceptors-run.json").read_text(encoding="utf-8"))
+    assert {k: v["status"] for k, v in run["clips"].items()} == {"Idle": "valid", "HitReact": "valid"}
+    assert sorted(fake_validate) == ["card.json", "card.json"]
+    # карточка уже есть: без --force и без --tag — отказ до запуска
+    assert rca.main(args) == 2
+    # validate-only по готовым карточкам, без Codex
+    assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--validate-only", "--executor-session-id", real]) == 0
+
+
+def test_run_clip_acceptors_flags_a_wrong_executor_and_env_failure(tmp_path, fake_validate, monkeypatch, capsys):
+    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    base = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path)]
+    monkeypatch.setenv("FAKE_EXECUTOR", "claude-code:other/agent:x")
+    assert rca.main(base) == 1                                               # карточка с чужим id исполнителя
+    assert "WARNING" in capsys.readouterr().err                              # id не дан — предупреждение (C55)
+    run = json.loads((e / "acceptors-run.json").read_text(encoding="utf-8"))
+    assert run["clips"]["Idle"]["status"] == "executor_mismatch" and not fake_validate
+    monkeypatch.delenv("FAKE_EXECUTOR")
+    monkeypatch.setenv("FAKE_ENV_FAIL", "1")
+    assert rca.main(base + ["--tag=-b"]) == 1
+    assert (e / "Idle/environment-failure-b.json").is_file() and not (e / "Idle/card-b.json").exists()
+    assert (e / "Idle/card-environment-failure-b.json").is_file()
+    assert json.loads((e / "acceptors-run-b.json").read_text(encoding="utf-8"))["clips"]["Idle"]["status"] == \
+        "environment_failure"
+
+
+def test_run_clip_acceptors_input_errors(tmp_path, capsys):
+    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    base = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path)]
+    assert rca.main(base + ["--executor-session-id", "codex:pending"]) == 2
+    assert rca.main(base + ["--executor-session-id", "beowulf-stage6"]) == 2  # не id вида <механизм>:<…>
+    assert rca.main(["--evidence", str(tmp_path / "nope"), "--repo", str(tmp_path)]) == 2
+    assert rca.main(base + ["--exe", str(tmp_path / "no-codex.exe")]) == 2
+    p = e / "Idle/acceptor-prompt.md"
+    p.write_text(p.read_text(encoding="utf-8") + "{{KNOWN_LIMITS}}\n", encoding="utf-8")
+    assert rca.main(base) == 2
+    assert "KNOWN_LIMITS" in capsys.readouterr().err
+
+
+def test_run_clip_acceptors_dry_run_lists_images_without_running(tmp_path, capsys):
+    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--dry-run", "--image",
+                     "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/contact-sheet-2fps.png"]) == 0
+    plan = json.loads(capsys.readouterr().out)
+    imgs = plan["clips"]["Idle"]["images"]
+    assert len(imgs) == 4 and len(set(imgs)) == 4                            # --image уже из промпта — без дубля
+    assert not (e / "Idle/card.json").exists() and not (e / "acceptors-run.json").exists()
+
+
+def test_run_clip_acceptors_validate_only_on_a_committed_card(tmp_path):
+    """Настоящий validate_card --check-files по карточке клипа Beowulf r1 (копия в своём каталоге цикла)."""
+    src = c.REPO / "art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance-anim/20261014-r1/Idle"
+    if not (src / "card.json").is_file():
+        pytest.skip("карточки Beowulf r1 нет в этом чекауте")
+    e = tmp_path / "20261014-r1"
+    (e / "Idle").mkdir(parents=True)
+    for name in ("card.json", "acceptor-prompt.md"):
+        (e / "Idle" / name).write_bytes((src / name).read_bytes())
+    assert rca.main(["--evidence", str(e), "--validate-only"]) == 0
+    run = json.loads((e / "acceptors-run.json").read_text(encoding="utf-8"))
+    assert run["clips"]["Idle"]["status"] == "valid" and run["clips"]["Idle"]["computed_verdict"] == "pass"

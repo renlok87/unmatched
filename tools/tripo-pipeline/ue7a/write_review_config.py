@@ -7,8 +7,11 @@ make_review_config_r4.py «r4 = r3 на модели r3»):
      concept_zones — <lookdev-run>/reports/measure-report.json; verify.clips_reference —
      <clips-run>/reports/ue-measure-clips.json; verify.height_uu — --height-uu (верх меша в UE, ue-import-report);
   3. скаляры MI тела verify.instances.figure_instance.scalars — из ue.figure_parameters профиля импорта
-     (--import-profile); verify.expect.triangles — сумма checks.triangles_as_h21.measured тела и оружия
-     ld-fbx-report (без подставки SM_*), если дан --lookdev-run;
+     (--import-profile); скаляры MI подставки verify.instances.base_instance.scalars — из ue.base_marker.parameters
+     того же профиля, родитель — ue.masters.base (C50: VertexMaskWeight / SideBandWeight шаблона чужого героя не
+     наследуются — у профиля без base_marker.parameters скаляры подставки шаблона снимаются);
+     verify.expect.triangles — сумма checks.triangles_as_h21.measured тела и оружия ld-fbx-report (без подставки
+     SM_*), если дан --lookdev-run;
   4. зоны, ворота, сторона камеры и заметки героя — --set / --set-json / --drop (debug_calibration и т. п.);
      якорь экспозиции из шаблона чужого героя не наследуется: без --set anchor_zone=<зона героя из zones> — отказ
      (ревью 2026-10-14, R-09; шаблон — свой прошлый конфиг: якорь остаётся как был);
@@ -68,6 +71,25 @@ def check_anchor_zone(cfg: dict, tpl: dict, key: str, t_key: str, sets=(), set_j
         raise ConfigError(f"anchor_zone {cfg.get('anchor_zone')!r} не из zones героя {key}: {zones}")
 
 
+def base_expectations(verify: dict, profile: dict) -> None:
+    """C50: verify.instances.base_instance из профиля импорта — скаляры ue.base_marker.parameters (их ставит
+    um_master_instances CLI на MI подставки) и родитель ue.masters.base. Без параметров у профиля скаляры подставки
+    шаблона снимаются: это значения чужого героя (или прошлой ревизии), verify сверил бы их с MI нового импорта."""
+    u = profile.get("ue") or {}
+    params = (u.get("base_marker") or {}).get("parameters") or {}
+    inst = verify.setdefault("instances", {})
+    if params:
+        inst.setdefault("base_instance", {})["scalars"] = dict(params)
+    elif isinstance(inst.get("base_instance"), dict):
+        inst["base_instance"].pop("scalars", None)
+    bi = inst.get("base_instance")
+    master = (u.get("masters") or {}).get("base")
+    if isinstance(bi, dict) and master:
+        bi["parent"] = master
+    if bi == {}:
+        del inst["base_instance"]
+
+
 def figure_triangles(fbx_report: dict) -> int | None:
     meas = (((fbx_report.get("checks") or {}).get("triangles_as_h21") or {}).get("measured")) or {}
     vals = [v for k, v in meas.items() if not k.startswith("SM_")]
@@ -118,6 +140,7 @@ def build(tpl: dict, *, repo: Path, key: str, content_key: str, asset_id: str | 
             raise ConfigError(f"{import_profile}: нет ue.figure_parameters")
         fi = v.setdefault("instances", {}).setdefault("figure_instance", {})
         fi["scalars"] = dict(fp)
+        base_expectations(v, prof)
     c.apply_sets(cfg, sets, set_jsons, drops)
     if not same:
         check_anchor_zone(cfg, tpl, key, t_key, sets, set_jsons)

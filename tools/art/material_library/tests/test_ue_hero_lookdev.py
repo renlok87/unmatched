@@ -424,6 +424,68 @@ class ApplyMiTest(unittest.TestCase):
         self.assertTrue(out["switches"]["UseTeamAccent"])  # kept: inherited expectation of the hand-written config
         self.assertEqual(cfg["verify"]["instances"]["figure_instance"]["scalars"]["TeamDyeGain"], 1.0)  # copy
 
+    # C50: apply-mi --update-verify writes the planned values into the config file, in the file's own format
+    def config_file(self, crlf=True, end_nl=False):
+        cfg = {"hero": "Hero", "run_dir": "run", "note": "Беовульф — заметка",
+               "verify": {"height_uu": 55.0, "instances": {
+                   "figure_instance": {"scalars": {"TeamDye": 1.0, "TeamDyeGain": 1.0}},
+                   "team:figure:P1": {"switches": {"UseTeamAccent": True}}}}}
+        text = json.dumps(cfg, ensure_ascii=False, indent=1) + ("\n" if end_nl else "")
+        p = self.tmp / "review-config.json"
+        p.write_bytes((text.replace("\n", "\r\n") if crlf else text).encode("utf-8"))
+        self.cfg = json.loads(p.read_text(encoding="utf-8"))
+        return p
+
+    def test_update_verify_writes_the_planned_values_keeping_the_format(self):
+        p = self.config_file(crlf=True, end_nl=False)
+        fake = ApplyUe(U.plan_instances(self.p1, self.names), (self.tmp / "lut/r1.dds").as_posix())
+        p2 = json.loads(json.dumps(self.p1))
+        p2["ue"]["figure_parameters"].update(Saturation=1.3, FixGainA=0.4)
+        p2["ue"]["base_marker"]["parameters"] = {"VertexMaskWeight": 1.0, "SideBandWeight": 0.0}
+        (self.tmp / "profiles/p2.json").write_text(json.dumps(p2), encoding="utf-8")
+        rep = self.apply(fake, profile=str(self.tmp / "profiles/p2.json"), update_verify=True, config=str(p))
+        self.assertTrue(rep["passed"], rep["checks"])
+        self.assertTrue(rep["verify_config"]["updated"])
+        self.assertIn("base_instance", rep["verify_config"]["changed_instances"])
+        raw = p.read_bytes()
+        self.assertEqual(raw.count(b"\r\n"), raw.count(b"\n"))           # CRLF kept
+        self.assertFalse(raw.endswith(b"\n"))                              # no trailing newline, as the file had
+        self.assertIn("Беовульф".encode("utf-8"), raw)                     # no \\u escapes
+        self.assertTrue(raw.startswith(b'{\r\n "hero"'))                    # indent 1 kept
+        vi = json.loads(raw.decode("utf-8"))["verify"]["instances"]
+        self.assertEqual(vi["figure_instance"]["scalars"]["Saturation"], 1.3)
+        self.assertEqual(vi["figure_instance"]["scalars"]["FixGainA"], 0.4)
+        self.assertEqual(vi["base_instance"]["scalars"], {"SideBandWeight": 0.0, "VertexMaskWeight": 1.0})
+        self.assertTrue(vi["team:figure:P1"]["switches"]["UseTeamAccent"])  # hand-written expectation kept
+        # the next run with the same profile: nothing to change, the file stays byte-identical
+        self.cfg = json.loads(raw.decode("utf-8"))
+        rep2 = self.apply(fake, profile=str(self.tmp / "profiles/p2.json"), update_verify=True, config=str(p))
+        self.assertEqual((rep2["verify_config"]["updated"], p.read_bytes()), (False, raw))
+
+    def test_update_verify_leaves_the_file_on_a_dry_run_or_without_the_flag(self):
+        p = self.config_file(crlf=False, end_nl=True)
+        before = p.read_bytes()
+        fake = ApplyUe(U.plan_instances(self.p1, self.names), (self.tmp / "lut/r1.dds").as_posix())
+        p2 = json.loads(json.dumps(self.p1))
+        p2["ue"]["figure_parameters"]["TeamDyeGain"] = 30.0
+        (self.tmp / "profiles/p2.json").write_text(json.dumps(p2), encoding="utf-8")
+        rep = self.apply(fake, profile=str(self.tmp / "profiles/p2.json"), dry_run=True, update_verify=True,
+                         config=str(p))
+        self.assertEqual(rep["verify_config"], {"updated": False, "reason": "dry run"})
+        rep = self.apply(fake, profile=str(self.tmp / "profiles/p2.json"), config=str(p))  # no --update-verify
+        self.assertNotIn("verify_config", rep)
+        self.assertEqual(p.read_bytes(), before)
+
+    def test_write_config_like_round_trips_a_committed_review_config(self):
+        src = Path(U.REPO_ORIG if hasattr(U, "REPO_ORIG") else self.repo0) / \
+            "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2ld-ldc-ue/review-config.json"
+        if not src.is_file():
+            self.skipTest("Beowulf review config not in this checkout")
+        dst = self.tmp / "copy.json"
+        dst.write_bytes(src.read_bytes())
+        U.write_config_like(dst, json.loads(src.read_text(encoding="utf-8-sig")))
+        self.assertEqual(dst.read_bytes(), src.read_bytes())
+
 
 if __name__ == "__main__":
     unittest.main()

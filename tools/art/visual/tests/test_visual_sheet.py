@@ -108,3 +108,31 @@ def test_cli_default_out_folder(tmp_path):
     ip, _ = make_inputs(tmp_path)
     assert sheet.main(["XX-04", "--inputs", str(ip), "--root", str(tmp_path), "--date", "2026-10-06"]) == 0
     assert (tmp_path / "docs/game-design/evidence/VISUAL/XX-04/sheet-01-icon-32.png").is_file()
+
+
+def test_jpeg_out_lists_the_jpegs_in_the_readme(tmp_path, capsys):
+    """C60 (ДС-8): PNG sheets stay in --out, the evidence folder gets JPEG 1200 q92 + sidecars, manifest and README."""
+    _, fp = make_inputs(tmp_path)
+    big = tmp_path / "bench-K1-1920x1080.png"
+    Image.new("RGB", (1920, 1080), (40, 60, 80)).save(big)
+    png_dir, ev = tmp_path / "tmp-game-sheet", tmp_path / "evidence" / "game-sheet"
+    assert sheet.main(["ASSET-TESTO-001", "--inputs", str(big), str(fp), "--out", str(png_dir), "--jpeg-out", str(ev),
+                       "--root", str(tmp_path), "--date", "2026-10-14", "--max-tile", "960"]) == 0
+    assert sorted(p.name for p in png_dir.iterdir()) == ["sheet-01-bench-K1-1920x1080.png", "sheet-02-frame.png",
+                                                         "sheet-manifest.json"]       # no README next to the PNGs
+    assert sorted(p.name for p in ev.iterdir()) == [
+        "README.md", "sheet-01-bench-K1-1920x1080.evidence.json", "sheet-01-bench-K1-1920x1080.jpg",
+        "sheet-02-frame.evidence.json", "sheet-02-frame.jpg", "sheet-manifest.json"]
+    readme = (ev / "README.md").read_text(encoding="utf-8")
+    assert "`sheet-01-bench-K1-1920x1080.jpg`, `sheet-02-frame.jpg` (JPEG 1200 q92; PNG — `tmp-game-sheet`, ДС-8)" in readme
+    assert ".png`" not in readme.split("## Входы")[0]
+    side = json.loads((ev / "sheet-01-bench-K1-1920x1080.evidence.json").read_text(encoding="utf-8"))
+    with Image.open(ev / "sheet-01-bench-K1-1920x1080.jpg") as im:
+        assert im.width == 1200 and list(im.size) == side["output_px"]
+    assert side["frameSha256"] == sha256_file(ev / "sheet-01-bench-K1-1920x1080.jpg")
+    assert side["png_before_jpeg"]["sha256"] == sha256_file(png_dir / "sheet-01-bench-K1-1920x1080.png")
+    man = json.loads((ev / "sheet-manifest.json").read_text(encoding="utf-8"))
+    assert [o["file"] for o in man["jpeg"]["outputs"]] == ["sheet-01-bench-K1-1920x1080.jpg", "sheet-02-frame.jpg"]
+    assert [o["file"] for o in man["outputs"]] == ["sheet-01-bench-K1-1920x1080.png", "sheet-02-frame.png"]
+    with pytest.raises(VisualError, match="must differ"):
+        sheet.build(tmp_path, "X", [fp], png_dir, jpeg_out=png_dir)

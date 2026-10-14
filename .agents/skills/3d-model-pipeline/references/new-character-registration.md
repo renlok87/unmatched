@@ -208,6 +208,30 @@ node backend/node_modules/ts-node/dist/bin.js --transpile-only -P backend/tsconf
 #   канонические — ok; каждый S08Bench<Map>-<Key>.json в Config/Bench пересобирается из benchVariant — ok | DRIFT
 ```
 
+**Где запускать (C52).** В чекауте `backend/node_modules` пуст: зависимости бэкенда живут в томе контейнера
+`unmatched-backend` (`docker-compose.yml`: `./backend:/app`, том `backend_node_modules:/app/node_modules`), поэтому
+команды выше на хосте падают на `ts-node`. Генератор вычисляет корень репо от своего пути (`REPO/backend`,
+`REPO/unreal/Unmatched/Config/Bench`), так что внутри контейнера ему собирают такой же корень во временном каталоге:
+`backend` — ссылка на `/app`, рядом копии генератора и `Config/Bench`; результат копируется обратно. Проверено
+2026-10-14: `--check` — ok по каноническим и всем вариантам, `--variant Beowulf` даёт файлы, равные закоммиченным.
+
+```bash
+export MSYS_NO_PATHCONV=1          # Git Bash: иначе /tmp/… и /app в аргументах docker превращаются в пути Windows
+C=unmatched-backend; T=/tmp/env-bench-<Key>
+docker exec $C sh -c "rm -rf $T && mkdir -p $T/tools/art/render $T/unreal/Unmatched/Config && ln -s /app $T/backend"
+docker cp tools/art/render/env_bench_fixtures.cts $C:$T/tools/art/render/
+docker cp unreal/Unmatched/Config/Bench $C:$T/unreal/Unmatched/Config/
+docker exec -w $T $C node backend/node_modules/ts-node/dist/bin.js --transpile-only -P backend/tsconfig.json \
+    tools/art/render/env_bench_fixtures.cts --variant <Key> --hero-name "<FighterName>" --hero-slug <slug>
+docker exec -w $T $C node backend/node_modules/ts-node/dist/bin.js --transpile-only -P backend/tsconfig.json \
+    tools/art/render/env_bench_fixtures.cts --check
+for M in Marmoreal Sarpedon; do docker cp $C:$T/unreal/Unmatched/Config/Bench/S08Bench$M-<Key>.json unreal/Unmatched/Config/Bench/; done
+docker exec $C rm -rf $T
+```
+
+Контейнер не запущен (`docker ps` без `unmatched-backend`) — вопрос оркестратору (запуск стенда — вне этапа 7);
+`npm install` в `backend/` чекаута не делать: зависимости бэкенда живут только в томе контейнера.
+
 - `--hero-name` и `--sidekick-name` обязаны точно совпасть с `FighterName` новых строк `Specs()` (Р7-3): клиент
   выбирает v2-фигуру по имени бойца (`S08HeroesV2::Find`), `heroSlug` задаёт только портрет и рубашку.
 - Вариант сохраняет статы King Arthur (здоровье 18, движение 2, ближний бой) — для кадров этого достаточно.
@@ -376,6 +400,12 @@ python tools/art/material_library/ue_lock.py --step "de011 apply <Key>" -- \
 #   пачка: --only <Key1>,<Key2>,… — одним прогоном на окно 7b
 ```
 
+Выход редактора (C56). `UnrealEditor-Cmd` может упасть уже после своего чистого выхода (Beowulf 7b: `de011 apply` —
+0xC0000005 после `LogExit: Exiting.`, ассеты сохранены, `HeroesV2.Dissolve` PASS). `de011.py` при ненулевом коде
+печатает `WARN <шаг>: UnrealEditor-Cmd exit … (0x…)` и пишет `editor_exit_warning` в `apply.json` (`capture-*.json`,
+`inspect.json`): после чистого `LogExit` — результат полный, шаг не повторять; без него — сверить, что `.uasset` шага
+сохранены, до сборки и тестов. Код возврата шага прежний (0).
+
 `--only` (76168867) ограничивает `apply` новыми героями. Без него оба `apply` пересохраняют `AM_*_LungeAttack` и MIC
 растворения **всех** героев своего списка: в 7b пилота — 12 файлов MVP и ERROR `validate_registry` 1 → 5, их
 откатывали поимённо (F157, 3528ae0b; RC-14 — с каждым героем квадратично больше бинарного шума в git). Без `--only`
@@ -459,7 +489,7 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 |---|---|---|---|
 | Р7-7 | `unreal/Unmatched/Config/DefaultGame.ini:33-44` | `+DirectoriesToAlwaysCook=(Path="/Game/PipelineCandidates/<Key>/<Stage>")`, `…/<Key>/Rig`, `…/<Key>/H2Anim`. MIC (`/Game/UM/Materials/v2`, `:45`), FX (`/Game/S08`, `:17`) и звук (`/Game/Audio`, `:18`) уже в списке | листинг `.utoc` содержит ассеты (`references/ue-import-package.md` §6.1; `.pak` даёт 0 строк — IoStore) |
 | Р7-8 | `unreal/Unmatched/Config/Cards/S08FighterNames.json:5-6` (`heroes`, ключ — `heroSlug` героя-владельца с сервера) | для героя: `"<slug>": {"hero": {"en": "<FighterName>", "ru": "<имя по-русски>"}, "sidekick": {…}}`. **Только помощник** (`OWNER_HERO_SLUG`): формат держит одного помощника на героя (`"sidekick"` — объект), поэтому запись не добавляется и чужая не перезаписывается (иначе у владельца в реальной игре сменится табличка его помощника, например Merlin у `king-arthur`); строка в NOTES заявки «S08FighterNames: формат на одного помощника, табличка — серверное имя». Без записи табличка показывает серверное имя (`:3`). Файл уже в пак-списке (`Unmatched.Build.cs:61`): touch не нужен | табличка при наведении на кадре показывает русское имя |
-| Р7-9 | `docs/game-design/visual/03-asset-registry.csv` | строки по образцу `SK_Merlin_H2LD` и `AM_Merlin_<Clip>`: `SK_<Key>_<Stage>` (area `hero`, `ue_path` `/Game/PipelineCandidates/<Key>/<Stage>/Meshes/SK_<Key>_<Stage>`, `rollback_flag` «-S08HeroesLegacy (серый Body: блок-аута ART-003 у нового персонажа нет)» — блок-ауты есть только у трёх имён, `S08FighterActor.cpp:347-353`), 4 строки `AM_<Key>_<Clip>` (area `anim`), строки звука и FX из раздела 6. Всего 13 колонок | `PYTHONIOENCODING=utf-8 python -c "import csv;r=list(csv.DictReader(open('docs/game-design/visual/03-asset-registry.csv',encoding='utf-8-sig')));print(len(r),{len(x) for x in r})"` → множество `{13}` |
+| Р7-9 | `docs/game-design/visual/03-asset-registry.csv` (писатель — `tools/art/registry_writer.py rows`, §10) | строки по образцу `SK_Merlin_H2LD` и `AM_Merlin_<Clip>`: `SK_<Key>_<Stage>` (area `hero`, `ue_path` `/Game/PipelineCandidates/<Key>/<Stage>/Meshes/SK_<Key>_<Stage>`, `rollback_flag` «-S08HeroesLegacy (серый Body: блок-аута ART-003 у нового персонажа нет)» — блок-ауты есть только у трёх имён, `S08FighterActor.cpp:347-353`), 4 строки `AM_<Key>_<Clip>` (area `anim`), строки звука и FX из раздела 6. Всего 13 колонок | `PYTHONIOENCODING=utf-8 python -c "import csv;r=list(csv.DictReader(open('docs/game-design/visual/03-asset-registry.csv',encoding='utf-8-sig')));print(len(r),{len(x) for x in r})"` → множество `{13}` |
 | Р7-10 | `.uasset` новых ассетов | `git add -f` поимённо: `unreal/Unmatched/.gitignore:8` игнорирует `Content/`. Касается `/Game/PipelineCandidates/<Key>/…`, `/Game/UM/Materials/v2/Dissolve/MI_<Key>_*`, перезаписанного `AM_<Key>_LungeAttack`; `M_UM_Figure_v2` — только при смене графа (`master-builds.json`, 5.1). Файлы других героев в коммит не идут (F157; `references/ue-import-package.md` §7.3) | `git status --short --ignored` по этим путям; `validate_registry` против базовой линии 5.1 — новых ERROR нет |
 
 ### 5.6 Кадры в игре
@@ -468,7 +498,7 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 вариантах (Д-2, раздел 2). Порядок:
 
 1. Р7-11: варианты фикстуры обеих досок — `env_bench_fixtures.cts --variant <Key> --hero-name "<FighterName>"
-   --hero-slug <slug> [--sidekick-name "…"]` (только помощник — `--hero-name "<owner_name>" --hero-slug <owner_slug>
+   --hero-slug <slug> [--sidekick-name "…"]` (в контейнере бэкенда — Д-2 «Где запускать», C52) (только помощник — `--hero-name "<owner_name>" --hero-slug <owner_slug>
    --sidekick-name "<FighterName>"`, Д-2) → `unreal/Unmatched/Config/Bench/S08Bench{Marmoreal,Sarpedon}-<Key>.json`;
    проверка `env_bench_fixtures.cts --check` (канонические и оба варианта `ok`); файлы коммитятся с персонажем. Можно
    ещё в 7a: сборки не требует.
@@ -551,8 +581,8 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
             Specs() (11 полей) + S08HeroesV2Tests (счётчик, имена, ratio, WantMs, WantSeconds);
             S08AudioBank CharacterKey/HitType + S08AudioTests; сборка + HeroesV2/Audio PASS;
             cue-table CUE-011/013 → validate-table PASS, pytest PASS; DefaultGame.ini ×3; S08FighterNames.json;
-            asset-registry.json (§10); registration_check.py --heroes <Key> → код 0;
-            03-asset-registry.csv; git add -f; варианты фикстуры Р7-11 → -Bench обеих досок (--fixture),
+            asset-registry.json (§10, registry_writer.py entry); registration_check.py --heroes <Key> → код 0
+            (в т. ч. колонка card: блок STAGE7A заявки); 03-asset-registry.csv (registry_writer.py rows); git add -f; варианты фикстуры Р7-11 → -Bench обеих досок (--fixture),
             кадры осмотрены, трассы чистые; лист AN-18 (run --heroes <Key> --fixture …, sheet --heroes <Key>) осмотрен;
             перед safe-integrate — registration_check.py ещё раз
 [ ] по условию: CUE-014/FX, свой DTH/VO/стинги/карты-сигнатуры, Art Tuner, heroMaterials, фикстура CUE
@@ -573,9 +603,15 @@ HitReact и смерти выдаёт `missing` (`cue_contract.py:342-345`). К�
 | 1–2 | не трогается | — | карточки `acceptance-concept/…/card.json`; строки журнала трат на каждую операцию Tripo и пакет Codex |
 | 3–5 | не трогается | — | карточки `acceptance/…/card.json` модели («художественно принято, по делегированию» — только в `status_note` карточки) |
 | 6 | не трогается | — (строки клипов, звука и FX ждут UE-путей) | 4 карточки клипов в `anim.csv`, запись `HEROES` листа; манифест клипов — `measured` |
-| 7a | не трогается | — | манифест клипов — `technically_imported` после импорта; карточки клипов `acceptance-anim/…/card.json` |
+| 7a | не трогается | — | манифест клипов — `technically_imported` после импорта; карточки клипов `acceptance-anim/…/card.json`; блок `STAGE7A` заявки (C57; `registration_check.py` колонка `card`) |
 | 7b, до упаковки | «технически импортировано», `ue-editor-frames` (импорт и UE-кадры 7a — факт; иначе `registration_check` даёт FAIL `registry`) | — | строки регистрации §5 |
 | 7b, шаг 7.8 | `live-packaged-probe` после осмотра кадров `-Bench`; выше «технически импортировано» не поднимается: «художественно принято» требует акта `docs/game-design/evidence/(ART\|GD)-NNN/…` | все строки ассета (Р7-9: `SK_<Key>_<Stage>`, 4 `AM_<Key>_<Clip>`, звук и FX): «технически импортировано», после осмотра листа K1/K2 — «художественно принято, по делегированию <дата> (ВР-17)» | `DIRECTORY-MAP.md` при новых каталогах; README evidence |
+
+Писатель обоих реестров — `tools/art/registry_writer.py` (C59): `entry --entry <JSON записи> --phase 0|7b-frames|7b-probe`
+(статус и стадия из этой таблицы, «художественно принято» — отказ, `"sha256": "auto"` — sha файла или `.uasset`) и
+`rows --rows <JSON-список> --phase 7b-tech|7b-art` (`7b-art` — только с «по делегированию» или актом в `acceptance`).
+Пишется одна запись / строки одного ассета; остальные строки файлов — байт в байт (стиль реестра, CRLF 03). Сначала
+`--dry-run`. Общий файл пачки пишет один писатель за раз (RC-13).
 
 Проверка реестра — `validate_registry.py`: новых ERROR против базовой линии нет (5.1). Статус исполнителя в
 `asset-registry.json` — максимум «технически импортировано» (HANDBOOK §0 п.3); пометка «по делегированию» существует

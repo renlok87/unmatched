@@ -29,6 +29,13 @@ INI, JSON, Python через ast — модули не импортируютс�
   bench     unreal/Unmatched/Config/Bench/S08Bench{Marmoreal,Sarpedon}-<Key>.json (benchVariant, доска, имя бойца);
             SKIP, если боец уже стоит в канонических фикстурах (MVP)
   registry  docs/art-pipeline/asset-registry.json: запись ASSET_ID, статус не ниже «технически импортировано»
+  card      блоки этапов заявки asset-card.yaml (SKILL.md §7.2, RA-22; C57): STAGE7A обязателен (регистрация идёт после
+            7a); заявка с STAGE3 (формат скилла после пилота) обязана нести и STAGE6; у каждого блока — свои ключи
+            (STAGE3 bake_run/lookdev_run/profiles/executor, STAGE6 run/spec/clip_cards, STAGE7A import_run/
+            import_profile/review/evidence/clip_acceptance — пилотные имена import_run_live/import_profiles/
+            evidence_7a/clip_acceptance_r<N> тоже, STAGE7B window/evidence), значения без «<…>» шаблона, пути
+            прогонов и evidence (первое слово значения) есть в чекауте; STAGE7B до упаковки необязателен; без
+            заявки (MVP) — SKIP
 
 Персонаж (CHARACTER), ASSET_ID, AUDIO_KEY, HIT_TYPE и слаги берутся из заявки art/pipeline-candidates/*/asset-card.yaml
 (поле KEY), иначе из спеки de010 и clip_review_sheet (у MVP заявок нет); AUDIO_KEY по умолчанию — CHARACTER
@@ -50,7 +57,20 @@ from pathlib import Path
 SCHEMA = "unmatched.registration-check/1"
 REPO_DEFAULT = Path(__file__).resolve().parents[2]
 CLIPS = ("Idle", "LungeAttack", "HitReact", "DeathSettle")
-ITEMS = ("specs", "audio", "cue", "cook", "names", "de010", "de011", "manifest", "sheet", "rig", "bench", "registry")
+ITEMS = ("specs", "audio", "cue", "cook", "names", "de010", "de011", "manifest", "sheet", "rig", "bench", "registry",
+         "card")
+# C57: блоки этапов заявки (SKILL.md §7.2). Ключ — кортеж допустимых имён (первое — имя шаблона скилла, дальше —
+# имена пилота 2026-10-14); «*» в конце имени — любой суффикс (clip_acceptance_r1).
+STAGE_KEYS = {
+    "STAGE3": (("bake_run",), ("lookdev_run",), ("profiles",), ("executor",)),
+    "STAGE6": (("run",), ("spec",), ("clip_cards",)),
+    "STAGE7A": (("import_run", "import_run_live"), ("import_profile", "import_profiles"), ("review",),
+                ("evidence", "evidence_7a"), ("clip_acceptance", "clip_acceptance_r*")),
+    "STAGE7B": (("window",), ("evidence",)),
+}
+STAGE_PATH_KEYS = {"STAGE3": ("bake_run", "lookdev_run"), "STAGE6": ("run",),
+                   "STAGE7A": ("import_run", "import_run_live", "review", "evidence", "evidence_7a"),
+                   "STAGE7B": ("evidence",)}
 CUE_CLIPS = {"CUE-011": "HitReact", "CUE-013": "DeathSettle"}
 MAPS = ("Marmoreal", "Sarpedon")
 UE_STATUSES = ("технически импортировано", "художественно принято")
@@ -227,6 +247,42 @@ def card_fields(text: str) -> dict:
     return out
 
 
+def _card_value(v: str) -> str | None:
+    v = v.strip()
+    if v.startswith('"'):
+        end = v.find('"', 1)
+        while end > 0 and v[end - 1] == "\\":
+            end = v.find('"', end + 1)
+        return v[1:end] if end > 0 else v.strip('"')
+    v = re.sub(r"\s+#.*$", "", v).strip()
+    return None if v in ("null", "~", "") else v
+
+
+def card_blocks(text: str) -> dict:
+    """Блоки этапов заявки (STAGE3, STAGE5, STAGE6, STAGE7A, STAGE7B): {блок: {ключ: значение}} по строкам
+    «  key: value» с отступом 2 под строкой «STAGEx:»; значение — строка (кавычки сняты) или текст списка / карты как
+    есть, None — null. Строка блока без вложенных ключей («STAGE5: []») — пустой блок."""
+    out: dict = {}
+    cur = None
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        m = re.match(r"^(STAGE[0-9A-Z]*):[ \t]*(.*)$", line)
+        if m:
+            cur = m.group(1)
+            out.setdefault(cur, {})
+            continue
+        if not line.startswith(" "):
+            cur = None
+            continue
+        if cur is None:
+            continue
+        m = re.match(r"^  ([a-z_][a-z0-9_]*):[ \t]*(.*)$", line)
+        if m:
+            out[cur].setdefault(m.group(1), _card_value(m.group(2)))
+    return out
+
+
 # ------------------------------------------------------------------------------------------------------- данные
 class Repo:
     """Ленивое чтение файлов чекаута (каждый файл — один раз)."""
@@ -257,6 +313,11 @@ class Repo:
         t = self.text(key)
         return module_constants(t, set(names)) if t is not None else {}
 
+    def blocks(self, key: str) -> dict:
+        """Блоки этапов заявки героя (card_blocks); {} — заявки нет."""
+        self.cards()
+        return self._cache.get(("blocks", key), {})
+
     def cards(self) -> dict:
         """KEY заявки → (путь заявки, поля)."""
         if "cards" not in self._cache:
@@ -264,11 +325,13 @@ class Repo:
             base = self.path("candidates")
             for p in sorted(base.glob("*/asset-card.yaml")) if base.is_dir() else []:
                 try:
-                    f = card_fields(p.read_text(encoding="utf-8-sig"))
+                    text = p.read_text(encoding="utf-8-sig")
                 except OSError:
                     continue
+                f = card_fields(text)
                 if f.get("KEY"):
                     res.setdefault(f["KEY"], (p, f))
+                    self._cache.setdefault(("blocks", f["KEY"]), card_blocks(text))
             self._cache["cards"] = res
         return self._cache["cards"]
 
@@ -639,6 +702,53 @@ def check_registry(repo: Repo, ident) -> dict:
     return _verdict(f, [f"{e.get('status')}, {e.get('stage')}"])
 
 
+def _block_key(block: dict, names: tuple) -> str | None:
+    for n in names:
+        if n.endswith("*"):
+            hit = sorted(k for k in block if k.startswith(n[:-1]))
+            if hit:
+                return hit[-1]
+        elif n in block:
+            return n
+    return None
+
+
+def check_card(repo: Repo, ident) -> dict:
+    """C57: блоки этапов заявки (SKILL.md §7.2, RA-22) — есть, с ключами своего этапа, пути прогонов существуют."""
+    if not ident["card"]:
+        return _res("SKIP", ["нет заявки asset-card.yaml (MVP): блоков этапов нет"])
+    blocks = repo.blocks(ident["key"])
+    f, ok = [], []
+    if "STAGE7A" not in blocks:
+        f.append("нет блока STAGE7A: его пишет исполнитель 7a (SKILL.md §7.2, RA-22; C57) — прогон импорта, профиль, "
+                 "review, evidence, приёмка клипов")
+    if "STAGE3" in blocks and "STAGE6" not in blocks:
+        f.append("есть STAGE3, нет STAGE6: блок этапа 6 пишет исполнитель клипов (RA-22)")
+    for name, keys in STAGE_KEYS.items():
+        block = blocks.get(name)
+        if block is None:
+            continue
+        for alts in keys:
+            k = _block_key(block, alts)
+            if k is None:
+                f.append(f"{name}: нет ключа {' | '.join(alts)}")
+                continue
+            v = block[k]
+            if v is None or not str(v).strip():
+                f.append(f"{name}.{k}: пусто")
+            elif str(v).lstrip().startswith("<") and ">" in str(v):
+                f.append(f"{name}.{k}: шаблон не заполнен ({str(v)[:60]})")
+            elif k in STAGE_PATH_KEYS.get(name, ()):
+                first = str(v).split()[0].rstrip(",;")
+                if not (repo.root / first).exists():
+                    f.append(f"{name}.{k}: нет пути {first}")
+        ok.append(name)
+    absent = [b for b in ("STAGE3", "STAGE6") if b not in blocks]
+    note = [f"блоки {', '.join(ok)}"] + ([f"нет {', '.join(absent)} (заявка пилота, до RA-22)"]
+                                          if absent and "STAGE3" not in blocks else [])
+    return _verdict(f, note)
+
+
 # ------------------------------------------------------------------------------------------------------ сборка
 def check_all(repo_root: Path, heroes: list[str] | None = None) -> dict:
     repo = Repo(repo_root)
@@ -659,7 +769,8 @@ def check_all(repo_root: Path, heroes: list[str] | None = None) -> dict:
                "cook": check_cook(repo, ident), "names": check_names(repo, ident),
                "de010": check_de010(repo, ident, row, consts), "de011": check_de011(ident, consts),
                "manifest": check_manifest(repo, ident, consts), "sheet": check_sheet(repo, ident, row, consts),
-               "rig": check_rig(repo, ident), "bench": check_bench(repo, ident), "registry": check_registry(repo, ident)}
+               "rig": check_rig(repo, ident), "bench": check_bench(repo, ident), "registry": check_registry(repo, ident),
+               "card": check_card(repo, ident)}
         out[key] = {"identity": {k: v for k, v in ident.items() if k not in ("de010_row", "de010_spec", "sheet_row")},
                     "checks": res}
     counts = {s: sum(r["status"] == s for h in out.values() for r in h["checks"].values()) for s in ("PASS", "SKIP", "FAIL")}

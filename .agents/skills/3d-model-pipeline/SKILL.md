@@ -382,18 +382,22 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 2. **7a.1 Импорт** (`references/ue-import-package.md` §3–§4.3): профили `ue7a/write_import_profile.py` и
    `write_review_config.py`; `um_masters.py verify` (только проверка, ДС-4); скелет и меш `skeletal-adopt` (проп —
    `static-candidate`); клипы `h2anim_ue.py import` и `measure`; `ue_hero_lookdev.py verify`; `clip_manifest.py build`
-   (клипы `technically_imported`); look-dev съёмка `ue_hero_lookdev.py review` и подстройка MI/LUT `apply-mi` без
-   переимпорта (≤ 3 итерации, RC-10). Переимпорт — только при новом FBX, текстуре или структуре (§4.4 там же).
+   (клипы `technically_imported`); look-dev съёмка `ue_hero_lookdev.py review` и подстройка MI/LUT `apply-mi
+   --update-verify` без переимпорта (≤ 3 итерации, RC-10; флаг переносит план MI в ожидания `verify` конфига, C50).
+   Переимпорт — только при новом FBX, текстуре или структуре (§4.4 там же).
 3. **7a.2 UE-кадры и приёмка 4 клипов** (ДС-1; `references/ue-import-package.md` §4.5): `h2anim_ue.py frames
    --light-pinned <review report>` по клипу за вызов, `closeup`, `sheet`; каталог цикла — `ue7a/prep_acceptance.py`;
-   приёмщики, рубрика R/C/D/L и маршруты — `references/animation-vfx-sfx.md` §10. Выход 7a — 4 карточки клипов
-   `pass`. Клип вскрыл дефект модели — поздний фикс (§5 п.4; маршрут — там же §10.5).
+   приёмщики — `ue7a/run_clip_acceptors.py --evidence <цикл> --executor-session-id <фактический id исполнителя
+   клипов>` (параллельно, `validate_card` сам, C51/C55); рубрика R/C/D/L и маршруты —
+   `references/animation-vfx-sfx.md` §10. Выход 7a — 4 карточки клипов `pass` и блок `STAGE7A` заявки (§7.2; его
+   проверяет `registration_check.py`, C57). Клип вскрыл дефект модели — поздний фикс (§5 п.4; маршрут — там же §10.5).
 4. Правки без сборки C++ (регистрация §5.4–5.5): CUE-011/013 в `cue-table.json` →
    `python tools/s08/cue_contract/cue_contract.py validate-table`; `DirectoriesToAlwaysCook` в
    `unreal/Unmatched/Config/DefaultGame.ini`; `S08FighterNames.json`; варианты bench-фикстур обеих досок (Р7-11:
    `env_bench_fixtures.cts --variant <Key> --hero-name "<FIGHTER_NAME>" --hero-slug <HERO_SLUG>`, затем `--check`;
    помощник без нового героя — `--hero-name "<FighterName владельца>" --hero-slug <OWNER_HERO_SLUG> --sidekick-name
-   "<FIGHTER_NAME>"`, регистрация Д-2);
+   "<FIGHTER_NAME>"`; запуск — внутри контейнера `unmatched-backend`, на хосте `backend/node_modules` пуст: регистрация
+   Д-2 «Где запускать», C52);
    `git add -f` новых `.uasset`.
 5. Перед закрытием редактора — 0 dirty-пакетов (`ue7a/discard_master.py` сбрасывает грязный `M_UM_Figure_v2`, F92),
    коммит результата 7a; редактор закрывает оркестратор по PID (`references/ue-import-package.md` §1 п.1).
@@ -414,7 +418,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    `CharacterKey`/`HitType` (номера строк — в таблицах регистрации). Сборка `node tools/s08/build-editor.cjs UnmatchedEditor Win64 Development -Project=<abs>/unreal/Unmatched/Unmatched.uproject -WaitMutex -NoXGE -MaxParallelActions=4`
    (в выводе `Result: Succeeded`), затем весь набор `node tools/s08/run-ue-tests.cjs "Unmatched.S08" <abs log>` —
    `EXIT CODE: 0`, нет `Result={Fail}` (`references/ue-import-package.md` §5 п.4).
-3. Запись `asset-registry.json` «технически импортировано», `ue-editor-frames` (п.5), затем
+3. Запись `asset-registry.json` «технически импортировано», `ue-editor-frames` (п.5; `tools/art/registry_writer.py
+   entry --phase 7b-frames`, C59), затем
    `python tools/art/registration_check.py --heroes <Key>` → код 0 (полнота регистрации, RB-04), затем одна упаковка
    `tools/s08/package-client.ps1` на окно 7b (новый `Config/**.json` → touch `Unmatched.Build.cs`, сборка игрового
    target, затем `-SkipBuild`; `references/ue-import-package.md` §6.1). Варианты фикстуры
@@ -437,7 +442,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    таблице `references/new-character-registration.md` §10 (RA-26): `asset-registry.json` — первая запись после этапа 0 в
    начале 7b («технически импортировано», `ue-editor-frames`), после осмотра кадров `-Bench` — `live-packaged-probe`,
    `validate_registry.py` без новых ERROR против базовой линии; строки `docs/game-design/visual/03-asset-registry.csv`
-   (фигура, 4 клипа, звук и FX) с `rollback_flag` — на шаге 7.8; `docs/art-pipeline/DIRECTORY-MAP.md` при новых
+   (фигура, 4 клипа, звук и FX) с `rollback_flag` — на шаге 7.8; обе записи — `tools/art/registry_writer.py`
+   (`entry` / `rows`, фазы таблицы §10; C59); `docs/art-pipeline/DIRECTORY-MAP.md` при новых
    каталогах. Перед `safe-integrate` — `registration_check.py --heroes <Key>` ещё раз (§8).
 
 ## 7. Дефолты и заявка

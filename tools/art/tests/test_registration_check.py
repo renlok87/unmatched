@@ -142,11 +142,21 @@ def make_repo(root: Path) -> Path:
     _w(root, f"art/pipeline-candidates/{AID}/asset-card.yaml",
        f"ASSET_ID: {AID}\nKEY: {KEY}\nGAME_ROLE: hero\nCHARACTER: \"{CHAR}\"   # comment\n"
        f"FIGHTER_NAME: \"{FIGHTER}\"\nHERO_SLUG: \"test-hero\"\nOWNER_HERO_SLUG: null\nHIT_TYPE: \"MAGIC\"\n"
-       f"AUDIO_KEY: \"TESTO\"\ndelegated:\n  CHARACTER: \"not this one\"\n")
+       f"AUDIO_KEY: \"TESTO\"\ndelegated:\n  CHARACTER: \"not this one\"\n" + STAGE7A)
+    for d in ("20261014-h2ld-ue-import", "20261014-h2ld-ldc-ue", "evidence/stage7a-20261014"):
+        _w(root, f"art/pipeline-candidates/{AID}/{d}/README.md", "x")
     _hero_files(root, "KingArthur", "ASSET-KING-ARTHUR-001", "ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
                 7, "Arthur")
     _hero_files(root, KEY, AID, SPEC_REL, 8, CHAR)
     return root
+
+
+STAGE7A = (f"STAGE7A:\n  editor: \"свой редактор, закрыт при 0 dirty\"\n"
+           f"  import_run: \"art/pipeline-candidates/{AID}/20261014-h2ld-ue-import\"   # technically_imported\n"
+           f"  import_profile: \"build-profiles/testo-h2ld-lookdev-ue-import.json\"\n"
+           f"  review: \"art/pipeline-candidates/{AID}/20261014-h2ld-ldc-ue\"\n"
+           f"  evidence: \"art/pipeline-candidates/{AID}/evidence/stage7a-20261014\"\n"
+           f"  clip_acceptance: \"r1: 4 pass\"\n")
 
 
 @pytest.fixture
@@ -269,3 +279,53 @@ def test_unknown_hero_fails_specs_and_exit_codes(repo, capsys):
     assert R.main(["--repo", str(repo), "--heroes", "Nobody", "--json"]) == 1
     assert json.loads(capsys.readouterr().out)["verdict"] == "FAIL"
     assert R.main(["--repo", str(repo / "missing")]) == 2
+
+
+# ---- C57: блоки этапов заявки -----------------------------------------------------------------------------------------
+def card_path(root: Path) -> Path:
+    return root / f"art/pipeline-candidates/{AID}/asset-card.yaml"
+
+
+def test_card_blocks_parse():
+    text = ("KEY: X\nSTAGE3:\n  bake_run: \"a/b\"   # c\n  executor: {mechanism: \"subagent\"}\n"
+            "STAGE5: []\nSTAGE6_SLOTS: {death: \"DTH\"}\n                  # comment\n"
+            "STAGE7A:\n  import_run_live: \"r (26/26)\"\n  note: null\n    deeper: x\ndecided_by:\n  \"k\": \"v\"\n")
+    b = R.card_blocks(text)
+    assert set(b) == {"STAGE3", "STAGE5", "STAGE7A"}                       # STAGE6_SLOTS — не блок этапа
+    assert b["STAGE3"] == {"bake_run": "a/b", "executor": "{mechanism: \"subagent\"}"}
+    assert b["STAGE5"] == {} and b["STAGE7A"] == {"import_run_live": "r (26/26)", "note": None}
+
+
+def test_card_stage7a_required_and_mvp_skips(repo):
+    rep = R.check_all(repo)
+    assert status(rep)["card"] == "PASS" and status(rep, "KingArthur")["card"] == "SKIP"
+    assert "заявка пилота" in rep["heroes"][KEY]["checks"]["card"]["messages"][-1]
+    edit(repo, card_path(repo).relative_to(repo).as_posix(), "STAGE7A:", "STAGE7X:")
+    r = R.check_all(repo, [KEY])["heroes"][KEY]["checks"]["card"]
+    assert r["status"] == "FAIL" and "нет блока STAGE7A" in r["messages"][0]
+
+
+def test_card_keys_paths_and_placeholders(repo):
+    rel = card_path(repo).relative_to(repo).as_posix()
+    edit(repo, rel, "  review: ", "  reviewed: ")
+    edit(repo, rel, "evidence/stage7a-20261014", "evidence/stage7a-missing")
+    edit(repo, rel, '"r1: 4 pass"', '"<цикл → вердикты и баллы 4 клипов>"')
+    msgs = R.check_all(repo, [KEY])["heroes"][KEY]["checks"]["card"]["messages"]
+    assert any("STAGE7A: нет ключа review" in m for m in msgs)
+    assert any("STAGE7A.evidence: нет пути" in m for m in msgs)
+    assert any("STAGE7A.clip_acceptance: шаблон не заполнен" in m for m in msgs)
+
+
+def test_card_pilot_names_and_stage3_needs_stage6(repo):
+    rel = card_path(repo).relative_to(repo).as_posix()
+    for old, new in (("  import_run: ", "  import_run_live: "), ("  import_profile: ", "  import_profiles: "),
+                     ("  evidence: ", "  evidence_7a: "), ("  clip_acceptance: ", "  clip_acceptance_r1: ")):
+        edit(repo, rel, old, new)
+    assert status(R.check_all(repo, [KEY]))["card"] == "PASS"                # имена пилота
+    p = card_path(repo)
+    p.write_text(p.read_text(encoding="utf-8") + (
+        f"STAGE3:\n  bake_run: \"art/pipeline-candidates/{AID}/20261014-h2ld-ue-import\"\n"
+        f"  lookdev_run: \"art/pipeline-candidates/{AID}/20261014-h2ld-ldc-ue\"\n  profiles: [\"a.json\"]\n"
+        "  executor: {mechanism: \"subagent\"}\n"), encoding="utf-8")
+    r = R.check_all(repo, [KEY])["heroes"][KEY]["checks"]["card"]
+    assert r["status"] == "FAIL" and "есть STAGE3, нет STAGE6" in r["messages"][0]

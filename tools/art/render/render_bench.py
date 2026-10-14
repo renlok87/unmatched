@@ -289,16 +289,37 @@ VARIANTS = ["dx12-lumen-high", "dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60",
 NUM = r"(-?\d+(?:\.\d+)?)"
 
 
+def focus_head(heads: dict, view_focus: str | None, bench_focus: str | None, scene_hero: str | None):
+    """(head, {fighter, source}) of the fighter the view is about (C58). The client traces one SHOT head line per
+    figure, so "the last line" was whoever came last (Merlin f-1-sk0 in a Beowulf -BenchFocusFighter run): the
+    view's own "BENCH view=<v> focus hero=<id>" first, then "BENCH focus fighter=<id>" (-BenchFocusFighter), then
+    the scene hero; none of them traced -> the last line, as before (old traces)."""
+    for fid, src in ((view_focus, "view focus"), (bench_focus, "BenchFocusFighter"), (scene_hero, "scene hero")):
+        if fid and fid in heads:
+            return heads[fid], {"fighter": fid, "source": src}
+    if heads:
+        fid = list(heads)[-1]
+        return heads[fid], {"fighter": fid, "source": "last SHOT head line (no focus traced)"}
+    return None, None
+
+
 def parse_trace(p: Path) -> dict:
     lines = RF.read_lines(p)
-    out = {"views": {}, "render": {}, "heads": {}, "scene": None, "done": False, "failed": None, "lines": len(lines)}
+    out = {"views": {}, "render": {}, "heads": {}, "scene": None, "done": False, "failed": None, "lines": len(lines),
+           "focus": None, "headsAll": {}, "headFocus": {}}
     view = None
+    view_focus: dict = {}
     for ln in lines:
         body = RF.payload(ln)
-        if body.startswith("BENCH scene"):
+        if body.startswith("BENCH focus fighter="):
+            out["focus"] = body[len("BENCH focus fighter="):].split()[0]
+        elif body.startswith("BENCH scene"):
             out["scene"] = dict(RF.PAIR.findall(body[len("BENCH scene"):]))
         elif body.startswith("BENCH view="):
             view = body.split()[1].split("=", 1)[1]
+            m = re.search(r"\bfocus hero=(\S+)", body)
+            if m:
+                view_focus[view] = m.group(1)
         elif body.startswith("BENCH measure view="):
             v = re.search(r"view=(\S+)", body).group(1)
             d = {}
@@ -317,11 +338,14 @@ def parse_trace(p: Path) -> dict:
         elif body.startswith("SHOT head fighter="):
             if view:
                 d = dict(re.findall(r"(\w+)=(\([^)]*\)|\S+)", body[len("SHOT head "):]))
-                out["heads"][view] = d
+                out["headsAll"].setdefault(view, {})[d.get("fighter")] = d
         elif body.startswith("BENCH done"):
             out["done"] = True
         elif body.startswith("BENCH FAILED"):
             out["failed"] = body
+    for v, heads in out["headsAll"].items():
+        head, why = focus_head(heads, view_focus.get(v), out["focus"], (out["scene"] or {}).get("hero"))
+        out["heads"][v], out["headFocus"][v] = head, why
     # SHOT fingerprints per shot file (the acceptance tools use these)
     out["shotFingerprints"] = {b["shot"]: b["render"] for b in RF.shot_fingerprints(lines) if b["shot"]}
     return out
@@ -435,6 +459,7 @@ def parse_csv(p: Path) -> dict:
 # and the board camera only. It was fitted on the K2 5x frames of this run set (Head at (960, 517.7),
 # headPx 56.4) and checked on every frame with face-roi-contact-sheet.jpg (tools/art/render/face_roi.py).
 # Meshes without a calibration and heads smaller than FACE_ROI_MIN_HEAD_PX get no face ROI at all.
+# The head is the one of the view's focus fighter (parse_trace / focus_head, C58), not the last traced figure.
 FACE_ROI_MIN_HEAD_PX = 40.0  # K1 heads are ~11 px: a face ROI there would be a handful of pixels
 FACE_ROI_CALIBRATION = {
     "SK_Medusa_FaceNeck_v2Candidate": {

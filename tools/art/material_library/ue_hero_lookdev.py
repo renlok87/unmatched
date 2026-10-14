@@ -22,7 +22,10 @@
     # RC-10: MI values and the LUT of the import profile onto the EXISTING MIs of the hero's import (no re-import of
     # the mesh, textures or clips), then verify; --profile = a newer rev of the run's profile, --dry-run = diff only
     python tools/art/material_library/ue_hero_lookdev.py apply-mi --config <review json> --out <dir> --tag <tag>
-        [--profile <build profile json>] [--dry-run] [--no-verify]
+        [--profile <build profile json>] [--dry-run] [--no-verify] [--update-verify]
+    # --update-verify (C50): after a successful apply the planned MI values are written into verify.instances of the
+    # --config file itself (indent, CRLF/LF and trailing newline of the file kept), so `verify --config` and the next
+    # apply-mi expect what is in the editor; without it only this run's verify uses them (in memory, as before)
 
 apply-mi vs re-import. A look-dev iteration that changes only MI values (ue.figure_parameters, ue.teams colours,
 ue.extra_instances scalars / vectors, ue.base_marker parameters / vectors, figure_static_switches) or the hero LUT
@@ -74,6 +77,7 @@ import hashlib
 import io
 import json
 import math
+import re
 import sys
 import time
 from pathlib import Path
@@ -997,6 +1001,45 @@ def verify_overlay(cfg: dict, plan: dict) -> dict:
     return out
 
 
+def write_config_like(path: Path, data) -> None:
+    """Rewrite a hand-kept JSON config in its own format (C50): the file's indent, line endings (CRLF / LF), BOM,
+    trailing newline and ASCII escaping (\\uXXXX only when the file has no raw non-ASCII text) are kept, so a config
+    the tools wrote with json.dumps(indent=1) changes only in the lines whose values changed."""
+    path = Path(path)
+    raw = path.read_bytes()
+    bom = raw.startswith(b"\xef\xbb\xbf")
+    text = raw.decode("utf-8-sig")
+    m = re.search(r"\n( +)\S", text)
+    indent = len(m.group(1)) if m else 2
+    ascii_only = bool(re.search(r"\\u[0-9a-fA-F]{4}", text)) and not re.search(r"[^\x00-\x7f]", text)
+    out = json.dumps(data, ensure_ascii=ascii_only, indent=indent)
+    if text.endswith("\n"):
+        out += "\n"
+    if "\r\n" in text:
+        out = out.replace("\n", "\r\n")
+    path.write_bytes((b"\xef\xbb\xbf" if bom else b"") + out.encode("utf-8"))
+
+
+def update_verify_config(a, cfg: dict, plan: dict, rep: dict) -> dict:
+    """apply-mi --update-verify (C50): the planned MI values become the expected values of the review config FILE
+    (verify.instances, the same overlay the verify read-back of this run uses), so a later `verify --config` and the
+    next apply-mi start from what is in the editor instead of hand edits. Only after a real apply whose MI values
+    match the profile; a dry run or a failed apply leaves the file as it is."""
+    path = getattr(a, "config", None)
+    why = ("dry run" if rep["dry_run"] else "no --config file" if not path else
+           "the config has no verify section" if not cfg.get("verify") else
+           "MI values differ from the profile after the apply" if not rep["checks"]["mi_values_as_profile"]["passed"]
+           else None)
+    if why:
+        return {"updated": False, "reason": why}
+    new = verify_overlay(cfg, plan)
+    old_i, new_i = (cfg["verify"].get("instances") or {}), new["verify"]["instances"]
+    changed = sorted(k for k in new_i if new_i[k] != old_i.get(k))
+    if changed:
+        write_config_like(Path(path), new)
+    return {"updated": bool(changed), "path": rel(Path(path)), "changed_instances": changed}
+
+
 def cmd_apply_mi(a, cfg) -> dict:
     """RC-10: MI values and the LUT of the import profile onto the EXISTING MIs of the hero's import (see the module
     docstring), then verify. Exit codes through main(): refusal = SystemExit with the reason."""
@@ -1075,6 +1118,8 @@ def cmd_apply_mi(a, cfg) -> dict:
                                     "dirty": after["dirty_after"]}}
     rep["passed"] = all(c["passed"] for c in rep["checks"].values())
     rep["apply_s"] = round(time.time() - t0, 1)
+    if getattr(a, "update_verify", False):
+        rep["verify_config"] = update_verify_config(a, cfg, plan, rep)
     if not getattr(a, "no_verify", False) and cfg.get("verify") and not rep["dry_run"]:
         vres = cmd_verify(a, verify_overlay(cfg, plan))
         rep["verify"] = {"passed": vres["passed"], "report": rel(out / ("verify-%s.json" % a.tag)),
@@ -1090,6 +1135,10 @@ def cmd_apply_mi(a, cfg) -> dict:
         "PASS" if rep["passed"] else "FAIL", rep["elapsed_s"]))
     for k, c in rep["checks"].items():
         print("%-28s %s" % (k, "PASS" if c["passed"] else "FAIL"))
+    vc = rep.get("verify_config")
+    if vc:
+        print("verify config %s" % (("updated %s: %s" % (vc["path"], ", ".join(vc["changed_instances"])))
+                                    if vc["updated"] else "unchanged (%s)" % vc.get("reason", "values already expected")))
     return rep
 
 
@@ -1477,6 +1526,9 @@ def main() -> int:
     ap.add_argument("--profile", help="apply-mi: build profile to apply (default: the profile of the config's run_dir)")
     ap.add_argument("--dry-run", action="store_true", help="apply-mi: read and diff only, change nothing")
     ap.add_argument("--no-verify", action="store_true", help="apply-mi: skip the verify read-back after applying")
+    ap.add_argument("--update-verify", action="store_true",
+                    help="apply-mi: write the planned MI values into verify.instances of the --config file (its own "
+                         "format kept) after a successful apply, instead of hand-editing the expectations (C50)")
     a = ap.parse_args()
     if a.command == "lut":
         cmd_lut(a)

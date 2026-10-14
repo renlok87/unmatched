@@ -1,5 +1,8 @@
 """Шаг 7a.2: каталог приёмки клипов цикла rN — копии кадров в <E>/<Clip>/frames/, заполненный промпт приёмщика и run-acceptor.ps1.
 
+Приёмщиков запускает run_clip_acceptors.py (параллельно, с validate_card, C51); run-acceptor.ps1 заготовок этапа 6
+(пилот) по-прежнему копируется в <E>, если он есть, а без него предупреждения больше нет.
+
 Источник промпта — заготовка этапа 6 `<asset-dir>/evidence/acceptance-anim-prompts/<Clip>/acceptor-prompt.md` с
 плейсхолдерами {{E}}, {{DATE}}, {{CYCLE}}, {{PREVIOUS_CARD_JSON}}, {{FRAMES_FILES_JSON}}, {{KNOWN_LIMITS}} и служебным
 комментарием <!-- … --> (удаляется). Пары `"path": …, "sha256": …` промпта сверяются с текущими файлами: перепечённый
@@ -272,8 +275,9 @@ def main(argv=None) -> int:
             else prompts / "run-acceptor.ps1"
         if ps1.is_file():
             shutil.copy2(ps1, ev / "run-acceptor.ps1")
-        else:
-            print(f"WARNING: нет {ps1} — run-acceptor.ps1 не скопирован", file=sys.stderr)
+        print(f"запуск приёмщиков: python tools/tripo-pipeline/ue7a/run_clip_acceptors.py --evidence {e_rel} "
+              "--executor-session-id <фактический id исполнителя клипов>"
+              + (f" (run-acceptor.ps1 скопирован из {ps1.parent.name} — прежний путь)" if ps1.is_file() else ""))
     except (PrepError, OSError, KeyError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2

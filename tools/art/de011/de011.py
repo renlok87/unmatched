@@ -17,6 +17,13 @@ Every editor step is a separate headless UnrealEditor-Cmd of the main checkout's
 tools/art/de010/de010.py: -ExecutePythonScript, -RenderOffScreen, no window). Lossless frames go to --frames (outside
 the repository), the report and JPEG copies to docs/art-pipeline/evidence/de011-2026-10-04/.
 
+Editor exit (C56, skill check figure Beowulf 7b: UnrealEditor-Cmd crashed 0xC0000005 after its clean exit, assets saved,
+Dissolve test PASS, nothing flagged it): a step whose editor exits non-zero prints a WARN on stderr and records
+editor_exit_warning in its JSON (apply.json / capture-<tag>.json / inspect.json; compare lists them). After a clean
+"LogExit: Exiting." in the step log the report and the saved packages are complete (a shutdown crash: do not repeat
+the step); without it the editor stopped before a clean exit - check the saved packages before going on. The step
+still returns 0 (its report has no error), as before.
+
 Why a switch + MICs and not a Masked master: the accepted figures stay Opaque (the v1 rule "no Masked" of the
 masters, PIPELINE.md; no masked depth pass for living figures). Only the dissolve MIC - a child of the hero MI, so
 textures, knobs and the static switches UseUV1Metres / UseTeamAccent are inherited - turns the dissolve on and
@@ -48,6 +55,34 @@ CAPTURE_LOOKS = {"KingArthur": "P1", "Merlin": "P2", "Medusa": "P1", "Harpy": "P
                  "Angel": "P1", "AncientLeshen": "P2", "Achilles": "P1",
                  # skill check figure 2026-10-14, stage 7b (registration R7-2)
                  "Beowulf": "P2"}
+
+
+LOG_EXIT = "LogExit: Exiting."
+
+
+def editor_exit_check(res: dict, name: str) -> dict | None:
+    """C56: WARN for a non-zero UnrealEditor-Cmd exit (de010.run_editor records it in _editor.exit); None at exit 0.
+    clean_logexit = the step log has the engine's final "LogExit: Exiting." line."""
+    ed = res.get("_editor") or {}
+    code = ed.get("exit")
+    if not code:
+        return None
+    log = ed.get("log")
+    clean = bool(log) and Path(log).is_file() and LOG_EXIT in Path(log).read_text(encoding="utf-8", errors="replace")
+    hexcode = "0x%08X" % (code & 0xFFFFFFFF) if isinstance(code, int) else str(code)
+    if clean:
+        msg = ("%s: UnrealEditor-Cmd exit %s (%s) AFTER a clean '%s' in %s: the report and the saved packages are "
+               "complete - a shutdown crash of the editor (C56); keep the result, do not repeat the step"
+               % (name, code, hexcode, LOG_EXIT, log))
+    else:
+        msg = ("%s: UnrealEditor-Cmd exit %s (%s) without '%s' in %s: the editor stopped before a clean exit - check "
+               "that the packages of the step are saved (the .uasset files on disk) before going on"
+               % (name, code, hexcode, LOG_EXIT, log))
+    warn = {"level": "WARN", "step": name, "exit": code, "exit_hex": hexcode, "clean_logexit": clean, "log": log,
+            "message": msg}
+    res["editor_exit_warning"] = warn
+    print("WARN " + msg, file=sys.stderr, flush=True)
+    return warn
 
 
 def stage_root(key: str, stage: str) -> str:
@@ -90,6 +125,7 @@ def cmd_inspect(a) -> None:
         meshes += ["%s/Meshes/SK_%s_%s" % (root, key, stage), "%s/Meshes/SM_%s_%s_Base" % (root, key, stage)]
     res = de010.run_editor(HERE / "de011_inspect_ue.py", {"out": str(frames / "inspect.json"), "materials": mats,
                                                           "meshes": meshes}, frames, "inspect")
+    editor_exit_check(res, "inspect")
     de010.write(frames / "inspect.json", res)
     for path, m in res["materials"].items():
         print(path.rsplit("/", 1)[1], m["master"], {k: v["mi"] for k, v in m["switches"].items()})
@@ -103,6 +139,7 @@ def cmd_capture(a) -> None:
                                                           "figures": figures(rows),
                                                           "dissolve": bool(a.dissolve)},
                            frames, "capture-" + a.tag)
+    editor_exit_check(res, "capture-" + a.tag)
     res.update(started_at=de010.now())
     de010.write(frames / ("capture-%s.json" % a.tag), res)
     print(json.dumps(res, indent=1)[:2000])
@@ -131,6 +168,7 @@ def cmd_apply(a) -> None:
                                                         "master_script": str(vm.HERE / "ue" / "um_v2_master.py"),
                                                         "switch": vm.DISSOLVE_SWITCH, "mics": plan["mics"]},
                            frames, "apply")
+    editor_exit_check(res, "apply")
     de010.after_master(res, mplan, g, "de011 apply")
     res["master"].update(dissolve_hlsl_sha256=hashlib.sha256(vm.DISSOLVE_HLSL.read_bytes()).hexdigest())
     res["heroes"] = plan["heroes"]
@@ -208,6 +246,8 @@ def cmd_compare(a) -> None:
     rep = {"schema": "unmatched.de011-evidence/1", "task": "DE-011 (W-27)", "tool": "tools/art/de011/de011.py",
            "created_at": de010.now(), "all_ok": all(checks.values()), "checks": checks, "metrics": m,
            "figure_pixels_vs_empty": px, "ash_vs_fade_p35": glow, "mics": mics_ok,
+           "editor_exit_warnings": [x["editor_exit_warning"] for x in (before, after, apply)
+                                    if x.get("editor_exit_warning")],
            "master": {k: apply["master"].get(k) for k in ("graph_signature", "node_count", "link_count",
                                                            "expressions", "statistics", "parameters",
                                                            "compile_errors", "core_hlsl_sha256",

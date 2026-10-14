@@ -11,6 +11,14 @@ input at each size (native when the file already has that size, otherwise resamp
 master is a preview, not a working-size export, И-9). sheet-manifest.json records inputs and outputs with sha256.
 README.md is written from a template with the fields of 02 13.2 when the folder has none (never overwritten).
 
+  ... --out C:/tmp/<ASSET_ID>-stage7/game-sheet --jpeg-out docs/art-pipeline/evidence/<content-key>-<YYYYMMDD>/game-sheet
+
+--jpeg-out (C60, ДС-8: only JPEG frames go to git): the PNG sheets stay in --out (outside git) and every one is also
+written to --jpeg-out as JPEG 1200 px wide (never upscaled), quality 92, Pillow LANCZOS, with its <stem>.evidence.json
+sidecar (the format of tools/tripo-pipeline/review/frames_to_jpeg.py: frame, frameSha256, output_px, jpeg,
+png_before_jpeg kept_outside_git). The manifest goes to both folders (the --jpeg-out copy adds "jpeg": the JPEG
+outputs) and the README template is written in --jpeg-out only, listing the JPEG files, not the PNGs.
+
 Gray: Y' = 0.2126 R' + 0.7152 G' + 0.0722 B' on the sRGB-encoded values (Rec.709 luma, as the icon sheets of the
 project). Deuteranopia: Machado, Oliveira, Fernandes 2009, severity 1.0, applied in linear RGB.
 """
@@ -281,14 +289,15 @@ README_TEMPLATE = """# {cid} — лист приёмки
 
 
 def write_readme(out: Path, cid: str, date: str, inputs: list[dict], sheet_files: list[str], sizes_file: str | None,
-                 ctx_files: list[str]) -> bool:
+                 ctx_files: list[str], files_note: str = "") -> bool:
     path = out / "README.md"
     if path.exists():
         return False
     table = "\n".join(f"| `{i['path']}` | {i['size'][0]}×{i['size'][1]} | {i['sha256']} |" for i in inputs)
     path.write_text(README_TEMPLATE.format(
         cid=cid, date=date, sizes_file=f"`{sizes_file}`" if sizes_file else "—",
-        sizes_have="да" if sizes_file else "—", sheet_files=", ".join(f"`{f}`" for f in sheet_files),
+        sizes_have="да" if sizes_file else "—",
+        sheet_files=", ".join(f"`{f}`" for f in sheet_files) + (f" {files_note}" if files_note else ""),
         ctx_files=", ".join(f"`{f}`" for f in ctx_files) or "—",
         ctx_have="да" if ctx_files else "— (входы непрозрачные)", inputs_table=table), encoding="utf-8", newline="\n")
     return True
@@ -296,13 +305,34 @@ def write_readme(out: Path, cid: str, date: str, inputs: list[dict], sheet_files
 
 # ---------------------------------------------------------------- main
 
+JPEG_WIDTH, JPEG_QUALITY = 1200, 92  # PIPELINE.md frame format (frames_to_jpeg.py), ДС-8
+
+
+def to_jpeg(png: Path, out_dir: Path, kept_at: str) -> dict:
+    """PNG sheet -> <out_dir>/<stem>.jpg (1200 px wide at most, q92, LANCZOS) + <stem>.evidence.json sidecar."""
+    raw = png.read_bytes()
+    with Image.open(png) as im:
+        rgb = im.convert("RGB")
+    w, h = rgb.size
+    size = (JPEG_WIDTH, round(h * JPEG_WIDTH / w)) if w > JPEG_WIDTH else (w, h)
+    jpg = out_dir / (png.stem + ".jpg")
+    (rgb.resize(size, Image.LANCZOS) if size != (w, h) else rgb).save(jpg, quality=JPEG_QUALITY)
+    side = {"frame": jpg.name, "frameSha256": sha256_file(jpg), "output_px": list(size),
+            "jpeg": "Pillow LANCZOS %dx%d, quality %d (PIPELINE.md frame format)" % (size[0], size[1], JPEG_QUALITY),
+            "png_before_jpeg": {"file": png.name, "sha256": sha256_file(png), "bytes": len(raw), "px": [w, h],
+                                "kept_outside_git": kept_at}}
+    (out_dir / (png.stem + ".evidence.json")).write_text(json.dumps(side, indent=1, sort_keys=True) + "\n",
+                                                         encoding="utf-8", newline="\n")
+    return {"file": jpg.name, "sha256": side["frameSha256"], "size": list(size), "from": png.name}
+
+
 def _safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-") or "input"
 
 
 def build(root: Path, cid: str, inputs: list[Path], out: Path | None = None, sizes: list[int] | None = None,
           zoom: int = 4, max_tile: int = 960, backgrounds: list[str] | None = None,
-          date: str | None = None) -> dict:
+          date: str | None = None, jpeg_out: Path | None = None) -> dict:
     _require_libs()
     if not re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]*$", cid):
         raise VisualError(f"bad unit id {cid!r}")
@@ -363,7 +393,25 @@ def build(root: Path, cid: str, inputs: list[Path], out: Path | None = None, siz
     (out / "sheet-manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
                                              encoding="utf-8", newline="\n")
     ctx_files = [f for f, i in zip(sheet_files, manifest_inputs) if i["alpha"]]
-    readme = write_readme(out, cid, date, manifest_inputs, sheet_files, sizes_file, ctx_files)
+    if jpeg_out is None:
+        readme = write_readme(out, cid, date, manifest_inputs, sheet_files, sizes_file, ctx_files)
+    else:
+        jpeg_out = Path(jpeg_out)
+        if jpeg_out.resolve() == out.resolve():
+            raise VisualError("--jpeg-out must differ from --out (the PNGs stay outside git)")
+        jpeg_out.mkdir(parents=True, exist_ok=True)
+        kept = rel_or_abs(root, out)
+        jpegs = [to_jpeg(out / name, jpeg_out, kept) for name in sheet_files + ([sizes_file] if sizes_file else [])]
+        jname = {j["from"]: j["file"] for j in jpegs}
+        jmanifest = dict(manifest, jpeg={"dir": rel_or_abs(root, jpeg_out), "png_dir": kept, "width_max": JPEG_WIDTH,
+                                         "quality": JPEG_QUALITY, "outputs": jpegs})
+        (jpeg_out / "sheet-manifest.json").write_text(json.dumps(jmanifest, ensure_ascii=False, indent=2) + "\n",
+                                                      encoding="utf-8", newline="\n")
+        readme = write_readme(jpeg_out, cid, date, manifest_inputs, [jname[f] for f in sheet_files],
+                              jname.get(sizes_file) if sizes_file else None, [jname[f] for f in ctx_files],
+                              files_note=f"(JPEG {JPEG_WIDTH} q{JPEG_QUALITY}; PNG — `{kept}`, ДС-8)")
+        manifest["jpeg"] = jmanifest["jpeg"]
+        manifest["jpeg_out"] = rel_or_abs(root, jpeg_out)
     manifest["readme_written"] = readme
     manifest["out"] = rel_or_abs(root, out)
     return manifest
@@ -392,20 +440,25 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--backgrounds", default=",".join(BACKGROUNDS),
                     help="context backgrounds for transparent inputs: " + ", ".join(BACKGROUNDS))
     ap.add_argument("--date", help="ISO date (default today)")
+    ap.add_argument("--jpeg-out", type=Path, help="evidence folder for the JPEG copies (1200 px q92 + sidecars), the "
+                                                  "manifest and the README (listing the JPEGs); PNGs stay in --out")
     ap.add_argument("--root", type=Path, help=argparse.SUPPRESS)
     a = ap.parse_args(argv)
     utf8_console()
     root = (a.root or repo_root()).resolve()
     try:
         m = build(root, a.unit_id, a.inputs, a.out, _sizes(a.sizes), a.zoom, a.max_tile,
-                  [b.strip() for b in a.backgrounds.split(",") if b.strip()], a.date)
+                  [b.strip() for b in a.backgrounds.split(",") if b.strip()], a.date, a.jpeg_out)
     except VisualError as e:
         print(f"sheet: ERROR: {e}", file=sys.stderr)
         return 2
     for o in m["outputs"]:
         print(f"{m['out']}/{o['file']}  {o['size'][0]}x{o['size'][1]}")
     print(f"{m['out']}/sheet-manifest.json")
-    print(f"{m['out']}/README.md" + ("  (template written)" if m["readme_written"] else "  (kept, not overwritten)"))
+    for j in (m.get("jpeg") or {}).get("outputs") or []:
+        print(f"{m['jpeg_out']}/{j['file']}  {j['size'][0]}x{j['size'][1]}")
+    readme_dir = m.get("jpeg_out") or m["out"]
+    print(f"{readme_dir}/README.md" + ("  (template written)" if m["readme_written"] else "  (kept, not overwritten)"))
     return 0
 
 

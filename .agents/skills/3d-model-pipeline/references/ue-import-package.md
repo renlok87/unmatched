@@ -212,6 +212,8 @@ python tools/tripo-pipeline/ue7a/write_review_config.py --template <review-confi
     --lookdev-run <lookdev run> --clips-run <h2anim run> --import-profile $P \
     --set side_camera=+X --set-json 'zones=[…]' --set anchor_zone=<зона из zones> --out $V/review-config.json [--dry-run]
 #   из шаблона чужого героя без --set anchor_zone — код 2 (его якорь не наследуется, R-09)
+#   --import-profile $P даёт ожидания verify обоих MI: тело — ue.figure_parameters, подставка (base_instance) —
+#   ue.base_marker.parameters и родитель ue.masters.base (C50: VertexMaskWeight / SideBandWeight шаблона не наследуются)
 ```
 
 ### 3.1 Профиль импорта `$P`
@@ -380,10 +382,13 @@ python tools/art/material_library/ue_hero_lookdev.py review --config $V/review-c
 
   ```bash
   python tools/art/material_library/ue_hero_lookdev.py apply-mi --config $V/review-config.json --out $V/review/<tag> \
-      --tag <tag> --profile <новый $P> [--dry-run]
+      --tag <tag> --profile <новый $P> --update-verify [--dry-run]
   #   задаёт только изменившиеся значения MI, LUT переимпортирует поверх себя при новом sha DDS, затем verify;
   #   блокировку берёт сам. Новый FBX, другая текстура (кроме LUT) или другая структура ассетов — отказ с причиной:
   #   тогда переимпорт §4.4
+  #   --update-verify (C50): после удачного apply записывает план MI в verify.instances самого $V/review-config.json
+  #   (отступ, CRLF/LF и конец файла сохраняются; в отчёте apply-mi — verify_config.changed_instances), так что
+  #   следующий `verify --config` и apply-mi ждут то, что в редакторе; без флага ожидания правились руками (Beowulf)
   ```
 
   По лёгкому режиму AGENTS.md («Iteration speed») итераций не больше 3 (FAIL при тюнинге — итерация, не стоп, ДС-2);
@@ -472,8 +477,8 @@ python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S    # лист из сня
   превью — отказ (F145, §4.4 п.4); прогрев не сошёлся — `settle.status: not_settled` в отчёте, переснять.
 - Notify `Contact` для кадров в редакторе не нужен; если нужен раньше 7b — задача живого редактора
   (`references/animation-vfx-sfx.md` §7). Шаг `de010.py apply` в 7b это не отменяет (§5 п.3).
-- Каталог приёмки цикла (кадры в `<Clip>/frames/`, заполненный промпт из заготовки этапа 6, `run-acceptor.ps1`) —
-  инструментом; он сверяет sha клипов в промпте с текущими файлами (W2-a, ee301065):
+- Каталог приёмки цикла (кадры в `<Clip>/frames/`, заполненный промпт из заготовки этапа 6) — инструментом; он
+  сверяет sha клипов в промпте с текущими файлами (W2-a, ee301065):
 
   ```bash
   python tools/tripo-pipeline/ue7a/prep_acceptance.py --asset-dir art/pipeline-candidates/<ASSET_ID> --key <Key> \
@@ -484,14 +489,36 @@ python tools/tripo-pipeline/anim/h2anim_ue.py sheet $S    # лист из сня
   #   код 2 — нет кадра, заготовки или known-limits.md при {{KNOWN_LIMITS}}, плейсхолдер не заполнен, sha расходится
   ```
 
-- Приёмщики, рубрика R/C/D/L, вердикт и маршрут доработки — `references/animation-vfx-sfx.md` §10–§11; карточки —
+- Приёмщики — 4 параллельно одной командой (C51; `run-acceptor.ps1` руками больше не пишется, у заготовок этапа 6
+  его нет):
+
+  ```bash
+  python tools/tripo-pipeline/ue7a/run_clip_acceptors.py --evidence <ASSET_DIR>/evidence/acceptance-anim/<YYYYMMDD>-r<N> \
+      --executor-session-id "claude-code:<uuid>/agent:<имя агента этапа 6 или доработки клипа>" [--clips …] [--dry-run]
+  #   изображения: <Clip>/frames/* + существующие .png/.jpg, названные в промпте путём от корня (образец библиотеки,
+  #   лист и вид концепта, эталон качества); codex exec Sol 6.1 xhigh, read-only, --output-schema …output-anim…;
+  #   acceptor.session_id ← thread.started; validate_card --print-verdict --check-files → validator-output.txt;
+  #   итог — <E>/acceptors-run.json. --executor-session-id — ФАКТИЧЕСКИЙ id исполнителя клипов (RA-21): заготовка
+  #   этапа 6 несла выдуманный «agent:stage6-<key>» вместо имени агента (C32, C55) — промпт переписывается на месте;
+  #   без флага — WARNING. Повтор — --tag=-b (card-b.json …), --validate-only — только проверка готовых карточек.
+  #   Код 0 — все карточки верны (validate 0, или 3 = нужен второй приёмщик §8.5), 1 — неверная / нет карточки /
+  #   сбой песочницы / чужой executor_session_id, 2 — ошибка входа
+  ```
+
+- Рубрика R/C/D/L, вердикт и маршрут доработки — `references/animation-vfx-sfx.md` §10–§11; карточки —
   `evidence/acceptance-anim/<YYYYMMDD>-r<N>/<Clip>/card.json`, проверка — `validate_card.py <card.json>
-  --print-verdict --check-files` (код 3 — пара по §8.5 `references/acceptance-and-blender.md`). Промпт Sol несёт блок
-  чтения кириллицы и «рубрика — только этот файл» (RA-03, как `references/concept-sheet.md` §11).
+  --print-verdict --check-files` (её делает `run_clip_acceptors.py`; код 3 — пара по §8.5
+  `references/acceptance-and-blender.md`). Промпт Sol несёт блок чтения кириллицы и «рубрика — только этот файл»
+  (RA-03, как `references/concept-sheet.md` §11).
 - Доработка клипа: новый прогон этапа 6 → переимпорт клипов (§4.1 шаг 5), `verify.clips_reference` (§4.4 п.5),
   `clip_manifest.py build`, кадры, повторная приёмка. Клип вскрыл дефект модели — маршрут
   `references/animation-vfx-sfx.md` §10 (этап 5 модели, затем §4.4 п.4).
-- Выход шага: 4 карточки `pass`. Только после этого — коммит 7a и шаги 7b.
+- Выход шага: 4 карточки `pass`. Только после этого — блок `STAGE7A` заявки, коммит 7a и шаги 7b.
+- **Блок `STAGE7A` заявки** (SKILL.md §7.2, RA-22; C57: у Beowulf его не было) пишет исполнитель 7a перед коммитом:
+  `editor` (командная строка и PID своего редактора, кто закрыл, 0 dirty), `import_run` (живой прогон; прежние — в
+  NOTES), `import_profile`, `review` (`$V`), `evidence` (`$E7`), `clip_acceptance` (цикл → вердикты и баллы 4 клипов),
+  `executor` (механизм, модель, effort, id сессии — факт). `registration_check.py` (7b) проверяет блок: без `STAGE7A`,
+  с пустым ключом, с `<…>` шаблона или с несуществующим путём прогона, `review`, `evidence` — FAIL колонки `card`.
 
 ## 5. Подключение S08 (шаг 7.5) — обязательно для героя и помощника
 
@@ -697,10 +724,12 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
       `mi=missing` (`S08FighterActor.cpp:843-845`). Без MIC фигура исчезает рывком: трасса
       `death dissolve=missing fallback=hide` (`:1308-1311`).
 - [ ] Лист для делегированной приёмки (ВР-17): K1 и K2 обеих досок, в цвете и в сером:
-      `python tools/art/visual/sheet.py <ASSET_ID> --inputs <PNG обеих досок> --out $W/game-sheet`
-      (цвет, серый Rec.709, дейтеранопия; PNG). Лист открыть и осмотреть. В git — только JPEG-копии:
-      `python tools/tripo-pipeline/review/frames_to_jpeg.py --src $W/game-sheet --out $E/game-sheet --png-kept-at $W/game-sheet`
-      и `sheet-manifest.json` (ДС-8, RA-13: в пилоте 18 PNG листов — 45,4 МБ в одном коммите 3528ae0b).
+      `python tools/art/visual/sheet.py <ASSET_ID> --inputs <PNG обеих досок> --out $W/game-sheet --jpeg-out $E/game-sheet`
+      (цвет, серый Rec.709, дейтеранопия). PNG листов остаются в `$W/game-sheet`, в `$E/game-sheet` — JPEG 1200 q92 с
+      `*.evidence.json`, `sheet-manifest.json` и README-шаблон, где пункт 2 уже перечисляет JPEG (C60: шаблон
+      перечислял PNG и правился руками; ДС-8, RA-13: в пилоте 18 PNG листов — 45,4 МБ в одном коммите 3528ae0b).
+      Лист открыть и осмотреть. Прежний путь — `--out $W/game-sheet`, затем `frames_to_jpeg.py --src $W/game-sheet
+      --out $E/game-sheet --png-kept-at $W/game-sheet` и README руками.
 
 ### 6.4 Evidence
 
@@ -732,6 +761,10 @@ rm C:/tmp/unmatched-gpu.lock                      # только свой ток
 
 - `--repeats 1` — «ровно один прогон» (по умолчанию инструмент делает 3).
 - `--client-args=-BenchFocusFighter=<Key>` — без него K2 меряет героя зрителя фикстуры (Medusa), а не нового бойца.
+  Яркость лица (`luma.faceRoi`, `faceRoiSkipped`) считается по голове того же бойца: строка `BENCH view=<v> focus
+  hero=<id>`, затем `BENCH focus fighter=<id>` (C58; раньше бралась последняя строка `SHOT head` — Merlin `f-1-sk0`).
+  У нового героя калибровки ROI нет — `faceRoiSkipped: no face ROI calibration for mesh SK_<Key>_<Stage>`, это норма;
+  `bench-run.json` пишет и `trace.headFocus` (чья голова и откуда).
 - `--out` — в `$W`, не в `$E`: PNG бенча в git не идут (ДС-8); в `$E` — отчёты и JPEG (§6.4). Все три пункта пилот
   записал отступлением (F160, RA-14; `docs/art-pipeline/evidence/achilles-20261014/README.md`).
 - **Пачка — один замер** на самую тяжёлую фигуру окна 7b (больше всего треугольников; пилот — Achilles, 44 804 tris), а
@@ -763,6 +796,13 @@ rm C:/tmp/unmatched-gpu.lock                      # только свой ток
 `docs/game-design/evidence/(ART|GD)-NNN/…/*.md` со строкой «Решение: принято» (`vocabularies.status`). Скилл такой акт
 не пишет, поэтому запись остаётся «технически импортировано».
 
+Пишет обе — `tools/art/registry_writer.py` (C59; на 7b Beowulf — самодельные скрипты в `$W`): запись реестра — из
+JSON (`entry --entry $W/registry-entry.json --phase 7b-frames|7b-probe`; статус и стадия — по таблице
+`references/new-character-registration.md` §10, «художественно принято» — отказ; `"sha256": "auto"` у пути —
+sha256 файла, у `/Game/…` — `.uasset`), строки 03 — из JSON-списка (`rows --rows $W/csv-rows.json --phase
+7b-tech|7b-art`; `7b-art` требует «по делегированию» или акт в `acceptance`). Остальные записи и строки файлов не
+меняются ни на байт (стиль реестра, CRLF и BOM 03 сохраняются); сначала `--dry-run`.
+
 Если появились новые каталоги — строка в `docs/art-pipeline/DIRECTORY-MAP.md` (HANDBOOK §8). Сводная таблица
 статусов всех реестров по этапам — `references/new-character-registration.md` §10.
 
@@ -792,7 +832,8 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 - [ ] ue_hero_lookdev verify: passed true; review — кадры settled, зоны в допусках (≤ 3 итерации через apply-mi;
       переимпорт §4.4 только при новом FBX, текстуре или структуре)
 - [ ] Снимок до/после: protected_unchanged: true; discard_master.py — 0 dirty-пакетов
-- [ ] Приёмка клипов §4.5: 4 карточки pass (validate_card.py код 0 или пара)
+- [ ] Приёмка клипов §4.5: 4 карточки pass (run_clip_acceptors.py --executor-session-id <факт> → код 0; validate_card
+      код 0 или пара); блок STAGE7A заявки записан
 - [ ] Коммит 7a; редактор закрыт оркестратором (0 dirty); 7b без GUI-редактора на checkout и без Live Coding;
       интерактивный редактор — гейт SKILL.md §5 п.7, пакет пользователю
 - [ ] Регистрация этапа 7 (references/new-character-registration.md) — все строки и их проверки PASS;
@@ -812,9 +853,9 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 - [ ] Замер стоимости: один на окно 7b, самая тяжёлая фигура; --repeats 1, GPU-токен, --client-args=-BenchFocusFighter=<Key>,
       --out в $W; число в README
 - [ ] Evidence $E: JPEG 1200 q92 + *.evidence.json, трасса, README по HANDBOOK §9 с отступлениями
-- [ ] asset-registry.json: технически импортировано / ue-editor-frames в начале 7b → live-packaged-probe;
+- [ ] asset-registry.json: registry_writer.py entry --phase 7b-frames в начале 7b → --phase 7b-probe;
       validate_registry — новых ошибок против базовой линии нет
-- [ ] 03-asset-registry.csv: строки по ВР-RG07/ВР-17 с пометкой делегирования
+- [ ] 03-asset-registry.csv: registry_writer.py rows --phase 7b-tech → 7b-art (ВР-RG07/ВР-17, пометка делегирования)
 - [ ] Свои процессы остановлены по PID; 0 dirty-пакетов
 - [ ] В git НЕ идут: work/, .staging/, logs/*.log, run.lock, *.fbm/, PNG кадров, листов и бенча, 4K-мастера,
       сырые GLB (per-asset .gitignore этапа 0)

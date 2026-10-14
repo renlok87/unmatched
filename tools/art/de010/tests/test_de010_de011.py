@@ -173,6 +173,34 @@ def test_apply_rebuild_records_the_new_file(monkeypatch, master_files, tmp_path,
     assert len(json.loads(master_files[1].read_text(encoding="utf-8"))["builds"]) == 1
 
 
+@pytest.mark.parametrize("log_text,clean", [("LogInit: x\nLogExit: Preparing to exit.\nLogExit: Exiting.\n", True),
+                                            ("LogInit: x\nLogPython: script done\n", False)])
+def test_de011_warns_on_a_non_zero_editor_exit(monkeypatch, master_files, tmp_path, capsys, log_text, clean):
+    """C56: Beowulf 7b - UnrealEditor-Cmd crashed 0xC0000005 after LogExit; the step still passes, with a WARN."""
+    log = tmp_path / "apply.log"
+    log.write_text(log_text, encoding="utf-8")
+
+    def run(script, args, work, name, timeout=1800):
+        return {"master": {"compile_errors": []}, "mics": {},
+                "_editor": {"exit": 3221225477, "seconds": 15.6, "log": log.as_posix()}}
+    monkeypatch.setattr(de010, "run_editor", run)
+    de011.cmd_apply(ns(frames=str(tmp_path / "f"), only="Beowulf"))
+    err = capsys.readouterr().err
+    assert "WARN apply: UnrealEditor-Cmd exit 3221225477 (0xC0000005)" in err
+    assert ("AFTER a clean" in err) is clean and ("check that the packages" in err) is (not clean)
+    rep = json.loads((tmp_path / "f" / "apply.json").read_text(encoding="utf-8"))
+    assert rep["editor_exit_warning"]["clean_logexit"] is clean and rep["editor_exit_warning"]["exit_hex"] == "0xC0000005"
+
+
+def test_de011_no_warning_at_exit_zero(monkeypatch, master_files, tmp_path, capsys):
+    monkeypatch.setattr(de010, "run_editor", lambda *a, **k: {"master": {"compile_errors": []}, "mics": {},
+                                                             "_editor": {"exit": 0, "log": "x"}})
+    de011.cmd_apply(ns(frames=str(tmp_path / "f"), only="Beowulf"))
+    assert "WARN" not in capsys.readouterr().err
+    assert "editor_exit_warning" not in json.loads((tmp_path / "f" / "apply.json").read_text(encoding="utf-8"))
+    assert de011.editor_exit_check({}, "inspect") is None                  # fake runners without _editor
+
+
 # ---- the editor tasks against a fake `unreal` ----------------------------------------------------------------------------
 
 def run_ue_task(monkeypatch, tmp_path, script: Path, args: dict, builder_body: str) -> dict:
