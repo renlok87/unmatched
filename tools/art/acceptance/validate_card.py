@@ -716,12 +716,16 @@ def _gate_rig(card, R, ctx):
     if pr is not None:
         _need_passed(pr, "probes-report.json", ["passed"], fails)
         pl = pr.get("plausible") if isinstance(pr.get("plausible"), dict) else {}
+        # N из probes-report.json#total (прежние 7 + расширенные пробы рига без skipped, RB-08); отчёт без total
+        # (прогон до расширенных проб) — прежние 7/7
+        tot = pr.get("total") if isinstance(pr.get("total"), dict) else {}
         for kind in ("blend", "fbx"):
-            vals = [v for k, v in pl.items() if k.endswith("-" + kind)]
-            if not vals:
+            keys = [k for k in pl if k.endswith("-" + kind)]
+            if not keys:
                 fails.append("probes-report.json#plausible: нет ключа <content_key>-h2-%s" % kind)
-            elif any(v != 7 for v in vals):
-                fails.append("probes-report.json#plausible.*-%s = %s ≠ 7/7" % (kind, vals))
+            elif any(pl[k] != tot.get(k, 7) for k in keys):
+                fails.append("probes-report.json#plausible.*-%s = %s ≠ %s" % (
+                    kind, [pl[k] for k in keys], "/".join(str(tot.get(k, 7)) for k in keys)))
         if _dig(pr, "validate_clip_v2", "result") != "pass":
             fails.append("probes-report.json#validate_clip_v2.result = %s ≠ pass" % _dig(pr, "validate_clip_v2", "result"))
     vs = _need(R, "validate-skeletal-mesh-v2.json", fails)
