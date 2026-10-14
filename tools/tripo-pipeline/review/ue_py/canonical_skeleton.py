@@ -1,7 +1,7 @@
 """UE editor Python task (LIVE editor via review/ue_live.py run_task): canonical hero skeleton (wave 5c, H2Anim).
 
 ARGS: {"out": ..., "fbx": <abs SK_<Hero>_H2.fbx>, "folder": "/Game/PipelineCandidates/<Hero>/Rig",
-       "mesh_name": "SK_<Hero>"}
+       "mesh_name": "SK_<Hero>", "fbx_sha256": <hex, optional: stamped into a NEW carrier's metadata (F145)>}
 
 Creates /Game/PipelineCandidates/<Hero>/Rig/SK_<Hero>_Skeleton by importing the hero's H2 skeletal FBX (UM_FBX_v1,
 face +X) once as the carrier mesh SK_<Hero> (legacy FbxFactory, the same options as the CLI's UE_PY_IMPORT_FBX: no
@@ -10,7 +10,8 @@ names the new skeleton <mesh>_Skeleton, so the canonical name needs no rename (n
 Idempotent: when the skeleton already exists nothing is imported or saved (a canonical skeleton is referenced by the
 meshes and clips of the hero; deleting it would break them) and only its reference pose is reported.
 The carrier mesh (grey default material) stays next to the skeleton as its preview mesh and as the pose carrier for
-clip previews of heroes without an imported H2 mesh (Medusa, Harpy). Saves only the two new assets.
+clip previews of heroes without an imported H2 mesh (Medusa, Harpy). Saves only the two new assets. An existing carrier
+is never touched here: after a model rework ue_py/preview_mesh.py (h2anim_ue.py skeleton) re-imports it (F145).
 Only folders under /Game/PipelineCandidates/ ending in /Rig are accepted.
 """
 import json
@@ -70,6 +71,10 @@ else:
         raise RuntimeError("the importer created %s, expected %s" % (out["skeleton_read_back"], skel_pkg))
     aid = mesh.get_editor_property("asset_import_data")
     out["asset_import_data_class"] = aid.get_class().get_name() if aid else None
+    if args.get("fbx_sha256"):
+        # F145: the carrier carries the sha of its source FBX (h2anim_ue.py compares it with the spec's target)
+        EAL.set_metadata_tag(mesh, "UM_SourceFbxSha256", args["fbx_sha256"])
+        out["sha_stamp"] = args["fbx_sha256"]
     out["saved"] = [bool(EAL.save_asset(p, only_if_is_dirty=False)) for p in (mesh_pkg, skel_pkg)]
     out["created"] = True
 skel = u.load_asset(skel_pkg)

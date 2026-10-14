@@ -19,6 +19,32 @@
     # on the H2LD mesh) under the editor lock
     python tools/art/material_library/ue_hero_lookdev.py verify --config <review json> --out <dir> --tag <tag>
 
+    # RC-10: MI values and the LUT of the import profile onto the EXISTING MIs of the hero's import (no re-import of
+    # the mesh, textures or clips), then verify; --profile = a newer rev of the run's profile, --dry-run = diff only
+    python tools/art/material_library/ue_hero_lookdev.py apply-mi --config <review json> --out <dir> --tag <tag>
+        [--profile <build profile json>] [--dry-run] [--no-verify]
+
+apply-mi vs re-import. A look-dev iteration that changes only MI values (ue.figure_parameters, ue.teams colours,
+ue.extra_instances scalars / vectors, ue.base_marker parameters / vectors, figure_static_switches) or the hero LUT
+(candidate.library_inputs.LUT: a new DDS) goes through apply-mi: the MI values are planned by the CLI's own
+um_master_instances (tripo_pipeline.py, same profile -> same values), only differing values are set, the LUT texture is
+re-imported over itself (MIs keep their reference) when its DDS sha differs, only changed packages are saved, values are
+read back against the plan and verify runs with the planned values. A new FBX (mesh or base) or any changed texture
+other than the LUT (BC, N, ORM, MatID, Edge, TeamAccent: compared by file sha) or a changed asset structure (names,
+folder, masters, team / extra MI set, parents) is refused: that still needs the re-import of
+references/ue-import-package.md §4.4 (delete the run's assets, new ue-import run, clips, verify).
+
+Settle (F153) and noise band (F155). review turns the editor's bThrottleCPUWhenNotForeground off in memory for the
+capture (a background or hidden editor does not converge Lumen + TSR: warm-up 1.7-2.6 instead of 0.3-0.8) and waits
+for convergence (3 frame differences in a row <= settle.threshold 1.0, at least the former 39 differences, at most 79);
+a warm-up that does not converge aborts the review (exit 3, report settle.status not_settled) unless --allow-unsettled
+(WARN). Each shot re-grabs (up to 6 more) until its last difference is under the threshold. measure reads the settle
+status of review-<tag>.json (old reports: from their warm-up / settle arrays) into settle and measurement_status;
+not_settled -> exit 3 (--allow-unsettled: WARN, exit 0). The luma verdict carries a noise band
+(tolerance.luma_noise_band, default 0.04 = the session-to-session spread of settled frames on identical inputs, F155):
+a zone whose Y ratio is within +-band of the tolerance edge is "noise_band" (deltas.<zone>.luma_state / state;
+verdicts.zones "noise band: ..."), so editor noise cannot flip within <-> off; all_within stays the hard threshold.
+
 Review config (JSON): {"hero", "run_dir" (skeletal-adopt run), "concept": {"front"|"side"|"back": png},
 "concept_zones": <ld measure-report.json> (concept medians per class, pooled over the three concept views),
 "variants": {"neutral"|"Blue"|"Red"|"debug": MI package}, "base_mi": {variant: MI package}, "zones": [class ids],
@@ -80,6 +106,13 @@ FOV = 35.0  # the level viewport renders ~35 deg horizontal whatever the camera 
 DIST, CAM_Z = 200.0, 29.0
 PITCH_K2, K2_5X, K2_1P6, FOCUS_Z = -55.0, 386.0, 1207.0, 28.0
 LUMA = np.array([0.2126, 0.7152, 0.0722])
+# F153: frame-to-frame mean abs difference (8-bit levels): settled reviews 0.3-0.8 (last shot grab <= 0.73), unsettled
+# sessions 1.7-2.6 for the whole warm-up and >= 1.1 on every shot (all 46 reviews 2026-09-29 .. 10-14)
+SETTLE = {"threshold": 1.0, "min_diffs": 39, "max_diffs": 79, "shot_extra_grabs": 6}
+LUMA_NOISE_BAND = 0.04  # F155: exposure-anchor spread of settled frames between editor sessions on identical inputs
+EXIT_NOT_SETTLED = 3
+THROTTLE_REF = {"refPath": "/Script/UnrealEd.Default__EditorPerformanceSettings"}
+TP_DIR = REPO / "tools" / "tripo-pipeline"
 
 
 def now() -> str:
@@ -271,10 +304,80 @@ def teams_of(cfg) -> list:
     return list(cfg.get("teams") or cfg.get("team_variants") or ["Blue", "Red"])
 
 
+def mean_abs_diff(a, b) -> float:
+    return round(float(np.abs(np.asarray(a, np.int16) - np.asarray(b, np.int16)).mean()), 4)
+
+
+def converged(diffs, threshold) -> bool:
+    return len(diffs) >= 3 and max(diffs[-3:]) <= threshold
+
+
+def settle_cfg(cfg) -> dict:
+    return dict(SETTLE, **(cfg.get("settle") or {}))
+
+
+def warm_up(grab_fn, s: dict, pause_s=1.5, sleep=time.sleep):
+    """F153: grab until the viewport converged: at least s["min_diffs"] differences (the warm-up length before the rule:
+    shader permutations and texture streaming), at most s["max_diffs"]. -> (differences, converged)."""
+    prev, diffs = None, []
+    while len(diffs) < s["max_diffs"]:
+        im = grab_fn()
+        if prev is not None:
+            diffs.append(mean_abs_diff(im, prev))
+            if len(diffs) >= s["min_diffs"] and converged(diffs, s["threshold"]):
+                break
+        prev = im
+        sleep(pause_s)
+    return diffs, converged(diffs, s["threshold"])
+
+
+def settle_status(review: dict | None, threshold: float = SETTLE["threshold"]) -> dict:
+    """Settle status of a review report (new: its settle block; older reports: their warm-up and per-shot settle
+    arrays). Measured shots = the ortho views (front / side / back) the zone statistics use; an unsettled K2 shot is a
+    warning only (K2 sheet)."""
+    if not review:
+        return {"status": "unknown", "why": "no review report next to the frames"}
+    warm = review.get("warmup_mean_abs_diff") or []
+    ok = converged(warm, threshold)
+    bad = sorted(n for n, f in (review.get("frames") or {}).items()
+                 if (f.get("settle_mean_abs_diff") or [0.0])[-1] > threshold)
+    measured = [n for n in bad if n.split("-", 1)[0] in ORTHO]
+    status = "settled" if ok and not measured else "not_settled"
+    res = {"status": status, "threshold": threshold, "warmup_converged": ok, "warmup_last3": warm[-3:],
+           "unsettled_measured_shots": measured, "unsettled_other_shots": [n for n in bad if n not in measured]}
+    if isinstance(review.get("settle"), dict):
+        res["recorded"] = {k: review["settle"].get(k) for k in ("status", "allow_unsettled", "throttle")}
+    return res
+
+
+def throttle(ue, value=None) -> dict:
+    """EditorPerformanceSettings.bThrottleCPUWhenNotForeground through the MCP object toolset, in memory only (not
+    saved; the class is not exposed to editor Python; same as ue_h5cb1.py, look-dev C C2)."""
+    def get():
+        r = ue.call("object", "get_properties", {"instance": THROTTLE_REF, "properties": ["bThrottleCPUWhenNotForeground"]},
+                    record=False)
+        return json.loads(r) if isinstance(r, str) and r[:1] in "[{" else r
+    rec = {"before": get()}
+    if value is not None:
+        ue.call("object", "set_properties", {"instance": THROTTLE_REF,
+                                             "values": json.dumps({"bThrottleCPUWhenNotForeground": bool(value)})},
+                record=False)
+    rec["after"] = get()
+    return rec
+
+
+def throttle_was_on(rec) -> bool:
+    return "true" in json.dumps((rec or {}).get("before")).lower()
+
+
 class Session:
-    def __init__(self, ue, out: Path, tag: str, hero: str):
+    def __init__(self, ue, out: Path, tag: str, hero: str, settle_threshold: float = SETTLE["threshold"],
+                 extra_grabs: int = 0):
         self.ue, self.out, self.tag, self.hero = ue, out, tag, hero
         self.frames = {}
+        # F153: a shot whose last grab still differs by more than the threshold re-grabs up to extra_grabs times
+        # (0 = the former fixed 4 grabs); info["settled"] records the outcome
+        self.settle_threshold, self.extra_grabs = settle_threshold, extra_grabs
 
     def task(self, script, op, timeout=600, **kw):
         path = Path(script) if Path(script).is_absolute() else REVIEW / "ue_py" / script
@@ -296,10 +399,17 @@ class Session:
         for attempt in range(grabs):
             im = self.grab(xform)
             if prev is not None:
-                settle.append(round(float(np.abs(np.asarray(im, np.int16) - np.asarray(prev, np.int16)).mean()), 4))
+                settle.append(mean_abs_diff(im, prev))
             prev = im
             if attempt < grabs - 1:
                 time.sleep(0.7)
+        for _ in range(self.extra_grabs):
+            if not settle or settle[-1] <= self.settle_threshold:
+                break
+            time.sleep(0.7)
+            im = self.grab(xform)
+            settle.append(mean_abs_diff(im, prev))
+            prev = im
         w, h = im.size
         ch = round(w * 9 / 16)
         box = (0, (h - ch) // 2, w, (h - ch) // 2 + ch) if ch <= h else ((w - round(h * 16 / 9)) // 2, 0,
@@ -311,7 +421,8 @@ class Session:
         frame.save(path, optimize=False, compress_level=6)
         digest = sha(path)
         info = {"view": {k: view[k] for k in ("eye", "rot", "yaw", "kind")}, "viewport_px": [w, h], "crop_px": list(box),
-                "output_px": [1920, 1080], "settle_mean_abs_diff": settle, "fov": FOV, **meta}
+                "output_px": [1920, 1080], "settle_mean_abs_diff": settle,
+                "settled": bool(settle) and settle[-1] <= self.settle_threshold, "fov": FOV, **meta}
         side = {"schema": "unmatched.evidence-frame/1", "class": "editor-mcp-viewport", "frameSha256": digest,
                 "frame": fname, "label": "EDITOR frame (LD %s look-dev on M_UM_Figure_v2, Cobble light, High, SP 100), "
                                          "diagnostic; not K1/K2 acceptance, no RENDER fingerprint" % self.hero,
@@ -363,7 +474,8 @@ def _cmd_review(a, cfg) -> dict:
     out = Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     ue = Ue()
-    ss = Session(ue, out, a.tag, cfg["hero"])
+    sc = settle_cfg(cfg)
+    ss = Session(ue, out, a.tag, cfg["hero"], settle_threshold=sc["threshold"])
     original = ue.call("scene", "get_current_level", record=False)
     if ue.call("asset", "is_dirty", {"asset_path": original}, record=False):
         raise SystemExit("open level %s has unsaved changes; refusing to switch levels" % original)
@@ -380,7 +492,13 @@ def _cmd_review(a, cfg) -> dict:
               "key_rotation_pitch_yaw_roll": KEY_ROTATION, "scalability_before": sg_before, "console": []}
     temp = [L_FIG, L_BASE, L_SKY, L_CAM]
     variants = cfg["variants"]
+    allow = bool(getattr(a, "allow_unsettled", False))
+    report["settle"] = dict(sc, status="not_started", allow_unsettled=allow)
+    thr = None
     try:
+        # F153: a background / hidden (-RenderOffScreen) editor throttles its CPU and never converges Lumen + TSR
+        thr = throttle(ue, False)
+        report["settle"]["throttle"] = thr
         ue.call("scene", "load_level", {"level_path": LEVEL})
         time.sleep(3.0)
         report["setup"] = ss.task("h2_review_ue.py", "setup", level=LEVEL, hide_label_prefixes=["P17 "],
@@ -418,16 +536,19 @@ def _cmd_review(a, cfg) -> dict:
         ss.task("control_scene_ue.py", "camera", label=L_CAM, location=v0["eye"], rotation=v0["rot"], fov=FOV)
         xform = {"location": dict(zip("xyz", v0["eye"])), "rotation": dict(zip(("pitch", "yaw", "roll"), v0["rot"])),
                  "scale": {"x": 1, "y": 1, "z": 1}}
-        prev, warm = None, []
-        for _ in range(40):
-            im = ss.grab(xform)
-            if prev is not None:
-                warm.append(round(float(np.abs(np.asarray(im, np.int16) - np.asarray(prev, np.int16)).mean()), 4))
-                if warm[-1] < 0.05 and len(warm) >= 3:
-                    break
-            prev = im
-            time.sleep(1.5)
+        warm, ok = warm_up(lambda: ss.grab(xform), sc)
         report["warmup_mean_abs_diff"] = warm
+        report["settle"].update(warmup_converged=ok, status="settled" if ok else "not_settled")
+        if not ok and not allow:
+            print("FAIL not_settled: the warm-up did not converge in %d frame differences (last %s > %.1f); no frames "
+                  "taken. Another load on the GPU or a throttled background editor? Re-run, or --allow-unsettled to "
+                  "capture anyway (WARN)" % (len(warm), warm[-3:], sc["threshold"]), flush=True)
+            raise SystemExit(EXIT_NOT_SETTLED)
+        if not ok:
+            print("WARN not_settled: warm-up did not converge (last %s); capturing anyway (--allow-unsettled)"
+                  % warm[-3:], flush=True)
+        else:
+            ss.extra_grabs = int(sc["shot_extra_grabs"])
         plan = cfg.get("shots") or dict({"neutral": list(vs)}, **{t: list(vs) for t in teams_of(cfg)},
                                         debug=list(ORTHO), plate=list(ORTHO))
         bloom_off = False
@@ -496,6 +617,11 @@ def _cmd_review(a, cfg) -> dict:
             report["scalability_after"] = {n: cvar_value(ue, n) for n in SG}
         except Exception as exc:  # noqa: BLE001
             report["console_error"] = str(exc)
+        if thr is not None:
+            try:
+                report["settle"]["throttle_restored"] = throttle(ue, throttle_was_on(thr))
+            except Exception as exc:  # noqa: BLE001
+                report["settle"]["throttle_error"] = str(exc)
         ue.call("scene", "load_level", {"level_path": original.split(".")[0]})
         time.sleep(2.0)
         report["restored_level"] = ue.call("scene", "get_current_level", record=False)
@@ -505,6 +631,9 @@ def _cmd_review(a, cfg) -> dict:
         report["run_assets_dirty"] = {k: ue.call("asset", "is_dirty", {"asset_path": v}, record=False)
                                       for k, v in sorted(names.items())}
         report["frames"] = ss.frames
+        if "warmup_mean_abs_diff" in report:
+            st = settle_status(report, sc["threshold"])
+            report["settle"].update({k: st[k] for k in ("status", "unsettled_measured_shots", "unsettled_other_shots")})
         report["finished_at"] = now()
         tmp = out / "_task.json"
         if tmp.exists():
@@ -591,9 +720,13 @@ def cmd_verify(a, cfg) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     tex = {k.split(":", 1)[1]: p for k, p in names.items() if k.startswith("texture:")}
     inst = {k: p for k, p in names.items() if k.endswith("instance") or k.startswith(("team:", "extra:"))}
+    # every parameter the expectations name is read back (ldc_verify_ue.py reads a fixed default set otherwise: a
+    # Saturation / FixGainA of the profile was not verified)
+    params = {s: sorted({n for want in (v.get("instances") or {}).values() for n in (want.get(s) or {})})
+              for s in ("scalars", "vectors", "textures", "switches")}
     hero_arg = {"hero": cfg["hero"], "mesh": names["skeletal"], "base": names["base"], "skeleton": v["skeleton"],
                 "folder": v["folder"], "hero_root": v["hero_root"], "clips_folder": v["clips_folder"],
-                "textures": tex, "instances": inst}
+                "textures": tex, "instances": inst, "params": params}
     ue = Ue()
     with ue_lock("ue_hero_lookdev verify %s %s" % (cfg["hero"], a.tag)) as lock:
         rb = ue.run_task(str(HERE / "ue" / "ldc_verify_ue.py"), str(out / "_task.json"), timeout=600, heroes=[hero_arg])
@@ -701,6 +834,261 @@ def cmd_verify(a, cfg) -> dict:
     for k, c in checks.items():
         print("%-28s %s" % (k, "PASS" if c["passed"] else "FAIL"))
     return res
+
+
+# ------------------------------------------------------------------ apply-mi (RC-10)
+# ue keys whose change is a different asset set or structure (-> re-import, references/ue-import-package.md §4.4)
+STRUCT_UE_KEYS = ("skeletal_asset", "base_asset", "target_skeleton", "material_route", "masters", "figure_instance",
+                  "base_instance", "team_instances", "team_color_mode", "base_material_mode", "textures")
+# profile texture properties (C++ names, as the CLI sets them through the MCP object toolset) -> editor-Python names
+TEX_PROPS = {"SRGB": "srgb", "CompressionSettings": "compression_settings", "Filter": "filter",
+             "MipGenSettings": "mip_gen_settings", "NeverStream": "never_stream", "LODGroup": "lod_group",
+             "bFlipGreenChannel": "flip_green_channel"}
+APPLY_TOL = 1e-4
+
+
+class _PlanRecorder:
+    """Stands in for the editor in tripo_pipeline.um_master_instances: records the plan, touches nothing."""
+
+    def call(self, toolset, tool, args=None, record=True):  # noqa: ARG002 - the Ue.call signature
+        if (toolset, tool) == ("asset", "exists"):
+            return True
+        if (toolset, tool) == ("instance", "create"):
+            return "%s/%s" % (args["folder_path"], args["asset_name"])
+        return None
+
+
+def _tripo_pipeline():
+    if str(TP_DIR) not in sys.path:
+        sys.path.insert(0, str(TP_DIR))
+    import tripo_pipeline
+    return tripo_pipeline
+
+
+def plan_instances(profile: dict, names: dict) -> dict:
+    """MI values of an um-master import profile, planned by the CLI's own um_master_instances (the same code as
+    ue-import, so the same profile gives the same values): {key: {asset, parent, textures, scalars, vectors,
+    switches}}; names = destination.assets of the run's ue-import-report.json."""
+    tp = _tripo_pipeline()
+    u = profile["ue"]
+    if tp.material_route(u) != "um-master":
+        raise SystemExit("apply-mi: ue.material_route %r is not um-master" % u.get("material_route"))
+    textures = {k: t for k, t in u["textures"].items() if "texture:" + k in names}
+    plan = tp.um_master_instances(_PlanRecorder(), u, names, textures, {}, u.get("team_color_mode", "multiply"),
+                                  u.get("base_material_mode", "atlas-instance"), lambda _r: None)
+    return plan["instances"]
+
+
+def profile_inputs(profile: dict) -> dict:
+    """{adopt key: repo-relative path} of a skeletal-adopt profile, as the CLI's adopt stage keys them (fbx:<k>,
+    texture:<k> for candidate.textures and candidate.library_inputs)."""
+    c = profile["candidate"]
+    d = Path(c["dir"])
+    keys = {"fbx:%s" % k: (d / v).as_posix() for k, v in (c.get("fbx") or {}).items()}
+    keys.update({"texture:%s" % k: (d / v).as_posix() for k, v in (c.get("textures") or {}).items()})
+    keys.update({"texture:%s" % k: v["path"] for k, v in (c.get("library_inputs") or {}).items()})
+    return keys
+
+
+def apply_mi_refusals(run_profile: dict, profile: dict, adopt: dict, names: dict, sha_of=sha) -> list:
+    """Why a profile cannot go through apply-mi onto the run's import (empty = it can): a changed asset structure or
+    any changed mesh / texture input other than the LUT (by content: sha of the new profile's file against the sha the
+    run's adopt stage pinned)."""
+    why = []
+    ru, u = run_profile["ue"], profile["ue"]
+    for k in STRUCT_UE_KEYS:
+        if ru.get(k) != u.get(k):
+            why.append("ue.%s changed" % k)
+    if sorted(ru.get("teams") or {}) != sorted(u.get("teams") or {}):
+        why.append("ue.teams: other team names")
+
+    def extras(p):
+        return sorted((e["asset"], e.get("parent", "figure_instance")) for e in p["ue"].get("extra_instances") or [])
+    if extras(run_profile) != extras(profile):
+        why.append("ue.extra_instances: other MIs or parents")
+    pinned = {k: adopt["inputs"].get(p) for k, p in (adopt.get("keys") or {}).items()}
+    for key, path in sorted(profile_inputs(profile).items()):
+        if key == "texture:LUT":
+            continue
+        if key.startswith("texture:") and key not in names:
+            continue  # pinned but not imported (e.g. TeamMask with team_color_mode none)
+        f = REPO / path
+        if not f.is_file():
+            why.append("%s: %s is missing" % (key, path))
+        elif key not in pinned:
+            why.append("%s: not an input of the run's import" % key)
+        elif sha_of(f) != pinned[key]:
+            why.append("%s: %s differs from the imported file (sha %s)" % (key, path, str(pinned[key])[:12]))
+    return why
+
+
+def lut_settings(tcfg: dict) -> dict:
+    """Profile ue.textures.<LUT> -> editor-Python texture properties (enum values by name)."""
+    s = {"srgb": bool(tcfg["srgb"]), "compression_settings": tcfg["compression"]}
+    if "flip_green" in tcfg:
+        s["flip_green_channel"] = bool(tcfg["flip_green"])
+    for k, v in (tcfg.get("properties") or {}).items():
+        if k not in TEX_PROPS:
+            raise SystemExit("apply-mi: texture property %s has no editor-Python mapping (TEX_PROPS)" % k)
+        s[TEX_PROPS[k]] = v
+    return s
+
+
+def lut_decision(info: dict, want_sha: str, sha_of=sha) -> dict:
+    """Is the LUT texture in the editor the profile's DDS? sha stamp (written by apply-mi) first, else the sha of the
+    file its import data names (the ue-import of the run records the DDS it read)."""
+    if info.get("sha_stamp"):
+        cur, how = info["sha_stamp"] == want_sha, "sha stamp"
+    else:
+        found = [s for s in info.get("source_files") or [] if Path(s).is_file()]
+        cur = bool(found) and any(sha_of(Path(s)) == want_sha for s in found)
+        how = ("source file %s" % found[0]) if found else "source file gone (%s)" % (info.get("source_files") or "-")
+    return {"current": cur, "how": how, "want_sha256": want_sha, "reimport": not cur}
+
+
+def instance_diff(plan: dict, got: dict, tol: float = APPLY_TOL) -> tuple:
+    """(changes {package: {section: {name: value}}}, parent mismatches) of the planned MI values against a read-back."""
+    changes, parents = {}, {}
+    for key, want in sorted(plan.items()):
+        pkg_ = want["asset"]
+        g = got[pkg_]
+        if g["parent"] != want["parent"]:
+            parents[key] = {"want": want["parent"], "got": g["parent"]}
+        ch = {}
+        for n, v in want["scalars"].items():
+            if g["scalars"].get(n) is None or abs(g["scalars"][n] - v) > tol:
+                ch.setdefault("scalars", {})[n] = float(v)
+        for n, v in want["vectors"].items():
+            gv = g["vectors"].get(n)
+            if gv is None or max(abs(a - b) for a, b in zip(gv, v)) > tol:
+                ch.setdefault("vectors", {})[n] = [float(x) for x in v]
+        for n, v in want["textures"].items():
+            if g["textures"].get(n) != v.split(".")[0]:
+                ch.setdefault("textures", {})[n] = v.split(".")[0]
+        for n, v in (want.get("switches") or {}).items():
+            if g["switches"].get(n) is not bool(v):
+                ch.setdefault("switches", {})[n] = bool(v)
+        if ch:
+            changes[pkg_] = ch
+    return changes, parents
+
+
+def param_names(plan: dict) -> dict:
+    return {w["asset"]: {s: sorted(w.get(s) or {}) for s in ("scalars", "vectors", "textures", "switches")}
+            for w in plan.values()}
+
+
+def verify_overlay(cfg: dict, plan: dict) -> dict:
+    """The review config with verify.instances updated by the planned MI values (the hand-copied expectations of the
+    config would otherwise fail on values apply-mi just changed)."""
+    out = json.loads(json.dumps(cfg))
+    vi = out["verify"].setdefault("instances", {})
+    for key, want in plan.items():
+        e = vi.setdefault(key, {})
+        e["parent"] = want["parent"]
+        for s in ("textures", "scalars", "vectors", "switches"):
+            if want.get(s):
+                e.setdefault(s, {}).update({n: (v.split(".")[0] if s == "textures" else
+                                                [round(x, 4) for x in v] if s == "vectors" else
+                                                float(v) if s == "scalars" else bool(v))
+                                            for n, v in want[s].items()})
+    return out
+
+
+def cmd_apply_mi(a, cfg) -> dict:
+    """RC-10: MI values and the LUT of the import profile onto the EXISTING MIs of the hero's import (see the module
+    docstring), then verify. Exit codes through main(): refusal = SystemExit with the reason."""
+    from ue_live import Ue
+    from ue_lock import ue_lock
+    t0 = time.time()
+    run = REPO / cfg["run_dir"]
+    ue_rep = json.loads((run / "reports/ue-import-report.json").read_text(encoding="utf-8"))
+    adopt = json.loads((run / "reports/adopt-report.json").read_text(encoding="utf-8"))
+    names = ue_rep["destination"]["assets"]
+    run_profile_path = REPO / json.loads((run / "manifest.json").read_text(encoding="utf-8"))["config"]["build_profile"]
+    profile_path = Path(a.profile).resolve() if getattr(a, "profile", None) else run_profile_path
+    run_profile = json.loads(run_profile_path.read_text(encoding="utf-8"))
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    out = Path(a.out).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    rep = {"schema": "unmatched.um-v2-hero-apply-mi/1", "hero": cfg["hero"], "tag": a.tag, "started_at": now(),
+           "tool": "tools/art/material_library/ue_hero_lookdev.py apply-mi (ue/hero_mi_apply_ue.py)",
+           "run_dir": cfg["run_dir"], "run_profile": rel(run_profile_path), "profile": rel(profile_path),
+           "profile_sha256": sha(profile_path), "dry_run": bool(getattr(a, "dry_run", False))}
+    why = apply_mi_refusals(run_profile, profile, adopt, names)
+    if why:
+        rep["refused"] = why
+        write_json(out / ("apply-mi-%s.json" % a.tag), rep)
+        raise SystemExit("apply-mi refused (needs the re-import of references/ue-import-package.md §4.4): %s" % "; ".join(why))
+    plan = plan_instances(profile, names)
+    rep["plan"] = plan
+    lut_pkg = names.get("texture:LUT")
+    lib_lut = (profile["candidate"].get("library_inputs") or {}).get("LUT")
+    want_lut = None
+    if lut_pkg and lib_lut:
+        f = REPO / lib_lut["path"]
+        digest = sha(f)
+        if lib_lut.get("sha256") and lib_lut["sha256"] != digest:
+            raise SystemExit("apply-mi: LUT %s has sha %s, the profile pins %s" % (lib_lut["path"], digest[:12],
+                                                                                   lib_lut["sha256"][:12]))
+        want_lut = {"asset": lut_pkg, "source_file": f.as_posix(), "sha256": digest,
+                    "settings": lut_settings(profile["ue"]["textures"]["LUT"])}
+    task = HERE / "ue" / "hero_mi_apply_ue.py"
+    tmp = out / "_task.json"
+    ue = Ue()
+    with ue_lock("ue_hero_lookdev apply-mi %s %s" % (cfg["hero"], a.tag)) as lock:
+        read_args = {"instances": param_names(plan), "textures": [lut_pkg] if lut_pkg else []}
+        before = ue.run_task(str(task), str(tmp), timeout=600, op="read", **read_args)
+        changes, parents = instance_diff(plan, before["instances"])
+        rep["before"] = before
+        if parents:
+            rep["refused"] = ["MI parent differs: %s" % parents]
+            write_json(out / ("apply-mi-%s.json" % a.tag), rep)
+            raise SystemExit("apply-mi refused: MI parents differ from the plan %s (re-import)" % parents)
+        lut = None
+        if want_lut:
+            rep["lut"] = dict(lut_decision(before["textures"][lut_pkg], want_lut["sha256"]), source_file=rel(Path(want_lut["source_file"])))
+            lut = want_lut if rep["lut"]["reimport"] else None
+        rep["changes"] = changes
+        rep["applied"] = None
+        if (changes or lut) and not rep["dry_run"]:
+            rep["applied"] = ue.run_task(str(task), str(tmp), timeout=900, op="apply", changes=changes, lut=lut)
+        after = ue.run_task(str(task), str(tmp), timeout=600, op="read", **read_args)
+        rest, _ = instance_diff(plan, after["instances"])
+        level = ue.call("scene", "get_current_level", record=False)
+        rep["editor_lock"] = {k: x for k, x in lock.items() if k != "waits"}
+    if tmp.exists():
+        tmp.unlink()
+    rep["after"] = after
+    rep["current_level"] = level
+    lut_after = lut_decision(after["textures"][lut_pkg], want_lut["sha256"]) if want_lut else None
+    rep["checks"] = {
+        "mi_values_as_profile": {"passed": not rest or rep["dry_run"], "remaining_differences": rest},
+        "lut_is_profile_dds": {"passed": lut_after is None or lut_after["current"] or rep["dry_run"], "measured": lut_after},
+        "only_changed_packages_saved": {"passed": rep["applied"] is None or
+                                        sorted((rep["applied"].get("saved") or {})) ==
+                                        sorted(set(changes) | ({lut_pkg} if lut else set())),
+                                        "saved": (rep["applied"] or {}).get("saved")},
+        "hero_packages_not_dirty": {"passed": not [p for p in after["dirty_after"] if p in set(names.values())],
+                                    "dirty": after["dirty_after"]}}
+    rep["passed"] = all(c["passed"] for c in rep["checks"].values())
+    rep["apply_s"] = round(time.time() - t0, 1)
+    if not getattr(a, "no_verify", False) and cfg.get("verify") and not rep["dry_run"]:
+        vres = cmd_verify(a, verify_overlay(cfg, plan))
+        rep["verify"] = {"passed": vres["passed"], "report": rel(out / ("verify-%s.json" % a.tag)),
+                         "failed": [k for k, c in vres["checks"].items() if not c["passed"]]}
+        rep["passed"] = rep["passed"] and vres["passed"]
+    rep["elapsed_s"] = round(time.time() - t0, 1)
+    rep["finished_at"] = now()
+    write_json(out / ("apply-mi-%s.json" % a.tag), rep)
+    print("apply-mi %s: %d MI(s) with changes %s, LUT %s, %s in %.1f s" % (
+        cfg["hero"], len(changes), sorted(p.rsplit("/", 1)[1] for p in changes),
+        "n/a" if not want_lut else ("re-imported" if lut and rep["applied"] else
+                                    "to re-import (dry run)" if lut else "current (%s)" % rep["lut"]["how"]),
+        "PASS" if rep["passed"] else "FAIL", rep["elapsed_s"]))
+    for k, c in rep["checks"].items():
+        print("%-28s %s" % (k, "PASS" if c["passed"] else "FAIL"))
+    return rep
 
 
 # ------------------------------------------------------------------ measure
@@ -813,6 +1201,7 @@ def cmd_measure(a, cfg) -> dict:
         px = np.concatenate(arrs, 0)
         zones.setdefault(zone, {"concept": concept.get(zone, {}).get("concept")})[var] = dict(hsv_stats(px), pixels=int(len(px)))
     tol = cfg["tolerance"]
+    band = float(tol.get("luma_noise_band", LUMA_NOISE_BAND))
     res = {"schema": "unmatched.um-v2-hero-lookdev-measure/1", "tag": tag, "hero": hero, "zones": zones,
            "per_view": per_view, "tolerance": tol, "team_accent": accent,
            "method": "UE zones = MatID classes of the debug MI (DebugView 1) decoded on the same camera against a plate "
@@ -846,43 +1235,85 @@ def cmd_measure(a, cfg) -> dict:
             hue_defined = c["sat"] >= float(tol.get("hue_min_sat", 0.0))
             ok = {"luma": abs(yr - 1.0) <= tol["luma_ratio"], "hue": (abs(dh) <= tol["hue_deg"]) if hue_defined else True,
                   "sat": abs(ds) <= tol["sat"]}
+            ls = luma_state(yr, tol["luma_ratio"], band)
             ev["deltas"][z] = {"Y_ratio_exposure_normalised": round(yr, 3), "Y_ratio_absolute": round(yr_abs, 3),
                                "Y_ratio_anchor": round(u["luma_Y_linear"] / max(c["luma_Y_linear"] / k_anchor, 1e-6), 3)
                                if k_anchor else None,
                                "dHue_deg": round(dh, 1), "dSat": round(ds, 3), "within": ok, "hue_defined": hue_defined,
-                               "all_within": all(ok.values()), "key_zone": z in cfg.get("tolerance_zones", [])}
+                               "all_within": all(ok.values()), "key_zone": z in cfg.get("tolerance_zones", []),
+                               "luma_state": ls, "state": zone_state(ls, ok["hue"], ok["sat"])}
         res.setdefault("exposure", {})[var] = ev
     # look-dev C verdicts: board exposure (neutral, EV100 1.3) against the reading exposure (bias reading_bias_ev):
     # a zone off on the board exposure and within tolerance on the reading one is "board light" (the board light is not
     # changed by look-dev); off on the reading exposure = material / tone curve
     ex = res.get("exposure") or {}
     if "neutral" in ex and "reading" in ex:
-        verdicts = {}
+        verdicts, hard = {}, {}
         for z in cfg.get("tolerance_zones") or []:
             a_ = ex["neutral"]["deltas"].get(z)
             b_ = ex["reading"]["deltas"].get(z)
             if not a_ or not b_:
-                verdicts[z] = "not measured"
-            elif a_["all_within"] and b_["all_within"]:
-                verdicts[z] = "within both"
-            elif b_["all_within"]:
-                verdicts[z] = "board light"
-            elif a_["all_within"]:
-                verdicts[z] = "off on the reading exposure only"
-            else:
-                verdicts[z] = "off on both"
-        res["verdicts"] = {"zones": verdicts, "board_exposure": "neutral (EV100 1.3)",
-                           "reading_exposure": "reading (%+.2f EV)" % float(cfg.get("reading_bias_ev", -1.5))}
+                verdicts[z] = hard[z] = "not measured"
+                continue
+            hard[z] = zone_verdict(a_["all_within"], b_["all_within"])
+            # F155: a zone in the noise band of either exposure is not decided (editor noise could flip it)
+            noisy = [n for n, d in (("neutral", a_), ("reading", b_)) if d["state"] == "noise_band"]
+            verdicts[z] = ("noise band: %s" % " + ".join(noisy) if noisy else
+                           zone_verdict(a_["state"] == "within", b_["state"] == "within"))
+        res["verdicts"] = {"zones": verdicts, "zones_hard": hard, "board_exposure": "neutral (EV100 1.3)",
+                           "reading_exposure": "reading (%+.2f EV)" % float(cfg.get("reading_bias_ev", -1.5)),
+                           "luma_noise_band": band}
+    # F153: the settle status of the review that took these frames
+    rev_path = out / ("review-%s.json" % tag)
+    rev = json.loads(rev_path.read_text(encoding="utf-8")) if rev_path.is_file() else None
+    res["settle"] = settle_status(rev, settle_cfg(cfg)["threshold"])
+    res["measurement_status"] = res["settle"]["status"]
+    if res["measurement_status"] == "not_settled":
+        res["measurement_note"] = ("frames measured before the editor viewport converged (F153): zone values are not "
+                                   "comparable with settled frames; do not tune MI values on them")
     write_json(out / ("measure-%s.json" % tag), res)
     # table to stdout
     for var, ev in (res.get("exposure") or {}).items():
         print("==", var, "k", ev["k_concept_over_ue_geomean_key_zones"])
         for z, d in ev["deltas"].items():
             u = zones[z][var]
-            print("  %-15s Y %.4f ratio %.3f (abs %.3f) hue %5.1f d %5.1f sat %.3f d %+.3f %s" % (
+            print("  %-15s Y %.4f ratio %.3f (abs %.3f) hue %5.1f d %5.1f sat %.3f d %+.3f %s%s" % (
                 z, u["luma_Y_linear"], d["Y_ratio_exposure_normalised"], d["Y_ratio_absolute"], u["hue_deg"],
-                d["dHue_deg"], u["sat"], d["dSat"], "OK" if d["all_within"] else "--"))
+                d["dHue_deg"], u["sat"], d["dSat"], "OK" if d["all_within"] else "--",
+                " (noise band)" if d["state"] == "noise_band" else ""))
+    st = res["settle"]
+    print("%s measurement %s (warm-up converged %s, unsettled measured shots %d)" % (
+        "WARN" if st["status"] != "settled" else "OK", st["status"], st.get("warmup_converged"),
+        len(st.get("unsettled_measured_shots") or [])))
     return res
+
+
+def luma_state(yr: float, tol: float, band: float = LUMA_NOISE_BAND) -> str:
+    """F155: luma verdict that holds for every Y ratio in [yr (1 - band), yr (1 + band)]: "within" / "off", else
+    "noise_band" (the ratio is within the noise of the tolerance edge 1 +- tol)."""
+    lo, hi = yr * (1.0 - band), yr * (1.0 + band)
+    if lo >= 1.0 - tol and hi <= 1.0 + tol:
+        return "within"
+    if lo > 1.0 + tol or hi < 1.0 - tol:
+        return "off"
+    return "noise_band"
+
+
+def zone_state(luma: str, hue_ok: bool, sat_ok: bool) -> str:
+    if luma == "off" or not hue_ok or not sat_ok:
+        return "off"
+    return luma
+
+
+def zone_verdict(board_within: bool, reading_within: bool) -> str:
+    """Look-dev C verdict of a zone from the board (neutral) and the reading exposure."""
+    if board_within and reading_within:
+        return "within both"
+    if reading_within:
+        return "board light"
+    if board_within:
+        return "off on the reading exposure only"
+    return "off on both"
 
 
 ACCENT_THRESH = 40
@@ -1001,29 +1432,48 @@ def main() -> int:
     for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="backslashreplace")
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["lut", "review", "measure", "sheets", "concept", "verify"])
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0],
+                                 epilog="apply-mi: MI values / LUT of the import profile onto the existing MIs, no "
+                                        "re-import; a new FBX or texture (other than the LUT) still needs the re-import "
+                                        "of references/ue-import-package.md §4.4")
+    ap.add_argument("command", choices=["lut", "review", "measure", "sheets", "concept", "verify", "apply-mi"])
     ap.add_argument("--overrides")
     ap.add_argument("--out", required=True)
     ap.add_argument("--config")
     ap.add_argument("--tag", default="i1")
+    ap.add_argument("--allow-unsettled", action="store_true",
+                    help="review / measure: capture and measure frames whose editor viewport did not converge (F153); "
+                         "WARN instead of exit 3")
+    ap.add_argument("--profile", help="apply-mi: build profile to apply (default: the profile of the config's run_dir)")
+    ap.add_argument("--dry-run", action="store_true", help="apply-mi: read and diff only, change nothing")
+    ap.add_argument("--no-verify", action="store_true", help="apply-mi: skip the verify read-back after applying")
     a = ap.parse_args()
     if a.command == "lut":
         cmd_lut(a)
         return 0
     cfg = json.loads(Path(a.config).read_text(encoding="utf-8"))
+    measured = None
     if a.command == "concept":
         cmd_concept(a, cfg)
     elif a.command == "verify":
         cmd_verify(a, cfg)
+    elif a.command == "apply-mi":
+        return 0 if cmd_apply_mi(a, cfg)["passed"] else 1
     elif a.command == "review":
         cmd_review(a, cfg)
-        cmd_measure(a, cfg)
+        measured = cmd_measure(a, cfg)
         cmd_sheets(a, cfg)
     elif a.command == "measure":
-        cmd_measure(a, cfg)
+        measured = cmd_measure(a, cfg)
     else:
         cmd_sheets(a, cfg)
+    if measured and measured.get("measurement_status") == "not_settled":
+        if a.allow_unsettled:
+            print("WARN not_settled frames measured (--allow-unsettled): diagnostic only, do not tune on them")
+        else:
+            print("FAIL not_settled: frames of %s were taken before the editor viewport converged (F153); re-run the "
+                  "review (or --allow-unsettled for a diagnostic measurement)" % a.tag)
+            return EXIT_NOT_SETTLED
     return 0
 
 

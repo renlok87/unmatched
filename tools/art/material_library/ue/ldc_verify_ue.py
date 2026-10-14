@@ -2,7 +2,9 @@
 Read only: nothing is created, changed or saved.
 
 ARGS: {"out", "heroes": [{"hero", "mesh", "base", "skeleton", "folder", "hero_root", "clips_folder",
-                          "textures": {key: package}, "instances": {key: package}}]}
+                          "textures": {key: package}, "instances": {key: package},
+                          "params": {"scalars"|"vectors"|"textures"|"switches": [names]} (optional: read on top of the
+                          default sets below, e.g. Saturation / FixGainA of a profile)}]}
 
 Per hero: mesh skeleton (bone 0, bone names and reference-pose positions), LOD count, LOD0 triangles and UV
 sets (GeometryScript), material slots and their MI, base UV channels and lightmap-UV build flag; texture settings
@@ -108,6 +110,11 @@ for h in args["heroes"]:
         tex[key] = item
     rec["textures"] = tex
     # instances
+    hp = h.get("params") or {}
+    scalars = tuple(dict.fromkeys(SCALARS + tuple(hp.get("scalars") or ())))
+    vectors = tuple(dict.fromkeys(VECTORS + tuple(hp.get("vectors") or ())))
+    tex_params = tuple(dict.fromkeys(TEX_PARAMS + tuple(hp.get("textures") or ())))
+    switches = tuple(dict.fromkeys(SWITCHES + tuple(hp.get("switches") or ())))
     inst = {}
     for key, path in sorted(h["instances"].items()):
         mi = u.load_asset(path)
@@ -116,23 +123,23 @@ for h in args["heroes"]:
             continue
         item = {"asset": path, "parent": pkg(mi.get_editor_property("parent")), "textures": {}, "scalars": {},
                 "vectors": {}, "switches": {}}
-        for p in TEX_PARAMS:
+        for p in tex_params:
             try:
                 item["textures"][p] = pkg(MEL.get_material_instance_texture_parameter_value(mi, p))
             except Exception:  # noqa: BLE001
                 pass
-        for p in SCALARS:
+        for p in scalars:
             try:
                 item["scalars"][p] = round(float(MEL.get_material_instance_scalar_parameter_value(mi, p)), 5)
             except Exception:  # noqa: BLE001
                 pass
-        for p in VECTORS:
+        for p in vectors:
             try:
                 c = MEL.get_material_instance_vector_parameter_value(mi, p)
                 item["vectors"][p] = [round(c.r, 5), round(c.g, 5), round(c.b, 5), round(c.a, 5)]
             except Exception:  # noqa: BLE001
                 pass
-        for p in SWITCHES:
+        for p in switches:
             try:
                 item["switches"][p] = bool(MEL.get_material_instance_static_switch_parameter_value(mi, p))
             except Exception as exc:  # noqa: BLE001
