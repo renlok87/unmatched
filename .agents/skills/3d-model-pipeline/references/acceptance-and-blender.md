@@ -145,8 +145,12 @@ E=$A/evidence/acceptance/<YYYYMMDD>-r<N>
 ls "$E" 2>/dev/null && echo "СТОП: $E уже есть — взять следующий r<N>"
 python tools/art/acceptance/capture_acceptance_set.py --fbx $LD/export/SK_<Key>_H2LD.fbx \
     --textures $LD/textures --out $E/frames --key <Key> --side-view <SIDE_VIEW> \
-    --sheet art/imagegen/concept-<content-key>-codex/sheet-<content-key>.png
+    --sheet art/imagegen/concept-<content-key>-codex/sheet-<content-key>.png \
+    --asset-card $A/asset-card.yaml [--previous <прежний $E>/frames]
 ```
+
+`--asset-card` даёт кость атаки для `close-attack` у фигуры без оружия (или `--attack-bone <кость>`); `--previous` на
+r ≥ 2 пишет `frames.json#changed_vs_previous` (F151, RC-19). Роли кадров — `frames.json#roles`.
 
 `--sheet` копирует лист в `frames/sheet.png` (не больше 1200 px по длинной стороне, ДС-8); свотчи палитры и виды инструмент
 находит по `checks-report.json` рядом с листом и пишет в `frames.json#sheet` (`compare_palette_by`: `swatches` или
