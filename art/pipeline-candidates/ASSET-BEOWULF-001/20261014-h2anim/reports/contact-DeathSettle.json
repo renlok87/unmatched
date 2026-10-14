@@ -1,0 +1,1483 @@
+{
+ "schema": "unmatched.h2anim-contact/1",
+ "clip": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_DeathSettle.fbx",
+ "clip_name": "DeathSettle",
+ "hero": "Beowulf",
+ "spec": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json",
+ "base": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/export/SM_Beowulf_H2_Base.fbx",
+ "height_m": 0.49345,
+ "frames": 22,
+ "role": "terminal",
+ "tool": "tools/tripo-pipeline/anim/clip_contact_check.py",
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "foot_slide_L",
+   "status": "pass",
+   "max_of_height": 0.002758,
+   "frame": 12,
+   "pinned_frames": 22,
+   "tol": 0.005,
+   "foot_vertices": 352
+  },
+  {
+   "check": "foot_slide_R",
+   "status": "pass",
+   "max_of_height": 0.002314,
+   "frame": 12,
+   "pinned_frames": 22,
+   "tol": 0.005,
+   "foot_vertices": 364
+  },
+  {
+   "check": "weapon_body",
+   "status": "pass",
+   "soft_violations": [],
+   "soft_frames": 0,
+   "rest_pairs": 0,
+   "rest_bones": {},
+   "max_pairs": 0,
+   "frame": 0,
+   "body_bones": {},
+   "violations": [],
+   "violating_frames": 0,
+   "excluded_grip_bones": [
+    "arm_lower.R",
+    "hand.R"
+   ],
+   "parts": [
+    {
+     "part": "SK_Beowulf_H2_Sword",
+     "kind": "mesh",
+     "triangles": 1399
+    },
+    {
+     "part": "weapon.R",
+     "kind": "body_bone",
+     "bone": "weapon.R",
+     "islands": false,
+     "triangles": 499,
+     "vertices": 276,
+     "excluded_attach_bones": [
+      "weapon.R"
+     ]
+    },
+    {
+     "part": "arm_lower.L#islands",
+     "kind": "body_bone",
+     "bone": "arm_lower.L",
+     "islands": true,
+     "triangles": 2699,
+     "vertices": 1475,
+     "excluded_attach_bones": [
+      "arm_lower.L",
+      "hand.L"
+     ]
+    }
+   ],
+   "rest_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   },
+   "parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "check": "limb_body_L",
+   "status": "pass",
+   "rest_regions": {},
+   "max_pairs": 0,
+   "frame": 0,
+   "regions": {},
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "limb_body_R",
+   "status": "pass",
+   "rest_regions": {},
+   "max_pairs": 0,
+   "frame": 0,
+   "regions": {},
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "skin_weight_bleed",
+   "status": "info",
+   "frames": [],
+   "frame": 0,
+   "max_bleed_fail_edges": 0,
+   "bleed_vertices": 0,
+   "bleed_regions": {},
+   "radius_of_height": 0.1,
+   "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+  },
+  {
+   "check": "skin_stretch",
+   "status": "warn",
+   "fail_frames": [],
+   "torn_frames": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+   ],
+   "warn_frames": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+   ],
+   "frame": 12,
+   "visible_torn_edges": 0,
+   "visible_regions": {},
+   "visible_xyz_cm": [],
+   "fail_edges": 7,
+   "fail_regions": {},
+   "fail_z_of_height": 0.074,
+   "warn_edges": 39,
+   "warn_regions": {
+    "foot.R|leg_lower.R": 18,
+    "foot.L|leg_lower.L": 17,
+    "arm_lower.R|arm_upper.R": 4
+   },
+   "warn_z_of_height": 0.071,
+   "max_ratio": 8.148,
+   "max_growth_of_height": 0.06949,
+   "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+   "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+   "warn_rule": "ребро > 3× rest и > 1.0 % H"
+  },
+  {
+   "check": "weapon_tip",
+   "status": "info",
+   "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+  },
+  {
+   "check": "weapon_below_base_top_outside",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0,
+   "tol": 0.002,
+   "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+   "parts": [
+    "SK_Beowulf_H2_Sword",
+    "weapon.R",
+    "arm_lower.L#islands"
+   ]
+  },
+  {
+   "check": "below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.006685,
+   "max_penetration_of_height": 0.006685,
+   "frame": 0,
+   "worst_bone": "foot.L",
+   "tol": 0.002,
+   "base_top_cm": 6.0,
+   "base_radius_cm": 14.7
+  },
+  {
+   "check": "hem_below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.005458,
+   "max_penetration_of_height": 0.005794,
+   "frame": 3,
+   "warn_above": 0.007458,
+   "fail_above": 0.015,
+   "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+  },
+  {
+   "check": "below_ground",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0
+  },
+  {
+   "check": "loop_seam",
+   "status": "info",
+   "note": "не петля (terminal)"
+  }
+ ],
+ "fails": [],
+ "result": "pass",
+ "per_frame": [
+  {
+   "f": 0,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.0,
+    "max_growth_of_height": 0.0
+   },
+   "weapon_tip": {
+    "r_of_base": 1.3619,
+    "dz_of_height": 0.986611,
+    "xyz_cm": [
+     9.469,
+     -17.638,
+     54.684
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005458,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 1,
+   "foot_slide": {
+    "L": 3.8e-05,
+    "R": 3.6e-05
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.45,
+    "max_growth_of_height": 0.00253
+   },
+   "weapon_tip": {
+    "r_of_base": 1.3313,
+    "dz_of_height": 0.98851,
+    "xyz_cm": [
+     8.562,
+     -17.596,
+     54.778
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005529,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 2,
+   "foot_slide": {
+    "L": 7.6e-05,
+    "R": 7.2e-05
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.933,
+    "max_growth_of_height": 0.00584
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2614,
+    "dz_of_height": 0.998972,
+    "xyz_cm": [
+     6.492,
+     -17.368,
+     55.294
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005711,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 3,
+   "foot_slide": {
+    "L": 9.1e-05,
+    "R": 8.6e-05
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.421,
+    "max_growth_of_height": 0.00822
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2351,
+    "dz_of_height": 0.999114,
+    "xyz_cm": [
+     5.789,
+     -17.209,
+     55.301
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005794,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 4,
+   "foot_slide": {
+    "L": 7.6e-05,
+    "R": 7.2e-05
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.887,
+    "max_growth_of_height": 0.01034
+   },
+   "weapon_tip": {
+    "r_of_base": 1.3031,
+    "dz_of_height": 0.977718,
+    "xyz_cm": [
+     7.801,
+     -17.494,
+     54.245
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005711,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 5,
+   "foot_slide": {
+    "L": 3.8e-05,
+    "R": 3.6e-05
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 2,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 2
+     },
+     "z_of_height": 0.609
+    },
+    "max_ratio": 3.308,
+    "max_growth_of_height": 0.01262
+   },
+   "weapon_tip": {
+    "r_of_base": 1.4309,
+    "dz_of_height": 0.938912,
+    "xyz_cm": [
+     11.13,
+     -17.846,
+     52.33
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005529,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 6,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 3,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 3
+     },
+     "z_of_height": 0.603
+    },
+    "max_ratio": 3.662,
+    "max_growth_of_height": 0.01636
+   },
+   "weapon_tip": {
+    "r_of_base": 1.5551,
+    "dz_of_height": 0.894726,
+    "xyz_cm": [
+     14.325,
+     -17.812,
+     50.15
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005458,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 7,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 3,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 3
+     },
+     "z_of_height": 0.599
+    },
+    "max_ratio": 4.176,
+    "max_growth_of_height": 0.02563
+   },
+   "weapon_tip": {
+    "r_of_base": 1.6659,
+    "dz_of_height": 0.840615,
+    "xyz_cm": [
+     17.973,
+     -16.628,
+     47.48
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005458,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 8,
+   "foot_slide": {
+    "L": 0.000135,
+    "R": 0.000125
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 4,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.587
+    },
+    "max_ratio": 4.514,
+    "max_growth_of_height": 0.02595
+   },
+   "weapon_tip": {
+    "r_of_base": 1.7863,
+    "dz_of_height": 0.768673,
+    "xyz_cm": [
+     19.919,
+     -17.104,
+     43.93
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.005608,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 9,
+   "foot_slide": {
+    "L": 0.000382,
+    "R": 0.000334
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 4,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.568
+    },
+    "max_ratio": 4.74,
+    "max_growth_of_height": 0.03095
+   },
+   "weapon_tip": {
+    "r_of_base": 1.8789,
+    "dz_of_height": 0.688164,
+    "xyz_cm": [
+     21.193,
+     -17.705,
+     39.957
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.00557,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 10,
+   "foot_slide": {
+    "L": 0.001218,
+    "R": 0.001046
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 5,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|arm_upper.R": 4,
+      "foot.R|leg_lower.R": 1
+     },
+     "z_of_height": 0.548
+    },
+    "max_ratio": 4.852,
+    "max_growth_of_height": 0.03663
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9191,
+    "dz_of_height": 0.615377,
+    "xyz_cm": [
+     22.011,
+     -17.637,
+     36.366
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.004859,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 11,
+   "foot_slide": {
+    "L": 0.002397,
+    "R": 0.002045
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 5,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 31,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.L|leg_lower.L": 14,
+      "foot.R|leg_lower.R": 13,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.072
+    },
+    "max_ratio": 6.975,
+    "max_growth_of_height": 0.06219
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9259,
+    "dz_of_height": 0.549023,
+    "xyz_cm": [
+     22.187,
+     -17.578,
+     33.091
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.00403,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 12,
+   "foot_slide": {
+    "L": 0.002758,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.148,
+    "max_growth_of_height": 0.06949
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9232,
+    "dz_of_height": 0.504486,
+    "xyz_cm": [
+     22.322,
+     -17.342,
+     30.894
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003832,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 13,
+   "foot_slide": {
+    "L": 0.002749,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.109,
+    "max_growth_of_height": 0.06941
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9331,
+    "dz_of_height": 0.488707,
+    "xyz_cm": [
+     22.619,
+     -17.194,
+     30.115
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003823,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 14,
+   "foot_slide": {
+    "L": 0.002745,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.088,
+    "max_growth_of_height": 0.06936
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9527,
+    "dz_of_height": 0.48913,
+    "xyz_cm": [
+     22.981,
+     -17.192,
+     30.136
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003818,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 15,
+   "foot_slide": {
+    "L": 0.002743,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.08,
+    "max_growth_of_height": 0.06934
+   },
+   "weapon_tip": {
+    "r_of_base": 1.974,
+    "dz_of_height": 0.496397,
+    "xyz_cm": [
+     23.34,
+     -17.235,
+     30.495
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003816,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 16,
+   "foot_slide": {
+    "L": 0.002743,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.079,
+    "max_growth_of_height": 0.06934
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9893,
+    "dz_of_height": 0.501386,
+    "xyz_cm": [
+     23.621,
+     -17.232,
+     30.741
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003816,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 17,
+   "foot_slide": {
+    "L": 0.002743,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.08,
+    "max_growth_of_height": 0.06935
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9959,
+    "dz_of_height": 0.500307,
+    "xyz_cm": [
+     23.783,
+     -17.172,
+     30.688
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003816,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 18,
+   "foot_slide": {
+    "L": 0.002744,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.083,
+    "max_growth_of_height": 0.06935
+   },
+   "weapon_tip": {
+    "r_of_base": 1.9998,
+    "dz_of_height": 0.499329,
+    "xyz_cm": [
+     23.888,
+     -17.125,
+     30.639
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003817,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 19,
+   "foot_slide": {
+    "L": 0.002745,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.087,
+    "max_growth_of_height": 0.06936
+   },
+   "weapon_tip": {
+    "r_of_base": 2.0021,
+    "dz_of_height": 0.498898,
+    "xyz_cm": [
+     23.952,
+     -17.095,
+     30.618
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003818,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 20,
+   "foot_slide": {
+    "L": 0.002745,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 39,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 4
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.089,
+    "max_growth_of_height": 0.06937
+   },
+   "weapon_tip": {
+    "r_of_base": 2.004,
+    "dz_of_height": 0.499424,
+    "xyz_cm": [
+     23.99,
+     -17.089,
+     30.644
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003818,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  },
+  {
+   "f": 21,
+   "foot_slide": {
+    "L": 0.002745,
+    "R": 0.002314
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {},
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 7,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": 0.074
+    },
+    "warn": {
+     "edges": 38,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "foot.R|leg_lower.R": 18,
+      "foot.L|leg_lower.L": 17,
+      "arm_lower.R|arm_upper.R": 3
+     },
+     "z_of_height": 0.071
+    },
+    "max_ratio": 8.091,
+    "max_growth_of_height": 0.06937
+   },
+   "weapon_tip": {
+    "r_of_base": 2.0065,
+    "dz_of_height": 0.5013,
+    "xyz_cm": [
+     24.018,
+     -17.114,
+     30.737
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.006685,
+   "base_penetration_bone": "foot.L",
+   "hem_penetration": 0.003818,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_Beowulf_H2_Sword": {},
+    "weapon.R": {},
+    "arm_lower.L#islands": {}
+   }
+  }
+ ],
+ "note": "техническая проверка контактов; не художественная приёмка"
+}

@@ -1,0 +1,2943 @@
+{
+ "schema": "unmatched.rider-gap/1",
+ "tool": "tools/tripo-pipeline/review/rider_gap.py",
+ "inputs": {
+  "run": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4",
+  "rest_fbx": {
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/export/SK_Beowulf_H2.fbx",
+   "sha256": "f86c7b02a616daa8814650352ac226391443af16b49c3c6cc4884995c3e3eab0"
+  },
+  "parts_blend": {
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/work/lp_uv.blend",
+   "sha256": "db1bad9b00c54b8e04bccf00f6cedc4e4f4e809d458a61b5185c0cd34481350d"
+  },
+  "profile": {
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t4.json",
+   "sha256": "4ce685cc09784f22fde85377407fc941a399693e1c88987191e5bc134946d254"
+  },
+  "spec": {
+   "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json",
+   "sha256": "d3227542f85e141749221a977578acade57ab756c9df5f651c39b489f70b9660"
+  },
+  "clips": {
+   "Idle": {
+    "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_Idle.fbx",
+    "sha256": "6f423ee229dab0806c8d40eff8d736d3986c3f0a3b8b3c656d6e77a43f7aa6e8"
+   },
+   "LungeAttack": {
+    "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_LungeAttack.fbx",
+    "sha256": "01e689d072cb55bb529eb4bfc361b312f01ae0f0706d6368c15b62baebf91013"
+   },
+   "HitReact": {
+    "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_HitReact.fbx",
+    "sha256": "7f984be2cac888bd73b89291bb6db1f815766ea2fd909fad5a600f2faa2cf83a"
+   },
+   "DeathSettle": {
+    "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_DeathSettle.fbx",
+    "sha256": "8c9b9af7c68a857f7d37bcb902494edf689b8c4f60ab8fed5b7c7ecf2288595a"
+   }
+  },
+  "float_ok": []
+ },
+ "blender": "5.2.2 LTS",
+ "frame": "мировая рамка импорта FBX UM_FBX_v1, м: +X лицо фигуры, +Y её левый бок, +Z вверх",
+ "thresholds": {
+  "gap_max_m": 0.002,
+  "pen_max_m": 0.002,
+  "auto_perch_margin_m": 0.01,
+  "window_m": 0.03,
+  "calibration": "пилот 2026-10-14. ASSET-ANCIENT-LESHEN-001 bake r3 (prepare.part_offsets_m tripo_part_8): вороны сидят — правое предплечье зазор 1,60 мм, левое предплечье 1,52 мм, левое плечо касание с утоплением лап 0,88 мм, во всех кадрах четырёх клипов h2anim-r3 те же числа; bake r2: ворона правого предплечья 29,0 мм в rest и 18,4–29,6 мм в клипах h2anim (вето D приёмки клипа HitReact r1) — FAIL. ASSET-ACHILLES-001 bake r3: щит (жёстко arm_lower.L) — рукоять в кулаке, утопление 1,52 мм в rest и во всех кадрах h2anim-r3, модель и клипы приняты — поэтому порог проникновения 2 мм, а не 1 мм",
+  "rule": "PASS пары: gap ≤ gap_max и pen ≤ pen_max в rest и в каждом кадре каждого клипа; скан: жёсткая часть касается остальной фигуры в rest (gap ≤ gap_max) или утоплена в неё, и в каждом кадре клипов зазор до её опоры rest ≤ gap_max (без проникновения)"
+ },
+ "mapping": {
+  "parts_frame": "UM_FBX_v1 (−y, x, z)",
+  "vertices": 24264,
+  "worst_match_m": 0.0003,
+  "median_match_m": 0.0,
+  "junction_faces": 573,
+  "per_part": {
+   "tripo_part_0": 4205,
+   "tripo_part_1": 1648,
+   "tripo_part_2": 1168,
+   "tripo_part_3": 3279,
+   "tripo_part_4": 1248,
+   "tripo_part_5": 1278,
+   "tripo_part_6": 939,
+   "tripo_part_7": 728,
+   "tripo_part_8": 735,
+   "tripo_part_9": 1429,
+   "tripo_part_10": 709,
+   "tripo_part_11": 995,
+   "tripo_part_12": 871,
+   "tripo_part_14": 2168,
+   "tripo_part_15": 981,
+   "tripo_part_16": 752,
+   "tripo_part_17": 276,
+   "tripo_part_18": 307,
+   "tripo_part_19": 548
+  },
+  "base_parts": [
+   "tripo_part_13"
+  ]
+ },
+ "parts_open_edges": {
+  "tripo_part_2": 137,
+  "tripo_part_7": 55,
+  "tripo_part_10": 228,
+  "tripo_part_17": 51,
+  "tripo_part_18": 112
+ },
+ "pairs": [
+  {
+   "name": "shield_grip",
+   "source": "cli",
+   "rider": [
+    "tripo_part_2",
+    "tripo_part_18"
+   ],
+   "rider_roles": {
+    "tripo_part_2": "круглый деревянный щит с железной кромкой (левое предплечье); жёстко на arm_lower.L, без новой кости (П3-2)",
+    "tripo_part_18": "железный умбон щита; жёстко на arm_lower.L, как щит (П3-2)"
+   },
+   "perch": [
+    "tripo_part_10"
+   ],
+   "perch_source": "cli",
+   "perch_roles": {
+    "tripo_part_10": "левая кисть за щитом на ручке (+X)"
+   },
+   "rest": {
+    "gap_m": 0.0,
+    "pen_m": 0.00012,
+    "rider_to_perch_signed_m": -0.00012,
+    "perch_to_rider_signed_m": -8.5e-05,
+    "closest_rider_vertex_m": [
+     0.01631,
+     0.13819,
+     0.34613
+    ],
+    "closest_perch_part": "tripo_part_10",
+    "others_gap_m": 0.005557,
+    "others_pen_m": 0.0,
+    "others_nearest_part": "tripo_part_12",
+    "perch_candidates_m": {
+     "tripo_part_10": 1e-06,
+     "tripo_part_12": 0.005557,
+     "tripo_part_0": 0.028782,
+     "tripo_part_15": 0.031311,
+     "tripo_part_1": 0.069353,
+     "tripo_part_14": 0.071084
+    },
+    "perch_bones_near_rider": {
+     "hand.L": 0.708,
+     "arm_lower.L": 0.292
+    },
+    "rider_bones": {
+     "bones": {
+      "arm_lower.L": 1.0
+     },
+     "min_dominant_weight": 1.0
+    },
+    "rider_vertices": 1475,
+    "perch_faces": 1200
+   },
+   "clips": {
+    "Idle": {
+     "frames": 61,
+     "summary": {
+      "frames": 61,
+      "measured": 61,
+      "gap_max_m": 0.0,
+      "gap_max_frame": 0,
+      "gap_min_m": 0.0,
+      "lift_m": 0.0,
+      "pen_max_m": 0.00012,
+      "pen_max_frame": 0,
+      "others_pen_max_m": 0.0,
+      "others_pen_max_frame": 0
+     },
+     "rows": [
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 0
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01633,
+        0.13791,
+        0.3461
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 1
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01638,
+        0.13764,
+        0.3463
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 2
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01647,
+        0.13737,
+        0.34652
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 3
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01659,
+        0.13708,
+        0.34674
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 4
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01674,
+        0.13678,
+        0.34697
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 5
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01693,
+        0.13649,
+        0.3472
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 6
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01714,
+        0.1362,
+        0.34744
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 7
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01737,
+        0.13593,
+        0.34767
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 8
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01763,
+        0.13567,
+        0.3479
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 9
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01791,
+        0.13544,
+        0.34812
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 10
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.0182,
+        0.13524,
+        0.34834
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 11
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01851,
+        0.13507,
+        0.34854
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 12
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01883,
+        0.13494,
+        0.34874
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 13
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01916,
+        0.13486,
+        0.34892
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 14
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01948,
+        0.13483,
+        0.34908
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 15
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01981,
+        0.13485,
+        0.34923
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 16
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02013,
+        0.13491,
+        0.34934
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 17
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02045,
+        0.135,
+        0.34943
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 18
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02075,
+        0.13514,
+        0.34948
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 19
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02104,
+        0.1353,
+        0.3495
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 20
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02132,
+        0.1355,
+        0.34949
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 21
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02157,
+        0.13573,
+        0.34945
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 22
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.0218,
+        0.13598,
+        0.34938
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 23
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.022,
+        0.13625,
+        0.34928
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 24
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02218,
+        0.13655,
+        0.34914
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 25
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02232,
+        0.13686,
+        0.34898
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 26
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02244,
+        0.13718,
+        0.3488
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 27
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02252,
+        0.13751,
+        0.34859
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 28
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02256,
+        0.13785,
+        0.34837
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 29
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02257,
+        0.13819,
+        0.34812
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 30
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02255,
+        0.13853,
+        0.34786
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 31
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02249,
+        0.13887,
+        0.34759
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 32
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02239,
+        0.1392,
+        0.34731
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 33
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02226,
+        0.13952,
+        0.34702
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 34
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02211,
+        0.13982,
+        0.34673
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 35
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02192,
+        0.14011,
+        0.34644
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 36
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02171,
+        0.14038,
+        0.34615
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 37
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02148,
+        0.14063,
+        0.34587
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 38
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02122,
+        0.14085,
+        0.34559
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 39
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02095,
+        0.14104,
+        0.34533
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 40
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02066,
+        0.14121,
+        0.34508
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 41
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02036,
+        0.14134,
+        0.34484
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 42
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02005,
+        0.14143,
+        0.34463
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 43
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01973,
+        0.14149,
+        0.34443
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 44
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01941,
+        0.14151,
+        0.34426
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 45
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01909,
+        0.14148,
+        0.34412
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 46
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01877,
+        0.1414,
+        0.34402
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 47
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01846,
+        0.14127,
+        0.34396
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 48
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01816,
+        0.14111,
+        0.34393
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 49
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01788,
+        0.14091,
+        0.34395
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 50
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01761,
+        0.14068,
+        0.344
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 51
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01735,
+        0.14043,
+        0.34409
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 52
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01712,
+        0.14016,
+        0.34421
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 53
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01692,
+        0.13987,
+        0.34437
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 54
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01674,
+        0.13959,
+        0.34456
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 55
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01659,
+        0.1393,
+        0.34478
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 56
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01647,
+        0.13901,
+        0.34503
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 57
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01638,
+        0.13873,
+        0.3453
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 58
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01633,
+        0.13847,
+        0.34559
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 59
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 60
+      }
+     ]
+    },
+    "LungeAttack": {
+     "frames": 15,
+     "summary": {
+      "frames": 15,
+      "measured": 15,
+      "gap_max_m": 0.0,
+      "gap_max_frame": 0,
+      "gap_min_m": 0.0,
+      "lift_m": 0.0,
+      "pen_max_m": 0.00012,
+      "pen_max_frame": 0,
+      "others_pen_max_m": 0.0,
+      "others_pen_max_frame": 0
+     },
+     "rows": [
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 0
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02633,
+        0.13605,
+        0.34944
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 1
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.04644,
+        0.12893,
+        0.357
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 2
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.06335,
+        0.11983,
+        0.36524
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 3
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.06906,
+        0.11748,
+        0.37101
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 4
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.0531,
+        0.13468,
+        0.37097
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 5
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01655,
+        0.1557,
+        0.36484
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 6
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        -0.00915,
+        0.16179,
+        0.35873
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 7
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        -0.01139,
+        0.16184,
+        0.35738
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 8
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        -0.01204,
+        0.16093,
+        0.35552
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 9
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        -0.00984,
+        0.15748,
+        0.35322
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 10
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        -0.00409,
+        0.15162,
+        0.35164
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 11
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.00254,
+        0.14589,
+        0.34947
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 12
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01107,
+        0.14102,
+        0.3471
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 13
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 14
+      }
+     ]
+    },
+    "HitReact": {
+     "frames": 11,
+     "summary": {
+      "frames": 11,
+      "measured": 11,
+      "gap_max_m": 0.0,
+      "gap_max_frame": 0,
+      "gap_min_m": 0.0,
+      "lift_m": 0.0,
+      "pen_max_m": 0.00012,
+      "pen_max_frame": 0,
+      "others_pen_max_m": 0.0,
+      "others_pen_max_frame": 0
+     },
+     "rows": [
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 0
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02213,
+        0.14099,
+        0.35309
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 1
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.02381,
+        0.14408,
+        0.35995
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 2
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02069,
+        0.14378,
+        0.35823
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 3
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01832,
+        0.14254,
+        0.35509
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 4
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01641,
+        0.14093,
+        0.35195
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 5
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.0141,
+        0.13927,
+        0.3485
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 6
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01335,
+        0.1385,
+        0.34641
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 7
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01454,
+        0.13844,
+        0.34593
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 8
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01573,
+        0.13828,
+        0.34601
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 9
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 10
+      }
+     ]
+    },
+    "DeathSettle": {
+     "frames": 22,
+     "summary": {
+      "frames": 22,
+      "measured": 22,
+      "gap_max_m": 0.0,
+      "gap_max_frame": 0,
+      "gap_min_m": 0.0,
+      "lift_m": 0.0,
+      "pen_max_m": 0.00012,
+      "pen_max_frame": 0,
+      "others_pen_max_m": 0.0,
+      "others_pen_max_frame": 0
+     },
+     "rows": [
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.01631,
+        0.13819,
+        0.34613
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 0
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.01776,
+        0.13942,
+        0.34656
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 1
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02079,
+        0.14157,
+        0.34718
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 2
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.0229,
+        0.14261,
+        0.3475
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 3
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.02555,
+        0.14188,
+        0.34831
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 4
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.03078,
+        0.14053,
+        0.34914
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 5
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.03589,
+        0.13967,
+        0.34833
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 6
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.03883,
+        0.14071,
+        0.34386
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 7
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.04438,
+        0.13696,
+        0.35152
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 8
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.05085,
+        0.13091,
+        0.36141
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 9
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.05782,
+        0.12647,
+        0.36444
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 10
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.06528,
+        0.12172,
+        0.36573
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 11
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.07116,
+        0.11881,
+        0.36516
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 12
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.07523,
+        0.11807,
+        0.36289
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 13
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.07837,
+        0.11801,
+        0.35974
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 14
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.0805,
+        0.11837,
+        0.35652
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 15
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.0816,
+        0.11886,
+        0.35403
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 16
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.08191,
+        0.11937,
+        0.3523
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 17
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.08181,
+        0.11991,
+        0.35089
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 18
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.0815,
+        0.12038,
+        0.34983
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 19
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.6e-05,
+       "closest_rider_vertex_m": [
+        0.08117,
+        0.12072,
+        0.34917
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 20
+      },
+      {
+       "gap_m": 0.0,
+       "pen_m": 0.00012,
+       "rider_to_perch_signed_m": -0.00012,
+       "perch_to_rider_signed_m": -8.5e-05,
+       "closest_rider_vertex_m": [
+        0.08102,
+        0.12085,
+        0.34894
+       ],
+       "closest_perch_part": "tripo_part_10",
+       "others_gap_m": 0.005557,
+       "others_pen_m": 0.0,
+       "others_nearest_part": "tripo_part_12",
+       "f": 21
+      }
+     ]
+    }
+   },
+   "verdict": "PASS",
+   "reasons": []
+  }
+ ],
+ "scan": [
+  {
+   "part": "tripo_part_7",
+   "gap_m": 0.0,
+   "nearest_part": "tripo_part_9",
+   "closest_vertex_m": [
+    0.04757,
+    -0.1359,
+    0.32811
+   ],
+   "embedded": false,
+   "bone": "weapon.R",
+   "perch": [
+    "tripo_part_9",
+    "tripo_part_17"
+   ],
+   "role": "меч: клинок, гарда и рукоять над кулаком (меш weapon, жёстко weapon.R)",
+   "clips": {
+    "Idle": {
+     "frames": 61,
+     "gap_max_m": 1.4e-05,
+     "gap_max_frame": 33,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 2,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 3,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 4,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 7,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 8,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 9,
+       "gap_m": 0.0
+      },
+      {
+       "f": 10,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 11,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 12,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 13,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 14,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 15,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 16,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 17,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 18,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 19,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 20,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 21,
+       "gap_m": 0.0
+      },
+      {
+       "f": 22,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 23,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 24,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 25,
+       "gap_m": 0.0
+      },
+      {
+       "f": 26,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 27,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 28,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 29,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 30,
+       "gap_m": 0.0
+      },
+      {
+       "f": 31,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 32,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 33,
+       "gap_m": 1.4e-05
+      },
+      {
+       "f": 34,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 35,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 36,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 37,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 38,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 39,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 40,
+       "gap_m": 0.0
+      },
+      {
+       "f": 41,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 42,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 43,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 44,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 45,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 46,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 47,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 48,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 49,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 50,
+       "gap_m": 0.0
+      },
+      {
+       "f": 51,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 52,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 53,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 54,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 55,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 56,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 57,
+       "gap_m": 1.4e-05
+      },
+      {
+       "f": 58,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 59,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 60,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "LungeAttack": {
+     "frames": 15,
+     "gap_max_m": 0.0,
+     "gap_max_frame": 0,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 0.0
+      },
+      {
+       "f": 2,
+       "gap_m": 0.0
+      },
+      {
+       "f": 3,
+       "gap_m": 0.0
+      },
+      {
+       "f": 4,
+       "gap_m": 0.0
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 0.0
+      },
+      {
+       "f": 7,
+       "gap_m": 0.0
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 0.0
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      },
+      {
+       "f": 11,
+       "gap_m": 0.0
+      },
+      {
+       "f": 12,
+       "gap_m": 0.0
+      },
+      {
+       "f": 13,
+       "gap_m": 0.0
+      },
+      {
+       "f": 14,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "HitReact": {
+     "frames": 11,
+     "gap_max_m": 3.4e-05,
+     "gap_max_frame": 2,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 2,
+       "gap_m": 3.4e-05
+      },
+      {
+       "f": 3,
+       "gap_m": 1.8e-05
+      },
+      {
+       "f": 4,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 7,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 8,
+       "gap_m": 1.2e-05
+      },
+      {
+       "f": 9,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "DeathSettle": {
+     "frames": 22,
+     "gap_max_m": 0.0,
+     "gap_max_frame": 0,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 0.0
+      },
+      {
+       "f": 2,
+       "gap_m": 0.0
+      },
+      {
+       "f": 3,
+       "gap_m": 0.0
+      },
+      {
+       "f": 4,
+       "gap_m": 0.0
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 0.0
+      },
+      {
+       "f": 7,
+       "gap_m": 0.0
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 0.0
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      },
+      {
+       "f": 11,
+       "gap_m": 0.0
+      },
+      {
+       "f": 12,
+       "gap_m": 0.0
+      },
+      {
+       "f": 13,
+       "gap_m": 0.0
+      },
+      {
+       "f": 14,
+       "gap_m": 0.0
+      },
+      {
+       "f": 15,
+       "gap_m": 0.0
+      },
+      {
+       "f": 16,
+       "gap_m": 0.0
+      },
+      {
+       "f": 17,
+       "gap_m": 0.0
+      },
+      {
+       "f": 18,
+       "gap_m": 0.0
+      },
+      {
+       "f": 19,
+       "gap_m": 0.0
+      },
+      {
+       "f": 20,
+       "gap_m": 0.0
+      },
+      {
+       "f": 21,
+       "gap_m": 0.0
+      }
+     ]
+    }
+   },
+   "verdict": "PASS"
+  },
+  {
+   "part": "tripo_part_17",
+   "gap_m": 0.0,
+   "nearest_part": "tripo_part_9",
+   "closest_vertex_m": [
+    0.03246,
+    -0.12197,
+    0.30516
+   ],
+   "embedded": false,
+   "bone": "weapon.R",
+   "perch": [
+    "tripo_part_9",
+    "tripo_part_7"
+   ],
+   "role": "меч: низ рукояти и навершие под кулаком; меш тела, жёстко на weapon.R (П3-1)",
+   "clips": {
+    "Idle": {
+     "frames": 61,
+     "gap_max_m": 1.1e-05,
+     "gap_max_frame": 4,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 0.0
+      },
+      {
+       "f": 2,
+       "gap_m": 0.0
+      },
+      {
+       "f": 3,
+       "gap_m": 0.0
+      },
+      {
+       "f": 4,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 5,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 6,
+       "gap_m": 8e-06
+      },
+      {
+       "f": 7,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 10,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 11,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 12,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 13,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 14,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 15,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 16,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 17,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 18,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 19,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 20,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 21,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 22,
+       "gap_m": 0.0
+      },
+      {
+       "f": 23,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 24,
+       "gap_m": 8e-06
+      },
+      {
+       "f": 25,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 26,
+       "gap_m": 1.1e-05
+      },
+      {
+       "f": 27,
+       "gap_m": 0.0
+      },
+      {
+       "f": 28,
+       "gap_m": 0.0
+      },
+      {
+       "f": 29,
+       "gap_m": 0.0
+      },
+      {
+       "f": 30,
+       "gap_m": 0.0
+      },
+      {
+       "f": 31,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 32,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 33,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 34,
+       "gap_m": 8e-06
+      },
+      {
+       "f": 35,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 36,
+       "gap_m": 9e-06
+      },
+      {
+       "f": 37,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 38,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 39,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 40,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 41,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 42,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 43,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 44,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 45,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 46,
+       "gap_m": 4e-06
+      },
+      {
+       "f": 47,
+       "gap_m": 3e-06
+      },
+      {
+       "f": 48,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 49,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 50,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 51,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 52,
+       "gap_m": 6e-06
+      },
+      {
+       "f": 53,
+       "gap_m": 5e-06
+      },
+      {
+       "f": 54,
+       "gap_m": 9e-06
+      },
+      {
+       "f": 55,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 56,
+       "gap_m": 8e-06
+      },
+      {
+       "f": 57,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 58,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 59,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 60,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "LungeAttack": {
+     "frames": 15,
+     "gap_max_m": 0.0,
+     "gap_max_frame": 0,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 0.0
+      },
+      {
+       "f": 2,
+       "gap_m": 0.0
+      },
+      {
+       "f": 3,
+       "gap_m": 0.0
+      },
+      {
+       "f": 4,
+       "gap_m": 0.0
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 0.0
+      },
+      {
+       "f": 7,
+       "gap_m": 0.0
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 0.0
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      },
+      {
+       "f": 11,
+       "gap_m": 0.0
+      },
+      {
+       "f": 12,
+       "gap_m": 0.0
+      },
+      {
+       "f": 13,
+       "gap_m": 0.0
+      },
+      {
+       "f": 14,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "HitReact": {
+     "frames": 11,
+     "gap_max_m": 1.3e-05,
+     "gap_max_frame": 2,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 2,
+       "gap_m": 1.3e-05
+      },
+      {
+       "f": 3,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 4,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 5,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 6,
+       "gap_m": 2e-06
+      },
+      {
+       "f": 7,
+       "gap_m": 7e-06
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 1e-06
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      }
+     ]
+    },
+    "DeathSettle": {
+     "frames": 22,
+     "gap_max_m": 0.0,
+     "gap_max_frame": 0,
+     "bad_frames": "",
+     "rows": [
+      {
+       "f": 0,
+       "gap_m": 0.0
+      },
+      {
+       "f": 1,
+       "gap_m": 0.0
+      },
+      {
+       "f": 2,
+       "gap_m": 0.0
+      },
+      {
+       "f": 3,
+       "gap_m": 0.0
+      },
+      {
+       "f": 4,
+       "gap_m": 0.0
+      },
+      {
+       "f": 5,
+       "gap_m": 0.0
+      },
+      {
+       "f": 6,
+       "gap_m": 0.0
+      },
+      {
+       "f": 7,
+       "gap_m": 0.0
+      },
+      {
+       "f": 8,
+       "gap_m": 0.0
+      },
+      {
+       "f": 9,
+       "gap_m": 0.0
+      },
+      {
+       "f": 10,
+       "gap_m": 0.0
+      },
+      {
+       "f": 11,
+       "gap_m": 0.0
+      },
+      {
+       "f": 12,
+       "gap_m": 0.0
+      },
+      {
+       "f": 13,
+       "gap_m": 0.0
+      },
+      {
+       "f": 14,
+       "gap_m": 0.0
+      },
+      {
+       "f": 15,
+       "gap_m": 0.0
+      },
+      {
+       "f": 16,
+       "gap_m": 0.0
+      },
+      {
+       "f": 17,
+       "gap_m": 0.0
+      },
+      {
+       "f": 18,
+       "gap_m": 0.0
+      },
+      {
+       "f": 19,
+       "gap_m": 0.0
+      },
+      {
+       "f": 20,
+       "gap_m": 0.0
+      },
+      {
+       "f": 21,
+       "gap_m": 0.0
+      }
+     ]
+    }
+   },
+   "verdict": "PASS"
+  }
+ ],
+ "warnings": [],
+ "failures": [],
+ "verdict": "PASS"
+}

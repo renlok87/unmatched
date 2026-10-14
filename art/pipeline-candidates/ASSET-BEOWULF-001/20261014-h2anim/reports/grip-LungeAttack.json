@@ -1,0 +1,957 @@
+{
+ "tool": "tools/tripo-pipeline/anim/grip_check.py",
+ "fbx": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_LungeAttack.fbx",
+ "base": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/export/SM_Beowulf_H2_Base.fbx",
+ "options": {
+  "side": "R",
+  "base": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/export/SM_Beowulf_H2_Base.fbx",
+  "shield_bone": "arm_lower.L",
+  "shield_min_dist_cm": 2.5,
+  "body_suffix": "_Body",
+  "weapon_suffix": [
+   "_Sword"
+  ],
+  "rest_only": false,
+  "verbose": false
+ },
+ "summary": {
+  "frames": 15,
+  "weapon_in_hand_max_deg": 0.0,
+  "wrist_R_max_deg": 23.88,
+  "wrist_L_max_deg": 0.0,
+  "elbow_R_range": [
+   112.2,
+   131.1
+  ],
+  "elbow_L_range": [
+   145.0,
+   148.0
+  ],
+  "elbow_R_offhinge_max_deg": 16.5,
+  "knee_min_deg": 158.5,
+  "thigh_flex_max_deg": 11.9,
+  "butt_sink_max_cm": -20.387,
+  "weapon_body_pairs_rest": 0,
+  "weapon_body_pairs_max": 0,
+  "shield_vs_forearm_max_cm": 0.0,
+  "shield_body_pairs_rest": 0,
+  "shield_body_pairs_max": 0,
+  "base_top_cm": 6.0,
+  "base_radius_cm": 15.0
+ },
+ "rest": {
+  "root": {
+   "head": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "tail": [
+    0.0,
+    0.0,
+    24.503
+   ],
+   "parent": null
+  },
+  "hips": {
+   "head": [
+    -0.4,
+    0.0,
+    24.5
+   ],
+   "tail": [
+    -0.4,
+    0.0,
+    29.0
+   ],
+   "parent": "root"
+  },
+  "spine": {
+   "head": [
+    -0.4,
+    0.0,
+    30.0
+   ],
+   "tail": [
+    -0.4,
+    0.0,
+    42.876
+   ],
+   "parent": "hips"
+  },
+  "head": {
+   "head": [
+    0.0,
+    -0.0,
+    44.5
+   ],
+   "tail": [
+    -0.286,
+    0.0,
+    57.373
+   ],
+   "parent": "spine"
+  },
+  "arm_upper.L": {
+   "head": [
+    -2.2,
+    6.5,
+    40.0
+   ],
+   "tail": [
+    -2.0,
+    10.5,
+    35.2
+   ],
+   "parent": "spine"
+  },
+  "arm_lower.L": {
+   "head": [
+    -2.0,
+    10.5,
+    35.2
+   ],
+   "tail": [
+    0.6,
+    13.4,
+    32.9
+   ],
+   "parent": "arm_upper.L"
+  },
+  "hand.L": {
+   "head": [
+    0.6,
+    13.4,
+    32.9
+   ],
+   "tail": [
+    4.309,
+    12.505,
+    30.47
+   ],
+   "parent": "arm_lower.L"
+  },
+  "arm_upper.R": {
+   "head": [
+    -2.2,
+    -6.5,
+    40.0
+   ],
+   "tail": [
+    -1.8,
+    -10.4,
+    35.0
+   ],
+   "parent": "spine"
+  },
+  "arm_lower.R": {
+   "head": [
+    -1.8,
+    -10.4,
+    35.0
+   ],
+   "tail": [
+    2.1,
+    -12.1,
+    32.9
+   ],
+   "parent": "arm_upper.R"
+  },
+  "hand.R": {
+   "head": [
+    2.1,
+    -12.1,
+    32.9
+   ],
+   "tail": [
+    3.815,
+    -12.622,
+    32.378
+   ],
+   "parent": "arm_lower.R"
+  },
+  "weapon.R": {
+   "head": [
+    3.78,
+    -12.69,
+    32.34
+   ],
+   "tail": [
+    4.191,
+    -13.049,
+    34.125
+   ],
+   "parent": "hand.R"
+  },
+  "leg_upper.L": {
+   "head": [
+    -0.4,
+    4.0,
+    24.5
+   ],
+   "tail": [
+    -0.8,
+    5.4,
+    17.8
+   ],
+   "parent": "hips"
+  },
+  "leg_lower.L": {
+   "head": [
+    -0.8,
+    5.4,
+    17.8
+   ],
+   "tail": [
+    -1.4,
+    7.1,
+    8.5
+   ],
+   "parent": "leg_upper.L"
+  },
+  "foot.L": {
+   "head": [
+    -1.4,
+    7.1,
+    8.5
+   ],
+   "tail": [
+    7.268,
+    8.493,
+    4.94
+   ],
+   "parent": "leg_lower.L"
+  },
+  "leg_upper.R": {
+   "head": [
+    -0.4,
+    -4.0,
+    24.5
+   ],
+   "tail": [
+    -0.8,
+    -5.4,
+    17.8
+   ],
+   "parent": "hips"
+  },
+  "leg_lower.R": {
+   "head": [
+    -0.8,
+    -5.4,
+    17.8
+   ],
+   "tail": [
+    -1.4,
+    -7.1,
+    8.5
+   ],
+   "parent": "leg_upper.R"
+  },
+  "foot.R": {
+   "head": [
+    -1.4,
+    -7.1,
+    8.5
+   ],
+   "tail": [
+    7.268,
+    -8.493,
+    4.94
+   ],
+   "parent": "leg_lower.R"
+  }
+ },
+ "frames": [
+  {
+   "f": 0,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.22,
+    -0.192,
+    0.956
+   ],
+   "wrist_R_deg": 0.0,
+   "wrist_R_twist_swing": [
+    0.0,
+    0.0
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    2.1,
+    -12.1,
+    32.9
+   ],
+   "elbow_R_deg": 128.3,
+   "knee_R_deg": 178.5,
+   "thigh_flex_R_deg": 0.0,
+   "elbow_L_deg": 145.0,
+   "knee_L_deg": 178.5,
+   "thigh_flex_L_deg": 0.0,
+   "butt_cm": [
+    2.72,
+    -11.7,
+    27.06
+   ],
+   "tip_cm": [
+    9.47,
+    -17.64,
+    54.68
+   ],
+   "butt_r_cm": 12.01,
+   "butt_below_top_cm": -21.061,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 22.55
+  },
+  {
+   "f": 1,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.262,
+    -0.234,
+    0.936
+   ],
+   "wrist_R_deg": 3.8,
+   "wrist_R_twist_swing": [
+    0.6,
+    3.7
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    0.407,
+    -12.402,
+    32.752
+   ],
+   "elbow_R_deg": 127.4,
+   "knee_R_deg": 175.5,
+   "thigh_flex_R_deg": 1.8,
+   "elbow_L_deg": 145.2,
+   "knee_L_deg": 175.1,
+   "thigh_flex_L_deg": 2.1,
+   "butt_cm": [
+    0.72,
+    -11.86,
+    26.9
+   ],
+   "tip_cm": [
+    8.64,
+    -19.02,
+    53.91
+   ],
+   "butt_r_cm": 11.88,
+   "butt_below_top_cm": -20.9,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 22.97
+  },
+  {
+   "f": 2,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.151,
+    -0.303,
+    0.941
+   ],
+   "wrist_R_deg": 14.14,
+   "wrist_R_twist_swing": [
+    7.8,
+    11.8
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    -1.72,
+    -12.036,
+    32.687
+   ],
+   "elbow_R_deg": 125.4,
+   "knee_R_deg": 172.0,
+   "thigh_flex_R_deg": 4.0,
+   "elbow_L_deg": 145.6,
+   "knee_L_deg": 171.3,
+   "thigh_flex_L_deg": 4.6,
+   "butt_cm": [
+    -0.92,
+    -11.4,
+    26.89
+   ],
+   "tip_cm": [
+    3.73,
+    -20.64,
+    54.04
+   ],
+   "butt_r_cm": 11.44,
+   "butt_below_top_cm": -20.89,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 24.04
+  },
+  {
+   "f": 3,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    -0.405,
+    -0.286,
+    0.869
+   ],
+   "wrist_R_deg": 11.94,
+   "wrist_R_twist_swing": [
+    8.9,
+    8.0
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    -4.066,
+    -11.596,
+    32.609
+   ],
+   "elbow_R_deg": 125.0,
+   "knee_R_deg": 169.0,
+   "thigh_flex_R_deg": 5.9,
+   "elbow_L_deg": 146.2,
+   "knee_L_deg": 168.1,
+   "thigh_flex_L_deg": 7.0,
+   "butt_cm": [
+    -0.42,
+    -11.47,
+    27.99
+   ],
+   "tip_cm": [
+    -11.97,
+    -20.26,
+    53.15
+   ],
+   "butt_r_cm": 11.47,
+   "butt_below_top_cm": -21.987,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 25.26
+  },
+  {
+   "f": 4,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    -0.602,
+    -0.2,
+    0.773
+   ],
+   "wrist_R_deg": 18.61,
+   "wrist_R_twist_swing": [
+    11.1,
+    15.0
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    -4.643,
+    -11.334,
+    32.69
+   ],
+   "elbow_R_deg": 124.5,
+   "knee_R_deg": 166.5,
+   "thigh_flex_R_deg": 7.4,
+   "elbow_L_deg": 146.8,
+   "knee_L_deg": 165.5,
+   "thigh_flex_L_deg": 9.0,
+   "butt_cm": [
+    -0.1,
+    -11.76,
+    28.97
+   ],
+   "tip_cm": [
+    -17.42,
+    -18.08,
+    51.42
+   ],
+   "butt_r_cm": 11.75,
+   "butt_below_top_cm": -22.969,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 26.14
+  },
+  {
+   "f": 5,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.168,
+    -0.208,
+    0.964
+   ],
+   "wrist_R_deg": 12.17,
+   "wrist_R_twist_swing": [
+    6.3,
+    10.4
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    -3.792,
+    -12.549,
+    32.219
+   ],
+   "elbow_R_deg": 126.6,
+   "knee_R_deg": 163.7,
+   "thigh_flex_R_deg": 8.6,
+   "elbow_L_deg": 147.4,
+   "knee_L_deg": 162.2,
+   "thigh_flex_L_deg": 11.0,
+   "butt_cm": [
+    -3.01,
+    -12.38,
+    26.39
+   ],
+   "tip_cm": [
+    2.15,
+    -18.82,
+    54.24
+   ],
+   "butt_r_cm": 12.73,
+   "butt_below_top_cm": -20.387,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 26.02
+  },
+  {
+   "f": 6,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.832,
+    0.472,
+    0.291
+   ],
+   "wrist_R_deg": 21.13,
+   "wrist_R_twist_swing": [
+    18.0,
+    11.1
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    1.387,
+    -15.423,
+    35.614
+   ],
+   "elbow_R_deg": 129.8,
+   "knee_R_deg": 161.9,
+   "thigh_flex_R_deg": 8.7,
+   "elbow_L_deg": 147.8,
+   "knee_L_deg": 159.3,
+   "thigh_flex_L_deg": 11.9,
+   "butt_cm": [
+    -2.27,
+    -18.66,
+    32.32
+   ],
+   "tip_cm": [
+    22.19,
+    -5.26,
+    40.47
+   ],
+   "butt_r_cm": 18.79,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 25.09
+  },
+  {
+   "f": 7,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.451,
+    0.752,
+    -0.481
+   ],
+   "wrist_R_deg": 12.87,
+   "wrist_R_twist_swing": [
+    4.7,
+    12.0
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    6.671,
+    -14.235,
+    36.356
+   ],
+   "elbow_R_deg": 130.0,
+   "knee_R_deg": 162.0,
+   "thigh_flex_R_deg": 8.2,
+   "elbow_L_deg": 148.0,
+   "knee_L_deg": 158.5,
+   "thigh_flex_L_deg": 11.4,
+   "butt_cm": [
+    4.51,
+    -19.6,
+    37.42
+   ],
+   "tip_cm": [
+    17.87,
+    1.89,
+    23.16
+   ],
+   "butt_r_cm": 20.12,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 24.31
+  },
+  {
+   "f": 8,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.075,
+    0.691,
+    -0.719
+   ],
+   "wrist_R_deg": 23.88,
+   "wrist_R_twist_swing": [
+    13.8,
+    19.6
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 1.3,
+   "hand_head": [
+    9.619,
+    -13.008,
+    36.849
+   ],
+   "elbow_R_deg": 131.1,
+   "knee_R_deg": 162.5,
+   "thigh_flex_R_deg": 8.0,
+   "elbow_L_deg": 147.7,
+   "knee_L_deg": 158.8,
+   "thigh_flex_L_deg": 11.0,
+   "butt_cm": [
+    9.81,
+    -18.25,
+    39.51
+   ],
+   "tip_cm": [
+    12.34,
+    1.52,
+    18.38
+   ],
+   "butt_r_cm": 20.72,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 24.13
+  },
+  {
+   "f": 9,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.101,
+    0.858,
+    -0.504
+   ],
+   "wrist_R_deg": 21.75,
+   "wrist_R_twist_swing": [
+    14.3,
+    16.4
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    10.54,
+    -11.987,
+    36.356
+   ],
+   "elbow_R_deg": 130.0,
+   "knee_R_deg": 162.6,
+   "thigh_flex_R_deg": 8.0,
+   "elbow_L_deg": 147.2,
+   "knee_L_deg": 158.8,
+   "thigh_flex_L_deg": 11.0,
+   "butt_cm": [
+    10.9,
+    -17.72,
+    37.63
+   ],
+   "tip_cm": [
+    14.23,
+    6.98,
+    22.72
+   ],
+   "butt_r_cm": 20.81,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 23.86
+  },
+  {
+   "f": 10,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.355,
+    0.935,
+    0.005
+   ],
+   "wrist_R_deg": 20.35,
+   "wrist_R_twist_swing": [
+    16.4,
+    12.1
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 6.3,
+   "hand_head": [
+    8.442,
+    -12.383,
+    35.051
+   ],
+   "elbow_R_deg": 124.4,
+   "knee_R_deg": 163.5,
+   "thigh_flex_R_deg": 7.8,
+   "elbow_L_deg": 146.7,
+   "knee_L_deg": 160.1,
+   "thigh_flex_L_deg": 10.4,
+   "butt_cm": [
+    7.62,
+    -17.97,
+    33.4
+   ],
+   "tip_cm": [
+    18.37,
+    9.02,
+    33.29
+   ],
+   "butt_r_cm": 19.52,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 23.53
+  },
+  {
+   "f": 11,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.462,
+    0.541,
+    0.703
+   ],
+   "wrist_R_deg": 18.53,
+   "wrist_R_twist_swing": [
+    17.7,
+    5.4
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 13.4,
+   "hand_head": [
+    5.478,
+    -11.949,
+    33.492
+   ],
+   "elbow_R_deg": 116.4,
+   "knee_R_deg": 165.9,
+   "thigh_flex_R_deg": 7.0,
+   "elbow_L_deg": 146.1,
+   "knee_L_deg": 163.4,
+   "thigh_flex_L_deg": 8.7,
+   "butt_cm": [
+    4.67,
+    -15.08,
+    28.58
+   ],
+   "tip_cm": [
+    18.54,
+    0.42,
+    48.85
+   ],
+   "butt_r_cm": 15.79,
+   "butt_below_top_cm": null,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 23.17
+  },
+  {
+   "f": 12,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.195,
+    0.098,
+    0.976
+   ],
+   "wrist_R_deg": 16.86,
+   "wrist_R_twist_swing": [
+    16.8,
+    0.6
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 16.5,
+   "hand_head": [
+    3.757,
+    -11.17,
+    32.916
+   ],
+   "elbow_R_deg": 112.2,
+   "knee_R_deg": 169.0,
+   "thigh_flex_R_deg": 5.4,
+   "elbow_L_deg": 145.6,
+   "knee_L_deg": 167.4,
+   "thigh_flex_L_deg": 6.5,
+   "butt_cm": [
+    4.6,
+    -12.29,
+    27.2
+   ],
+   "tip_cm": [
+    10.66,
+    -9.79,
+    55.5
+   ],
+   "butt_r_cm": 13.12,
+   "butt_below_top_cm": -21.2,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 22.91
+  },
+  {
+   "f": 13,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.093,
+    -0.104,
+    0.99
+   ],
+   "wrist_R_deg": 9.66,
+   "wrist_R_twist_swing": [
+    9.6,
+    0.7
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 10.9,
+   "hand_head": [
+    2.742,
+    -11.385,
+    32.882
+   ],
+   "elbow_R_deg": 118.4,
+   "knee_R_deg": 173.1,
+   "thigh_flex_R_deg": 3.1,
+   "elbow_L_deg": 145.2,
+   "knee_L_deg": 172.5,
+   "thigh_flex_L_deg": 3.5,
+   "butt_cm": [
+    4.09,
+    -11.56,
+    27.16
+   ],
+   "tip_cm": [
+    7.17,
+    -14.95,
+    55.84
+   ],
+   "butt_r_cm": 12.26,
+   "butt_below_top_cm": -21.157,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 22.67
+  },
+  {
+   "f": 14,
+   "weapon_in_hand_deg": 0.0,
+   "weapon_dir": [
+    0.22,
+    -0.192,
+    0.956
+   ],
+   "wrist_R_deg": 0.0,
+   "wrist_R_twist_swing": [
+    0.0,
+    0.0
+   ],
+   "wrist_L_deg": 0.0,
+   "elbow_R_twist_deg": 0.0,
+   "elbow_R_offhinge_deg": 0.0,
+   "hand_head": [
+    2.1,
+    -12.1,
+    32.9
+   ],
+   "elbow_R_deg": 128.3,
+   "knee_R_deg": 178.5,
+   "thigh_flex_R_deg": 0.0,
+   "elbow_L_deg": 145.0,
+   "knee_L_deg": 178.5,
+   "thigh_flex_L_deg": 0.0,
+   "butt_cm": [
+    2.72,
+    -11.7,
+    27.06
+   ],
+   "tip_cm": [
+    9.47,
+    -17.64,
+    54.68
+   ],
+   "butt_r_cm": 12.01,
+   "butt_below_top_cm": -21.061,
+   "weapon_body_pairs": 0,
+   "weapon_regions": {},
+   "shield_vs_forearm_cm": 0.0,
+   "shield_body_pairs": 0,
+   "shield_regions": {},
+   "shield_min_z_cm": 22.55
+  }
+ ]
+}

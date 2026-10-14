@@ -1,0 +1,841 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.02895
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000682,
+      "frame": 45,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 352
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000579,
+      "frame": 15,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 364
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "SK_Beowulf_H2_Sword",
+        "kind": "mesh",
+        "triangles": 1399
+       },
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 499,
+        "vertices": 276,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       },
+       {
+        "part": "arm_lower.L#islands",
+        "kind": "body_bone",
+        "bone": "arm_lower.L",
+        "islands": true,
+        "triangles": 2699,
+        "vertices": 1475,
+        "excluded_attach_bones": [
+         "arm_lower.L",
+         "hand.L"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      },
+      "parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 15,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.96,
+      "max_growth_of_height": 0.01201,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "SK_Beowulf_H2_Sword",
+       "weapon.R",
+       "arm_lower.L#islands"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006685,
+      "max_penetration_of_height": 0.006685,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.7
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005458,
+      "max_penetration_of_height": 0.005676,
+      "frame": 56,
+      "warn_above": 0.007458,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 0.002607,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/preview/Beowulf-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.22434
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.001996,
+      "frame": 7,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 352
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.001055,
+      "frame": 7,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 364
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "SK_Beowulf_H2_Sword",
+        "kind": "mesh",
+        "triangles": 1399
+       },
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 499,
+        "vertices": 276,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       },
+       {
+        "part": "arm_lower.L#islands",
+        "kind": "body_bone",
+        "bone": "arm_lower.L",
+        "islands": true,
+        "triangles": 2699,
+        "vertices": 1475,
+        "excluded_attach_bones": [
+         "arm_lower.L",
+         "hand.L"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      },
+      "parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [
+       7,
+       8,
+       9
+      ],
+      "warn_frames": [
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "frame": 9,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 1,
+      "fail_regions": {},
+      "fail_z_of_height": 0.073,
+      "warn_edges": 8,
+      "warn_regions": {
+       "foot.L|leg_lower.L": 8
+      },
+      "warn_z_of_height": 0.072,
+      "max_ratio": 5.612,
+      "max_growth_of_height": 0.0396,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "SK_Beowulf_H2_Sword",
+       "weapon.R",
+       "arm_lower.L#islands"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006685,
+      "max_penetration_of_height": 0.006685,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.7
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005458,
+      "max_penetration_of_height": 0.006078,
+      "frame": 3,
+      "warn_above": 0.007458,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/preview/Beowulf-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.23527
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000813,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 352
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000712,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 364
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "SK_Beowulf_H2_Sword",
+        "kind": "mesh",
+        "triangles": 1399
+       },
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 499,
+        "vertices": 276,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       },
+       {
+        "part": "arm_lower.L#islands",
+        "kind": "body_bone",
+        "bone": "arm_lower.L",
+        "islands": true,
+        "triangles": 2699,
+        "vertices": 1475,
+        "excluded_attach_bones": [
+         "arm_lower.L",
+         "hand.L"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      },
+      "parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 2,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 2.722,
+      "max_growth_of_height": 0.02454,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "SK_Beowulf_H2_Sword",
+       "weapon.R",
+       "arm_lower.L#islands"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006685,
+      "max_penetration_of_height": 0.006685,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.7
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005458,
+      "max_penetration_of_height": 0.00585,
+      "frame": 4,
+      "warn_above": 0.007458,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/preview/Beowulf-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Beowulf_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.45134
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.002758,
+      "frame": 12,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 352
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.002314,
+      "frame": 12,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 364
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "SK_Beowulf_H2_Sword",
+        "kind": "mesh",
+        "triangles": 1399
+       },
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 499,
+        "vertices": 276,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       },
+       {
+        "part": "arm_lower.L#islands",
+        "kind": "body_bone",
+        "bone": "arm_lower.L",
+        "islands": true,
+        "triangles": 2699,
+        "vertices": 1475,
+        "excluded_attach_bones": [
+         "arm_lower.L",
+         "hand.L"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      },
+      "parts_bones": {
+       "SK_Beowulf_H2_Sword": {},
+       "weapon.R": {},
+       "arm_lower.L#islands": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 0,
+      "bleed_regions": {},
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "warn_frames": [
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "frame": 12,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 7,
+      "fail_regions": {},
+      "fail_z_of_height": 0.074,
+      "warn_edges": 39,
+      "warn_regions": {
+       "foot.R|leg_lower.R": 18,
+       "foot.L|leg_lower.L": 17,
+       "arm_lower.R|arm_upper.R": 4
+      },
+      "warn_z_of_height": 0.071,
+      "max_ratio": 8.148,
+      "max_growth_of_height": 0.06949,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "SK_Beowulf_H2_Sword",
+       "weapon.R",
+       "arm_lower.L#islands"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006685,
+      "max_penetration_of_height": 0.006685,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.0,
+      "base_radius_cm": 14.7
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.005458,
+      "max_penetration_of_height": 0.005794,
+      "frame": 3,
+      "warn_above": 0.007458,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/preview/Beowulf-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 1.4,
+  "lines": [
+   "CLIP_AUTHOR OK DeathSettle art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2anim/export/AM_Beowulf_DeathSettle.fbx rest 1.144e-05 pose 4e-05 unreached []"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json",
+ "validation_dir": "docs/art-pipeline/animation-library/validation-h2anim"
+}
