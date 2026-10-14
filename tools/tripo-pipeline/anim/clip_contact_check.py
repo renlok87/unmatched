@@ -10,11 +10,19 @@ validate_clip.py (контракт v2) не проверяет скольжен�
 Геометрия — вычисленные (скиненные) меши клипа по всем кадрам 0..N; подставка — SM_*_H2_Base.fbx спеки.
 Рост H — габарит скиненных мешей в кадре 0 (как validate_clip.py). Проверки:
   foot_slide      макс. сдвиг вершин подошвы (вес foot.X ≥ 0,95) от кадра 0 в кадрах, где IK стопы этой стороны = 1
-                  (ik_feet.weight[_L|_R] спеки), ≤ 0,5 % H (FAIL);
-  weapon_body     BVH-пересечение треугольников меша оружия с телом; треугольники хвата (кость — кисть и
+                  (ik_feet.weight[_L|_R] спеки), ≤ 0,5 % H (FAIL). 0 вершин подошвы (фигура без стоп — ствол Leshen,
+                  F113) — WARN с measured=false и причиной, а не PASS: скольжение не измерено;
+  weapon_body     BVH-пересечение треугольников оружия с телом; треугольники хвата (кость — кисть и
                   предплечье руки оружия) исключены. rest-контакт миниатюры (кадр 0) не считается: FAIL — пересечение
                   с областью тела (доминирующая кость), которой в rest не было, или рост в rest-области > 3× + 20 пар;
-                  рост в rest-области > 25 % + 10 пар — WARN (посох в складках мантии);
+                  рост в rest-области > 25 % + 10 пар — WARN (посох в складках мантии). Оружие — меш meshes.weapon и
+                  части weapon.extra_parts спеки (RB-09/F127, П3-1/П3-2): ["weapon.R", {"bone": "arm_lower.L",
+                  "islands": true}, ...]. Часть-кость — треугольники body, все вершины которых с весом ≥ 0,95 на этой
+                  кости (пятка копья Achilles 100 % на weapon.R); с "islands": true — только целые острова меша body,
+                  все вершины которых такие (щит на предплечье без кожи предплечья). Части исключаются из тела для
+                  всех частей; для части-кости хватом считаются ещё треугольники тела с доминирующей костью — сама
+                  кость части и её потомки. rest-сравнение — по парам (часть, область тела). Без extra_parts
+                  результат прежний;
   limb_body       пересечения треугольников рук (крыльев) с корпусом/головой/ногами по областям тела (доминирующая
                   кость треугольника). rest-контакт не считается: области, пересекающиеся с рукой/крылом в кадре 0
                   или ближе 0,4 % H к ней (BVH с допуском, «касание в rest» — перья Harpy H3 у бёдер, рукава у
@@ -36,8 +44,9 @@ validate_clip.py (контракт v2) не проверяет скольжен�
                   H2/H2LD); из вердикта skin_stretch такие рёбра НЕ исключаются;
   weapon_tip      для клипов с contact.weapon_tip_frames (опора на оружие): острие (вершина меша оружия, самая
                   дальняя вдоль оси кости оружия) в этих кадрах внутри круга подставки и |z − верх| ≤ 0,2 % H (FAIL);
-  weapon_below_base_top_outside  вершины оружия вне круга подставки ниже её верха (висят в воздухе у бока
-                  подставки или «воткнуты» в бок) глубже 0,2 % H — WARN (кроме кадров weapon_tip);
+  weapon_below_base_top_outside  вершины оружия (меш и части weapon.extra_parts) вне круга подставки ниже её верха
+                  (висят в воздухе у бока подставки или «воткнуты» в бок) глубже 0,2 % H — WARN (кроме кадров
+                  weapon_tip);
   below_base_top  вершины фигуры (кроме подола) над кругом подставки не ниже верха подставки сверх
                   rest-заглубления + 0,2 % H (FAIL); вне круга — не ниже z = 0 (FAIL);
   hem_below_base_top  подол (доминирующая кость hips/leg_upper/leg_lower): сверх rest + 0,2 % H — WARN,
@@ -82,6 +91,7 @@ BLEED_R = 0.10  # вершина дальше 10 % роста от отрезк�
 BLEED_W = 0.05
 TIP_TOL = 0.002
 LIMB_NEW_MAX = 10  # до 10 пар в новой области — край зоны стыка плеча (WARN)
+HARD_W = 0.95  # жёсткий вес: вершина body целиком на кости части оружия (weapon.extra_parts) или на стопе (foot_slide)
 
 
 def rel(p):
@@ -133,7 +143,86 @@ def overlap_count(ta, tb):
     return len(ta.overlap(tb))
 
 
+def extra_part_specs(spec):
+    """weapon.extra_parts спеки -> [{"bone", "islands", "name"}] (RB-09/F127, П3-1/П3-2). Элемент — имя кости или
+    {"bone": кость, "islands": true}; нет ключа — пустой список (прежнее поведение)."""
+    out = []
+    for e in ((spec.get("weapon") or {}).get("extra_parts") or []):
+        if isinstance(e, str) and e:
+            bone, isl = e, False
+        elif isinstance(e, dict) and isinstance(e.get("bone"), str) and e["bone"]:
+            bone, isl = e["bone"], bool(e.get("islands", False))
+        else:
+            raise ValueError("weapon.extra_parts: ожидается имя кости или {\"bone\": ..., \"islands\": bool}: %r" % (e,))
+        out.append({"bone": bone, "islands": isl, "name": bone + ("#islands" if isl else "")})
+    if len({p["name"] for p in out}) != len(out):
+        raise ValueError("weapon.extra_parts: повтор части %s" % [p["name"] for p in out])
+    return out
+
+
+def island_labels(nv, edges):
+    """Метка острова (связной компоненты по рёбрам) каждой вершины меша."""
+    parent = list(range(nv))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for a, b in edges:
+        ra, rb = find(int(a)), find(int(b))
+        if ra != rb:
+            parent[ra] = rb
+    return [find(i) for i in range(nv)]
+
+
+def part_polys(vw, polys, bone, islands, labels=None, hard=HARD_W):
+    """Полигоны части оружия в body: все вершины с весом >= hard на кости; с islands — только из островов, у которых
+    все вершины такие (щит на предплечье — без кожи самого предплечья)."""
+    hard_v = {i for i, w in enumerate(vw) if w.get(bone, 0.0) >= hard}
+    if islands:
+        bad = {labels[i] for i in range(len(vw)) if i not in hard_v}
+        hard_v = {i for i in hard_v if labels[i] not in bad}
+    return [k for k, p in enumerate(polys) if p and all(i in hard_v for i in p)]
+
+
+def foot_slide_verdict(vals, foot_vertices, side, tol):
+    """Вердикт foot_slide стороны: vals — [(кадр, сдвиг / H)] по закреплённым кадрам. 0 вершин подошвы — WARN «не
+    измерено» с причиной (F113), а не PASS."""
+    if not foot_vertices:
+        return {"status": "warn", "measured": False, "max_of_height": None, "frame": None,
+                "pinned_frames": len(vals), "tol": tol, "foot_vertices": 0,
+                "reason": "0 вершин подошвы (вес foot.%s >= %.2f): скольжение стопы не измерено — фигура без стоп "
+                          "(ствол, корни, змеиный хвост); опору проверить отдельно (F113)" % (side, HARD_W)}
+    mx = max(vals, key=lambda x: x[1]) if vals else (None, 0.0)
+    return {"status": "pass" if mx[1] <= tol else "fail", "max_of_height": mx[1], "frame": mx[0],
+            "pinned_frames": len(vals), "tol": tol, "foot_vertices": foot_vertices}
+
+
+def weapon_verdict(frames, with_part):
+    """rest-сравнение weapon_body: frames — [(кадр, {часть: {кость тела: пар}})], кадр 0 первый. Нарушение (bad) —
+    область тела, которой у этой части в rest не было, или рост > 3× + 20 пар; рост > 25 % + 10 пар — soft (WARN)."""
+    base = frames[0][1]
+    bad, soft = [], []
+    for f, parts in frames:
+        for part, bones in parts.items():
+            for g, n in bones.items():
+                b0 = base.get(part, {}).get(g, 0)
+                e = {"f": f, "bone": g, "pairs": n, "rest_pairs": b0}
+                if with_part:
+                    e["part"] = part
+                if (b0 == 0 and n > 0) or n > b0 * 3.0 + 20:
+                    bad.append(e)
+                elif n > b0 * 1.25 + 10:
+                    soft.append(e)
+    return bad, soft
+
+
 def main():
+    for stream in (sys.stdout, sys.stderr):  # RB-11/F47: «×» и кириллица в отчёте при cp1251-канале (Bash агентов)
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     argv = sys.argv[sys.argv.index("--") + 1:]
     src = argv[0]
     opts = dict(a[2:].split("=", 1) for a in argv[1:] if a.startswith("--") and "=" in a)
@@ -164,7 +253,22 @@ def main():
     vdom = [max(w, key=w.get) if w else None for w in vw]
     rest_len = None
     grip = set(ARM[wside][1:]) if wside else set()
-    body_ex_grip = [i for i, g in enumerate(dom) if g not in grip]
+    # части оружия в body (weapon.extra_parts, П3-1/П3-2): полигоны с жёстким весом на кости части; из тела исключены
+    # для всех частей, для своей части хват — ещё доминирующая кость части и её потомки
+    extra = extra_part_specs(spec)
+    labels = island_labels(len(vw), edges) if any(p["islands"] for p in extra) else None
+    for p in extra:
+        p["polys"] = part_polys(vw, polys, p["bone"], p["islands"], labels)
+        if not p["polys"]:
+            raise ValueError("weapon.extra_parts %s: 0 треугольников body с весом >= %.2f на кости" % (p["name"], HARD_W))
+        bb = arm.data.bones.get(p["bone"])
+        p["attach"] = {p["bone"]} | ({c.name for c in bb.children_recursive} if bb is not None else set())
+        p["vertices"] = sorted({v for k in p["polys"] for v in polys[k]})
+    extra_poly = {k for p in extra for k in p["polys"]}
+    extra_v = sorted({v for p in extra for v in p["vertices"]})
+    body_ex_grip = [i for i, g in enumerate(dom) if g not in grip and i not in extra_poly]
+    for p in extra:
+        p["body"] = [i for i in body_ex_grip if dom[i] not in p["attach"]]
     core_i = [i for i, g in enumerate(dom) if g in CORE]
     legs_i = [i for i, g in enumerate(dom) if g in LEGS]
     # стык плеча: треугольники руки/крыла и корпуса ближе JUNCTION_R x длина arm_upper к голове arm_upper (rest)
@@ -210,7 +314,7 @@ def main():
     trunk_i = {sd: [i for i in core_i + legs_i if i not in near[sd]] for sd in ("L", "R")}
     # подошва: вершины, скиненные на стопу почти целиком (вес foot >= 0,95); вершины смешанного веса у щиколотки
     # законно следуют за голенью и в скольжение не входят
-    foot_v = {s: [i for i, w in enumerate(vw) if w.get("foot." + s, 0.0) >= 0.95] for s in ("L", "R")}
+    foot_v = {s: [i for i, w in enumerate(vw) if w.get("foot." + s, 0.0) >= HARD_W] for s in ("L", "R")}
     # подол (одежда до подставки): вершины тела с доминирующей костью hips/leg_upper/leg_lower. Жёстко скиненный
     # подол при сгибе колен уходит вниз вместе с голенью/тазом (симуляции ткани нет), поэтому он проверяется
     # отдельно: WARN до HEM_MAX роста, FAIL сверх; стопы, оружие, руки, корпус — FAIL сверх rest + BASE_TOL
@@ -319,6 +423,17 @@ def main():
         for _a, j in wb_pairs:
             g = dom[body_ex_grip[j]]
             wb_bones[g] = wb_bones.get(g, 0) + 1
+        wp_bones = {weapon.name: dict(wb_bones)} if (weapon and extra) else {}
+        for p in extra:
+            # часть оружия в body против тела без хвата, без всех частей и без своей кости крепления
+            t_p, t_pb = tree(co, polys, p["polys"]), tree(co, polys, p["body"])
+            pb = {}
+            for _a, j in (t_p.overlap(t_pb) if (t_p is not None and t_pb is not None) else []):
+                g = dom[p["body"][j]]
+                pb[g] = pb.get(g, 0) + 1
+                wb_bones[g] = wb_bones.get(g, 0) + 1
+                wb += 1
+            wp_bones[p["name"]] = pb
         t_core = tree(co, polys, core_i)
         t_legs = tree(co, polys, legs_i)
         lb = {}
@@ -354,7 +469,7 @@ def main():
         hem_pen = 0.0
         outside_low = 0.0
         w_out_below = 0.0
-        for p in wco:
+        for p in (wco + [co[i] for i in extra_v]) if extra_v else wco:
             if (Vector((p.x, p.y, 0.0)) - bctr).length > brad:
                 w_out_below = max(w_out_below, base_top - p.z)
         tip = None
@@ -377,12 +492,15 @@ def main():
             pen_where = max(vw[pen_i], key=vw[pen_i].get) if vw[pen_i] else "body"
         else:
             pen_where = "weapon"
-        rows.append({"f": f, "foot_slide": {k: r(v) for k, v in slide.items()}, "weapon_body_pairs": wb,
-                     "weapon_body_bones": wb_bones,
-                     "limb_body_pairs": lb, "skin_stretch": st, "weapon_tip": tip,
-                     "weapon_below_base_top_outside": r(w_out_below / height), "base_penetration": r(inside_pen / height), "base_penetration_bone": pen_where,
-                     "hem_penetration": r(hem_pen / height),
-                     "below_ground": r(outside_low / height)})
+        row = {"f": f, "foot_slide": {k: r(v) for k, v in slide.items()}, "weapon_body_pairs": wb,
+               "weapon_body_bones": wb_bones,
+               "limb_body_pairs": lb, "skin_stretch": st, "weapon_tip": tip,
+               "weapon_below_base_top_outside": r(w_out_below / height), "base_penetration": r(inside_pen / height), "base_penetration_bone": pen_where,
+               "hem_penetration": r(hem_pen / height),
+               "below_ground": r(outside_low / height)}
+        if extra:
+            row["weapon_parts_bones"] = wp_bones  # только при weapon.extra_parts: строки без них — прежние
+        rows.append(row)
         if f in (0, 1, N - 1, N):
             seam_pts[f] = figure[::5]
     # вердикты
@@ -396,27 +514,29 @@ def main():
 
     for s in ("L", "R"):
         vals = [(row["f"], row["foot_slide"].get(s, 0.0)) for row in rows if row["f"] in pinned[s]]
-        mx = max(vals, key=lambda x: x[1]) if vals else (None, 0.0)
-        check("foot_slide_" + s, "pass" if mx[1] <= FOOT_SLIDE_MAX else "fail", max_of_height=mx[1], frame=mx[0],
-              pinned_frames=len(vals), tol=FOOT_SLIDE_MAX, foot_vertices=len(foot_v[s]))
-    if weapon:
+        v = foot_slide_verdict(vals, len(foot_v[s]), s, FOOT_SLIDE_MAX)
+        check("foot_slide_" + s, v.pop("status"), **v)
+    if weapon or extra:
         # rest-контакт миниатюры (посох Merlin касается мантии и стопы) не считается: FAIL — пересечение с областью
-        # тела (доминирующая кость), которой в rest не было, или рост пересечений в rest-области > 25 % + 10 пар
+        # тела (доминирующая кость), которой в rest не было, или рост пересечений в rest-области > 25 % + 10 пар;
+        # с weapon.extra_parts — по каждой части отдельно (rest одной части не маскирует другую)
         base_bones = rows[0]["weapon_body_bones"]
-        bad, soft = [], []
-        for row in rows:
-            for g, n in row["weapon_body_bones"].items():
-                b0 = base_bones.get(g, 0)
-                if (b0 == 0 and n > 0) or n > b0 * 3.0 + 20:
-                    bad.append({"f": row["f"], "bone": g, "pairs": n, "rest_pairs": b0})
-                elif n > b0 * 1.25 + 10:
-                    soft.append({"f": row["f"], "bone": g, "pairs": n, "rest_pairs": b0})
+        bad, soft = weapon_verdict([(row["f"], row.get("weapon_parts_bones") or {"mesh": row["weapon_body_bones"]})
+                                    for row in rows], bool(extra))
         worst = max(rows, key=lambda row: row["weapon_body_pairs"])
+        more = {}
+        if extra:
+            more["parts"] = ([{"part": weapon.name, "kind": "mesh", "triangles": len(wpolys)}] if weapon else []) + [
+                {"part": p["name"], "kind": "body_bone", "bone": p["bone"], "islands": p["islands"],
+                 "triangles": len(p["polys"]), "vertices": len(p["vertices"]), "excluded_attach_bones": sorted(p["attach"])}
+                for p in extra]
+            more["rest_parts_bones"] = rows[0]["weapon_parts_bones"]
+            more["parts_bones"] = worst["weapon_parts_bones"]
         check("weapon_body", "fail" if bad else ("warn" if soft else "pass"),
               soft_violations=soft[:6], soft_frames=len({b["f"] for b in soft}),
               rest_pairs=rows[0]["weapon_body_pairs"], rest_bones=base_bones, max_pairs=worst["weapon_body_pairs"],
               frame=worst["f"], body_bones=worst["weapon_body_bones"], violations=bad[:12], violating_frames=len({b["f"] for b in bad}),
-              excluded_grip_bones=sorted(grip))
+              excluded_grip_bones=sorted(grip), **more)
     else:
         check("weapon_body", "info", note="у героя нет меша оружия")
     for s in ("L", "R"):
@@ -481,13 +601,14 @@ def main():
               note="острие в круге подставки (r ≤ радиуса) на уровне её верха: опора на оружие")
     else:
         check("weapon_tip", "info", note="клип без опоры на оружие (contact.weapon_tip_frames не задан)")
-    if weapon:
+    if weapon or extra:
         wo = [row for row in rows if row["f"] not in tip_frames]
         wmax = max(wo, key=lambda row: row["weapon_below_base_top_outside"])
         v = wmax["weapon_below_base_top_outside"]
+        more = {"parts": ([weapon.name] if weapon else []) + [p["name"] for p in extra]} if extra else {}
         check("weapon_below_base_top_outside", "warn" if v > BASE_TOL else "pass", max_of_height=v,
               frame=wmax["f"], tol=BASE_TOL,
-              note="оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки")
+              note="оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки", **more)
     base_pen = rows[0]["base_penetration"]
     worst = max(rows, key=lambda row: row["base_penetration"])
     check("below_base_top", "pass" if worst["base_penetration"] <= base_pen + BASE_TOL else "fail",
