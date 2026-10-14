@@ -27,5 +27,13 @@ escalations.
 | C12 | 1c | B-CONCEPT-PACKAGE contradicts itself: earlier-run files «stay as they are», but the 1c task asks to write README and verification.json; Codex chose to append | «append a 1c section, keep the 1a history» |
 | C13 | 1c | Minor: long swatch names overlap on the sheet; `palette.json` lacks `asset_id` (§4.5 wants it); `make_1c` prints «view.; back»; the `limit_reached` line goes into the acceptor prompt even when empty | small tool fixes |
 
+| C14 | 2 | `tripo3d-stages.md` §5.1 names the texture form `/texture-edit/<uuid>`; that address opens «Волшебная кисть» (Magic Brush, «Создать превью 5»). The texture generator is `/workspace/texture/<uuid>` (left toolbar «Текстура»). A click on the Magic Brush button would spend on the wrong tool | §5.1: `/workspace/texture/<uuid>`; warn that `/texture-edit/` is Magic Brush |
+| C15 | 2 | «Удалить освещение» was OFF on the texture form (8K was remembered); §5.1 says the form remembers both from the last run. It does not: the toggle resets to OFF on every load of the form (checked again after the run), so it is not an account setting to restore. Without the check the BC would carry baked light | §5.1: always switch «Удалить освещение» on and zoom-check before «Создать текстуру» |
+| C16 | 2 | Claude in Chrome path worked end to end for stage 2 (file_upload into the four multi-view slot inputs by ref; no OS file dialog, no cursor) — faster and safer than the pilot's Windows-MCP path | `tripo3d-stages.md` §2: describe `find` → `file_upload` per slot as the main path |
 Stage 1c result: Sol 8.8 pass r1 (S 2, C 1.5, Q 2, P 1.5), 33 PASS / 0 FAIL, `view.facing` 0.965 vs mirror 0.683;
 6 image_gen (2 per view), ≈ 26 min incl. a 429 restart.
+
+Stage 2 result: task ada45143 — generate 60 (20895 → 20835), texture 8K + remove lighting 30 (→ 20805), PBR 5
+(→ 20800), 95 credits, three ledger rows; 20 parts, 1 993 213 tris in both GLBs; `post_h2.py` exit 0 (register-source,
+previews). Previews checked by eye: one figure, one two-tier base, sword in the right hand, shield on the left arm, all
+views consistent. Whole stage 2 through Claude in Chrome in ≈ 12 min without the user's cursor.

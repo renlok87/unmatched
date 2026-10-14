@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-ada45143-h2",
+  "asset_id": "ASSET-BEOWULF-001",
+  "service": "tripo-studio",
+  "task_id": "ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa",
+  "date": "2026-10-14",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+        "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856"
+      },
+      "left": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+        "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+        "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-beowulf-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60.0,
+        "observed_debit": 60.0,
+        "balance_before": 20895.0,
+        "balance_after": 20835.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30.0,
+        "observed_debit": 30.0,
+        "balance_before": 20835.0,
+        "balance_after": 20805.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5.0,
+        "observed_debit": 5.0,
+        "balance_before": 20805.0,
+        "balance_after": 20800.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-parts20.glb",
+      "expected_sha256": "4431493e4e5d58c85c35fc06fd583baddcdac081104ecbe41f294cf375024839",
+      "expected_bytes": 48004692,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-tex8k-pbr.glb",
+      "expected_sha256": "f66a1b93620b0368024d8fa92f549e7ccb45c1c9e53ba054cdadabf0232019cd",
+      "expected_bytes": 81569420,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 20,
+      "glb_triangles": 1993213,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 20,
+      "glb_triangles": 1993213,
+      "glb_materials": 20,
+      "glb_images": 60,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

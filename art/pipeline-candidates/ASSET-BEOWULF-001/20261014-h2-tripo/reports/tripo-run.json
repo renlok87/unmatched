@@ -1,0 +1,625 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-45",
+  "asset_id": "ASSET-BEOWULF-001",
+  "date": "2026-10-14",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (оркестратор 3d-model-pipeline) в браузере пользователя через Windows-MCP: клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/ada45143-f3ce-4ee5-b6ed-ec78a6ca62aa"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-front.png",
+        "sha256": "6d4d5f073c9810f80045a89bcab1e752a0415369cd418102ef3d539fd50b9856"
+      },
+      "left": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-side.png",
+        "sha256": "ae9a3ceb96d2b81060a9bbe2334ab237004cdd8123d95e6f9fc8bec52c9e9fd0"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-beowulf-codex/beowulf-back.png",
+        "sha256": "81d86176b7c4a8f1423b5e38ac3e2c5f9b692e11c55161049cdb1e84a5f458d8"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма стояла на H2-настройках (по частям Баланс, без текстуры, ультра 2M, 8K выкл., Приватный)",
+    "studio_settings_after": "не менялись: форма остаётся на H2-настройках для следующих героев"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60.0,
+        "observed_debit": 60.0,
+        "balance_before": 20895.0,
+        "balance_after": 20835.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30.0,
+        "observed_debit": 30.0,
+        "balance_before": 20835.0,
+        "balance_after": 20805.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5.0,
+        "observed_debit": 5.0,
+        "balance_before": 20805.0,
+        "balance_after": 20800.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-parts20.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "4431493e4e5d58c85c35fc06fd583baddcdac081104ecbe41f294cf375024839",
+      "bytes": 48004692,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 20,
+      "triangles": 1993213,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 722719
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 27924
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 35385
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 32268
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 159150
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 47260
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 34352
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 24309
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 13035
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 11799
+        },
+        {
+          "name": "meshes[19]",
+          "triangles": 7313
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 162898
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 146808
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 157756
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 116151
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 114509
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 67790
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 40111
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 24706
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 46970
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/source/beowulf-h2-tripo-ada45143-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "f66a1b93620b0368024d8fa92f549e7ccb45c1c9e53ba054cdadabf0232019cd",
+      "bytes": 81569420,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 20,
+      "triangles": 1993213,
+      "materials": 20,
+      "images": 60,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 722719
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 27924
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 35385
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 32268
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 159150
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 47260
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 34352
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 24309
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 13035
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 11799
+        },
+        {
+          "name": "meshes[19]",
+          "triangles": 7313
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 162898
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 146808
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 157756
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 116151
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 114509
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 67790
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 40111
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 24706
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 46970
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 722719,
+      "min": [
+        -0.1953,
+        0.2049,
+        -0.1626
+      ],
+      "max": [
+        0.2,
+        0.8722,
+        0.0674
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 162898,
+      "min": [
+        -0.1493,
+        0.2778,
+        -0.0961
+      ],
+      "max": [
+        0.1506,
+        0.5834,
+        0.0934
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 146808,
+      "min": [
+        0.1954,
+        0.3924,
+        -0.1096
+      ],
+      "max": [
+        0.3227,
+        0.7218,
+        0.2121
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 157756,
+      "min": [
+        -0.0567,
+        0.7133,
+        -0.0782
+      ],
+      "max": [
+        0.068,
+        0.9801,
+        0.1185
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 116151,
+      "min": [
+        0.0472,
+        0.0865,
+        -0.0808
+      ],
+      "max": [
+        0.1949,
+        0.3146,
+        0.1001
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 114509,
+      "min": [
+        -0.1927,
+        0.087,
+        -0.0807
+      ],
+      "max": [
+        -0.0458,
+        0.3158,
+        0.1
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 67790,
+      "min": [
+        -0.1143,
+        0.4231,
+        -0.0756
+      ],
+      "max": [
+        0.1162,
+        0.6308,
+        0.0935
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 40111,
+      "min": [
+        -0.3227,
+        0.5747,
+        0.0548
+      ],
+      "max": [
+        -0.1864,
+        0.9741,
+        0.1746
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 24706,
+      "min": [
+        -0.1398,
+        0.2907,
+        -0.0676
+      ],
+      "max": [
+        -0.0255,
+        0.3695,
+        0.0466
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 46970,
+      "min": [
+        -0.271,
+        0.528,
+        -0.0777
+      ],
+      "max": [
+        -0.1281,
+        0.6797,
+        0.0981
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 27924,
+      "min": [
+        0.1939,
+        0.5067,
+        -0.0441
+      ],
+      "max": [
+        0.2708,
+        0.6125,
+        0.0961
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 35385,
+      "min": [
+        -0.1977,
+        0.6321,
+        -0.0904
+      ],
+      "max": [
+        -0.0983,
+        0.7408,
+        0.0115
+      ]
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 32268,
+      "min": [
+        0.1308,
+        0.5465,
+        -0.0799
+      ],
+      "max": [
+        0.2573,
+        0.6812,
+        0.0403
+      ]
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "meshes[13]",
+      "tris": 159150,
+      "min": [
+        -0.2677,
+        0.0,
+        -0.2683
+      ],
+      "max": [
+        0.2687,
+        0.0924,
+        0.2683
+      ]
+    },
+    {
+      "node": "tripo_part_14",
+      "mesh": "meshes[14]",
+      "tris": 47260,
+      "min": [
+        -0.1169,
+        0.6214,
+        -0.0825
+      ],
+      "max": [
+        0.1074,
+        0.7628,
+        0.078
+      ]
+    },
+    {
+      "node": "tripo_part_15",
+      "mesh": "meshes[15]",
+      "tris": 34352,
+      "min": [
+        0.1003,
+        0.6323,
+        -0.0908
+      ],
+      "max": [
+        0.1998,
+        0.7222,
+        0.0114
+      ]
+    },
+    {
+      "node": "tripo_part_16",
+      "mesh": "meshes[16]",
+      "tris": 24309,
+      "min": [
+        0.0265,
+        0.2904,
+        -0.0675
+      ],
+      "max": [
+        0.1411,
+        0.3688,
+        0.0464
+      ]
+    },
+    {
+      "node": "tripo_part_17",
+      "mesh": "meshes[17]",
+      "tris": 13035,
+      "min": [
+        -0.2431,
+        0.4731,
+        0.0315
+      ],
+      "max": [
+        -0.1983,
+        0.5756,
+        0.075
+      ]
+    },
+    {
+      "node": "tripo_part_18",
+      "mesh": "meshes[18]",
+      "tris": 11799,
+      "min": [
+        0.247,
+        0.5099,
+        -0.0009
+      ],
+      "max": [
+        0.3024,
+        0.6149,
+        0.0992
+      ]
+    },
+    {
+      "node": "tripo_part_19",
+      "mesh": "meshes[19]",
+      "tris": 7313,
+      "min": [
+        -0.0486,
+        0.7835,
+        -0.0244
+      ],
+      "max": [
+        0.0498,
+        0.836,
+        0.0293
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-ada45143-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/preview",
+    "out": " --render-dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-BEOWULF-001\\20261014-h2-tripo\\preview\\draft-orthos-0b7d1axv --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  }
+}
