@@ -163,6 +163,9 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F142 | 7 | Import-profile base footprint has no stated source; the bake base top is 5.805 uu, not the card's 0.06 m | ue-import-package §3.1: take it from the rig report's expected UE bounds |
 | F143 | 7 | Orchestrator's look: on a two-tier Tripo base (Achilles) the team-colour ring band on the base renders as ragged patches (white/P1/P2) — Angel's simple base is clean | base marker / `team_mask.base_band` for non-cylindrical bases, or the standard Ø0.30×0.06 base for heroes (cf. F73) |
 | F144 | 7 | Achilles base see-through 0.98 uu² (8 open loops in the base top under the sandals and the spear butt) — second hero with a stage-3 base defect found only at stage 7 (F134) | base_seethrough at stage 3 exit |
+| F145 | 7 | After a model rework the UE clip preview mesh (`Rig/SK_<Key>`, spec `mesh_for_preview`) is never refreshed: `h2anim_ue.py skeleton` is a no-op once the skeleton exists → clip frames would show the old mesh | tool: re-import the preview mesh onto the existing skeleton when the spec's target sha changes (pilot: scratch `refresh_carrier.py`) |
+| F146 | 6 | The r1 clip Blender close-ups came from a scratch script that recorded no camera centre/size — not reproducible for r2/r3 comparisons | tool: close-up framing recorded in the run report |
+| F147 | 4 | Executor commentary reaches the acceptor through the bake profile's `note`/`status_note` (the prompt sends it there for name checks) | §8.2: name checks from reports, not profiles; or strip notes |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 
