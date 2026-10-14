@@ -61,3 +61,23 @@ base with the height team band [0.003, 0.029]); `rig.cloth_shell` on mantle/ches
 42 462 + sword 1 399 = 43 861, base 1 430. Handover checklist: tone code 0 / t_cap 2.0; 34 own frames looked at, 2 defects
 fixed; base see-through 0.00 uu²; rider gap shield 0.00 mm / 0.12 mm in rest and 4 smoke clips; smoke clips PASS except
 the sample-tied `weapon_tip` (C28); probes 14/14; TeamAccent 3.48 % (П3-4). Scouting ≈ 1.5 h of the 2 h 20 min stage.
+
+## Stage 4 findings (launcher agent + orchestrator, 2026-10-14 ≈ 15:00–15:20)
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C29 | 4 | Small gold accents (torc, guard, pommel, helmet rims) render as pale ivory vs gold on the sheet; neither the Sol rubric nor `tone.json` caught it (all classes ok except floor) — same as the stage-3 note (gold saturation −0.074) | tone: a check for small chromatic accent classes (share < 10 %), or a close-up crop of accents in the tone table |
+| C30 | 4 | `close-hands`: for a shield arm the `hand.L` panel shows only the shield face, the left hand is not visible | capture: a shield-side angle for the hand panel when `weapon.extra_parts`/shield is present |
+| C31 | 4 | With 1200 px frames (ДС-8) Sol still logged «Reconnecting 5/5» and fell back to HTTPS — RC-22 is not closed by the frame size | measure the request size; look at the number of frames (42 images) rather than their size |
+| C32 | 0/4 | Card `STAGE3.executor.session` held `agent:stage3-beowulf`, the real agent name was `beowulf-stage3` | the launcher writes the actual id (RA-21) |
+| C33 | 4 | The «item only S/F/T/D…; empty field = JSON null» reminder (§8.5 п.6) had to be added to both prompts by hand | move it into the §8.2 template |
+| C35 | 4 | `finish_second.py` expects `{"result": [...]}` (the workflow notification shape); the journal / workflow return is a bare list → `TypeError: list indices must be integers` | accept both shapes; document the input in §8.3 |
+| C34 | 4 | Orchestrator: passing the strict output schema to `second-acceptor` — the Cyrillic `description` fields came out mangled through a cp1251 print; worked around by stripping descriptions/titles | ship an ASCII args file (e.g. `_output_schema.py --workflow-args <kind>`) or have `prep` write `second-acceptor-args.json` |
+
+Stage 4 r1: Sol 6.1 xhigh — S 2 / F 1.5 / T 1.5 / D 1.5 = 8.1, pass, `rework_fix_list` [], 8 known issues (neck flats behind
+the beard, angular mantle strands, right sleeve armhole cut in `pose-05`, grey-blue strokes on the fur, thigh through the
+hem in `pose-04b`); gates all PASS and recomputed by `--check-files`; validate_card code 3 → second acceptor Opus via
+`second-acceptor` workflow. Capture 19 s, Sol 11 min.
+
+Stage 4 second acceptor: Opus xhigh via `second-acceptor` — S 2 / F 1.5 / T 1.5 / D 1.5 = 8.1 pass; pair final 8.1 pass
+(finish_second exit 0). Model accepted at r1 — no stage 5.

@@ -1,0 +1,192 @@
+{
+  "schema": "unmatched.acceptance-tone/1",
+  "rule": {
+    "main_share_min": 0.1,
+    "y_ratio_ok": [
+      0.8,
+      1.25
+    ],
+    "hue_abs_max_deg": 15.0,
+    "hue_checked": "|dHue| проверяется, только когда обе медианы хроматические (sat >= 0.15); оттенок почти серого цвета — шум (RB-06)",
+    "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по построению, его яркость проверяет только y_ratio_loo",
+    "family": "same | changed: обе медианы хроматические (sat >= 0.15) и |dHue| > 30 deg, либо переход нейтральный <-> хроматический с |dSat| >= 0.20 — смена семейства (S); светлота и насыщенность внутри семейства — тон (T)",
+    "cap": "1.0 — основной класс вне допуска; 1.5 — только второстепенные; 2.0 — все в допуске; status floor (ld-maps-report grade.median_floor_applied) T не снижает"
+  },
+  "framing": "concept",
+  "exposure_k_concept_over_ld": 1.2237,
+  "exposure": {
+    "class": "wool_coarse",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по меху мантии (самая большая зона, 36 %, главный цвет; как плащ Achilles). Якорь по коже (2,4 % площади) дал k 2,09 против среднего по всем классам 0,92: кожа H2 вдвое темнее концепта, а прочие классы в пределах 0,6–1,3 — по ней вне допуска вышли бы 9 классов из 11 (проход разведки C:/tmp/beowulf-scout/ld1)"
+  },
+  "anchor_class": "wool_coarse",
+  "classes": [
+    {
+      "class": "gold_antique",
+      "pixels_ld": 6437,
+      "y_ratio": 0.941,
+      "d_hue_deg": 3.5,
+      "d_sat": -0.074,
+      "share": 0.0043,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "leather_smooth",
+      "pixels_ld": 36676,
+      "y_ratio": 2.125,
+      "d_hue_deg": -0.5,
+      "d_sat": -0.031,
+      "share": 0.0247,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "leather_worn",
+      "pixels_ld": 158138,
+      "y_ratio": 1.154,
+      "d_hue_deg": -2.1,
+      "d_sat": -0.014,
+      "share": 0.1066,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": 1.116,
+      "status": "floor"
+    },
+    {
+      "class": "legacy_bake",
+      "pixels_ld": 21364,
+      "y_ratio": 1.178,
+      "d_hue_deg": -1.2,
+      "d_sat": -0.038,
+      "share": 0.0144,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "linen",
+      "pixels_ld": 32186,
+      "y_ratio": 1.01,
+      "d_hue_deg": 1.0,
+      "d_sat": -0.011,
+      "share": 0.0217,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "metal_forged",
+      "pixels_ld": 139605,
+      "y_ratio": 1.208,
+      "d_hue_deg": -1.4,
+      "d_sat": -0.044,
+      "share": 0.0941,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "skin",
+      "pixels_ld": 35124,
+      "y_ratio": 1.075,
+      "d_hue_deg": -0.6,
+      "d_sat": -0.021,
+      "share": 0.0237,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "steel_blued",
+      "pixels_ld": 97809,
+      "y_ratio": 0.871,
+      "d_hue_deg": 0.0,
+      "d_sat": 0.022,
+      "share": 0.0659,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "stone_base",
+      "pixels_ld": 277493,
+      "y_ratio": 1.224,
+      "d_hue_deg": 0.0,
+      "d_sat": 0.0,
+      "share": 0.1871,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": 1.183,
+      "status": "floor"
+    },
+    {
+      "class": "wood",
+      "pixels_ld": 142359,
+      "y_ratio": 1.133,
+      "d_hue_deg": -3.0,
+      "d_sat": -0.098,
+      "share": 0.096,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "wool_coarse",
+      "pixels_ld": 536117,
+      "y_ratio": 1.0,
+      "d_hue_deg": 0.9,
+      "d_sat": 0.064,
+      "share": 0.3614,
+      "role": "main",
+      "anchor": true,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": 0.93,
+      "status": "ok"
+    }
+  ],
+  "t_cap": 2.0,
+  "out_of_tolerance": [],
+  "floor_limited": [
+    "leather_smooth",
+    "leather_worn",
+    "stone_base"
+  ],
+  "family_changed_main": [],
+  "warnings": [],
+  "sources": {
+    "measure_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/measure-report.json",
+    "maps_report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-maps-report.json"
+  }
+}

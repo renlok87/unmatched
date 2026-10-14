@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-BEOWULF-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance/20261014-r1/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5",
+    "bake_run": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/asset-card.yaml",
+      "sha256": "00225b37c94fcb04602c863375b4b2fc8a77288ca55ea37fcbb99eefc3537f4a"
+    },
+    "previous_card": null
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_Beowulf_H2LD",
+      "base": "SM_Beowulf_H2LD_Base",
+      "materials": [
+        "MI_Beowulf_H2LD",
+        "MI_Beowulf_H2LD_Base",
+        "MI_Beowulf_H2LD_P1",
+        "MI_Beowulf_H2LD_P2",
+        "MI_Beowulf_H2LD_Base_P1",
+        "MI_Beowulf_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_Beowulf_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/Beowulf/Rig/SK_Beowulf_Skeleton",
+      "clips": "/Game/PipelineCandidates/Beowulf/H2Anim/AM_Beowulf_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_Beowulf_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_Beowulf_H2LD_Edge",
+        "T_UM_MatLUT_Beowulf"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.55,
+    "FIGURE_BOUNDS_TOP_M": 0.55015,
+    "texture_files": [
+      "T_Beowulf_H2LD_2K_BC.png",
+      "T_Beowulf_H2LD_2K_Edge.png",
+      "T_Beowulf_H2LD_2K_MatID.png",
+      "T_Beowulf_H2LD_2K_N.png",
+      "T_Beowulf_H2LD_2K_ORM.png",
+      "T_Beowulf_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t4.json",
+      "sha256": "4ce685cc09784f22fde85377407fc941a399693e1c88987191e5bc134946d254",
+      "meshes": {
+        "body": "SK_Beowulf_H2_Body",
+        "weapon": "SK_Beowulf_H2_Sword",
+        "base": "SM_Beowulf_H2_Base"
+      },
+      "materials.atlas": "M_Beowulf_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.55
+    },
+    "height": {
+      "body_mesh": "SK_Beowulf_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_Beowulf_H2_Body.bounds_m.max[2]",
+        "value": 0.55015
+      },
+      "other_meshes_top_m": {
+        "SK_Beowulf_H2_Sword": 0.54684
+      },
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 55.015,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.55,
+      "FIGURE_BOUNDS_TOP_M": 0.55015,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5",
+    "texture": "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "9c0364d7b742300438a0b08632f72f661d2a6b805ea2f00edaca7c81bb2c9353",
+    "output": "T_Beowulf_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t4/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t3/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "longsword in the figure's own RIGHT hand; round wooden shield on the LEFT arm; fur mantle; braided beard",
+  "prev_fix_list": {
+    "cycle": null,
+    "items": []
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_Beowulf_H2LD\", \"base\": \"SM_Beowulf_H2LD_Base\", \"materials\": [\"MI_Beowulf_H2LD\", \"MI_Beowulf_H2LD_Base\", \"MI_Beowulf_H2LD_P1\", \"MI_Beowulf_H2LD_P2\", \"MI_Beowulf_H2LD_Base_P1\", \"MI_Beowulf_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_Beowulf_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/Beowulf/Rig/SK_Beowulf_Skeleton\", \"clips\": \"/Game/PipelineCandidates/Beowulf/H2Anim/AM_Beowulf_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_Beowulf_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_Beowulf_H2LD_Edge\", \"T_UM_MatLUT_Beowulf\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_Beowulf_H2LD_2K_BC.png, T_Beowulf_H2LD_2K_Edge.png, T_Beowulf_H2LD_2K_MatID.png, T_Beowulf_H2LD_2K_N.png, T_Beowulf_H2LD_2K_ORM.png, T_Beowulf_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t4.json\", \"meshes\": {\"body\": \"SK_Beowulf_H2_Body\", \"weapon\": \"SK_Beowulf_H2_Sword\", \"base\": \"SM_Beowulf_H2_Base\"}, \"materials.atlas\": \"M_Beowulf_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.55}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_Beowulf_H2_Body.bounds_m.max[2] = 0.55015 м против FIGURE_HEIGHT_M заявки 0.55 м ± 1 %; рост не задают другие меши (оружие): SK_Beowulf_H2_Sword bounds_m.max[2] = 0.54684 м; art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-bake-t4/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 55.015 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_Beowulf_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-BEOWULF-001/20261014-h2-lookdev-t5/textures/T_Beowulf_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "longsword in the figure's own RIGHT hand; round wooden shield on the LEFT arm; fur mantle; braided beard",
+    "PREV_FIX_LIST": "нет (r1 или у прежней карточки пустые rework_fix_list и known_issues)"
+  }
+}
