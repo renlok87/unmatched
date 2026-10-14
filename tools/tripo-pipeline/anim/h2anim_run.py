@@ -20,6 +20,12 @@
 и --out-dir могут лежать вне репозитория; пути в отчётах — от корня репозитория, вне его — абсолютные. Дымовой прогон
 этапа 3 (animation-vfx-sfx.md §6.6) кладёт всё в <bake run>/work/smoke/: --out-dir <bake run>/work/smoke/validation,
 отчёты validate настоящих клипов в docs/ не трогаются.
+
+Спека дыма — ключ `"smoke": true` (C28, 2026-10-14): цели образца (`weapon_tip` острия, `hand_follow`) привязаны к его
+пропорциям и на другом герое не сходятся, поэтому в вердикт дыма не входят — clip_contact_check ставит weapon_tip
+info (status_without_smoke), а здесь у клипа блок `smoke` с этим статусом и недотянутыми кадрами hand_follow из журнала
+автора. Без --out-dir отчёты validate дыма ложатся в <run_dir>/../validation (по раскладке §6.6 это
+<bake run>/work/smoke/validation), а не в docs/.
 """
 import argparse
 import json
@@ -70,6 +76,27 @@ def compact_sheet(run, label):
     return rel(jpg)
 
 
+def smoke_entry(crep, arep):
+    """Блок `smoke` клипа (C28): что исключено из вердикта дыма и замеры этих целей образца — статус weapon_tip без
+    дыма (contact) и hand_follow из журнала автора: кадры, где IK руки не дотянулась, и наибольший дефицит досягаемости
+    по стороне (follow_<S>_reach_deficit_cm > 0 — цель дальше вытянутой руки)."""
+    tip = next((k for k in (crep or {}).get("checks", []) if k.get("check") == "weapon_tip"), {})
+    unreached, deficit = [], {}
+    for row in (arep or {}).get("ik_log") or []:
+        for k, v in row.items():
+            if k.startswith("follow_") and k[len("follow_"):] in ("L", "R") and v is False:
+                unreached.append(row["f"])
+            if k.startswith("follow_") and k.endswith("_reach_deficit_cm") and v is not None:
+                s = k[len("follow_"):-len("_reach_deficit_cm")]
+                deficit[s] = max(deficit.get(s, v), v)
+    return {"excluded_from_verdict": ["weapon_tip", "hand_follow"],
+            "weapon_tip_without_smoke": tip.get("status_without_smoke", tip.get("status")),
+            "hand_follow": {"configured": bool((arep or {}).get("hand_follow")),
+                            "unreached_frames": sorted(set(unreached)),
+                            "max_reach_deficit_cm": deficit},
+            "note": "цели образца привязаны к его пропорциям (C28): замер для отчёта сдачи модели, не вердикт"}
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):  # RB-11/F47: «×» of the contact checks in a cp1251 pipe (agents' Bash)
         if hasattr(stream, "reconfigure"):
@@ -88,7 +115,11 @@ def main():
     run = Path(REPO) / spec["run_dir"]       # абсолютный run_dir — как есть
     (run / "reports").mkdir(parents=True, exist_ok=True)
     (run / "preview").mkdir(parents=True, exist_ok=True)
-    val_dir = Path(a.out_dir).resolve() if a.out_dir else VAL_DIR
+    smoke = bool(spec.get("smoke", False))  # спека дыма §6.6 (C28)
+    if a.out_dir:
+        val_dir = Path(a.out_dir).resolve()
+    else:
+        val_dir = run.resolve().parent / "validation" if smoke else VAL_DIR  # дым не пишет в docs/
     val_dir.mkdir(parents=True, exist_ok=True)
     clips = a.clips.split(",") if a.clips else list(spec["clips"])
     out_path = run / "reports" / "h2anim-run.json"
@@ -146,12 +177,20 @@ def main():
                               "sheet": compact_sheet(run, "%s-%s" % (spec["ue_hero"], name))}
         elif (summary["clips"].get(name) or {}).get("probe"):
             entry["probe"] = summary["clips"][name]["probe"]  # --no-probe: лист прошлого прогона
+        if smoke:
+            ap_ = run / "reports" / ("author-%s.json" % name)
+            arep = json.loads(ap_.read_text(encoding="utf-8")) if ap_.exists() else {}
+            entry["smoke"] = smoke_entry(crep, arep)
+            print("    smoke (вне вердикта): weapon_tip", entry["smoke"]["weapon_tip_without_smoke"],
+                  "| hand_follow unreached", entry["smoke"]["hand_follow"]["unreached_frames"][:8])
         ok = vrep.get("result") == "pass" and crep.get("result") == "pass"
         entry["passed"] = ok
         ok_all &= ok
         summary["clips"][name] = entry
     summary["spec"] = rel(spec_path)
     summary["validation_dir"] = rel(val_dir)
+    if smoke:
+        summary["smoke"] = True
     out_path.write_text(json.dumps(summary, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     sys.exit(0 if ok_all else 1)
 

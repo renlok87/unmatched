@@ -18,7 +18,10 @@
   weapon_dir, hand_head   ось кости оружия и голова кисти <S>
   butt_cm / tip_cm        концы оружия (вершины веса weapon.<S> тела + меши оружия, по оси кости в rest);
                           butt_below_top_cm — насколько пятка ниже верха подставки (> 0 = утоплена; только с --base и
-                          если пятка над кругом подставки)
+                          если пятка над кругом подставки). Верх подставки — устойчивая высота robust_base_top (C40,
+                          2026-10-14): 90-й перцентиль по площади высот граней, смотрящих вверх (нормаль ≤ 30° от +Z),
+                          а не максимум вершин (бугорок 3 мм на 6,00 см при видимой поверхности 5,68 у Beowulf);
+                          максимум вершин — base_top_max_vertex_cm в summary
   weapon_body_pairs       BVH-пересечения оружия (меши оружия + грани тела с доминантой weapon.<S>) с гранями тела
                           ядра, ног, головы и другой руки (грани хвата hand.<S>/arm_lower.<S> исключены); weapon_regions
   shield_vs_forearm_cm    (с --shield-bone) сдвиг вершин щита (вес кости щита ≥ 0,999 и дальше --shield-min-dist-cm от
@@ -37,6 +40,62 @@ import sys
 
 TOOL = "tools/tripo-pipeline/anim/grip_check.py"
 CORE = ("hips", "spine", "head", "leg_upper.L", "leg_lower.L", "foot.L", "leg_upper.R", "leg_lower.R", "foot.R")
+BASE_UP_COS = 0.866  # грань подставки «смотрит вверх»: нормаль не дальше 30° от +Z
+BASE_TOP_Q = 0.9     # верх подставки — 90-й перцентиль (по площади) высот таких граней (C40)
+BASE_TOP_RULE = ("верх подставки — 90-й перцентиль по площади высот центров граней, смотрящих вверх (нормаль ≤ 30° "
+                 "от +Z), не выше максимума вершин; не максимум вершин (C40: бугорок 3 мм на 6,00 см при видимой "
+                 "поверхности 5,68 см у Beowulf заставлял острие висеть)")
+
+
+def robust_base_top(faces, max_vertex_z=None, q: float = BASE_TOP_Q, cos_min: float = BASE_UP_COS) -> dict:
+    """Устойчивая высота верха подставки (C40, 2026-10-14; общая для grip_check и clip_contact_check).
+
+    faces — [(z центра грани, площадь, z единичной нормали)] в одной системе (мир или арматура). Берутся грани,
+    смотрящие вверх (nz ≥ cos_min), сортируются по высоте; верх — высота, на которой набирается доля q их площади
+    (взвешенный перцентиль): бугорок или шип в несколько граней его не поднимает, а нижний ярус двухъярусной
+    подставки не опускает, пока у верхнего больше 1 − q площади вверх. Не выше max_vertex_z. Нет граней вверх —
+    максимум вершин (fallback). Возврат: {top, max_vertex, up_faces, up_area_share, q, fallback, rule}."""
+    faces = [(float(z), float(a), float(nz)) for z, a, nz in faces]
+    if max_vertex_z is None and faces:
+        max_vertex_z = max(z for z, _a, _n in faces)
+    up = sorted((z, a) for z, a, nz in faces if nz >= cos_min and a > 0.0)
+    tot_all = sum(a for _z, a, _n in faces if a > 0.0)
+    out = {"max_vertex": max_vertex_z, "up_faces": len(up), "q": q, "rule": BASE_TOP_RULE,
+           "up_area_share": round(sum(a for _z, a in up) / tot_all, 4) if tot_all > 0 else None}
+    if not up:
+        out.update(top=max_vertex_z, fallback="нет граней, смотрящих вверх: верх = максимум вершин")
+        return out
+    tot = sum(a for _z, a in up)
+    acc, top = 0.0, up[-1][0]
+    for z, a in up:
+        acc += a
+        if acc >= q * tot - 1e-12:
+            top = z
+            break
+    if max_vertex_z is not None:
+        top = min(top, max_vertex_z)
+    out.update(top=top, fallback=None)
+    return out
+
+
+def polygon_faces(polys) -> list:
+    """[(вершины полигона как 3-кортежи)] → [(z центра, площадь, nz единичной нормали)] (веер треугольников; нормаль —
+    сумма векторных произведений, то есть по обходу вершин, как у Blender)."""
+    out = []
+    for vs in polys:
+        if len(vs) < 3:
+            continue
+        n = [0.0, 0.0, 0.0]
+        for k in range(1, len(vs) - 1):
+            a = [vs[k][i] - vs[0][i] for i in range(3)]
+            b = [vs[k + 1][i] - vs[0][i] for i in range(3)]
+            c = (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+            n = [n[i] + c[i] for i in range(3)]
+        ln = math.sqrt(sum(x * x for x in n))
+        if ln <= 0.0:
+            continue
+        out.append((sum(v[2] for v in vs) / len(vs), ln / 2.0, n[2] / ln))
+    return out
 
 
 # ---------------------------------------------------------------------------------- чистая математика (без Blender)
@@ -107,6 +166,8 @@ def summarize(rows: list, side: str = "R", base: dict | None = None) -> dict:
     }
     if base:
         out.update({"base_top_cm": base.get("top_cm"), "base_radius_cm": base.get("radius_cm")})
+        if "top_max_vertex_cm" in base:  # C40: верх — устойчивая высота; прежний верх (максимум вершин) — справка
+            out["base_top_max_vertex_cm"] = base["top_max_vertex_cm"]
     return out
 
 
@@ -165,7 +226,14 @@ def measure(a) -> dict:  # pragma: no cover - выполняется тольк�
     if a.base and base_objs:
         bco = [inv @ o.matrix_world @ v.co for o in base_objs for v in o.data.vertices]
         bx, by = [p.x for p in bco], [p.y for p in bco]
-        base = {"top_cm": round(max(p.z for p in bco), 3),
+        bpolys = []
+        for o in base_objs:
+            m = inv @ o.matrix_world
+            vs = [tuple(m @ v.co) for v in o.data.vertices]
+            bpolys += [[vs[i] for i in p.vertices] for p in o.data.polygons]
+        top = robust_base_top(polygon_faces(bpolys), max(p.z for p in bco))  # C40: не максимум вершин
+        base = {"top_cm": round(top["top"], 3), "top_max_vertex_cm": round(top["max_vertex"], 3),
+                "top_rule": top["rule"],
                 "center": Vector(((max(bx) + min(bx)) / 2, (max(by) + min(by)) / 2, 0.0)),
                 "radius_cm": round(min(max(bx) - min(bx), max(by) - min(by)) / 2, 2)}
     B, P = arm.data.bones, arm.pose.bones

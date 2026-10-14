@@ -3,7 +3,9 @@
     blender -b --factory-startup --python tools/tripo-pipeline/review/_rider_gap_blender.py -- <cfg.json>
 
 cfg.json пишет обёртка: {"parts_blend", "rest_fbx", "clips": {имя: fbx}, "pairs": [{name, rider[], perch[]|null}],
-"scan": {часть: кость}, "base_parts": [...], "auto_margin_m", "window_m", "match_warn_m", "pen_eval_m", "raw_out"}.
+"scan": [{name, parts[], bone}] (прежняя форма {часть: кость} тоже читается), "same_bone": {часть: [соседи по кости]}
+(C47: в опору auto не идут), "base_parts": [...], "auto_margin_m", "window_m", "match_warn_m", "pen_eval_m",
+"raw_out"}.
 Выход — сырой замер raw_out (вердикты считает обёртка): сопоставление частей, опоры auto, rest (пары и скан), клипы
 (пары по кадрам). Печатает RIDER_GAP_RAW_OK.
 
@@ -279,12 +281,17 @@ def bones_near(vecs, idx, bones, geoms, rider, perch, limit):
              "min_dominant_weight": round(min(bones[i][1] for i in rid), 4) if len(rid) else None})
 
 
-def scan_part(vecs, co, idx, geoms, part, rest_parts, window, pen_eval):
-    """Жёсткая часть против всей остальной фигуры: зазор поверхностей, ближайшая часть, утоплена ли."""
-    rs, os_ = Surface(geoms, [part], pen_eval), Surface(geoms, rest_parts, pen_eval)
+def scan_part(vecs, co, idx, geoms, part, rest_parts, window, pen_eval, parts=None):
+    """Жёсткая часть (или группа частей одной кости, C47: parts) против всей остальной фигуры: зазор поверхностей,
+    ближайшая часть, утоплена ли."""
+    parts = list(parts or [part])
+    rs, os_ = Surface(geoms, parts, pen_eval), Surface(geoms, rest_parts, pen_eval)
     if rs.empty or os_.empty:
-        return {"part": part, "gap_m": None, "note": "пустая часть"}
-    rv = idx[part]
+        out = {"part": part, "gap_m": None, "note": "пустая часть"}
+        if len(parts) > 1:
+            out["parts"] = parts
+        return out
+    rv = ids_of(idx, parts)
     lo, hi = co[rv].min(0) - window, co[rv].max(0) + window
     u1, v1, part1, _s1 = os_.stats(vecs, co, rv)
     u2 = min((h[1] for h in (rs.nearest(vecs[i]) for i in in_window(co, ids_of(idx, rest_parts), lo, hi)) if h),
@@ -292,6 +299,8 @@ def scan_part(vecs, co, idx, geoms, part, rest_parts, window, pen_eval):
     gap = min(u1, u2)
     item = {"part": part, "gap_m": r6(gap), "nearest_part": part1,
             "closest_vertex_m": [round(float(x), 5) for x in co[v1]] if v1 is not None else None, "embedded": False}
+    if len(parts) > 1:
+        item["parts"] = parts
     if gap > 1e-4:  # не касается: утоплена ли (половина выборки вершин внутри остальных частей)?
         sample = rv[np.linspace(0, len(rv) - 1, min(len(rv), 60)).astype(int)]
         inside = 0
@@ -351,13 +360,22 @@ def main():
     geoms = part_geoms(vecs, co, st["faces_by_part"], st["tris_by_part"])
     bones = dominant_bones(meshes)
 
+    same_bone = cfg.get("same_bone") or {}  # C47: соседи детали по кости — одно тело с ней, не опора
+
+    def attached(parts):
+        return {q for p in parts for q in same_bone.get(p, [])} - set(parts)
+
+    scan_cfg = cfg.get("scan") or []
+    if isinstance(scan_cfg, dict):  # прежняя форма {часть: кость}
+        scan_cfg = [{"name": p, "parts": [p], "bone": b} for p, b in scan_cfg.items()]
     perch_of, rest_pairs = {}, {}
     for pr in cfg["pairs"]:
         rider = pr["rider"]
-        dist = part_distances(vecs, st["idx"], geoms, rider, [p for p in fig_parts if p not in rider])
+        sib = attached(rider)
+        dist = part_distances(vecs, st["idx"], geoms, rider, [p for p in fig_parts if p not in rider and p not in sib])
         perch = pr["perch"] or auto_perch(dist, margin)
         perch_of[pr["name"]] = perch
-        others = [p for p in fig_parts if p not in rider and p not in perch]
+        others = [p for p in fig_parts if p not in rider and p not in perch and p not in sib]
         m = measure(vecs, co, st["idx"], geoms, rider, perch, others, window, pen_eval)
         near, rider_bones = bones_near(vecs, st["idx"], bones, geoms, rider, perch,
                                        (m.get("gap_m") or 0.0) + NEAR_BONES_M)
@@ -367,17 +385,21 @@ def main():
                   "perch_faces": int(sum(len(st["faces_by_part"].get(p, [])) for p in perch))})
         rest_pairs[pr["name"]] = m
     scan = []
-    for part, bone in sorted(cfg["scan"].items(), key=lambda kv: part_sort_key(kv[0])):
-        if part not in fig_parts:
-            warnings.append("скан: части %s нет в фигуре" % part)
+    for unit in sorted(scan_cfg, key=lambda u: part_sort_key(u["parts"][0])):
+        missing = [p for p in unit["parts"] if p not in fig_parts]
+        if missing:
+            warnings.append("скан: части %s нет в фигуре" % "+".join(missing))
             continue
-        item = scan_part(vecs, co, st["idx"], geoms, part, [p for p in fig_parts if p != part], window, pen_eval)
-        item["bone"] = bone
+        excl = set(unit["parts"]) | attached(unit["parts"])
+        rest_parts = [p for p in fig_parts if p not in excl]
+        item = scan_part(vecs, co, st["idx"], geoms, unit["name"], rest_parts, window, pen_eval, unit["parts"])
+        item["bone"] = unit["bone"]
         # опора скана в клипах (F133 у детали без пары): ближайшие части в rest, как опора auto пары
-        dist = part_distances(vecs, st["idx"], geoms, [part], [p for p in fig_parts if p != part])
+        dist = part_distances(vecs, st["idx"], geoms, unit["parts"], rest_parts)
         item["perch"] = auto_perch(dist, margin)
         scan.append(item)
-    involved = {p for pr in cfg["pairs"] for p in pr["rider"] + perch_of[pr["name"]]} | set(cfg["scan"])
+    involved = {p for pr in cfg["pairs"] for p in pr["rider"] + perch_of[pr["name"]]} | \
+        {p for u in scan_cfg for p in u["parts"]}
     raw = {
         "blender": bpy.app.version_string,
         "mapping": {"parts_frame": pmap.frame, "vertices": st["n"], "worst_match_m": r6(st["dist"].max()),
@@ -415,12 +437,14 @@ def main():
             geoms_f = part_geoms(vecs_f, co_f, cst["faces_by_part"], cst["tris_by_part"])
             for pr in cfg["pairs"]:
                 perch = perch_of[pr["name"]]
-                others = [p for p in fig_parts if p not in pr["rider"] and p not in perch]
+                sib = attached(pr["rider"])
+                others = [p for p in fig_parts if p not in pr["rider"] and p not in perch and p not in sib]
                 m = measure(vecs_f, co_f, cst["idx"], geoms_f, pr["rider"], perch, others, window, pen_eval)
                 m["f"] = f - f0
                 rows[pr["name"]].append(m)
             for it in scan_live:
-                m = measure(vecs_f, co_f, cst["idx"], geoms_f, [it["part"]], it["perch"], [], window, 0.0)
+                m = measure(vecs_f, co_f, cst["idx"], geoms_f, it.get("parts") or [it["part"]], it["perch"], [],
+                            window, 0.0)
                 scan_rows[it["part"]].append({"f": f - f0, "gap_m": m.get("gap_m")})
         raw["clips"][clip] = {"action": act.name, "frame_range": [f0, f1], "rows": rows, "scan_rows": scan_rows}
         print("CLIP", clip, f1 - f0 + 1, "frames")

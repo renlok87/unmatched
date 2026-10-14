@@ -120,3 +120,68 @@ def test_override_of_an_unknown_hero_or_clip(monkeypatch):
 def test_hero_in_h2anim_without_chars(monkeypatch):
     monkeypatch.setitem(cm.H2ANIM, "Ghost", ACH_SPEC)
     assert "Ghost: есть в H2ANIM, нет в CHARS" in cm.registration_errors(committed())
+
+
+# ---------------------------------------------- C53 (2026-10-14): происхождение движения из pattern / MOTION_SOURCE
+def _clip_spec(**top):
+    spec = {"clips": {"Idle": {"template": {"file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx"},
+                               "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle",
+                               "reference_kind": "library pattern (D-11), not a X video"}}}
+    spec.update(top)
+    return spec
+
+
+def _asset(tmp_path, card_line=None):
+    """<asset>/build-profiles/x-h2anim.json (путь спеки) и при card_line — <asset>/asset-card.yaml."""
+    (tmp_path / "build-profiles").mkdir(parents=True, exist_ok=True)
+    if card_line is not None:
+        (tmp_path / "asset-card.yaml").write_text("ASSET_ID: X\n%s\n  \"MOTION_SOURCE\": \"nested, ignored\"\n"
+                                                 % card_line, encoding="utf-8")
+    return str(tmp_path / "build-profiles" / "x-h2anim.json")
+
+
+def test_provenance_without_pattern_keys_is_the_old_text(tmp_path):
+    txt, kind = cm.provenance(_clip_spec(), _asset(tmp_path), "Idle")
+    assert kind == "video"
+    assert txt == ("шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу "
+                   "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle")
+    # MOTION_SOURCE «syntx: …» — видео-референс, текст прежний
+    txt2, kind2 = cm.provenance(_clip_spec(), _asset(tmp_path, 'MOTION_SOURCE: "syntx: полёт"'), "Idle")
+    assert (txt2, kind2) == (txt, "video")
+
+
+def test_provenance_from_history_pattern_spec_and_card(tmp_path):
+    spec = _clip_spec(history={"pattern_spec": "art/x/angel-h2anim-r2.json", "pattern_sha256": "ab"})
+    txt, kind = cm.provenance(spec, _asset(tmp_path, 'MOTION_SOURCE: "library: Angel (r2)"   # ДС-6'), "Idle")
+    assert kind == "pattern"
+    assert "ключи паттерна библиотеки art/x/angel-h2anim-r2.json" in txt
+    assert "MOTION_SOURCE «library: Angel (r2)»" in txt and "по видео-референсу" not in txt
+    assert "reference_kind: library pattern (D-11), not a X video" in txt and "AM_Medusa_Idle.fbx" in txt
+
+
+def test_provenance_pattern_key_forms_and_motion_source_only(tmp_path):
+    p = _asset(tmp_path)
+    txt, kind = cm.provenance(_clip_spec(pattern={"spec": "art/k/king-arthur-h2anim.json", "key": "KingArthur"}), p,
+                              "Idle")
+    assert kind == "pattern" and "art/k/king-arthur-h2anim.json (KingArthur)" in txt
+    assert cm.pattern_of(_clip_spec(pattern="art/k/a.json")) == {"spec": "art/k/a.json"}
+    txt, kind = cm.provenance(_clip_spec(motion_source="library: Merlin"), p, "Idle")
+    assert kind == "pattern" and "авторский слой по паттерну библиотеки" in txt and "«library: Merlin»" in txt
+    txt, kind = cm.provenance(_clip_spec(), _asset(tmp_path, "MOTION_SOURCE: tripo-preset: slash"), "Idle")
+    assert kind == "pattern" and "пресета Tripo" in txt and "«tripo-preset: slash»" in txt
+    assert cm.motion_source({}, _asset(tmp_path, "MOTION_SOURCE: 'library: Harpy'  # c")) == "library: Harpy"
+    assert cm.pattern_of({"history": {"previous_specs": ["a"]}}) is None
+
+
+def test_committed_heroes_keep_their_text_and_beowulf_names_the_angel_pattern():
+    """Только Beowulf (history.pattern_spec + MOTION_SOURCE заявки) получает новый текст; у остальных героев H2ANIM
+    заметка прежняя (вид video)."""
+    for char in cm.H2ANIM:
+        for clip in cm.TARGETS:
+            rel = cm.spec_for(char, clip)
+            spec = cm.load_json(rel)
+            txt, kind = cm.provenance(spec, rel, clip)
+            if char == "Beowulf":
+                assert kind == "pattern" and "angel-h2anim-r2.json" in txt and "по видео-референсу" not in txt
+            else:
+                assert kind == "video" and "по видео-референсу" in txt, (char, clip)

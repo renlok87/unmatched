@@ -101,5 +101,86 @@ class H2AnimRunPathsTests(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in frames.iterdir()), [])
 
 
+
+SMOKE_DRIVER = r"""
+import json, sys
+from pathlib import Path
+anim, val_default = sys.argv[1], sys.argv[2]
+sys.path.insert(0, anim)
+import h2anim_run as h
+h.VAL_DIR = Path(val_default)
+
+def fake_blender(script, *args, timeout=1800):
+    out = next(str(a)[len("--out="):] for a in args if str(a).startswith("--out="))
+    checks = []
+    if script == "clip_contact_check.py":  # the smoke contact check: weapon_tip measured, out of the verdict
+        checks = [{"check": "weapon_tip", "status": "info", "status_without_smoke": "fail", "smoke_excluded": True}]
+    Path(out).write_text(json.dumps({"result": "pass", "fails": [], "warnings": [], "checks": checks}),
+                         encoding="utf-8")
+    return {"code": 0, "seconds": 0.0, "lines": []}
+
+h.blender = fake_blender
+sys.argv = ["h2anim_run.py"] + sys.argv[3:]
+h.main()
+"""
+
+
+class H2AnimRunSmokeTests(unittest.TestCase):
+    """C28 (2026-10-14): the smoke spec flag `"smoke": true` keeps the sample's weapon_tip / hand_follow targets out of
+    the smoke verdict and keeps its validate reports out of docs/ even without --out-dir."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name).resolve()
+        self.smoke = self.root / "bake-run" / "work" / "smoke"
+        (self.smoke / "run" / "reports").mkdir(parents=True)
+        self.val_default = self.root / "default-validation-h2anim"
+        spec = {"run_dir": (self.smoke / "run").as_posix(), "ue_hero": "ProbeSmoke", "character": "Probe",
+                "smoke": True, "clips": {"DeathSettle": {"frames": 21, "role": "terminal"}}}
+        self.spec = self.smoke / "probe-h2anim-smoke.json"
+        self.spec.write_text(json.dumps(spec), encoding="utf-8")
+        author = {"hand_follow": [{"side": "R", "mode": "weapon_tip"}],
+                  "ik_log": [{"f": 0, "ik_weight": {"L": 1, "R": 1}, "L": True, "R": True, "follow_R": True,
+                              "follow_R_reach_deficit_cm": -1.2},
+                             {"f": 13, "ik_weight": {"L": 1, "R": 1}, "L": True, "R": True, "follow_R": False,
+                              "follow_R_reach_deficit_cm": 0.8},
+                             {"f": 14, "ik_weight": {"L": 1, "R": 1}, "L": True, "R": False, "follow_R": False,
+                              "follow_R_reach_deficit_cm": 0.4}]}
+        (self.smoke / "run" / "reports" / "author-DeathSettle.json").write_text(json.dumps(author), encoding="utf-8")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_smoke_block_and_default_validation_dir(self):
+        env = dict(os.environ, PYTHONIOENCODING="utf-8")
+        p = subprocess.run([sys.executable, "-c", SMOKE_DRIVER, str(ANIM), str(self.val_default), str(self.spec),
+                            "--no-author", "--no-probe"], capture_output=True, env=env, timeout=120)
+        self.assertEqual(p.returncode, 0, p.stderr.decode("utf-8", "replace"))
+        summary = json.loads((self.smoke / "run/reports/h2anim-run.json").read_text(encoding="utf-8"))
+        self.assertTrue(summary["smoke"])
+        self.assertEqual(summary["validation_dir"], (self.smoke / "validation").as_posix())
+        self.assertTrue((self.smoke / "validation" / "AM_ProbeSmoke_DeathSettle.validation.json").is_file())
+        self.assertFalse(self.val_default.exists(), "the smoke run wrote into the default validation dir")
+        e = summary["clips"]["DeathSettle"]
+        self.assertTrue(e["passed"])
+        sm = e["smoke"]
+        self.assertEqual(sm["excluded_from_verdict"], ["weapon_tip", "hand_follow"])
+        self.assertEqual(sm["weapon_tip_without_smoke"], "fail")
+        self.assertEqual(sm["hand_follow"], {"configured": True, "unreached_frames": [13, 14],
+                                             "max_reach_deficit_cm": {"R": 0.8}})
+        self.assertIn("smoke", p.stdout.decode("utf-8", "replace"))
+
+    def test_smoke_entry_without_reports(self):
+        sys.path.insert(0, str(ANIM))
+        try:
+            import h2anim_run as h
+        finally:
+            sys.path.remove(str(ANIM))
+        e = h.smoke_entry({}, {})
+        self.assertEqual((e["weapon_tip_without_smoke"], e["hand_follow"]),
+                         (None, {"configured": False, "unreached_frames": [], "max_reach_deficit_cm": {}}))
+        e = h.smoke_entry({"checks": [{"check": "weapon_tip", "status": "info"}]}, None)
+        self.assertEqual(e["weapon_tip_without_smoke"], "info")
+
 if __name__ == "__main__":
     unittest.main()

@@ -105,3 +105,138 @@ def test_main_refuses_without_shots_and_missing_files(tmp_path, capsys):
     blender.write_bytes(b"")
     assert cc.main(["--fbx", str(tmp_path / "AM_X_Idle.fbx"), "--out", str(tmp_path), "--blender", str(blender)]) == 1
     assert "нет кадров" in capsys.readouterr().err
+
+
+# ------------------------------------------------- C43/C45 (2026-10-14): стандартный список кадров по роли клипа
+def test_parse_shots_frame_rules_height_sizes_and_lists():
+    s = cc.parse_shots("armR:q34b:@arm_upper.R:h0.33;last:topb:@head:h0.33;mid:q34:fig:auto")
+    assert [x["frame"] for x in s] == ["armR", "last", "mid"]
+    assert s[0]["size_cm"] is None and s[0]["size_h"] == 0.33 and "size_h" not in s[2]
+    assert s[1]["view"] == "topb"
+    assert cc.parse_shots(["7:q34:fig:auto", " gripL:q34l:@hand.L:h0.22 "])[1]["frame"] == "gripL"
+    for bad in ("armX:q34:fig:auto", "x7:q34:fig:auto", "7:q34:@head:h0", "7:q34:@head:h3", "7:q34:@head:hx"):
+        with pytest.raises(ValueError):
+            cc.parse_shots(bad)
+    # прежние формы — прежний результат (числа, без size_h)
+    assert cc.parse_shots("7:q34:7.16,-9.52,33.7:18") == [
+        {"frame": 7, "view": "q34", "centre": {"kind": "arm_cm", "value": [7.16, -9.52, 33.7]}, "size_cm": 18.0}]
+
+
+def test_default_shots_by_role_and_side():
+    for role in cc.ROLES:
+        lst = cc.default_shots(role, "R", True)
+        shots = cc.parse_shots(lst)  # каждая строка разбирается
+        views = {(s["frame"], s["view"], s["centre"].get("bone")) for s in shots}
+        # со спины 3/4 на кадре наибольшего поворота плеча каждой руки (срез рукава, C43; F129)
+        assert ("armR", "q34b", "arm_upper.R") in views and ("armL", "q34bl", "arm_upper.L") in views
+        # ворот и затылок сзади и сзади сверху (провал ворота, C61) и кулак при повороте оружия
+        assert ("armR", "back", "head") in views and ("armR", "topb", "head") in views
+        assert ("gripR", "q34r", "hand.R") in views
+    term = {(s["frame"], s["view"]) for s in cc.parse_shots(cc.default_shots("terminal"))}
+    assert {("last", "back"), ("last", "topb"), ("last", "q34"), ("mid", "q34b")} <= term
+    assert ("mid", "q34") in {(s["frame"], s["view"]) for s in cc.parse_shots(cc.default_shots("idle"))}
+    left = cc.default_shots("oneshot", "L", False)
+    assert "armL:q34bl:@arm_upper.L:h0.33" in left and not any(x.startswith("grip") for x in left)
+    with pytest.raises(ValueError):
+        cc.default_shots("walk")
+    with pytest.raises(ValueError):
+        cc.default_shots("idle", "X")
+
+
+class _FakeBlender:
+    """Подмена subprocess.run обёртки: читает cfg, переводит правила кадра в числа (mid = 5, last = 10, arm/grip = 3),
+    называет кадры name_shots и пишет PNG и render.json, как _clip_closeups_blender.py."""
+
+    def __init__(self):
+        self.cfg = None
+
+    def __call__(self, cmd, **kw):
+        from types import SimpleNamespace
+
+        cfg = json.loads(Path(cmd[-1]).read_text(encoding="utf-8"))
+        self.cfg = cfg
+        work = Path(cfg["work_dir"])
+        (work / "raw").mkdir(parents=True, exist_ok=True)
+        shots, tokens = [dict(s) for s in cfg["shots"]], {}
+        for s in shots:
+            if isinstance(s["frame"], str):
+                f = {"mid": 5, "last": 10}.get(s["frame"], 3)
+                tokens[s["frame"]] = {"frame": f, "rule": s["frame"]}
+                s["frame_rule"], s["frame"] = s["frame"], f
+        cc.name_shots(cfg["label"], shots)
+        meta = []
+        for s in shots:
+            Image.new("RGB", (8, 8), (90, 90, 90)).save(work / "raw" / (s["name"] + ".png"))
+            m = {"name": s["name"], "frame": s["frame"], "view": s["view"], "centre_arm_cm": [0.0, 0.0, 30.0],
+                 "size_cm": 16.0}
+            if s.get("frame_rule"):
+                m["frame_rule"] = s["frame_rule"]
+            meta.append(m)
+        look = {"engine": "BLENDER_WORKBENCH"}
+        if cfg["look"]["backface_culling"]:
+            look["backface_culling"] = True
+        info = {"blender": "5.2", "frame_start": 1, "frame_end": 11, "last_frame": 10, "fps": 24, "shots": meta,
+                "seam": None, "look": look, "frame_tokens": tokens}
+        (work / "render.json").write_text(json.dumps(info), encoding="utf-8")
+        return SimpleNamespace(returncode=0, stdout="CLOSEUPS_OK", stderr="")
+
+
+def _fake_env(tmp_path, monkeypatch):
+    monkeypatch.setattr(cc, "REPO", tmp_path)
+    spec = {"ue_hero": "X", "run_dir": "a/run", "target": {"base_fbx": "a/bake/SM_X_H2_Base.fbx"},
+            "weapon": {"bone": "weapon.R", "side": "R"},
+            "clips": {"DeathSettle": {"role": "terminal", "frames": 10}, "Idle": {"role": "idle", "frames": 60}}}
+    sp = tmp_path / "x-h2anim.json"
+    sp.write_text(json.dumps(spec), encoding="utf-8")
+    for p in ("a/run/export/AM_X_DeathSettle.fbx", "a/run/export/AM_X_Idle.fbx", "a/bake/SM_X_H2_Base.fbx"):
+        (tmp_path / p).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / p).write_bytes(b"fbx")
+    blender = tmp_path / "blender.exe"
+    blender.write_bytes(b"")
+    fake = _FakeBlender()
+    monkeypatch.setattr(cc.subprocess, "run", fake)
+    return sp, blender, fake
+
+
+def test_main_default_shots_culling_and_repeat(tmp_path, monkeypatch):
+    sp, blender, fake = _fake_env(tmp_path, monkeypatch)
+    out = tmp_path / "o"
+    assert cc.main(["--spec", str(sp), "--clip", "DeathSettle", "--default-shots", "--out", str(out),
+                    "--blender", str(blender)]) == 0
+    assert fake.cfg["look"] == {"backface_culling": True} and fake.cfg["label"] == "X-DeathSettle"
+    assert [s["frame"] for s in fake.cfg["shots"]][:5] == ["armR", "armL", "armR", "armR", "gripR"]
+    rep = json.loads((out / "X-DeathSettle-closeups.json").read_text(encoding="utf-8"))
+    assert rep["default_shots"]["role"] == "terminal" and rep["default_shots"]["side"] == "R"
+    assert rep["default_shots"]["list"] == cc.default_shots("terminal", "R", True)
+    assert rep["look"]["backface_culling"] is True and rep["frame_tokens"]["last"]["frame"] == 10
+    names = [s["name"] for s in rep["shots"]]
+    assert "X-DeathSettle-f03-q34b" in names and "X-DeathSettle-f10-topb" in names
+    assert "X-DeathSettle-f03-back" in names and len(names) == len(set(names))
+    assert all((out / (n + ".jpg")).is_file() for n in names)
+    # повтор --shots-from: те же числа, то же отсечение, без списка по умолчанию
+    assert cc.main(["--spec", str(sp), "--clip", "DeathSettle", "--shots-from", str(out / "X-DeathSettle-closeups.json"),
+                    "--out", str(out), "--blender", str(blender)]) == 0
+    assert fake.cfg["look"] == {"backface_culling": True}
+    assert all(isinstance(s["frame"], int) for s in fake.cfg["shots"])
+    rep2 = json.loads((out / "X-DeathSettle-closeups.json").read_text(encoding="utf-8"))
+    assert "default_shots" not in rep2 and [s["name"] for s in rep2["shots"]] == names
+
+
+def test_main_without_new_flags_keeps_the_old_look(tmp_path, monkeypatch):
+    sp, blender, fake = _fake_env(tmp_path, monkeypatch)
+    out = tmp_path / "o"
+    assert cc.main(["--spec", str(sp), "--clip", "Idle", "--shots", "15:q34:fig:auto", "--no-seam", "--out", str(out),
+                    "--blender", str(blender)]) == 0
+    assert fake.cfg["look"] == {"backface_culling": False}
+    rep = json.loads((out / "X-Idle-closeups.json").read_text(encoding="utf-8"))
+    assert "backface_culling" not in rep["look"] and "default_shots" not in rep and "frame_tokens" not in rep
+    assert [s["name"] for s in rep["shots"]] == ["X-Idle-f15-q34"]
+    assert cc.main(["--spec", str(sp), "--clip", "Idle", "--default-shots", "--backface-culling", "off", "--no-seam",
+                    "--out", str(out), "--blender", str(blender)]) == 0
+    assert fake.cfg["look"] == {"backface_culling": False}
+
+
+def test_main_default_shots_needs_a_role(tmp_path, capsys):
+    (tmp_path / "AM_X_Hit.fbx").write_bytes(b"x")
+    assert cc.main(["--fbx", str(tmp_path / "AM_X_Hit.fbx"), "--out", str(tmp_path), "--default-shots"]) == 1
+    assert "--role" in capsys.readouterr().err

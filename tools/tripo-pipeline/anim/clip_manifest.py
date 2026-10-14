@@ -16,10 +16,17 @@ UE-импорт (reports/ue-import-clips.json). Статус technically_importe
 все три свидетельства есть и сходятся (validate PASS, контакты PASS, импорт legacy FbxFactory + bForceRootLock с тем же
 sha256 FBX); иначе measured (validate PASS) или draft_test. artistically_accepted сборка не пишет никогда.
 v1-черновики AM_Medusa_* остаются тестовыми записями.
+
+Происхождение движения в notes (C53, 2026-10-14): у спеки с паттерном библиотеки — ключ `pattern` (путь спеки образца
+или {"spec", "key"}) или `history.pattern_spec` — или с MOTION_SOURCE «library: …» / «tripo-preset: …» (ключ спеки
+`motion_source`, иначе строка `MOTION_SOURCE:` заявки <ASSET_DIR>/asset-card.yaml) заметка называет образец, а не
+«видео-референс» папки clips.*.reference (Beowulf: паттерн Angel r2, а не видео ARTH; F50). Спеки без этих ключей —
+прежний текст.
 """
 import hashlib
 import json
 import os
+import re
 import sys
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -115,6 +122,62 @@ def spec_for(char, clip):
     return H2ANIM_CLIP.get((char, clip), H2ANIM[char])
 
 
+MOTION_RE = re.compile(r"""^MOTION_SOURCE:\s*(?:"([^"]*)"|'([^']*)'|([^#\s][^#]*?))\s*(?:#.*)?$""")
+
+
+def pattern_of(spec):
+    """Спека образца библиотеки (ДС-6): `pattern` — путь или {"spec", "key", …}; иначе `history.pattern_spec` (так
+    записан Beowulf). Нет — None."""
+    p = spec.get("pattern")
+    if isinstance(p, str) and p.strip():
+        return {"spec": p.strip()}
+    if isinstance(p, dict) and p.get("spec"):
+        return dict(p)
+    hist = spec.get("history") if isinstance(spec.get("history"), dict) else {}
+    if hist.get("pattern_spec"):
+        return {"spec": hist["pattern_spec"], "sha256": hist.get("pattern_sha256")}
+    return None
+
+
+def motion_source(spec, spec_rel):
+    """MOTION_SOURCE героя (SKILL.md §7.2): ключ спеки `motion_source` / `MOTION_SOURCE`, иначе строка верхнего уровня
+    `MOTION_SOURCE: "…"` заявки <ASSET_DIR>/asset-card.yaml (спека — <ASSET_DIR>/build-profiles/*.json). Нет — None."""
+    ms = spec.get("motion_source") or spec.get("MOTION_SOURCE")
+    if isinstance(ms, str) and ms.strip():
+        return ms.strip()
+    card = os.path.join(REPO, os.path.dirname(os.path.dirname(spec_rel)), "asset-card.yaml")
+    if not os.path.isfile(card):
+        return None
+    with open(card, encoding="utf-8") as f:
+        for line in f:
+            m = MOTION_RE.match(line.rstrip("\r\n"))
+            if m:
+                return next(g for g in m.groups() if g is not None).strip() or None
+    return None
+
+
+def provenance(spec, spec_rel, clip):
+    """(текст происхождения движения для notes, вид: pattern | video). Паттерн библиотеки или пресет Tripo (C53) —
+    образец и MOTION_SOURCE; иначе прежнее «шаблон дельт … + авторский слой по видео-референсу …»."""
+    c = spec["clips"][clip]
+    tmpl = (c.get("template") or {}).get("file", "нет")
+    pat = pattern_of(spec)
+    ms = motion_source(spec, spec_rel)
+    kind = (ms or "").split(":", 1)[0].strip().lower()
+    if pat is None and kind not in ("library", "tripo-preset"):
+        return ("шаблон дельт %s + авторский слой по видео-референсу %s" % (tmpl, c.get("reference")), "video")
+    if pat is not None:
+        head = "ключи паттерна библиотеки %s%s" % (pat["spec"], (" (%s)" % pat["key"]) if pat.get("key") else "")
+    elif kind == "tripo-preset":
+        head = "авторский слой по образцу пресета Tripo (тайминг и ключевые позы, не клип)"
+    else:
+        head = "авторский слой по паттерну библиотеки"
+    extra = (["MOTION_SOURCE «%s»" % ms] if ms else []) + \
+        (["reference_kind: %s" % c["reference_kind"]] if c.get("reference_kind") else []) + \
+        (["папка образца %s" % c["reference"]] if c.get("reference") else [])
+    return ("шаблон дельт %s + %s%s" % (tmpl, head, (" (%s)" % "; ".join(extra)) if extra else ""), "pattern")
+
+
 def h2anim_paths(spec, clip):
     """(FBX клипа, отчёт validate_clip v2) по спеке — пути от корня репозитория."""
     hero = spec["ue_hero"]
@@ -131,7 +194,6 @@ def h2anim(char, clip):
     pre, asset = CHARS[char]
     t = TARGETS[clip]
     hero = spec["ue_hero"]
-    c = spec["clips"][clip]
     fbx, vrel = h2anim_paths(spec, clip)
     if not os.path.exists(os.path.join(REPO, fbx)):
         return None
@@ -160,10 +222,9 @@ def h2anim(char, clip):
     else:
         status = "draft_test"
     target_path = "%s/%s" % (spec["ue"]["clips_folder"], name)
-    note = ("кандидат H2Anim волны 5c на rest %s (%s): шаблон дельт %s + авторский слой по видео-референсу %s; "
+    note = ("кандидат H2Anim волны 5c на rest %s (%s): %s; "
             "контакты (clip_contact_check): %s%s; UE: %s на канонический скелет %s; художественно не принят"
-            % (spec["target"].get("rest_generation"), spec["target"]["sk_fbx"],
-               (c.get("template") or {}).get("file", "нет"), c.get("reference"),
+            % (spec["target"].get("rest_generation"), spec["target"]["sk_fbx"], provenance(spec, spec_rel, clip)[0],
                "PASS" if contact_ok else ("FAIL" if contact else "не проверены"),
                (" (WARN: %s)" % ", ".join(contact_warn)) if contact_warn else "",
                "импортирован" if imported else "не импортирован", spec["ue"]["skeleton"]))

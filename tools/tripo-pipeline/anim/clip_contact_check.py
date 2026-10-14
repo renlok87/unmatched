@@ -43,7 +43,10 @@ validate_clip.py (контракт v2) не проверяет скольжен�
                   отрезка в rest (бедро Arthur с 22 % arm_upper.R). Это дефект весов меша (исправляется в скине
                   H2/H2LD); из вердикта skin_stretch такие рёбра НЕ исключаются;
   weapon_tip      для клипов с contact.weapon_tip_frames (опора на оружие): острие (вершина меша оружия, самая
-                  дальняя вдоль оси кости оружия) в этих кадрах внутри круга подставки и |z − верх| ≤ 0,2 % H (FAIL);
+                  дальняя вдоль оси кости оружия) в этих кадрах внутри круга подставки и |z − верх| ≤ 0,2 % H (FAIL).
+                  Спека дыма (`"smoke": true`, animation-vfx-sfx.md §6.6, C28): цели образца (tip_target, hand_follow)
+                  привязаны к его пропорциям — проверка остаётся замером со статусом info и полем
+                  status_without_smoke, в вердикт не входит;
   weapon_below_base_top_outside  вершины оружия (меш и части weapon.extra_parts) вне круга подставки ниже её верха
                   (висят в воздухе у бока подставки или «воткнуты» в бок) глубже 0,2 % H — WARN (кроме кадров
                   weapon_tip);
@@ -53,6 +56,9 @@ validate_clip.py (контракт v2) не проверяет скольжен�
                   сверх 1,5 % H — FAIL (жёсткий скин подола без симуляции ткани, решение волны 5c);
   loop_seam       для петли: позиционный шов (кадр N против 0) и скоростной шов (N−(N−1) против 1−0),
                   средний сдвиг вершин ≤ 0,5 % H (FAIL).
+Верх подставки во всех проверках — устойчивая высота (C40, 2026-10-14; grip_check.robust_base_top): 90-й перцентиль
+по площади высот граней, смотрящих вверх, а не максимум вершин (бугорок 3 мм у Beowulf заставлял острие висеть);
+максимум вершин — base_top_max_vertex_cm в below_base_top и блоке base_top отчёта.
 Код выхода: 0 — нет FAIL, 1 — есть FAIL, 2 — ошибка запуска.
 """
 import json
@@ -72,6 +78,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 sys.path.insert(0, str(HERE))
 import clip_curves as cc  # noqa: E402
+import grip_check as gc  # noqa: E402  (robust_base_top, polygon_faces — чистые функции, C40)
 
 SCHEMA = "unmatched.h2anim-contact/1"
 CORE = ("hips", "spine", "head", "root")
@@ -200,6 +207,34 @@ def foot_slide_verdict(vals, foot_vertices, side, tol):
             "pinned_frames": len(vals), "tol": tol, "foot_vertices": foot_vertices}
 
 
+def weapon_tip_verdict(rows, tip_frames, tol, smoke=False):
+    """Вердикт weapon_tip: (статус, поля проверки). rows — строки кадров с "f" и "weapon_tip" ({r_of_base,
+    dz_of_height, …} или None). Нарушение — острие вне круга подставки или |dz| > tol в кадре опоры. Спека дыма
+    (smoke, C28): цели образца привязаны к его пропорциям, поэтому статус info, а вердикт без дыма — в
+    status_without_smoke (замер остаётся). Без tip_frames — info «клип без опоры на оружие» (как раньше)."""
+    if not tip_frames:
+        return "info", {"note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"}
+    bad_tip = []
+    for row in rows:
+        if row["f"] in tip_frames:
+            t = row["weapon_tip"]
+            if t is None or t["r_of_base"] > 1.0 or abs(t["dz_of_height"]) > tol:
+                bad_tip.append({"f": row["f"], **(t or {})})
+    tips = [row["weapon_tip"] for row in rows if row["f"] in tip_frames and row["weapon_tip"]]
+    status = "fail" if bad_tip else "pass"
+    kw = {"frames": [tip_frames[0], tip_frames[-1]],
+          "max_r_of_base": max((t["r_of_base"] for t in tips), default=None),
+          "max_abs_dz_of_height": max((abs(t["dz_of_height"]) for t in tips), default=None),
+          "tol_dz_of_height": tol, "violations": bad_tip[:8],
+          "note": "острие в круге подставки (r ≤ радиуса) на уровне её верха: опора на оружие"}
+    if smoke:
+        kw.update(status_without_smoke=status, smoke_excluded=True,
+                  note=kw["note"] + "; дымовой прогон (спека smoke, C28): цели образца (tip_target, hand_follow) "
+                       "привязаны к его пропорциям — замер, не вердикт")
+        status = "info"
+    return status, kw
+
+
 def weapon_verdict(frames, with_part):
     """rest-сравнение weapon_body: frames — [(кадр, {часть: {кость тела: пар}})], кадр 0 первый. Нарушение (bad) —
     область тела, которой у этой части в rest не было, или рост > 3× + 20 пар; рост > 25 % + 10 пар — soft (WARN)."""
@@ -244,6 +279,7 @@ def main():
     body = meshes[spec["meshes"]["body"]]
     weapon = meshes.get((spec["meshes"].get("weapon") or ""))
     wings = bool((spec.get("contact") or {}).get("wings", False))
+    smoke = bool(spec.get("smoke", False))  # спека дыма §6.6 (C28): цели образца вне вердикта
     wside = (spec.get("weapon") or {}).get("side")
     dom, vw = dominant_groups(body)
     polys = [tuple(p.vertices) for p in body.data.polygons]
@@ -330,9 +366,14 @@ def main():
         tip_i = max(range(len(wrest)), key=lambda i: (wrest[i] - wh).dot(wax))
     tip_frames = sorted({f for a, b in ((clip.get("contact") or {}).get("weapon_tip_frames") or [])
                          for f in range(int(a), int(b) + 1) if 0 <= f <= N})
-    # подставка
+    # подставка; верх — устойчивая высота граней, смотрящих вверх (C40), а не максимум вершин
     bco = [o.matrix_world @ v.co for o in base for v in o.data.vertices]
-    base_top = max(p.z for p in bco)
+    bpolys = []
+    for o in base:
+        bw = [tuple(o.matrix_world @ v.co) for v in o.data.vertices]
+        bpolys += [[bw[i] for i in p.vertices] for p in o.data.polygons]
+    top_info = gc.robust_base_top(gc.polygon_faces(bpolys), max(p.z for p in bco))
+    base_top = top_info["top"]
     bx = [p.x for p in bco]
     by = [p.y for p in bco]
     bctr = Vector(((max(bx) + min(bx)) / 2, (max(by) + min(by)) / 2, 0.0))
@@ -586,21 +627,8 @@ def main():
                     % (STRETCH_FAIL[0], STRETCH_FAIL[1] * 100, len(VIEW_DIRS)),
           hidden_note="torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
           warn_rule="ребро > %.0f× rest и > %.1f %% H" % (STRETCH_WARN[0], STRETCH_WARN[1] * 100))
-    if tip_frames:
-        bad_tip = []
-        for row in rows:
-            if row["f"] in tip_frames:
-                t = row["weapon_tip"]
-                if t is None or t["r_of_base"] > 1.0 or abs(t["dz_of_height"]) > TIP_TOL:
-                    bad_tip.append({"f": row["f"], **(t or {})})
-        tips = [row["weapon_tip"] for row in rows if row["f"] in tip_frames and row["weapon_tip"]]
-        check("weapon_tip", "fail" if bad_tip else "pass", frames=[tip_frames[0], tip_frames[-1]],
-              max_r_of_base=max((t["r_of_base"] for t in tips), default=None),
-              max_abs_dz_of_height=max((abs(t["dz_of_height"]) for t in tips), default=None),
-              tol_dz_of_height=TIP_TOL, violations=bad_tip[:8],
-              note="острие в круге подставки (r ≤ радиуса) на уровне её верха: опора на оружие")
-    else:
-        check("weapon_tip", "info", note="клип без опоры на оружие (contact.weapon_tip_frames не задан)")
+    tip_status, tip_kw = weapon_tip_verdict(rows, tip_frames, TIP_TOL, smoke)
+    check("weapon_tip", tip_status, **tip_kw)
     if weapon or extra:
         wo = [row for row in rows if row["f"] not in tip_frames]
         wmax = max(wo, key=lambda row: row["weapon_below_base_top_outside"])
@@ -613,7 +641,8 @@ def main():
     worst = max(rows, key=lambda row: row["base_penetration"])
     check("below_base_top", "pass" if worst["base_penetration"] <= base_pen + BASE_TOL else "fail",
           rest_penetration_of_height=base_pen, max_penetration_of_height=worst["base_penetration"],
-          frame=worst["f"], worst_bone=worst["base_penetration_bone"], tol=BASE_TOL, base_top_cm=r(base_top * 100, 3), base_radius_cm=r(brad * 100, 3))
+          frame=worst["f"], worst_bone=worst["base_penetration_bone"], tol=BASE_TOL, base_top_cm=r(base_top * 100, 3), base_radius_cm=r(brad * 100, 3),
+          base_top_max_vertex_cm=r(top_info["max_vertex"] * 100, 3))
     base_hem = rows[0]["hem_penetration"]
     worst_h = max(rows, key=lambda row: row["hem_penetration"])
     hv = worst_h["hem_penetration"]
@@ -635,9 +664,16 @@ def main():
     report = {"schema": SCHEMA, "clip": rel(src), "clip_name": clip_name, "hero": spec["hero"],
               "spec": rel(opts["spec"]), "base": spec["target"]["base_fbx"], "height_m": r(height, 5),
               "frames": N + 1, "role": role, "tool": "tools/tripo-pipeline/anim/clip_contact_check.py",
+              "base_top": {"top_cm": r(base_top * 100, 3), "max_vertex_cm": r(top_info["max_vertex"] * 100, 3),
+                           "up_faces": top_info["up_faces"], "up_area_share": top_info["up_area_share"],
+                           "fallback": top_info["fallback"], "rule": top_info["rule"]},
               "blender": bpy.app.version_string, "checks": checks, "fails": fails,
               "result": "fail" if fails else "pass", "per_frame": rows,
               "note": "техническая проверка контактов; не художественная приёмка"}
+    if smoke:  # только у спеки дыма: отчёты настоящих клипов без этого ключа
+        report["smoke"] = {"excluded_from_verdict": ["weapon_tip"],
+                           "note": "дымовой прогон этапа 3 (animation-vfx-sfx.md §6.6, C28): чужие ключи образца на "
+                                   "новой модели; цели образца (tip_target, hand_follow) — замер, не вердикт"}
     out = opts.get("out")
     if out:
         Path(out).parent.mkdir(parents=True, exist_ok=True)

@@ -363,8 +363,11 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 
 - В спеке: `clips.*.reference` — папка образца (`art/animation-refs/<ASSET_ID образца>/<PRE>-<Clip>`), рядом
   `clips.*.reference_kind` — «library pattern (D-11, <герой и клип>), not a <Key> video» (так пилот, Angel и Achilles).
-  Заметка манифеста `clip_manifest.py` всё ещё пишет «по видео-референсу» и для паттерна (F50) — источник смотреть по
-  `reference_kind` спеки.
+  Рядом в корне спеки — `pattern`: путь спеки образца или `{"spec": <путь>, "key": "<Key образца>"}` (Beowulf записал
+  его как `history.pattern_spec` — тоже читается). По нему и по `MOTION_SOURCE` заявки (`library:` / `tripo-preset:`)
+  заметка манифеста `clip_manifest.py` называет образец, а не «видео-референс» папки `reference` (C53, F50; раньше
+  BEO-* получили «шаблон Medusa + видео ARTH» вместо паттерна Angel r2). Спеки без `pattern` и без такого
+  `MOTION_SOURCE` пишут прежний текст.
 - В заявке: `MOTION_SOURCE: "library: <Key образца>"` (`SKILL.md` §7.2).
 - Отступление от HANDBOOK §4.5 («по видео-референсам») — решение ДС-6 (для пресета Tripo — решение 2026-10-14):
   записать строкой в README evidence этапа 7 («Отступления от хендбука»).
@@ -533,6 +536,9 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
 | `clips.*.reference`, `clips.*.reference_kind` | папка образца библиотеки или своего видео-референса и вид источника (§6.1, ДС-6) |
 | `clips.*.design`, `keys`, `waves`, `key_frames`, `ik_feet`, `hand_follow`, `amplitude_scale` | авторский слой под нового героя. Кадр `LUNGE_CONTACT_FRAME` записывается в `design` LungeAttack, входит в `key_frames` и имеет ключ в `keys` (§2.1) |
 | `clips.*.template` | черновики `blender/ASSET-MEDUSA-001/export/AM_Medusa_*.fbx` (в git). `mirror: true`, если сторона оружия противоположна Medusa |
+| `pattern` (корень спеки) | спека образца библиотеки, с которой скопирован блок `clips`: путь или `{"spec", "key"}` (§6.1; по нему пишет происхождение `clip_manifest.py`, C53) |
+| `clips.*.keys[].aim.<кость>.from`, `from2` | при копии паттерна — **свои** rest-оси героя: `from` — ось кости в rest (у кисти с оружием — ось оружия, `weapon.note`), `from2` — вторая ось базиса (ось кисти, ось сгиба локтя) из замера rest этого героя; `to`/`to2` образца остаются. Чужие оси поворачивают кость на разницу rest двух фигур (C42, Beowulf ← Angel r2) |
+| `clips.*.hand_follow[]`: `anchor_offset`, `tip_target`, `offset` | цели в досягаемости руки **этого** героя: после авторинга в `author-<Clip>.json` `ik_log[].follow_<S>_reach_deficit_cm` должен быть −0,5…−1,5 см (цель на 0,5–1,5 см ближе вытянутой руки). > 0 — рука не достаёт (`follow_<S>: false`, кадр в `ik_unreached_frames`), < −1,5 — локоть сильно согнут; смещение образца переносится, только если дефицит в этой полосе (Beowulf: якорь Angel (5; −12; 0) → (3; −11,5; 3), −1,25 см; C42) |
 
 Длины LungeAttack, HitReact и DeathSettle не менять: это константы C++ (§2.1). Пределы, которые не чинятся в клипе
 (жёстко скиненный подол, наплечник, поворот головы, IK), описаны в HANDBOOK §4.5 п.4.
@@ -544,6 +550,10 @@ SFX** → 7a импорт в UE и **приёмка клипов (шаг 7a.2)**
   кости (F122). Хват, кисть и локоть по кадрам — `grip_check.py` (§6.3).
 - **Ноги.** Прямые ноги в rest при повороте таза дают скольжение стоп: таз опускать на 0,3–0,5 см, когда он
   движется (F48). Журнал IK про недотянутые кадры важен, только когда нога несёт вес (F114).
+  После каждого авторинга смотреть `ik_unreached_frames` в `author-<Clip>.json` (кадры, где IK стопы `L`/`R` или руки
+  `follow_<S>` не дотянулась) и запас `foot_slide_<L|R>` в `contact-<Clip>.json`: держать ≤ 0,3 % H, а не у порога
+  0,5 %. Beowulf (C41): ноги в rest прямые (16,328 из 16,329 см), в недотянутых кадрах стопа ехала до 0,48 % H —
+  PASS на краю; опускание таза в этих кадрах убрало и недотяг, и скольжение.
 - **Закреплённая рука** (`hand_follow`/пин на оружии): полюс локтя брать в осях арматуры rest, а не в осях корпуса —
   иначе локоть переворачивается назад и кисть крутится на 26–45° (F126).
 - **Оружие, упёртое пяткой в подставку** (копьё Achilles): режим `weapon_tip` для него не годится, смещения шарнира —
@@ -581,6 +591,11 @@ python tools/tripo-pipeline/anim/h2anim_run.py <ASSET_DIR>/build-profiles/<conte
 - Оружие — меш `meshes.weapon` и части `weapon.extra_parts` (§6.2): `weapon_body` и `weapon_below_base_top_outside`
   считают их отдельно по каждой части.
 - `skin_stretch` FAIL — только видимые рваные рёбра; закрытые — WARN `skin_stretch_hidden`.
+- Верх подставки (`below_base_top`, `hem_below_base_top`, `weapon_tip`; `grip_check.py` — `butt_below_top_cm`) — устойчивая
+  высота: 90-й перцентиль по площади граней, смотрящих вверх, а не максимум вершин (C40); максимум — в
+  `base_top.max_vertex_cm`. Цель `tip_target` острия ставить на видимую поверхность, а не на бугорок: у Beowulf бугорок
+  3 мм на 6,00 см при поверхности 5,68 заставлял острие висеть. Острия DeathSettle Angel r2 и Arthur, принятые по
+  старому верху, висят над поверхностью на 3,0 и 2,4 мм — повторная проверка их клипов даст FAIL `weapon_tip`.
 
 **Проверки исполнителя** (не гейт и не приёмка: числа для правки ключей и для приёмщика, §10.3):
 
@@ -588,7 +603,7 @@ python tools/tripo-pipeline/anim/h2anim_run.py <ASSET_DIR>/build-profiles/<conte
 "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup \
     --python tools/tripo-pipeline/anim/grip_check.py -- <run>/export/AM_<Key>_<Clip>.fbx <run>/reports/grip-<Clip>.json \
     --side R [--base <SM_<Key>_H2_Base.fbx>] [--shield-bone arm_lower.L] [--weapon-suffix _Spear]
-python tools/tripo-pipeline/anim/clip_closeups.py --spec <spec> --clip <Clip>     # §10.3; у Idle — с парой шва
+python tools/tripo-pipeline/anim/clip_closeups.py --spec <spec> --clip <Clip> --default-shots   # §10.3; у Idle — с парой шва
 ```
 
 `grip_check.py`: поворот оружия в кулаке (`weapon_in_hand_deg`, 0 — оружие жёстко в руке), излом кисти, локоть,
@@ -666,13 +681,29 @@ python tools/tripo-pipeline/anim/clip_manifest.py build && python tools/tripo-pi
    `.gitignore` ассета). Поля — по таблице §6.2, но `run_dir` = `<bake run>/work/smoke/run` (относительный — от корня
    репозитория, абсолютный — как есть; спека и прогон вне репозитория `h2anim_run.py` тоже принимает, ревью
    2026-10-14, R-13), `ue_hero` = `<Key>Smoke` — имена FBX и отчётов дыма не спутать с настоящими клипами. Ключи и волны
-   образца не менять; `mirror` у `template` — по стороне оружия.
+   образца не менять; `mirror` у `template` — по стороне оружия. В корень спеки — `"smoke": true` (C28): цели образца
+   (`tip_target` острия в `weapon_tip_frames`, точки `hand_follow`) привязаны к его пропорциям и на другом герое не
+   сходятся, поэтому `weapon_tip` в `contact-*.json` дыма — замер со статусом info (`status_without_smoke`), а
+   `h2anim-run.json` пишет у клипа блок `smoke` (статус острия без дыма, недотянутые кадры `hand_follow`) — в вердикт
+   дыма они не входят. Без флага DeathSettle с опорой на меч даёт FAIL на любом другом герое (Beowulf ← Angel r2).
 2. `python tools/tripo-pipeline/anim/h2anim_run.py <bake run>/work/smoke/<content-key>-h2anim-smoke.json --out-dir
    <bake run>/work/smoke/validation` — отчёты validate дыма ложатся туда, а не в
-   `docs/art-pipeline/animation-library/validation-h2anim/` (отчёты гейта настоящих клипов не трогаются); затем
-   `grip_check.py` по LungeAttack и DeathSettle (§6.3).
+   `docs/art-pipeline/animation-library/validation-h2anim/` (отчёты гейта настоящих клипов не трогаются; со `smoke`
+   без `--out-dir` — в `<run_dir>/../validation`, то есть туда же); затем `grip_check.py` по LungeAttack и DeathSettle
+   (§6.3) и **крупные планы каждого клипа дыма** (C43, C45):
+   `python tools/tripo-pipeline/anim/clip_closeups.py --spec <спека дыма> --clip <Clip> --default-shots` →
+   `<bake run>/work/smoke/run/preview/closeups-blender/`. Стандартный список по роли клипа: со спины 3/4 на кадре
+   наибольшего поворота плеча каждой руки (`armR`/`armL`), ворот и затылок сзади и сзади сверху (`topb`), кулак на
+   кадре наибольшего поворота оружия (`gripR`), фигура по роли (у DeathSettle ещё последний кадр с воротом сзади
+   сверху); отсечение задних граней включено, как в UE. Открыть (Read) каждый JPEG.
 3. Что смотреть: `contact-*.json` — `limb_body`, `skin_stretch` (видимые рёбра), `weapon_body` с `extra_parts`;
-   Blender-листы — кромки и срезы при руке вперёд со спины, зазор «наездников» к телу. Найденное — пункт доработки
+   Blender-листы и крупные планы — кромки и срезы при руке вперёд со спины, провал между воротом и шлемом или
+   затылком, дыра кулака при повороте оружия, зазор «наездников» к телу. Этого не ловит ни один валидатор: на Beowulf
+   срез верха правого рукава (LungeAttack к. 8–9, DeathSettle к. 13, вид `q34b`) и провал ворота за шлемом
+   (DeathSettle к. 21, вид `topb`, в игре — C61) видны только на этих кадрах, и без них этап 3 их пропустил (C43).
+   `rider_gap.py` на клипах дыма: жёсткие части одной кости (щит + умбон, клинок + навершие) идут одной группой против
+   остальной фигуры, их опора — не соседи по кости; постоянный задуманный зазор пары — `--designed-gap ИМЯ=мм`
+   (щит над предплечьем Beowulf 5,6 мм), иначе такая пара может только FAIL (C47). Найденное — пункт доработки
    модели до приёмки, а не на клипах. Числа и вывод — строкой в отчёт сдачи модели.
 4. После прогона — удалить каталог `<bake run>/work/smoke/` — свой временный выход (`SKILL.md` §11.5); в `docs/` дым
    ничего не пишет.
@@ -818,7 +849,11 @@ AM_<Key>_<Clip>, цикл <rN> (шаг 7a.2)»; рубрика — этот фа
 `G-MANIFEST` по отчётам, баллы R, C, D, L по кадрам; константы `schema "unmatched.anim-acceptance/1"`, `kind "anim"`,
 `clip "<Clip>"`. Вызов — §8.3 (или §8.4) того же файла, label `acceptor-<ASSET_ID>-<Clip>-r<N>`; Workflow-приёмщику
 — строгая схема `tools/art/acceptance/asset-acceptance-2.output-anim.schema.json` (RA-11). Образец заполненного
-промпта — `art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance-anim/20261014-r2/LungeAttack/acceptor-prompt.md`.
+промпта — `art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance-anim/20261014-r1/LungeAttack/acceptor-prompt.md`
+(полный блок чтения кириллицы п.3 и блок известных пределов п.4); образец заготовки этапа 6 с `{{KNOWN_LIMITS}}` —
+`art/pipeline-candidates/ASSET-BEOWULF-001/evidence/acceptance-anim-prompts/LungeAttack/acceptor-prompt.md` и рядом
+`known-limits.md`. Прежний образец Achilles r2 нёс старый OEM-блок без «читай КАЖДЫЙ файл» и без «СБОЙ ОКРУЖЕНИЯ» и
+не знал `{{KNOWN_LIMITS}}` (C46) — по нему не копировать.
 
 Заготовку промпта на каждый клип пишет этап 6: `<ASSET_DIR>/evidence/acceptance-anim-prompts/<Clip>/acceptor-prompt.md`
 с плейсхолдерами `{{E}}`, `{{DATE}}`, `{{CYCLE}}`, `{{PREVIOUS_CARD_JSON}}`, `{{FRAMES_FILES_JSON}}`, `{{KNOWN_LIMITS}}`
@@ -884,10 +919,11 @@ UE-кадр 1920 × 1080 → 1200 × 675, Blender-лист 1680 × 2520 → 800 
 того же клипа, а одно имя листа сохраняет список кадров циклов r2+. Кадр не больше 1200 px копируется байт в байт,
 оригиналы в `<run>/preview` не меняются; `--max-px 0` — копия как есть. Состав:
 - Blender-лист `<Key>-<Clip>-blender-sheet.jpg` (§6.3);
-- крупные планы Blender (RA-27, F146): `python tools/tripo-pipeline/anim/clip_closeups.py --spec <S> --clip <Clip>` →
-  `<run>/preview/closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера каждого кадра — в
-  `<Key>-<Clip>-closeups.json`; на r2/r3 — `--shots-from <отчёт прежнего цикла>`, те же камеры числами (у пилота разовый
-  скрипт камеру не записывал, и r2 нельзя было снять один в один);
+- крупные планы Blender (RA-27, F146): `python tools/tripo-pipeline/anim/clip_closeups.py --spec <S> --clip <Clip>
+  --default-shots [--shots "<свои кадры>"]` → `<run>/preview/closeups-blender/<Key>-<Clip>-fNN-<view>.jpg`, камера
+  каждого кадра — в `<Key>-<Clip>-closeups.json`; на r1 — стандартный список по роли клипа (§6.6 п.2, C45) плюс свои
+  кадры исполнителя; на r2/r3 — `--shots-from <отчёт прежнего цикла>`, те же камеры числами и то же отсечение задних
+  граней (у пилота разовый скрипт камеру не записывал, и r2 нельзя было снять один в один);
 - у Idle — пара шва цикла `<Key>-Idle-seam-fNN-f00-{front,q34}.jpg`: последний кадр и кадр 0 одной камерой, разница —
   `seam.views.*.diff_px` отчёта (F154: по ключам 0/15/30/45 приёмщик шва не видел, и L держался на 1,5);
 - UE-кадры `<Key>-<Clip>-fNN-front-ue-editor.jpg` и `<Key>-<Clip>-fNN-q34-ue-editor.jpg` (§6.4);
@@ -1150,8 +1186,10 @@ packaged-прогоном на вариантах фикстуры, packaged-к�
 - Шаги SYNTX §6.1 (create-chat, upload-files, разбор `fileobj.json`) собраны по заголовку `gen.sh`, 07 §2.4 и
   сохранённым ответам сессии King Arthur; сквозным платным прогоном для нового героя не проверялись. Пилот шёл на
   паттернах библиотеки (ДС-6), SYNTX — только для нестандартного движения.
-- Заметка манифеста `clip_manifest.py` пишет «по видео-референсу» и для паттерна библиотеки (F50); дата валидации в
-  манифесте зашита 2026-09-29 (F130). Источник движения — по `reference_kind` спеки.
+- Заметка манифеста `clip_manifest.py` пишет «по видео-референсу» для паттерна библиотеки, только если в спеке нет
+  `pattern` / `history.pattern_spec`, а в заявке — `MOTION_SOURCE` «library:» / «tripo-preset:» (F50; C53 исправлено
+  для таких спек, пилотные Angel, Achilles, Leshen — прежний текст); дата валидации в манифесте зашита 2026-09-29
+  (F130). Источник движения — по `reference_kind` спеки.
 - Крупные планы и пара шва Idle (`clip_closeups.py`), `grip_check.py` и `weapon.extra_parts` в `clip_contact_check`
   появились после пилота (42ed7951, ee301065, 00f358c7) и на новом герое целиком ещё не прогонялись.
 - Дымовой прогон §6.6 — правило после пилота (RC-06); на фигуре ещё не прогонялся.

@@ -8,8 +8,8 @@
         [--fbx <SK_*.fbx того же rest, например H2LD>] [--parts <lp_uv.blend>] [--profile <bake profile>]
     python tools/tripo-pipeline/review/rider_gap.py --spec <ASSET>/build-profiles/<key>-h2anim.json --out <json> \
         [--clips Idle,HitReact] [--clip-fbx <Name>=<AM_*.fbx>]...
-    общие: [--pair [NAME=]RIDER[:PERCH]]... [--no-profile-pairs] [--no-scan] [--float-ok PART]...
-           [--gap-max-mm 2.0] [--pen-max-mm 1.0] [--blender <exe>]
+    общие: [--pair [NAME=]RIDER[:PERCH]]... [--designed-gap NAME=MM]... [--no-profile-pairs] [--no-scan]
+           [--float-ok PART]... [--no-bone-groups] [--gap-max-mm 2.0] [--pen-max-mm 1.0] [--blender <exe>]
 
 Части. Скелетный меш h2_bake — склейка низкополигональных частей Tripo; принадлежность вершины части берётся из рабочего
 файла прогона `<run>/work/lp_uv.blend` (объекты `LP_tripo_part_N`, авторская рамка: м, −Y лицо) по положению
@@ -24,6 +24,14 @@
 - из bake-профиля (`--profile`, по умолчанию `<run>/reports/run-manifest.json#profile.path`): каждая часть
   `prepare.part_offsets_m` (её и сажали на опору; F137) с опорой auto; `--no-profile-pairs` — без них. Пара CLI с той же
   деталью заменяет пару профиля.
+- «Задуманный зазор» (C47, 2026-10-14): `--designed-gap NAME=5.6` — у пары NAME зазор не обязан быть ≤ порога, он
+  должен держаться у задуманного: |gap − задуманный| ≤ порога зазора в rest и в каждом кадре (щит Beowulf над
+  предплечьем — 5,6 мм постоянно; без этого такая пара могла только FAIL). Проникновение — как у всех пар.
+Жёсткие части на одной кости (C47; профиль `rig.weights.<p>` kind rigid с одной `bone`: щит и умбон на arm_lower.L,
+клинок и навершие на weapon.R) двигаются как одно тело: зазор между ними ничего не говорит о посадке. Поэтому скан
+берёт их одной группой («tripo_part_2+tripo_part_18») против остальной фигуры, а опора auto (пары и скана) не берёт
+части той же кости; группа, часть которой названа деталью пары, в скан не идёт. `--no-bone-groups` — прежнее
+поведение (каждая жёсткая часть отдельно, соседи по кости в опоре), для повтора старых отчётов.
 Скан (`--no-scan` — без него): каждая жёсткая часть профиля (`rig.weights.<p>.kind = rigid`, не подставка), не
 названная парой, против всей остальной фигуры в rest: висит в воздухе (зазор > порога и не утоплена внутрь) — FAIL
 (F137: деталь, которой никто не назначил опору, Tripo тоже мог сгенерировать с зазором). В клипах — зазор до её опоры
@@ -177,6 +185,50 @@ def rigid_parts(profile: dict | None) -> dict:
             if isinstance(v, dict) and v.get("kind") == "rigid" and n not in base}
 
 
+def bone_groups(rigid: dict) -> dict:
+    """{часть: [все жёсткие части той же кости, по порядку]} (C47): щит и умбон на arm_lower.L — одно тело."""
+    by_bone = {}
+    for p, b in rigid.items():
+        if b:
+            by_bone.setdefault(b, []).append(p)
+    return {p: sorted(by_bone.get(b, [p]), key=part_sort_key) if b else [p] for p, b in rigid.items()}
+
+
+def scan_units(rigid: dict, pairs: list, grouped: bool = True) -> list:
+    """Единицы скана: [{name, parts, bone}]. grouped — жёсткие части одной кости одной группой (C47), группа с деталью
+    какой-либо пары не сканируется; иначе (--no-bone-groups) — по части, как раньше (части пар выпадают поштучно)."""
+    named = {p for pr in pairs for p in pr["rider"]}
+    if not grouped:
+        return [{"name": p, "parts": [p], "bone": b} for p, b in rigid.items() if p not in named]
+    groups, seen, out = bone_groups(rigid), set(), []
+    for p, b in rigid.items():
+        g = groups[p]
+        if p in seen:
+            continue
+        seen.update(g)
+        if set(g) & named:
+            continue
+        out.append({"name": "+".join(g), "parts": g, "bone": b})
+    return out
+
+
+def parse_designed(items, pairs: list) -> dict:
+    """`--designed-gap NAME=MM` → {имя пары: зазор, м}. Пара должна быть среди пар (CLI или профиля), зазор ≥ 0."""
+    names = {pr["name"] for pr in pairs}
+    out = {}
+    for it in items or []:
+        if "=" not in it:
+            raise ValueError("--designed-gap %r: нужно ИМЯ=мм" % it)
+        n, v = (x.strip() for x in it.split("=", 1))
+        if n not in names:
+            raise ValueError("--designed-gap %s: нет такой пары (есть %s)" % (n, ", ".join(sorted(names)) or "нет"))
+        mm = float(v)
+        if mm < 0:
+            raise ValueError("--designed-gap %s: зазор ≥ 0 мм" % n)
+        out[n] = mm / 1e3
+    return out
+
+
 def part_roles(profile: dict | None) -> dict:
     return {n: v.get("role") for n, v in ((profile or {}).get("parts") or {}).items()
             if isinstance(v, dict) and v.get("role")}
@@ -227,13 +279,18 @@ def winding_numbers(points, tris, chunk_elems: int = 2_000_000):
     return out
 
 
-def state_flags(meas: dict, gap_max: float, pen_max: float) -> list:
-    """Нарушения одного состояния (rest или кадр): ['gap 2.900 mm > 2.0', 'pen …']."""
+def state_flags(meas: dict, gap_max: float, pen_max: float, designed: float | None = None) -> list:
+    """Нарушения одного состояния (rest или кадр): ['gap 2.900 mm > 2.0', 'pen …']. designed — задуманный зазор пары
+    (C47): тогда нарушение — отход зазора от задуманного больше порога зазора в любую сторону."""
     out = []
     if meas.get("gap_m") is None:
         out.append("нет замера (пустая деталь или опора)")
         return out
-    if meas["gap_m"] > gap_max + 1e-9:
+    if designed is not None:
+        if abs(meas["gap_m"] - designed) > gap_max + 1e-9:
+            out.append("зазор %.2f мм вне задуманного %.2f ± %.1f" % (meas["gap_m"] * 1e3, designed * 1e3,
+                                                                     gap_max * 1e3))
+    elif meas["gap_m"] > gap_max + 1e-9:
         out.append("зазор %.2f мм > %.1f" % (meas["gap_m"] * 1e3, gap_max * 1e3))
     if (meas.get("pen_m") or 0.0) > pen_max + 1e-9:
         out.append("проникновение %.2f мм > %.1f" % (meas["pen_m"] * 1e3, pen_max * 1e3))
@@ -262,19 +319,22 @@ def pair_verdict(pair: dict, gap_max: float, pen_max: float) -> tuple[str, list,
     частей — предупреждение."""
     reasons, warns = [], []
     rest = pair.get("rest") or {}
-    reasons += ["rest: %s" % f for f in state_flags(rest, gap_max, pen_max)]
+    dg = pair.get("designed_gap_m")  # задуманный зазор пары (C47) или None
+    reasons += ["rest: %s" % f for f in state_flags(rest, gap_max, pen_max, dg)]
     if (rest.get("others_pen_m") or 0.0) > pen_max:
         warns.append("rest: остальные части входят в деталь на %.2f мм" % (rest["others_pen_m"] * 1e3))
     for clip, c in (pair.get("clips") or {}).items():
-        bad = [(r["f"], state_flags(r, gap_max, pen_max)) for r in c.get("rows") or []]
+        bad = [(r["f"], state_flags(r, gap_max, pen_max, dg)) for r in c.get("rows") or []]
         bad = [(f, fl) for f, fl in bad if fl]
         if bad:
             frames = [f for f, _ in bad]
             worst = max((r for r in c.get("rows") or [] if r["f"] in frames),
-                        key=lambda r: max((r.get("gap_m") or 0.0) - gap_max, (r.get("pen_m") or 0.0) - pen_max))
+                        key=lambda r: max((abs((r.get("gap_m") or 0.0) - dg) if dg is not None
+                                           else (r.get("gap_m") or 0.0)) - gap_max,
+                                          (r.get("pen_m") or 0.0) - pen_max))
             reasons.append("%s: %d кадров из %d (к. %s), худший к. %d: %s"
                            % (clip, len(bad), len(c.get("rows") or []), compact_frames(frames), worst["f"],
-                              "; ".join(state_flags(worst, gap_max, pen_max))))
+                              "; ".join(state_flags(worst, gap_max, pen_max, dg))))
         s = c.get("summary") or {}
         if (s.get("others_pen_max_m") or 0.0) > pen_max:
             warns.append("%s: остальные части входят в деталь на %.2f мм (к. %s)"
@@ -292,7 +352,8 @@ def scan_verdict(item: dict, gap_max: float, float_ok: set) -> str:
     clip_bad = any((s.get("gap_max_m") or 0.0) > gap_max + 1e-9 for s in (item.get("clips") or {}).values())
     if item["gap_m"] <= gap_max + 1e-9 and not clip_bad:
         return "PASS"
-    return "FLOAT_OK" if item["part"] in float_ok else "FAIL"
+    parts = item.get("parts") or [item["part"]]  # группа частей одной кости (C47): разрешена, если названа любая
+    return "FLOAT_OK" if item["part"] in float_ok or set(parts) & set(float_ok) else "FAIL"
 
 
 def compact_frames(frames: list) -> str:
@@ -325,6 +386,8 @@ def build_report(raw: dict, inputs: dict, pairs: list, roles: dict, gap_max: flo
                "perch_source": "cli" if pr["perch"] else "auto",
                "perch_roles": {p: roles.get(p) for p in ((raw.get("perch") or {}).get(name) or pr["perch"] or [])},
                "rest": rest, "clips": {}}
+        if pr.get("designed_gap_m") is not None:  # только у пар с --designed-gap (C47)
+            rec["designed_gap_m"] = pr["designed_gap_m"]
         for clip, c in (raw.get("clips") or {}).items():
             rows = (c.get("rows") or {}).get(name) or []
             rec["clips"][clip] = {"frames": len(rows), "summary": clip_summary(rows), "rows": rows}
@@ -335,7 +398,10 @@ def build_report(raw: dict, inputs: dict, pairs: list, roles: dict, gap_max: flo
         out_pairs.append(rec)
     scan = []
     for item in (raw.get("rest") or {}).get("scan") or []:
-        item = dict(item, role=roles.get(item["part"]))
+        parts = item.get("parts") or [item["part"]]
+        role = roles.get(item["part"]) if len(parts) == 1 else \
+            ("; ".join("%s: %s" % (p, roles[p]) for p in parts if roles.get(p)) or None)
+        item = dict(item, role=role)
         clips = {}
         for clip, c in (raw.get("clips") or {}).items():
             rows = [r for r in ((c.get("scan_rows") or {}).get(item["part"]) or []) if r.get("gap_m") is not None]
@@ -349,7 +415,7 @@ def build_report(raw: dict, inputs: dict, pairs: list, roles: dict, gap_max: flo
         v = scan_verdict(item, gap_max, float_ok)
         item["verdict"] = v
         scan.append(item)
-        what = "%s (%s)" % (item["part"], roles.get(item["part"]) or "без роли")
+        what = "%s (%s)" % (item["part"], role or "без роли")
         if v == "FAIL" and item["gap_m"] > gap_max + 1e-9:
             failures.append("скан: %s висит: зазор %.2f мм до %s > %.1f мм — опора и prepare.part_offsets_m "
                             "(HANDBOOK 4.2) или --pair" % (what, item["gap_m"] * 1e3, item.get("nearest_part"),
@@ -468,6 +534,10 @@ def main(argv=None) -> int:
     ap.add_argument("--clips", help="клипы спеки через запятую (по умолчанию все)")
     ap.add_argument("--clip-fbx", action="append", help="Имя=AM_*.fbx — клип вне спеки (дымовой прогон); можно много")
     ap.add_argument("--pair", action="append", help="[NAME=]RIDER[:PERCH|:auto], части через +; можно много")
+    ap.add_argument("--designed-gap", action="append", default=[],
+                    help="NAME=мм — задуманный зазор пары: |gap − мм| ≤ порога зазора (C47); можно много")
+    ap.add_argument("--no-bone-groups", action="store_true",
+                    help="прежнее поведение: жёсткие части одной кости сканируются по одной и входят в опору auto")
     ap.add_argument("--no-profile-pairs", action="store_true", help="не брать детали prepare.part_offsets_m профиля")
     ap.add_argument("--no-scan", action="store_true", help="без скана жёстких частей профиля")
     ap.add_argument("--float-ok", action="append", default=[], help="жёсткая часть, которой можно висеть (скан)")
@@ -481,6 +551,10 @@ def main(argv=None) -> int:
         cli = [parse_pair(t) for t in a.pair or []]
         prof = [] if a.no_profile_pairs else profile_pairs(inp["profile"])
         pairs = merge_pairs(cli, prof)
+        designed = parse_designed(a.designed_gap, pairs)
+        for pr in pairs:
+            if pr["name"] in designed:
+                pr["designed_gap_m"] = designed[pr["name"]]
         float_ok = {part_name(t) for t in a.float_ok}
     except (InputError, ValueError) as e:
         print("FAIL: %s" % e, file=sys.stderr)
@@ -488,8 +562,11 @@ def main(argv=None) -> int:
     if not Path(a.blender).is_file():
         print("FAIL: нет Blender %s (--blender или env BLENDER)" % a.blender, file=sys.stderr)
         return 1
-    scan = {} if a.no_scan else rigid_parts(inp["profile"])
-    scan = {p: b for p, b in scan.items() if not any(p in pr["rider"] for pr in pairs)}
+    grouped = not a.no_bone_groups
+    rigid = rigid_parts(inp["profile"])
+    scan = [] if a.no_scan else scan_units(rigid, pairs, grouped)
+    # соседи по кости (C47): в опору auto пар и скана не идут — двигаются с деталью как одно тело
+    same_bone = {p: [q for q in g if q != p] for p, g in bone_groups(rigid).items() if len(g) > 1} if grouped else {}
     if not pairs and not scan:
         print("FAIL: нечего мерить: нет пар (--pair, prepare.part_offsets_m профиля) и жёстких частей для скана",
               file=sys.stderr)
@@ -500,7 +577,8 @@ def main(argv=None) -> int:
         cfg = {"parts_blend": str(inp["parts"]), "rest_fbx": str(inp["rest"]),
                "clips": {k: str(v) for k, v in inp["clips"].items()},
                "pairs": [{"name": p["name"], "rider": p["rider"], "perch": p["perch"]} for p in pairs],
-               "scan": scan, "base_parts": base_parts(inp["profile"]), "auto_margin_m": AUTO_MARGIN_M,
+               "scan": scan, "same_bone": same_bone,
+               "base_parts": base_parts(inp["profile"]), "auto_margin_m": AUTO_MARGIN_M,
                "window_m": WINDOW_M, "match_warn_m": MATCH_WARN_M, "pen_eval_m": PEN_EVAL_M, "raw_out": str(Path(tmp) / "raw.json")}
         (Path(tmp) / "cfg.json").write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
         cmd = [a.blender, "-b", "--factory-startup", "--python-exit-code", "1",
@@ -522,7 +600,13 @@ def main(argv=None) -> int:
         "clips": {k: {"path": repo_rel(v), "sha256": sha256(v)} for k, v in inp["clips"].items()},
         "float_ok": sorted(float_ok, key=part_sort_key),
     }
+    if grouped and same_bone:  # только если группы что-то меняют (C47); --no-bone-groups — прежний отчёт
+        groups = bone_groups(rigid)
+        inputs["bone_groups"] = {"+".join(groups[p]): rigid[p] for p in same_bone}
     rep = build_report(raw, inputs, pairs, part_roles(inp["profile"]), gap_max, pen_max, float_ok)
+    if designed:
+        rep["thresholds"]["designed_gap_rule"] = ("пара с --designed-gap: |gap − задуманный| ≤ gap_max в rest и в каждом "
+                                                  "кадре, pen ≤ pen_max (C47: постоянный зазор щита к предплечью)")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
     for w in rep["warnings"]:
@@ -532,9 +616,11 @@ def main(argv=None) -> int:
         clips = "; ".join("%s gap≤%.2f pen≤%.2f мм" % (c, (v["summary"].get("gap_max_m") or 0) * 1e3,
                                                     (v["summary"].get("pen_max_m") or 0) * 1e3)
                           for c, v in pr["clips"].items())
-        print("PAIR %s %s → %s: rest gap %.2f мм pen %.2f мм%s — %s" % (
+        print("PAIR %s %s → %s: rest gap %.2f мм pen %.2f мм%s%s — %s" % (
             pr["name"], "+".join(pr["rider"]), "+".join(pr["perch"] or []), (rest.get("gap_m") or 0) * 1e3,
-            (rest.get("pen_m") or 0) * 1e3, ("; " + clips) if clips else "", pr["verdict"]))
+            (rest.get("pen_m") or 0) * 1e3,
+            (" (задуманный %.2f мм)" % (pr["designed_gap_m"] * 1e3)) if pr.get("designed_gap_m") is not None else "",
+            ("; " + clips) if clips else "", pr["verdict"]))
     for s in rep["scan"]:
         clips = "; ".join("%s ≤%.2f" % (c, v["gap_max_m"] * 1e3) for c, v in (s.get("clips") or {}).items())
         print("SCAN %s (%s) gap %.2f мм до %s%s — %s" % (s["part"], s.get("bone"), (s.get("gap_m") or 0) * 1e3,

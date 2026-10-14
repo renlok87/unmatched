@@ -145,6 +145,75 @@ class PureTests(unittest.TestCase):
         self.assertIn("ворона плеча", rep["failures"][0])
 
 
+class BoneGroupAndDesignedGapTests(unittest.TestCase):
+    """C47 (Beowulf 2026-10-14): скан спаривал щит с его же умбоном (одна кость arm_lower.L), постоянный задуманный
+    зазор щита к предплечью (5,6 мм) мог только FAIL."""
+
+    RIGID = {"tripo_part_2": "arm_lower.L", "tripo_part_7": "weapon.R", "tripo_part_17": "weapon.R",
+             "tripo_part_18": "arm_lower.L", "tripo_part_6": "head"}
+
+    def test_bone_groups(self):
+        g = rg.bone_groups(self.RIGID)
+        self.assertEqual(g["tripo_part_18"], ["tripo_part_2", "tripo_part_18"])
+        self.assertEqual(g["tripo_part_7"], ["tripo_part_7", "tripo_part_17"])
+        self.assertEqual(g["tripo_part_6"], ["tripo_part_6"])
+
+    def test_scan_units_grouped_and_legacy(self):
+        units = rg.scan_units(self.RIGID, [])
+        self.assertEqual([(u["name"], u["bone"]) for u in units],
+                         [("tripo_part_2+tripo_part_18", "arm_lower.L"), ("tripo_part_7+tripo_part_17", "weapon.R"),
+                          ("tripo_part_6", "head")])
+        # деталь пары (щит без умбона) снимает со скана всю группу кости: умбон не висит «сам по себе»
+        units = rg.scan_units(self.RIGID, [rg.parse_pair("shield=2:10")])
+        self.assertEqual([u["name"] for u in units], ["tripo_part_7+tripo_part_17", "tripo_part_6"])
+        legacy = rg.scan_units(self.RIGID, [rg.parse_pair("shield=2:10")], grouped=False)
+        self.assertEqual([u["parts"] for u in legacy],
+                         [["tripo_part_7"], ["tripo_part_17"], ["tripo_part_18"], ["tripo_part_6"]])
+
+    def test_parse_designed(self):
+        pairs = [rg.parse_pair("shield_arm=2+18:12")]
+        self.assertEqual(rg.parse_designed(["shield_arm=5.6"], pairs), {"shield_arm": 0.0056})
+        self.assertEqual(rg.parse_designed([], pairs), {})
+        for bad in (["shield_arm"], ["nope=5"], ["shield_arm=-1"], ["shield_arm=x"]):
+            with self.assertRaises(ValueError, msg=bad):
+                rg.parse_designed(bad, pairs)
+
+    def test_designed_gap_verdict(self):
+        rows = [{"f": f, "gap_m": g, "pen_m": 0.0} for f, g in enumerate([0.0056, 0.0057, 0.0061, 0.0056])]
+        pair = {"rest": {"gap_m": 0.0056, "pen_m": 0.0},
+                "clips": {"Idle": {"rows": rows, "summary": rg.clip_summary(rows)}}}
+        self.assertEqual(rg.pair_verdict(pair, 0.002, 0.002)[0], "FAIL")  # без задуманного — зазор > 2 мм
+        pair["designed_gap_m"] = 0.0056
+        self.assertEqual(rg.pair_verdict(pair, 0.002, 0.002), ("PASS", [], []))
+        lift = [{"f": 0, "gap_m": 0.0056, "pen_m": 0.0}, {"f": 1, "gap_m": 0.0081, "pen_m": 0.0}]
+        pair["clips"] = {"HitReact": {"rows": lift, "summary": rg.clip_summary(lift)}}
+        v, reasons, _ = rg.pair_verdict(pair, 0.002, 0.002)
+        self.assertEqual(v, "FAIL")
+        self.assertIn("вне задуманного 5.60", reasons[0])
+        self.assertIn("худший к. 1", reasons[0])
+        touch = dict(pair, rest={"gap_m": 0.0, "pen_m": 0.0}, clips={})
+        self.assertEqual(rg.pair_verdict(touch, 0.002, 0.002)[0], "FAIL")  # прилип вместо зазора — тоже отход
+        self.assertEqual(rg.state_flags({"gap_m": 0.003, "pen_m": 0.0}, 0.002, 0.002),
+                         ["зазор 3.00 мм > 2.0"])  # без задуманного — прежнее правило и текст
+
+    def test_group_scan_verdict_and_report(self):
+        item = {"part": "tripo_part_2+tripo_part_18", "parts": ["tripo_part_2", "tripo_part_18"], "gap_m": 0.0056,
+                "embedded": False, "nearest_part": "tripo_part_12"}
+        self.assertEqual(rg.scan_verdict(item, 0.002, set()), "FAIL")
+        self.assertEqual(rg.scan_verdict(item, 0.002, {"tripo_part_18"}), "FLOAT_OK")
+        raw = {"perch": {"sa": ["tripo_part_12"]},
+               "rest": {"pairs": {"sa": {"gap_m": 0.0056, "pen_m": 0.0}}, "scan": [item]},
+               "clips": {}, "warnings": []}
+        pairs = [dict(rg.parse_pair("sa=7:12"), designed_gap_m=0.0056)]
+        rep = rg.build_report(raw, {}, pairs, {"tripo_part_2": "щит", "tripo_part_18": "умбон"}, 0.002, 0.002, set())
+        self.assertEqual((rep["pairs"][0]["verdict"], rep["pairs"][0]["designed_gap_m"]), ("PASS", 0.0056))
+        self.assertEqual(rep["scan"][0]["role"], "tripo_part_2: щит; tripo_part_18: умбон")
+        self.assertIn("tripo_part_2+tripo_part_18", rep["failures"][0])
+        plain = rg.build_report(dict(raw, rest={"pairs": raw["rest"]["pairs"], "scan": []}), {},
+                                [rg.parse_pair("sa=7:12")], {}, 0.002, 0.002, set())
+        self.assertNotIn("designed_gap_m", plain["pairs"][0])  # ключ только у пар с --designed-gap
+
+
 # ---------------------------------------------------------------------------------------------- Blender
 
 GENERATOR = r'''
@@ -277,6 +346,34 @@ class BlenderEndToEnd(unittest.TestCase):
             self.assertEqual(a["clips"]["Lift"]["bad_frames"], "2")
             self.assertIn("отрывается", rep["failures"][0])
             self.assertEqual(scan["tripo_part_2"]["verdict"], "FLOAT_OK")
+            # C47: жёсткие части одной кости — одна группа скана против остальной фигуры (не друг против друга)
+            prof2 = dict(prof, rig={"weights": {"tripo_part_1": {"kind": "rigid", "bone": "rider"},
+                                                "tripo_part_2": {"kind": "rigid", "bone": "rider"}}})
+            (tmp / "profile2.json").write_text(json.dumps(prof2), encoding="utf-8")
+            code = rg.main(["--run", str(run), "--profile", str(tmp / "profile2.json"), "--no-profile-pairs",
+                            "--clip-fbx", "Lift=%s" % (run / "AM_Test_Lift.fbx"), "--out", str(out),
+                            "--blender", BLENDER])
+            self.assertEqual(code, 2)
+            rep = json.loads(out.read_text(encoding="utf-8"))
+            (grp,) = rep["scan"]
+            self.assertEqual((grp["part"], grp["parts"], grp["perch"]),
+                             ("tripo_part_1+tripo_part_2", ["tripo_part_1", "tripo_part_2"], ["tripo_part_0"]))
+            self.assertAlmostEqual(grp["gap_m"], 0.0005, delta=2e-5)  # группа касается тела деталью A
+            self.assertAlmostEqual(grp["clips"]["Lift"]["gap_max_m"], 0.0055, delta=1e-4)
+            self.assertEqual(rep["inputs"]["bone_groups"], {"tripo_part_1+tripo_part_2": "rider"})
+            # задуманный зазор пары: 0,5 мм против задуманных 3 мм — отход 2,5 мм > 2 → FAIL; 1 мм — PASS
+            code = rg.main(["--run", str(run), "--profile", str(tmp / "profile.json"), "--no-profile-pairs",
+                            "--pair", "A=1:0", "--designed-gap", "A=3", "--float-ok", "2", "--out", str(out),
+                            "--blender", BLENDER])
+            self.assertEqual(code, 2)
+            rep = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(rep["pairs"][0]["designed_gap_m"], 0.003)
+            self.assertIn("вне задуманного 3.00", rep["pairs"][0]["reasons"][0])
+            self.assertIn("designed_gap_rule", rep["thresholds"])
+            code = rg.main(["--run", str(run), "--profile", str(tmp / "profile.json"), "--no-profile-pairs",
+                            "--pair", "A=1:0", "--designed-gap", "A=1", "--float-ok", "2", "--out", str(out),
+                            "--blender", BLENDER])
+            self.assertEqual(code, 0)
 
 
 if __name__ == "__main__":

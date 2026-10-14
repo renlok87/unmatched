@@ -264,5 +264,52 @@ class ClipContactTests(unittest.TestCase):
         self.assertLess(fix, body.find("sys.argv"))
 
 
+
+class ContactSmokeAndBaseTopTests(unittest.TestCase):
+    """C28 (smoke spec: the sample's weapon_tip targets out of the verdict) and C40 (robust base top), 2026-10-14."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = load_parts(CONTACT, {"weapon_tip_verdict"})
+
+    @staticmethod
+    def rows(dzs, r_of_base=0.5):
+        return [{"f": f, "weapon_tip": {"r_of_base": r_of_base, "dz_of_height": dz, "xyz_cm": [0, 0, 6]}}
+                for f, dz in enumerate(dzs)]
+
+    def test_no_tip_frames_is_the_old_info(self):
+        st, kw = self.c["weapon_tip_verdict"](self.rows([0.0]), [], 0.002, smoke=True)
+        self.assertEqual((st, kw), ("info", {"note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"}))
+
+    def test_real_clip_verdict_unchanged(self):
+        st, kw = self.c["weapon_tip_verdict"](self.rows([0.0, 0.001, 0.0049, 0.0]), [1, 2, 3], 0.002)
+        self.assertEqual(st, "fail")
+        self.assertEqual(list(kw), ["frames", "max_r_of_base", "max_abs_dz_of_height", "tol_dz_of_height",
+                                    "violations", "note"])  # key order of the old check (reports stay the same)
+        self.assertEqual((kw["frames"], kw["max_abs_dz_of_height"], [v["f"] for v in kw["violations"]]),
+                         ([1, 3], 0.0049, [2]))
+        st, _ = self.c["weapon_tip_verdict"](self.rows([0.0, 0.001]), [0, 1], 0.002)
+        self.assertEqual(st, "pass")
+        st, kw = self.c["weapon_tip_verdict"](self.rows([0.0], r_of_base=1.2), [0], 0.002)
+        self.assertEqual((st, kw["violations"][0]["r_of_base"]), ("fail", 1.2))
+
+    def test_smoke_spec_keeps_the_measure_out_of_the_verdict(self):
+        st, kw = self.c["weapon_tip_verdict"](self.rows([0.0, 0.0049]), [0, 1], 0.002, smoke=True)
+        self.assertEqual(st, "info")
+        self.assertEqual((kw["status_without_smoke"], kw["smoke_excluded"]), ("fail", True))
+        self.assertEqual(kw["max_abs_dz_of_height"], 0.0049)
+        self.assertIn("C28", kw["note"])
+        st, kw = self.c["weapon_tip_verdict"](self.rows([0.0]), [0], 0.002, smoke=True)
+        self.assertEqual((st, kw["status_without_smoke"]), ("info", "pass"))
+
+    def test_main_reads_the_smoke_flag_and_the_robust_base_top(self):
+        body = main_body(CONTACT)
+        self.assertIn('spec.get("smoke", False)', body)
+        self.assertIn("weapon_tip_verdict(rows, tip_frames, TIP_TOL, smoke)", body)
+        self.assertIn("gc.robust_base_top(gc.polygon_faces(bpolys)", body)
+        self.assertNotIn("base_top = max(p.z for p in bco)", body)  # C40: not the highest vertex any more
+        src = CONTACT.read_text(encoding="utf-8")
+        self.assertIn("import grip_check as gc", src)
+
 if __name__ == "__main__":
     unittest.main()
