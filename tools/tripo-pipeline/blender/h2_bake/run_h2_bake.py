@@ -13,9 +13,12 @@ Tripo sources are only read (sha256 checked by prepare). The run directory gets 
 reports/ (all deterministic) and work/ (blend files, npy composites, raw frames: not for git).
 --compare-with: determinism verdict against another run of the same profile (determinism.py: tolerance table, scope)
   -> reports/determinism-report.json; exit code 1 and the list of failures when a file is outside its tolerance.
---reuse-from <old run> [--reuse-allow-code-drift] (h2 mode, new empty --run-dir, --stages all; reuse.py): stages whose
+--reuse-from <old run> [--reuse-allow-code-drift] (h2 mode, new empty --run-dir; reuse.py): stages whose
   profile blocks, input files, Blender and code equal those of the old run are taken over (work/ files hard-linked,
   reports copied with `reused_from`); recomputation starts at the first stage that differs. Plan: work/reuse-plan.json.
+  --stages all, or the stages to run now (one stage at a time, HANDBOOK §4.3; the first must be the first recomputed
+  stage; the next ones run later without --reuse-from). profile_version >= 2: a change of textures.team_mask.base_band
+  only reruns the band step of the uv stage (bake and aux stay reused; reuse.py, skill check C24).
 Every h2 stage records its fingerprint in work/stages.json (the stage ledger, reuse.py); the manifest copies it.
 
 Look-dev mode (material library v1 on a finished H2.1 run; lookdev.py, st_lookdev.py):
@@ -84,13 +87,18 @@ def blender(exe, script, args, log):
         raise RuntimeError("blender failed (%d): %s — see %s" % (proc.returncode, " ".join(cmd[-3:]), log))
 
 
-def blender_stage(exe, stage, profile_path, run_dir):
+def blender_stage(exe, stage, profile_path, run_dir, mode=None):
+    """mode "band": the band step of the uv stage (st_uv.run_band; params work/params/uv-band.json, log logs/uv-band.log)."""
     params = {"stage": stage, "profile": str(Path(profile_path).resolve()), "run_dir": str(Path(run_dir).resolve()),
               "repo_root": str(REPO)}
-    pfile = run_dir / "work" / "params" / ("%s.json" % stage)
+    tag = stage
+    if mode:
+        params["mode"] = mode
+        tag = "%s-%s" % (stage, mode)
+    pfile = run_dir / "work" / "params" / ("%s.json" % tag)
     pfile.parent.mkdir(parents=True, exist_ok=True)
     pfile.write_text(json.dumps(params, indent=2), encoding="utf-8")
-    blender(exe, HERE / "blender_entry.py", [pfile], run_dir / "logs" / ("%s.log" % stage))
+    blender(exe, HERE / "blender_entry.py", [pfile], run_dir / "logs" / ("%s.log" % tag))
 
 
 def probe_counts(data, extended_gate=True):
@@ -365,14 +373,19 @@ def main():
     plan = None
     if a.reuse_from:
         source = Path(a.reuse_from).resolve()
-        if a.stages != "all":
-            raise SystemExit("--reuse-from builds a complete run: use it with --stages all")
         if source == run_dir:
             raise SystemExit("--reuse-from: the old run and --run-dir are the same directory")
         if run_dir.exists() and any(p.is_file() for p in run_dir.rglob("*")):
             raise SystemExit("--reuse-from needs a new, empty --run-dir (%s has files)" % run_dir)
-        plan = reuse.plan(source, profile, REPO, bver(), prof_mod.load, a.reuse_allow_code_drift)
+        plan = reuse.plan(source, profile, REPO, bver(), prof_mod.load, a.reuse_allow_code_drift,
+                          band_only=prof_mod.is_new_hero_profile(profile))
         reuse.print_plan(plan, lambda s: print(s, flush=True))
+        if a.stages != "all":  # one stage at a time (HANDBOOK §4.3, C24): the carried run continues from its first gap
+            want = [s for s in stages if s in plan["recomputed"]]
+            first = plan["first_recomputed"]
+            if want and first and want[0] != first:
+                raise SystemExit("--reuse-from --stages %s: the first stage to recompute is %s; run it first "
+                                 "(--stages %s), then the next stages without --reuse-from" % (a.stages, first, first))
     for d in ("work", "logs", "reports", "export", "textures", "preview"):
         (run_dir / d).mkdir(parents=True, exist_ok=True)
     timings = {}
@@ -389,9 +402,28 @@ def main():
             dict(plan, source=src_rel, carried=carried, seconds=timings["reuse_apply"]), indent=1, ensure_ascii=False,
             sort_keys=True) + "\n", encoding="utf-8")
         print("[h2-bake] reused %s in %.1f s: %d links (%.2f GB), %d reports, %d copies, %d unowned copied%s" % (
-            ", ".join(plan["reused"]) or "nothing", timings["reuse_apply"], carried["link"], carried["linked_bytes"] / 1e9,
-            carried["report"], carried["copy"], carried["unowned_copied"],
+            ", ".join(plan["reused"] + plan.get("band", [])) or "nothing", timings["reuse_apply"], carried["link"],
+            carried["linked_bytes"] / 1e9, carried["report"], carried["copy"], carried["unowned_copied"],
             (" (%s)" % ", ".join(carried["unowned"][:8])) if carried["unowned"] else ""), flush=True)
+        for row in plan["stages"]:
+            if row["action"] != "band":
+                continue
+            t0 = time.time()  # band step (C24): the base band of the carried uv stage from the current profile
+            print("[h2-bake] %s band step ..." % row["stage"], flush=True)
+            private = reuse.private_copies(run_dir, reuse.BAND_FILES)
+            links = reuse.snapshot_links(run_dir)
+            blender_stage(a.blender, row["stage"], a.profile, run_dir, mode="band")
+            tmp = run_dir / "work" / "lp_uv.band-tmp.blend"  # st_uv.BAND_TMP_BLEND when Blender could not rename it
+            if tmp.is_file():
+                os.replace(tmp, run_dir / "work" / "lp_uv.blend")
+            reuse.check_links(run_dir, links, row["stage"] + " band step")
+            timings["%s_band" % row["stage"]] = round(time.time() - t0, 1)
+            reuse.record(run_dir, row["stage"], row["old_fingerprint"], profile_rel, profile_sha,
+                         timings["%s_band" % row["stage"]],
+                         reused_from={"run": src_rel, "evidence": plan["evidence"], "code_drift": row.get("code_drift") or [],
+                                      "partial": "band step: %s recomputed (private copies: %s)"
+                                                 % (reuse.BAND_KEY, ", ".join(private) or "none")})
+            print("[h2-bake] %s band step done in %.1f s" % (row["stage"], timings["%s_band" % row["stage"]]), flush=True)
         stages = [s for s in stages if s in plan["recomputed"]]
     for stage in stages:
         t0 = time.time()
@@ -470,6 +502,7 @@ def stage_block(reuse, run_dir, profile, bver):
         p = json.loads(plan.read_text(encoding="utf-8"))
         reuse_info = {"from": p["source"], "evidence": p["evidence"], "reused": p["reused"],
                       "recomputed": p["recomputed"], "code_drift": p["code_drift"],
+                      **({"band": p["band"]} if p.get("band") else {}),
                       "determinism": "full repeat required (scope full) — code drift in reused stages" if p["code_drift"]
                       else "the run that goes to UE needs the full repeat; otherwise repeat the recomputed stages"}
     return {"ledger": "work/stages.json", "order": [s for s in reuse.REUSABLE if s in fps],

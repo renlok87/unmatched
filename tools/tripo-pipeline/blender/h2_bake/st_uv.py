@@ -42,6 +42,7 @@ from . import charts
 from . import profile as PR
 
 CAP_ATTR = "h2_cap"
+BAND_TMP_BLEND = "lp_uv.band-tmp.blend"  # run_band saves here, then renames over work/lp_uv.blend
 
 
 def uv_islands(bm, uv_layer):
@@ -454,7 +455,79 @@ def write_base_mask(obj, band_faces, height_m):
             "team_mask_g": "the same faces (work/uv/base_band.npy)"}
 
 
+def band_triangles(bm, uv_layer, size, band_cfg, band_height):
+    """(band_faces | None, UV triangles in px of the team band faces) of the base part's bmesh, in the face order of
+    run() (islands, then faces): the normal rule |n_z| <= normal_z_abs_max, or the height slab of base_band.height_m."""
+    band_faces = None
+    if band_height is not None:
+        bm.faces.ensure_lookup_table()
+        band_faces = B.height_band_faces(np.array([f.calc_center_median().z for f in bm.faces]),
+                                         np.array([f.normal.z for f in bm.faces]), band_height)
+    tris = []
+    for faces in uv_islands(bm, uv_layer):
+        for f in faces:
+            if not (band_faces[f.index] if band_height is not None else abs(f.normal.z) <= band_cfg["normal_z_abs_max"]):
+                continue
+            uvs = [(l[uv_layer].uv.x * size, l[uv_layer].uv.y * size) for l in f.loops]
+            for k in range(1, len(uvs) - 1):
+                tris.append((uvs[0], uvs[k], uvs[k + 1]))
+    return band_faces, tris
+
+
+def run_band(params, profile):
+    """Band step of a `band` reuse (reuse.py, skill check C24): the uv stage of the old run is carried and only the team
+    band of the base is recomputed from the current textures.team_mask.base_band — work/uv/base_band.npy (TeamMask.G),
+    the vertex mask UM_Mask.R of the base mesh in work/lp_uv.blend (saved to a temporary file and renamed over the hard
+    link) and the uv-report.json block base_band, the same functions and face order as run(). The UV layout, islands,
+    caps and every other uv output stay those of the old run."""
+    import os
+
+    run_dir = Path(params["run_dir"])
+    blend = run_dir / "work" / "lp_uv.blend"
+    bpy.ops.wm.open_mainfile(filepath=str(blend))
+    size = int(profile["uv"]["atlas_px"])
+    band_cfg = profile["textures"]["team_mask"]["base_band"]
+    band_height = PR.base_band_height(profile)
+    obj = bpy.data.objects["LP_" + band_cfg["part"]]
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    band_faces, band_tris = band_triangles(bm, bm.loops.layers.uv.active, size, band_cfg, band_height)
+    bm.free()
+    base_band = np.zeros((size, size), np.int32)
+    if band_tris:
+        U.raster_triangles(np.array(band_tris, np.float64), np.ones(len(band_tris), np.int32), size, out=base_band)
+    out = run_dir / "work" / "uv" / "base_band.npy"
+    if out.exists():
+        out.unlink()  # never write into a hard link of the old run (the driver made a private copy as well)
+    np.save(out, base_band.astype(np.uint8))
+    band_rep = None
+    if band_height is not None:
+        band_rep = write_base_mask(obj, band_faces, band_height)
+    elif obj.data.color_attributes.get(B.MASK_ATTRIBUTE) is not None:  # the old run had height_m, the profile not
+        obj.data.color_attributes.remove(obj.data.color_attributes[B.MASK_ATTRIBUTE])
+        obj.data.update()
+    tmp = blend.with_name(BAND_TMP_BLEND)
+    bpy.ops.wm.save_as_mainfile(filepath=str(tmp), compress=False, copy=True)
+    try:
+        os.replace(str(tmp), str(blend))
+    except OSError as e:  # the opened file may still be mapped on Windows: the driver renames it after Blender exits
+        print("uv band step: %s left for the driver (%s)" % (tmp.name, e), flush=True)
+    rep_path = run_dir / "reports" / "uv-report.json"
+    rep = json.loads(rep_path.read_text(encoding="utf-8"))
+    rep.pop("base_band", None)
+    if band_rep is not None:
+        band_rep["texels_4k"] = int((base_band > 0).sum())
+        rep["base_band"] = band_rep
+    if isinstance(rep.get("reused_from"), dict):
+        rep["reused_from"]["band_step"] = "base_band recomputed from the current profile (st_uv.run_band)"
+    U.write_json(rep_path, rep)
+    print("uv band step: %d band triangles, %d texels; vertex mask %s" % (len(band_tris), int((base_band > 0).sum()),
+                                                                        "written" if band_rep else "none"), flush=True)
+
+
 def run(params, profile):
+    if params.get("mode") == "band":
+        return run_band(params, profile)
     run_dir = Path(params["run_dir"])
     bpy.ops.wm.open_mainfile(filepath=str(run_dir / "work" / "lp_closed.blend"))
     cfg = profile["uv"]

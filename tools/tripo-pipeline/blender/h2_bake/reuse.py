@@ -12,17 +12,24 @@ the other input files (`files`: rig contract, FBX preset, files named in the pre
 Outputs of the earlier stages are inputs too: they are covered by the chain (a stage is reused only when every earlier
 stage is reused).
 
---reuse-from <old run> (new, empty run directory; `--stages all`): walking ORDER, a stage is reused while its
+--reuse-from <old run> (new, empty run directory; `--stages all` or the stages to run now, h2-bake 0.9.0, skill check
+C24): walking ORDER, a stage is reused while its
 profile blocks, input files and Blender version equal those of the old run, its code too (or --reuse-allow-code-drift:
 then the drift is listed and the full determinism repeat is required) and the old run finished it. From the first
 stage that differs everything is recomputed; `manifest` always is. Old-run evidence: work/stages.json, or for a run
 made before the ledger (h2-bake <= 0.6.1) reports/run-manifest.json (its profile file must still have the recorded
 sha256; module sha256 = the code at the manifest stage; anim helpers, rig contract and preview files were not
 recorded there, so rig and later stages of such a run are never reused).
+Base band only (plan(band_only=True): profile_version >= 2, skill check C24): when the one change of the uv stage is
+the sub-key textures.team_mask.base_band (the team ring of the base: TeamMask.G raster work/uv/base_band.npy and the
+base vertex mask UM_Mask.R in work/lp_uv.blend), the uv stage gets the action `band`: its files are carried like a
+reused stage and the driver reruns only the band step (st_uv.run_band, Blender) on a private copy of lp_uv.blend;
+bake and aux (they do not read the band) stay reusable, textures and everything after it are recomputed.
 Reused stages: files owned by the stage (OWNERS) are hard-linked from the old run (copy when a link is impossible),
 JSON reports are copied with the run path rewritten and a top-level `reused_from`; work/params/* are not carried;
-files no stage owns are copied (listed). Before any stage runs, its own files that are hard links are unlinked
-(unshare) so that no write reaches the old run; after it, a changed hard-linked file of another stage stops the run."""
+files no stage owns are copied (listed), except work/smoke/* (the stage-3 smoke clips of the old run: never carried,
+C24). Before any stage runs, its own files that are hard links are unlinked (unshare) so that no write reaches the old
+run; after it, a changed hard-linked file of another stage stops the run."""
 
 import fnmatch
 import hashlib
@@ -84,6 +91,9 @@ METADATA_KEYS = ("profile_id", "profile_version", "status", "status_note", "note
 OWNERS = (
     ("work/stages.json", None), ("work/timings.json", None), ("reports/run-manifest.json", "manifest"),
     ("reports/determinism-report.json", None),
+    ("work/smoke/*", None),  # stage-3 smoke clips (HANDBOOK §4.4 «Сдача модели» п.5) belong to that run (C24)
+    ("work/reuse-plan.json", None),  # the old run's own plan (the driver writes the new one)
+    ("work/params/uv-band.json", None), ("logs/uv-band.log", "uv"),  # band step of a `band` reuse (st_uv.run_band)
     ("work/hp.blend*", "prepare"), ("reports/prepare-report.json", "prepare"),
     ("work/lp.blend*", "retopo"), ("reports/retopo-report.json", "retopo"),
     ("work/lp_closed.blend*", "close"), ("reports/close-report.json", "close"),
@@ -405,11 +415,27 @@ def source_records(source, repo, profile_loader):
 
 
 # ------------------------------------------------------------------ plan and apply
-def plan(source, profile, repo, blender_version, profile_loader, allow_code_drift=False):
-    """-> {"source", "evidence", "stages": [{stage, action: reuse|recompute, changes, code_drift, why}], "reused",
-    "recomputed", "code_drift"}."""
+BAND_KEY = "textures.team_mask.base_band"
+BAND_STAGE = "uv"
+# rewritten in place by the band step (private copies first); work/lp_uv.blend is saved to a temporary file and renamed
+# over the link (the old run keeps its inode), reports/uv-report.json was carried as a copy
+BAND_FILES = ("work/uv/base_band.npy",)
+
+
+def band_fingerprint(old_fp, new_fp):
+    """Ledger fingerprint of a `band` stage: the old run's fingerprint (code drift stays visible) with the band sub-key
+    of the current profile (the band was recomputed from it)."""
+    fp = json.loads(json.dumps(old_fp))
+    fp["profile"][BAND_KEY] = new_fp["profile"][BAND_KEY]
+    return fp
+
+
+def plan(source, profile, repo, blender_version, profile_loader, allow_code_drift=False, band_only=False):
+    """-> {"source", "evidence", "stages": [{stage, action: reuse|band|recompute, changes, code_drift, why}], "reused",
+    "band", "recomputed", "code_drift"}. band_only (profile_version >= 2): a uv stage whose one change is
+    textures.team_mask.base_band gets the action `band` (module docstring); otherwise it is recomputed as before."""
     kind, old = source_records(source, repo, profile_loader)
-    rows, reused, drift_all, broken = [], [], {}, None
+    rows, reused, band, drift_all, broken = [], [], [], {}, None
     for stage in ORDER:
         if stage == "manifest":
             rows.append({"stage": stage, "action": "recompute", "why": "always (hashes the outputs of this run)"})
@@ -424,10 +450,16 @@ def plan(source, profile, repo, blender_version, profile_loader, allow_code_drif
         else:
             changes, drift = differences(new_fp, rec["fingerprint"])
             row.update(changes=changes, code_drift=drift)
-            if changes:
+            band_case = band_only and stage == BAND_STAGE and changes == ["profile %s" % BAND_KEY]
+            if changes and not band_case:
                 row.update(action="recompute", why="changed: %s" % "; ".join(changes))
             elif drift and not allow_code_drift:
                 row.update(action="recompute", why="code changed: %s (--reuse-allow-code-drift reuses it)" % ", ".join(drift))
+            elif band_case:
+                row.update(action="band", why="only %s changed: uv outputs carried, the base band recomputed (band step)"
+                                              % BAND_KEY + (" (code drift allowed: %s)" % ", ".join(drift) if drift else ""))
+                if drift:
+                    drift_all[stage] = drift
             else:
                 row.update(action="reuse", why="unchanged" + (" (code drift allowed: %s)" % ", ".join(drift) if drift else ""))
                 if drift:
@@ -436,10 +468,13 @@ def plan(source, profile, repo, blender_version, profile_loader, allow_code_drif
         if row["action"] == "reuse":  # the ledger of the new run keeps the provenance of the reused outputs
             row["old_fingerprint"] = rec["fingerprint"]
             reused.append(stage)
+        elif row["action"] == "band":
+            row["old_fingerprint"] = band_fingerprint(rec["fingerprint"], new_fp)
+            band.append(stage)
         elif broken is None:
             broken = stage
         rows.append(row)
-    return {"source": str(Path(source).resolve()), "evidence": kind, "stages": rows, "reused": reused,
+    return {"source": str(Path(source).resolve()), "evidence": kind, "stages": rows, "reused": reused, "band": band,
             "recomputed": [r["stage"] for r in rows if r["action"] == "recompute"], "code_drift": drift_all,
             "first_recomputed": broken}
 
@@ -491,7 +526,7 @@ def link_or_copy(src, dst):
 def apply(p, run_dir, repo):
     """Carry the files of the reused stages of plan `p` into the empty run_dir. -> summary."""
     source, run_dir = Path(p["source"]), Path(run_dir)
-    reused = set(p["reused"])
+    reused = set(p["reused"]) | set(p.get("band") or ())  # a band stage is carried, then its band step rewrites
     counts = {"link": 0, "copy": 0, "report": 0, "unowned_copied": 0, "skipped": 0}
     unowned, sizes = [], {"linked_bytes": 0, "copied_bytes": 0}
     src_rel = _rel(source, repo)
@@ -519,8 +554,24 @@ def apply(p, run_dir, repo):
     return dict(counts, **sizes, unowned=unowned)
 
 
+def private_copies(run_dir, rels):
+    """Hard-linked files of `rels` (run-relative) become private copies before a step rewrites them in place (the band
+    step: np.save opens the existing file, Blender may too); -> the rels copied."""
+    done = []
+    for rel in rels:
+        p = Path(run_dir) / rel
+        if p.is_file() and p.stat().st_nlink > 1:
+            tmp = p.with_name(p.name + ".private-tmp")
+            shutil.copy2(p, tmp)
+            os.replace(tmp, p)
+            done.append(rel)
+    return done
+
+
 def print_plan(p, out):
     out("[h2-bake] reuse from %s (evidence: %s)" % (p["source"], p["evidence"]))
+    if p.get("band"):
+        out("[h2-bake]   band step: %s carried, the base band recomputed (st_uv.run_band)" % ", ".join(p["band"]))
     for r in p["stages"]:
         out("[h2-bake]   %-9s %-9s %s" % (r["stage"], r["action"], r.get("why", "")))
     if p["code_drift"]:

@@ -10,7 +10,10 @@ Poses: the 7 poses of anim/rig_deform_probe.py (same bones, world axes, angles),
                base), closed_by_cap (a cap of the close stage shares every rim vertex); per pose the share of the loop
                perimeter whose distance to the posed covering surface grew by more than seams.exposure_threshold_mm
                (verify 2026-09-29: "открытые петли, открывшиеся в позе"). Gate: an open (uncapped) loop may not open on
-               more than seams.max_open_share of its perimeter in any pose.
+               more than seams.max_open_share of its perimeter in any pose. seams.loop_cover "per_vertex" (default of
+               profile_version >= 2, h2-bake 0.9.0, skill check C21): only the vertices that touch the covering part
+               at rest (<= seams.loop_contact_mm) open against it; the opening against each vertex's own nearest part
+               is reported, not gated (loop_cover_mode).
 3. see-through ray test (raycam, seams.raycast views/pitch): the posed figure (body + bow + static base) seen from
                17 orthographic views; a pixel whose first hit is a BACK face sees the inside of an open shell — with UE
                one-sided materials that pixel shows what lies behind: a see-through hole. A cap hit from behind is
@@ -143,9 +146,35 @@ def junction_metric(arm, body, vpart, ppart, polys, radius, pairs_cfg):
             "worst_by_pair": worst}
 
 
-def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
+LOOP_COVER = ("per_loop", "per_vertex")
+LOOP_CONTACT_MM = 3.0  # per_vertex: a loop vertex touches its cover when it lies within this distance at rest
+
+
+def loop_cover_mode(profile, cfg):
+    """seams.loop_cover: "per_loop" (one covering part per loop, the smallest median distance; every vertex of the loop
+    opens against it — the rule of every profile written before h2-bake 0.9.0) or "per_vertex" (skill check C21; default
+    for profile_version >= 2): only the loop vertices that touch the cover at rest (<= seams.loop_contact_mm, default 3)
+    can open against it; a vertex far from the cover is not a contact (the hem cut-out of the Beowulf mantle measured
+    against the belt gave a false 11-12 mm at vertices 1.3-6.8 cm from it). Each vertex is also measured against its
+    own nearest part (rows: nearest_parts, nearest_part_opening) — reported, not gating: on the accepted Beowulf t4 it
+    shows layered cloth parting in the probe poses (tunic waist from the mantle 7.6 mm, belt from the chest 10 mm) where
+    the see-through rays find no hole."""
+    mode = cfg.get("loop_cover") or ("per_vertex" if PR.is_new_hero_profile(profile) else "per_loop")
+    if mode not in LOOP_COVER:
+        raise ValueError("seams.loop_cover must be one of %s (got %r)" % (", ".join(LOOP_COVER), mode))
+    return mode
+
+
+def nearest_other(surfaces, part, pts):
+    """(distance, label) per point to the nearest surface of the other parts (per_vertex rule)."""
+    keys = [q for q in surfaces if q != part]
+    d = np.array([[surfaces[q].find_nearest(Vector(p))[3] for p in pts] for q in keys])
+    return d.min(0), np.array(keys)[d.argmin(0)]
+
+
+def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of, per_vertex=False):
     """objs: {"body": obj, "bow": obj | None, "base": obj}; labels: {"body": (vpart, vcap, fcap), "bow": part | None,
-    "base": part}."""
+    "base": part}. per_vertex: loop_cover_mode "per_vertex" (rows get cover_rule; the per_loop rows keep their keys)."""
     body, bow, base = objs["body"], objs["bow"], objs["base"]
     vpart, vcap, fcap = labels["body"]
     bm = bmesh.new()
@@ -188,6 +217,7 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
         cap_kd[p] = (kd, len(ids))
     s0 = surfaces(rest, rest_bow)
     thr = float(cfg["exposure_threshold_mm"]) / 1000.0
+    contact_m = float(cfg.get("loop_contact_mm", LOOP_CONTACT_MM)) / 1000.0
     rows = []
     for lp in raw_loops:
         vi = np.array(lp)
@@ -203,6 +233,7 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
         if n_cap and all(h[2] is not None and h[2] <= 1e-6 for h in cap_hits):
             cid = int(vcap[cap_hits[0][1]])
             closed = cap_name_of.get((part, cid), "cap %d" % cid)
+        wv = (seg + np.roll(seg, 1)) / 2
         best = None
         for q, bvh in s0.items():
             if q == part:
@@ -210,11 +241,19 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
             d = np.array([bvh.find_nearest(Vector(p))[3] for p in pts])
             if best is None or np.median(d) < np.median(best[1]):
                 best = (q, d)
-        wv = (seg + np.roll(seg, 1)) / 2
-        rows.append({"part": names_by_label[part], "covered_by": names_by_label[best[0]], "cover_label": best[0],
-                     "perimeter_cm": U.r(seg.sum() * 100, 2), "centre_cm": U.rv(pts.mean(0) * 100, 2),
-                     "median_to_cover_mm": U.r(np.median(best[1]) * 1000, 3), "closed_by_cap": closed,
-                     "_vi": vi, "_d0": best[1], "_w": wv / wv.sum(), "poses": {}})
+        row = {"part": names_by_label[part], "covered_by": names_by_label[best[0]], "cover_label": best[0],
+               "perimeter_cm": U.r(seg.sum() * 100, 2), "centre_cm": U.rv(pts.mean(0) * 100, 2),
+               "median_to_cover_mm": U.r(np.median(best[1]) * 1000, 3), "closed_by_cap": closed,
+               "_vi": vi, "_d0": best[1], "_w": wv / wv.sum(), "poses": {}}
+        if per_vertex:  # C21: only the vertices that touch the cover at rest can open against it
+            contact = best[1] <= contact_m
+            d0n, lab0 = nearest_other(s0, part, pts)
+            near_q, near_n = np.unique(lab0, return_counts=True)
+            row.update({"cover_rule": "per_vertex", "contact_mm": U.r(contact_m * 1000, 3),
+                        "contact_share": U.r((row["_w"] * contact).sum(), 4),
+                        "nearest_parts": {names_by_label[int(q)]: int(n) for q, n in zip(near_q, near_n)},
+                        "_part": part, "_contact": contact, "_d0n": d0n, "_ncontact": d0n <= contact_m, "_near": {}})
+        rows.append(row)
     for name, _b, _a, _d in TESTS:
         pose(arm, name)
         co, co_bow = evaluated(body), evaluated_or_none(bow)
@@ -222,13 +261,21 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
         for r in rows:
             d = np.array([s[r["cover_label"]].find_nearest(Vector(p))[3] for p in co[r["_vi"]]])
             op = d - r["_d0"]
+            if per_vertex:
+                op = np.where(r["_contact"], op, 0.0)
+                dn = nearest_other(s, r["_part"], co[r["_vi"]])[0]  # information: the nearest part of each vertex
+                opn = np.where(r["_ncontact"], dn - r["_d0n"], 0.0)
+                r["_near"][name] = {"open_share": U.r((r["_w"] * (opn > thr)).sum(), 4), "max_mm": U.r(opn.max() * 1000, 2)}
             r["poses"][name] = {"open_share": U.r((r["_w"] * (op > thr)).sum(), 4), "max_mm": U.r(op.max() * 1000, 2)}
     reset_pose(arm)
     for r in rows:
         worst = max(r["poses"].items(), key=lambda kv: (kv[1]["open_share"], kv[1]["max_mm"]))
         r["worst"] = {"pose": worst[0], **worst[1]}
-        for k in ("_vi", "_d0", "_w", "cover_label"):
-            r.pop(k)
+        if per_vertex:
+            nw = max(r["_near"].items(), key=lambda kv: (kv[1]["open_share"], kv[1]["max_mm"]))
+            r["nearest_part_opening"] = {"pose": nw[0], **nw[1], "gating": False}
+        for k in ("_vi", "_d0", "_w", "cover_label", "_part", "_contact", "_d0n", "_ncontact", "_near"):
+            r.pop(k, None)
     rows.sort(key=lambda r: (r["part"], -r["perimeter_cm"]))
     return rows
 
@@ -414,7 +461,8 @@ def run(params, profile):
     labels = {"body": (vpart, vcap, fcap), "bow": bow_label, "base": base_label}
     junctions = junction_metric(arm, objs["body"], vpart, ppart, polys, float(rig.get("seam_radius_m", 0.001)),
                                 rig["seam_pairs"])
-    loops = loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of)
+    cover_mode = loop_cover_mode(profile, cfg)  # per_vertex for profile_version >= 2 (C21)
+    loops = loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of, per_vertex=cover_mode == "per_vertex")
     st_blend = see_through(arm, objs, labels, cfg["raycast"], names_by_label)
     # ---------------- FBX read back (what UE imports), turned back into the authored frame by the probes stage
     authored_body = objs["body"]
@@ -496,6 +544,8 @@ def run(params, profile):
               "note": "junction opening = distance to the posed neighbour surface minus the rest distance; loops: rim "
                       "loops of real (non-cap) faces; see-through = first ray hit on a back face (UE one-sided); "
                       "figure height 0.55 m"}
+    if cover_mode == "per_vertex":  # profiles of the per_loop rule keep their report bytes
+        report["loops"]["cover_rule"] = cover_mode
     U.write_json(run_dir / "reports" / "seams-report.json", report)
     if not report["passed"]:
         raise RuntimeError("seams checks failed: %s" % [k for k, c in checks.items() if not c["passed"]])

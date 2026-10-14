@@ -646,6 +646,28 @@ def sheets(ta, repo, run_dir, rdir, gain):
     return out
 
 
+def gold_check(checks, gd, trim_cls, max_de):
+    """Check gold_unchanged_by_dye. gd = {view: {ld_p1, ld_p2: median dE of the trim pixels or None}}. A view without
+    trim pixels (median None: the trim is hidden there, e.g. the torc from the back) is "not measured", as the dress
+    check does below dress_min_px; without a trim class (team_accent.trim_class absent, no hem) the check is "not
+    applicable" (skill check Beowulf 2026-10-14, C19: it failed on a view without gold and always with trim_class none;
+    the workaround was a wrong trim_class). A figure whose trim shows in every view (Medusa) keeps its report bytes."""
+    expected = "median dE of the gold pixels (meander, belt) with P1 / P2 against no dye <= %s" % max_de
+    if trim_cls is None:
+        check(checks, "gold_unchanged_by_dye", True,
+              {"not_applicable": "no trim class (team_accent.trim_class absent, no hem)"}, expected)
+        return
+    measured = {v: d for v, d in gd.items() if all(x is not None for x in d.values())}
+    not_measured = sorted(v for v in gd if v not in measured)
+    ok = all(x <= max_de for d in measured.values() for x in d.values())
+    if not_measured:
+        check(checks, "gold_unchanged_by_dye", ok,
+              {"measured": measured, "not_measured_no_trim_px": {"trim_class": trim_cls, "views": not_measured}},
+              expected + " (views without trim pixels: not measured)")
+    else:
+        check(checks, "gold_unchanged_by_dye", ok, gd, expected)
+
+
 def run_report(run_dir, ta, repo):
     run_dir, repo = Path(run_dir), Path(repo)
     pr = presets(repo)
@@ -683,8 +705,7 @@ def run_report(run_dir, ta, repo):
           % (rd["dress_unchanged_share_min"], min_px),
           "the dress stays in the concept colour; the rest is the anti-aliased rim of the accent and the dyed bounce light")
     gd = {v: {s: per[v]["gold_unchanged_" + s]["median_delta_e"] for s in ("ld_p1", "ld_p2")} for v in views}
-    check(checks, "gold_unchanged_by_dye", all(x is not None and x <= rd["gold_median_delta_e_max"] for d in gd.values() for x in d.values()),
-          gd, "median dE of the gold pixels (meander, belt) with P1 / P2 against no dye <= %s" % rd["gold_median_delta_e_max"])
+    gold_check(checks, gd, trim_cls, rd["gold_median_delta_e_max"])
     check(checks, "ta_maps_passed", maps["passed"], [k for k, c in maps["checks"].items() if not c["passed"]], [])
     cal = rend["lights"]["cobble"]
     check(checks, "cobble_exposure_calibrated_to_w4a", abs(cal["k1_board_p50"] - ta["cobble"]["exposure_calibration"]["target_board_p50_luma"])

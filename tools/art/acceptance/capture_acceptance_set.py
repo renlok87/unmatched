@@ -4,7 +4,13 @@
     python tools/art/acceptance/capture_acceptance_set.py --fbx <SK_*.fbx> --textures <dir> --out <evidence>/frames \
         [--key <Key>] [--sheet <sheet-<key>.png>] [--side-view left|right] [--measure <measure-report.json>] \
         [--allow-no-tone] [--blender <exe>] [--base <SM_*_Base.fbx> | --no-base] [--previous <frames dir> | none] \
-        [--asset-card <asset-card.yaml>] [--attack-bone <кость> | none]
+        [--asset-card <asset-card.yaml>] [--attack-bone <кость> | none] [--rules auto|1|2]
+
+Правила v2 (--rules auto: профиль H2 прогона с profile_version ≥ 2 или ASSET_ID заявки вне MVP и пилота; проверочный
+прогон Beowulf 2026-10-14): задние грани отсекаются, как в UE (C22: крышка, видимая только изнанкой, на кадре — дыра);
+панель кисти close-hands снимается с ракурса наибольшей видимости, если с ракурса по умолчанию её закрывает деталь на
+предплечье (C30: щит); uv-layout.png и uv_islands — без внутренней копии оболочки rig.cloth_shell и её мостов (C36).
+frames.json#rules — что включено и откуда. У профилей v1 кадры и frames.json прежние.
 
 Вход: отгружаемый скелетный FBX (UM_FBX_v1, `HANDBOOK §2.2`) и каталог его текстур. Из каталога берутся BC, N
 (DirectX, `HANDBOOK §2.4`) и ORM: `*_BC.png` / `*_2K_BC.png` / `*_BC_2K.png` (последнее — раскладка форков Arthur и
@@ -381,6 +387,42 @@ def resolve_attack(flag: str | None, card: dict | None) -> tuple[str | None, str
     return None, None
 
 
+H2_PROFILE_PY = REPO / "tools" / "tripo-pipeline" / "blender" / "h2_bake" / "profile.py"
+
+
+def _h2_profile():
+    """h2_bake/profile.py (без bpy): SCHEMA, LEGACY_ASSETS, profile_version."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("accept_h2_profile", H2_PROFILE_PY)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def detect_rules(fbx: Path, card_text: str | None = None) -> tuple[int | None, str]:
+    """Версия правил съёмки (C22, C30, C36: правила v2 — профиль H2 с profile_version ≥ 2): профиль прогона FBX
+    (<run>/reports/run-manifest.json → source_profile.path у look-dev, profile.path у bake), иначе ASSET_ID заявки
+    (ассеты MVP и пилота — 1, остальные — 2). → (1 | 2 | None, источник)."""
+    pr = _h2_profile()
+    man = fbx.parent.parent / "reports" / "run-manifest.json"
+    if fbx.parent.name == "export" and man.is_file():
+        try:
+            m = json.loads(man.read_text(encoding="utf-8"))
+            rel = (m.get("source_profile") or {}).get("path") or (m.get("profile") or {}).get("path")
+            p = Path(rel) if rel and Path(rel).is_absolute() else REPO / (rel or "")
+            prof = json.loads(p.read_text(encoding="utf-8")) if rel and p.is_file() else None
+        except (OSError, ValueError):
+            prof = None
+        if isinstance(prof, dict) and prof.get("schema") == pr.SCHEMA:
+            return int(pr.profile_version(prof)), "профиль H2 %s (run-manifest.json)" % rel
+    if card_text:
+        aid = card_scalars(card_text, keys=("ASSET_ID",)).get("ASSET_ID")
+        if aid:
+            return (1 if aid in pr.LEGACY_ASSETS else pr.NEW_HERO_PROFILE_VERSION), "asset-card ASSET_ID %s" % aid
+    return None, "нет профиля H2 и заявки: правила v1"
+
+
 def find_measure(fbx: Path) -> Path | None:
     """<run>/reports/measure-report.json для FBX в <run>/export/ (генерический look-dev, стадия ld_measure)."""
     p = fbx.parent.parent / "reports" / "measure-report.json"
@@ -562,6 +604,10 @@ def main(argv=None) -> int:
                                          "ближайший вверх от --fbx)")
     ap.add_argument("--attack-bone", help="кость атакующей конечности для close-attack (F74), например hand.R; none — "
                                           "не снимать; по умолчанию — WEAPON_SOCKET_BONE заявки при WEAPON_HAND none")
+    ap.add_argument("--rules", choices=["auto", "1", "2"], default="auto",
+                    help="правила съёмки: 2 — отсечение задних граней (C22), ракурс close-hands по видимости кисти "
+                         "(C30), UV без оболочки cloth_shell (C36); auto — по профилю H2 прогона (profile_version) или "
+                         "ASSET_ID заявки; 1 — прежние кадры")
     a = ap.parse_args(argv)
 
     fbx = Path(a.fbx).resolve()
@@ -609,8 +655,14 @@ def main(argv=None) -> int:
     if a.asset_card and not card_path.is_file():
         print("FAIL: нет asset-card %s" % card_path, file=sys.stderr)
         return 1
-    card_vals = card_scalars(card_path.read_text(encoding="utf-8")) if card_path is not None else {}
+    card_text = card_path.read_text(encoding="utf-8") if card_path is not None else None
+    card_vals = card_scalars(card_text) if card_text is not None else {}
     attack_bone, attack_source = resolve_attack(a.attack_bone, card_vals)
+    if a.rules == "auto":
+        rules, rules_source = detect_rules(fbx, card_text)
+    else:
+        rules, rules_source = int(a.rules), "--rules %s" % a.rules
+    v2 = rules is not None and rules >= 2
     out.mkdir(parents=True, exist_ok=True)
     stale = [p for p in out.iterdir() if STALE.fullmatch(p.name)]
     for p in stale:  # повторный прогон в тот же каталог: старые кадры не должны смешаться с новыми
@@ -621,6 +673,8 @@ def main(argv=None) -> int:
         cfg = {"fbx": str(fbx), "base_fbx": str(base) if base else None, "textures": {k: str(v) for k, v in tex.items()},
                "work_dir": str(work), "size": SIZE, "probe_source": str(PROBE_SOURCE),
                "attack_bone": attack_bone, "attack_source": attack_source}
+        if v2:  # правила v2 (C22, C30, C36); v1 — прежний cfg и прежние кадры
+            cfg.update(rules=rules, backface_culling=True, hand_view="visibility", uv_shell=True)
         (work / "cfg.json").write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
         cmd = [a.blender, "-b", "--factory-startup", "--python-exit-code", "1",
                "--python", str(BLENDER_SCRIPT), "--", str(work / "cfg.json")]
@@ -800,6 +854,10 @@ def main(argv=None) -> int:
         "files": files,
         "roles": {f: ROLES.get(f) for f in files},
     }
+    if v2:  # правила v2: что изменилось в кадрах (v1 — frames.json прежний)
+        manifest["rules"] = dict(info.get("rules") or {}, source=rules_source,
+                                 note="задние грани отсечены, как в UE (крышка, видимая изнанкой, — дыра на кадре); "
+                                      "close-hands по видимости кисти; UV без оболочки cloth_shell (C22, C30, C36)")
     (out / "frames.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     for w in warnings:
         print("WARN: %s" % w, file=sys.stderr)

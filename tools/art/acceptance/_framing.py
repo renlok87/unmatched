@@ -57,6 +57,70 @@ def best_visible_azimuth(visible, avoid_deg, min_sep=60.0):
     return best[3], best[0]
 
 
+HAND_MIN_VISIBLE = 0.2  # close-hands (C30): ракурс по умолчанию годится, если видно ≥ 20 % вершин кисти (выпуклое тело
+# видно с одной стороны не больше чем наполовину: кисть с мечом Beowulf — 40 % с az −35, кисть за щитом — 0 % с az 35)
+
+
+def best_panel_azimuth(visible, default_az, min_share=HAND_MIN_VISIBLE):
+    """Ракурс панели close-hands (правила v2, проверочный прогон Beowulf C30: щит на левом предплечье закрывал кисть
+    hand.L с az 35). visible = {азимут: доля видимых вершин кисти}. Ракурс по умолчанию остаётся, если с него видно
+    не меньше min_share; иначе — азимут с наибольшей долей, при равенстве ближе к ракурсу по умолчанию, затем меньший.
+    → (азимут, доля, выбран_по_видимости)."""
+    d = float(visible.get(default_az, 0.0))
+    if d >= min_share or not visible:
+        return int(default_az), d, False
+    az = max(visible, key=lambda a: (round(float(visible[a]), 6), -ang_diff(a, default_az), -int(a)))
+    if float(visible[az]) <= d:
+        return int(default_az), d, False
+    return int(az), float(visible[az]), True
+
+
+def shell_copy_mask(tri_uv, tri_co, max_offset_m=0.0015, decimals=6):
+    """Треугольники внутренней копии `rig.cloth_shell` (П3-3) в отгружаемом FBX, где меток нет (C36): тот же UV0
+    треугольника, что у его грани, с обратным обходом в UV (знак площади противоположный), центр в 3D не дальше
+    max_offset_m (offset_mm ≤ 1 мм). Из пары помечается треугольник с отрицательной площадью UV. Мосты кромки
+    (нулевая площадь UV) — отдельно: zero_uv_area_mask. tri_uv [T, 3, 2], tri_co [T, 3, 3] → bool [T]."""
+    tri_uv = np.asarray(tri_uv, dtype=float).reshape(-1, 3, 2)
+    tri_co = np.asarray(tri_co, dtype=float).reshape(-1, 3, 3)
+    n = len(tri_uv)
+    out = np.zeros(n, bool)
+    if n == 0:
+        return out
+    e1, e2 = tri_uv[:, 1] - tri_uv[:, 0], tri_uv[:, 2] - tri_uv[:, 0]
+    area = 0.5 * (e1[:, 0] * e2[:, 1] - e1[:, 1] * e2[:, 0])
+    q = np.round(tri_uv * 10 ** decimals).astype(np.int64)
+    corner = np.lexsort((q[:, :, 1], q[:, :, 0]), axis=-1)  # канонический ключ: углы по (u, v), обход не важен
+    key = np.take_along_axis(q, corner[..., None], axis=1).reshape(n, 6)
+    order = np.lexsort(key.T[::-1])
+    cen = tri_co.mean(1)
+    i = 0
+    while i < n:
+        j = i + 1
+        while j < n and (key[order[j]] == key[order[i]]).all():
+            j += 1
+        if j - i >= 2:
+            grp = order[i:j]
+            pos = [g for g in grp if area[g] > 0]
+            neg = [g for g in grp if area[g] < 0]
+            for g in neg:  # копия — к ближайшей грани с положительной площадью
+                if not pos:
+                    break
+                dist = [float(np.linalg.norm(cen[g] - cen[p])) for p in pos]
+                k = int(np.argmin(dist))
+                if dist[k] <= max_offset_m:
+                    out[g] = True
+                    pos.pop(k)
+        i = j
+    return out
+
+
+def zero_uv_area_mask(tri_uv, eps=1e-12):
+    """Треугольники с нулевой площадью UV (мосты кромки оболочки П3-3: цвет кромки с обеих сторон)."""
+    tri_uv = np.asarray(tri_uv, dtype=float).reshape(-1, 3, 2)
+    e1, e2 = tri_uv[:, 1] - tri_uv[:, 0], tri_uv[:, 2] - tri_uv[:, 0]
+    return np.abs(0.5 * (e1[:, 0] * e2[:, 1] - e1[:, 1] * e2[:, 0])) <= eps
+
+
 CLOSE_MIN, CLOSE_MAX = 0.12, 0.25  # крупный план кисти/хвата: рамка 12–25 % роста (решение скилла)
 
 

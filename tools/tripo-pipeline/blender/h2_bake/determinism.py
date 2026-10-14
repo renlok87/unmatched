@@ -16,7 +16,13 @@ run_h2_bake.py exits with code 1 on "fail" and prints the failures.
 Scope (RC-08): a stage both runs took from the same --reuse-from source is not evidence of determinism (its files are
 hard links of one source). Such files are marked reused_in_both; the scope is then "recomputed_stages_only" and lists
 the recomputed stages. Rule of the skill: the full repeat (scope "full") once per figure, on the run that goes to UE;
-other runs with --reuse-from repeat only the recomputed stages."""
+other runs with --reuse-from repeat only the recomputed stages.
+
+Look-dev metal_f0 "self" (h2-bake 0.9.0, skill check C18): when BOTH runs' reports/ld-maps-report.json#metal_f0 has
+concept_source "self", the F0 of those classes comes from this run's ld_measure (medians of Cycles class masks, C38).
+Then the hero LUT (textures/T_UM_MatLUT_*.dds), its overrides JSON and ld-maps-report.json follow the rule lut_f0_self:
+every LUT cell / JSON value equal except the F0 (row 0 RGB) and worn colour (row 6 RGB) of the metal_f0 classes and the
+blocks derived from them, which may differ by <= F0_SELF_TOL (linear) — otherwise the json / exact rule as before."""
 
 import fnmatch
 import hashlib
@@ -31,7 +37,18 @@ NOISE_MEASURED = ("pilot 2026-10-13/14, 11 repeats (Medusa, Achilles r1-r3, Ange
                   "C:/tmp/*-repro): N, N_OpenGL, ORM (4K and 2K) differ in 1-6 pixels by 1 level, Medusa ORM 4K one "
                   "pixel by 2; BC, TeamMask, TeamAccent, MatID, UV sheet always identical")
 
+F0_SELF_TOL = 0.01  # linear F0 / worn colour channel: one mask pixel of the class pass moves a concept median (C38)
+LUT_F0_ROWS = (0, 6)  # build_ue_inputs.LUT_ROWS: 0 bcR/G/B (F0 of a metal), 6 wornBCR/G/B
+
 TOLERANCES = (
+    {"pattern": "textures/T_UM_MatLUT_*.dds", "rule": "lut_f0_self", "when": "metal_f0_self", "tolerance": F0_SELF_TOL,
+     "why": "look-dev metal_f0 \"self\" in both runs: F0 / worn colour cells of the metal_f0 classes within the "
+            "tolerance, every other cell exact (C18)"},
+    {"pattern": "textures/T_UM_MatLUT_*.overrides.json", "rule": "lut_f0_self", "when": "metal_f0_self",
+     "tolerance": F0_SELF_TOL, "why": "the same for the overrides JSON (bc / wornBC of the metal_f0 classes)"},
+    {"pattern": "reports/ld-maps-report.json", "rule": "lut_f0_self", "when": "metal_f0_self", "tolerance": F0_SELF_TOL,
+     "why": "the same for ld-maps-report.json: blocks derived from the F0 (metal_f0, lut sha256 / applied, LUT outputs, "
+            "measured values of the LUT checks) within the tolerance, the rest and every passed equal"},
     {"pattern": "reports/run-manifest.json", "rule": "excluded",
      "why": "sha256 of every output and the profile path; rewritten by the manifest stage"},
     {"pattern": "reports/determinism-report.json", "rule": "excluded", "why": "this comparison"},
@@ -65,8 +82,86 @@ def sha256(path):
     return d.hexdigest()
 
 
-def rule_for(rel):
-    return next(t for t in TOLERANCES if fnmatch.fnmatchcase(rel, t["pattern"]))
+def rule_for(rel, conditions=()):
+    """First rule whose pattern matches; a rule with `when` counts only when that condition holds for the pair."""
+    return next(t for t in TOLERANCES if fnmatch.fnmatchcase(rel, t["pattern"])
+                and (t.get("when") is None or t["when"] in conditions))
+
+
+def metal_f0_self_classes(run_dir):
+    """{class: LUT column} of the metal_f0 "self" classes of a look-dev run (ld-maps-report.json), or None."""
+    p = Path(run_dir) / "reports" / "ld-maps-report.json"
+    try:
+        mf = json.loads(p.read_text(encoding="utf-8")).get("metal_f0") or {}
+    except (OSError, ValueError, AttributeError):
+        return None
+    if mf.get("concept_source") != "self" or not isinstance(mf.get("lut_column"), dict):
+        return None
+    return {k: int(v) for k, v in mf["lut_column"].items()}
+
+
+def read_dds_half(path):
+    """DDS DX10 RGBA16F, one 2D slice (lookdev.read_dds_rgba16f) -> float32 [H, W, 4]."""
+    import numpy as np
+
+    b = Path(path).read_bytes()
+    h, w = (int(x) for x in np.frombuffer(b[12:20], "<u4"))
+    return np.frombuffer(b[148:148 + h * w * 8], "<f2").reshape(h, w, 4).astype(np.float32), b[:148]
+
+
+def _close(a, b, tol):
+    """Numbers (nested lists / dicts) equal in structure and within tol."""
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(_close(a[k], b[k], tol) for k in a)
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_close(x, y, tol) for x, y in zip(a, b))
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)) and not isinstance(a, bool) and not isinstance(b, bool):
+        return abs(float(a) - float(b)) <= tol
+    return a == b
+
+
+def _lut_f0_compare(rel, pa, pb, run_a, run_b, repo, cols, tol):
+    """lut_f0_self rule (module docstring) -> (ok, detail)."""
+    import numpy as np
+
+    if rel.endswith(".dds"):
+        (a, ha), (b, hb) = read_dds_half(pa), read_dds_half(pb)
+        if ha != hb or a.shape != b.shape:
+            return False, "header / size"
+        free = np.zeros(a.shape, bool)
+        for c in cols.values():
+            for row in LUT_F0_ROWS:
+                free[row, c, :3] = True
+        d = np.abs(a - b)
+        ok = bool((d[~free] == 0).all() and (d[free] <= tol).all())
+        return ok, {"max_f0_diff": round(float(d[free].max()), 5) if free.any() else 0.0,
+                    "other_cells_differing": int((d[~free] > 0).sum())}
+    da, db = normalised(pa, run_a, repo), normalised(pb, run_b, repo)
+    fa, fb = {}, {}
+    if rel.endswith(".overrides.json"):
+        for data, out in ((da, fa), (db, fb)):
+            for c in cols:
+                e = (data.get("classes") or {}).get(c) or {}
+                out[c] = {k: e.pop(k, None) for k in ("bc", "wornBC")}
+    else:  # ld-maps-report.json: sha256 of the LUT files dropped, F0-derived numbers within the tolerance
+        for data, out in ((da, fa), (db, fb)):
+            mf = data.pop("metal_f0", None) or {}
+            out["metal_f0"] = {c: {"f0": r.get("f0_linear"), "worn": (r.get("worn") or {}).get("linear"),
+                                   "reached": r.get("reached")} for c, r in sorted((mf.get("classes") or {}).items())}
+            lut = data.get("lut") or {}
+            out["applied"] = lut.pop("applied", None)
+            for k in ("dds_sha256", "overrides_sha256"):
+                lut.pop(k, None)
+            for name in (lut.get("dds"), lut.get("overrides_json")):
+                (data.get("outputs") or {}).pop(name, None)
+            checks = data.get("checks") or {}
+            (checks.get("lut_dds_read_back") or {}).pop("measured", None)  # the DDS sha256
+            for name, keys in (("lut_metal_f0_plausible", ("measured",)),
+                               ("lut_metal_f0_from_concept", ("measured", "expected"))):
+                for k in keys:
+                    out["%s.%s" % (name, k)] = (checks.get(name) or {}).pop(k, None)
+    ok = da == db and _close(fa, fb, tol)
+    return ok, {"rest_equal": da == db, "f0_within_tolerance": _close(fa, fb, tol)}
 
 
 def output_files(run_dir):
@@ -136,8 +231,10 @@ def compare(run_dir, other, repo, stage_of=None, reuse_a=None, reuse_b=None):
     fa, fb = output_files(run_dir), output_files(other)
     reuse_a, reuse_b = reuse_a or {}, reuse_b or {}
     rows, png_ok, deferred = {}, {}, []
+    f0_cols = metal_f0_self_classes(run_dir)
+    conditions = ("metal_f0_self",) if f0_cols and f0_cols == metal_f0_self_classes(other) else ()
     for rel in sorted(set(fa) | set(fb)):
-        rule = rule_for(rel)
+        rule = rule_for(rel, conditions)
         row = {"rule": rule["rule"]}
         stage = stage_of(rel) if stage_of else None
         if stage:
@@ -185,6 +282,12 @@ def compare(run_dir, other, repo, stage_of=None, reuse_a=None, reuse_b=None):
             except ValueError:
                 eq = False
             row.update(result="identical after normalisation" if eq else "different", ok=eq)
+        elif rule["rule"] == "lut_f0_self":
+            try:
+                ok, detail = _lut_f0_compare(rel, fa[rel], fb[rel], run_dir, other, repo, f0_cols, rule["tolerance"])
+            except (ValueError, OSError) as e:
+                ok, detail = False, str(e)
+            row.update(result="within tolerance" if ok else "different", ok=ok, detail=detail)
         else:
             row.update(result="different", ok=False)
     for rel in deferred:

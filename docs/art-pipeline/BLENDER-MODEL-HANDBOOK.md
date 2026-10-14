@@ -453,12 +453,12 @@ Medusa» без проверки, что это верно для нового �
 | `scale` | `figure_top_m` = бюджет / 100 (0,55 для 55 uu), `base_diameter_m`, `base_height_m`; необязательный `figure_top_part` | `prepare` берёт самую высокую вершину не-подставки, оружие и рога включительно; деталь выше головы — `figure_top_part` (§2.10) |
 | `orientation` | `method` ray-escape, `samples_per_part 4000`, `seed 0`, `flip_below_score -0.5`, `min_score_after_fix 0.5`, `expected_inside_out_parts` — **пустой до первого прогона** | первый prepare перечислит вывернутые части и откажет; список переносится в **новый** файл профиля, порог не ослабляется |
 | `retopo` | `method` COLLAPSE, `target_tris` по частям (крупные части первыми), `dense_regions` (лицо ~1 600 tris), `cleanup`, `caps` | итог с крышками и оболочками → 30–45k на героя (§2.10); лицо, кисти, оружие получают приоритет. Регион `name: "face"` обязателен: его `part` — часть с лицом, по ней `rig` и `ld_fbx` меряют фронт лица (`profile.face_part_key`; без региона — `tripo_part_1` Medusa, у Achilles это подставка: rig FAIL, 0 граней лица, F12) |
-| `closure` | `contact_caps` по петлям, которые открываются в позах | у Medusa 19 крышек; видимость крышек в rest ≤ 0,01 % и ≤ 9 px; выбор крышка / стык весов / оболочка — «Новый герой» ниже |
+| `closure` | `contact_caps` по петлям, которые открываются в позах | у Medusa 19 крышек; видимость крышек в rest ≤ 0,01 % и ≤ 9 px; выбор крышка / стык весов / оболочка — «Новый герой» ниже. v2 (h2-bake 0.9.0): крышка, которую в покое видно почти только изнанкой (> 100 px сзади, спереди < 10 % от них), — FAIL `close-report.json#checks.caps_not_seen_only_from_behind`: UE отсекает изнанку, щель остаётся (`neck_top` Beowulf: 1 163 px сзади, 0 спереди, чёрная щель ворота в игре — C22, C61); крышку убрать, петлю закрыть стыком весов или `rig.cloth_shell` |
 | `uv` | `atlas_px 4096`, `runtime_px 2048`, `min_gap_px 8`, `pack_margin_fraction 0.0013`, `max_overlap_px 0`, `texel_priority` (лицо ×2, кисти ×1,75, оружие ×1,5, подставка ×0,45), `density_reference_part`, `charts.chart_area_cm2` | Smart UV запрещён (5 402 острова у Medusa); только charts (Voronoi + MINIMUM_STRETCH). `density_reference_part` — крупная часть тела, с которой сравнивается плотность лица (без ключа `tripo_part_0` = платье Medusa). Острова, прошедшие проверку на 512 px, на 4K перекрывались на 7–17 px (`uv-report.json#checks.raster_overlap_px`, F30, F56): рукавам и клинкам — меньший `chart_area_cm2` (по части или `charts.regions`) |
 | `bake` | `device`, `resolution 4096`, AO (128 samples, distance 0,044 м = 0,08 × рост), `cage` (1,5 × p99 отклонения, 0,6–4 мм, `max_ray_factor 2.5`), `ao_exclusions` (AO части без загораживающей части, которая в анимации отходит — кулак Medusa у пояса) | `device: "GPU"` (Medusa): FBX повторяются байт в байт, а N/ORM расходятся в 1–3 пикселях на 1–2 уровня; `CPU` (Merlin) бит-стабилен, но медленнее. Выбор записать в отчёт |
 | `textures` | `prefix T_<Hero>_H2`, `maps`, `ao_gate`, `team_mask`, металл-маска `materials.metal`, `edge_extend_px 16`; необязательные `band_repaint` и `team_mask.base_band.height_m` (h2-bake 0.8.0) | `team_mask.cloth_hsv` и `base_band.part` — значения Medusa, перенастроить (чек-лист ниже). Металл есть — блок `materials.metal` обязателен (look-dev читает маску). Металла нет — без блока: стадия пишет нулевую `work/uv/metal_mask.npy` и `textures-report.json#metal_mask` (F51). Мазки цвета соседа на полосе стыка (ворот Achilles — это текстура Tripo) — `band_repaint`, а не `bake.cage` (F107). Двухъярусная подставка — `base_band.height_m` (2.9) |
 | `rig` | `skeleton UM_HUMANOID_17_v2`, `armature_object SKEL_UM_Humanoid`, `character <Hero>`, `max_influences 4`, `clean_below 0.01`, `bones` (голова/хвост каждой кости по геометрии героя), `weights` (`chain`, `zblend`, `cloth`, `rigid`), `junctions`, `seam_pairs`, необязательные `cloth_shell` и `probe_skip` | кости ставить по геометрии нового героя (разведка, ниже); копия координат Medusa = гарантированный FAIL проб. `probe_skip` — расширенные пробы, которых у фигуры нет (ствол Leshen без ног: `shin_l_bend`, `shin_r_bend`, `foot_l_flex`, `foot_r_flex`); прежние 7 пропускать нельзя (4.3) |
-| `seams` | `raycast` (`pitch_m 0.0015`, `margin_m 0.1`, `posed_clearance_m 0.005`), `max_new_blob_px 8`, `frames`, `k2_frames` под свою фигуру | сетка лучей одна на все позы: rest + `margin_m`, сторона, которую поза покидает, отодвигается до позы + `posed_clearance_m` (`profile.seams_grid_bounds`, F55/F65). Обход пилота `margin_m 0.2` больше не нужен; расширение пишется в `seams-report.json#see_through.<blend\|fbx>.grid_extended_by_posed_bounds_m` |
+| `seams` | `raycast` (`pitch_m 0.0015`, `margin_m 0.1`, `posed_clearance_m 0.005`), `max_new_blob_px 8`, `frames`, `k2_frames` под свою фигуру | сетка лучей одна на все позы: rest + `margin_m`, сторона, которую поза покидает, отодвигается до позы + `posed_clearance_m` (`profile.seams_grid_bounds`, F55/F65). Обход пилота `margin_m 0.2` больше не нужен; расширение пишется в `seams-report.json#see_through.<blend\|fbx>.grid_extended_by_posed_bounds_m`. v2: `seams.loop_cover` по умолчанию `per_vertex` — раскрываться против покрывающей части может только вершина петли, которая касается её в покое (≤ `seams.loop_contact_mm`, 3 мм); вырез подола мантии против одного пояса давал ложные 11–12 мм у вершин в 1,3–6,8 см от него (C21). Раскрытие против ближайшей части каждой вершины — в строке петли `nearest_part_opening`, не гейт (у принятого t4 слоёная ткань расходится в позах: верхний край туники и мантия 7,6 мм, пояс и грудь 10 мм — лучи дыр не нашли); `per_loop` — прежнее правило |
 | `sockets` | `Weapon` на кости оружия, `Head` на `head`, `location_uu: null` | — |
 | `exports` | `fbx_preset blender/_tools/presets/UM_FBX_v1.json`, `skeletal_fbx SK_<Hero>_H2.fbx`, `base_fbx SM_<Hero>_H2_Base.fbx` | — |
 | `meshes`, `materials` | какие части → body/weapon/base; один слот | — |
@@ -519,6 +519,11 @@ Medusa» без проверки, что это верно для нового �
 части внутреннюю копию её реальных граней: обратная намотка, тот же UV0, веса копируются, смещение против нормали, по
 кромке — мост. Атлас и бейк не меняются, а треугольники части удваиваются (§2.10). Без ключа FBX Medusa совпадает байт
 в байт (`tests/test_cloth_shell.py`). Перед ключом — инвентарь петель (лист или оболочка, п.4 разведки).
+У v2 грани оболочки помечены: `work/rig/body_face_shell.npy` (1 — внутренняя копия, 2 — мост кромки) и
+`rig-report.json#cloth_shell.face_tag`. UV-замеры (перевёрнутые треугольники, перекрытия, острова) эти грани исключают:
+копия повторяет UV0 своей грани с обратным обходом, внешний замер считает её перевёрнутой и перекрытой (6 099
+«перевёрнутых» треугольников Beowulf — оболочка, C36). В FBX меток нет: там копию находит повтор UV с обратным обходом
+в пределах `offset_mm` (`tools/art/acceptance/_framing.shell_copy_mask`, съёмка приёмки v2).
 
 **Безногий ствол** (Ancient Leshen, F53). Частей ног нет. Ствол — правило `cloth`: `hips`, выше талии `spine`, ниже
 `leg_start_z` половины по сторонам на `leg_upper.L/R` до `leg_max`. У подставки — правило `rigid` на `root`: подставка
@@ -530,6 +535,13 @@ Medusa» без проверки, что это верно для нового �
 
 Запускать **по одной стадии** и читать отчёт после каждой. `all` — только для повтора уже отлаженного профиля. Нового
 героя — только после разведки (4.2, «Новый герой»).
+
+`--reuse-from` — тоже по одной стадии (h2-bake 0.9.0, C24): `--reuse-from <старый прогон> --stages <первая
+пересчитываемая стадия плана>` переносит готовые стадии и запускает только её, следующие — `--stages <стадия>` без
+`--reuse-from`. У v2 смена одного `textures.team_mask.base_band` (кольцо подставки) пересчитывает только шаг полосы
+стадии `uv` (`st_uv.run_band`: `work/uv/base_band.npy`, `UM_Mask.R` в `lp_uv.blend`, блок `base_band` отчёта): `bake` и
+`aux` переносятся, `textures` и дальше считаются заново (Beowulf t3 → t4 пересчитал всё от `uv`). `work/smoke/` старого
+прогона не переносится.
 
 ```bash
 P=art/pipeline-candidates/<ASSET-ID>/build-profiles/<hero>-h2-bake-h2.json
@@ -568,6 +580,7 @@ run>` → `reports/determinism-report.json` (`unmatched.h2-bake-determinism/2`, 
 | `compose-report.json`, `ld-compose-report.json`, `ld-team-*.json` (меряют кадры Cycles `ta_render`), `measure-report.json` look-dev (медианы масок ID-прохода по кадрам Cycles; Beowulf: маска ±1 пиксель при одинаковых картах, LUT и FBX — C38) | только `passed` совпадает |
 | `textures-report.json` | равен без `outputs.<карта>.{sha256, bytes}` карт, прошедших правило PNG |
 | `*.png` | тот же размер, `max_abs_diff` ≤ 2 на канал, отличаются ≤ 0,01 % пикселей (шум GPU-бейка N, N_OpenGL, ORM; пилот: 11 повторов, 1–6 пикселей на 1 уровень) |
+| look-dev с `metal_f0` «self» в обоих прогонах: `T_UM_MatLUT_*.dds`, `*.overrides.json`, `ld-maps-report.json` | клетки F0 и цвета износа классов `metal_f0` и выведенные из них числа — с допуском 0,01 (линейно: F0 из медиан масок Cycles этого прогона, C18), всё остальное — как в строках ниже |
 | прочие `*.json` | побайтно или равны после замены пути прогона на `<run>` и без `reused_from` |
 | FBX и всё остальное | побайтно |
 
@@ -627,11 +640,21 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
   `ld-maps-report.json#checks.lut_metal_f0_from_concept`. Эффект виден только в UE: Blender-превью и кадры приёмки
   берут металл из BC. Съёмка UE судит и оттенок металла, а не только яркость (F120: у Achilles `t_cap` 2,0 и T 2,0, а
   бронза бледно-серебряная против тёплого золота концепта; после `metal_f0` — оттенок 29,1° против 30,9° концепта, F138).
+  У v2 (h2-bake 0.9.0, C18) `concept_report` можно не задавать (или `"self"`): `ld_maps` пишет LUT с медианами металла
+  и помечает F0 `pending`, `ld_measure` берёт зоны концепта этого же прогона, ставит F0 и переписывает LUT и
+  `ld-maps-report.json` — один прогон look-dev вместо двух (Beowulf брал зоны из прогона 1).
 - **Стартовые значения материала в UE** (пилот, 7a; выдержка — `references/ue-import-package.md` §4.3). Библиотечные
   specular 0,5 / sheen 0,5 дают тёмной коже и шёлку в UE в 2–3 раза ярче концепта (Angel — 3 итерации LUT, F93), тёмному
   красному сукну с sheen 0,35 — в 2,4–2,7 раза ярче и розовый оттенок (F139). Первая итерация: тёмная кожа — specular
   0,2–0,3, sheen ≤ 0,1, roughness 0,55–0,6; сукно — sheen ≤ 0,05, specular около 0,2. Якорь экспозиции съёмки —
   простой диффузный класс (кожа персонажа), не ткань: плащ после правки sheen оставался в 1,43 раза ярче кожи (F140).
+  У v2 `ld_maps` сразу пишет стартовые значения F139 в LUT: `wool_coarse` и `linen` — sheen 0, specular 0,1, roughness
+  0,85 (поле `lut_overrides` важнее; `lut_start_values: "library"` — пресеты библиотеки), и первая итерация UE не
+  начинается с размытого меха (третий герой подряд, C49).
+- **Якорь экспозиции `ld_measure`** (v2, C20): без `measure.exposure` — `largest_class`, самый крупный по пикселям
+  диэлектрический класс фигуры (не металл, не `legacy_bake`, не подставка); отчёт пишет его как `anchor_class` с
+  `selected_by`. Якорь по коже (2,4 % площади Beowulf) дал k 2,09 против среднего 0,92 и вывел 9 классов из 11 за
+  допуск. Кожа как якорь — правило съёмки UE (пункт выше), не `ld_measure`.
 - Слота `horn_claw` в генерическом look-dev нет: череп, рога и когти уходят в `legacy_bake` (Leshen, F54) — записать в
   отчёт. Класс в библиотеке есть (Harpy, слот `brass`), но слот героя — новый режим инструмента, решение владельца.
 - Классы MatID — только существующие (`material-library/README.md`). Нужен новый класс (как маховые перья Harpy) —
@@ -663,6 +686,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 - `ta_report` с проваленной проверкой останавливает драйвер, как `ta_maps`: код ≠ 0, `ta_manifest` не пишется (F32).
   Читать `ld-team-report.json#checks`. `ta_manifest` принимает профиль вне репо (путь пишется абсолютным, F60).
   Блок `frame` профилю TeamAccent не нужен: `ta_render` снимает только K2 (F24).
+- `gold_unchanged_by_dye` (h2-bake 0.9.0, C19): вид без пикселей отделки (`trim_class`) — «нет замера», без
+  `trim_class` и `hem` — «не применима»; обход Beowulf `trim_class: wool_coarse` больше не нужен.
 - Тона под концепт — предсказание; решение по материалу принимается только по съёмке в UE (4.6,
   `ue_hero_lookdev.py review`), не по прогнозу `lookdev_r2.py forecast`.
 
@@ -686,7 +711,10 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    → все `close-*`, `pose-01` … `pose-04`, `pose-03b`, `wire-*`, `compare-*`. Кадры не evidence: этап 4 снимает свои.
    Пилот пропустил: коричневый наконечник копья, наносник цвета кожи, мазки на вороте, защемление локтя (Achilles),
    гранёные когти и отростки рогов (Leshen). Найденное чинится средствами профиля до передачи; пункт этапа 5 закрыт,
-   только когда это видно на кадре того же вида (F100).
+   только когда это видно на кадре того же вида (F100). У v2 съёмка (`--rules auto`) отсекает задние грани, как UE
+   (крышка, видимая изнанкой, на кадре — дыра, C22), панель кисти `close-hands` снимает с ракурса наибольшей видимости,
+   если с az ±35 её закрывает щит (C30), а `uv-layout.png` строит без оболочки `cloth_shell` (C36); что включено —
+   `frames.json#rules`.
 3. **Подставка без просвета**: `python tools/tripo-pipeline/review/base_seethrough.py --out C:/tmp/<key>-stage3-check/base-seethrough.json <Key>=<LD>/export/SM_<Key>_H2LD_Base.fbx,<LD>/export/SK_<Key>_H2LD.fbx`
    → `with_figure` ≤ 0,1 uu² в каждом направлении (схема `base-seethrough/2`, 8). Уже на этапе 3, а не на входе 7a:
    открытые петли верха подставки Leshen и Achilles нашлись только там (F134, F144).
@@ -698,7 +726,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    проникновение ≤ 2 мм. Нужен `work/lp_uv.blend` прогона (после очистки `work/` — `--parts`). Пилот: ворона Leshen r2
    29 мм — FAIL, r3 1,6 мм — PASS; рукоять щита Achilles 1,5 мм — PASS (22f247cf).
 5. **Дымовой прогон клипов** (RC-06): копия спеки героя библиотеки с тем же классом оружия (ДС-6; 4.5) в
-   `<bake run>/work/smoke/` (`work/` не в git), `ue_hero` = `<Key>Smoke`. Прогон `h2anim_run.py <спека дыма> --out-dir
+   `<bake run>/work/smoke/` (`work/` не в git), `ue_hero` = `<Key>Smoke`, `"smoke": true` (цели образца — острие и
+   `hand_follow` — вне вердикта дыма, C28). Прогон `h2anim_run.py <спека дыма> --out-dir
    <bake run>/work/smoke/validation` (отчёты validate — в дым, не в `docs/`; пути вне репозитория он принимает, R-13;
    внутри `clip_contact_check`) и
    `"$B" -b --factory-startup --python tools/tripo-pipeline/anim/grip_check.py -- <AM_<Key>Smoke_<Clip>.fbx> <out.json>
@@ -706,7 +735,12 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    пробы не ловят: кромка руки под плащом при руке вперёд со спины (F129, F148), зазор наездника в движении (F133;
    `rider_gap.py --run <bake run> --spec <спека дыма> [--clip-fbx Имя=AM.fbx]` — те же пороги в каждом кадре),
    предел разгибания скина (F122), оружие сквозь тело. FAIL `skin_stretch`/`limb_body`/`weapon_body` на паттерне —
-   дефект модели, чинится до приёмки. Порядок, что смотреть и что удалить после —
+   дефект модели, чинится до приёмки. **Крупные планы клипов дыма** (C43, C45): `python
+   tools/tripo-pipeline/anim/clip_closeups.py --spec <спека дыма> --clip <Clip> --default-shots` по каждому клипу и Read
+   каждого JPEG — стандартный список по роли: со спины 3/4 при наибольшем повороте плеча, ворот сзади сверху, кулак при
+   повороте оружия, с отсечением задних граней, как в UE. Только так видны срез верха рукава и провал ворота за шлемом
+   (Beowulf: валидаторы и приёмщики клипов их пропустили, провал дошёл до игры — C61). Порядок, что смотреть и что
+   удалить после —
    `.agents/skills/3d-model-pipeline/references/animation-vfx-sfx.md` §6.6. Клипы дыма — не клипы этапа 6.
 6. **Детерминизм** по ДС-7 (4.3): у прогона с `--reuse-from` — повтор пересчитанных стадий, `--compare-with` код 0;
    полный повтор — один раз на фигуру, на прогоне для UE. Код 1 — модель дальше не идёт.

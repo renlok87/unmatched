@@ -26,6 +26,15 @@ uv-data.npz (UV0 треугольников), capture.json (pose_checks: 3D-за
   группе этой кости: бок (R: az 270, L: az 90) и спина 3/4 (R: az 215, L: az 145); рамка — вся группа с запасом 15 %,
   не меньше 12 % роста. Фронт 3/4 атакующей кисти даёт close-hands; close-weapon без кости оружия показывает верх фигуры.
 
+Правила v2 (профиль H2 с profile_version ≥ 2; cfg "rules": 2, решает обёртка; проверочный прогон Beowulf 2026-10-14):
+- backface_culling (C22): материалы превью и каркаса отсекают задние грани, как односторонние материалы UE — крышка,
+  видимая только изнанкой, на кадре становится дырой (как в игре), а не закрашенной заплаткой;
+- hand_view "visibility" (C30): панель close-hands снимается с ракурса по умолчанию (R az −35, L az 35), если с него
+  видно не меньше HAND_MIN_VISIBLE (20 %) вершин кисти; иначе — с азимута (шаг 30°) наибольшей видимости (щит на предплечье);
+- uv_shell (C36): в uv-data не идут внутренняя копия оболочки `rig.cloth_shell` (тот же UV0, обратный обход:
+  _framing.shell_copy_mask) и её мосты (нулевая площадь UV) — они не острова и не перевёрнутые треугольники развёртки.
+У профилей v1 (Medusa, пилот) и без правил все три выключены: кадры прежние.
+
 Сцена: FBX UM_FBX_v1 (лицо +X) поворачивается на -90 deg вокруг Z обратно в авторский кадр (лицо -Y, сторона .L = +X),
 как st_preview.py h2_bake. Материал превью: BC (sRGB) -> Base Color; N (Non-Color, DirectX) -> зелёный канал
 инвертируется (1 - G) -> Normal Map (Blender ждёт OpenGL); ORM (Non-Color): G -> Roughness, B -> Metallic,
@@ -43,8 +52,9 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _framing import (CLOSE_MIN, best_separating_azimuth, best_visible_azimuth,  # noqa: E402  (только numpy;
-                      clamp_close_scale, panel_fit_scale, view_fit_scale)  # тестируется без Blender)
+from _framing import (CLOSE_MIN, HAND_MIN_VISIBLE, best_panel_azimuth,  # noqa: E402  (только numpy;
+                      best_separating_azimuth, best_visible_azimuth, clamp_close_scale,  # тестируется без Blender)
+                      panel_fit_scale, shell_copy_mask, view_fit_scale, zero_uv_area_mask)
 
 if not bpy.app.background:
     raise RuntimeError("_blender_capture.py: только headless (blender -b)")
@@ -68,6 +78,8 @@ POSE05_AZ, POSE05_EL = {"R": 225, "L": 135}, 10
 POSE04B_CANDIDATES, POSE04B_MIN_SEP, POSE04B_SAMPLE = range(0, 360, 30), 60, 400
 # close-attack (F74): бок и спина 3/4 атакующей конечности
 ATTACK_AZ = {"R": (("side", 270), ("back", 215)), "L": (("side", 90), ("back", 145))}
+# close-hands по видимости (правила v2, C30): кандидаты азимута панели кисти
+HAND_CANDIDATES = range(0, 360, 30)
 
 
 def probe_definitions(path):
@@ -143,6 +155,23 @@ def tex_node(nt, path, colour, uv):
     node.image = img
     nt.links.new(uv.outputs["UV"], node.inputs["Vector"])
     return node
+
+
+def cull_back_faces(mat, engine):
+    """Отсечение задних граней (C22): флаг материала EEVEE; в Cycles — Backfacing → Transparent перед выходом."""
+    mat.use_backface_culling = True
+    if engine != "CYCLES":
+        return
+    nt = mat.node_tree
+    out = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
+    src = out.inputs["Surface"].links[0].from_socket
+    geo = nt.nodes.new("ShaderNodeNewGeometry")
+    clear = nt.nodes.new("ShaderNodeBsdfTransparent")
+    mix = nt.nodes.new("ShaderNodeMixShader")
+    nt.links.new(geo.outputs["Backfacing"], mix.inputs["Fac"])
+    nt.links.new(src, mix.inputs[1])
+    nt.links.new(clear.outputs["BSDF"], mix.inputs[2])
+    nt.links.new(mix.outputs["Shader"], out.inputs["Surface"])
 
 
 def preview_material(tex):
@@ -362,6 +391,12 @@ def main():
     scene.camera = cam
     rig = light_rig(scene, centre, h)
     mats = {"preview": preview_material(cfg["textures"]), "wire": wire_material()}
+    cull = bool(cfg.get("backface_culling"))  # правила v2 (C22)
+    if cull:
+        for m in mats.values():
+            cull_back_faces(m, engine)
+    hand_view = cfg.get("hand_view") or "fixed"  # правила v2: "visibility" (C30)
+    hand_views = {}
     frames = []
 
     def shot(name, target, az, el, ortho, material, note="", res=(None, None)):
@@ -442,6 +477,7 @@ def main():
     # close-hands: две портретные панели 600x1200 (слева hand.R, справа hand.L — как у фигуры, стоящей лицом к нам);
     # только при арматуре (у пропа кистей нет)
     if arm is not None:
+        hand_bvh = figure_bvh(meshes, rest) if hand_view == "visibility" else None
         for side, az_h in (("R", -35), ("L", 35)):
             pts = hands.get(side)
             if pts is not None:
@@ -450,6 +486,21 @@ def main():
                 tgt = Vector(((hmn_ + hmx_) / 2).tolist())
                 ortho = clamp_close_scale(3.0 * ext, h)
                 src = "vertex group hand.%s (%d вершин, вес >= 0,5), 3 габарита кисти" % (side, len(pts))
+                if hand_bvh is not None:  # C30: щит или другая деталь на предплечье закрывает кисть с ракурса по умолчанию
+                    sample = pts[np.linspace(0, len(pts) - 1, min(len(pts), POSE04B_SAMPLE)).astype(int)]
+                    vis = {a: visible_share(hand_bvh, sample, a, 10, 1e-4 * h)
+                           for a in [az_h] + [a for a in HAND_CANDIDATES if a % 360 != az_h % 360]}
+                    az_new, share, moved = best_panel_azimuth(vis, az_h, HAND_MIN_VISIBLE)
+                    hand_views[side] = {"default_azimuth_deg": az_h, "default_visible_share": round(vis[az_h], 4),
+                                        "azimuth_deg": az_new, "visible_share": round(share, 4), "moved": moved,
+                                        "visibility": {str(a): round(v, 4) for a, v in vis.items()},
+                                        "min_share": HAND_MIN_VISIBLE}
+                    if moved:
+                        src += "; ракурс az %d по видимости кисти (%.0f %% против %.0f %% с az %d: деталь на предплечье)" % (
+                            az_new, share * 100, vis[az_h] * 100, az_h)
+                        warnings.append("close-hands: hand.%s снята с az %d (с az %d видно %.0f %% кисти)"
+                                        % (side, az_new, az_h, vis[az_h] * 100))
+                    az_h = az_new
             else:
                 bone = arm.data.bones.get("hand." + side)
                 tgt = (arm.matrix_world @ bone.head_local) if bone else Vector((0.0, 0.0, float(mn[2]) + 0.55 * h))
@@ -672,6 +723,7 @@ def main():
     # UV0 для uv-layout.png (рисует обёртка): треугольники в UV, острова, границы островов
     uvdata = {}
     island_counts = {}
+    uv_shell = {}
     for o in meshes:
         me = o.data
         if not me.uv_layers:
@@ -690,6 +742,21 @@ def main():
         tri = tri.reshape(-1, 3)
         tri_poly = np.empty(len(me.loop_triangles), dtype=np.int64)
         me.loop_triangles.foreach_get("polygon_index", tri_poly)
+        keep_poly = None  # правила v2 (C36): полигоны оболочки П3-3 не входят в острова, треугольники и границы
+        if cfg.get("uv_shell"):
+            t_uv, t_co = uv[tri], rest[o.name][lv[tri]]  # мировые метры (локальные FBX — в сантиметрах)
+            copy_m = shell_copy_mask(t_uv, t_co)
+            bridge_m = zero_uv_area_mask(t_uv) & bool(copy_m.any())  # мосты — только у сетки с оболочкой
+            drop = copy_m | bridge_m
+            e1, e2 = t_uv[:, 1] - t_uv[:, 0], t_uv[:, 2] - t_uv[:, 0]
+            flipped = (e1[:, 0] * e2[:, 1] - e1[:, 1] * e2[:, 0]) < 0
+            uv_shell[o.name] = {"shell_copy_triangles": int(copy_m.sum()), "rim_bridge_triangles": int(bridge_m.sum()),
+                                "uv_flipped_triangles_without_shell": int((flipped & ~drop).sum()),
+                                "uv_flipped_triangles_all": int(flipped.sum())}
+            if drop.any():
+                keep_poly = np.ones(len(me.polygons), bool)
+                keep_poly[np.unique(tri_poly[drop])] = False
+                tri, tri_poly = tri[~drop], tri_poly[~drop]
         # острова: полигоны, связанные ребром с совпадающими UV на обоих концах
         ps = np.empty(len(me.polygons), dtype=np.int64)
         pt = np.empty(len(me.polygons), dtype=np.int64)
@@ -705,7 +772,9 @@ def main():
         k0, k1 = np.where(swap, vb, va), np.where(swap, va, vb)
         q = np.round(np.where(swap[:, None], np.hstack([ub, ua]), np.hstack([ua, ub])) * 1e6).astype(np.int64)
         key = np.stack([k0, k1], axis=1)
-        order = np.lexsort((q[:, 3], q[:, 2], q[:, 1], q[:, 0], key[:, 1], key[:, 0]))
+        loops_in = np.arange(nl) if keep_poly is None else np.nonzero(keep_poly[loop_poly])[0]
+        order = loops_in[np.lexsort((q[loops_in, 3], q[loops_in, 2], q[loops_in, 1], q[loops_in, 0], key[loops_in, 1],
+                                     key[loops_in, 0]))]
         parent = list(range(len(me.polygons)))
 
         def find(x):
@@ -722,12 +791,19 @@ def main():
                     parent[a] = b
             prev = (sig, li)
         roots = np.array([find(i) for i in range(len(me.polygons))])
-        _u, island = np.unique(roots, return_inverse=True)
-        island_counts[o.name] = int(island.max() + 1) if len(island) else 0
+        if keep_poly is None:
+            _u, island = np.unique(roots, return_inverse=True)
+            island_counts[o.name] = int(island.max() + 1) if len(island) else 0
+        else:
+            _u, isl_kept = np.unique(roots[keep_poly], return_inverse=True)
+            island = np.full(len(me.polygons), -1, np.int64)
+            island[keep_poly] = isl_kept.ravel()
+            island_counts[o.name] = int(isl_kept.max() + 1) if len(isl_kept) else 0
         # граница острова: ребро (вершины + UV) встречается в одном полигоне
         sigs = np.hstack([key, q])
-        _s, inv_idx, cnt = np.unique(sigs, axis=0, return_inverse=True, return_counts=True)
-        boundary = cnt[inv_idx.ravel()] == 1
+        _s, inv_idx, cnt = np.unique(sigs[loops_in], axis=0, return_inverse=True, return_counts=True)
+        boundary = np.zeros(nl, bool)
+        boundary[loops_in] = cnt[inv_idx.ravel()] == 1
         uvdata[o.name + "__uv"] = uv.astype(np.float32)
         uvdata[o.name + "__tri"] = tri.astype(np.int32)
         uvdata[o.name + "__tri_island"] = island[tri_poly].astype(np.int32)
@@ -746,6 +822,9 @@ def main():
         "frames": frames, "poses": poses_out, "pose_checks": pose_checks, "warnings": warnings,
         "attack": attack,
     }
+    if cfg.get("rules") is not None:  # правила v2 (C22, C30, C36); без них capture.json прежний
+        info["rules"] = {"version": cfg["rules"], "backface_culling": cull, "hand_view": hand_view,
+                         "hands": hand_views or None, "uv_shell": uv_shell or None}
     with open(os.path.join(work_dir, "capture.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
     print("CAPTURE_OK", len(frames))

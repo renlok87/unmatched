@@ -33,6 +33,9 @@ bridge (two triangles: the figure stays all-triangles) to its copy, so the shell
 shelled part has no rim loops left: the seams loop gate no longer lists them, the see-through test judges the shell.
 Every later stage (export, probes, seams, preview, look-dev, TeamAccent) reads the shelled mesh. Without the key nothing
 runs: the profiles written before it (Medusa, Arthur, Merlin, Harpy) give byte-identical FBX (tests/test_cloth_shell.py).
+profile_version >= 2 (h2-bake 0.9.0, skill check C36): the shell faces are tagged (int face attribute h2_cloth_shell:
+1 inner copy, 2 rim bridge) and written to work/rig/body_face_shell.npy + rig-report.json#cloth_shell.face_tag; the
+attribute is dropped before the export like h2_part / h2_cap (the FBX stays free of custom data).
 
 Export: candidate_build.core (read only) — UM_FBX_v1 rotation +90 deg about Z with EditBone.transform(roll=True),
 data x100, FBX_SCALE_UNITS, Triangulate, UnitScaleFactor patched to 1.0, determinism pins; path_mode STRIP. The pair is
@@ -202,8 +205,15 @@ def weight_part(obj, rule, arm, rig, cache, junctions=()):
     return per_vertex
 
 
-def add_cloth_shell(obj, offset_m, cap_attr="h2_cap"):
-    """Inner copy of the real faces of obj + bridge quads along its rim (module docstring, "Cloth shell")."""
+SHELL_ATTR = "h2_cloth_shell"  # int face tag of profile_version >= 2: 1 inner copy, 2 rim bridge (C36); dropped before FBX
+SHELL_INNER, SHELL_BRIDGE = 1, 2
+
+
+def add_cloth_shell(obj, offset_m, cap_attr="h2_cap", tag_attr=None):
+    """Inner copy of the real faces of obj + bridge quads along its rim (module docstring, "Cloth shell"). tag_attr
+    (profile_version >= 2, skill check C36): int face attribute, SHELL_INNER on the inner copies and SHELL_BRIDGE on the
+    bridge triangles, 0 elsewhere — the rig stage writes it to work/rig/body_face_shell.npy so that UV checks can leave
+    the shell out (same UV0, reversed winding: an external UV measure counts it as flipped and overlapping)."""
     import bmesh
 
     bm = bmesh.new()
@@ -211,6 +221,7 @@ def add_cloth_shell(obj, offset_m, cap_attr="h2_cap"):
     bm.normal_update()
     bm.verts.ensure_lookup_table()
     cap = bm.faces.layers.int.get(cap_attr)
+    tag = (bm.faces.layers.int.get(tag_attr) or bm.faces.layers.int.new(tag_attr)) if tag_attr else None
     deform = bm.verts.layers.deform.active
     uv_layers = list(bm.loops.layers.uv.values())
     real = [f for f in bm.faces if cap is None or f[cap] == 0]
@@ -244,11 +255,17 @@ def add_cloth_shell(obj, offset_m, cap_attr="h2_cap"):
     for f in real:
         nf = bm.faces.new([new[v.index] for v in reversed(f.verts)], f)  # example f: face attributes (h2_cap 0, smooth)
         copy_uv(nf, list(reversed(f.loops)))
+        if tag is not None:
+            nf[tag] = SHELL_INNER
     for l in rim_loops:  # bridge quad (b, a, a', b'): (b, a) against the rim face, (a', b') against the reversed copy;
         a, b = l.vert, l.link_loop_next.vert  # two triangles: the figure stays all-triangles (FBX read-back face count)
         nb = l.link_loop_next
-        copy_uv(bm.faces.new([b, a, new[a.index]], l.face), [nb, l, l])  # the rim colour on both sides (zero UV area)
-        copy_uv(bm.faces.new([b, new[a.index], new[b.index]], l.face), [nb, l, nb])
+        t1 = bm.faces.new([b, a, new[a.index]], l.face)
+        copy_uv(t1, [nb, l, l])  # the rim colour on both sides (zero UV area)
+        t2 = bm.faces.new([b, new[a.index], new[b.index]], l.face)
+        copy_uv(t2, [nb, l, nb])
+        if tag is not None:
+            t1[tag] = t2[tag] = SHELL_BRIDGE
     bm.to_mesh(obj.data)
     bm.free()
     obj.data.update()
@@ -340,8 +357,9 @@ def run(params, profile):
         weights[n] = weight_part(lp[n], rig["weights"][n], arm, rig, cache, junctions.get(n, ()))
     cont = continuity(lp, weights, sorted(weights, key=U.part_key), float(rig.get("continuity_radius_m", 0.0015)))
     shell_cfg = PR.cloth_shell(profile)  # None for every profile without rig.cloth_shell: old path, no report key
-    shells = ({n: add_cloth_shell(lp[n], float(shell_cfg["offset_mm"]) / 1000.0) for n in shell_cfg["parts"]}
-              if shell_cfg else None)
+    shell_tag = SHELL_ATTR if shell_cfg and PR.is_new_hero_profile(profile) else None  # C36: v2 tags the shell faces
+    shells = ({n: add_cloth_shell(lp[n], float(shell_cfg["offset_mm"]) / 1000.0, tag_attr=shell_tag)
+               for n in shell_cfg["parts"]} if shell_cfg else None)
     mat = atlas_material(profile, run_dir)
     for n in names:
         lp[n].data.materials.clear()
@@ -388,10 +406,17 @@ def run(params, profile):
     np.save(run_dir / "work" / "rig" / "body_vertex_part.npy", vert_part)
     np.save(run_dir / "work" / "rig" / "body_vertex_cap.npy", vert_cap)
     np.save(run_dir / "work" / "rig" / "body_face_cap.npy", caps)
+    shell_faces = None
+    if shell_tag is not None and body.data.attributes.get(shell_tag) is not None:  # C36: face tag -> work/rig, no FBX data
+        shell_faces = np.zeros(len(body.data.polygons), np.int64)
+        body.data.attributes[shell_tag].data.foreach_get("value", shell_faces)
+        np.save(run_dir / "work" / "rig" / "body_face_shell.npy", shell_faces)
     for obj in figure:
         obj.data.attributes.remove(obj.data.attributes["h2_part"])
         if obj.data.attributes.get("h2_cap") is not None:
             obj.data.attributes.remove(obj.data.attributes["h2_cap"])  # keeps the FBX free of custom data
+        if shell_tag is not None and obj.data.attributes.get(shell_tag) is not None:
+            obj.data.attributes.remove(obj.data.attributes[shell_tag])
     face_box = next((d["box_m"] for d in profile["retopo"].get("dense_regions", []) if d["name"] == "face"), None)
     face_key = PR.face_part_key(profile)  # part of dense_regions "face" (Medusa: 1)
     face_polys = [p.index for p in body.data.polygons
@@ -514,6 +539,14 @@ def run(params, profile):
     if shells is not None:
         report["cloth_shell"] = {"parts": shells, "note": "decision П3-3: inner copy offset against the normal, reversed "
                                                           "winding, same UV0, weights copied, rim bridged (closed shell)"}
+        if shell_faces is not None:  # profile_version >= 2 (C36); v1 reports keep their bytes
+            report["cloth_shell"]["face_tag"] = {
+                "file": "work/rig/body_face_shell.npy", "values": {"0": "real face", "1": "inner copy", "2": "rim bridge"},
+                "inner_faces": int((shell_faces == SHELL_INNER).sum()), "bridge_faces": int((shell_faces == SHELL_BRIDGE).sum()),
+                "uv_checks": "leave tags 1 and 2 out of UV measures (flips, overlap, islands): the inner copy repeats the "
+                             "UV0 of its face with reversed winding, a bridge has zero UV area; the FBX carries no tag — "
+                             "there the copy is the UV0 triangle repeated with the opposite UV winding within offset_mm "
+                             "of its face (tools/art/acceptance/_framing.shell_copy_mask)"}
     U.write_json(run_dir / "reports" / "rig-report.json", report)
     if checks.failed():  # the staged pair stays under work/rig/export-staging for inspection; export/ is not touched
         raise RuntimeError("rig checks failed: %s" % checks.failed())

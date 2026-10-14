@@ -21,7 +21,9 @@ the loop vertices to that part's surface) is `covered_by`, within max_median_mm,
 
 Checks: every selected loop found; projected polygon simple; no flipped / degenerate cap triangles; caps hidden at rest
 (ray test: area-weighted samples on the cap faces x Fibonacci directions on the front side, a ray that escapes the
-whole figure (all LP parts incl. caps, bow and base) = visible; share <= rest_visibility.max_visible_share).
+whole figure (all LP parts incl. caps, bow and base) = visible; share <= rest_visibility.max_visible_share);
+profile_version >= 2 (h2-bake 0.9.0, skill check C22): no contact cap seen (almost) only from behind at rest
+(backside_only_caps: UE culls its back face, the gap stays open).
 Reads work/lp.blend (retopo), writes work/lp_closed.blend and reports/close-report.json (+ the loop inventory of all
 parts before and after)."""
 
@@ -36,6 +38,7 @@ from mathutils import geometry as G
 from mathutils.bvhtree import BVHTree
 
 from . import bl_util as U
+from . import profile as PR
 
 CAP_ATTR = "h2_cap"
 
@@ -431,6 +434,34 @@ def rest_visibility(objs, names, cap_names, vcfg):
     return {"pitch_m": pitch, "views": [v[0] for v in views], "totals": totals, "per_cap": per, "per_view": per_view}
 
 
+BACKSIDE_ONLY_MAX_PX = 100     # cap pixels seen from behind (rest, all views) before a cap is flagged
+BACKSIDE_ONLY_FRONT_SHARE = 0.1  # ... while its front-facing pixels (fills_gap + covers_front) stay below this share
+
+
+def backside_only_caps(contact, vcfg):
+    """Check caps_not_seen_only_from_behind (profile_version >= 2, skill check C22): a contact cap whose rest pixels are
+    almost all its BACK face (cap_backside_px > closure.rest_visibility.max_backside_only_px, default 100, and front
+    pixels < backside_only_front_share, default 0.1, of them) does not close the gap it was built for — UE culls the back
+    face and the gap shows (Beowulf neck_top: 1163 px from behind, 0 from the front; the black collar gap of C61). The
+    acceptance capture culls back faces as well. Fix: drop the cap and close the loop by rig.junctions or
+    rig.cloth_shell (HANDBOOK §4.2)."""
+    lim = float(vcfg.get("max_backside_only_px", BACKSIDE_ONLY_MAX_PX))
+    share = float(vcfg.get("backside_only_front_share", BACKSIDE_ONLY_FRONT_SHARE))
+    rows, bad = {}, []
+    for r in contact:
+        v = r.get("rest_visibility") or {}
+        back = int(v.get("cap_backside_px", 0))
+        front = int(v.get("fills_gap_px", 0)) + int(v.get("covers_front_px", 0))
+        rows[r["name"]] = [back, front]
+        if back > lim and front < share * back:
+            bad.append(r["name"])
+    return {"passed": not bad, "measured": {"seen_only_from_behind": bad or "none",
+                                            "per_cap_backside_front_px": rows},
+            "expected": "no contact cap with > %d px seen from behind at rest and front pixels < %s of them (UE culls the "
+                        "back face: the gap stays open; drop the cap, close the loop by rig.junctions or rig.cloth_shell)"
+                        % (lim, share)}
+
+
 def inventory(objs, bvhs, min_perimeter_m, closed=None):
     """Rim loops of every part (perimeter >= min); closed = {(part, frozenset(vertex indices)): cap name}."""
     out = {}
@@ -551,6 +582,7 @@ def run(params, profile):
     max_blob = int(vcfg.get("max_covers_front_blob_px", 9))
     fig_px = max(vis["totals"]["figure_px"], 1)
     contact = [r for r in caps if not r.get("visible_by_design")]
+    behind = backside_only_caps(contact, vcfg) if PR.is_new_hero_profile(profile) else None  # C22, v2 only
     checks = {
         "all_cap_loops_found_and_built": {"passed": not problems, "measured": problems or "all", "expected": "no problems"},
         "no_degenerate_or_inverted_cap_triangles": {
@@ -572,6 +604,8 @@ def run(params, profile):
                         "8-connected blob > %d px (%d views, %.1f mm pitch; a back-facing cap pixel is culled in UE)"
                         % (max_cover, max_blob, len(vis["views"]), vis["pitch_m"] * 1000)},
     }
+    if behind is not None:  # profiles of profile_version 1 keep their report bytes
+        checks["caps_not_seen_only_from_behind"] = behind
     report = {"stage": "close", "caps": caps, "cap_triangles": sum(r.get("triangles", 0) for r in contact),
               "cap_area_cm2": U.r(sum(r.get("cap_area_cm2", 0) for r in contact), 3),
               "contact_caps": len(contact), "tagged_retopo_caps": len(caps) - len(contact),
