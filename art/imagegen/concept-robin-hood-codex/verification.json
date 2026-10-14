@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-13",
+  "card_id": "ASSET-ROBIN-HOOD-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-robin-hood-codex/palette.json",
+      "before_sha256": "9277007d0a579396abb8d549c9a75e14c1f9c069232c42dc6b5998e5ac82d2ff",
+      "after_sha256": "9277007d0a579396abb8d549c9a75e14c1f9c069232c42dc6b5998e5ac82d2ff",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Аудит записей данного запуска: все файлы агента внутри пакета. Предусмотренные заданием оригиналы image_gen вне пакета перечислены отдельно. Изменения параллельных сессий не проверялись.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 1,
+      "report": null,
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-robin-hood-codex/design --key robin-hood --views front --role hero --min-top-pct 4 --out art/imagegen/concept-robin-hood-codex/checks/design-front-g1",
+      "error": "ERROR: нет каталога набора art\\imagegen\\concept-robin-hood-codex\\design",
+      "classification": "input/tool error, not candidate FAIL",
+      "note": "Первая команда Python копирования получила SyntaxError из-за кавычек PowerShell; checker был ошибочно вызван после неё без каталога. Он вернул 1 вместо предусмотренного заданием 2 для ошибки входа. Отчёт не создавался. Команда исправлена, кандидат скопирован и проверен. Генерация g2 вызвана визуальным провалом подставки, а не ошибкой инструмента."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robin-hood-codex/checks/design-front-g1/checks-report.json",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-robin-hood-codex/design --key robin-hood --views front --role hero --min-top-pct 4 --out art/imagegen/concept-robin-hood-codex/checks/design-front-g1",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robin-hood-codex/checks/design-front-g2/checks-report.json",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-robin-hood-codex/design --key robin-hood --views front --role hero --min-top-pct 4 --out art/imagegen/concept-robin-hood-codex/checks/design-front-g2",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robin-hood-codex/design/checks-report.json",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-robin-hood-codex/design --key robin-hood --views front --role hero --min-top-pct 4",
+      "final": true,
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Один мужчина и одна подставка из двух дисков. Коллажа, второго вида и надписей нет."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура прямо перед камерой; верх подставки скрыт, передние края горизонтальны. Фронтальная ортографическая подача визуально соблюдена. Параметры виртуальной камеры недоступны."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Всё целиком в кадре. Фон ровный тёмно-серый; выборочные RGB около 45, p99_deviation рамки = 2. Первоначальное подозрение о градиенте не подтвердилось."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "The weapon is held in the figure's own LEFT hand, which appears on the viewer's RIGHT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Лук в собственной левой руке, справа для зрителя. Между обеими руками и торсом видны зазоры, частично на фоне плаща. Локти согнуты, поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "every identity anchor is visible: longbow in the figure's own LEFT hand; quiver over the RIGHT shoulder; hood up; belt pouch",
+      "passed": true,
+      "note": "Лук справа для зрителя, колчан с красным оперением слева за правым плечом, капюшон поднят, поясная сумка видна."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Лесной зелёный, коричневая кожа, льняная ткань, красное оперение присутствуют. Точное совпадение отдельных пикселей с HEX не заявляется. Командных цветов, цветного кольца и металлической полосы на базе нет."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верх подставки виден. В CORRECTION также вошло предварительное подозрение о неравномерном фоне; поздние пиксельные замеры его не подтвердили."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": []
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "limit_reached": [],
+  "byte_identical_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13330-6401-7283-98dc-e1bbeb920a19\\exec-474a4192-cc16-4d51-96d0-4b2ff4181b57.png",
+      "saved_path": "art/imagegen/concept-robin-hood-codex/concepts/robin-hood-design-front-g1.png",
+      "sha256": "bd5bf5fe59b38369ea60900e8ee2f58dc048426c411cfada5c46cba6797b7ebb",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13330-6401-7283-98dc-e1bbeb920a19\\exec-8673f7b3-f008-4680-867d-1fbc736aac22.png",
+      "saved_path": "art/imagegen/concept-robin-hood-codex/concepts/robin-hood-design-front-g2.png",
+      "sha256": "ec2b8b305233e11c2ff165e29476e8a999e5f68b17b2f92deb1d0086991ef19e",
+      "byte_identical": true
+    }
+  ],
+  "selected": {
+    "view": "design-front",
+    "generation": 2,
+    "path": "art/imagegen/concept-robin-hood-codex/design/robin-hood-front.png",
+    "sha256": "ec2b8b305233e11c2ff165e29476e8a999e5f68b17b2f92deb1d0086991ef19e"
+  },
+  "warnings": [
+    {
+      "item": "view.frame_top",
+      "note": "Верх лука y=3.453%, менее 4%; разрешённый WARN."
+    },
+    {
+      "item": "view.single_component",
+      "note": "Дополнительные компоненты маски; визуально части единственной фигуры и лука, не второй персонаж. Разрешённый WARN."
+    }
+  ],
+  "limitations": [
+    {
+      "item": "CORE.SUBJECT.short_cloak",
+      "note": "Плащ длиннее короткой накидки CORE: задние полотнища ниже колен. Этот пункт не входит в CHECKLIST."
+    },
+    {
+      "item": "CORE.PEDESTAL.round",
+      "note": "Круглая форма в глубину не подтверждается единственной реберной фронтальной проекцией."
+    }
+  ],
+  "preexisting_package_files_preserved": true,
+  "process_lifecycle": {
+    "started_persistent_processes": [],
+    "cleanup_required": false
+  },
+  "runtime_errors": [
+    {
+      "item": "finalization.command_length",
+      "note": "Одна команда финализации отклонена CreateProcess из-за длины. Она не была запущена и ничего не записала; финализация разделена на короткие команды."
+    }
+  ],
+  "encoding": "UTF-8 без BOM; записи Path.write_text из Python"
+}

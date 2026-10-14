@@ -1,0 +1,172 @@
+{
+  "card_id": "ASSET-BIGFOOT-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13T04:14:08.826154+00:00",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-bigfoot-codex/palette.json",
+      "sha256_before": "61452153e8827bf0ab36f19e3038763f96f7ecc793322e42f4d8cfa025e03768",
+      "sha256_after": "61452153e8827bf0ab36f19e3038763f96f7ecc793322e42f4d8cfa025e03768",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Все команды записи направлены только в пакет. Единственное разрешённое исключение: собственные оригиналы image_gen вне пакета; они оставлены на месте. git, Unreal, Tripo, SYNTX и загрузки не использовались.",
+  "preexisting_files_preserved": [
+    "palette.json"
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bigfoot-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bigfoot-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top",
+        "view.single_component"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bigfoot-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top",
+        "view.single_component"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух дисков. Надписей и посторонних объектов нет. WARN view.single_component относится к сегментации: визуально отдельной второй фигуры нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере; диски видны с ребра, верхняя плоскость подставки скрыта, передняя кромка горизонтальна. Оценка визуальная: параметры виртуальной камеры по PNG не доказуемы."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре. Фон ровный тёмно-серый; медиана рамки RGB [44,44,44], p99 отклонения 2. Верх 2,831% вместо 4% — разрешённый WARN."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Кисти пустые. Руки опущены, локти слегка согнуты, между руками и корпусом видны зазоры; нейтральная поза миниатюры."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: shaggy dark brown fur; long arms away from the body; large flat feet; heavy brow",
+      "passed": true,
+      "note": "Видны лохматая тёмно-коричневая шерсть, длинные отведённые руки, большие плоские стопы и тяжёлые надбровные дуги."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневая и тёмно-коричневая шерсть, серые лицо/кисти/стопы, мшисто-зелёные акценты на шерсти. Тёмная каменная подставка без цветного кольца и металлического пояса. HEX — ориентиры, освещение даёт вариации оттенков."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_in_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [],
+  "copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13373-5950-7d93-83a7-8b1102118510\\exec-f69fd9d1-3d24-4f10-adea-f318c1924b4d.png",
+      "saved_path": "art/imagegen/concept-bigfoot-codex/concepts/bigfoot-design-front-g1.png",
+      "byte_identical": true,
+      "sha256": "725e6a54016292ba1d03da866ad577679db5e0d89f5ecc6fd3c69bc520c9e1c7"
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13373-5950-7d93-83a7-8b1102118510\\exec-5056a451-adae-404a-b4c4-5537f136ea77.png",
+      "saved_path": "art/imagegen/concept-bigfoot-codex/concepts/bigfoot-design-front-g2.png",
+      "byte_identical": true,
+      "sha256": "303886f1404a81b14c43483050894774c37129585ac8e1754054a1a9a64e9c31"
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-bigfoot-codex/design/bigfoot-front.png",
+    "source": "art/imagegen/concept-bigfoot-codex/concepts/bigfoot-design-front-g2.png",
+    "byte_identical": true
+  },
+  "unmet_core_limits": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "FRAMING highest point y >= 4%",
+      "observed_top_pct": 2.831,
+      "required_min_pct": 4,
+      "classification": "WARN view.frame_top; allowed by task, not CHECKLIST FAIL"
+    }
+  ],
+  "candidate_review": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "script_exit_code": 0,
+      "failed_checklist_items": [
+        "strict front orthographic view, camera exactly level; pedestal top surface not visible"
+      ],
+      "note": "Верх подставки виден. Первоначально заподозрена неоднородность фона и включена в CORRECTION; последующее измерение рамки показывает небольшое отклонение p99=2, поэтому это визуальное подозрение, а не автоматический FAIL."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "script_exit_code": 0,
+      "failed_checklist_items": [],
+      "note": "Подставка исправлена, выбран лучший кандидат. WARN сегментации не подтверждается отдельным объектом при осмотре."
+    }
+  ],
+  "encoding": "UTF-8 without BOM; Python Path.write_text"
+}

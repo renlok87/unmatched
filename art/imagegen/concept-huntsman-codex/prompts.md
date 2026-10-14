@@ -1,0 +1,81 @@
+# Промпты концепта Охотника — 1a
+
+Дата: 2026-10-13
+Инструмент: image_gen, встроенный, режим generate.
+
+## art/imagegen/concept-huntsman-codex/concepts/huntsman-design-front-g1.png
+
+referenced_image_paths (in call order):
+[
+  "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+]
+
+Exact prompt, key 1a/design-front/g1:
+
+```text
+Use case: original concept design of ONE collectible painted tabletop miniature, front view, as the input for
+image-to-3D modelling.
+Image 1 is ONLY the craftsmanship reference: a finished premium painted miniature. Match its level of sculpted and
+painted detail, its matte hand-painted resin look and its studio presentation. Do not copy its anatomy, face, costume,
+weapon, colours, pose, pedestal or framing.
+SUBJECT: The Huntsman: rugged bearded woodsman in a green-brown hunting coat, fur-trimmed cap, leather boots, large woodcutter's axe in his RIGHT hand, horn on a strap over his LEFT hip.
+IDENTITY ANCHORS, each clearly visible: woodcutter's axe in the figure's own RIGHT hand; hunting horn on the LEFT hip; fur-trimmed cap.
+PALETTE: hunter green #4C5A34, leather #6E4C2E, fur grey #8A8378, accent horn ivory #E2D6B4. These are the main colours plus one accent; no other strong colours.
+POSE: Neutral standing pose of a tabletop miniature: both feet planted on the pedestal, weight even, both arms held slightly away from the torso with a visible gap between each arm and the body, elbows slightly bent; not a T-pose and not an A-pose. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: one round dark stone pedestal under the feet, two low stacked discs with plain bevelled edges, diameter about 0.55 of the figure height, flat top, no cobbles, no scenery, no coloured ring and no metal band. The camera is level with the pedestal: the pedestal is seen exactly edge-on, its top surface is not visible, its front edge is a straight horizontal line.
+VIEW: strict front orthographic view, camera exactly level with the subject at its mid-height (zero elevation, not
+looking down), no perspective, no three-quarter turn, the subject faces the camera.
+FRAMING: portrait aspect ratio 3:4; one isolated subject; the pedestal, or the bottom of the object if it has no pedestal,
+centred at x50% with its bottom at y93%; the highest point of the subject or of anything it holds no higher than y4%
+(y >= 4%: at least 4% of the image height below the top edge); the whole subject and the whole pedestal visible,
+nothing cropped.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background, no gradient, no vignette, no floor, no cast
+shadow on the background; soft even studio lighting, no strong rim light, no depth of field.
+READABILITY: large clear shapes; arms, wings and held objects separated from the body by visible gaps; thin parts such
+as strings, shafts and staffs clearly readable, not hair-thin; fine detail stays inside the silhouette.
+FORBIDDEN: text, letters, numbers, logos, watermark, frame, collage or several views, extra figures, extra limbs,
+heads, wings or weapons, team colours, a coloured ring or metal band on the pedestal.
+Output one single image.
+```
+
+## art/imagegen/concept-huntsman-codex/concepts/huntsman-design-front-g2.png
+
+referenced_image_paths (in call order):
+[
+  "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+]
+
+Exact prompt, key 1a/design-front/g2:
+
+```text
+Use case: original concept design of ONE collectible painted tabletop miniature, front view, as the input for
+image-to-3D modelling.
+Image 1 is ONLY the craftsmanship reference: a finished premium painted miniature. Match its level of sculpted and
+painted detail, its matte hand-painted resin look and its studio presentation. Do not copy its anatomy, face, costume,
+weapon, colours, pose, pedestal or framing.
+SUBJECT: The Huntsman: rugged bearded woodsman in a green-brown hunting coat, fur-trimmed cap, leather boots, large woodcutter's axe in his RIGHT hand, horn on a strap over his LEFT hip.
+IDENTITY ANCHORS, each clearly visible: woodcutter's axe in the figure's own RIGHT hand; hunting horn on the LEFT hip; fur-trimmed cap.
+PALETTE: hunter green #4C5A34, leather #6E4C2E, fur grey #8A8378, accent horn ivory #E2D6B4. These are the main colours plus one accent; no other strong colours.
+POSE: Neutral standing pose of a tabletop miniature: both feet planted on the pedestal, weight even, both arms held slightly away from the torso with a visible gap between each arm and the body, elbows slightly bent; not a T-pose and not an A-pose. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: one round dark stone pedestal under the feet, two low stacked discs with plain bevelled edges, diameter about 0.55 of the figure height, flat top, no cobbles, no scenery, no coloured ring and no metal band. The camera is level with the pedestal: the pedestal is seen exactly edge-on, its top surface is not visible, its front edge is a straight horizontal line.
+VIEW: strict front orthographic view, camera exactly level with the subject at its mid-height (zero elevation, not
+looking down), no perspective, no three-quarter turn, the subject faces the camera.
+FRAMING: portrait aspect ratio 3:4; one isolated subject; the pedestal, or the bottom of the object if it has no pedestal,
+centred at x50% with its bottom at y93%; the highest point of the subject or of anything it holds no higher than y4%
+(y >= 4%: at least 4% of the image height below the top edge); the whole subject and the whole pedestal visible,
+nothing cropped.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background, no gradient, no vignette, no floor, no cast
+shadow on the background; soft even studio lighting, no strong rim light, no depth of field.
+READABILITY: large clear shapes; arms, wings and held objects separated from the body by visible gaps; thin parts such
+as strings, shafts and staffs clearly readable, not hair-thin; fine detail stays inside the silhouette.
+FORBIDDEN: text, letters, numbers, logos, watermark, frame, collage or several views, extra figures, extra limbs,
+heads, wings or weapons, team colours, a coloured ring or metal band on the pedestal.
+Output one single image.
+CORRECTION (fix only this; everything above still applies):
+- strict front orthographic view: the pedestal top surface is visible and its front edge curves -> show the pedestal exactly edge-on with no visible top surface and a straight horizontal front edge; keep the camera exactly level with zero elevation.
+- whole subject and pedestal visible; plain flat dark gray background: the background has a visible gradient and vignette -> use one uniform flat neutral dark gray background across the entire image with no gradient, vignette, floor or background shadow.
+```
+
+## Проверка и ограничения
+
+Создан один вид design-front; межвидовая согласованность на 1a не оценивается. В обеих генерациях сохранены оружейная рука, рог на левом бедре, меховая шапка и основная палитра. g2 создан заново по тому же эталону мастерства: изменились форма шапки, силуэт меха и плаща, орнаменты одежды, подставка и фон. CORRECTION исправлял видимую верхнюю поверхность подставки и градиент/виньетку фона. g1: 0 FAIL, 1 WARN; g2 и итог: 0 FAIL, 0 WARN. Выбран g2, CHECKLIST 6/6. Верх маски g2 y4,213 %, низ y94,682 % вместо y93 %, центр x49,908 %. Пиксели не ретушировались и не перекодировались. Технический ранний вызов проверки без design/ записан в verification.json.

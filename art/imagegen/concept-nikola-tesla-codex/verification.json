@@ -1,0 +1,132 @@
+{
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-nikola-tesla-codex/palette.json",
+      "before_sha256": "de16c3eb39128b0250eec929602ca4444f06a98ee1e5b4fffc815f1ba94818a7",
+      "after_sha256": "de16c3eb39128b0250eec929602ca4444f06a98ee1e5b4fffc815f1ba94818a7",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Executor writes were confined to art/imagegen/concept-nikola-tesla-codex/. The tool-managed original PNGs outside the package are the explicit task exception and were left unchanged.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-nikola-tesla-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-nikola-tesla-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-nikola-tesla-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух дисков; коллажа, второго вида, надписей и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура анфас, без трёхчетвертного разворота; горизонтальные края дисков прямые, верхняя поверхность подставки скрыта. Геометрию камеры можно оценить только по изображению."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Вся фигура, дуги и подставка в кадре; фон визуально ровный тёмно-серый. Контрольные участки фона: медианы около RGB 41–44, без заметного градиента; малые пиксельные вариации не считаются градиентом."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Катушка в собственной правой руке, слева для зрителя. Между обеими руками и торсом видны просветы; локти согнуты, поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: coil device with blue arcs in the figure's own RIGHT hand; centre-parted hair; thin moustache; long dark coat;",
+      "passed": true,
+      "note": "Медная катушка и синие дуги в правой руке, центральный пробор, узкие усы и длинное тёмное пальто читаются."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Угольный костюм, медная катушка и фурнитура, белая рубашка, электрические синие дуги. Подставка тёмная каменная, без командного цвета, цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "generations_used_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [],
+  "candidate_visual_review": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view; pedestal top surface not visible"
+      ],
+      "note": "Visible shallow top surface of pedestal. Suspected background gradient motivated correction; later background samples showed only small RGB variations (about 47-51), so substantial gradient was not confirmed."
+    },
+    {
+      "generation": 2,
+      "failed_items": [],
+      "note": "Pedestal top hidden; background samples approximately RGB 41-44. All selected checklist items pass."
+    }
+  ],
+  "byte_preservation": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1335d-44f8-7fb2-aa38-5e4774a25286\\exec-74cecb14-57b2-425b-bd3e-4da2b5443e54.png",
+      "saved_path": "art/imagegen/concept-nikola-tesla-codex/concepts/nikola-tesla-design-front-g1.png",
+      "sha256": "22b34dd1b4f46477cfdc812447139d73c9d1fa3e2ca51e3dd304a8153a011a86",
+      "original_matches_saved": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1335d-44f8-7fb2-aa38-5e4774a25286\\exec-e635856f-ed27-4343-9e98-1a790c714a76.png",
+      "saved_path": "art/imagegen/concept-nikola-tesla-codex/concepts/nikola-tesla-design-front-g2.png",
+      "sha256": "6e89b012941b745718871b2d8eb03830d2b80f52532f18bdaf5197aabf15c956",
+      "original_matches_saved": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-nikola-tesla-codex/design/nikola-tesla-front.png",
+    "sha256": "6e89b012941b745718871b2d8eb03830d2b80f52532f18bdaf5197aabf15c956",
+    "matches_generation": 2
+  },
+  "limitations": [
+    "Only one front design: consistency between views is not applicable.",
+    "Camera geometry is assessed visually from the image, not measured from a 3D scene.",
+    "Small pixel noise and painted shading are present; palette colours are checked visually, not required to match HEX on every pixel."
+  ]
+}

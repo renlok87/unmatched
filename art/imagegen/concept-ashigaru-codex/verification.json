@@ -1,0 +1,198 @@
+{
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 1,
+      "report": null,
+      "run": "pre-copy-input-error",
+      "classification": "input_error",
+      "error": "ERROR: нет каталога набора art\\imagegen\\concept-ashigaru-codex\\design",
+      "note": "Преждевременный запуск после ошибки команды копирования. Отчёт не создан. Эта версия скрипта вернула 1 при ошибке входа; результат не классифицирован как FAIL и не вызвал повторную генерацию."
+    },
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ashigaru-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ashigaru-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ashigaru-codex/design/checks-report.json",
+      "run": "final-selected"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна двухдисковая подставка, один фронтальный вид. Надписей, эмблем, логотипов и водяных знаков не видно; дополнительный меч g1 устранён."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере; разворота 3/4 и перспективного сокращения не видно. Подставка показана с ребра, верхняя плоскость скрыта, края горизонтальны. Оценка ортографичности визуальная, без данных камеры."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, знамя, копьё и подставка полностью в кадре. Фон визуально ровный тёмный нейтральный серый, без пола, виньетки и падающей тени; слабый пиксельный шум около 1 уровня RGB не является видимым градиентом. Верхний отступ 1,588% остаётся WARN, а не обрезкой."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Копьё зажато в собственной правой руке, слева от зрителя. Между каждой рукой и корпусом видны зазоры; локти согнуты, поза нейтральная, не T/A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: yari spear upright in the figure's own RIGHT hand; jingasa hat; small back banner",
+      "passed": true,
+      "note": "Все три якоря видны: вертикальное yari, чёрная jingasa и небольшое красное знамя за плечом. На знамени нет символов."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный лак доспехов и шляпы, ткань индиго, древесный коричневый древка и киноварный акцент знамени присутствуют. Командной окраски, цветного кольца или металлического обода подставки нет. Кожа и сталь — локальные нейтральные материалы."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "note": "Верх копья y=1,588%, минимум CORE 4%. WARN разрешён заданием и не служит причиной ретрая."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.base_bottom",
+      "severity": "deviation",
+      "note": "Низ подставки y=95,58% вместо целевых 93%; вся подставка видна."
+    },
+    {
+      "view": "design-front",
+      "item": "BACKGROUND.pixel_noise",
+      "severity": "observation",
+      "note": "Фон визуально ровный, слабый шум ~1 уровень RGB; математически не каждый пиксель идентичен."
+    }
+  ],
+  "candidate_review": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "selected": false,
+      "failed_items": [
+        "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "core_failures": [
+        "FORBIDDEN: extra weapons — дополнительный меч"
+      ],
+      "note": "Эмблемы на шляпе/знамени, видимая верхняя поверхность подставки и впечатление неоднородного фона."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "selected": true,
+      "failed_items": [],
+      "note": "Исправлены символы, лишний меч и ракурс подставки; визуально ровный фон."
+    }
+  ],
+  "errors": [
+    {
+      "step": "initial-save",
+      "type": "SyntaxError",
+      "text": "SyntaxError: invalid decimal literal",
+      "resolved": true,
+      "note": "Windows снял кавычки с JSON в аргументе Python; команда не выполнила записей. Исправлено base64-передачей исходного Python-кода."
+    },
+    {
+      "step": "write-final-package",
+      "type": "CreateProcessAsUserW 206",
+      "text": "Имя файла или его расширение имеет слишком большую длину.",
+      "resolved": true,
+      "note": "Слишком длинная команда не запустилась и не выполнила записей. Пакет записан короткими отдельными Python-командами."
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_basis": "Все команды записи ограничены пакетом; PYTHONDONTWRITEBYTECODE=1 исключает pycache. Собственные оригиналы image_gen вне пакета — явно разрешённое договором исключение, оставлены на месте.",
+  "status": "предложено",
+  "date": "2026-10-13T03:44:20.315907+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ashigaru-codex/palette.json",
+      "before_sha256": "dfe667d843ec2031135fe709fbc3ae6302895fa80581e936d51ba069b0089ab6",
+      "after_sha256": "dfe667d843ec2031135fe709fbc3ae6302895fa80581e936d51ba069b0089ab6",
+      "unchanged": true
+    }
+  ],
+  "source_unchanged": true,
+  "preexisting_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-ashigaru-codex/palette.json",
+      "unchanged": true
+    }
+  ],
+  "byte_for_byte": [
+    {
+      "generation": "g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13357-321b-7bd0-a5e5-319e4821cbed\\exec-2ea0209e-7697-4f3f-8df5-d17ff67d2297.png",
+      "saved_path": "art/imagegen/concept-ashigaru-codex/concepts/ashigaru-design-front-g1.png",
+      "identical": true
+    },
+    {
+      "generation": "g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13357-321b-7bd0-a5e5-319e4821cbed\\exec-f2d31c37-efa0-4818-b65e-ac9a4cfc7789.png",
+      "saved_path": "art/imagegen/concept-ashigaru-codex/concepts/ashigaru-design-front-g2.png",
+      "identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-ashigaru-codex/design/ashigaru-front.png",
+    "generation": "g2",
+    "identical": true
+  },
+  "text_encoding": {
+    "encoding": "UTF-8 without BOM",
+    "passed": true,
+    "files": [
+      "art/imagegen/concept-ashigaru-codex/checks/design-front-g1/checks-report.json",
+      "art/imagegen/concept-ashigaru-codex/checks/design-front-g2/checks-report.json",
+      "art/imagegen/concept-ashigaru-codex/design/checks-report.json",
+      "art/imagegen/concept-ashigaru-codex/generation-records.json",
+      "art/imagegen/concept-ashigaru-codex/palette.json",
+      "art/imagegen/concept-ashigaru-codex/prompts/concept-prompts.json",
+      "art/imagegen/concept-ashigaru-codex/prompts.md",
+      "art/imagegen/concept-ashigaru-codex/README.md",
+      "art/imagegen/concept-ashigaru-codex/source-hashes-before.json",
+      "art/imagegen/concept-ashigaru-codex/verification.json"
+    ]
+  },
+  "processes_started_by_run_remaining": 0
+}

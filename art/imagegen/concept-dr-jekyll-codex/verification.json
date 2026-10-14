@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-13T03:39:50.769574+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-jekyll-codex/palette.json",
+      "before_sha256": "c3bef263f73b3bc87d6a24addbca8c0941482f3d99149e4d0ab7b50f551efe79",
+      "after_sha256": "c3bef263f73b3bc87d6a24addbca8c0941482f3d99149e4d0ab7b50f551efe79",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "scope_proof": "All filesystem writes issued by this agent and checker were confined to the package; Python bytecode disabled. Tool-managed original image_gen PNG files outside the package are explicitly authorized and retained. No whole-repository scan was performed.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-jekyll-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-jekyll-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-jekyll-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; текста, коллажа и посторонних фигур нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура смотрит прямо; фронтальные края обоих ярусов горизонтальны, верхняя поверхность подставки не видна. Ортографичность оценена визуально, параметры камеры генератор не раскрывает."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре; ровный тёмно-серый фон без пола и заметной виньетки. Допустим небольшой растровый шум: p99 отклонения рамки 2 уровня, residual_std около 0,96."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Оружия нет; между руками и корпусом есть зазоры, поза не T и не A. Буквальное «No ... held object» не выполнено: флакон и саквояж прямо обязательны в SUBJECT и IDENTITY ANCHORS того же CORE. Сохранены обязательные признаки; CORE не изменён."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: glowing green potion vial in the LEFT hand; doctor's bag in the RIGHT hand; grey frock coat; cravat;",
+      "passed": true,
+      "note": "Зелёный флакон в анатомически левой руке (справа для зрителя), коричневый саквояж в правой (слева для зрителя), серый сюртук и кремовый шейный платок ясно видны."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Серый, кремовый и коричневый основные цвета, зелёный акцент присутствуют. Небольшая приглушённая фурнитура не образует дополнительного сильного цвета; цветной полосы и металлического обода на основании нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "run_generation_limit": 2,
+  "selected": {
+    "view": "design-front",
+    "generation": 2,
+    "saved_path": "art/imagegen/concept-dr-jekyll-codex/design/dr-jekyll-front.png",
+    "sha256": "32c256ae4c9736bd5e8e1aacabd242b3d1dfb54f216727231ec0ff740c19f6be"
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "id": "view.frame_top",
+      "severity": "WARN",
+      "note": "Allowed WARN: g1 2.486%, g2 2.970%; not a retry trigger."
+    },
+    {
+      "id": "framing.base_bottom",
+      "requested_pct": 93,
+      "actual_pct": 95.304,
+      "note": "Unmodified generated image; base center x49.954%."
+    },
+    {
+      "id": "core.held_object_conflict",
+      "severity": "CHECKLIST_FAIL",
+      "note": "No held object conflicts with mandatory vial and bag. Identity anchors preserved without changing CORE."
+    },
+    {
+      "id": "camera.parameters",
+      "note": "Orthographic appearance judged visually; generator camera metadata is unavailable."
+    },
+    {
+      "id": "palette.auto_check",
+      "note": "Prescribed command has no --palette; palette checked visually."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Visible top surface of pedestal; selected identity anchors conflict with literal no-held-object rule."
+    },
+    {
+      "generation": 2,
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Pedestal top no longer visible; one unresolved contradictory checklist item."
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13354-1da4-72d0-b38c-c6d44e146ed1\\exec-b2145753-81f9-4d48-b2bd-bb9f5121b24d.png",
+      "saved_path": "art/imagegen/concept-dr-jekyll-codex/concepts/dr-jekyll-design-front-g1.png",
+      "sha256": "67f86caf805d9ebf49a0cb739196a75c078718864fe20d3d388ee85995eb874e",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13354-1da4-72d0-b38c-c6d44e146ed1\\exec-4e51478c-9fb6-4aba-ac5a-a3d8fc4d2c12.png",
+      "saved_path": "art/imagegen/concept-dr-jekyll-codex/concepts/dr-jekyll-design-front-g2.png",
+      "sha256": "32c256ae4c9736bd5e8e1aacabd242b3d1dfb54f216727231ec0ff740c19f6be",
+      "byte_identical": true
+    }
+  ],
+  "errors": []
+}

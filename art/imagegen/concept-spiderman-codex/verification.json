@@ -1,0 +1,100 @@
+{
+ "card_id": "ASSET-SPIDERMAN-001",
+ "stage": "1a",
+ "date": "2026-10-13",
+ "status": "blocked",
+ "source_unchanged": true,
+ "sources": [
+  {
+   "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+   "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "bytes_before": 2034907,
+   "bytes_after": 2034907,
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-spiderman-codex/palette.json",
+   "sha256_before": "b7a54b8b934b65a6e094eb6b8ad556ec67b475bb56870a798facf87bb7585c4e",
+   "sha256_after": "b7a54b8b934b65a6e094eb6b8ad556ec67b475bb56870a798facf87bb7585c4e",
+   "bytes_before": 293,
+   "bytes_after": 293,
+   "unchanged": true
+  }
+ ],
+ "outside_folder": [],
+ "write_scope": {
+  "package": "art/imagegen/concept-spiderman-codex",
+  "method": "Audit of the exact write targets in commands; no whole-repository scan. Python writes only package metadata; no image was returned.",
+  "pre_existing_package_files_unchanged": true,
+  "git_commands": 0,
+  "unreal_access": false,
+  "downloads": false
+ },
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+   "source": "unstability.ai"
+  },
+  {
+   "view": "design-front",
+   "generation": "rc1",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-spiderman-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [],
+ "generations_per_view": {
+  "design-front": 1
+ },
+ "successful_generations_per_view": {
+  "design-front": 0
+ },
+ "generation_limit": 2,
+ "generations_used": 1,
+ "selected": {
+  "design-front": null
+ },
+ "final_script_exit_code": null,
+ "limit_reached": [],
+ "blocked": {
+  "tool": "image_gen.imagegen",
+  "view": "design-front",
+  "generation": "g1",
+  "error": {
+   "http_status": 400,
+   "code": "moderation_blocked",
+   "type": "image_generation_user_error",
+   "message": "Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID 4b6e86c2-12dc-4129-97e5-29c538b9684f.",
+   "request_id": "4b6e86c2-12dc-4129-97e5-29c538b9684f",
+   "moderation_stage": "output",
+   "categories": [
+    "other"
+   ]
+  }
+ },
+ "limitations": [
+  "Image generation returned HTTP 400 moderation_blocked; no PNG or original output path was returned.",
+  "No candidate could be copied to concepts/ or design/ and no generation could be selected.",
+  "check_concept_views.py was not run because there was no image; there is no final script exit code.",
+  "No visual CHECKLIST assessment exists because there is no selected image.",
+  "One of two allowed tool calls was used. Retry criteria (script FAIL or failed visual checklist item) could not be evaluated; generation service rejection is a blocker."
+ ],
+ "processes": {
+  "started_persistent_processes": [],
+  "remaining_processes_from_task": []
+ },
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+ }
+}

@@ -1,0 +1,191 @@
+{
+  "card_id": "ASSET-SHREDDER-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_scope": "Изменения репозитория этим запуском. Оригиналы image_gen вне репозитория сохранены инструментом по явно разрешённому контракту; пути указаны в generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-shredder-codex/checks/design-front-g1/checks-report.json",
+      "kind": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-shredder-codex/checks/design-front-g2/checks-report.json",
+      "kind": "candidate",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top",
+        "view.single_component"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-shredder-codex/design/checks-report.json",
+      "kind": "selected-final",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top",
+        "view.single_component"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Сохранённый PNG g2 проверен визуально: одна фигура на одной двухъярусной подставке, без надписей и дополнительных видов."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Прямой фронт, без разворота; верхние кромки ярусов горизонтальны, верхняя плоскость подставки скрыта. Визуальных признаков перспективы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура и подставка целиком видны. Фон ровный нейтральный тёмно-серый; пробы свободного фона около RGB 47–49. Слабая пиксельная фактура без выраженного градиента."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Кисти пустые; руки отделены от корпуса, локти слегка согнуты. Спокойная поза, не T/A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: bladed steel gauntlets on both forearms; horned helmet with face mask; dark purple robe; long cape;",
+      "passed": true,
+      "note": "Видны оба лезвийных наруча, рогатый шлем с маской, фиолетовое одеяние и длинный бордовый плащ."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Сталь, фиолетовая ткань, бордовый плащ и красные глаза присутствуют. Подставка без командного цвета, цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_generations": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [],
+  "candidate_rejections": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "note": "Видна узкая верхняя плоскость подставки. CORRECTION также включил выравнивание визуально воспринимаемого фона."
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "type": "WARN",
+      "passed": false,
+      "requested_min_pct": 4,
+      "actual_pct": 2.21,
+      "note": "WARN допустим; основанием ретрая не служил."
+    },
+    {
+      "view": "design-front",
+      "item": "view.single_component",
+      "type": "WARN",
+      "passed": false,
+      "other_component_pct": 1.71,
+      "note": "Дополнительная компонента сегментации; визуально одна фигура и одна подставка."
+    },
+    {
+      "view": "design-front",
+      "item": "FRAMING pedestal bottom",
+      "type": "CORE framing deviation",
+      "passed": false,
+      "requested_pct": 93,
+      "actual_pct": 94.613,
+      "note": "Низ маски ниже целевого y93%; подставка целиком в кадре, скрипт не считает это FAIL."
+    }
+  ],
+  "core_unchanged": true,
+  "image_processing_performed": false,
+  "original_tool_images_left_in_place": true,
+  "processes_started_left_running": [],
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-shredder-codex/palette.json",
+      "before_sha256": "5dcc4a3a639a25b5d4f54ada58205aa8729b20e5e4ad0f771a936010ad3ba74e",
+      "after_sha256": "5dcc4a3a639a25b5d4f54ada58205aa8729b20e5e4ad0f771a936010ad3ba74e",
+      "unchanged": true,
+      "bytes": 291
+    }
+  ],
+  "preexisting_package_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-shredder-codex/palette.json",
+      "sha256": "5dcc4a3a639a25b5d4f54ada58205aa8729b20e5e4ad0f771a936010ad3ba74e",
+      "unchanged": true
+    }
+  ],
+  "image_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-shredder-codex/concepts/shredder-design-front-g1.png",
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13434-8417-7cd1-9c56-58e39772c699/exec-d54ff559-2339-4c33-a0b4-d4ea67812be8.png",
+      "sha256": "777add8db3fc12e2a0c270a2a9563b763c97c1b0f956c9d0e690d410b45661e5",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-shredder-codex/concepts/shredder-design-front-g2.png",
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13434-8417-7cd1-9c56-58e39772c699/exec-e97cf5c8-dc2d-4387-beb0-16c715993c2f.png",
+      "sha256": "3c3f6fb5561da265fada4d99bcbc634af81d41de4ddb08540ff2d86506bebae1",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "view": "design-front",
+    "generation": 2,
+    "path": "art/imagegen/concept-shredder-codex/design/shredder-front.png",
+    "sha256": "3c3f6fb5561da265fada4d99bcbc634af81d41de4ddb08540ff2d86506bebae1",
+    "byte_identical": true
+  }
+}

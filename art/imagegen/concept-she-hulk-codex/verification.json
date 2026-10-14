@@ -1,0 +1,325 @@
+{
+ "source_unchanged": true,
+ "outside_folder": [],
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "ASSET-SHE-HULK-001-1a-design-front-u1",
+   "attempt": 1,
+   "exit_code": 1,
+   "report": "art/imagegen/concept-she-hulk-codex/checks/design-front-g1/checks-report.json",
+   "candidate_path": "art/imagegen/concept-she-hulk-codex/concepts/she-hulk-design-front-u1.png",
+   "input_sha256": "f17bc088bd8b066a62b4522e63362b232452ce281c853b0a99edbf8172b9fb34",
+   "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g1",
+    "--key",
+    "she-hulk",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-she-hulk-codex/palette.json",
+    "--out",
+    "art/imagegen/concept-she-hulk-codex/checks/design-front-g1"
+   ],
+   "stdout": "FAIL view.border_uniform    front    value={\"share_warn_tone\": 0.471, \"share_fail_tone\": 0.6244, \"p99_deviation\": 69.0} limit=>= 0.99 при ±20 (WARN при ±12)  # рамка 2 % кадра — ровный фон без объектов\nWARN view.frame_top         front    value=2.25 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nFAIL view.bottom_margin     front    value=100.0 limit=<= 99.0 %  # низ подставки в кадре\nFAIL view.side_margin       front    value=0.0 limit=>= 1.0 %  # фигура не обрезана по бокам\nWARN view.single_component  front    value=[0.54, 0.522, 0.006, 0.004, 0.003, 0.003, 0.003, 0.002, 0.002, 0.002] limit=прочие < 0.5 %  # одна крупная связная фигура\nFAIL: PASS 8 WARN 2 FAIL 3 → art/imagegen/concept-she-hulk-codex/checks/design-front-g1/checks-report.json\n",
+   "stderr": "",
+   "temporary_set": "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g1",
+   "temporary_set_removed": true,
+   "historical": true
+  },
+  {
+   "view": "design-front",
+   "generation": "ASSET-SHE-HULK-001-1a-design-front-g2",
+   "attempt": 2,
+   "exit_code": 0,
+   "report": "art/imagegen/concept-she-hulk-codex/checks/design-front-g2/checks-report.json",
+   "candidate_path": "art/imagegen/concept-she-hulk-codex/concepts/she-hulk-design-front-g2.png",
+   "input_sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f",
+   "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g2",
+    "--key",
+    "she-hulk",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-she-hulk-codex/palette.json",
+    "--out",
+    "art/imagegen/concept-she-hulk-codex/checks/design-front-g2"
+   ],
+   "stdout": "WARN view.frame_top         front    value=2.375 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-she-hulk-codex/checks/design-front-g2/checks-report.json\n",
+   "stderr": "",
+   "temporary_set": "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g2",
+   "temporary_set_removed": true,
+   "historical": false
+  },
+  {
+   "view": "design-front",
+   "generation": "ASSET-SHE-HULK-001-1a-design-front-g2",
+   "attempt": 2,
+   "exit_code": 0,
+   "report": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+   "candidate_path": "art/imagegen/concept-she-hulk-codex/concepts/she-hulk-design-front-g2.png",
+   "input_sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f",
+   "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-she-hulk-codex/design",
+    "--key",
+    "she-hulk",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-she-hulk-codex/palette.json"
+   ],
+   "stdout": "WARN view.frame_top         front    value=2.375 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-she-hulk-codex/design/checks-report.json\n",
+   "stderr": "",
+   "historical": false
+  },
+  {
+   "view": "design-front",
+   "generation": "rc2",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [
+  {
+   "view": "design-front",
+   "item": "one subject, one pedestal, no collage, second view, text, letters, logo or watermark",
+   "passed": false,
+   "assessment": "not_verified",
+   "note": "Historical Claude note documents one subject and no text/logo after cleanup. It does not explicitly cover the full item. Images were used only for hashing and automated checks in this repair."
+  },
+  {
+   "view": "design-front",
+   "item": "strict front orthographic, level camera, no perspective/three-quarter, pedestal edge-on with no top visible",
+   "passed": false,
+   "assessment": "not_verified",
+   "note": "Historical front-view note does not establish strict orthography, elevation or pedestal top visibility. The old prompt is an instruction, not proof of output."
+  },
+  {
+   "view": "design-front",
+   "item": "whole subject and pedestal visible, no crop, plain flat dark gray background",
+   "passed": true,
+   "assessment": "historical_note_and_automated_checks",
+   "note": "Historical Claude note states full body and pedestal; current checker passes border uniformity, neutral dark background and top/bottom/side crop margins. No new visual review was performed."
+  },
+  {
+   "view": "design-front",
+   "item": "no weapon or held object; both arms apart from torso; neither T-pose nor A-pose",
+   "passed": false,
+   "assessment": "not_verified",
+   "note": "No explicit historical observation validates this complete item. No image was opened for visual inspection during this metadata-only run."
+  },
+  {
+   "view": "design-front",
+   "item": "identity anchors: green skin, long dark green hair, purple/white athletic suit, muscular build",
+   "passed": false,
+   "assessment": "not_verified",
+   "note": "Palette presence is measured but does not prove anatomy, hair length, clothing identity or muscular build; no new visual evidence is claimed."
+  },
+  {
+   "view": "design-front",
+   "item": "main palette colors and accent present; no team color, colored base ring or band",
+   "passed": false,
+   "assessment": "not_verified",
+   "note": "Checker measures all four palette swatches. Absence of a team color or base ring/band is not established by automated palette measurements."
+  }
+ ],
+ "limit_reached": [
+  {
+   "view": "design-front",
+   "failed_items": [
+    "one subject, one pedestal, no collage, second view, text, letters, logo or watermark",
+    "strict front orthographic, level camera, no perspective/three-quarter, pedestal edge-on with no top visible",
+    "no weapon or held object; both arms apart from torso; neither T-pose nor A-pose",
+    "identity anchors: green skin, long dark green hair, purple/white athletic suit, muscular build",
+    "main palette colors and accent present; no team color, colored base ring or band"
+   ],
+   "reason": "Zero generations allowed; incomplete checklist evidence retained for the acceptor. These are unverified items, not proven visual failures."
+  }
+ ],
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+ },
+ "status": "proposed",
+ "run_id": "metadata-repair-20261013T100044593241Z",
+ "source_unchanged_scope": "All pre-existing PNGs and palette.json are unchanged. Mutable input metadata was intentionally updated after byte-identical archival. No external package or quality-reference image was opened.",
+ "image_gen_calls_in_run": 0,
+ "image_generations_in_run": 0,
+ "generations_allowed_in_run": 0,
+ "historical_checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai"
+  }
+ ],
+ "historical_checks_report_archive": "art/imagegen/concept-she-hulk-codex/archive/metadata-repair-20261013T100044593241Z/design/checks-report.json",
+ "checklist_note": "False with assessment=not_verified denotes missing evidence, not a demonstrated image defect. Historical observations are attributed to Claude; no visual or art acceptance is claimed.",
+ "generations": {
+  "design-front": {
+   "used_in_run": 0,
+   "allowed_in_run": 0,
+   "historical_generations_documented": 1,
+   "metadata_registrations_in_run": 1,
+   "records_total": 2
+  }
+ },
+ "warnings": [
+  {
+   "id": "view.frame_top",
+   "scope": "front",
+   "result": "WARN",
+   "value": 2.375,
+   "limit": ">= 4.0 %",
+   "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+  }
+ ],
+ "immutable_inputs": [
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/concepts/she-hulk-design-front-u1.png",
+   "sha256": "f17bc088bd8b066a62b4522e63362b232452ce281c853b0a99edbf8172b9fb34",
+   "bytes": 6147669,
+   "after_sha256": "f17bc088bd8b066a62b4522e63362b232452ce281c853b0a99edbf8172b9fb34",
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/design/she-hulk-front-raw.png",
+   "sha256": "ad8304914738a0142b90efd0d608bf696c2711ac04561486eed289d16b98aaa6",
+   "bytes": 1369357,
+   "after_sha256": "ad8304914738a0142b90efd0d608bf696c2711ac04561486eed289d16b98aaa6",
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/design/she-hulk-front.png",
+   "sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f",
+   "bytes": 763020,
+   "after_sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f",
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/palette.json",
+   "sha256": "2b105087fc9e28a0b71e3ad0cf32efa37cbbbb13cdf24222cd3f591ca133615b",
+   "bytes": 303,
+   "after_sha256": "2b105087fc9e28a0b71e3ad0cf32efa37cbbbb13cdf24222cd3f591ca133615b",
+   "unchanged": true
+  }
+ ],
+ "metadata_archive": [
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/generation-records.json",
+   "sha256": "4a937b43fdfdec345bb4b1c6e55bbd5fe1e92d4b14436513d016c881814ca345",
+   "bytes": 1461,
+   "archive_path": "art/imagegen/concept-she-hulk-codex/archive/metadata-repair-20261013T100044593241Z/generation-records.json",
+   "archive_sha256": "4a937b43fdfdec345bb4b1c6e55bbd5fe1e92d4b14436513d016c881814ca345",
+   "verified": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/verification.json",
+   "sha256": "7e3cc61051f2a18c9ac8913dfe985ff283652f0d7cbe02cbe99219381f1b3dde",
+   "bytes": 843,
+   "archive_path": "art/imagegen/concept-she-hulk-codex/archive/metadata-repair-20261013T100044593241Z/verification.json",
+   "archive_sha256": "7e3cc61051f2a18c9ac8913dfe985ff283652f0d7cbe02cbe99219381f1b3dde",
+   "verified": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/README.md",
+   "sha256": "6b6486cc3f2cbb0ed11fa15c4b238a795a7a2bafe7b85b565557b056c3f959b9",
+   "bytes": 1495,
+   "archive_path": "art/imagegen/concept-she-hulk-codex/archive/metadata-repair-20261013T100044593241Z/README.md",
+   "archive_sha256": "6b6486cc3f2cbb0ed11fa15c4b238a795a7a2bafe7b85b565557b056c3f959b9",
+   "verified": true
+  },
+  {
+   "path": "art/imagegen/concept-she-hulk-codex/design/checks-report.json",
+   "sha256": "a6a1923aac74ece9e57e5b7db4246518cd3f9a4860438da573d0490ff06a0309",
+   "bytes": 7110,
+   "archive_path": "art/imagegen/concept-she-hulk-codex/archive/metadata-repair-20261013T100044593241Z/design/checks-report.json",
+   "archive_sha256": "a6a1923aac74ece9e57e5b7db4246518cd3f9a4860438da573d0490ff06a0309",
+   "verified": true
+  }
+ ],
+ "selected_design": {
+  "generation": "ASSET-SHE-HULK-001-1a-design-front-g2",
+  "candidate": "art/imagegen/concept-she-hulk-codex/concepts/she-hulk-design-front-g2.png",
+  "source": "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/concept-she-hulk-codex/design/she-hulk-front.png",
+  "sha256": "3412b8761b16660cecf457b5cd04298cf48de635463ef2a38d133ce9b42af21f",
+  "byte_identical": true
+ },
+ "provenance_repair": {
+  "historical_postprocess": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "executed_in_run": false,
+  "prompt_execution": "Historical external source prompt copied exactly to 1a/design-front/g2; not executed now.",
+  "prior_records_preserved_except_selected_flags": true,
+  "prior_candidate_not_replaced": true,
+  "source_relation_note": "The prior immutable candidate and the documented raw frame have different hashes. This registration copies the existing normalized design; it does not assert an undocumented transformation from the old candidate."
+ },
+ "blockers": [],
+ "contract_limits": [
+  {
+   "item": "CORE portrait aspect ratio 3:4",
+   "actual_pixels": [
+    1280,
+    1600
+   ],
+   "actual_aspect": "4:5",
+   "note": "Existing PNG unchanged."
+  },
+  {
+   "item": "CORE framing top >=4%, pedestal bottom y93%, center x50%",
+   "checker_measurements": {
+    "top_pct": 2.375,
+    "bottom_pct": 97.688,
+    "base_center_x_pct_estimate": 46.562
+   },
+   "note": "Segmentation measurements; no art acceptance. Framing unchanged."
+  },
+  {
+   "item": "Quality reference and CORE source prompt",
+   "note": "Historical prompt and no references; no CORE generation claimed."
+  }
+ ],
+ "restricted_actions_in_run": {
+  "image_gen": 0,
+  "other_generators": 0,
+  "browser": 0,
+  "git": 0,
+  "Unreal": 0,
+  "Tripo": 0,
+  "SYNTX": 0,
+  "image_edits": 0
+ }
+}

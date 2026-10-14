@@ -1,0 +1,298 @@
+{
+  "card_id": "ASSET-SINBAD-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "f8304ca086c88345dbdf0f1f69050c532144e9c529c768ce6face979b63eb68e",
+      "run": "initial"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365",
+      "run": "initial"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/runs/fix1/previous/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365",
+      "run": "initial",
+      "previous_report": "art/imagegen/concept-sinbad-codex/design/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g3/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe",
+      "run": "fix1"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g4/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "sha256": "9c4dcfbba71bc95cacf68588ae2593176c1cc2f50754166818eaefa02bfd342b",
+      "run": "fix1"
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe",
+      "run": "fix1"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "One figure, one two-disc pedestal; no collage, second view, text, letters, logo or watermark.",
+      "generation": 3
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Front-facing figure without three-quarter turn, but a narrow top surface of the upper pedestal disc is visible. Strict edge-on pedestal requirement failed.",
+      "generation": 3
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Figure, weapon and pedestal entirely visible. Plain dark gray background, no floor or obvious cast shadow; view.border_uniform PASS, p99_deviation 2.0.",
+      "generation": 3
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Only scimitar in the own RIGHT hand, viewer LEFT; both arms separated from torso with clear gaps and bent elbows, neither T-pose nor A-pose.",
+      "generation": 3
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: scimitar in the figure's own RIGHT hand; white turban; wide blue sash belt; scabbard on the LEFT hip",
+      "passed": true,
+      "note": "All anchors visible. LEFT-hip scabbard is visibly open and empty; no second pommel, grip or guard.",
+      "generation": 3
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Sail white, sea blue, tan and gold trim present; dark stone pedestal has no team colour, coloured ring or metal band.",
+      "generation": 3
+    }
+  ],
+  "generations": {
+    "design-front": 4
+  },
+  "generation_limit": 2,
+  "selected": {
+    "design-front": 3
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Front-facing figure without three-quarter turn, but a narrow top surface of the upper pedestal disc is visible. Strict edge-on pedestal requirement failed."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.base_bottom",
+      "passed": false,
+      "note": "Mask bottom y=95.304% instead of CORE y=93%; fully in frame, raw image unchanged."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.PEDESTAL.diameter",
+      "passed": false,
+      "note": "Visual pedestal diameter estimate about 0.63 of figure height versus CORE about 0.55; raw image unchanged."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верх подставки виден; остальные пункты CHECKLIST визуально соблюдены. Отступ сверху 2,693% — допустимый WARN."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Подставка ребром; все пункты CHECKLIST визуально соблюдены. Отклонения CORE перечислены в limitations."
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "run": "fix1",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "core_extra_weapons": false,
+      "correction_resolved": true,
+      "note": "Front-facing figure without three-quarter turn, but a narrow top surface of the upper pedestal disc is visible. Strict edge-on pedestal requirement failed. Provided correction S design-front resolved: scabbard empty."
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "run": "fix1",
+      "failed_items": [],
+      "core_extra_weapons": true,
+      "correction_resolved": false,
+      "note": "Pedestal edge-on, but second sword pommel, grip and guard returned above LEFT-hip scabbard. CORE.FORBIDDEN.extra_weapons failed; candidate rejected."
+    }
+  ],
+  "scope": {
+    "agent_writes": "art/imagegen/concept-sinbad-codex/",
+    "allowed_tool_originals": "Абсолютные original_path в generation-records.json — оригиналы image_gen, сохранённые самим инструментом согласно заданию; не удалены.",
+    "git_commands": 0,
+    "unreal_access": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "downloads": 0,
+    "background_processes_started": 0
+  },
+  "raw_images_modified": false,
+  "errors": [],
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sinbad-codex/palette.json",
+      "sha256_before": "e318b742bd525d527f44590645319697701a2aa2c1ceca06ab251ec0e7ad9200",
+      "sha256_after": "e318b742bd525d527f44590645319697701a2aa2c1ceca06ab251ec0e7ad9200",
+      "unchanged": true
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-eb95-7933-8da5-e0ee7076f8f2\\exec-699cf763-2ec6-44de-8eee-141908843f74.png",
+      "sha256": "f8304ca086c88345dbdf0f1f69050c532144e9c529c768ce6face979b63eb68e",
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-eb95-7933-8da5-e0ee7076f8f2\\exec-2f03bb11-9925-4172-9a26-2154932a7d04.png",
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365",
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 3,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g3.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13374-3990-78b0-97c6-e236cdc06e2c\\exec-373176b3-7b9a-480f-8505-c22240076476.png",
+      "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe",
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 4,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g4.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13374-3990-78b0-97c6-e236cdc06e2c\\exec-dcf64863-e578-401e-ba6f-db9aca9fe82d.png",
+      "sha256": "9c4dcfbba71bc95cacf68588ae2593176c1cc2f50754166818eaefa02bfd342b",
+      "byte_identical": true,
+      "original_preserved": true
+    }
+  ],
+  "selected_copy": {
+    "saved_path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+    "generation": 3,
+    "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe",
+    "byte_identical": true
+  },
+  "run": "fix1",
+  "acceptance_run": false,
+  "generations_this_run": {
+    "design-front": 2
+  },
+  "total_generation_limit_per_view": 4,
+  "previous_verification": "art/imagegen/concept-sinbad-codex/runs/fix1/previous/verification.json",
+  "command_errors_resolved": [
+    {
+      "operation": "prepare g4 prompt",
+      "error": "Python SyntaxError caused by shell quoting before image_gen call",
+      "resolved": true,
+      "note": "Retried using Python literal; failed command created no file or extra generation."
+    },
+    {
+      "operation": "write final metadata",
+      "error": "CreateProcessAsUserW 206: command exceeded Windows command-line length",
+      "resolved": true,
+      "note": "Split into smaller Python commands; rejected command did not start."
+    }
+  ],
+  "history_preserved": true
+}

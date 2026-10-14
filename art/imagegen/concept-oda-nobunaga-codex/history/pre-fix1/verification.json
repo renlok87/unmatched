@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-13T04:11:35.956970+00:00",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-oda-nobunaga-codex/palette.json",
+      "sha256_before": "6098548147f636dfbe95a7b179853b249b36b10e4e5276f45042b0925b7364ca",
+      "sha256_after": "6098548147f636dfbe95a7b179853b249b36b10e4e5276f45042b0925b7364ca",
+      "unchanged": true,
+      "bytes": 303
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "All task commands wrote only within the package. image_gen originals outside it are the explicit tool-copy exception; both retained.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; один фронтальный вид. Нет текста, букв, водяных знаков и коммерческих логотипов. Цветочные рельефы трактуются как декоративный орнамент доспехов."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура смотрит прямо; плечи, шлем и стопы фронтальны. У g2 обе ступени подставки имеют прямые горизонтальные кромки, верхняя поверхность не видна. Ортографичность оценена визуально, параметры камеры генератор не предоставляет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Все части фигуры, катана, полумесяц и подставка в кадре. Нейтральный тёмно-серый фон воспринимается ровным; контрольные пиксели фона примерно RGB 49–54, без выраженного градиента, пола или тени."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Обнажённая катана в собственной правой руке, слева для зрителя. Обе руки опущены, локти слегка согнуты, кисти и предплечья отделены от торса видимыми промежутками; плащ находится позади этих промежутков."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: katana in the figure's own RIGHT hand; crescent helmet crest; red-orange cape; scabbard on the LEFT hip",
+      "passed": true,
+      "note": "Катана слева для зрителя, золотой полумесяц над кабуто, красно-оранжевый плащ и чёрные ножны на собственном левом бедре справа для зрителя видны. В ножнах также изображена лишняя рукоять: отдельное ограничение CORE extra weapons."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют чёрный лак, киноварь плаща, тёплое золото ткани и яркое золото гребня. Нет командного акцента и цветной или металлической полосы на каменной подставке. Освещение меняет оттенки относительно точных HEX."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_in_run": 2,
+  "limit_reached": [],
+  "core_limitations": [
+    {
+      "view": "design-front",
+      "item": "FRAMING / view.frame_top",
+      "passed": false,
+      "note": "g2: y2,21% вместо минимум 4%; g1: y1,519%. WARN разрешён и сам по себе не служит причиной повтора."
+    },
+    {
+      "view": "design-front",
+      "item": "FORBIDDEN / extra weapons",
+      "passed": false,
+      "note": "Дополнительная рукоять в ножнах может читаться как второе оружие. Оба исходных PNG сохранены без исправлений."
+    },
+    {
+      "view": "design-front",
+      "item": "VIEW / camera metadata",
+      "passed": null,
+      "note": "Фронтальная ортографичность оценена визуально; метаданных камеры нет."
+    }
+  ],
+  "selected": {
+    "design-front": 2
+  },
+  "originals_preserved": true,
+  "generated_images_reencoded": false,
+  "copy_byte_identical": true,
+  "checklist_previous_candidates": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view: pedestal top visible",
+        "plain flat dark gray background: tone variation"
+      ],
+      "note": "Visual inspection; retry allowed by CHECKLIST failures, not WARN."
+    }
+  ],
+  "final_script_exit_code": 0
+}

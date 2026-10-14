@@ -1,0 +1,214 @@
+{
+  "card_id": "ASSET-THE-GENIE-001",
+  "stage": "1a",
+  "run_id": "2026-10-13-concept-1a-r1",
+  "date": "2026-10-13T08:36:36+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "matches_task": true
+    },
+    {
+      "path": "art/imagegen/concept-the-genie-codex/palette.json",
+      "before_sha256": "39c74f5757d4e79615b462f5fb2e8c8aba1ac3525e64495a43c1da654d39352f",
+      "after_sha256": "39c74f5757d4e79615b462f5fb2e8c8aba1ac3525e64495a43c1da654d39352f",
+      "unchanged": true,
+      "matches_task": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_audit": {
+    "method": "All agent-issued file writes and checker outputs were restricted to the package; PYTHONDONTWRITEBYTECODE=1 for image handling and checks. No git or Unreal commands were run.",
+    "scope": "Agent writes; tool-owned generated originals are the explicit task exception.",
+    "originals_record": "art/imagegen/concept-the-genie-codex/generation-records.json"
+  },
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-genie-codex/checks/design-front-g1/checks-report.json",
+      "output": "WARN view.frame_top         front    value=1.657 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-the-genie-codex/checks/design-front-g1/checks-report.json\r\n"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-genie-codex/checks/design-front-g2/checks-report.json",
+      "output": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-the-genie-codex/checks/design-front-g2/checks-report.json\r\n"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-genie-codex/design/checks-report.json",
+      "output": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-the-genie-codex/design/checks-report.json\r\n",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.1",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Один джинн и одна подставка; коллажа, второго вида, текста, логотипов и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.2",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус строго анфас. В g2 подставка показана с ребра, верхняя плоскость не видна, передний край горизонтален. Оценка визуальная, не доказательство модели камеры."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.3",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, волосы, дым, лампа и вся подставка внутри кадра. Фон ровный нейтральный тёмно-серый; без пола и падающей тени. Медиана рамки RGB 41/41/42, p99 отклонения 2."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.4",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Оружия и предмета в руках нет, поза не T/A. Однако скрещённые руки примыкают к корпусу: явных просветов между каждой рукой и торсом нет даже после CORRECTION."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.5",
+      "item": "every identity anchor is visible: blue skin; topknot; gold armbands; arms folded; lower body is a swirl of smoke from a brass lamp;",
+      "passed": true,
+      "note": "Видны синяя кожа, высокий пучок волос, золотые наручные украшения, скрещённые руки и голубой дым, выходящий из латунной лампы. Золотые серьги также видны."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "checklist.6",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Присутствуют синий цвет кожи, золото, светло-голубой дым и красный пояс. Подставка тёмная каменная, без командного цвета, цветного кольца и металлической полосы; точное соответствие каждого пикселя hex не заявляется."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "used": 2,
+      "allowed_this_run": 2,
+      "selected": 2
+    }
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "checklist.4"
+      ],
+      "note": "Arms folded, but no clearly visible gap from each arm to the torso; generation budget exhausted."
+    }
+  ],
+  "candidate_visual_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "checklist.2",
+        "checklist.4"
+      ],
+      "note": "Верхняя плоскость подставки видна; руки без открытых зазоров к торсу. Все идентификационные якоря и палитра присутствуют. Скрипт: код 0, WARN view.frame_top 1.657%."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "checklist.4"
+      ],
+      "note": "Положение подставки исправлено на вид с ребра. Просветы у рук не появились. Все якоря и палитра сохранены. Выбран как кандидат с меньшим числом проваленных пунктов."
+    }
+  ],
+  "limitations": [
+    {
+      "id": "checklist.4",
+      "view": "design-front",
+      "note": "Явные зазоры между обеими руками и корпусом не получились. Лимит 2 генераций исчерпан; решение оставлено приёмщику."
+    },
+    {
+      "id": "core.framing_top",
+      "view": "design-front",
+      "requested_min_pct": 4,
+      "actual_pct": 1.934,
+      "note": "WARN view.frame_top. Повтор из-за WARN не выполнялся."
+    },
+    {
+      "id": "core.framing_bottom",
+      "view": "design-front",
+      "requested_pct": 93,
+      "actual_pct": 96.409,
+      "note": "Низ подставки ниже заданного y93%, но внутри кадра. Отдельного FAIL этой позиции скрипт не выдаёт."
+    },
+    {
+      "id": "core.pedestal_diameter",
+      "view": "design-front",
+      "requested_figure_height_ratio": 0.55,
+      "visual_estimate_ratio": 0.43,
+      "note": "Подставка визуально уже заданного соотношения. Это приблизительная оценка по силуэту, не размер 3D-модели."
+    },
+    {
+      "id": "core.pose_feet",
+      "view": "design-front",
+      "note": "CORE одновременно требует обе стопы на подставке и дымовой низ из лампы. В обоих результатах выбран дымовой низ согласно SUBJECT и IDENTITY ANCHORS; стопы отсутствуют. CORE не изменялся."
+    }
+  ],
+  "copies": [
+    {
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a1345f-b7de-7780-8897-1413d437d536/exec-23b8e425-43e4-4827-9ebb-a73a9c8cb7ce.png",
+      "saved_path": "art/imagegen/concept-the-genie-codex/concepts/the-genie-design-front-g1.png",
+      "sha256": "9394aec0538ac48175ea39c994a4f8363c95fb709295c1d6102ce42e0d9e5481",
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a1345f-b7de-7780-8897-1413d437d536/exec-ca2f4dc6-6a3d-4d29-8ea9-449de8837812.png",
+      "saved_path": "art/imagegen/concept-the-genie-codex/concepts/the-genie-design-front-g2.png",
+      "sha256": "26e06f19fef3b4cbcd285ca337750ebe0e8f81d0fe95718a1ce3c1641c0ee86a",
+      "byte_identical": true,
+      "original_preserved": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-the-genie-codex/design/the-genie-front.png",
+    "generation": 2,
+    "sha256": "26e06f19fef3b4cbcd285ca337750ebe0e8f81d0fe95718a1ce3c1641c0ee86a",
+    "byte_identical": true
+  },
+  "image_processing": {
+    "retouched": false,
+    "resized": false,
+    "cropped": false,
+    "recoloured": false,
+    "reencoded": false
+  },
+  "prompt_verification": {
+    "core_identical": true,
+    "correction_lines": 2,
+    "retry_reason": [
+      "checklist.2",
+      "checklist.4"
+    ],
+    "warn_triggered_retry": false,
+    "size_parameter_passed": false
+  },
+  "errors": []
+}

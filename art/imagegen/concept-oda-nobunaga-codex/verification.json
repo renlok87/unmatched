@@ -1,0 +1,219 @@
+{
+  "date": "2026-10-13T04:58:47.987193+00:00",
+  "stage": "1a",
+  "run": "fix1",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-oda-nobunaga-codex/palette.json",
+      "sha256_before": "6098548147f636dfbe95a7b179853b249b36b10e4e5276f45042b0925b7364ca",
+      "sha256_after": "6098548147f636dfbe95a7b179853b249b36b10e4e5276f45042b0925b7364ca",
+      "unchanged": true,
+      "bytes": 303
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "All command writes were restricted to the package. image_gen retained originals outside it are the explicit tool-copy exception. No git, Unreal, Tripo, SYNTX, downloads or acceptance operations.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/history/pre-fix1/design/checks-report.json",
+      "final": true,
+      "original_report_path": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "historical": true
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g3/checks-report.json",
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g3/console.txt"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g4/checks-report.json",
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g4/console.txt"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "final": true,
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/runs/fix1-final-check-console.txt"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна миниатюра, одна подставка из двух низких дисков, один вид. Текста и водяных знаков нет; цветочные эмблемы и завитки ножен читаются как орнамент."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Лицо, плечи, шлем и стопы фронтальны. Обе ступени подставки имеют прямые горизонтальные кромки; верхняя плоскость не видна, узкие фаски допустимы по CORE. Ортографичность оценена визуально, метаданных камеры нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, клинок, полумесяц и подставка целиком в кадре. Фон визуально ровный тёмно-серый: контрольные пиксели RGB 39–43, p99 отклонения границы 3. Нет заметного градиента, виньетки, пола или тени на фоне."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Единственная обнажённая катана в собственной правой руке, слева для зрителя. Руки опущены и слегка согнуты, кисти и предплечья отделены от торса видимыми промежутками; плащ остаётся позади."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: katana in the figure's own RIGHT hand; crescent helmet crest; red-orange cape; scabbard on the LEFT hip",
+      "passed": true,
+      "note": "Все четыре якоря видны. Ножны на собственном левом бедре, справа для зрителя, имеют открытое пустое устье; рукояти и гарды второго меча нет."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный лак, красно-оранжевая киноварь плаща, тёплое золото ткани и более светлое жёлтое золото гребня присутствуют. Плащ и гребень визуально ближе к #C2462A и #E6C04E; естественное затенение сохранено. Нет командного цвета, цветной или металлической полосы на каменной подставке. Значения исходных материалов генератор не предоставляет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 4
+  },
+  "generations_per_view_in_run": {
+    "design-front": 2
+  },
+  "generations_allowed_in_run": 2,
+  "view_total_generation_limit": 4,
+  "limit_reached": [],
+  "core_limitations": [
+    {
+      "view": "design-front",
+      "item": "FRAMING / view.frame_top",
+      "passed": false,
+      "note": "g4: y1.657% instead of y >= 4%; WARN only, no cropping, not a retry reason."
+    },
+    {
+      "view": "design-front",
+      "item": "FRAMING / base bottom and horizontal centre",
+      "passed": false,
+      "note": "g4: bottom y94.682% instead of y93%; centre x50.875% instead of x50%; minor presentation deviations, not failed CHECKLIST items."
+    },
+    {
+      "view": "design-front",
+      "item": "VIEW / camera metadata",
+      "passed": null,
+      "note": "Orthographic appearance judged visually; camera metadata unavailable."
+    },
+    {
+      "view": "design-front",
+      "item": "PALETTE / intrinsic material HEX",
+      "passed": null,
+      "note": "Cape and crest judged visually against specified palette. Exact intrinsic material HEX cannot be proven from a shaded generated bitmap."
+    }
+  ],
+  "selected": {
+    "design-front": 4
+  },
+  "originals_preserved": true,
+  "generated_images_reencoded": false,
+  "copy_byte_identical": true,
+  "checklist_previous_candidates": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view: pedestal top visible",
+        "plain flat dark gray background: tone variation"
+      ],
+      "note": "Visual inspection; retry allowed by CHECKLIST failures, not WARN."
+    },
+    {
+      "generation": 3,
+      "failed_checklist_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "acceptance_correction_status": {
+        "S": {
+          "closed": false,
+          "note": "A wrapped second hilt with a gold cap remains above the scabbard on the figure's LEFT hip (viewer RIGHT)."
+        },
+        "P": {
+          "closed": true,
+          "note": "Cape reads as red-orange vermilion and crest as yellow gold; material shading remains."
+        }
+      },
+      "visual_notes": [
+        "Single subject and one two-disc stone base, no text or collage.",
+        "Front-facing figure, but the pedestal top plane is visible and disc edges curve in depth.",
+        "All parts in frame; background has tonal variation and vignette.",
+        "Drawn katana in own RIGHT hand, arms apart from torso.",
+        "All identity anchors present, but the scabbard is not empty.",
+        "Palette colours present; base has no coloured ring or metal band."
+      ],
+      "retry_reason": "Visible acceptance-card S defect plus failed CHECKLIST pedestal and flat-background requirements. view.frame_top WARN is not a retry reason."
+    }
+  ],
+  "acceptance_correction_status": {
+    "S": {
+      "closed": true,
+      "note": "Визуально: открытое пустое устье ножен, без второй рукояти и гарды; единственная обнажённая катана в правой руке."
+    },
+    "P": {
+      "closed": true,
+      "note": "Визуально: плащ красно-оранжевый, гребень светлый жёлто-золотой; сохранено естественное затенение. Это проверка исполнителя, не приёмка."
+    }
+  },
+  "acceptance_correction_status_note": "Executor visual self-check only, no acceptance score or verdict.",
+  "previous_run_snapshot": "art/imagegen/concept-oda-nobunaga-codex/history/pre-fix1",
+  "final_script_exit_code": 0,
+  "errors": [],
+  "long_running_processes_started": [],
+  "historical_files_preserved": [
+    "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g1/checks-report.json",
+    "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g2/checks-report.json",
+    "art/imagegen/concept-oda-nobunaga-codex/concepts/oda-nobunaga-design-front-g1.png",
+    "art/imagegen/concept-oda-nobunaga-codex/concepts/oda-nobunaga-design-front-g2.png",
+    "art/imagegen/concept-oda-nobunaga-codex/palette.json"
+  ],
+  "previous_generation_records_preserved_except_selected": true,
+  "previous_prompts_preserved": true,
+  "source_hash_blocks_preserved": true,
+  "prompts_core_unchanged": true,
+  "all_original_and_candidate_hashes_match": true,
+  "text_files_utf8_without_bom": true,
+  "record_paths_relative_forward_slashes": true,
+  "all_six_check_runs_verified": true
+}

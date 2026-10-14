@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-13T03:29:40.717873+00:00",
+  "card_id": "ASSET-DRACULA-001",
+  "stage": "1a",
+  "status": "proposed",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dracula-codex/palette.json",
+      "sha256_before": "e0425c5c13044fbaa3ff00c01b1da999a683ec1f96b7d5861e9deec2298bd3d4",
+      "sha256_after": "e0425c5c13044fbaa3ff00c01b1da999a683ec1f96b7d5861e9deec2298bd3d4",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Agent-authored file changes; image_gen originals outside the package are explicitly allowed by the task and logged in generation-records.json. No git commands or full repository-diff scan were used.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dracula-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dracula-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dracula-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "id": "single_subject",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна подставка; дополнительных видов, текста и маркировки нет."
+    },
+    {
+      "view": "design-front",
+      "id": "strict_front_orthographic",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Лицо и корпус фронтальны. Передние кромки почти горизонтальны, но над верхним диском видна узкая полоска верхней поверхности. Строгое требование edge-on не закрыто."
+    },
+    {
+      "view": "design-front",
+      "id": "complete_subject_flat_background",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре. Фон визуально ровный тёмно-серый, без пола и падающей тени, со слабым растровым шумом. Выборочные RGB по краям близки: примерно 38–41."
+    },
+    {
+      "view": "design-front",
+      "id": "arms_apart",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Оружия и предметов нет, кисти открыты, локти согнуты, стойка не T/A. Руки отведены, но плащ заполняет просветы между руками и корпусом; явно открытые зазоры не получены."
+    },
+    {
+      "view": "design-front",
+      "id": "identity_anchors",
+      "item": "every identity anchor is visible: high-collared black cape with crimson lining; medallion on a red ribbon; slicked-back hair; pale face",
+      "passed": true,
+      "note": "Все четыре якоря видны: высокий воротник и багровая подкладка чёрного плаща, медальон на красной ленте, зачёсанные назад чёрные волосы и бледное лицо."
+    },
+    {
+      "view": "design-front",
+      "id": "palette",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный, багровый, бледный тон и золотой акцент присутствуют. Подставка тёмная каменная, без цветного кольца или металлической полосы. Золотые застёжки и цепочки — орнамент того же акцентного цвета."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "view.frame_top",
+      "value_pct": 3.246,
+      "required_min_pct": 4,
+      "allowed": true,
+      "note": "WARN alone is not a retry reason."
+    }
+  ],
+  "copy_integrity": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13349-7598-7200-8f76-6418fc8b42a1\\exec-2d0dac12-f298-4569-b96a-86981a7b9f51.png",
+      "saved_path": "art/imagegen/concept-dracula-codex/concepts/dracula-design-front-g1.png",
+      "original_sha256": "8963d6544f3a926bd7b6fd2c777c1e5b5217cbbdc4d84d9398816c290b2c46d7",
+      "saved_sha256": "8963d6544f3a926bd7b6fd2c777c1e5b5217cbbdc4d84d9398816c290b2c46d7",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13349-7598-7200-8f76-6418fc8b42a1\\exec-55de8593-395e-4257-bd70-85f31829f4bb.png",
+      "saved_path": "art/imagegen/concept-dracula-codex/concepts/dracula-design-front-g2.png",
+      "original_sha256": "6bbaf0c48db87c41dd143bbc6ccd0ace29513ad0df46e86e134187d6d4855721",
+      "saved_sha256": "6bbaf0c48db87c41dd143bbc6ccd0ace29513ad0df46e86e134187d6d4855721",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-dracula-codex/design/dracula-front.png",
+    "generation": 2,
+    "sha256": "6bbaf0c48db87c41dd143bbc6ccd0ace29513ad0df46e86e134187d6d4855721",
+    "byte_identical": true
+  },
+  "errors": [],
+  "pixel_edits": false,
+  "background_processes_started": []
+}

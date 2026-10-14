@@ -1,0 +1,272 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-13T03:25:50+00:00",
+  "set": "art/imagegen/concept-sister-wife-codex/design",
+  "key": "sister-wife",
+  "role": "hero",
+  "views": [
+    "front"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-sister-wife-codex/design/sister-wife-front.png",
+      "sha256": "0bfdb60ff430e410b6a6fefebdcd8b8c6e21dff21509c43ec441af7add4ea961",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": 4.0
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          44.0,
+          44.0,
+          44.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 0.0,
+        "luma": 44.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.7,
+          1.49,
+          1.44
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 36.999,
+        "filled_area_pct": 36.999,
+        "components_kept": 3,
+        "main_component_pct": 34.696,
+        "other_components_pct": [
+          2.247,
+          0.056,
+          0.009,
+          0.009,
+          0.008,
+          0.007,
+          0.004,
+          0.004,
+          0.004,
+          0.003
+        ],
+        "bbox_px": [
+          185,
+          32,
+          901,
+          1406
+        ],
+        "top_pct": 2.21,
+        "bottom_pct": 97.099,
+        "left_pct": 17.035,
+        "right_pct": 82.965,
+        "height_pct": 94.89,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 65.93,
+        "base_top_pct_est": 87.431
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1086,
+            1448
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1086,
+          1448
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        44.0,
+        44.0,
+        44.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 44.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 36.999,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 2.21,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 2.21,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 97.099,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 17.035,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "WARN",
+      "value": [
+        2.247,
+        0.056,
+        0.009,
+        0.009,
+        0.008,
+        0.007,
+        0.004,
+        0.004,
+        0.004,
+        0.003
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 11,
+    "WARN": 2,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": null,
+    "swatches": []
+  },
+  "sheet": null
+}

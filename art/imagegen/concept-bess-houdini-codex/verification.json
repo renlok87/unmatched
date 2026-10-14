@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-13T03:38:06.433256+00:00",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9"
+    },
+    {
+      "path": "art/imagegen/concept-bess-houdini-codex/palette.json",
+      "sha256": "3166633051ae850ddfe83e0937998637081fbfd9c4480036b4b7cddf032e4c8b",
+      "expected_sha256": "3166633051ae850ddfe83e0937998637081fbfd9c4480036b4b7cddf032e4c8b",
+      "sha256_after": "3166633051ae850ddfe83e0937998637081fbfd9c4480036b4b7cddf032e4c8b"
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Записи исполнителя на диск только внутри пакета; оригиналы image_gen вне пакета разрешены заданием и учтены исключительно полем original_path в generation-records.json. Весь репозиторий не сканировался; чужие параллельные изменения не оцениваются.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bess-houdini-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bess-houdini-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bess-houdini-codex/design/checks-report.json"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна женская фигура на одной двухъярусной подставке; надписей, логотипов, коллажа и дополнительных видов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус обращены прямо к камере; диски видны с торца, верхняя поверхность скрыта, передние края горизонтальны. Ортографичность оценена визуально; данных камеры у растрового концепта нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, перо и подставка целиком в кадре. Фон визуально ровный тёмно-серый; медиана рамки RGB 47/47/46, p99 отклонения 2.0, шесть фоновых проб 46–47. Допустимый WARN view.frame_top: верх 2.624% вместо требуемых 4%; обрезки нет, ретрай по WARN запрещён."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Оружия нет, обе руки отделены от корпуса, локти согнуты; нет T- или A-позы. Буквальная часть «no held object» не выполнена: в правой руке обязательная связка ключей. CORE одновременно требует её и запрещает любой удерживаемый предмет. Сохранён конкретный identity anchor; удаление ключей противоречило бы CORE."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: large key ring in the RIGHT hand; sequined jacket; bob haircut; stage heels;",
+      "passed": true,
+      "note": "Крупное латунное кольцо с ключами находится в собственной правой руке фигуры (слева для зрителя); видны серебряные пайетки жакета, короткое каре и обе сценические туфли на каблуках."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Присутствуют сценический чёрный, серебро, сливовая юбка и латунные ключи; естественные оттенки кожи и волос нейтральны. Подставка тёмно-серая, без командного цвета, цветного кольца и металлического пояса."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_per_view": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ]
+    }
+  ],
+  "limitations": [
+    "CORE противоречив: обязательные ключи удерживаются в руке, но одновременно запрещён любой удерживаемый предмет. Приоритет отдан конкретному identity anchor; буквальный запрет отмечен failed.",
+    "Допустимый WARN view.frame_top: g1 3.315%, g2 2.624% при требовании >=4%. Исправление по WARN не выполнялось.",
+    "Строгая ортографичность оценивается по изображению; параметры камеры image_gen не доступны."
+  ],
+  "candidate_visual_review": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Виден верх подставки. Фон при осмотре воспринимался неравномерным; его скриптовая проверка прошла. Ключи конфликтуют с буквальным запретом удерживаемого предмета."
+    },
+    {
+      "generation": 2,
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Ракурс подставки исправлен, фон подтверждён пробами. Осталось внутреннее противоречие запрета и обязательных ключей."
+    }
+  ],
+  "raw_files_modified": false,
+  "byte_identical_copies": true,
+  "preexisting_package_files_unchanged": true,
+  "status": "предложено",
+  "errors": [],
+  "processes_started_still_running": []
+}

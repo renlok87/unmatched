@@ -1,0 +1,138 @@
+{
+  "card_id": "ASSET-DR-WATSON-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "run_status": "stopped_on_check_exit_2",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/palette.json",
+      "before_sha256": "485da8b13cb0238854c681a5600a9f0544cbcca0cf7871ddbc7a25c3e818c5c4",
+      "after_sha256": "485da8b13cb0238854c681a5600a9f0544cbcca0cf7871ddbc7a25c3e818c5c4",
+      "bytes": 308,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Files written by the agent are confined to the package. The image_gen-managed original outside the package is the explicit contract exception; it remains unchanged.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 2,
+      "report": null,
+      "expected_report": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4 --out art/imagegen/concept-dr-watson-codex/checks/design-front-g1",
+      "error": "ERROR: нет файла вида art\\imagegen\\concept-dr-watson-codex\\design\\dr-watson-front.png",
+      "cause": "The preceding Python copy command failed with SyntaxError: unterminated string literal due to shell quoting. The checker was then invoked with its required input still missing."
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка; дополнительных видов и надписей нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Фигура фронтальна, но видна верхняя поверхность подставки и верх обуви. Строгий вид подставки ребром не получен."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и вся подставка в кадре; фон тёмно-серый, без пола и падающей тени. Это визуальная оценка; автоматического отчёта нет."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Револьвер справа у персонажа, слева для зрителя; правая рука отделена от корпуса. У левой руки с сумкой нет ясно читаемого просвета между рукавом и пальто. Не T- и не A-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+      "passed": true,
+      "note": "Все четыре якоря видны; стороны рук соблюдены."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневое пальто, чёрный котелок, светло-коричневый жилет и золотая цепочка присутствуют. Командного цвета и цветного/металлического кольца нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 1
+  },
+  "generation_limit_this_run": 2,
+  "generations_used_this_run": 1,
+  "limit_reached": [],
+  "final_script_exit_code": null,
+  "last_script_exit_code": 2,
+  "final_report": null,
+  "final_check_not_run_reason": "The task explicitly requires stopping on checker exit 2. Copying was repaired only to preserve the generated deliverable; no subsequent checker or image_gen calls were made.",
+  "limits_not_met": [
+    {
+      "item": "immediate_byte_copy",
+      "note": "The first copy command failed; the original was later copied byte for byte."
+    },
+    {
+      "item": "candidate_automatic_check",
+      "note": "Exit 2, missing input after failed copy command; no report was created."
+    },
+    {
+      "item": "final_selected_report",
+      "note": "Not run due to the explicit stop-on-exit-2 rule; design/checks-report.json is absent."
+    },
+    {
+      "item": "strict_front_orthographic",
+      "note": "The pedestal top surface is visible."
+    },
+    {
+      "item": "both_arms_clear_gap",
+      "note": "The left sleeve is not visibly separated from the overcoat."
+    }
+  ],
+  "processes_started_by_this_run_remaining": [],
+  "notes": [
+    "No git commands, Unreal access, Tripo, SYNTX or downloads.",
+    "npx openskills failed with ENOTCACHED; instructions were read from local files.",
+    "A subsequent metadata write invocation exceeded the Windows command-line length limit and did not start. Metadata was written using shorter commands."
+  ],
+  "selected": {
+    "design-front": {
+      "generation": 1,
+      "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84"
+    }
+  },
+  "byte_copies": [
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13365-cb17-7d02-a4e5-38b011565fb5\\exec-e186b809-d34a-449b-8e22-484c84c805b1.png",
+      "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "unchanged": true
+    },
+    {
+      "source": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+      "saved_path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "unchanged": true
+    }
+  ],
+  "existing_package_files_preserved": [
+    "art/imagegen/concept-dr-watson-codex/palette.json"
+  ]
+}

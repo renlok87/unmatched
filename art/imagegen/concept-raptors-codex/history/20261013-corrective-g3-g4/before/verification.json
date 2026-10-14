@@ -1,0 +1,241 @@
+{
+  "card_id": "ASSET-RAPTORS-001",
+  "stage": "1a",
+  "date": "2026-10-13T13:37:57.631756+05:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "before_bytes": 2034907,
+      "after_bytes": 2034907,
+      "unchanged": true,
+      "matches_expected": true
+    },
+    {
+      "path": "art/imagegen/concept-raptors-codex/palette.json",
+      "before_sha256": "b03cc8d28c147e8beb3755e29dbe0f00205b96e21875939689a8e7112af54b78",
+      "after_sha256": "b03cc8d28c147e8beb3755e29dbe0f00205b96e21875939689a8e7112af54b78",
+      "before_bytes": 297,
+      "after_bytes": 297,
+      "unchanged": true,
+      "matches_expected": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_basis": "Все явные записи файлов и выходы check_concept_views.py ограничены пакетом. Обязательные внешние оригиналы созданы самим image_gen и сохранены на месте. Аудит действий этого запуска; глобальный снимок чужих параллельных изменений не выполнялся.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raptors-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "input_sha256": "9d3fd195e8f5f6e337df1f32f1ee47521d1565348b55f2e5b831495fb2e0bb33",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "error": null
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raptors-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "input_sha256": "185de7d36b74affdad0db34cefbb17e2a45b72bbfedea6a3adacfafeafefa0ae",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "error": null
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raptors-codex/design/checks-report.json",
+      "final": true,
+      "input_sha256": "185de7d36b74affdad0db34cefbb17e2a45b72bbfedea6a3adacfafeafefa0ae",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "error": null
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка. Вторых видов, текста, логотипов и водяных знаков при осмотре нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Голова и корпус направлены фронтально, без видимого поворота в три четверти. Верхняя плоскость подставки скрыта; передние кромки горизонтальные и прямые. Ортографичность оценена визуально."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Весь видимый силуэт и подставка внутри кадра. Ровный тёмно-серый фон, без пола и заметного градиента; слабый растровый шум. Скрытый фигурой хвост оценён отдельно в пункте идентичности."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и предметов нет. Между обеими руками и корпусом видны промежутки; локти и запястья согнуты, кисти опущены. Стойка не является прямой A/T-позой."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: lean dinosaur on hind legs; mottled tan hide with dark stripes; sickle claw on each foot; long stiff tail",
+      "passed": false,
+      "note": "Двуногая фигура, пятнистая песочная кожа, тёмные полосы и оба серповидных когтя читаются. Длинный жёсткий хвост не показан достаточно ясно: его основная часть скрыта за головой и корпусом, над головой выступает только поднятый конец."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Визуально присутствуют песочная кожа, коричневые полосы, светлое брюхо и жёлтые глаза. Командного цвета, цветного кольца и металлической полосы на подставке нет. Точность HEX не проверялась колориметрически."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "every identity anchor is visible: lean dinosaur on hind legs; mottled tan hide with dark stripes; sickle claw on each foot; long stiff tail"
+      ]
+    }
+  ],
+  "core_limitations": [
+    {
+      "view": "design-front",
+      "item": "FRAMING: highest point y >= 4%",
+      "actual": 2.831,
+      "unit": "percent of image height",
+      "note": "WARN view.frame_top разрешён заданием, не является причиной ретрая."
+    },
+    {
+      "view": "design-front",
+      "item": "FRAMING: pedestal bottom y93%",
+      "actual": 94.268,
+      "unit": "percent of image height",
+      "note": "Низ подставки на 94,268 %, отклонение +1,268 п.п."
+    },
+    {
+      "view": "design-front",
+      "item": "PEDESTAL: diameter about 0.55 of figure height",
+      "actual_estimate": 0.695,
+      "expected_approximate": 0.55,
+      "note": "Приблизительная визуальная оценка: ширина подставки 844 px, видимый силуэт фигуры от кончика хвоста до стоп около 1214 px; изображение не изменялось."
+    },
+    {
+      "view": "design-front",
+      "item": "SUBJECT: jaws slightly open",
+      "note": "Пасть заметно раскрыта, шире требуемого слегка."
+    }
+  ],
+  "warnings": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "view.single_component",
+      "note": "Дополнительный компонент маски 1,755 %; при осмотре второй фигуры или второй подставки нет. WARN не причина ретрая."
+    }
+  ],
+  "candidate_observations": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Видна верхняя плоскость подставки; длинный хвост читается лучше, чем у g2."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "every identity anchor is visible: lean dinosaur on hind legs; mottled tan hide with dark stripes; sickle claw on each foot; long stiff tail"
+      ],
+      "note": "Выбран за фронтальную проекцию и подставку с ребра. Хвост недостаточно виден."
+    }
+  ],
+  "image_byte_verification": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13461-a640-7860-bf11-b1589c68eea3\\exec-9c6e0b9f-b11f-4f20-a256-90d91c576eb5.png",
+      "saved_path": "art/imagegen/concept-raptors-codex/concepts/raptors-design-front-g1.png",
+      "sha256": "9d3fd195e8f5f6e337df1f32f1ee47521d1565348b55f2e5b831495fb2e0bb33",
+      "bytes": 1792843,
+      "original_equal_saved": true,
+      "selected": false
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13461-a640-7860-bf11-b1589c68eea3\\exec-59466174-807d-44a1-9366-d685b93a127a.png",
+      "saved_path": "art/imagegen/concept-raptors-codex/concepts/raptors-design-front-g2.png",
+      "sha256": "185de7d36b74affdad0db34cefbb17e2a45b72bbfedea6a3adacfafeafefa0ae",
+      "bytes": 1669773,
+      "original_equal_saved": true,
+      "selected": true
+    }
+  ],
+  "selected_copy_unchanged": true,
+  "scope": {
+    "git_commands": 0,
+    "unreal_access": false,
+    "unreal_builds": 0,
+    "tripo_calls": 0,
+    "syntx_calls": 0,
+    "downloads": 0,
+    "image_gen_calls": 2,
+    "reference_images_per_call": 1
+  },
+  "errors": [],
+  "text_encoding": "UTF-8 without BOM; written from Python",
+  "process_cleanup": {
+    "started_long_lived_processes": [],
+    "remaining_owned_processes": []
+  },
+  "package_integrity": {
+    "generation_records_valid": true,
+    "prompts_exact": true,
+    "core_unchanged_on_retry": true,
+    "all_originals_equal_candidates": true,
+    "selected_equal_candidate": true,
+    "candidate_reports_match_input_hashes": true,
+    "final_report_equal_selected_candidate_report": true,
+    "existing_package_files_unchanged": true,
+    "text_utf8_without_bom": true,
+    "utf8_files_checked": [
+      "art/imagegen/concept-raptors-codex/checks/design-front-g1/checks-report.json",
+      "art/imagegen/concept-raptors-codex/checks/design-front-g2/checks-report.json",
+      "art/imagegen/concept-raptors-codex/design/checks-report.json",
+      "art/imagegen/concept-raptors-codex/generation-records.json",
+      "art/imagegen/concept-raptors-codex/palette.json",
+      "art/imagegen/concept-raptors-codex/prompts/concept-prompts.json",
+      "art/imagegen/concept-raptors-codex/prompts.md",
+      "art/imagegen/concept-raptors-codex/README.md",
+      "art/imagegen/concept-raptors-codex/source-hashes-before.json",
+      "art/imagegen/concept-raptors-codex/verification.json"
+    ]
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "status": "proposed",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pandora-codex/checks/design-front-g1/checks-report.json",
+      "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-pandora-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pandora-codex/checks/design-front-g2/checks-report.json",
+      "stdout": "WARN view.frame_top         front    value=2.97 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-pandora-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "final": true,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pandora-codex/design/checks-report.json",
+      "stdout": "WARN view.frame_top         front    value=2.97 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-pandora-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "card_id": "ASSET-PANDORA-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:32:04+00:00",
+  "source_unchanged": true,
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-pandora-codex/palette.json",
+      "expected_sha256": "25521c2ce7366010df6e16bb9952c73b43724e344418b874a630cd632db8cec4",
+      "before_sha256": "25521c2ce7366010df6e16bb9952c73b43724e344418b874a630cd632db8cec4",
+      "after_sha256": "25521c2ce7366010df6e16bb9952c73b43724e344418b874a630cd632db8cec4",
+      "bytes": 295,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "All explicit repository write destinations were inside the package. Required native image_gen originals outside the repository are listed in raw_output_verification. No whole-repository hash audit was attempted.",
+  "preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-pandora-codex/palette.json",
+      "unchanged": true,
+      "sha256": "25521c2ce7366010df6e16bb9952c73b43724e344418b874a630cd632db8cec4"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке; один ракурс. Надписей и водяных знаков нет; орнаменты коробки декоративные."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере. Оба диска g2 показаны с ребра, горизонтальными полосами; верхняя плоскость не видна. Это визуальная оценка рисунка."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, обе ступни и подставка целиком в кадре. Нейтральный тёмно-серый фон без пола, заметного градиента и падающей тени; небольшая пиксельная вариация тона отражена в отчёте."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Оружия нет; руки согнуты, поза не T/A, просветы между руками и корпусом видны. Однако в обеих руках находится обязательная бронзовая коробка. Буквальный запрет любого предмета в руках противоречит SUBJECT и IDENTITY ANCHORS. Полностью выполнить пункт без нарушения CORE невозможно."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: ornate bronze box held in both hands, lid half open; pale chiton with gold trim; braided dark hair",
+      "passed": true,
+      "note": "Обе кисти поддерживают орнаментированную бронзовую коробку с приоткрытой крышкой; видны кремовый хитон с золотой каймой и тёмные косы. Из коробки выходит фиолетовый дым."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют кремовый хитон, бронза, тёмные волосы и фиолетовый акцент. Командной окраски нет; подставка каменная, без цветного кольца и металлической ленты. Палитра оценена визуально, не как равенство каждого пикселя hex."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": "g2"
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ]
+    }
+  ],
+  "limits_not_met": [
+    {
+      "item": "view.frame_top",
+      "actual_pct": 2.97,
+      "requested_min_pct": 4,
+      "severity": "WARN"
+    },
+    {
+      "item": "CORE FRAMING pedestal bottom",
+      "actual_pct": 95.649,
+      "requested_pct": 93
+    },
+    {
+      "item": "CORE FRAMING pedestal center",
+      "actual_pct": 49.494,
+      "requested_pct": 50
+    },
+    {
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "reason": "Literal held-object prohibition conflicts with the required box in both hands."
+    }
+  ],
+  "raw_output_verification": [
+    {
+      "generation": "g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13458-b65e-7ab3-ba95-6ec02b9366ea\\exec-01f0ce4a-9751-4131-9d78-c8e330d05976.png",
+      "saved_path": "art/imagegen/concept-pandora-codex/concepts/pandora-design-front-g1.png",
+      "sha256": "df857b3f6969af98727a8be733c13f1c8335b64da67e9bad3dee018956f182c0",
+      "byte_identical": true
+    },
+    {
+      "generation": "g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13458-b65e-7ab3-ba95-6ec02b9366ea\\exec-be295de1-278a-45c6-a963-2bf1a729fea7.png",
+      "saved_path": "art/imagegen/concept-pandora-codex/concepts/pandora-design-front-g2.png",
+      "sha256": "1afa4cc157ed8ee01113d15d3ec8a25fe591bbf4b32eaa0680fe4dcef654132e",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "saved_path": "art/imagegen/concept-pandora-codex/design/pandora-front.png",
+    "source_path": "art/imagegen/concept-pandora-codex/concepts/pandora-design-front-g2.png",
+    "sha256": "1afa4cc157ed8ee01113d15d3ec8a25fe591bbf4b32eaa0680fe4dcef654132e",
+    "byte_identical": true
+  },
+  "prompt_verification": {
+    "core_unchanged": true,
+    "retry_correction_lines": 2,
+    "only_listed_reference_image": true,
+    "size_argument_provided": false,
+    "one_image_per_call": true,
+    "aspect_ratio": [
+      3,
+      4
+    ]
+  },
+  "candidate_visual_review": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ],
+      "note": "Pedestal top plane was visible and arm gaps unclear; required box conflicts with literal held-object prohibition."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ],
+      "note": "Pedestal edge-on and arm gaps clearer; required box still conflicts with literal held-object prohibition."
+    }
+  ],
+  "process_cleanup": {
+    "persistent_processes_started": 0,
+    "checker_processes_completed": 3
+  },
+  "encoding_verification": {
+    "encoding": "UTF-8 without BOM",
+    "text_files_checked": 10,
+    "passed": true
+  }
+}

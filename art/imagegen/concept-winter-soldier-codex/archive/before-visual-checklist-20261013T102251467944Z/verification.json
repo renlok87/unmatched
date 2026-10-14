@@ -1,0 +1,337 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-u1",
+      "exit_code": 1,
+      "report": "art/imagegen/concept-winter-soldier-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "source_path": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-u1.png",
+      "source_sha256": "256ce52be2111fc3bce9d84ca61bc492e8b55a6d0dfe9deb5c879da7c9cca58d",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-winter-soldier-codex/repair/20261013T102024448789Z/temporary-design-front-g1",
+        "--key",
+        "winter-soldier",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-winter-soldier-codex/checks/design-front-g1"
+      ],
+      "stdout": "FAIL view.border_uniform    front    value={\"share_warn_tone\": 0.2792, \"share_fail_tone\": 0.3781, \"p99_deviation\": 73.0} limit=>= 0.99 при ±20 (WARN при ±12)  # рамка 2 % кадра — ровный фон без объектов\nWARN view.frame_top         front    value=2.938 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nFAIL view.side_margin       front    value=0.0 limit=>= 1.0 %  # фигура не обрезана по бокам\nFAIL: PASS 10 WARN 1 FAIL 2 → art/imagegen/concept-winter-soldier-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": "",
+      "historical_candidate": true,
+      "failed_items": [
+        "view.border_uniform",
+        "view.side_margin"
+      ],
+      "warnings": [
+        "view.frame_top"
+      ],
+      "temporary_input_deleted_after_check": true
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-winter-soldier-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "source_path": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-g2.png",
+      "source_sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-winter-soldier-codex/repair/20261013T102024448789Z/temporary-design-front-g2",
+        "--key",
+        "winter-soldier",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-winter-soldier-codex/checks/design-front-g2"
+      ],
+      "stdout": "WARN view.frame_top         front    value=2.875 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-winter-soldier-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": "",
+      "historical_candidate": false,
+      "failed_items": [],
+      "warnings": [
+        "view.frame_top"
+      ],
+      "temporary_input_deleted_after_check": true
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+      "final": true,
+      "source_path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png",
+      "source_sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+      "command": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-winter-soldier-codex/design",
+        "--key",
+        "winter-soldier",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4"
+      ],
+      "stdout": "WARN view.frame_top         front    value=2.875 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-winter-soldier-codex/design/checks-report.json\n",
+      "stderr": "",
+      "historical_candidate": false,
+      "failed_items": [],
+      "warnings": [
+        "view.frame_top"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective or three-quarter turn; pedestal edge-on, no visible top",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    },
+    {
+      "view": "design-front",
+      "item": "whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    },
+    {
+      "view": "design-front",
+      "item": "rifle in figure's RIGHT hand (viewer LEFT); arms apart from torso, not T-pose or A-pose",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    },
+    {
+      "view": "design-front",
+      "item": "identity anchors: rifle in RIGHT hand, silver LEFT arm with red star, black tactical gear, lower-face mask",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    },
+    {
+      "view": "design-front",
+      "item": "palette main colours and accent; no team colour, coloured base ring or band",
+      "passed": null,
+      "status": "not_reassessed",
+      "note": "В этой правке изображения разрешены только для хеширования и checker. Визуальная оценка не выполнялась; null не означает PASS или FAIL. Историческая заметка Claude сохранена в design_source.checklist_note."
+    }
+  ],
+  "limit_reached": [],
+  "design_source": {
+    "service": "unstability.ai",
+    "model": "UltraReal Fine-Tune v4 (Flux.1 D)",
+    "by": "Claude (Windows-MCP in the user's Chrome)",
+    "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+    "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+    "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+  },
+  "status": "proposed",
+  "status_ru": "предложено",
+  "source_unchanged_scope": "All pre-existing package PNGs and palette unchanged; original mutable metadata archived byte-for-byte.",
+  "image_gen_calls_this_run": 0,
+  "image_generations_this_run": 0,
+  "generations_allowed": 0,
+  "generations": {
+    "design-front": 0
+  },
+  "record_count": 2,
+  "generation_history": {
+    "historical_external_generation_records": 1,
+    "metadata_registration_records_added_this_run": 1
+  },
+  "selected": {
+    "view": "design-front",
+    "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+    "candidate": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-g2.png",
+    "sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+    "original_path": "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png"
+  },
+  "final_checker_exit_code": 0,
+  "historical_checks": [
+    {
+      "view": "design-front",
+      "generation": "unstability",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+      "final": true,
+      "source": "unstability.ai"
+    }
+  ],
+  "historical_verification": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z/verification.json",
+  "checklist_completed": false,
+  "png_hash_preservation": [
+    {
+      "path": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-u1.png",
+      "before": {
+        "sha256": "256ce52be2111fc3bce9d84ca61bc492e8b55a6d0dfe9deb5c879da7c9cca58d",
+        "bytes": 6147669
+      },
+      "after": {
+        "sha256": "256ce52be2111fc3bce9d84ca61bc492e8b55a6d0dfe9deb5c879da7c9cca58d",
+        "bytes": 6147669
+      },
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front-raw.png",
+      "before": {
+        "sha256": "e3e83204ac0a83b922283299541e960c569492ea94066616174eedf06adf39e1",
+        "bytes": 1489057
+      },
+      "after": {
+        "sha256": "e3e83204ac0a83b922283299541e960c569492ea94066616174eedf06adf39e1",
+        "bytes": 1489057
+      },
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png",
+      "before": {
+        "sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+        "bytes": 859855
+      },
+      "after": {
+        "sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+        "bytes": 859855
+      },
+      "unchanged": true
+    }
+  ],
+  "all_previous_pngs_unchanged": true,
+  "registered_candidate_byte_identical_to_design": true,
+  "mutable_metadata_archive": {
+    "path": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z",
+    "files": [
+      {
+        "path": "art/imagegen/concept-winter-soldier-codex/generation-records.json",
+        "sha256": "ad13cd0b3d52f189bd9cfa62eebd78cb23b79c563db80c80cc633ec49d20adf1",
+        "bytes": 1550,
+        "kind": "mutable_metadata",
+        "archive_path": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z/generation-records.json",
+        "archived_byte_identical": true,
+        "updated_in_place": true
+      },
+      {
+        "path": "art/imagegen/concept-winter-soldier-codex/verification.json",
+        "sha256": "216faea01aad05b5e01c580a158746fa269c88b350793169104513c0bf278b7d",
+        "bytes": 849,
+        "kind": "mutable_metadata",
+        "archive_path": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z/verification.json",
+        "archived_byte_identical": true,
+        "updated_in_place": true
+      },
+      {
+        "path": "art/imagegen/concept-winter-soldier-codex/README.md",
+        "sha256": "72df564784e96af27505e43fbc5a0561aed384821bff7e3010ca841486a0d560",
+        "bytes": 1525,
+        "kind": "mutable_metadata",
+        "archive_path": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z/README.md",
+        "archived_byte_identical": true,
+        "updated_in_place": true
+      },
+      {
+        "path": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+        "sha256": "d9ca6d16c4723012d42c59458a63f945eed0217debe41b0cd11263a5e1183df3",
+        "bytes": 7384,
+        "kind": "mutable_metadata",
+        "archive_path": "art/imagegen/concept-winter-soldier-codex/archive/metadata-only-20261013T102024448789Z/design/checks-report.json",
+        "archived_byte_identical": true,
+        "updated_in_place": true
+      }
+    ]
+  },
+  "prompt_provenance": {
+    "key": "1a/design-front/g2",
+    "copied_from_record": "ASSET-WINTER-SOLDIER-001-1a-design-front-u1",
+    "exact_historical_external_prompt": true,
+    "executed_this_run": false
+  },
+  "limitations": [
+    "Визуальная приёмка и новая визуальная проверка CHECKLIST не выполнялись; все passed=null обозначают непроверенные пункты.",
+    "Исторические FAIL сохранены, повторная генерация запрещена. Технический PASS checker не является художественной приёмкой.",
+    "Фактический размер 1280×1600 (4:5); исторически сервис был указан как 3:4. В этой правке размер не изменялся.",
+    "Исторические кандидат u1 и raw имеют разные хеши; точная цепочка их преобразования не установлена. rebg.py не запускался.",
+    "Референс качества из другого пакета не открывался, не хешировался и не использовался."
+  ],
+  "blocker": null,
+  "selected_checker_summary": {
+    "PASS": 12,
+    "WARN": 1,
+    "FAIL": 0
+  },
+  "selected_checker_warnings": [
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 2.875,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    }
+  ],
+  "selected_framing_measurements": {
+    "area_pct": 28.118,
+    "filled_area_pct": 28.118,
+    "components_kept": 1,
+    "main_component_pct": 28.118,
+    "other_components_pct": [
+      0.015,
+      0.015,
+      0.009,
+      0.007,
+      0.002,
+      0.002,
+      0.002
+    ],
+    "bbox_px": [
+      315,
+      46,
+      1012,
+      1573
+    ],
+    "top_pct": 2.875,
+    "bottom_pct": 98.312,
+    "left_pct": 24.609,
+    "right_pct": 79.062,
+    "height_pct": 95.438,
+    "base_center_x_pct": 51.836,
+    "base_width_pct": 54.297,
+    "base_top_pct_est": 86.25
+  }
+}

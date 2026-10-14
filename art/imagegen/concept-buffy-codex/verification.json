@@ -1,0 +1,223 @@
+{
+  "card_id": "ASSET-BUFFY-001",
+  "stage": "1a",
+  "run_id": "2026-10-13-1a-design-front-r1",
+  "date": "2026-10-13T08:43:09+00:00",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-buffy-codex/palette.json",
+      "sha256_before": "bae32b2cdc638ad9310ed5e2be02d188cdcd0c38a0cc60d3fbc67572f4cbf7af",
+      "sha256_after": "bae32b2cdc638ad9310ed5e2be02d188cdcd0c38a0cc60d3fbc67572f4cbf7af",
+      "bytes_before": 297,
+      "bytes_after": 297,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Все собственные записи ограничены пакетом; штатная внешняя копия image_gen — разрешённый заданием результат инструмента и оставлена на месте. PYTHONDONTWRITEBYTECODE=1 исключил создание кэша Python вне пакета.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "run": "premature-input-error",
+      "exit_code": 2,
+      "launcher_exit_code": 1,
+      "exit_code_note": "Код скрипта 2 установлен по обработчику InputError в main(): отсутствующий каталог — ошибка входа. PowerShell сообщил общий код запуска 1.",
+      "report": null,
+      "expected_report": "art/imagegen/concept-buffy-codex/checks/design-front-g1/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-buffy-codex/design",
+        "--key",
+        "buffy",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-buffy-codex/checks/design-front-g1"
+      ],
+      "error_text": "ERROR: нет каталога набора art\\imagegen\\concept-buffy-codex\\design",
+      "note": "Проверка ошибочно запущена после сбоя команды копирования, до создания design. Ошибка входа остановила дальнейшие генерации; затем сохранён уже полученный g1 и завершены проверки пакета."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "run": "candidate",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-buffy-codex/checks/design-front-g1/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-buffy-codex/design",
+        "--key",
+        "buffy",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-buffy-codex/checks/design-front-g1"
+      ],
+      "stdout": "WARN view.frame_top         front    value=2.555 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-buffy-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "run": "final-selected",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-buffy-codex/design/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-buffy-codex/design",
+        "--key",
+        "buffy",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4"
+      ],
+      "stdout": "WARN view.frame_top         front    value=2.555 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-buffy-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; дополнительных видов, надписей и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Лицо и корпус обращены к камере, но видна верхняя поверхность верхнего диска; передняя кромка слегка дугообразная. Строгая горизонтальная ортопроекция не выдержана."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре, без обрезки; ровный тёмно-серый фон без пола, декора и заметного градиента."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Кол в собственной правой руке, слева для зрителя; обе руки отделены от корпуса, локти согнуты. Поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: wooden stake in the RIGHT hand; blonde hair; leather jacket",
+      "passed": true,
+      "note": "Деревянный кол, светлые волосы и чёрная кожаная куртка отчётливо видны."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрная куртка, светлые волосы, красный топ и деревянный кол присутствуют. Подставка тёмная каменная, без цветного кольца или металлического пояса; мелкая фурнитура костюма приглушённая."
+    }
+  ],
+  "generations": {
+    "design-front": 1
+  },
+  "generation_limit_this_run": 2,
+  "generations_used_this_run": 1,
+  "selected": {
+    "design-front": {
+      "generation": 1,
+      "id": "ASSET-BUFFY-001-1a-design-front-g1",
+      "saved_path": "art/imagegen/concept-buffy-codex/concepts/buffy-design-front-g1.png",
+      "design_path": "art/imagegen/concept-buffy-codex/design/buffy-front.png"
+    }
+  },
+  "limit_reached": [],
+  "stopped_after_input_error": true,
+  "stop_reason": "Преждевременная проверка отсутствующей папки design после ошибки команды копирования; дальнейшие генерации остановлены. Уже полученный результат сохранён, документация и итоговая проверка оформлены.",
+  "errors": [
+    {
+      "type": "copy-command",
+      "tool": "exec_command/python",
+      "exit_code": 1,
+      "message": "SyntaxError: invalid syntax при exec(from pathlib import Path...). PowerShell удалил внутренние кавычки; первая команда ничего не записала.",
+      "recovered": true
+    },
+    {
+      "type": "concept-check-input",
+      "check_run": "premature-input-error",
+      "message": "ERROR: нет каталога набора art\\imagegen\\concept-buffy-codex\\design",
+      "new_generations_after_error": 0
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view",
+      "note": "Видна верхняя поверхность подставки; пункт CHECKLIST не пройден."
+    },
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "measured_top_pct": 2.555,
+      "requested_min_top_pct": 4,
+      "note": "WARN разрешён; не повод для перегенерации."
+    },
+    {
+      "view": "design-front",
+      "item": "framing.base_bottom",
+      "measured_pct": 96.754,
+      "requested_pct": 93,
+      "note": "Низ подставки ниже заданной линии; изображение не нормализовалось."
+    }
+  ],
+  "failed_checklist_items": {
+    "design-front": [
+      "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+    ]
+  },
+  "copy_integrity": [
+    {
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13465-6c8c-7241-9966-9761177e0345/exec-fd9d245e-b804-4a51-bf84-97f01f9eb8b1.png",
+      "saved_path": "art/imagegen/concept-buffy-codex/concepts/buffy-design-front-g1.png",
+      "design_path": "art/imagegen/concept-buffy-codex/design/buffy-front.png",
+      "sha256": "06041e7bc10895173f035992ce1e3aee7ef80057a08fdfa8d5c4f8dc8e14f8c8",
+      "bytes": 1629986,
+      "original_equals_saved": true,
+      "saved_equals_selected": true,
+      "image_modified": false
+    }
+  ],
+  "preserved_existing_files": [
+    {
+      "path": "art/imagegen/concept-buffy-codex/palette.json",
+      "sha256": "bae32b2cdc638ad9310ed5e2be02d188cdcd0c38a0cc60d3fbc67572f4cbf7af",
+      "bytes": 297
+    }
+  ],
+  "text_encoding": "UTF-8 without BOM",
+  "status": "предложено"
+}

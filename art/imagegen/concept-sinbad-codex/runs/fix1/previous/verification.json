@@ -1,0 +1,188 @@
+{
+  "card_id": "ASSET-SINBAD-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "f8304ca086c88345dbdf0f1f69050c532144e9c529c768ce6face979b63eb68e"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sinbad-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной подставке из двух дисков; коллажа, второго вида, текста, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура смотрит прямо на зрителя; подставка показана ребром, верхняя плоскость скрыта, передние края горизонтальны. Проверено визуально на исходном PNG g2."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, клинок и оба диска целиком в кадре. Фон визуально ровный тёмно-серый без пола и падающей тени; view.border_uniform PASS, p99 отклонения рамки 2 уровня RGB."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Скимитар в правой руке фигуры, слева для зрителя; руки отделены от корпуса просветами, локти слегка согнуты, стойка нейтральная."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: scimitar in the figure's own RIGHT hand; white turban; wide blue sash belt; scabbard on the LEFT hip",
+      "passed": true,
+      "note": "Все четыре якоря видны: скимитар справа у фигуры, белый тюрбан, широкий синий кушак, ножны на левом бедре (справа для зрителя). Дополнительный эфес над ножнами отмечен отдельно как нарушение CORE."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют белый парусный, морской синий, песочный загар и золотая отделка; палитра оценена визуально с учётом окраски и освещения. На тёмной каменной подставке нет командного цвета, цветного кольца и металлического обода."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "passed": false,
+      "note": "Верх маски y=3,522% вместо y>=4%; допустимый WARN по заданию, отдельным поводом для повторной генерации не являлся."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.base_bottom",
+      "passed": false,
+      "note": "Низ подставки y=94,751%, а CORE задаёт y=93%. Изображение не обрезано; ретушь или перемещение запрещены."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.PEDESTAL.diameter",
+      "passed": false,
+      "note": "По визуальной оценке диаметр подставки около 0,63 высоты самой фигуры, несколько больше заданного «about 0.55». Изображение сохранено без изменения."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FORBIDDEN.extra_weapons",
+      "passed": false,
+      "note": "Над ножнами на левом бедре видна отдельная рукоять с гардой: выглядит как второе вложенное оружие при скимитаре в правой руке. Запрет extra weapons не соблюдён; ни один из шести пунктов CHECKLIST отдельно этот запрет не проверяет. Обе генерации имеют эту деталь; лимит 2/2 исчерпан."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верх подставки виден; остальные пункты CHECKLIST визуально соблюдены. Отступ сверху 2,693% — допустимый WARN."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Подставка ребром; все пункты CHECKLIST визуально соблюдены. Отклонения CORE перечислены в limitations."
+    }
+  ],
+  "scope": {
+    "agent_writes": "art/imagegen/concept-sinbad-codex/",
+    "allowed_tool_originals": "Абсолютные original_path в generation-records.json — оригиналы image_gen, сохранённые самим инструментом согласно заданию; не удалены.",
+    "git_commands": 0,
+    "unreal_access": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "downloads": 0,
+    "background_processes_started": 0
+  },
+  "raw_images_modified": false,
+  "errors": [],
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sinbad-codex/palette.json",
+      "sha256_before": "e318b742bd525d527f44590645319697701a2aa2c1ceca06ab251ec0e7ad9200",
+      "sha256_after": "e318b742bd525d527f44590645319697701a2aa2c1ceca06ab251ec0e7ad9200",
+      "unchanged": true
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-eb95-7933-8da5-e0ee7076f8f2\\exec-699cf763-2ec6-44de-8eee-141908843f74.png",
+      "sha256": "f8304ca086c88345dbdf0f1f69050c532144e9c529c768ce6face979b63eb68e",
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-sinbad-codex/concepts/sinbad-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-eb95-7933-8da5-e0ee7076f8f2\\exec-2f03bb11-9925-4172-9a26-2154932a7d04.png",
+      "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365",
+      "byte_identical": true,
+      "original_preserved": true
+    }
+  ],
+  "selected_copy": {
+    "saved_path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+    "generation": 2,
+    "sha256": "939d2656728390c9c305decf1ce5226abb49818c25f88f375b84b150caa81365",
+    "byte_identical": true
+  }
+}

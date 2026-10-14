@@ -1,0 +1,166 @@
+{
+  "card_id": "ASSET-THE-PORTER-001",
+  "stage": "1a",
+  "status": "предложено",
+  "outside_folder": [],
+  "outside_folder_scope": "Изменения файлов репозитория, выполненные этой задачей. Разрешённые копии самого image_gen вне репозитория перечислены в generation-records.json и оставлены на месте; остальные команды записи ограничены пакетом.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-porter-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-porter-codex/checks/design-front-g2/checks-report.json",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-the-porter-codex/design/checks-report.json",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Один мужчина на одной двухдисковой подставке; коллажа, другого ракурса, надписей и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена фронтально; верхняя плоскость подставки не видна, края двух дисков прямые и горизонтальные. Ортографический вид подтверждён визуально; параметры камеры из растрового изображения не восстанавливались."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Голова, корзина, дубинка, обе стопы и подставка целиком в кадре. Ровный тёмно-серый фон без заметного градиента, пола или тени; медианы 11 фоновых участков различаются на 1–2 уровня RGB, что соответствует слабой растровой фактуре."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Дубинка в собственной правой руке, слева для зрителя. Обе руки согнуты и отделены от корпуса видимыми просветами; стойка нейтральная, обе стопы на подставке."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: short wooden club in the figure's own RIGHT hand; wicker basket on the back; headcloth",
+      "passed": true,
+      "note": "Короткая деревянная дубинка и хват читаются; большая плетёная корзина за спиной выступает над плечами и по бокам, видны лямки; красный головной платок виден полностью."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневая туника с заплатами, плетение цвета охры, пыльно-кремовая ткань и красный платок присутствуют. Подставка тёмно-каменная, без цветного кольца и металлической ленты. HEX задают палитру, а свет и ручная покраска создают оттенки."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "generations_used_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "candidate_visual_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Видна эллиптическая верхняя плоскость подставки; слабый градиент фона. Скрипт PASS."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Подставка ребром; фон визуально ровный. Разница медиан 11 фоновых участков — 1–2 уровня RGB."
+    }
+  ],
+  "limitations": [
+    {
+      "item": "PEDESTAL diameter about 0.55 of the figure height",
+      "met_exactly": false,
+      "note": "Визуальная оценка g2: диаметр около 0,67 высоты фигуры. Ориентировочная пропорция CORE не достигнута; отдельного пункта CHECKLIST для неё нет."
+    },
+    {
+      "item": "orthographic camera parameters",
+      "note": "Фронтальность и отсутствие видимой верхней поверхности подставки подтверждены глазами; точные параметры камеры из PNG не доступны."
+    },
+    {
+      "item": "between-view consistency",
+      "note": "Только один вид этапа 1a; боковой и задний виды не создавались."
+    }
+  ],
+  "tool_errors": [],
+  "execution_notes": [
+    "npx openskills read 3d-model-pipeline недоступен в npm-кэше (ENOTCACHED); локальные инструкции прочитаны напрямую как UTF-8. Загрузок не было.",
+    "Предварительная команда чтения Python и первая попытка записи verification.json завершились ошибками синтаксиса/сериализации; исправлены. Входные файлы не затронуты."
+  ],
+  "image_processing": "Только побайтное копирование shutil.copyfile; инспекция PIL и view_image без сохранения преобразований.",
+  "final_exit_code": 0,
+  "preserved_existing_files": [
+    "art/imagegen/concept-the-porter-codex/palette.json"
+  ],
+  "date": "2026-10-13T03:06:39.465344+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-the-porter-codex/palette.json",
+      "before_sha256": "ea2df4e9412ddcfeeb9c75121f387439dc5beeacba79046110c0ed9b46187091",
+      "after_sha256": "ea2df4e9412ddcfeeb9c75121f387439dc5beeacba79046110c0ed9b46187091",
+      "unchanged": true
+    }
+  ],
+  "source_unchanged": true,
+  "byte_identity": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-a8e5-7f01-8c3b-de994cec106e\\exec-df872fb1-2b61-4896-9e9c-a06adbfd99cc.png",
+      "saved_path": "art/imagegen/concept-the-porter-codex/concepts/the-porter-design-front-g1.png",
+      "sha256": "06695528e53cfe8bca0d2121c6ac5c9ac9f4a4061aa41fe3d4728e74e9eb3bac",
+      "matches_original": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13335-a8e5-7f01-8c3b-de994cec106e\\exec-92fcaf1f-41a1-4999-8626-da9dea570938.png",
+      "saved_path": "art/imagegen/concept-the-porter-codex/concepts/the-porter-design-front-g2.png",
+      "sha256": "b3c26cedf761730b1600ad9fbebab3315776a8a6f969b55ac15326e8d7a37f97",
+      "matches_original": true
+    }
+  ]
+}

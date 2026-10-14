@@ -1,0 +1,228 @@
+{
+  "card_id": "ASSET-HAMLET-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "selected_generation": "design-front-g2",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "design-front-g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-hamlet-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": "design-front-g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-hamlet-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": "design-front-g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-hamlet-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна двухъярусная подставка; запрещённых элементов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "g2 фронтально, края подставки горизонтальны, её верх не виден; g1 этот пункт не прошёл."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Всё целиком в кадре. Свободный фон RGB около (39,39,40), колебания 1–2 уровня; градиент не подтверждён."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Рапира в правой руке, слева для зрителя; руки с зазорами от корпуса, локти согнуты, T/A-позы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: rapier in the figure's own RIGHT hand; skull in the LEFT hand; white ruff collar; black doublet",
+      "passed": true,
+      "note": "Все четыре якоря видны; череп в левой руке."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный костюм, белый воротник, серебристая рапира и фурнитура, синяя подкладка; подставка тёмно-серая без цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "limit_reached": [],
+  "final_script_exit_code": 0,
+  "tool_errors": [
+    {
+      "tool": "image_gen",
+      "generation_created": false,
+      "error": "AbsolutePathBuf deserialized without a base path at line 1 column 97",
+      "resolution": "Use the absolute path of the same listed image input; records retain repository-relative paths."
+    }
+  ],
+  "warnings": [
+    {
+      "item": "view.frame_top",
+      "value": 3.384,
+      "note": "Разрешённый WARN: меньше 4%."
+    },
+    {
+      "item": "view.single_component",
+      "value": [
+        6.602,
+        0.458
+      ],
+      "note": "Разрешённый WARN: маска тёмной фигуры разделяется; визуально одна фигура."
+    }
+  ],
+  "limitations": [
+    {
+      "item": "CORE short black cape",
+      "note": "Плащ длиннее короткого: до колен/голени; вне шести CHECKLIST-пунктов."
+    },
+    {
+      "item": "CORE pedestal diameter about 0.55 of figure height",
+      "note": "Визуально около 0.67 вместо 0.55; приблизительная оценка по изображению, не 3D-измерение."
+    },
+    {
+      "item": "CORE framing",
+      "note": "Верх маски y3.384% вместо y>=4% (WARN), низ y92.887%, центр подставки x50%."
+    }
+  ],
+  "candidate_review": [
+    {
+      "generation": "design-front-g1",
+      "failed_items": [
+        "CHECKLIST strict front orthographic view"
+      ],
+      "note": "Верх подставки виден, край дугообразный. Первоначально также подозревался градиент; подозрение включено в CORRECTION."
+    },
+    {
+      "generation": "design-front-g2",
+      "failed_items": [],
+      "note": "Исправлен ракурс подставки; выбрана лучшая попытка. Подозрение на градиент проверено пикселями и снято."
+    }
+  ],
+  "background_samples": [
+    {
+      "xy": [
+        10,
+        10
+      ],
+      "rgb": [
+        39,
+        39,
+        40
+      ]
+    },
+    {
+      "xy": [
+        100,
+        300
+      ],
+      "rgb": [
+        38,
+        38,
+        39
+      ]
+    },
+    {
+      "xy": [
+        750,
+        130
+      ],
+      "rgb": [
+        39,
+        39,
+        40
+      ]
+    },
+    {
+      "xy": [
+        970,
+        500
+      ],
+      "rgb": [
+        39,
+        40,
+        40
+      ]
+    },
+    {
+      "xy": [
+        980,
+        1000
+      ],
+      "rgb": [
+        40,
+        40,
+        40
+      ]
+    },
+    {
+      "xy": [
+        543,
+        1390
+      ],
+      "rgb": [
+        40,
+        40,
+        41
+      ]
+    }
+  ],
+  "outside_folder_note": "Записи исполнителя ограничены пакетом. Сам image_gen создал две исходные копии в C:/Users/ren/.codex/generated_images/; они оставлены на месте как разрешённое контрактом исключение.",
+  "image_processing": "Только побайтовое копирование, без ретуши, ресайза, кадрирования, перекраски или перекодирования.",
+  "generations_created": 2,
+  "image_gen_invocations": 3,
+  "invocation_note": "Первый вызов отклонён до генерации из-за относительного пути; два следующих создали по одному изображению. CORE неизменен; g2 добавляет CORRECTION.",
+  "execution_notes": [
+    "openskills отсутствует в npm-кэше; навык прочитан напрямую локально.",
+    "Один слишком длинный вызов записи отчётов отклонён Windows до запуска; запись разбита на меньшие вызовы Python."
+  ],
+  "source_hashes_before": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-hamlet-codex/palette.json",
+      "sha256": "c63ea47ab6c280a3cd2be8aaa634456499cab2edd74b1151051e68205e80a9b4",
+      "bytes": 304
+    }
+  ],
+  "source_hashes_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-hamlet-codex/palette.json",
+      "sha256": "c63ea47ab6c280a3cd2be8aaa634456499cab2edd74b1151051e68205e80a9b4",
+      "bytes": 304
+    }
+  ]
+}

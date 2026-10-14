@@ -1,0 +1,297 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-13T10:01:31+00:00",
+  "set": "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g1",
+  "key": "she-hulk",
+  "role": "hero",
+  "views": [
+    "front"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-she-hulk-codex/checks/.temporary-set-metadata-repair-20261013T100044593241Z/g1/she-hulk-front.png",
+      "sha256": "f17bc088bd8b066a62b4522e63362b232452ce281c853b0a99edbf8172b9fb34",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1280,
+        1600
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": 4.0
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1280,
+        1600
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 26,
+        "median_rgb": [
+          70.0,
+          69.0,
+          72.0
+        ],
+        "share_within_tone_warn": 0.471,
+        "share_within_tone_fail": 0.6244,
+        "p99_deviation": 69.0,
+        "neutral_delta": 3.0,
+        "luma": 69.4
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          5.03,
+          5.18,
+          5.32
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 29.334,
+        "filled_area_pct": 29.334,
+        "components_kept": 3,
+        "main_component_pct": 28.271,
+        "other_components_pct": [
+          0.54,
+          0.522,
+          0.006,
+          0.004,
+          0.003,
+          0.003,
+          0.003,
+          0.002,
+          0.002,
+          0.002
+        ],
+        "bbox_px": [
+          0,
+          36,
+          1280,
+          1600
+        ],
+        "top_pct": 2.25,
+        "bottom_pct": 100.0,
+        "left_pct": 0.0,
+        "right_pct": 100.0,
+        "height_pct": 97.75,
+        "base_center_x_pct": 35.586,
+        "base_width_pct": 59.219,
+        "base_top_pct_est": 83.688
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1280,
+            1600
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1280,
+          1600
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "FAIL",
+      "value": {
+        "share_warn_tone": 0.471,
+        "share_fail_tone": 0.6244,
+        "p99_deviation": 69.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        70.0,
+        69.0,
+        72.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 69.4,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 29.334,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 2.25,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 2.25,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "FAIL",
+      "value": 100.0,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "FAIL",
+      "value": 0.0,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "WARN",
+      "value": [
+        0.54,
+        0.522,
+        0.006,
+        0.004,
+        0.003,
+        0.003,
+        0.003,
+        0.002,
+        0.002,
+        0.002
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 8,
+    "WARN": 2,
+    "FAIL": 3
+  },
+  "verdict": "FAIL",
+  "palette": {
+    "path": "art/imagegen/concept-she-hulk-codex/palette.json",
+    "swatches": [
+      {
+        "name": "skin green",
+        "hex": "#4E9A44",
+        "role": "main",
+        "figure_share_within_40_pct": 10.29
+      },
+      {
+        "name": "suit purple",
+        "hex": "#5B2A7E",
+        "role": "main",
+        "figure_share_within_40_pct": 2.14
+      },
+      {
+        "name": "suit white",
+        "hex": "#E6E4E0",
+        "role": "main",
+        "figure_share_within_40_pct": 4.09
+      },
+      {
+        "name": "hair dark green",
+        "hex": "#1F4A2A",
+        "role": "accent",
+        "figure_share_within_40_pct": 15.44
+      }
+    ]
+  },
+  "sheet": null
+}

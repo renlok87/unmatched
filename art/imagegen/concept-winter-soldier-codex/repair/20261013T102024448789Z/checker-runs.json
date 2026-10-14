@@ -1,0 +1,107 @@
+[
+  {
+    "view": "design-front",
+    "generation": "g1",
+    "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-u1",
+    "exit_code": 1,
+    "report": "art/imagegen/concept-winter-soldier-codex/checks/design-front-g1/checks-report.json",
+    "final": false,
+    "source_path": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-u1.png",
+    "source_sha256": "256ce52be2111fc3bce9d84ca61bc492e8b55a6d0dfe9deb5c879da7c9cca58d",
+    "command": [
+      "C:\\Python313\\python.exe",
+      "-B",
+      "tools/art/concept/check_concept_views.py",
+      "--set",
+      "art/imagegen/concept-winter-soldier-codex/repair/20261013T102024448789Z/temporary-design-front-g1",
+      "--key",
+      "winter-soldier",
+      "--views",
+      "front",
+      "--role",
+      "hero",
+      "--min-top-pct",
+      "4",
+      "--out",
+      "art/imagegen/concept-winter-soldier-codex/checks/design-front-g1"
+    ],
+    "stdout": "FAIL view.border_uniform    front    value={\"share_warn_tone\": 0.2792, \"share_fail_tone\": 0.3781, \"p99_deviation\": 73.0} limit=>= 0.99 при ±20 (WARN при ±12)  # рамка 2 % кадра — ровный фон без объектов\nWARN view.frame_top         front    value=2.938 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nFAIL view.side_margin       front    value=0.0 limit=>= 1.0 %  # фигура не обрезана по бокам\nFAIL: PASS 10 WARN 1 FAIL 2 → art/imagegen/concept-winter-soldier-codex/checks/design-front-g1/checks-report.json\n",
+    "stderr": "",
+    "historical_candidate": true,
+    "failed_items": [
+      "view.border_uniform",
+      "view.side_margin"
+    ],
+    "warnings": [
+      "view.frame_top"
+    ],
+    "temporary_input_deleted_after_check": true
+  },
+  {
+    "view": "design-front",
+    "generation": "g2",
+    "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+    "exit_code": 0,
+    "report": "art/imagegen/concept-winter-soldier-codex/checks/design-front-g2/checks-report.json",
+    "final": false,
+    "source_path": "art/imagegen/concept-winter-soldier-codex/concepts/winter-soldier-design-front-g2.png",
+    "source_sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+    "command": [
+      "C:\\Python313\\python.exe",
+      "-B",
+      "tools/art/concept/check_concept_views.py",
+      "--set",
+      "art/imagegen/concept-winter-soldier-codex/repair/20261013T102024448789Z/temporary-design-front-g2",
+      "--key",
+      "winter-soldier",
+      "--views",
+      "front",
+      "--role",
+      "hero",
+      "--min-top-pct",
+      "4",
+      "--out",
+      "art/imagegen/concept-winter-soldier-codex/checks/design-front-g2"
+    ],
+    "stdout": "WARN view.frame_top         front    value=2.875 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-winter-soldier-codex/checks/design-front-g2/checks-report.json\n",
+    "stderr": "",
+    "historical_candidate": false,
+    "failed_items": [],
+    "warnings": [
+      "view.frame_top"
+    ],
+    "temporary_input_deleted_after_check": true
+  },
+  {
+    "view": "design-front",
+    "generation": "g2",
+    "record_id": "ASSET-WINTER-SOLDIER-001-1a-design-front-g2",
+    "exit_code": 0,
+    "report": "art/imagegen/concept-winter-soldier-codex/design/checks-report.json",
+    "final": true,
+    "source_path": "art/imagegen/concept-winter-soldier-codex/design/winter-soldier-front.png",
+    "source_sha256": "742d0d500316a0a2bea57583d55590d3a8a232b57973269084d379da4c65444a",
+    "command": [
+      "C:\\Python313\\python.exe",
+      "-B",
+      "tools/art/concept/check_concept_views.py",
+      "--set",
+      "art/imagegen/concept-winter-soldier-codex/design",
+      "--key",
+      "winter-soldier",
+      "--views",
+      "front",
+      "--role",
+      "hero",
+      "--min-top-pct",
+      "4"
+    ],
+    "stdout": "WARN view.frame_top         front    value=2.875 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-winter-soldier-codex/design/checks-report.json\n",
+    "stderr": "",
+    "historical_candidate": false,
+    "failed_items": [],
+    "warnings": [
+      "view.frame_top"
+    ]
+  }
+]

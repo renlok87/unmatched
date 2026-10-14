@@ -1,0 +1,189 @@
+{
+  "card_id": "ASSET-BLOB-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13T08:16:41+00:00",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-blob-codex/palette.json",
+      "sha256_before": "ea0355e22cfb2310fe669c43a6ef10f7e0470344b0ca2231cbcd537604771a08",
+      "sha256_after": "ea0355e22cfb2310fe669c43a6ef10f7e0470344b0ca2231cbcd537604771a08",
+      "bytes_before": 300,
+      "bytes_after": 300,
+      "unchanged": true
+    }
+  ],
+  "preserved_preexisting_files": [
+    {
+      "path": "art/imagegen/concept-blob-codex/palette.json",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "scope_evidence": {
+    "agent_repository_writes": "art/imagegen/concept-blob-codex/",
+    "git_commands_run": 0,
+    "unreal_open_edit_build": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "downloads": false,
+    "python_bytecode_disabled": true,
+    "image_gen_originals_preserved": true,
+    "outside_folder_scope": "Repository writes by this task; authorized image_gen originals are logged under original_path in generation-records.json."
+  },
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-blob-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "report_input_matches_generation": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-blob-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "report_input_matches_generation": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-blob-codex/design/checks-report.json",
+      "phase": "final",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "report_input_matches_generation": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-1",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна масса желе на одной подставке, один вид. Текста, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-2",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фронтальный вид без разворота. Кромки дисков прямые и горизонтальные; верхняя плоскость подставки не видна."
+    },
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-3",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Всё целиком в кадре. Ровный тёмно-серый фон с мелким шумом, без видимого градиента, пола и падающей тени. Верх y8,011%, низ y92,956%, центр подставки x50%."
+    },
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-4",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Оружия и удерживаемых предметов нет. Боковые отростки отделены от корпуса просветами, согнуты и свисают концами; прямых рук в T- или A-позе нет."
+    },
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-5",
+      "item": "every identity anchor is visible: amorphous glossy jelly mound; translucent pink-red; objects visible inside;",
+      "passed": true,
+      "note": "Видны аморфный бугристый холм, глянцевое полупрозрачное розово-красное желе и внутренние предметы: автомобиль, колесо, костные и деревянные остатки."
+    },
+    {
+      "view": "design-front",
+      "id": "CHECKLIST-6",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Красное желе, розовые участки, тёмно-красная глубина и светлые блики присутствуют. Внутренние предметы приглушены красной средой. Подставка без командного цвета, цветного кольца и металлической полосы."
+    }
+  ],
+  "candidate_visual_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_checklist_items": [
+        "CHECKLIST-2"
+      ],
+      "note": "Видна узкая верхняя поверхность подставки. Ровность фона подтверждена пиксельной сверкой; коррекция фона не вызывалась."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_checklist_items": []
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "generations_used_this_run": 2,
+  "selected_generation_per_view": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [],
+  "unmet_requirements": [
+    {
+      "view": "design-front",
+      "item": "CORE PEDESTAL: diameter about 0.55 of the figure height",
+      "passed": false,
+      "target": 0.55,
+      "observed_approx": 0.814,
+      "method": "909 px approximate base diameter / 1117 px figure height; base rows 1305:1325 (mean RGB >60), manually observed figure top y116 and base top y1233."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE POSE: both feet planted on the pedestal",
+      "passed": false,
+      "note": "Нижняя масса желе опирается слитными лопастями; две отдельные стопы не выделены."
+    }
+  ],
+  "byte_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-blob-codex/concepts/blob-design-front-g1.png",
+      "sha256": "b8a85c69fcc4b880707701755068ccc1b068a63ca79c0e010f4fccf632a1159b",
+      "original_matches_candidate": true,
+      "selected_design_matches_candidate": null,
+      "image_modified": false
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-blob-codex/concepts/blob-design-front-g2.png",
+      "sha256": "4390e0f2d7ec71e9b9e721cbc027e4e24d1d80776f41d60c658dbee5dff983b6",
+      "original_matches_candidate": true,
+      "selected_design_matches_candidate": true,
+      "image_modified": false
+    }
+  ],
+  "errors": [],
+  "processes_started_requiring_cleanup": []
+}

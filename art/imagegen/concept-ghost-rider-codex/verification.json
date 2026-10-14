@@ -1,0 +1,288 @@
+{
+ "source_unchanged": true,
+ "outside_folder": [],
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-ghost-rider-codex/metadata-archive/2026-10-13-metadata-only-r1/design/checks-report.json",
+   "source": "unstability.ai",
+   "original_report": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+   "historical_run": true,
+   "historical_final": true
+  },
+  {
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-u1",
+   "attempt": 1,
+   "exit_code": 1,
+   "report": "art/imagegen/concept-ghost-rider-codex/checks/design-front-g1/checks-report.json",
+   "source_candidate": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-u1.png",
+   "source_sha256": "80eaa1a21b83bdc61ce54642843e86d94161809f7b5955b19f2586ff8c35fcde",
+   "temporary_input": "art/imagegen/concept-ghost-rider-codex/_check-inputs/design-front-g1/ghost-rider-front.png",
+   "temporary_input_removed": true,
+   "historical": true,
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-ghost-rider-codex/_check-inputs/design-front-g1",
+    "--key",
+    "ghost-rider",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-ghost-rider-codex/palette.json",
+    "--out",
+    "art/imagegen/concept-ghost-rider-codex/checks/design-front-g1"
+   ],
+   "stdout": "FAIL view.border_uniform    front    value={\"share_warn_tone\": 0.35, \"share_fail_tone\": 0.4138, \"p99_deviation\": 93.0} limit=>= 0.99 при ±20 (WARN при ±12)  # рамка 2 % кадра — ровный фон без объектов\nFAIL view.top_margin        front    value=0.312 limit=>= 1.0 %  # верх фигуры не касается края\nWARN view.frame_top         front    value=0.312 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nFAIL view.bottom_margin     front    value=100.0 limit=<= 99.0 %  # низ подставки в кадре\nFAIL view.side_margin       front    value=0.0 limit=>= 1.0 %  # фигура не обрезана по бокам\nWARN view.single_component  front    value=[4.776, 0.002, 0.002, 0.001] limit=прочие < 0.5 %  # одна крупная связная фигура\nFAIL: PASS 7 WARN 2 FAIL 4 → art/imagegen/concept-ghost-rider-codex/checks/design-front-g1/checks-report.json\n",
+   "stderr": ""
+  },
+  {
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "attempt": 2,
+   "exit_code": 0,
+   "report": "art/imagegen/concept-ghost-rider-codex/checks/design-front-g2/checks-report.json",
+   "source_candidate": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-g2.png",
+   "source_sha256": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba",
+   "temporary_input": "art/imagegen/concept-ghost-rider-codex/_check-inputs/design-front-g2/ghost-rider-front.png",
+   "temporary_input_removed": true,
+   "historical": false,
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-ghost-rider-codex/_check-inputs/design-front-g2",
+    "--key",
+    "ghost-rider",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-ghost-rider-codex/palette.json",
+    "--out",
+    "art/imagegen/concept-ghost-rider-codex/checks/design-front-g2"
+   ],
+   "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-ghost-rider-codex/checks/design-front-g2/checks-report.json\n",
+   "stderr": ""
+  },
+  {
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "attempt": 2,
+   "exit_code": 0,
+   "report": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+   "source_candidate": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-g2.png",
+   "source_sha256": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba",
+   "historical": false,
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-ghost-rider-codex/design",
+    "--key",
+    "ghost-rider",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--palette",
+    "art/imagegen/concept-ghost-rider-codex/palette.json"
+   ],
+   "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-ghost-rider-codex/design/checks-report.json\n",
+   "stderr": ""
+  },
+  {
+   "view": "design-front",
+   "generation": "rc1",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [
+  {
+   "id": "subject",
+   "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+   "passed": true,
+   "note": "Read-only visual check of the current authoritative PNG: one figure and one pedestal; no collage, lettering, logo or watermark visible.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  },
+  {
+   "id": "orthographic",
+   "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+   "passed": false,
+   "note": "The figure faces front, but the broad oval top of the pedestal is visible. Strict edge-on pedestal and zero camera elevation are not met; the numeric checker does not test projection.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  },
+  {
+   "id": "full-frame-background",
+   "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+   "passed": false,
+   "note": "The complete figure and pedestal are in frame. A nonuniform gray residual patch/shadow is visible immediately behind the pedestal to the right; the flat background criterion is not fully met, although border metrics pass.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  },
+  {
+   "id": "pose-no-held-object",
+   "item": "No weapon or held object. Both arms clearly apart from the torso, not a T-pose, not an A-pose",
+   "passed": true,
+   "note": "No separate weapon or held object visible. The required chain wraps the right forearm and has hanging slack; both arms have visible torso gaps in a low neutral pose.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  },
+  {
+   "id": "identity-anchors",
+   "item": "every identity anchor is visible: flaming skull head; black leather jacket with spikes; chain wrapped around the right arm",
+   "passed": true,
+   "note": "Read-only visual check: flaming skull, black spiked biker jacket and chain around the figure's right forearm are visible.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  },
+  {
+   "id": "palette",
+   "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+   "passed": true,
+   "note": "Black leather, bone skull, steel chain and orange flame are visible; palette swatch measurements are retained in the final checker report. No team-colored base ring or metal band visible.",
+   "view": "design-front",
+   "generation": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+   "basis": "read-only visual/checker review in metadata-only corrective run; not art acceptance"
+  }
+ ],
+ "limit_reached": [
+  {
+   "view": "design-front",
+   "failed_items": [
+    "orthographic",
+    "full-frame-background"
+   ],
+   "generations_allowed": 0,
+   "generations_used": 0,
+   "note": "Generations are prohibited in this corrective run; selected design remains byte-identical and failed visual criteria are disclosed for the acceptor."
+  }
+ ],
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup",
+  "selected_record": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+  "registered_candidate": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-g2.png",
+  "authoritative_path": "art/imagegen/concept-ghost-rider-codex/design/ghost-rider-front.png",
+  "authoritative_sha256": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba",
+  "postprocess_historical": true,
+  "postprocess_executed_in_run": false,
+  "repair": "Metadata-only byte-for-byte registration; no generation, retouching, resizing or re-encoding.",
+  "historical_candidate_distinct": true
+ },
+ "status": "proposed",
+ "source_unchanged_scope": "All pre-existing PNGs and palette; mutable metadata is intentionally repaired and its original bytes are archived.",
+ "generations": {
+  "design-front": 0
+ },
+ "generations_allowed": 0,
+ "image_gen_calls_in_run": 0,
+ "image_generations_in_run": 0,
+ "registration_count_in_run": 1,
+ "record_count": 2,
+ "selected_record": "ASSET-GHOST-RIDER-001-1a-design-front-g2",
+ "selected_candidate": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-g2.png",
+ "source_hashes_before": "art/imagegen/concept-ghost-rider-codex/source-hashes-before.json",
+ "source_preservation": [
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/palette.json",
+   "sha256_before": "f1597fce7dfe1c173bb78a7894dbec3d6dc781e8dd7e0ac1eeb4c8639662db57",
+   "sha256_after": "f1597fce7dfe1c173bb78a7894dbec3d6dc781e8dd7e0ac1eeb4c8639662db57",
+   "bytes_before": 303,
+   "bytes_after": 303,
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/concepts/ghost-rider-design-front-u1.png",
+   "sha256_before": "80eaa1a21b83bdc61ce54642843e86d94161809f7b5955b19f2586ff8c35fcde",
+   "sha256_after": "80eaa1a21b83bdc61ce54642843e86d94161809f7b5955b19f2586ff8c35fcde",
+   "bytes_before": 6147669,
+   "bytes_after": 6147669,
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/design/ghost-rider-front-raw.png",
+   "sha256_before": "00ce0fca0b82efc9ccf797db493dccccf258aed9b371799857ae1df612dcc6da",
+   "sha256_after": "00ce0fca0b82efc9ccf797db493dccccf258aed9b371799857ae1df612dcc6da",
+   "bytes_before": 1422441,
+   "bytes_after": 1422441,
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/design/ghost-rider-front.png",
+   "sha256_before": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba",
+   "sha256_after": "4394d398e514854307f31606b81233dffadd3235c0dcdbd655fd173f531138ba",
+   "bytes_before": 656212,
+   "bytes_after": 656212,
+   "unchanged": true
+  }
+ ],
+ "archived_metadata": [
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/generation-records.json",
+   "archive": "art/imagegen/concept-ghost-rider-codex/metadata-archive/2026-10-13-metadata-only-r1/generation-records.json",
+   "sha256": "1a06978d959da41ee477a1764002c6458e0c81f8d15332f9459e3946c0eba845"
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/verification.json",
+   "archive": "art/imagegen/concept-ghost-rider-codex/metadata-archive/2026-10-13-metadata-only-r1/verification.json",
+   "sha256": "ed0bf46097af7367c0d0c04f80fc30286e121099585aa97c2f5ba30908b77934"
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/README.md",
+   "archive": "art/imagegen/concept-ghost-rider-codex/metadata-archive/2026-10-13-metadata-only-r1/README.md",
+   "sha256": "025f816807faa7dae9f7afb23dd96612aea064642aa98e03a52bd2c1545bb2ac"
+  },
+  {
+   "path": "art/imagegen/concept-ghost-rider-codex/design/checks-report.json",
+   "archive": "art/imagegen/concept-ghost-rider-codex/metadata-archive/2026-10-13-metadata-only-r1/design/checks-report.json",
+   "sha256": "8d60ac7cbd3d334ea8dee6739388fb1b284ba323012dc6cad08fee4ecdbafa11"
+  }
+ ],
+ "remaining_blocker": null,
+ "limitations": [
+  {
+   "id": "aspect-ratio",
+   "expected": "3:4",
+   "actual": "4:5 (1280x1600)",
+   "note": "Existing dimensions are retained without resizing."
+  },
+  {
+   "id": "base-bottom",
+   "expected": "y93%",
+   "actual": "y95%",
+   "note": "Measured final bottom position; no image change."
+  },
+  {
+   "id": "historical-lineage",
+   "note": "The prior immutable u1 candidate and the documented raw frame have different hashes. This repair registers the authoritative existing normalized design; it does not assert an unverified byte-level derivation from u1 to raw or normalized."
+  }
+ ],
+ "historical_generation_records": 1,
+ "metadata_registration_records": 1,
+ "processes_started_remaining": 0
+}

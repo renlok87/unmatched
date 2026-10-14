@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-13",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Записи агента выполнены только внутри пакета. Автоматическое сохранение image_gen вне пакета — предусмотренное заданием исключение; оригинал сохранён на месте и указан в generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-blackbeard-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-blackbeard-codex/design/checks-report.json",
+      "run": "selected-final",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной подставке; коллажа, второго вида, надписей и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура строго анфас, плечи и корпус без разворота; подставка с ребра, передняя кромка горизонтальна. Видны фаски, открытой верхней площадки нет. Ортографичность оценена визуально; параметры камеры генератора недоступны."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, сабля и обе ступени подставки целиком в кадре; фон тёмно-серый, визуально ровный, без пола или падающей тени. Автопроверки фона пройдены."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Сабля в правой руке фигуры, слева для зрителя. Обе руки слегка отведены, между руками и корпусом видны просветы; локти согнуты, поза нейтральная."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: cutlass in the figure's own RIGHT hand; braided black beard with ribbons; tricorn hat; pistol bandolier across the chest;",
+      "passed": true,
+      "note": "Видны сабля, массивная чёрная борода с косами и алыми лентами, треуголка и диагональная перевязь с тремя пистолетами."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Тёмно-красный сюртук, чёрные борода и шляпа, латунная фурнитура и алые ленты присутствуют. Кожа и металл приглушены; командного цвета, цветного кольца и металлического обруча на подставке нет. Соответствие палитре визуальное, точные HEX всех окрашенных пикселей не гарантируются."
+    }
+  ],
+  "generations": {
+    "design-front": {
+      "used": 1,
+      "allowed": 2,
+      "selected": "g1"
+    }
+  },
+  "limit_reached": [],
+  "unmet_constraints": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "expected": "top_pct >= 4",
+      "actual": 2.693,
+      "note": "Поле над шляпой меньше заданных 4%. Это WARN, а не FAIL; по условиям задания не служит основанием для повторной генерации."
+    }
+  ],
+  "errors": [],
+  "process_cleanup": "Все запущенные команды завершились; фоновые процессы не запускались.",
+  "execution_notes": [
+    "npx openskills read 3d-model-pipeline не сработал из-за отсутствующего локального кэша (ENOTCACHED); SKILL.md прочитан напрямую с диска. Загрузки не выполнялись.",
+    "Размер не передавался image_gen; итоговый аспект 1086:1448 = 3:4.",
+    "Пиксели не правились; обе копии должны совпадать с оригиналом побайтно."
+  ],
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-blackbeard-codex/palette.json",
+      "sha256_before": "901bba8442a606c90633e32af5333f1b5c595eef3f0ae0bcb829f730b297e0ec",
+      "sha256_after": "901bba8442a606c90633e32af5333f1b5c595eef3f0ae0bcb829f730b297e0ec",
+      "unchanged": true
+    }
+  ],
+  "byte_copies": {
+    "original_sha256": "05d18b22077fb04a8da587d5637bb0917c37d8042ac495aeca282caeed2d3197",
+    "candidate_sha256": "05d18b22077fb04a8da587d5637bb0917c37d8042ac495aeca282caeed2d3197",
+    "selected_path": "art/imagegen/concept-blackbeard-codex/design/blackbeard-front.png",
+    "selected_sha256": "05d18b22077fb04a8da587d5637bb0917c37d8042ac495aeca282caeed2d3197",
+    "equal": true
+  }
+}

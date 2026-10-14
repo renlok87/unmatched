@@ -1,0 +1,242 @@
+{
+  "date": "2026-10-13T03:44:48.404541+00:00",
+  "card_id": "ASSET-LITTLE-RED-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-little-red-codex/palette.json",
+      "sha256_before": "013e92c1a1d999b668cdd033e0d3c88232db59c78bbe76131926f8d923b8575d",
+      "sha256_after": "013e92c1a1d999b668cdd033e0d3c88232db59c78bbe76131926f8d923b8575d",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Собственные команды писали только внутри пакета. Автоматические оригиналы image_gen вне пакета разрешены контрактом, сохранены на месте и перечислены как original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-red-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "value": 2.348,
+          "limit": ">= 4.0 %"
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-red-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "value": 3.729,
+          "limit": ">= 4.0 %"
+        },
+        {
+          "id": "view.single_component",
+          "value": [
+            1.89,
+            0.008,
+            0.008,
+            0.006,
+            0.005,
+            0.005,
+            0.005,
+            0.004,
+            0.004,
+            0.004
+          ],
+          "limit": "прочие < 0.5 %"
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-red-codex/design/checks-report.json",
+      "run": "selected-final",
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "value": 3.729,
+          "limit": ">= 4.0 %"
+        },
+        {
+          "id": "view.single_component",
+          "value": [
+            1.89,
+            0.008,
+            0.008,
+            0.006,
+            0.005,
+            0.005,
+            0.005,
+            0.004,
+            0.004,
+            0.004
+          ],
+          "limit": "прочие < 0.5 %"
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Осмотр g2: одна девушка, одна двухъярусная подставка; надписей, логотипов, водяных знаков и дополнительных видов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Осмотр g2: лицо и корпус фронтальны, края двух дисков горизонтальны; верхняя плоскость подставки не видна. Светлая линия по краю читается как фаска."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, топор, корзина и оба диска целиком в кадре. Фон визуально ровный тёмно-серый; контрольные фоновые точки RGB 37–40, без выраженного градиента, пола и падающей тени. Есть слабый генеративный шум."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Топор в собственной правой руке, слева для зрителя. Предплечья отведены, локти согнуты; просветы под руками читаются. Стойка нейтральная, обе стопы на подставке."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: red hooded cape; hand axe in the figure's own RIGHT hand; wicker basket on the LEFT forearm; white apron",
+      "passed": true,
+      "note": "Видны красный капюшон и плащ, ручной топор справа у фигуры, плетёная корзина на левом предплечье и белый фартук."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Красный плащ, тёплый белый фартук, коричневые платье и сапоги, золотистая лоза корзины. Металл топора нейтрально-серый. Подставка тёмная каменная, без цветного кольца или металлического обода; точное совпадение hex при освещении не заявляется."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "used": 2,
+      "allowed": 2,
+      "selected": "g2"
+    }
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.top",
+      "note": "Верх маски y=3,729%, требование >=4%; допустимый WARN view.frame_top."
+    },
+    {
+      "view": "design-front",
+      "item": "view.single_component",
+      "note": "Дополнительная компонента маски 1,89%; визуально один субъект. WARN разрешён, ретрай не требуется."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.bottom",
+      "note": "Низ маски подставки y=94,613% вместо 93%."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE.FRAMING.center",
+      "note": "Центр подставки x=49,217% вместо 50%."
+    },
+    {
+      "view": "design-front",
+      "item": "background.texture",
+      "note": "Визуально ровный фон, но слабый генеративный шум есть; идеально постоянный RGB не заявляется."
+    },
+    {
+      "view": "design-front",
+      "item": "stage_scope",
+      "note": "Только этап 1a; согласованность нескольких видов и внешняя приёмка не выполнялись."
+    }
+  ],
+  "candidate_visual_reviews": [
+    {
+      "generation": "g1",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Верхняя плоскость подставки видна; фон воспринимается слегка неоднородным. Исправлялись только эти два пункта."
+    },
+    {
+      "generation": "g2",
+      "failed_items": [],
+      "note": "Все шесть пунктов CHECKLIST пройдены; ограничения CORE и WARN записаны отдельно."
+    }
+  ],
+  "byte_copies": [
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13358-b930-7d33-9e57-44120ee93d75\\exec-e66a886c-bf41-4ebc-a364-76a046ba8cf1.png",
+      "saved_path": "art/imagegen/concept-little-red-codex/concepts/little-red-design-front-g1.png",
+      "sha256": "506afff7b2e16ff7083813e17d51d3885301d4164f6d6d09475fc49b82a0049b",
+      "byte_identical": true,
+      "original_exists": true
+    },
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13358-b930-7d33-9e57-44120ee93d75\\exec-08950226-bd02-4e0d-a31a-8f81cd4d71b0.png",
+      "saved_path": "art/imagegen/concept-little-red-codex/concepts/little-red-design-front-g2.png",
+      "sha256": "dcde1157cecf4a6d233ecbbb5bcf814f50524c5386a549609478eb28cfc2f85d",
+      "byte_identical": true,
+      "original_exists": true
+    }
+  ],
+  "selected_file": {
+    "view": "design-front",
+    "generation": "g2",
+    "saved_path": "art/imagegen/concept-little-red-codex/design/little-red-front.png",
+    "sha256": "dcde1157cecf4a6d233ecbbb5bcf814f50524c5386a549609478eb28cfc2f85d",
+    "byte_identical_to_candidate": true
+  },
+  "errors": [],
+  "scope_audit": {
+    "git_commands": 0,
+    "unreal_access": false,
+    "tripo_calls": 0,
+    "syntx_calls": 0,
+    "downloads": 0,
+    "image_gen_calls": 2,
+    "initial_package_files_preserved": [
+      "art/imagegen/concept-little-red-codex/palette.json"
+    ]
+  }
+}

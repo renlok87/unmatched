@@ -1,0 +1,297 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-13T09:53:01+00:00",
+  "set": "art/imagegen/concept-doctor-strange-codex/archive/metadata-only-1a-2026-10-13-r1/temporary-check-sets/design-front-g1",
+  "key": "doctor-strange",
+  "role": "hero",
+  "views": [
+    "front"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-doctor-strange-codex/archive/metadata-only-1a-2026-10-13-r1/temporary-check-sets/design-front-g1/doctor-strange-front.png",
+      "sha256": "3ff7f2d00f64396c8715cbc316683c076941d01fe20b387aee1ef3eed7d957dd",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1280,
+        1600
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": 4.0
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1280,
+        1600
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 26,
+        "median_rgb": [
+          65.0,
+          68.0,
+          71.0
+        ],
+        "share_within_tone_warn": 0.2003,
+        "share_within_tone_fail": 0.2822,
+        "p99_deviation": 164.0,
+        "neutral_delta": 3.0,
+        "luma": 67.6
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          3.32,
+          3.41,
+          3.38
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 35.347,
+        "filled_area_pct": 35.347,
+        "components_kept": 6,
+        "main_component_pct": 33.125,
+        "other_components_pct": [
+          0.731,
+          0.708,
+          0.681,
+          0.064,
+          0.039,
+          0.005,
+          0.004,
+          0.004,
+          0.003,
+          0.002
+        ],
+        "bbox_px": [
+          12,
+          16,
+          1280,
+          1600
+        ],
+        "top_pct": 1.0,
+        "bottom_pct": 100.0,
+        "left_pct": 0.938,
+        "right_pct": 100.0,
+        "height_pct": 99.0,
+        "base_center_x_pct": 50.117,
+        "base_width_pct": 99.062,
+        "base_top_pct_est": 94.125
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1280,
+            1600
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1280,
+          1600
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "FAIL",
+      "value": {
+        "share_warn_tone": 0.2003,
+        "share_fail_tone": 0.2822,
+        "p99_deviation": 164.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        65.0,
+        68.0,
+        71.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 67.6,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 35.347,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 1.0,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 1.0,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "FAIL",
+      "value": 100.0,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "FAIL",
+      "value": 0.0,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "WARN",
+      "value": [
+        0.731,
+        0.708,
+        0.681,
+        0.064,
+        0.039,
+        0.005,
+        0.004,
+        0.004,
+        0.003,
+        0.002
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 8,
+    "WARN": 2,
+    "FAIL": 3
+  },
+  "verdict": "FAIL",
+  "palette": {
+    "path": "art/imagegen/concept-doctor-strange-codex/palette.json",
+    "swatches": [
+      {
+        "name": "tunic blue",
+        "hex": "#22305E",
+        "role": "main",
+        "figure_share_within_40_pct": 3.82
+      },
+      {
+        "name": "cloak red",
+        "hex": "#A3242A",
+        "role": "main",
+        "figure_share_within_40_pct": 6.03
+      },
+      {
+        "name": "glove yellow",
+        "hex": "#D9B23A",
+        "role": "main",
+        "figure_share_within_40_pct": 1.01
+      },
+      {
+        "name": "amulet gold",
+        "hex": "#D4AE45",
+        "role": "accent",
+        "figure_share_within_40_pct": 0.67
+      }
+    ]
+  },
+  "sheet": null
+}

@@ -1,0 +1,194 @@
+{
+  "card_id": "ASSET-T-REX-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все записи команд исполнителя находятся внутри пакета. Оригиналы встроенного image_gen вне пакета — разрешённое договором исключение и сохранены по original_path. Глобальный аудит через git не выполнялся: git запрещён заданием.",
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура T. rex на одной подставке из двух дисков. Коллажа, второго вида, надписей, логотипов и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Голова направлена прямо к камере, фронтальный вид без заметного разворота в три четверти. Оба диска показаны с ребра: верхняя плоскость не видна, передние грани горизонтальные. Ортографичность оценена визуально, метаданных камеры у PNG нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, хвост и подставка в кадре. Фон визуально ровный тёмно-серый, без пола и падающей тени; сохраняется слабый шум генератора (p99 отклонения рамки 2 уровня RGB). Верх 5,870%, низ 93,715%; справа у хвоста поле 2,394%."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и предметов нет. Локти согнуты, обе маленькие передние лапы отведены от корпуса; под локтями видны тёмные просветы. Кисть справа в изображении частично перекрывает бедро, но просвет между предплечьем и торсом читается. Обе стопы опираются на подставку; T- и A-позы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: huge head with open jaws; tiny forelimbs; thick level tail; brown-grey pebbled hide",
+      "passed": true,
+      "note": "Все четыре якоря видны: крупная голова с открытой пастью, короткие передние лапы, толстый хвост почти горизонтально вправо в изображении, бугристая коричнево-серая кожа."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Есть коричневые и серые зоны кожи, светлое бежевое брюхо и костяной оттенок зубов. Командной окраски, цветного кольца и металлического пояса нет. Мелкие янтарные глаза и приглушённая красно-коричневая пасть — локальные натуральные детали; точное совпадение каждого пикселя с HEX не заявляется."
+    }
+  ],
+  "generations": {
+    "design-front": {
+      "used": 2,
+      "allowed": 2,
+      "selected": 2
+    }
+  },
+  "limit_reached": [],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "script_exit_code": 0,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Верхняя поверхность подставки видна; обе лапы недостаточно отделены просветами; фон имеет слабую неоднородность. WARN view.frame_top не причина повтора."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "script_exit_code": 0,
+      "failed_items": [],
+      "note": "Все пункты выбранного вида проверены визуально по сохранённому PNG."
+    }
+  ],
+  "limitations": [
+    {
+      "item": "CORE PEDESTAL: diameter about 0.55 of the figure height",
+      "target": "Около 0,55 высоты фигуры без подставки",
+      "observed": "При визуально оценённой линии опоры y≈1230 и верхе y=85 ширина нижнего диска ≈811 px составляет около 0,71 высоты фигуры (1145 px). Подставка шире заданной.",
+      "passed": false,
+      "checklist_item": false
+    },
+    {
+      "item": "CORE FRAMING: pedestal centred at x50% with its bottom at y93%",
+      "target": {
+        "base_center_x_pct": 50,
+        "base_bottom_pct": 93
+      },
+      "observed": {
+        "base_center_x_pct": 48.158,
+        "base_bottom_pct": 93.715
+      },
+      "passed": false,
+      "checklist_item": false,
+      "note": "Небольшой сдвиг влево и вниз. Автопроверки и пункт чек-листа о полноте кадра проходят; пиксели не исправлялись."
+    },
+    {
+      "item": "Круглая форма подставки",
+      "note": "Строгий фронт с ребра не позволяет надёжно подтвердить форму дисков в плане. По этому виду подтверждаются два уровня и отсутствие видимой верхней плоскости."
+    }
+  ],
+  "image_processing": {
+    "retouch": false,
+    "resize": false,
+    "crop": false,
+    "recolour": false,
+    "reencode": false
+  },
+  "process_cleanup": {
+    "background_processes_started": [],
+    "remaining_task_processes": [],
+    "note": "Все shell-команды завершились синхронно; сервисы и клиенты не запускались."
+  },
+  "errors": [],
+  "date": "2026-10-13T08:42:14+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-t-rex-codex/palette.json",
+      "before_sha256": "c37e4fe7d993d4277f83835de298a1f03357e92d77002eb8f0aefdcfe0c9c38c",
+      "after_sha256": "c37e4fe7d993d4277f83835de298a1f03357e92d77002eb8f0aefdcfe0c9c38c",
+      "expected_sha256": "c37e4fe7d993d4277f83835de298a1f03357e92d77002eb8f0aefdcfe0c9c38c",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-t-rex-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-t-rex-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-t-rex-codex/design/checks-report.json",
+      "run": "selected-final",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    }
+  ],
+  "byte_copies": [
+    {
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13463-72a8-7221-8ef5-fdb56b0c5dc0/exec-fe842f73-ca49-4545-99b2-fdd95e22d63a.png",
+      "saved_path": "art/imagegen/concept-t-rex-codex/concepts/t-rex-design-front-g1.png",
+      "sha256": "0d771b8bb4f2ba2f1f2fab5347e3187aa34a5b7aa2b57e9f19049247a12188a3",
+      "byte_identical": true
+    },
+    {
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13463-72a8-7221-8ef5-fdb56b0c5dc0/exec-d82fc046-9f43-4900-893e-6f7901266f02.png",
+      "saved_path": "art/imagegen/concept-t-rex-codex/concepts/t-rex-design-front-g2.png",
+      "sha256": "01365a3a6383dec040b46595eb622827f208539481a24606417a92e562279d8d",
+      "byte_identical": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-t-rex-codex/design/t-rex-front.png",
+    "sha256": "01365a3a6383dec040b46595eb622827f208539481a24606417a92e562279d8d",
+    "byte_identical_to_generation": 2
+  },
+  "preserved_existing_package_files": [
+    {
+      "path": "art/imagegen/concept-t-rex-codex/palette.json",
+      "sha256": "c37e4fe7d993d4277f83835de298a1f03357e92d77002eb8f0aefdcfe0c9c38c"
+    }
+  ]
+}

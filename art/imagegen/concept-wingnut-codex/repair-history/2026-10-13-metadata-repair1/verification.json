@@ -1,0 +1,140 @@
+{
+  "card_id": "ASSET-WINGNUT-001",
+  "stage": "1a",
+  "run_id": "ASSET-WINGNUT-001-concept-1a-2026-10-13-r1",
+  "date": "2026-10-13T13:05:24.044426+05:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-wingnut-codex/palette.json",
+      "before_sha256": "7fb3c1e4501b2390a5dc5a4f2117aae1c687456e2f989b1dd5142ac20933f2db",
+      "after_sha256": "7fb3c1e4501b2390a5dc5a4f2117aae1c687456e2f989b1dd5142ac20933f2db",
+      "unchanged": true,
+      "bytes": 298
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope_note": "Executor writes were confined to the package; the image_gen-managed original is the explicitly permitted exception and remains at original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 2,
+      "shell_exit_code": 1,
+      "classification": "input_error",
+      "report": null,
+      "expected_report": "art/imagegen/concept-wingnut-codex/checks/design-front-g1/checks-report.json",
+      "error_log": "art/imagegen/concept-wingnut-codex/checks/design-front-g1/error.json",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-wingnut-codex/design --key wingnut --views front --role hero --min-top-pct 4 --out art/imagegen/concept-wingnut-codex/checks/design-front-g1",
+      "error": "ERROR: нет каталога набора art\\imagegen\\concept-wingnut-codex\\design",
+      "exit_code_basis": "InputError из-за отсутствующего каталога: main() возвращает 2 (check_concept_views.py:493–495). PowerShell сообщил общий код оболочки 1; это не FAIL проверки изображения.",
+      "cause": "Исполнитель ошибочно запустил зависимую проверку после неудачной команды копирования. PowerShell удалил кавычки пути в переданной python -c программе; она завершилась SyntaxError. Полученное изображение затем сохранено побайтно через исправленную ASCII-программу Python."
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура Wingnut с заданным маленьким симбиотом на плече, одна двухъярусная подставка. Надписей, коллажа, второго ракурса и водяных знаков не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": false,
+      "note": "Фигура обращена фронтально и без заметного разворота; под стопами читается узкая верхняя плоскость подставки. Строгое условие полностью скрытого верха подставки не выполнено."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": false,
+      "note": "Фигура, крылья и подставка полностью в кадре. Фон нейтральный тёмно-серый, но имеет слабую тональную неоднородность; строго однородный flat-фон не подтверждён. На внешних контрольных точках RGB меняется примерно от 46 до 51."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Оружия и предметов в кистях нет; руки отведены от корпуса, локти согнуты. Между руками и торсом виден зазор; поза не T и не прямая A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: large leathery bat wings; aviator goggles; flight harness; small creature on the shoulder;",
+      "passed": true,
+      "note": "Большие кожистые крылья, очки с янтарными линзами, ременная лётная сбруя и маленький одноглазый симбиот на левом плече изображения хорошо видны."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": false,
+      "note": "Коричневый мех, серые крылья, светло-коричневая сбруя и янтарные линзы присутствуют. Симбиот розово-красный: появился дополнительный сильный цвет вне заданной палитры. Командного цвета, цветного кольца и металлического обода подставки нет."
+    }
+  ],
+  "generations": {
+    "design-front": 1
+  },
+  "generation_budget": {
+    "allowed_this_run": 2,
+    "used_this_run": 1,
+    "remaining_this_run": 1
+  },
+  "limit_reached": [],
+  "selected": {
+    "design-front": {
+      "generation": 1,
+      "path": "art/imagegen/concept-wingnut-codex/design/wingnut-front.png",
+      "sha256": "a222b437afea29fd58c0247375d4b97cf410b4d72b576f7f74403620f8fa05b1"
+    }
+  },
+  "byte_copies": [
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13444-e80b-70f0-b32a-9455b2de6abd\\exec-19f3bf3f-e6c2-414e-bea4-5aad6e0b4966.png",
+      "saved_path": "art/imagegen/concept-wingnut-codex/concepts/wingnut-design-front-g1.png",
+      "sha256": "a222b437afea29fd58c0247375d4b97cf410b4d72b576f7f74403620f8fa05b1",
+      "identical": true
+    },
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13444-e80b-70f0-b32a-9455b2de6abd\\exec-19f3bf3f-e6c2-414e-bea4-5aad6e0b4966.png",
+      "saved_path": "art/imagegen/concept-wingnut-codex/design/wingnut-front.png",
+      "sha256": "a222b437afea29fd58c0247375d4b97cf410b4d72b576f7f74403620f8fa05b1",
+      "identical": true
+    }
+  ],
+  "stop_reason": "input_error",
+  "final_check": {
+    "exit_code": null,
+    "status": "not_run",
+    "reason": "Stopped after the input error as required; no retry or final check was performed."
+  },
+  "last_script_exit_code": 2,
+  "last_shell_exit_code": 1,
+  "limitations": [
+    "The first byte-copy command failed; the original was copied after the failed checker invocation rather than immediately.",
+    "The only checker invocation had no input directory and produced no image-check report.",
+    "The final selected-design check was not run; design/checks-report.json is absent.",
+    "Selected candidate has failed visual checklist items; no correction generation was made after the input error."
+  ],
+  "missing_outputs": [
+    "art/imagegen/concept-wingnut-codex/design/checks-report.json"
+  ],
+  "image_pixel_edits": false,
+  "preexisting_package_files_preserved": [
+    {
+      "path": "art/imagegen/concept-wingnut-codex/palette.json",
+      "sha256": "7fb3c1e4501b2390a5dc5a4f2117aae1c687456e2f989b1dd5142ac20933f2db"
+    }
+  ],
+  "git_commands_run": false,
+  "unreal_opened_or_changed": false,
+  "process_cleanup": {
+    "executor_background_processes_started": [],
+    "executor_background_processes_left_running": []
+  }
+}

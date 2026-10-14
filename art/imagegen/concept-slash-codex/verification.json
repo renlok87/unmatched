@@ -1,0 +1,206 @@
+{
+  "card_id": "ASSET-SLASH-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "scope_audit": "Ручные записи и копирование выполнены только внутри пакета. Оригинальные PNG автоматически сохранены image_gen в его каталоге по разрешённому исключению. Git, Unreal, Tripo, SYNTX и загрузки не выполнялись.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-slash-codex/checks/design-front-g1/checks-report.json",
+      "output": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-slash-codex/checks/design-front-g1/checks-report.json\r\n",
+      "run": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "failed_checks": [],
+      "warn_checks": []
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-slash-codex/checks/design-front-g2/checks-report.json",
+      "output": "WARN view.single_component  front    value=[1.817, 0.134, 0.057, 0.031, 0.013, 0.008, 0.006, 0.006, 0.006, 0.004] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-slash-codex/checks/design-front-g2/checks-report.json\r\n",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "failed_checks": [],
+      "warn_checks": [
+        "view.single_component"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-slash-codex/design/checks-report.json",
+      "output": "WARN view.single_component  front    value=[1.817, 0.134, 0.057, 0.031, 0.013, 0.008, 0.006, 0.006, 0.006, 0.004] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-slash-codex/design/checks-report.json\r\n",
+      "run": "selected-final",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "failed_checks": [],
+      "warn_checks": [
+        "view.single_component"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка; коллажа, второго вида, надписей, знаков и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура прямо спереди. Подставка видна с ребра, верхняя поверхность скрыта; верхний передний край горизонтальный."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, булава, шипы и подставка целиком в кадре; фон визуально ровный тёмно-серый. Скрипт подтвердил нейтральный ровный фон по рамке."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Булава в собственной правой руке, слева для зрителя. Между обеими руками и корпусом читаются просветы; локти согнуты, поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "every identity anchor is visible: spiked mace in the RIGHT hand; spiked black shell; black eye mask",
+      "passed": true,
+      "note": "Видны булава с шипами в правой руке, чёрный панцирь со стальными шипами и чёрная маска на глазах."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Зелёная кожа, чёрные панцирь и маска, стальные шипы присутствуют; командного цвета, цветного кольца или металлической полосы на подставке нет. Дополнительный бежевый пластрон отмечен в limitations."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE/PEDESTAL: two low stacked discs",
+      "note": "Подставка читается как один диск, два отдельных диска не различимы."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE/PEDESTAL: diameter about 0.55 of the figure height",
+      "note": "Приблизительное отношение диаметра к высоте фигуры без подставки — 0.72 вместо 0.55; подставка шире заданной."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE/FRAMING: pedestal centred at x50%, bottom at y93%",
+      "note": "Скрипт измерил центр x52.348%, низ y91.782%; размещение близкое, но не точное."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE/PALETTE: main colours plus one accent",
+      "note": "Крупный приглушённый бежевый пластрон добавляет цвет, отсутствующий в palette.json. Основные цвета и стальной акцент присутствуют; точное ограничение палитры не достигнуто."
+    }
+  ],
+  "selected": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-slash-codex/concepts/slash-design-front-g2.png",
+      "design_path": "art/imagegen/concept-slash-codex/design/slash-front.png",
+      "reason": "Верх подставки скрыт, передний край горизонтальный; все шесть пунктов CHECKLIST выполнены."
+    }
+  ],
+  "candidate_visual_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верхняя поверхность подставки видна; других провалов CHECKLIST не обнаружено."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Шесть пунктов CHECKLIST пройдены; отклонения CORE перечислены отдельно."
+    }
+  ],
+  "tool_errors": [],
+  "processing_notes": [
+    "npx openskills unavailable in local npm cache; local SKILL.md read directly.",
+    "Initial metadata write rejected by Windows command-length limit before process start; recovered with shorter base64 payload commands."
+  ],
+  "process_cleanup": {
+    "started_long_lived_processes": [],
+    "remaining_task_processes": [],
+    "note": "Все запущенные команды завершились; фоновые процессы для задачи не создавались."
+  },
+  "source_hashes_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-slash-codex/palette.json",
+      "before_sha256": "938cbe2614d5599c610b0ee6cbc65298b0658a64f8a6579443f4c9c444175f87",
+      "after_sha256": "938cbe2614d5599c610b0ee6cbc65298b0658a64f8a6579443f4c9c444175f87",
+      "bytes": 304,
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_files_unchanged": true,
+  "byte_copies": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13444-8820-7872-985b-42486bc4f21b\\exec-f2c78e1a-e73e-4dbc-9cd5-8bb3e1f5df13.png",
+      "saved_path": "art/imagegen/concept-slash-codex/concepts/slash-design-front-g1.png",
+      "sha256": "b6d40fc4fdbde41b98022ba58d7c1c4afd1dcb51b6de64962c9ac536e1444c8e",
+      "equal": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13444-8820-7872-985b-42486bc4f21b\\exec-e3ecbe3a-edac-41fc-bebc-093968f501a2.png",
+      "saved_path": "art/imagegen/concept-slash-codex/concepts/slash-design-front-g2.png",
+      "sha256": "c5b8070d86b54be39e3355e6f0d1537ea708a22cbe23ff4e33e7eae79329e4b6",
+      "equal": true
+    }
+  ],
+  "selected_design_byte_identical": true
+}

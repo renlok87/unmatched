@@ -1,0 +1,96 @@
+{
+ "card_id": "ASSET-GERALT-OF-RIVIA-001",
+ "stage": "1a",
+ "date": "2026-10-13T07:29:56+00:00",
+ "run_id": "ASSET-GERALT-OF-RIVIA-001-1a-20261013T072720Z",
+ "status": "blocked",
+ "source_unchanged": true,
+ "sources": [
+  {
+   "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+   "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "bytes": 2034907,
+   "unchanged": true
+  },
+  {
+   "path": "art/imagegen/concept-geralt-of-rivia-codex/palette.json",
+   "before_sha256": "99251be9a049be2934426a4b8b33736b63d67546c12f8beef98542cfee76abeb",
+   "after_sha256": "99251be9a049be2934426a4b8b33736b63d67546c12f8beef98542cfee76abeb",
+   "bytes": 301,
+   "unchanged": true
+  }
+ ],
+ "preexisting_package_files_unchanged": [
+  {
+   "path": "art/imagegen/concept-geralt-of-rivia-codex/palette.json",
+   "before_sha256": "99251be9a049be2934426a4b8b33736b63d67546c12f8beef98542cfee76abeb",
+   "after_sha256": "99251be9a049be2934426a4b8b33736b63d67546c12f8beef98542cfee76abeb",
+   "unchanged": true
+  }
+ ],
+ "outside_folder": [],
+ "outside_folder_note": "All task-owned file writes were confined to this package. The image_gen call returned no original file path; no tool output was copied or changed.",
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+   "source": "unstability.ai"
+  },
+  {
+   "view": "design-front",
+   "generation": "rc1",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-geralt-of-rivia-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [],
+ "checklist_status": "not_run_no_image_returned",
+ "generations_per_view": {
+  "design-front": 1
+ },
+ "generation_budget": {
+  "allowed_in_run": 2,
+  "calls_used": 1,
+  "images_returned": 0,
+  "remaining_calls": 1
+ },
+ "limit_reached": [],
+ "selected": {
+  "design-front": null
+ },
+ "final_script_exit_code": null,
+ "blockers": [
+  {
+   "code": "moderation_blocked",
+   "http_status": 400,
+   "stage": "output",
+   "request_id": "ea1c2665-aa85-4fd0-a36c-2329e804adfc",
+   "text": "image generation failed: http 400 Bad Request: {\"error\":{\"message\":\"Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID ea1c2665-aa85-4fd0-a36c-2329e804adfc.\",\"type\":\"image_generation_user_error\",\"param\":null,\"code\":\"moderation_blocked\",\"moderation_details\":{\"moderation_stage\":\"output\",\"categories\":[\"other\"]}}}"
+  }
+ ],
+ "unmet_requirements": [
+  "No generated candidate or selected design PNG: image_gen returned moderation_blocked.",
+  "No candidate or final check_concept_views.py report: input PNG unavailable.",
+  "Selected-file visual CHECKLIST not evaluated: no image returned.",
+  "Original image path, saved path, output hash and dimensions unavailable; recorded as null."
+ ],
+ "process_lifecycle": {
+  "background_processes_started": [],
+  "all_shell_commands_completed": true
+ },
+ "encoding": "Python Path.write_text UTF-8 without BOM; JSON ensure_ascii=False, indent=2",
+ "raw_images_modified": false,
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+ }
+}

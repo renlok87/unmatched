@@ -1,0 +1,276 @@
+{
+  "card_id": "ASSET-PIRATE-BOATSWAIN-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "verified_at": "2026-10-13T04:43:09.707323+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "source_hashes_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "before_bytes": 2034907,
+      "after_bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-pirate-boatswain-codex/palette.json",
+      "before_sha256": "d4e76473be581ff61b5ff42e1c0b504ee2f0cb0e42f22e67d999527b4f4cbff5",
+      "after_sha256": "d4e76473be581ff61b5ff42e1c0b504ee2f0cb0e42f22e67d999527b4f4cbff5",
+      "before_bytes": 301,
+      "after_bytes": 301,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Записи командами исполнителя ограничены пакетом. Штатные внешние оригиналы image_gen — предусмотренное заданием исключение; original_path записаны в generation-records.json и byte_identical_copies.",
+  "existing_package_files_preserved": [
+    {
+      "path": "art/imagegen/concept-pirate-boatswain-codex/palette.json",
+      "sha256": "d4e76473be581ff61b5ff42e1c0b504ee2f0cb0e42f22e67d999527b4f4cbff5",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-boatswain-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-boatswain-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-boatswain-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная каменная подставка; коллажа, дополнительных видов и надписей нет. WARN сегментации не означает вторую фигуру: изображение осмотрено."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура анфас, без заметного поворота или перспективного сокращения. Два яруса подставки показаны с ребра, их передние грани горизонтальны, верхняя поверхность скрыта."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, клинок и подставка целиком в кадре. Фон тёмный нейтрально-серый, визуально ровный, без пола и падающей тени; присутствует слабый растровый шум. Верх маски 5,732 %, низ 93,370 %."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Короткий тесак находится в правой руке персонажа, слева для зрителя. Обе руки отделены от корпуса видимыми зазорами, локти согнуты; поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "every identity anchor is visible: short cutlass in the figure's own RIGHT hand; red knit cap; tiny spectacles; striped shirt",
+      "passed": true,
+      "note": "Хорошо видны короткий тесак справа у персонажа, красная вязаная шапка, маленькие круглые очки и сине-белая полосатая рубашка."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Синие полосы, красная шапка, бежево-коричневые брюки и латунные очки присутствуют. Остальные материалы нейтральные или приглушённые. Командного цвета, цветного кольца и металлической полосы на подставке нет."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "inspection": "Осмотр изображения image_gen; выбранный g2 дополнительно открыт через view_image.",
+      "checklist": [
+        {
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "При визуальном осмотре пункт выполнен."
+        },
+        {
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Верх подставки виден, её край изогнут: строгий вид с ребра не выполнен."
+        },
+        {
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "При визуальном осмотре пункт выполнен."
+        },
+        {
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "При визуальном осмотре пункт выполнен."
+        },
+        {
+          "item": "every identity anchor is visible: short cutlass in the figure's own RIGHT hand; red knit cap; tiny spectacles; striped shirt",
+          "passed": true,
+          "note": "При визуальном осмотре пункт выполнен."
+        },
+        {
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "При визуальном осмотре пункт выполнен."
+        }
+      ],
+      "script_summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "selected": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "inspection": "Осмотр изображения image_gen; выбранный g2 дополнительно открыт через view_image.",
+      "checklist": [
+        {
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна двухъярусная каменная подставка; коллажа, дополнительных видов и надписей нет. WARN сегментации не означает вторую фигуру: изображение осмотрено."
+        },
+        {
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Фигура анфас, без заметного поворота или перспективного сокращения. Два яруса подставки показаны с ребра, их передние грани горизонтальны, верхняя поверхность скрыта."
+        },
+        {
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура, клинок и подставка целиком в кадре. Фон тёмный нейтрально-серый, визуально ровный, без пола и падающей тени; присутствует слабый растровый шум. Верх маски 5,732 %, низ 93,370 %."
+        },
+        {
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Короткий тесак находится в правой руке персонажа, слева для зрителя. Обе руки отделены от корпуса видимыми зазорами, локти согнуты; поза не T и не A."
+        },
+        {
+          "item": "every identity anchor is visible: short cutlass in the figure's own RIGHT hand; red knit cap; tiny spectacles; striped shirt",
+          "passed": true,
+          "note": "Хорошо видны короткий тесак справа у персонажа, красная вязаная шапка, маленькие круглые очки и сине-белая полосатая рубашка."
+        },
+        {
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Синие полосы, красная шапка, бежево-коричневые брюки и латунные очки присутствуют. Остальные материалы нейтральные или приглушённые. Командного цвета, цветного кольца и металлической полосы на подставке нет."
+        }
+      ],
+      "script_summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "selected": true
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "used_in_this_run": 2,
+      "allowed_in_this_run": 2,
+      "total_recorded": 2
+    }
+  },
+  "selected": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-pirate-boatswain-codex/design/pirate-boatswain-front.png",
+      "sha256": "587b2048ac79583401ad093c49afc76a9096824e1016ead6e93c5565a633f3a3"
+    }
+  ],
+  "limit_reached": [],
+  "limitations": [
+    {
+      "item": "CORE PEDESTAL diameter about 0.55 of the figure height",
+      "passed": false,
+      "expected_ratio": 0.55,
+      "observed_ratio_approx": 0.75,
+      "note": "Подставка выбранного g2 шире ориентира CORE. Оценка: ширина силуэта подставки около 850 пикселей / рост фигуры от шапки до подошв около 1140 пикселей. Это не пункт CHECKLIST, поэтому limit_reached остаётся пустым; отклонение передано приёмщику."
+    },
+    {
+      "item": "round pedestal cross-section",
+      "passed": null,
+      "note": "Круглое сечение нельзя достоверно проверить по единственному фронтальному изображению подставки с ребра; её верхняя поверхность по заданию скрыта."
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "view.single_component",
+      "note": "Допустимый WARN: дополнительные компоненты маски, крупнейшая 2,107 % кадра. Визуально одна фигура и одна двухъярусная подставка."
+    }
+  ],
+  "final_script_exit_code": 0,
+  "final_script_summary": {
+    "PASS": 12,
+    "WARN": 1,
+    "FAIL": 0
+  },
+  "byte_identical_copies": [
+    {
+      "generation": 1,
+      "view": "design-front",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1338c-c1c7-7e72-9084-1d25cb1779f6\\exec-43abfb25-ad62-4d27-a067-992e794f329a.png",
+      "saved_path": "art/imagegen/concept-pirate-boatswain-codex/concepts/pirate-boatswain-design-front-g1.png",
+      "sha256": "79968a3c1c2e1ce96e1155185a93703a6b05ce17dcd1f92186306c59204d917f",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "view": "design-front",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1338c-c1c7-7e72-9084-1d25cb1779f6\\exec-3422e7a2-f1e1-4db7-a58b-6d9e043555fe.png",
+      "saved_path": "art/imagegen/concept-pirate-boatswain-codex/concepts/pirate-boatswain-design-front-g2.png",
+      "sha256": "587b2048ac79583401ad093c49afc76a9096824e1016ead6e93c5565a633f3a3",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy_byte_identical": true,
+  "image_processing": {
+    "retouched": false,
+    "resized": false,
+    "cropped": false,
+    "recoloured": false,
+    "reencoded": false
+  },
+  "scope": {
+    "git_commands": 0,
+    "unreal_opened_edited_built": false,
+    "tripo_calls": 0,
+    "syntx_calls": 0,
+    "downloads": 0
+  },
+  "tooling_notes": [
+    "npx openskills read 3d-model-pipeline: ENOTCACHED; локальный SKILL.md прочитан напрямую, установка и загрузка не выполнялись.",
+    "Слишком длинная команда записи отчётов не запустилась (Windows 206); запись разбита на короткие команды."
+  ],
+  "process_lifecycle": {
+    "started_background_processes": [],
+    "remaining_processes_started_for_task": []
+  }
+}

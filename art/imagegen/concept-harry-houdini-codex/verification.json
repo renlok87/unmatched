@@ -1,0 +1,339 @@
+{
+  "card_id": "ASSET-HARRY-HOUDINI-001",
+  "stage": "1a",
+  "run_id": "2026-10-13-1a-fix1",
+  "date": "2026-10-13T09:43:39.759366+05:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/palette.json",
+      "before_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "after_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "bytes": 296,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Agent-written files; automatic image_gen originals are the authorized exception logged as original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "run_id": "2026-10-13-1a-run1"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "run_id": "2026-10-13-1a-run1"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/history/fix1-before/design/checks-report.json",
+      "final": true,
+      "original_report": "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+      "run_id": "2026-10-13-1a-run1"
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g3/checks-report.json",
+      "final": false,
+      "run_id": "2026-10-13-1a-fix1"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g4/checks-report.json",
+      "final": false,
+      "run_id": "2026-10-13-1a-fix1"
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+      "final": true,
+      "run_id": "2026-10-13-1a-fix1"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; текста, коллажа и лишних частей тела нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Фигура смотрит прямо, но верхний диск подставки виден сверху; передняя верхняя кромка слегка выгнута."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": false,
+      "note": "Фигура и подставка целиком в кадре; фон имеет слабую неоднородность и высветление около нижней части подставки."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Поза асимметричная, не T и не A: рука с цепью поднята, обе открытые ладони пусты и отделены от тела. CORRECTION исполнена частично: нижний локоть почти прямой, поднятая ладонь выше талии."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: iron chains over the shoulders; padlock hanging at the chest; rolled white sleeves; black waistcoat",
+      "passed": true,
+      "note": "Все четыре якоря читаются; цепь обвивает собственное правое предплечье фигуры."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный костюм, белая рубашка, серое железо и латунный замок; подставка тёмная, без командных цветов и металлической полосы."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "generation": 3,
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна двухъярусная подставка; текста, коллажа и лишних частей тела нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Фигура смотрит прямо, но верхний диск подставки виден сверху; передняя верхняя кромка слегка выгнута."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": false,
+          "note": "Фигура и подставка целиком в кадре; фон имеет слабую неоднородность и высветление около нижней части подставки."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Поза асимметричная, не T и не A: рука с цепью поднята, обе открытые ладони пусты и отделены от тела. CORRECTION исполнена частично: нижний локоть почти прямой, поднятая ладонь выше талии."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: iron chains over the shoulders; padlock hanging at the chest; rolled white sleeves; black waistcoat",
+          "passed": true,
+          "note": "Все четыре якоря читаются; цепь обвивает собственное правое предплечье фигуры."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Чёрный костюм, белая рубашка, серое железо и латунный замок; подставка тёмная, без командных цветов и металлической полосы."
+        }
+      ]
+    },
+    {
+      "generation": 4,
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна двухъярусная подставка; текста, коллажа и лишних частей тела нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Фронтальный вид; верх подставки не виден, оба диска показаны с ребра с прямыми горизонтальными кромками."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": false,
+          "note": "Фигура и подставка целиком в кадре; на тёмном фоне остаётся слабая неоднородность."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": false,
+          "note": "Открытые ладони пусты и отделены от тела, но обе руки симметрично направлены вниз по диагонали: стойка снова читается как запрещённая A-поза."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: iron chains over the shoulders; padlock hanging at the chest; rolled white sleeves; black waistcoat",
+          "passed": true,
+          "note": "Все четыре якоря читаются; цепь обвивает собственное правое предплечье фигуры."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Чёрный костюм, белая рубашка, железные цепи и латунный замок; нет командных цветов и металлических полос на подставке."
+        }
+      ]
+    }
+  ],
+  "corrective_checklist": [
+    {
+      "view": "design-front",
+      "generation": 3,
+      "item": "S design-front",
+      "requested": "- S design-front: Replace the symmetric A-pose with a natural asymmetric escape-artist stance: visibly bend the chain-wrapped arm and raise its open palm to waist height, keep the other open hand lower beside the hip with a distinct elbow bend, and preserve clear gaps between both arms and the torso.",
+      "passed": false,
+      "note": "Симметричная A-поза устранена; рука с цепью поднята, другая ниже. Полное выполнение коррекции не достигнуто: поднятая ладонь выше талии, сгиб нижнего локтя недостаточно выражен."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 4
+  },
+  "generations_this_run": {
+    "design-front": 2
+  },
+  "generation_limit_per_run": 2,
+  "generation_limit_per_view": 4,
+  "generations_used_before_run": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+        "S design-front: raised palm above waist; lower elbow bend insufficiently distinct"
+      ]
+    }
+  ],
+  "selected": {
+    "design-front": 3
+  },
+  "selection_reason": "g3 выбран за асимметричную позу и поднятую руку с цепью; g4 имеет более правильный ракурс подставки, но возвращает запрещённую симметричную A-позу. Выбор является предложением исполнителя; новая приёмка не проводилась.",
+  "previous_selection": {
+    "design-front": 2
+  },
+  "previous_verification": "art/imagegen/concept-harry-houdini-codex/history/fix1-before/verification.json",
+  "previous_manifest": "art/imagegen/concept-harry-houdini-codex/history/fix1-before/manifest-sha256.json",
+  "previous_generation_records": "art/imagegen/concept-harry-houdini-codex/history/fix1-before/generation-records.json",
+  "previous_source_hash_blocks_preserved": true,
+  "previous_prompts_preserved": true,
+  "previous_candidates_and_candidate_reports_unchanged": true,
+  "image_byte_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g1.png",
+      "matches_original": true,
+      "sha256": "beb476b5e3ce7536fc811deff3486afd1eca3d31a36ebbfc87bc044297b8e87e"
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g2.png",
+      "matches_original": true,
+      "sha256": "cb0bce49c150c102d932aa86e825d8abebda41a09d9e5c2de3b197ab04dbd481"
+    },
+    {
+      "generation": 3,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g3.png",
+      "matches_original": true,
+      "sha256": "4575f2b099942b9358e31cf17d682c4a30ae7b8b213b0953fff0e91fcb03af14"
+    },
+    {
+      "generation": 4,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g4.png",
+      "matches_original": true,
+      "sha256": "acc6f69885585ef69fec7f63faade3cbf00e10924664428b260860f38569dce6"
+    }
+  ],
+  "selected_design_matches_candidate": true,
+  "warnings": [
+    {
+      "id": "view.frame_top",
+      "value": 2.831,
+      "limit": ">= 4.0 %",
+      "retry_reason": false
+    }
+  ],
+  "limitations": [
+    "Selected g3 still shows the top surface of the pedestal; strict edge-on orthographic pedestal requirement failed.",
+    "Selected g3 background retains slight nonuniformity; strict flat fill requirement failed.",
+    "Corrective S line only partially achieved: asymmetric stance is visible, raised chain-wrapped palm is above the waist and the lower elbow bend is weak.",
+    "Selected g3 top 2.831%, bottom 95.994%, pedestal center 49.263%; exact framing targets not fully achieved. Top warning did not trigger a retry.",
+    "Only design-front was regenerated; no cross-view consistency claim.",
+    "All four generations for design-front have now been used. Acceptance belongs to the acceptor."
+  ],
+  "errors": [],
+  "tooling_events": [
+    {
+      "action": "verify unchanged CORE before writing",
+      "error": "Extraction matched an earlier instruction ending with CORE; assertion stopped execution before writes.",
+      "resolved": true,
+      "resolution": "Extracted final standalone CORE marker; equality to g1 confirmed."
+    },
+    {
+      "action": "persist g3 generation metadata",
+      "error": "PowerShell native argument handling stripped double quotes in JSON; parsing stopped before file writes.",
+      "resolved": true,
+      "resolution": "Transferred ASCII base64 payload into Python; image byte copies and generation records verified."
+    }
+  ],
+  "text_encoding": "UTF-8 without BOM",
+  "image_transformations": [],
+  "git_commands_run": false,
+  "acceptance_run": false,
+  "processes_started_still_running": [],
+  "preservation": [
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g1/checks-report.json",
+      "before_sha256": "4fbed574f735fc0591932ebef50c6b7e81dee1a79583ca360787a564862d2113",
+      "after_sha256": "4fbed574f735fc0591932ebef50c6b7e81dee1a79583ca360787a564862d2113",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g2/checks-report.json",
+      "before_sha256": "9561267ef620756d60626d9bb8ca8d008e50ba2130ee8cd9a348d57de1e459c2",
+      "after_sha256": "9561267ef620756d60626d9bb8ca8d008e50ba2130ee8cd9a348d57de1e459c2",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g1.png",
+      "before_sha256": "beb476b5e3ce7536fc811deff3486afd1eca3d31a36ebbfc87bc044297b8e87e",
+      "after_sha256": "beb476b5e3ce7536fc811deff3486afd1eca3d31a36ebbfc87bc044297b8e87e",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g2.png",
+      "before_sha256": "cb0bce49c150c102d932aa86e825d8abebda41a09d9e5c2de3b197ab04dbd481",
+      "after_sha256": "cb0bce49c150c102d932aa86e825d8abebda41a09d9e5c2de3b197ab04dbd481",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/palette.json",
+      "before_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "after_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "unchanged": true
+    }
+  ],
+  "history_archive_matches_before": true
+}

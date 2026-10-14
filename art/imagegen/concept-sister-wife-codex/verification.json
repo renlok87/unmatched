@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-13",
+  "card_id": "ASSET-SISTER-WIFE-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sister-wife-codex/palette.json",
+      "sha256_before": "47f4d62d1fd578f7cde15a92fcd8d84b4ffb217984da14a851dfc99f962c8558",
+      "sha256_after": "47f4d62d1fd578f7cde15a92fcd8d84b4ffb217984da14a851dfc99f962c8558",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sister-wife-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sister-wife-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sister-wife-codex/design/checks-report.json",
+      "run": "final_selected"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке; надписей, логотипов, коллажа и других видов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура обращена строго вперёд; плечи и лицо фронтальны. Оба диска видны с ребра, верхняя поверхность отсутствует, передние края горизонтальны. Оценка визуальная, параметров камеры у генерации нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Корона, кисти, подол и вся подставка в кадре. Фон ровный нейтральный тёмно-серый; медиана рамки RGB 44/44/44. Численные отклонения размещения записаны отдельно."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Оружия и предметов нет. Обе руки отделены от корпуса видимыми промежутками, локти согнуты, кисти опущены; поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: flowing white burial gown; clawed hands; long dark hair; pale skin with red lips;",
+      "passed": true,
+      "note": "Видны белое струящееся погребальное платье с рваным подолом, обе когтистые кисти, длинные тёмные волосы, бледная кожа и красные губы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Белое платье, почти чёрные волосы, бледная кожа и кроваво-красный акцент присутствуют. Металл украшений приглушённый нейтральный. Командного цвета, цветного кольца или металлической полосы на подставке нет."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;"
+      ],
+      "note": "У g1 была видна узкая эллиптическая верхняя поверхность подставки, а передний край изгибался; это причина повторной генерации. Остальные пять пунктов визуально выполнены."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов визуально выполнены; выбранный кандидат."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "view": "design-front",
+    "generation": 2,
+    "saved_path": "art/imagegen/concept-sister-wife-codex/design/sister-wife-front.png"
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "CORE framing: highest point y >= 4%",
+      "expected": ">= 4%",
+      "observed": "2.210%",
+      "note": "WARN view.frame_top; по заданию WARN не является основанием для повтора. Изображение не обрезано."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE framing: pedestal bottom y93%",
+      "expected": "93%",
+      "observed": "97.099%",
+      "note": "Низ маски по финальному отчёту. Подставка целиком видима; это отклонение точного размещения CORE, не FAIL скрипта и не нарушение пункта чек-листа о полном кадре."
+    },
+    {
+      "view": "design-front",
+      "item": "view.single_component",
+      "observed": [
+        2.247,
+        0.056
+      ],
+      "note": "WARN связности маски. Глазами проверена одна фигура на одной подставке; дополнительных фигур нет."
+    },
+    {
+      "item": "outside_folder scope",
+      "note": "outside_folder учитывает изменения, выполненные агентом вне пакета. Собственные исходные копии инструмента image_gen вне пакета оставлены по прямому требованию задания и перечислены только в original_path."
+    }
+  ],
+  "copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-sister-wife-codex/concepts/sister-wife-design-front-g1.png",
+      "byte_identical_to_original": true,
+      "sha256": "1d53c00ab59509903c15fe1d3c009974aed3abe03bc92d0186179a59ea60f60e"
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-sister-wife-codex/concepts/sister-wife-design-front-g2.png",
+      "byte_identical_to_original": true,
+      "sha256": "0bfdb60ff430e410b6a6fefebdcd8b8c6e21dff21509c43ec441af7add4ea961"
+    }
+  ],
+  "selected_copy_byte_identical": true,
+  "errors": [],
+  "text_encoding": "UTF-8 without BOM; Python Path.write_text",
+  "git_commands_run": false,
+  "remaining_task_processes": []
+}

@@ -1,0 +1,118 @@
+{
+  "card_id": "ASSET-WILLIAM-SHAKESPEARE-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-william-shakespeare-codex/palette.json",
+      "sha256_before": "50f77e5f15575de85e0e1b5a096940c4cdf7bada40e6cb18154a5ab69f64e634",
+      "sha256_after": "50f77e5f15575de85e0e1b5a096940c4cdf7bada40e6cb18154a5ab69f64e634",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "All agent-authored package writes; automatic image_gen original outputs are the explicitly permitted exception and are logged in generation-records.json. No repository-wide git scan was run.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-william-shakespeare-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-william-shakespeare-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-william-shakespeare-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "id": "one_subject_no_text",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной подставке. Страницы книги без надписей; орнамент обложки не содержит читаемых букв. Коллажа, второго вида и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "id": "front_orthographic",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус анфас. Оба диска видны сбоку, передние кромки горизонтальны; широкой верхней плоскости подставки не видно, светлая линия читается как фаска. Оценка по изображению, параметры камеры генератор не раскрывает."
+    },
+    {
+      "view": "design-front",
+      "id": "whole_subject_flat_background",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура и подставка целиком. Фон визуально ровный тёмно-серый: медиана рамки RGB 42/42/43, отклонение p99 2. Верх маски 4,765%, низ 92,68%, центр подставки x49,77%."
+    },
+    {
+      "view": "design-front",
+      "id": "weapon_hand_and_arm_separation",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Перо в собственной правой руке, слева для зрителя; локти согнуты, поза не T/A. Полное требование не выполнено: у собственной левой руки книга и плащ перекрывают просвет до корпуса; два ясных фоновых просвета подтвердить нельзя."
+    },
+    {
+      "view": "design-front",
+      "id": "identity_anchors",
+      "item": "every identity anchor is visible: quill pen in the figure's own RIGHT hand; open book in the LEFT arm; pointed beard; white falling collar;",
+      "passed": true,
+      "note": "Красное перо справа у фигуры, раскрытая книга в левой руке, остроконечная борода с усами и белый отложной воротник видны. Облысение читается."
+    },
+    {
+      "view": "design-front",
+      "id": "palette_no_team_base",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Чёрный камзол, белый воротник, пергаментные страницы и красное перо присутствуют. Приглушённая коричнево-бронзовая отделка — дополнительная детализация без другого сильного цвета. Командной окраски и цветного кольца/металлической полосы на основании нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "weapon_hand_and_arm_separation"
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "SUBJECT.short_cape",
+      "note": "The generated cape is longer than the short cape requested in CORE; preserved unchanged for acceptance."
+    },
+    {
+      "view": "design-front",
+      "item": "camera_metadata",
+      "note": "Camera alignment is assessed from the image; the generator exposes no orthographic camera parameters."
+    }
+  ],
+  "errors": [],
+  "tool_notes": [
+    "openskills unavailable in local npm cache; local SKILL.md and concept-sheet.md read directly; no install/download performed."
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "card_id": "ASSET-TITANIA-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все явные операции записи исполнителя выполнялись внутри art/imagegen/concept-titania-codex/. Оригиналы, автоматически сохранённые image_gen вне пакета, разрешены контрактом и учтены отдельно в generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-titania-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-titania-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-titania-codex/design/checks-report.json",
+      "run": "final"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна Титания и одна подставка из двух дисков; второго вида, надписей и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Лицо и корпус обращены прямо к камере; подставка показана с ребра, её верхняя плоскость скрыта, горизонтальные края читаются. Оценено по изображению."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Крылья, корона, платье и подставка целиком в кадре. Фон визуально ровный нейтральный тёмно-серый; медиана рамки RGB [43, 43, 43], p99 отклонения 2 уровня. Слабый генеративный шум сохранён."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Обе кисти пустые; пыльца парит над поднятой ладонью. Между каждой рукой и корпусом виден зазор; локти согнуты, поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: translucent dragonfly wings; gown of leaves and petals; flower crown; long silver hair; glowing pollen in a raised hand",
+      "passed": true,
+      "note": "Видны две пары полупрозрачных стрекозиных крыльев, платье из листьев и розовых лепестков, цветочная корона, длинные серебряные волосы и золотистая светящаяся пыльца у поднятой руки."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют зелёный листьев, розовый лепестков, серебряный волос и золотой акцент. Цвета оценены визуально с учётом светотени. Подставка тёмная каменная, без командного цвета, цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "used": 2,
+      "allowed": 2,
+      "selected": "g2"
+    }
+  },
+  "limit_reached": [],
+  "candidate_assessments": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "visual_failed_items": [
+        "CHECKLIST strict front orthographic view",
+        "CHECKLIST plain flat dark gray background",
+        "CHECKLIST both arms clearly apart from the torso"
+      ],
+      "note": "Видна верхняя плоскость подставки; заметен градиент фона; волосы, крылья и лепестки мешают открытым зазорам у рук. WARN view.frame_top не служил основанием повтора."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "visual_failed_items": [],
+      "note": "Выбран после визуального просмотра исходного PNG; все пункты CHECKLIST пройдены."
+    }
+  ],
+  "limitations": [
+    {
+      "id": "view.frame_top",
+      "view": "design-front",
+      "generation": "g2",
+      "target_min_pct": 4,
+      "measured_pct": 3.246,
+      "severity": "WARN",
+      "note": "Верхний отступ меньше CORE. WARN разрешён заданием и не является основанием новой генерации."
+    },
+    {
+      "id": "framing.base_bottom",
+      "view": "design-front",
+      "generation": "g2",
+      "target_pct": 93,
+      "measured_pct": 95.442,
+      "note": "Низ подставки ниже целевого положения; подставка полностью в кадре, view.bottom_margin PASS."
+    },
+    {
+      "id": "framing.base_center",
+      "view": "design-front",
+      "generation": "g2",
+      "target_pct": 50,
+      "measured_pct": 48.665,
+      "note": "Подставка немного левее целевого центра."
+    },
+    {
+      "id": "pose.feet_visibility",
+      "view": "design-front",
+      "generation": "g2",
+      "note": "Вторая стопа скрыта платьем; положение обеих стоп нельзя полностью проверить по фронтальному изображению."
+    },
+    {
+      "id": "background.noise",
+      "view": "design-front",
+      "generation": "g2",
+      "note": "Фон визуально ровный, с небольшим генеративным шумом; frame median RGB [43, 43, 43], p99 отклонения 2 уровня."
+    }
+  ],
+  "errors": [],
+  "acceptance_performed": false,
+  "git_commands_run": 0,
+  "generated_images_modified": false,
+  "background_processes_started": 0,
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-titania-codex/palette.json",
+      "before_sha256": "d841a8fc24bf4cdfa5189d42c4f9841708e953e9f94c17d19d3095ac35449752",
+      "after_sha256": "d841a8fc24bf4cdfa5189d42c4f9841708e953e9f94c17d19d3095ac35449752",
+      "bytes": 297,
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_files_unchanged": true,
+  "raw_copies": [
+    {
+      "generation": "ASSET-TITANIA-001-1a-design-front-g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13460-2a80-7230-9385-a1ff60363bbc\\exec-fb770aba-1033-4804-b24a-b49228df7701.png",
+      "saved_path": "art/imagegen/concept-titania-codex/concepts/titania-design-front-g1.png",
+      "sha256": "b5978a66d263d68171982542e9c99f5f6e70147cece25c1fccb8e8438ca12431",
+      "bytes": 2327011,
+      "byte_identical": true
+    },
+    {
+      "generation": "ASSET-TITANIA-001-1a-design-front-g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13460-2a80-7230-9385-a1ff60363bbc\\exec-88e55911-9cee-4176-828e-b3bedf5dcd6e.png",
+      "saved_path": "art/imagegen/concept-titania-codex/concepts/titania-design-front-g2.png",
+      "sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+      "bytes": 2286435,
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-titania-codex/design/titania-front.png",
+    "generation": "g2",
+    "sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+    "byte_identical": true
+  }
+}

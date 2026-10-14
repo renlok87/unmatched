@@ -1,0 +1,14 @@
+{
+  "view": "design-front",
+  "generation": 1,
+  "exit_code": 2,
+  "shell_exit_code": 1,
+  "classification": "input_error",
+  "report": null,
+  "expected_report": "art/imagegen/concept-wingnut-codex/checks/design-front-g1/checks-report.json",
+  "error_log": "art/imagegen/concept-wingnut-codex/checks/design-front-g1/error.json",
+  "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-wingnut-codex/design --key wingnut --views front --role hero --min-top-pct 4 --out art/imagegen/concept-wingnut-codex/checks/design-front-g1",
+  "error": "ERROR: нет каталога набора art\\imagegen\\concept-wingnut-codex\\design",
+  "exit_code_basis": "InputError из-за отсутствующего каталога: main() возвращает 2 (check_concept_views.py:493–495). PowerShell сообщил общий код оболочки 1; это не FAIL проверки изображения.",
+  "cause": "Исполнитель ошибочно запустил зависимую проверку после неудачной команды копирования. PowerShell удалил кавычки пути в переданной python -c программе; она завершилась SyntaxError. Полученное изображение затем сохранено побайтно через исправленную ASCII-программу Python."
+}

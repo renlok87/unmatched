@@ -1,0 +1,179 @@
+{
+  "card_id": "ASSET-YENNENGA-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:35:13+00:00",
+  "status": "proposed",
+  "source_unchanged": true,
+  "source_checks": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-yennenga-codex/palette.json",
+      "sha256_before": "3ce543f904ad7d573bf73e2bd0daa4cc4bb07fe94232bdbe7db2bf5beb951543",
+      "sha256_after": "3ce543f904ad7d573bf73e2bd0daa4cc4bb07fe94232bdbe7db2bf5beb951543",
+      "unchanged": true
+    }
+  ],
+  "existing_package_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-yennenga-codex/palette.json",
+      "sha256_before": "3ce543f904ad7d573bf73e2bd0daa4cc4bb07fe94232bdbe7db2bf5beb951543",
+      "sha256_after": "3ce543f904ad7d573bf73e2bd0daa4cc4bb07fe94232bdbe7db2bf5beb951543",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Executor file writes only; image_gen original files are the explicit tool-output exception recorded in generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-yennenga-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-yennenga-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-yennenga-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке; дополнительных видов, коллажа, читаемого текста, логотипа и водяного знака нет. Геометрический узор ткани — орнамент."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "При визуальном осмотре g2 лицо и корпус направлены прямо к камере; верхняя плоскость подставки скрыта, передние кромки горизонтальны. Видимого наклона камеры сверху и трёхчетвертного поворота нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, наконечник и древко копья, щит и обе ступени подставки находятся в кадре. Фон ровный нейтральный тёмно-серый: медиана рамки RGB [41, 41, 42], p99 отклонения 2; без пола и падающей тени."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Копьё в собственной правой кисти слева для зрителя; обе руки отделены от корпуса видимыми зазорами, локти слегка согнуты. Стойка естественная, без T/A-позы; обе стопы на подставке."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: short spear in the RIGHT hand; small round shield on the LEFT arm; patterned wrap; beaded jewellery",
+      "passed": true,
+      "note": "Видны все четыре якоря: короткое относительно роста фигуры копьё в правой руке, небольшой круглый щит на левой, охристая обёртка с геометрическим узором, красные бусы и браслеты."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют охра ткани, коричневая кожа брони, тёмная кожа лица и тела, красный акцент бус. Мелкая приглушённая фурнитура и светлые раковины нейтральны; дополнительных сильных цветов нет. Подставка тёмно-каменная без цветного кольца и металлического обода."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limits": {
+    "design-front": 2
+  },
+  "selected": {
+    "design-front": "g2"
+  },
+  "limit_reached": [],
+  "copy_checks": [
+    {
+      "generation": "g1",
+      "saved_path": "art/imagegen/concept-yennenga-codex/concepts/yennenga-design-front-g1.png",
+      "sha256": "9f3632b48463849b8c0ac76fe1206027d9a2832c751a29da2b8b3b1b576538db",
+      "byte_identical_to_original": true
+    },
+    {
+      "generation": "g2",
+      "saved_path": "art/imagegen/concept-yennenga-codex/concepts/yennenga-design-front-g2.png",
+      "sha256": "456b1601dfcc54ad684af4f11a143685075a0bd1e8ce78f8810f1870413adae0",
+      "byte_identical_to_original": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-yennenga-codex/design/yennenga-front.png",
+    "sha256": "456b1601dfcc54ad684af4f11a143685075a0bd1e8ce78f8810f1870413adae0",
+    "byte_identical_to_selected": true
+  },
+  "prompt_core_unchanged": true,
+  "raw_files_modified": false,
+  "final_script_exit_code": 0,
+  "candidate_visual_failures": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Visible pedestal top surface and curved front edge; corrected in g2."
+    }
+  ],
+  "constraints_not_met": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "item": "FRAMING top y >= 4%",
+      "actual": 2.624,
+      "target": 4,
+      "classification": "allowed WARN view.frame_top"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "FRAMING top y >= 4%",
+      "actual": 3.246,
+      "target": 4,
+      "classification": "allowed WARN view.frame_top"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "FRAMING pedestal bottom y93%",
+      "actual": 95.718,
+      "target": 93,
+      "classification": "framing deviation; view.bottom_margin PASS; whole pedestal visible"
+    }
+  ],
+  "errors": [],
+  "external_acceptance_completed": false,
+  "write_method": "All package JSON/Markdown written by Python Path.write_text UTF-8 without BOM; images copied byte for byte; checker only wrote JSON reports.",
+  "process_cleanup": "Only synchronous Python and image_gen calls were used; no persistent development service, client, build, terminal helper or subagent was started."
+}

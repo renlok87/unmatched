@@ -1,0 +1,231 @@
+{
+  "date": "2026-10-13T07:51:01+00:00",
+  "card_id": "ASSET-BAXTER-STOCKMAN-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-baxter-stockman-codex/palette.json",
+      "before_sha256": "0ba6fdc1cb8ed27e98a2059657172873be0855c09fe892aa9b7c933ccbcb9193",
+      "after_sha256": "0ba6fdc1cb8ed27e98a2059657172873be0855c09fe892aa9b7c933ccbcb9193",
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_files_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Вне пакета исполнитель ничего не записывал. Автоматические оригиналы image_gen — исключение, прямо указанное в договоре пакета; их original_path есть в generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-baxter-stockman-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-baxter-stockman-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-baxter-stockman-codex/design/checks-report.json",
+      "phase": "selected_final"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух низких дисков. Второго ракурса, коллажа, текста, букв, логотипов и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Голова и торс обращены точно к зрителю. Подставка видна строго с ребра: верхняя плоскость скрыта, её передние края горизонтальны. Перспектива и разворот в три четверти визуально не обнаружены."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, оба крыла, гаджет и подставка видны целиком. Фон визуально ровный тёмно-серый, без пола, заметного градиента, виньетки и падающей тени."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Гаджет находится в собственной правой руке фигуры, слева для зрителя. Обе руки отделены от корпуса видимыми просветами, локти согнуты; поза не T и не A. Обе стопы стоят на подставке."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: ray gadget in the RIGHT hand; compound fly eyes; translucent wings; ragged lab coat",
+      "passed": true,
+      "note": "Хорошо видны лучевой гаджет в правой руке, два красных фасеточных глаза, два полупрозрачных крыла с жилками и рваный белый лабораторный халат."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Есть все три основных цвета и бирюзовый акцент гаджета. Прочие детали нейтральные или приглушённые; командной окраски, цветного кольца и металлической ленты на каменной подставке нет."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна двухъярусная подставка; коллажа, второго ракурса, надписей, логотипов и водяных знаков нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Фигура показана спереди, но верхняя плоскость подставки видна; верхний передний край изогнут. Требование нулевого угла камеры и вида подставки строго с ребра не выполнено."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура, крылья, гаджет и подставка целиком в кадре. Фон визуально ровный тёмно-серый; незначительные вариации тона не образуют заметного градиента."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Гаджет в собственной правой руке, слева для зрителя. Локти согнуты, обе руки отделены от торса видимыми просветами; поза не T и не A."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: ray gadget in the RIGHT hand; compound fly eyes; translucent wings; ragged lab coat",
+          "passed": true,
+          "note": "Видны лучевой гаджет, красные фасеточные глаза, два полупрозрачных крыла с жилками и рваный лабораторный халат."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Присутствуют белый халат, коричневая муха, красные глаза и бирюзовый гаджет. Подставка тёмная каменная, без цветного кольца или металлической ленты."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна подставка из двух низких дисков. Второго ракурса, коллажа, текста, букв, логотипов и водяных знаков нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Голова и торс обращены точно к зрителю. Подставка видна строго с ребра: верхняя плоскость скрыта, её передние края горизонтальны. Перспектива и разворот в три четверти визуально не обнаружены."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Вся фигура, оба крыла, гаджет и подставка видны целиком. Фон визуально ровный тёмно-серый, без пола, заметного градиента, виньетки и падающей тени."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Гаджет находится в собственной правой руке фигуры, слева для зрителя. Обе руки отделены от корпуса видимыми просветами, локти согнуты; поза не T и не A. Обе стопы стоят на подставке."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: ray gadget in the RIGHT hand; compound fly eyes; translucent wings; ragged lab coat",
+          "passed": true,
+          "note": "Хорошо видны лучевой гаджет в правой руке, два красных фасеточных глаза, два полупрозрачных крыла с жилками и рваный белый лабораторный халат."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Есть все три основных цвета и бирюзовый акцент гаджета. Прочие детали нейтральные или приглушённые; командной окраски, цветного кольца и металлической ленты на каменной подставке нет."
+        }
+      ]
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed": {
+    "design-front": 2
+  },
+  "selected_generations": {
+    "design-front": 2
+  },
+  "selection_reason": "g2 исправляет видимую верхнюю плоскость подставки из g1, проходит все шесть пунктов CHECKLIST и все 13 автоматических проверок. Основные признаки персонажа, палитра и сторона оружия сохранены.",
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE FRAMING: pedestal bottom at y93%",
+      "target_y_pct": 93,
+      "observed_y_pct": 94.682,
+      "note": "Низ подставки на 1,682 процентного пункта ниже заданной линии. Обрезки нет; автоматическая проверка проходит. Сырой результат не сдвигался и не кадрировался."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE PEDESTAL: diameter about 0.55 of the figure height",
+      "target_ratio_approx": 0.55,
+      "observed_ratio_approx": 0.65,
+      "note": "По видимому силуэту диаметр около 0,65 высоты фигуры без подставки. Это приблизительная визуальная оценка; численной проверки этого отношения в скрипте нет. Формат двух низких каменных дисков сохранён."
+    }
+  ],
+  "errors": [],
+  "byte_copy_verification": [
+    {
+      "generation": 1,
+      "sha256": "e71846a0ed9e7f2a0627bab1c39357909630080d8313f75806788440863f2c2a",
+      "original_equals_saved": true
+    },
+    {
+      "generation": 2,
+      "sha256": "bd905e26be655ff2dc740ce2e14de1f2a3b6bb5e06f734f9787d3e63c3a144ff",
+      "original_equals_saved": true
+    }
+  ],
+  "selected_design_equals_candidate": true,
+  "final_script_exit_code": 0,
+  "final_script_summary": {
+    "PASS": 13,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "text_encoding": "UTF-8 without BOM",
+  "image_edits": [],
+  "image_generation_calls": 2,
+  "scope": {
+    "git_commands": 0,
+    "unreal_access": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "downloads": false,
+    "background_processes_started": 0
+  }
+}

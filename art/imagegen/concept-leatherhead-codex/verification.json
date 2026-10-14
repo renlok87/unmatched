@@ -1,0 +1,253 @@
+{
+  "card_id": "ASSET-LEATHERHEAD-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:12:24+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "matches_task_sha256": true
+    },
+    {
+      "path": "art/imagegen/concept-leatherhead-codex/palette.json",
+      "before_sha256": "de4ccc2420b445a8a8b58526a09ee17295e1442236e21d0e5480ae5f94272457",
+      "after_sha256": "de4ccc2420b445a8a8b58526a09ee17295e1442236e21d0e5480ae5f94272457",
+      "unchanged": true,
+      "matches_task_sha256": true
+    }
+  ],
+  "outside_folder": [],
+  "scope_note": "Все файловые записи команд этой задачи направлены в art/imagegen/concept-leatherhead-codex/. PYTHONDONTWRITEBYTECODE=1 предотвращал побочные pycache при проверках. outside_folder исключает только прямо разрешённые заданием оригиналы, созданные самим image_gen; их абсолютные пути и SHA-256 сохранены в byte_identical_copies. Git и Unreal не использовались; общий diff репозитория не выполнялся.",
+  "preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-leatherhead-codex/palette.json",
+      "before_sha256": "de4ccc2420b445a8a8b58526a09ee17295e1442236e21d0e5480ae5f94272457",
+      "after_sha256": "de4ccc2420b445a8a8b58526a09ee17295e1442236e21d0e5480ae5f94272457",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leatherhead-codex/checks/design-front-g1/checks-report.json",
+      "output": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-leatherhead-codex/checks/design-front-g1/checks-report.json\r\n",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leatherhead-codex/checks/design-front-g2/checks-report.json",
+      "output": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-leatherhead-codex/checks/design-front-g2/checks-report.json\r\n",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leatherhead-codex/design/checks-report.json",
+      "output": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-leatherhead-codex/design/checks-report.json\r\n",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной подставке из двух низких дисков. Коллажа, второго вида, надписей, логотипов и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена строго вперёд, разворота в три четверти нет. Подставка показана с ребра: верхняя плоскость скрыта, передние края горизонтальны; читается только узкая фаска."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, весь хвост и подставка помещаются в кадр. Фон визуально ровный тёмно-серый, без пола и падающей тени; медианы десяти свободных участков RGB 44–45, остаточное отклонение модели фона 1,32/1,12/1,11."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Кисти пустые. Обе руки отделены от корпуса просветами, локти согнуты; это нейтральная стойка, не T- и не A-поза. Обе стопы стоят на подставке."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: long toothy jaws; dark green scales; tattered vest; clawed hands; thick tail",
+      "passed": true,
+      "note": "Видны удлинённая зубастая морда, тёмно-зелёная чешуя, рваный жилет, обе когтистые кисти и толстый хвост справа в изображении. Во фронтальном виде длина морды сокращена ракурсом."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют зелёная чешуя, песочное брюхо, коричневый жилет и жёлтые глаза. Каменная подставка тёмная, без командного цвета, цветного кольца и металлического обода. Точные RGB оттенки меняются из-за росписи и освещения."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "items": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "One figure and one two-disc pedestal; no collage, duplicate view, lettering or watermark."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "The figure faces front, but a narrow top surface of the pedestal is visible and its front top edge is curved."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": false,
+          "note": "The entire figure, tail and pedestal are visible; subtle tonal shading remains in the background."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Empty clawed hands, bent elbows, visible gaps to the torso, both feet planted; neither T nor A pose."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: long toothy jaws; dark green scales; tattered vest; clawed hands; thick tail",
+          "passed": true,
+          "note": "Toothy snout, dark green scales, torn brown vest, both clawed hands and thick tail at image right are visible."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Green scales, tan belly, brown vest and yellow eyes are present; dark stone base without coloured ring or band."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "items": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура на одной подставке из двух низких дисков. Коллажа, второго вида, надписей, логотипов и водяного знака нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Фигура обращена строго вперёд, разворота в три четверти нет. Подставка показана с ребра: верхняя плоскость скрыта, передние края горизонтальны; читается только узкая фаска."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура, весь хвост и подставка помещаются в кадр. Фон визуально ровный тёмно-серый, без пола и падающей тени; медианы десяти свободных участков RGB 44–45, остаточное отклонение модели фона 1,32/1,12/1,11."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Кисти пустые. Обе руки отделены от корпуса просветами, локти согнуты; это нейтральная стойка, не T- и не A-поза. Обе стопы стоят на подставке."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: long toothy jaws; dark green scales; tattered vest; clawed hands; thick tail",
+          "passed": true,
+          "note": "Видны удлинённая зубастая морда, тёмно-зелёная чешуя, рваный жилет, обе когтистые кисти и толстый хвост справа в изображении. Во фронтальном виде длина морды сокращена ракурсом."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Присутствуют зелёная чешуя, песочное брюхо, коричневый жилет и жёлтые глаза. Каменная подставка тёмная, без командного цвета, цветного кольца и металлического обода. Точные RGB оттенки меняются из-за росписи и освещения."
+        }
+      ]
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [],
+  "core_constraints": [
+    {
+      "item": "pedestal diameter about 0.55 of figure height",
+      "met": false,
+      "note": "Оценка по маске: диаметр подставки / высота фигуры до верхнего края подставки ≈ 0,73; подставка шире ориентира CORE. Это не отдельный пункт CHECKLIST и не FAIL скрипта."
+    },
+    {
+      "item": "pedestal bottom at y93%",
+      "met": false,
+      "note": "Измерение маски y94,682%; отклонение +1,682 процентного пункта. Ничего не обрезано."
+    },
+    {
+      "item": "pedestal centred at x50%",
+      "met": false,
+      "note": "Измерение маски x49,079%; отклонение −0,921 процентного пункта."
+    },
+    {
+      "item": "subject highest point y >= 4%",
+      "met": true,
+      "note": "Измерение маски y4,765%; минимум соблюдён."
+    },
+    {
+      "item": "portrait aspect ratio 3:4",
+      "met": true,
+      "note": "1086 × 1448 = 3:4; размер выбран инструментом."
+    }
+  ],
+  "byte_identical_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13443-23ee-71d0-9ad1-1411e7defe97\\exec-5feb354c-3d89-4214-908a-25be75e11cda.png",
+      "saved_path": "art/imagegen/concept-leatherhead-codex/concepts/leatherhead-design-front-g1.png",
+      "sha256": "68dc0839071ed7a0efb06367510efc2e9e067ce3a7e254de59f2e9e6c89f2ded",
+      "original_unchanged": true,
+      "copy_byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13443-23ee-71d0-9ad1-1411e7defe97\\exec-ed956182-63dd-4d3b-95b0-d001d7e41b40.png",
+      "saved_path": "art/imagegen/concept-leatherhead-codex/concepts/leatherhead-design-front-g2.png",
+      "sha256": "03589bd76f5b739f8ec27ade00f2e0a927e48578585701003505640a1d5b5efa",
+      "original_unchanged": true,
+      "copy_byte_identical": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-leatherhead-codex/design/leatherhead-front.png",
+    "source": "art/imagegen/concept-leatherhead-codex/concepts/leatherhead-design-front-g2.png",
+    "sha256": "03589bd76f5b739f8ec27ade00f2e0a927e48578585701003505640a1d5b5efa",
+    "copy_byte_identical": true
+  },
+  "prompt_core_unchanged": true,
+  "image_processing_performed": false,
+  "text_encoding": "UTF-8 without BOM",
+  "errors": [],
+  "recovered_command_errors": [
+    {
+      "error": "Windows CreateProcess error 206: command too long",
+      "effect": "The command did not start and wrote no files. Documentation writes were completed using shorter ASCII base64 commands."
+    }
+  ]
+}

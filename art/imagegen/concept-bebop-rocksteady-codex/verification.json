@@ -1,0 +1,202 @@
+{
+  "card_id": "ASSET-BEBOP-ROCKSTEADY-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-bebop-rocksteady-codex/palette.json",
+      "sha256_before": "98c4a18449dc61a8d6e6c16be658ef71dea820c16e6e19059e8a634f1b8b9810",
+      "sha256_after": "98c4a18449dc61a8d6e6c16be658ef71dea820c16e6e19059e8a634f1b8b9810",
+      "bytes_before": 299,
+      "bytes_after": 299,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_verification_method": "command write-path audit; no repository-wide hash scan or git command",
+  "scope_note": "Все наши записи направлены в пакет. Собственные оригиналы image_gen вне пакета являются явным исключением контракта и оставлены на месте. Git не вызывался; unreal/ не открывался.",
+  "preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-bebop-rocksteady-codex/palette.json",
+      "sha256": "98c4a18449dc61a8d6e6c16be658ef71dea820c16e6e19059e8a634f1b8b9810",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bebop-rocksteady-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "intended_generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bebop-rocksteady-codex/checks/design-front-g2/stale-input-report.json",
+      "final": false,
+      "note": "Перед проверкой g2 команда копирования остановилась из-за передачи кавычек в Python через PowerShell. Следующий скрипт с кодом 0 фактически проверил ещё g1. Его отчёт сохранён как checks/design-front-g2/stale-input-report.json и отдельно учтён в verification.json. Затем g2 побайтно скопирован, проверен в собственном каталоге и финальным прогоном. Ошибка устранена; дополнительных генераций не было."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bebop-rocksteady-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bebop-rocksteady-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка. Коллажа, второго вида, надписей, логотипа и водяного знака нет; черепа являются скульптурным декором."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к зрителю. Два диска показаны ребром с горизонтальными кромками; верхняя плоскость не видна. Ортографичность оценена визуально: параметры камеры из PNG не извлекаются."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Ирокез, бластер, руки, ступни и вся подставка в кадре. Фон ровный нейтральный тёмно-серый; медиана рамки RGB [44,44,46], p99 отклонения 2.0; заметной виньетки, пола и тени на фоне нет."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Бластер слева для зрителя, в собственной правой руке фигуры. Между руками и корпусом видны просветы; локти согнуты; обе ступни стоят на подставке. Поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: blaster in the RIGHT hand; purple mohawk; sunglasses; leather vest; tusks",
+      "passed": true,
+      "note": "Видны все пять якорей: правый хват бластера, фиолетовый ирокез, тёмные очки, чёрный кожаный жилет и два клыка."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют загорелая кожа, чёрный жилет, фиолетовый ирокез и серебряные шипы/заклёпки. Подставка тёмная каменная, без цветного кольца и металлической полосы; командного цвета нет. Палитра оценена визуально, точное равенство каждого оттенка HEX не заявляется."
+    }
+  ],
+  "generations": {
+    "design-front": {
+      "used": 2,
+      "allowed_this_run": 2,
+      "selected": 2
+    }
+  },
+  "limit_reached": [],
+  "candidate_review": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view"
+      ],
+      "note": "Видна верхняя плоскость подставки и эллиптическая передняя кромка. Повтор вызван этим пунктом; WARN view.frame_top не был причиной повтора."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов CHECKLIST выполнены по визуальному осмотру."
+    }
+  ],
+  "byte_for_byte_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-bebop-rocksteady-codex/concepts/bebop-rocksteady-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13434-8986-7520-898b-d324259dd902\\exec-0fd15872-add7-430a-8fd8-9764bda8bbd3.png",
+      "sha256": "5fae5fe986c0f3718ab2566304b62f6da124d412ef1ba6795c13b6d1768ebd0d",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-bebop-rocksteady-codex/concepts/bebop-rocksteady-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13434-8986-7520-898b-d324259dd902\\exec-411624dc-0bd5-4459-8a73-eda87e313f39.png",
+      "sha256": "dff12d2e30b3082feee568285df807c865139e61b98ddb2c562c0de638ae262e",
+      "byte_identical": true
+    }
+  ],
+  "selected_design": {
+    "view": "design-front",
+    "generation": 2,
+    "path": "art/imagegen/concept-bebop-rocksteady-codex/design/bebop-rocksteady-front.png",
+    "sha256": "dff12d2e30b3082feee568285df807c865139e61b98ddb2c562c0de638ae262e",
+    "byte_identical_to_candidate": true
+  },
+  "framing": {
+    "aspect_ratio": "3:4",
+    "width": 1086,
+    "height": 1448,
+    "top_pct": 7.113,
+    "bottom_pct": 94.682,
+    "base_center_x_pct": 49.816
+  },
+  "limitations": [
+    {
+      "item": "CORE FRAMING pedestal bottom y93%",
+      "requested": 93.0,
+      "measured": 94.682,
+      "unit": "% image height",
+      "note": "Низ подставки ниже точного ориентира; обрезки нет, автопроверка пройдена."
+    },
+    {
+      "item": "CORE FRAMING pedestal centre x50%",
+      "requested": 50.0,
+      "measured": 49.816,
+      "unit": "% image width",
+      "note": "Небольшое отклонение от точного центра."
+    },
+    {
+      "item": "CORE PEDESTAL diameter about 0.55 of figure height",
+      "requested": 0.55,
+      "measured_estimate": 0.719,
+      "unit": "diameter / figure height",
+      "note": "Подставка шире ориентира. Оценка по ширине маски подставки и base_top_pct_est, не точный обмер 3D-геометрии."
+    }
+  ],
+  "operational_errors": [
+    {
+      "resolved": true,
+      "type": "PowerShell native argument quoting in Python copy command",
+      "generation": 2,
+      "image_generation_error": false,
+      "copy_command_exit_code": 1,
+      "checker_exit_code": 0,
+      "note": "Перед проверкой g2 команда копирования остановилась из-за передачи кавычек в Python через PowerShell. Следующий скрипт с кодом 0 фактически проверил ещё g1. Его отчёт сохранён как checks/design-front-g2/stale-input-report.json и отдельно учтён в verification.json. Затем g2 побайтно скопирован, проверен в собственном каталоге и финальным прогоном. Ошибка устранена; дополнительных генераций не было."
+    }
+  ],
+  "process_cleanup": {
+    "background_processes_started": 0,
+    "all_shell_commands_completed": true
+  },
+  "encoding": {
+    "writer": "Python Path.write_text(encoding=utf-8), json.dumps(ensure_ascii=False, indent=2)",
+    "bom": false
+  }
+}

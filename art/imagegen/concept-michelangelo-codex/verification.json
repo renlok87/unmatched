@@ -1,0 +1,247 @@
+{
+  "card_id": "ASSET-MICHELANGELO-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_scope": "Ручные записи только внутри пакета. Внешние оригиналы image_gen разрешены контрактом; их original_path записан в generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-michelangelo-codex/checks/design-front-g1/checks-report.json",
+      "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-michelangelo-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-michelangelo-codex/checks/design-front-g2/checks-report.json",
+      "stdout": "WARN view.single_component  front    value=[1.875, 0.147, 0.034, 0.013, 0.011, 0.011, 0.01, 0.008, 0.008, 0.007] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-michelangelo-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-michelangelo-codex/design/checks-report.json",
+      "final": true,
+      "stdout": "WARN view.single_component  front    value=[1.875, 0.147, 0.034, 0.013, 0.011, 0.011, 0.01, 0.008, 0.008, 0.007] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-michelangelo-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; коллажа, второго вида, текста, логотипов и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура строго фронтальная. Две боковые поверхности дисков имеют прямые горизонтальные границы, верхняя поверхность подставки скрыта."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, хвосты маски, обе пары нунчаков и вся подставка в кадре. Фон визуально ровный угольно-серый; контрольные точки вне силуэта дают RGB около 46–48 с вариацией фактуры 1–2 уровня."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "В каждой руке нунчаки, как одновременно требует IDENTITY ANCHORS. Поэтому буквальный запрет оружия и предметов не выполнен. Руки с зазором от торса, локти согнуты, поза не T и не A. Убрать нунчаки означало бы нарушить неизменяемые SUBJECT и IDENTITY ANCHORS; этот конфликт нельзя исправить допустимым CORRECTION."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: a nunchaku in each hand; orange eye mask with tails; brown shell on the back; grinning face",
+      "passed": true,
+      "note": "Нунчаки в обеих руках читаются вместе со стальными цепями. Оранжевая маска с двумя хвостами, коричневый спинной панцирь за плечами и по бокам, улыбающееся лицо видимы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Зелёная кожа, коричневый панцирь, оранжевая маска и стальные цепи присутствуют. Светлая грудная пластина и пояс — оттенки коричневого; подставка тёмно-серая без цветного кольца и металлической полосы."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной подставке; дополнительных видов, текста и знаков нет."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Фигура направлена прямо в камеру, но между стопами видна верхняя поверхность подставки; её верхняя граница изгибается."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": false,
+      "note": "Фигура и подставка целиком, но фон за фигурой светлее краёв; виден плавный перепад тона."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Руки отделены от корпуса, локти согнуты; в каждой руке нунчаки. Запрет предметов противоречит SUBJECT и IDENTITY ANCHORS неизменяемого CORE."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "every identity anchor is visible: a nunchaku in each hand; orange eye mask with tails; brown shell on the back; grinning face",
+      "passed": true,
+      "note": "Две пары нунчаков с цепями, оранжевая маска с двумя хвостами, коричневый край спинного панциря за плечами и боками, широкая улыбка видимы."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Зелёная кожа, коричневый панцирь, оранжевая маска и стальные цепи присутствуют; подставка серая без цветного или металлического обода."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; коллажа, второго вида, текста, логотипов и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура строго фронтальная. Две боковые поверхности дисков имеют прямые горизонтальные границы, верхняя поверхность подставки скрыта."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, хвосты маски, обе пары нунчаков и вся подставка в кадре. Фон визуально ровный угольно-серый; контрольные точки вне силуэта дают RGB около 46–48 с вариацией фактуры 1–2 уровня."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "В каждой руке нунчаки, как одновременно требует IDENTITY ANCHORS. Поэтому буквальный запрет оружия и предметов не выполнен. Руки с зазором от торса, локти согнуты, поза не T и не A. Убрать нунчаки означало бы нарушить неизменяемые SUBJECT и IDENTITY ANCHORS; этот конфликт нельзя исправить допустимым CORRECTION."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "every identity anchor is visible: a nunchaku in each hand; orange eye mask with tails; brown shell on the back; grinning face",
+      "passed": true,
+      "note": "Нунчаки в обеих руках читаются вместе со стальными цепями. Оранжевая маска с двумя хвостами, коричневый спинной панцирь за плечами и по бокам, улыбающееся лицо видимы."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Зелёная кожа, коричневый панцирь, оранжевая маска и стальные цепи присутствуют. Светлая грудная пластина и пояс — оттенки коричневого; подставка тёмно-серая без цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "allowed_this_run": 2,
+      "used_this_run": 2,
+      "selected": 2
+    }
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ]
+    }
+  ],
+  "core_deviations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "PEDESTAL diameter about 0.55 of the figure height",
+      "passed": false,
+      "expected_ratio": 0.55,
+      "estimated_ratio": 0.747,
+      "note": "Подставка шире CORE: оценка около 0.75 вместо около 0.55. Диаметр взят из base_width_pct, высота фигуры — от top_pct до base_top_pct_est; оценка верха подставки приблизительна. Скрипт и обязательный CHECKLIST эту пропорцию отдельно не проверяют."
+    }
+  ],
+  "contradictions": [
+    {
+      "item": "No weapon or held object versus a nunchaku in each hand",
+      "note": "CORE дословно содержит оба требования. Удаление нунчаков нарушает SUBJECT и IDENTITY ANCHORS; исправление конфликта не добавлялось в CORRECTION."
+    }
+  ],
+  "final_script_exit_code": 0,
+  "final_script_summary": {
+    "PASS": 12,
+    "WARN": 1,
+    "FAIL": 0
+  },
+  "selected_path": "art/imagegen/concept-michelangelo-codex/design/michelangelo-front.png",
+  "images_modified": false,
+  "text_encoding": "UTF-8 without BOM; Python Path.write_text",
+  "tool_errors": [],
+  "process_cleanup": {
+    "background_processes_started": [],
+    "all_command_processes_finished": true
+  },
+  "workflow_notes": [
+    "Все команды из корня репозитория; PYTHONIOENCODING=utf-8, PYTHONDONTWRITEBYTECODE=1; Python с -B.",
+    "Первый python -c не записал файлы из-за передачи кавычек PowerShell. Слишком длинный финальный командный аргумент также был отвергнут до запуска. Запись выполнена Python через короткие команды с ASCII-передачей содержимого; это не ошибки check_concept_views.py и не попытки генерации.",
+    "До запуска пакет содержал только palette.json; она сохранена."
+  ],
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-michelangelo-codex/palette.json",
+      "before_sha256": "5fc1222270eddef6e0f4bcf59e1ff2e04809ab6150b62705bb8147caf8507a34",
+      "after_sha256": "5fc1222270eddef6e0f4bcf59e1ff2e04809ab6150b62705bb8147caf8507a34",
+      "bytes": 300,
+      "unchanged": true
+    }
+  ],
+  "raw_copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-michelangelo-codex/concepts/michelangelo-design-front-g1.png",
+      "sha256": "33f10064adb96909f3992b8cc6dc5beefc1e34c181231efd4768620af975ec11",
+      "bytes": 1920603,
+      "original_identical": true,
+      "selected": false
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-michelangelo-codex/concepts/michelangelo-design-front-g2.png",
+      "sha256": "8cb7a7a66df5adf006b2d1fa0b0afe632afb20080f9519d87dc286a269d023aa",
+      "bytes": 1727806,
+      "original_identical": true,
+      "selected": true
+    }
+  ],
+  "selected_copy_identical": true,
+  "preexisting_package_files_preserved": true
+}

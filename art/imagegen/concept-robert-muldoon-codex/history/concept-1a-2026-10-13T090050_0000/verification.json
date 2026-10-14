@@ -1,0 +1,186 @@
+{
+  "card_id": "ASSET-ROBERT-MULDOON-001",
+  "stage": "1a",
+  "run_id": "concept-1a-2026-10-13T090050_0000",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все файлы исполнителя записаны только в пакет. Исходные копии image_gen вне пакета оставлены по явному договору задания.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robert-muldoon-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "output": "WARN view.frame_top         front    value=2.21 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-robert-muldoon-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.frame_top"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robert-muldoon-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "output": "WARN view.single_component  front    value=[2.282, 0.015, 0.012, 0.01, 0.007, 0.007, 0.005, 0.004, 0.004, 0.004] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-robert-muldoon-codex/checks/design-front-g2/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.single_component"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+      "final": true,
+      "output": "WARN view.single_component  front    value=[2.282, 0.015, 0.012, 0.01, 0.007, 0.007, 0.005, 0.004, 0.004, 0.004] limit=прочие < 0.5 %  # одна крупная связная фигура\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-robert-muldoon-codex/design/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        "view.single_component"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка. Дополнительных видов, персонажей, надписей, логотипов и водяного знака не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере. Верхняя плоскость подставки полностью скрыта; передние грани обоих ярусов прямые и горизонтальные. Признаков трёхчетвертного поворота не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, ствол и подставка целиком в кадре. Фон визуально ровный нейтральный тёмно-серый, без пола и падающей тени. Маска: верх 4,834%, низ 92,887%, центр подставки x50,0%."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружие держит собственная правая рука фигуры, слева для зрителя. У обеих рук виден зазор до корпуса; локти согнуты, поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: shotgun in the RIGHT hand; wide-brimmed bush hat; khaki safari shirt; ammo belt",
+      "passed": true,
+      "note": "Видны длинное ружьё в правой руке, широкополая коричневая шляпа, рубашка сафари цвета хаки и пояс с патронами."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Видны хаки одежды, коричневый шляпы, загорелая кожа и стальной серый оружия. Небольшие тёплые детали патронов остаются в сдержанной земляной гамме. Командных цветов и цветной/металлической полосы на подставке нет."
+    }
+  ],
+  "candidate_checklist": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "В g1 видна верхняя плоскость подставки; передние грани дугообразные. Остальные визуальные пункты выполнены."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов CHECKLIST выполнены."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "generations_used_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [],
+  "image_transformations": [],
+  "text_encoding": "UTF-8 without BOM",
+  "scope": {
+    "image_inputs": 1,
+    "git_commands": 0,
+    "unreal_access": false,
+    "downloads": false,
+    "tripo": false,
+    "syntx": false
+  },
+  "processes": {
+    "background_processes_started": [],
+    "remaining_task_processes": []
+  },
+  "limitations": [
+    "Виды side/back не создавались; межвидовая согласованность на шаге 1a не проверяется.",
+    "Круглую форму подставки нельзя доказать одним видом строго с ребра.",
+    "g2: WARN view.single_component; допустимое предупреждение сегментации, не FAIL. Визуально второго субъекта нет."
+  ],
+  "date": "2026-10-13T09:08:40+00:00",
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-robert-muldoon-codex/palette.json",
+      "sha256_before": "01275584e398b85791c96c2521e8bc212e5116996516d297f10c879440d9e8ce",
+      "sha256_after": "01275584e398b85791c96c2521e8bc212e5116996516d297f10c879440d9e8ce",
+      "unchanged": true
+    }
+  ],
+  "pre_existing_package_files": [
+    {
+      "path": "art/imagegen/concept-robert-muldoon-codex/palette.json",
+      "unchanged": true
+    }
+  ],
+  "raw_image_integrity": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-robert-muldoon-codex/concepts/robert-muldoon-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1347d-2299-70d1-8bee-38b305c412c4\\exec-83eea61b-c699-4b46-987e-b70ab48cf270.png",
+      "sha256": "8a61ab74d50ac73cb922a3dfaeaa4493c0af1cd379c472dbeebc738d97cd41da",
+      "original_matches_saved": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-robert-muldoon-codex/concepts/robert-muldoon-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1347d-2299-70d1-8bee-38b305c412c4\\exec-6c32f31a-f0a7-4e45-b678-78df5802ca75.png",
+      "sha256": "ff87dd40c1400047cc5b5858c1d5d3dde20d4ee3d841612686b5c83200b9902a",
+      "original_matches_saved": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-robert-muldoon-codex/design/robert-muldoon-front.png",
+    "sha256": "ff87dd40c1400047cc5b5858c1d5d3dde20d4ee3d841612686b5c83200b9902a",
+    "matches_generation": true
+  }
+}

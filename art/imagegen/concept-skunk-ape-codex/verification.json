@@ -1,0 +1,189 @@
+{
+  "card_id": "ASSET-SKUNK-APE-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-skunk-ape-codex/palette.json",
+      "sha256_before": "5272e6194403928705c52fd531d47df0abd4407b898326fedacab0943f0c40c9",
+      "sha256_after": "5272e6194403928705c52fd531d47df0abd4407b898326fedacab0943f0c40c9",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "write_scope_note": "Only agent writes inside the package; tool-owned original image_gen files are the explicitly required exception and are preserved.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-skunk-ape-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "input_sha256": "7e464a3b5e0b15ef3088034281ba8842a8586a368e9207e7ccd43390aed176c2"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-skunk-ape-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "input_sha256": "e6d6afc26b5e0f176ca8bbece1f6f124b9651098ae832df91b82dbe005ce9512"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-skunk-ape-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 11,
+        "WARN": 2,
+        "FAIL": 0
+      },
+      "input_sha256": "e6d6afc26b5e0f176ca8bbece1f6f124b9651098ae832df91b82dbe005ce9512"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке; второго вида, текста, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "По визуальному осмотру лицо, корпус и стопы направлены фронтально; верхняя плоскость подставки скрыта, её верхняя кромка горизонтальная, эллипс не виден. Параметры виртуальной камеры по одному PNG независимо не измеряются."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре. Фон визуально ровный тёмно-серый; крупного градиента и виньетки после коррекции не видно. Медиана рамки RGB [51, 51, 50], небольшая пиксельная фактура сохраняется."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Кисти пустые; обе руки отделены от корпуса видимыми просветами, локти слегка согнуты, руки опущены; это нейтральная стойка, не T/A-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: tall hunched ape body; shaggy matted fur with swamp moss; long arms; big feet",
+      "passed": true,
+      "note": "Высокое сутулое обезьяноподобное тело, спутанная тёмная шерсть с болотным мхом, длинные руки и крупные стопы различимы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Видны тёмно-коричневая шерсть, оливковый мох, серо-коричневая кожа и янтарные глаза. Командной окраски, цветного кольца и металлической полосы на подставке нет; точное совпадение всех пикселей с hex не утверждается."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "selected": {
+    "design-front": "g2"
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "CORE FRAMING / view.frame_top",
+      "expected": "top_pct >= 4",
+      "observed": 2.486,
+      "severity": "WARN",
+      "note": "Предупреждение разрешено заданием; не являлось основанием для повтора."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "CORE FRAMING / pedestal bottom",
+      "expected": "bottom_pct = 93",
+      "observed": 96.133,
+      "severity": "documented deviation",
+      "note": "Подставка полностью видна; численный ориентир ядра не достигнут."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "view.single_component",
+      "expected": "other components < 0.5% of image",
+      "observed": 1.118,
+      "severity": "WARN",
+      "note": "Дополнительная компонента относится к сегментации силуэта; второй фигуры или предмета при осмотре нет."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "visual verification scope",
+      "severity": "observation limit",
+      "note": "Проверка камеры и палитры выполнена глазами по PNG; математическая ортографичность и точное равенство освещённых цветов hex не подтверждаются независимо. Сгенерирован только один вид."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "selected": false,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Визуально заметны узкая полоска верхней поверхности подставки и слабый градиент фона. Остальные четыре пункта выполнены. Скрипт: 0 FAIL, 1 WARN."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "selected": true,
+      "failed_items": [],
+      "note": "Верх подставки скрыт, фон заметно ровнее; все шесть пунктов визуального CHECKLIST выполнены. Скрипт: 0 FAIL, 2 WARN."
+    }
+  ],
+  "byte_copies": [
+    {
+      "generation": "g1",
+      "saved_path": "art/imagegen/concept-skunk-ape-codex/concepts/skunk-ape-design-front-g1.png",
+      "sha256": "7e464a3b5e0b15ef3088034281ba8842a8586a368e9207e7ccd43390aed176c2",
+      "original_exists": true,
+      "byte_identical": true
+    },
+    {
+      "generation": "g2",
+      "saved_path": "art/imagegen/concept-skunk-ape-codex/concepts/skunk-ape-design-front-g2.png",
+      "sha256": "e6d6afc26b5e0f176ca8bbece1f6f124b9651098ae832df91b82dbe005ce9512",
+      "original_exists": true,
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-skunk-ape-codex/design/skunk-ape-front.png",
+    "sha256": "e6d6afc26b5e0f176ca8bbece1f6f124b9651098ae832df91b82dbe005ce9512",
+    "byte_identical": true
+  },
+  "retouch_resize_crop_recolour_reencode": false,
+  "errors": [],
+  "text_encoding": "UTF-8 without BOM; Python Path.write_text, ensure_ascii=False"
+}

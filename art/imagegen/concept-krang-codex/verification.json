@@ -1,0 +1,215 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-krang-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate",
+      "stdout": "WARN view.frame_top         front    value=1.657 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-krang-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-krang-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate",
+      "stdout": "WARN view.frame_top         front    value=2.348 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.702, 0.175, 0.033, 0.013, 0.011, 0.011, 0.011, 0.01, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-krang-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-krang-codex/design/checks-report.json",
+      "phase": "selected",
+      "stdout": "WARN view.frame_top         front    value=2.348 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.702, 0.175, 0.033, 0.013, 0.011, 0.011, 0.011, 0.01, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-krang-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Один робот с Крангом в брюшной полости и одна двухъярусная подставка. Нет коллажа, дополнительных видов, надписей или водяных знаков. WARN view.single_component относится к разделению пиксельной маски, а не к дополнительному персонажу."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Визуально фронтальный вид без разворота в три четверти. У двух дисков прямые параллельные горизонтальные кромки; верхняя плоскость подставки не видна, тонкая светлая линия читается как фаска. Ортографичность оценена по изображению, параметры камеры генератор не сообщает."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура и подставка находятся в кадре. Фон ровный тёмно-серый, без пола и заметного градиента. Верхний отступ 2,348% вместо заданных 4% даёт разрешённый WARN; обрезания нет."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Обе кисти пустые. Между руками и корпусом отчётливые просветы, локти слегка согнуты, кисти опущены; поза не Т- и не А-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: pink alien brain sitting in the robot's belly; tall humanoid robot body; grey and purple armour plates",
+      "passed": true,
+      "note": "Розовый мозг с лицом и щупальцами виден в открытой брюшной полости высокого двуногого робота. Серые и фиолетовые бронепластины явно присутствуют."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Присутствуют серый, фиолетовый и розовый основные цвета, жёлтый акцент глаз. Нет командной окраски, цветного кольца или металлической ленты на каменной подставке."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "candidate_visual_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view"
+      ],
+      "note": "A narrow pedestal top surface and a curved front edge remain visible; the framing WARN is not a retry reason."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Прямые кромки обоих дисков; верхняя плоскость не видна. Остальные пять пунктов CHECKLIST проходят."
+    }
+  ],
+  "final_script_exit_code": 0,
+  "run_id": "2026-10-13-1a-r1",
+  "card_id": "ASSET-KRANG-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13T07:53:13+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-krang-codex/palette.json",
+      "sha256_before": "0a932ca9e543110ca898134adfb553bb280ebb75151054edb0fd71f55c41e8e3",
+      "sha256_after": "0a932ca9e543110ca898134adfb553bb280ebb75151054edb0fd71f55c41e8e3",
+      "bytes_before": 300,
+      "bytes_after": 300,
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-krang-codex/palette.json",
+      "unchanged": true
+    }
+  ],
+  "write_scope": {
+    "allowed_directory": "art/imagegen/concept-krang-codex",
+    "method": "All explicit repository writes in this run target the package; Python bytecode writes were disabled. image_gen original saves are the required exception and remain at the logged original_path. No full scan of unrelated work or unreal was performed."
+  },
+  "copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-krang-codex/concepts/krang-design-front-g1.png",
+      "original_sha256": "2134a30b3f03b5d37a5efde917a91ec41b202d6c680f9718df41230a398aef38",
+      "saved_sha256": "2134a30b3f03b5d37a5efde917a91ec41b202d6c680f9718df41230a398aef38",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-krang-codex/concepts/krang-design-front-g2.png",
+      "original_sha256": "14e91717f9f4a7b1bc5b421671f30076a243d71b9397e73af7b3ec42d0e8fead",
+      "saved_sha256": "14e91717f9f4a7b1bc5b421671f30076a243d71b9397e73af7b3ec42d0e8fead",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "view": "design-front",
+    "generation": 2,
+    "path": "art/imagegen/concept-krang-codex/design/krang-front.png",
+    "sha256": "14e91717f9f4a7b1bc5b421671f30076a243d71b9397e73af7b3ec42d0e8fead",
+    "byte_identical": true
+  },
+  "generation_limit": {
+    "design-front": 2
+  },
+  "final_summary": {
+    "PASS": 11,
+    "WARN": 2,
+    "FAIL": 0
+  },
+  "warnings": [
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 2.348,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "WARN",
+      "value": [
+        1.702,
+        0.175,
+        0.033,
+        0.013,
+        0.011,
+        0.011,
+        0.011,
+        0.01,
+        0.009,
+        0.008
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    }
+  ],
+  "unmet_prompt_constraints": [
+    {
+      "view": "design-front",
+      "item": "FRAMING.subject_top",
+      "target_min_pct": 4,
+      "actual_pct": 2.348,
+      "note": "Разрешённый WARN view.frame_top; фигура не обрезана. Повтор только из-за WARN запрещён заданием."
+    },
+    {
+      "view": "design-front",
+      "item": "FRAMING.pedestal_bottom",
+      "target_pct": 93,
+      "actual_pct": 95.994,
+      "note": "Низ подставки ниже целевого ориентира, но целиком в кадре; автопроверка view.bottom_margin проходит."
+    },
+    {
+      "view": "design-front",
+      "item": "PEDESTAL.diameter_to_figure_height",
+      "target_about": 0.55,
+      "actual_estimate": 0.672,
+      "note": "Приближённая оценка по маске и base_top_pct_est. Подставка шире ориентира CORE; это не провал отдельного пункта CHECKLIST."
+    }
+  ],
+  "prompt_verification": {
+    "g2_core_unchanged": true,
+    "g2_correction_lines": 1,
+    "core_sha256": "87af975994cde53bb9ada696c6f98091564e8fb6c7a23f42250608d9ada19e8a"
+  },
+  "raw_images_modified": false,
+  "background_processes_started": []
+}

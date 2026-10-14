@@ -1,0 +1,297 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-13T10:37:40+00:00",
+  "set": "art/imagegen/concept-bullseye-codex/checks/.temporary-metadata-only-20261013T103733672540Z/design-front-g1",
+  "key": "bullseye",
+  "role": "hero",
+  "views": [
+    "front"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-bullseye-codex/checks/.temporary-metadata-only-20261013T103733672540Z/design-front-g1/bullseye-front.png",
+      "sha256": "33fd44fcfd850c6baabdbf136a86db1ea507b7197b4e3037d60b1fb2b99c7e29",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1280,
+        1600
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": 4.0
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1280,
+        1600
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 26,
+        "median_rgb": [
+          81.0,
+          82.0,
+          87.0
+        ],
+        "share_within_tone_warn": 0.2898,
+        "share_within_tone_fail": 0.352,
+        "p99_deviation": 47.0,
+        "neutral_delta": 5.0,
+        "luma": 82.1
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          5.35,
+          5.3,
+          4.95
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 23.994,
+        "filled_area_pct": 23.994,
+        "components_kept": 6,
+        "main_component_pct": 23.499,
+        "other_components_pct": [
+          0.377,
+          0.034,
+          0.033,
+          0.03,
+          0.022,
+          0.017,
+          0.01,
+          0.01,
+          0.009,
+          0.008
+        ],
+        "bbox_px": [
+          0,
+          153,
+          1280,
+          1568
+        ],
+        "top_pct": 9.562,
+        "bottom_pct": 98.0,
+        "left_pct": 0.0,
+        "right_pct": 100.0,
+        "height_pct": 88.438,
+        "base_center_x_pct": 91.914,
+        "base_width_pct": 16.172,
+        "base_top_pct_est": 96.562
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1280,
+            1600
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1280,
+          1600
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "FAIL",
+      "value": {
+        "share_warn_tone": 0.2898,
+        "share_fail_tone": 0.352,
+        "p99_deviation": 47.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        81.0,
+        82.0,
+        87.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 82.1,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 23.994,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 9.562,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "PASS",
+      "value": 9.562,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 98.0,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "FAIL",
+      "value": 0.0,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        0.377,
+        0.034,
+        0.033,
+        0.03,
+        0.022,
+        0.017,
+        0.01,
+        0.01,
+        0.009,
+        0.008
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 11,
+    "WARN": 0,
+    "FAIL": 2
+  },
+  "verdict": "FAIL",
+  "palette": {
+    "path": "art/imagegen/concept-bullseye-codex/palette.json",
+    "swatches": [
+      {
+        "name": "costume black",
+        "hex": "#18181C",
+        "role": "main",
+        "figure_share_within_40_pct": 47.79
+      },
+      {
+        "name": "costume blue",
+        "hex": "#1F3E8A",
+        "role": "main",
+        "figure_share_within_40_pct": 3.79
+      },
+      {
+        "name": "target white",
+        "hex": "#E8E8E8",
+        "role": "main",
+        "figure_share_within_40_pct": 1.01
+      },
+      {
+        "name": "blade steel",
+        "hex": "#B8BEC4",
+        "role": "accent",
+        "figure_share_within_40_pct": 1.07
+      }
+    ]
+  },
+  "sheet": null
+}

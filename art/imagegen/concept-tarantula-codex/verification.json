@@ -1,0 +1,300 @@
+{
+  "card_id": "ASSET-TARANTULA-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:28:55+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-tarantula-codex/palette.json",
+      "sha256_before": "592f82fa15d2660ef96648491360f3776d6326c5603c6a3bc0fab4255bbdc5e6",
+      "sha256_after": "592f82fa15d2660ef96648491360f3776d6326c5603c6a3bc0fab4255bbdc5e6",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-tarantula-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-tarantula-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-tarantula-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "id": "single_subject",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Один паук на одной двухъярусной подставке. Коллажа, второго вида, надписей, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "id": "front_orthographic",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Не выполнено полностью: паук обращён прямо к камере и симметричен, но над передней стенкой верхнего диска видна узкая верхняя поверхность; нижняя кромка слегка выгнута. Строгое положение подставки ребром не достигнуто."
+    },
+    {
+      "view": "design-front",
+      "id": "whole_subject_background",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и вся подставка в кадре. Фон визуально ровный тёмно-серый; медиана рамки [47,47,47], p99 отклонения 3. Автопроверки рамки и обрезки PASS."
+    },
+    {
+      "view": "design-front",
+      "id": "no_weapon_separated_limbs",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и удерживаемого предмета нет. У паука нет человеческих рук: проверена передняя пара ног, отделённая от корпуса просветами; человеческая T/A-поза не добавлялась."
+    },
+    {
+      "view": "design-front",
+      "id": "identity_anchors",
+      "item": "every identity anchor is visible: huge hairy spider; eight thick legs with orange bands; glossy black eyes; fangs",
+      "passed": true,
+      "note": "Видны крупное волосатое тело, четыре толстые полосатые ноги с каждой стороны (всего восемь), чёрные блестящие глаза и два клыка. Перекрытия у оснований ног остаются естественными для фронтального вида."
+    },
+    {
+      "view": "design-front",
+      "id": "palette_no_team_colour",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневая шерсть, тёмное тело, оранжевые полосы и чёрные глаза присутствуют. Окрашенного командного акцента, цветного кольца и металлической ленты на подставке нет; блики глаз не считаются дополнительной сильной палитрой."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "selected": true,
+      "checklist": [
+        {
+          "view": "design-front",
+          "id": "single_subject",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Один паук на одной двухъярусной подставке. Коллажа, второго вида, надписей, логотипа и водяного знака нет."
+        },
+        {
+          "view": "design-front",
+          "id": "front_orthographic",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Не выполнено полностью: паук обращён прямо к камере и симметричен, но над передней стенкой верхнего диска видна узкая верхняя поверхность; нижняя кромка слегка выгнута. Строгое положение подставки ребром не достигнуто."
+        },
+        {
+          "view": "design-front",
+          "id": "whole_subject_background",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и вся подставка в кадре. Фон визуально ровный тёмно-серый; медиана рамки [47,47,47], p99 отклонения 3. Автопроверки рамки и обрезки PASS."
+        },
+        {
+          "view": "design-front",
+          "id": "no_weapon_separated_limbs",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Оружия и удерживаемого предмета нет. У паука нет человеческих рук: проверена передняя пара ног, отделённая от корпуса просветами; человеческая T/A-поза не добавлялась."
+        },
+        {
+          "view": "design-front",
+          "id": "identity_anchors",
+          "item": "every identity anchor is visible: huge hairy spider; eight thick legs with orange bands; glossy black eyes; fangs",
+          "passed": true,
+          "note": "Видны крупное волосатое тело, четыре толстые полосатые ноги с каждой стороны (всего восемь), чёрные блестящие глаза и два клыка. Перекрытия у оснований ног остаются естественными для фронтального вида."
+        },
+        {
+          "view": "design-front",
+          "id": "palette_no_team_colour",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Коричневая шерсть, тёмное тело, оранжевые полосы и чёрные глаза присутствуют. Окрашенного командного акцента, цветного кольца и металлической ленты на подставке нет; блики глаз не считаются дополнительной сильной палитрой."
+        }
+      ],
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "selected": false,
+      "checklist": [
+        {
+          "view": "design-front",
+          "id": "single_subject",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Один паук, одна подставка, без коллажа и текста."
+        },
+        {
+          "view": "design-front",
+          "id": "front_orthographic",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Подставка показана ребром: верхняя плоскость не видна, фронтальные линии дисков горизонтальны. Паук расположен строго спереди."
+        },
+        {
+          "view": "design-front",
+          "id": "whole_subject_background",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Ничего не обрезано; нейтральный тёмно-серый фон. Автопроверки PASS."
+        },
+        {
+          "view": "design-front",
+          "id": "no_weapon_separated_limbs",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Оружия и предмета нет. Передние короткие конечности отделены от корпуса; человеческие руки не добавлены."
+        },
+        {
+          "view": "design-front",
+          "id": "identity_anchors",
+          "item": "every identity anchor is visible: huge hairy spider; eight thick legs with orange bands; glossy black eyes; fangs",
+          "passed": false,
+          "note": "Не выполнено: читаются шесть длинных полосатых ног и две короткие передние конечности без оранжевых полос. Требование восьми толстых ног с оранжевыми полосами не доказано."
+        },
+        {
+          "view": "design-front",
+          "id": "palette_no_team_colour",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Основные коричневые и оранжевый цвета и чёрный акцент глаз присутствуют; цветного кольца и металлической ленты нет."
+        }
+      ],
+      "failed_items": [
+        "every identity anchor is visible: huge hairy spider; eight thick legs with orange bands; glossy black eyes; fangs"
+      ]
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_generations": {
+    "design-front": 1
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ]
+    }
+  ],
+  "core_constraints": [
+    {
+      "id": "framing.aspect_3_4",
+      "passed": true,
+      "note": "1086 × 1448, отношение сторон ровно 3:4."
+    },
+    {
+      "id": "framing.base_center_x50",
+      "passed": true,
+      "note": "Центр подставки x50,0 % по маске автопроверки."
+    },
+    {
+      "id": "framing.top_y_at_least_4",
+      "passed": true,
+      "note": "Верх маски y14,572 %: требование не выше y4 % выполнено."
+    },
+    {
+      "id": "framing.bottom_y93",
+      "passed": false,
+      "note": "Низ маски подставки y90,608 % вместо y93 %. Исходный PNG оставлен без изменений.",
+      "measured_pct": 90.608,
+      "target_pct": 93
+    },
+    {
+      "id": "pedestal.diameter_about_0_55_figure_height",
+      "passed": false,
+      "note": "Визуальная оценка: ширина подставки около 888 px, высота паука до верхней границы подставки около 963 px; отношение около 0,92 вместо около 0,55. Автоматическая оценка base_top_pct_est для широко расставленных ног непригодна и здесь не использована.",
+      "approximate_ratio": 0.92,
+      "target_ratio": 0.55
+    },
+    {
+      "id": "pose.even_support_on_pedestal",
+      "passed": false,
+      "note": "Некоторые концы ног находятся вне подставки либо выше верхней границы. Равномерная опора не подтверждена; универсальные строки CORE про обе стопы и обе руки сохранены дословно."
+    }
+  ],
+  "image_integrity": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13452-b4d7-7ba0-bc5e-b847e5d6adaa\\exec-3f3f5570-6a27-42cb-bbf2-626a959a9b0e.png",
+      "saved_path": "art/imagegen/concept-tarantula-codex/concepts/tarantula-design-front-g1.png",
+      "sha256": "2330b8effbf58c2486caedc0d8b95b6e794a64b684a739a5e2285f0aa39d7936",
+      "original_matches_saved": true,
+      "original_unchanged": true,
+      "saved_unchanged": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13452-b4d7-7ba0-bc5e-b847e5d6adaa\\exec-26616e60-0d35-46e5-88ad-a47f076e3548.png",
+      "saved_path": "art/imagegen/concept-tarantula-codex/concepts/tarantula-design-front-g2.png",
+      "sha256": "86c97b27b6ab2885e897b9709e0ad2e862327b46969178fcfa5b34faef07368c",
+      "original_matches_saved": true,
+      "original_unchanged": true,
+      "saved_unchanged": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-tarantula-codex/design/tarantula-front.png",
+    "generation": 1,
+    "sha256": "2330b8effbf58c2486caedc0d8b95b6e794a64b684a739a5e2285f0aa39d7936",
+    "byte_identical_to_candidate": true
+  },
+  "preserved_preexisting_package": [
+    {
+      "path": "art/imagegen/concept-tarantula-codex/palette.json",
+      "sha256_before": "592f82fa15d2660ef96648491360f3776d6326c5603c6a3bc0fab4255bbdc5e6",
+      "sha256_after": "592f82fa15d2660ef96648491360f3776d6326c5603c6a3bc0fab4255bbdc5e6",
+      "unchanged": true
+    }
+  ],
+  "tool_errors": [],
+  "git_commands_run": false,
+  "unreal_accessed": false,
+  "downloads_performed": false,
+  "lingering_task_processes": []
+}

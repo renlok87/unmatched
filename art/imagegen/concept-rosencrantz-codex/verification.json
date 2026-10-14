@@ -1,0 +1,188 @@
+{
+  "card_id": "ASSET-ROSENCRANTZ-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rosencrantz-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rosencrantz-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rosencrantz-codex/design/checks-report.json",
+      "run": "selected_final",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух дисков; нет коллажа, дополнительных видов, текста, букв, логотипа или водяного знака."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фронтальный вид: лицо и корпус обращены к камере, разворота в три четверти нет. Диски показаны с ребра, фронтальные грани горизонтальны; видимая светлая кромка является фаской, открытой поверхности верха подставки нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, перо, кинжал, ступни и подставка целиком в кадре. Нейтральный тёмно-серый фон без пола, предметов и заметной отбрасываемой тени; небольшая неоднородность тона генерации остаётся в допуске view.border_uniform."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Кинжал в собственной правой руке, слева для зрителя. Обе руки отведены от корпуса, у предплечий видны просветы фона; локти слегка согнуты, стойка нейтральная, не T/A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: dagger in the figure's own RIGHT hand; feathered cap; puffed sleeves; short cape;",
+      "passed": true,
+      "note": "Видны единственный кинжал в правой руке, шапочка с золотым пером, объёмные буфы рукавов и короткий чёрный плащ до верхней части бёдер."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Зелёный дублет, чёрный плащ, белый воротник и золотое перо присутствуют. Золото используется также в небольшой декоративной отделке; других насыщенных цветов нет. Подставка тёмно-каменная, без командной окраски, цветного кольца и металлической полосы."
+    }
+  ],
+  "candidate_visual_failures": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "CHECKLIST item 2",
+        "CHECKLIST item 4",
+        "CHECKLIST item 5"
+      ],
+      "note": "Виден верх подставки; длинный плащ закрывает просветы у рук; у пояса второе оружие. Исправления ограничены тремя строками CORRECTION."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "errors": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "required_min_pct": 4,
+      "observed_pct": 3.522,
+      "severity": "WARN",
+      "note": "Допустимый WARN. Не является причиной повтора; предмет не обрезан, пункт CHECKLIST выполнен."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE.FRAMING.pedestal_bottom",
+      "target_pct": 93,
+      "observed_pct": 94.751,
+      "note": "Точное целевое положение не выдержано; view.bottom_margin PASS."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE.FRAMING.pedestal_center",
+      "target_pct": 50,
+      "observed_pct": 49.862,
+      "note": "Небольшое отклонение центра; изображение не правилось."
+    }
+  ],
+  "file_scope_audit": {
+    "allowed_write_root": "art/imagegen/concept-rosencrantz-codex/",
+    "note": "Все записи исполнителя и отчёты валидатора внутри пакета. Разрешённые заданием оригиналы image_gen перечислены в original_path записей генераций и оставлены на месте.",
+    "git_commands_executed": 0,
+    "unreal_accessed": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "downloads_performed": false,
+    "background_processes_started": [],
+    "all_commands_completed": true
+  },
+  "date": "2026-10-13T04:50:36.131866+00:00",
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-rosencrantz-codex/palette.json",
+      "before_sha256": "a790bd36a67cc4810fc1c936567f2d69913e966bab7d31e90ce03fa4b5afa74b",
+      "after_sha256": "a790bd36a67cc4810fc1c936567f2d69913e966bab7d31e90ce03fa4b5afa74b",
+      "unchanged": true,
+      "bytes": 302
+    }
+  ],
+  "preexisting_package_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-rosencrantz-codex/palette.json",
+      "sha256": "a790bd36a67cc4810fc1c936567f2d69913e966bab7d31e90ce03fa4b5afa74b",
+      "unchanged": true
+    }
+  ],
+  "image_copy_verification": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-rosencrantz-codex/concepts/rosencrantz-design-front-g1.png",
+      "sha256": "1171457852895edd436ba5e7f0a7aa1e92c61f3e4bd4b16d0bbf9c08b532816d",
+      "byte_identical_to_original": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-rosencrantz-codex/concepts/rosencrantz-design-front-g2.png",
+      "sha256": "7fcd77f191d21be5e54a332cf4ccf9a7d8d00f1efe51561aea103360f5d656bd",
+      "byte_identical_to_original": true
+    }
+  ],
+  "selected_design_copy": {
+    "path": "art/imagegen/concept-rosencrantz-codex/design/rosencrantz-front.png",
+    "generation": 2,
+    "sha256": "7fcd77f191d21be5e54a332cf4ccf9a7d8d00f1efe51561aea103360f5d656bd",
+    "byte_identical_to_candidate": true
+  }
+}

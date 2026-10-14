@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-13",
+  "card_id": "ASSET-GOLDEN-BAT-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все явные записи агента выполнены только внутри пакета. Единственное разрешённое исключение — исходные PNG, сохранённые самим image_gen вне пакета; они оставлены на месте и указаны в original_path. Полный мониторинг чужих процессов и всего диска не выполнялся.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-golden-bat-codex/checks/design-front-g1/checks-report.json",
+      "kind": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-golden-bat-codex/checks/design-front-g2/checks-report.json",
+      "kind": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-golden-bat-codex/design/checks-report.json",
+      "kind": "selected_final"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка. Текста, водяного знака и логотипоподобных эмблем нет; застёжки и пряжка украшены абстрактным орнаментом."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус направлены прямо к камере, разворота в три четверти нет. Передние края обоих дисков горизонтальны; верхняя площадка не видна. Тонкая светлая линия у верхнего края читается как фаска."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, посох и оба диска целиком в кадре. Ровный тёмно-серый фон без пола и падающей тени; рамка имеет median RGB [41, 41, 42], p99 deviation 2. Верх посоха y=3,177% — разрешённый WARN, обрезки нет."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Посох зажат собственной правой кистью фигуры, слева для зрителя. Обе руки отделены от торса видимыми промежутками перед тёмной подкладкой плаща; локти согнуты, T-позы и A-позы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: golden skull face; dark red high-collared cape; golden body; ornate staff in the RIGHT hand;",
+      "passed": true,
+      "note": "Золотой череп, золотое тело, тёмно-красный плащ с высоким воротником и орнаментированный посох в правой руке читаются отчётливо."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Присутствуют золотой основной цвет, тёмно-красный плащ, почти чёрная подкладка и зелёные камни посоха. Сильных дополнительных и командных цветов нет; подставка тёмно-каменная, без цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_per_view": {
+    "design-front": 2
+  },
+  "generations_used": 2,
+  "limit_reached": [],
+  "selected": {
+    "design-front": 2
+  },
+  "candidate_failures": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "script_failures": [],
+      "checklist_failed_items": [
+        "CHECKLIST item 1 (no logo)",
+        "CHECKLIST item 2 (strict front orthographic view)"
+      ],
+      "note": "У g1 видна узкая верхняя площадка подставки и логотипоподобные эмблемы летучей мыши на застёжках плаща и пряжке. Оба пункта исправлены в g2."
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "required": "y >= 4%",
+      "actual": "y = 3.177%",
+      "note": "Верхушка посоха выше заданной рамки на 0,823 процентного пункта. Скрипт помечает это WARN; за WARN повторная генерация запрещена, визуальный пункт «ничего не обрезано» пройден."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE pedestal diameter",
+      "required": "about 0.55 of the figure height",
+      "actual": "approximately 0.64 of the figure height (visual estimate)",
+      "note": "По видимым границам фигуры без подставки: диаметр около 752 px, рост около 1175 px. Подставка несколько шире ориентира CORE; это записано отдельно от обязательных пунктов CHECKLIST."
+    }
+  ],
+  "errors": [],
+  "image_edits_performed": false,
+  "tool_calls": 2,
+  "only_image_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+  "palette_input_used_as_image": false,
+  "lifecycle": {
+    "background_services_started": [],
+    "unfinished_exec_sessions": [],
+    "note": "Все команды выполнялись синхронно и завершились. Долгоживущие процессы и сервисы для задачи не запускались.",
+    "process_inventory_verified": false,
+    "process_inventory_limitation": "Get-CimInstance Win32_Process was denied by the sandbox (HRESULT 0x80041003). The shell printed a no-process line after the error; that line is not evidence. No background services or unfinished exec sessions were started, and each invoked command returned completion."
+  },
+  "decisions": [
+    "Выбран g2: оба визуальных недостатка g1 устранены; разрешённый WARN view.frame_top принят с явной записью.",
+    "Для фронтального вида side_view=null.",
+    "Зелёный акцент размещён в камнях посоха; застёжки и пряжка имеют абстрактный орнамент.",
+    "Диски считаются круглыми по CORE: строгий вид в профиль показывает их прямоугольный силуэт, глубина круга по одному фронту не измеряется."
+  ],
+  "verified_at": "2026-10-13T08:08:05+00:00",
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-golden-bat-codex/palette.json",
+      "before_sha256": "15c8d7cfbb461c3c52bdb330e7246e200ce2ff448fd83baccb9e4de71f37d0dc",
+      "after_sha256": "15c8d7cfbb461c3c52bdb330e7246e200ce2ff448fd83baccb9e4de71f37d0dc",
+      "unchanged": true,
+      "bytes": 295
+    }
+  ],
+  "raw_copy_verification": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13445-8c47-7190-a61c-23e63cd82f2b\\exec-08d2fe70-5595-4b5d-b865-9937889377ba.png",
+      "saved_path": "art/imagegen/concept-golden-bat-codex/concepts/golden-bat-design-front-g1.png",
+      "original_sha256": "455f7da4446bdafd3798e06b8aabedf4d93ee4c75a1058dc912140ff376fd944",
+      "saved_sha256": "455f7da4446bdafd3798e06b8aabedf4d93ee4c75a1058dc912140ff376fd944",
+      "byte_identical": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13445-8c47-7190-a61c-23e63cd82f2b\\exec-116adde4-e4c3-429a-b86d-068aba704c33.png",
+      "saved_path": "art/imagegen/concept-golden-bat-codex/concepts/golden-bat-design-front-g2.png",
+      "original_sha256": "9999b8c63cdec553c7f4bee65f3e8d40c5b6e9689166e7534c386fab1d6dbb11",
+      "saved_sha256": "9999b8c63cdec553c7f4bee65f3e8d40c5b6e9689166e7534c386fab1d6dbb11",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "view": "design-front",
+    "generation": 2,
+    "saved_path": "art/imagegen/concept-golden-bat-codex/design/golden-bat-front.png",
+    "sha256": "9999b8c63cdec553c7f4bee65f3e8d40c5b6e9689166e7534c386fab1d6dbb11",
+    "byte_identical": true
+  },
+  "tooling_notes": [
+    {
+      "tool": "npx openskills read",
+      "result": "ENOTCACHED",
+      "resolution": "Read the installed local SKILL.md directly; no downloads."
+    },
+    {
+      "tool": "exec_command",
+      "result": "CreateProcessAsUserW error 206 on oversized documentation command",
+      "resolution": "No command started or files changed; documentation written in smaller Python calls using ASCII base64 transport."
+    },
+    {
+      "tool": "Get-CimInstance Win32_Process",
+      "result": "Access denied: HRESULT 0x80041003",
+      "resolution": "No process was stopped. Process-wide inspection unavailable; synchronous command completion is recorded separately."
+    }
+  ]
+}

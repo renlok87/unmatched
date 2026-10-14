@@ -1,0 +1,187 @@
+{
+  "card_id": "ASSET-BRUCE-LEE-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-bruce-lee-codex/palette.json",
+      "sha256_before": "495ba61affba041cdee77d2a44a677f62d85f74856c22b3d333bd2ff223b7e71",
+      "sha256_after": "495ba61affba041cdee77d2a44a677f62d85f74856c22b3d333bd2ff223b7e71",
+      "bytes_before": 298,
+      "bytes_after": 298,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "scope_verification": {
+    "method": "Пути записи собственных команд ограничены пакетом; импорт Python не создавал pycache (PYTHONDONTWRITEBYTECODE=1 / -B). Полный снимок внешнего дерева не выполнялся; чужие параллельные изменения не оценивались.",
+    "package": "art/imagegen/concept-bruce-lee-codex",
+    "tool_originals_exception": "Автоматические оригиналы image_gen вне репозитория разрешены контрактом; оба оставлены на месте.",
+    "git_commands_run": false,
+    "unreal_opened_edited_or_built": false,
+    "downloads_run": false
+  },
+  "preexisting_package_files_unchanged": true,
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bruce-lee-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bruce-lee-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-bruce-lee-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной двухдисковой подставке. Коллажа, второго ракурса, надписей, букв, логотипа и водяного знака не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере; разворота в три четверти не видно. Передние грани обоих дисков горизонтальны, верхняя плоскость подставки не раскрыта. Проверка визуальная, параметры виртуальной камеры из PNG не извлекаются."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, кисти, стопы и оба диска полностью в кадре. Фон нейтральный тёмно-серый: медиана рамки RGB [47, 47, 47], p99 отклонения 2; визуально без градиента, пола и падающей тени. Незначительное зерно генерации сохранено."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Оружия и предметов в руках нет. Обе руки отделены от корпуса видимыми просветами, локти согнуты; это боевая стойка, не T- и не A-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair;",
+      "passed": true,
+      "note": "Виден жёлтый комбинезон с чёрными боковыми полосами, обе обнажённые кисти в боевой стойке и короткие чёрные волосы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Присутствуют жёлтая ткань, чёрные полосы, тёплая загорелая кожа и чёрная обувь. Свет и тени меняют локальные оттенки; дополнительных сильных цветов нет. Командного цвета, цветного кольца и металлической ленты на основании нет."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;"
+      ],
+      "note": "Верхняя плоскость подставки видна; фон имеет слабую неравномерность тона."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов визуального CHECKLIST пройдены."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": {
+      "used": 2,
+      "allowed_in_this_run": 2,
+      "selected_generation": 2
+    }
+  },
+  "limit_reached": [],
+  "unmet_limits": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "actual_pct": 3.453,
+      "required_min_pct": 4.0,
+      "severity": "WARN",
+      "allowed_by_task": true,
+      "note": "Изображение целиком в кадре. WARN не считается FAIL и не служит причиной повторной генерации; пиксели не правились."
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-bruce-lee-codex/concepts/bruce-lee-design-front-g1.png",
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13465-9b2c-7f91-86e0-bc9516085f9d/exec-43d91448-6bf2-48f7-a14e-69f271874dc5.png",
+      "sha256": "312a32bbcef079c22a4b4e54e5016f83ade2bdbcd389da111a485b475d33fe44",
+      "bytes": 1578855,
+      "byte_identical": true,
+      "original_preserved": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-bruce-lee-codex/concepts/bruce-lee-design-front-g2.png",
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13465-9b2c-7f91-86e0-bc9516085f9d/exec-a9162b34-397d-489c-941c-aced13ac8679.png",
+      "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+      "bytes": 1544620,
+      "byte_identical": true,
+      "original_preserved": true
+    }
+  ],
+  "selected_design": {
+    "view": "design-front",
+    "generation": 2,
+    "path": "art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png",
+    "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+    "byte_identical_to_selected_candidate": true,
+    "final_script_exit_code": 0
+  },
+  "image_processing": {
+    "retouched": false,
+    "resized": false,
+    "cropped": false,
+    "recoloured": false,
+    "reencoded": false
+  },
+  "errors": [],
+  "operational_notes": [
+    {
+      "tool": "npx openskills read 3d-model-pipeline",
+      "exit_code": 1,
+      "error": "ENOTCACHED: openskills was not cached; npm used only-if-cached mode and reported no log file written.",
+      "resolved_by": "Read the local skill and relevant concept-sheet instructions without downloading anything."
+    }
+  ],
+  "encoding": {
+    "text_writer": "Python Path.write_text(..., encoding='utf-8')",
+    "json_writer": "json.dumps(..., ensure_ascii=False, indent=2)",
+    "bom": false,
+    "shell_cyrillic_pipe_used": false
+  },
+  "process_cleanup": {
+    "foreground_commands_completed": true,
+    "background_processes_started": [],
+    "services_started": []
+  },
+  "checked_at": "2026-10-13T08:44:19.011519+00:00"
+}

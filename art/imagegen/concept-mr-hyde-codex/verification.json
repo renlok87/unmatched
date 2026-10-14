@@ -1,0 +1,62 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [],
+  "checklist": [],
+  "generations": {
+    "design-front": {
+      "calls_attempted_this_run": 1,
+      "images_produced_this_run": 0,
+      "allowed_this_run": 2,
+      "selected": null
+    }
+  },
+  "limit_reached": [],
+  "status": "blocked",
+  "blocker": "image_gen отклонил запрос на этапе output: moderation_blocked; изображение не создано.",
+  "tool_errors": [
+    {
+      "generation": "ASSET-MR-HYDE-001-1a-design-front-g1",
+      "tool": "image_gen.imagegen",
+      "error": "image generation failed: http 400 Bad Request: {\"error\":{\"message\":\"Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID 3c95ac66-e359-4ee5-9f6f-59c50a4674be.\",\"type\":\"image_generation_user_error\",\"param\":null,\"code\":\"moderation_blocked\",\"moderation_details\":{\"moderation_stage\":\"output\",\"categories\":[\"other\"]}}}"
+    }
+  ],
+  "final_script_exit_code": null,
+  "unmet_requirements": [
+    {
+      "view": "design-front",
+      "items": [
+        "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+        "every identity anchor is visible: huge clenched fists; torn grey frock coat; hunched back; wild hair",
+        "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base"
+      ],
+      "note": "Нет полученного изображения: CHECKLIST и check_concept_views.py не выполнялись. Выбранного файла нет."
+    }
+  ],
+  "byte_copy_verification": [],
+  "audit": {
+    "method": "Явные операции записи ограничены указанным пакетом; git, Unreal, Tripo, SYNTX и загрузки не запускались.",
+    "image_tool_exception": "Инструмент вернул ошибку без пути к изображению; внешняя копия не получена."
+  },
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-mr-hyde-codex/palette.json",
+      "sha256_before": "d3121e8985c6a44231d5317f0156ee796020c9a63b2d6a514da371ab8ae6740f",
+      "sha256_after": "d3121e8985c6a44231d5317f0156ee796020c9a63b2d6a514da371ab8ae6740f",
+      "bytes_before": 300,
+      "bytes_after": 300,
+      "unchanged": true
+    }
+  ]
+}

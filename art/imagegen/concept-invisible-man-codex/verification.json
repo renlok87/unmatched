@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-invisible-man-codex/checks/design-front-g1/checks-report.json",
+      "purpose": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-invisible-man-codex/checks/design-front-g2/checks-report.json",
+      "purpose": "candidate"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-invisible-man-codex/design/checks-report.json",
+      "purpose": "selected-final"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура, одна подставка; коллажа, второго вида и надписей не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фронтальная симметрия без разворота; подставка с ребра, верхняя плоскость скрыта, передний край горизонтален. Математическая ортографичность растрового изображения не измеряется."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Шляпа, руки, ноги и подставка целиком в кадре; ровный тёмно-серый фон без пола и тени на фоне."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Кисти пусты; видны зазоры между предплечьями и корпусом, локти слегка согнуты; нейтральная стойка с опорой на обе ноги."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: head wrapped in bandages; dark round goggles; brown overcoat with raised collar; brimmed hat;",
+      "passed": true,
+      "note": "Все четыре якоря видны. Также читаются накладной нос и пустой тёмный проём в воротнике вместо шеи."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Видны белые бинты, коричневое пальто, чёрные линзы и светло-коричневые перчатки; командного цвета и цветной или металлической полосы на подставке нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_per_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "generation": 1,
+      "observed_pct": 1.934,
+      "requested_min_pct": 4,
+      "note": "Допустимый WARN; не причина повтора."
+    },
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "severity": "WARN",
+      "generation": 2,
+      "observed_pct": 2.21,
+      "requested_min_pct": 4,
+      "note": "Отступ меньше требования CORE; предупреждение допускается заданием."
+    }
+  ],
+  "candidate_visual_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view"
+      ],
+      "note": "Верхняя плоскость подставки видна, передний край криволинеен. Повтор только по этому пункту CHECKLIST."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все пункты CHECKLIST выполнены визуально; подставка с ребра."
+    }
+  ],
+  "outside_folder_note": "Пользовательские записи выполнены только внутри пакета. Штатные оригиналы image_gen вне пакета — явно разрешённое исключение; их пути записаны в generation-records.json.",
+  "tool_errors": [],
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-invisible-man-codex/palette.json",
+      "sha256_before": "c20abf78232297d497a224605bafbf5b2860fd3c408b8109781ce78fa088bc80",
+      "sha256_after": "c20abf78232297d497a224605bafbf5b2860fd3c408b8109781ce78fa088bc80",
+      "unchanged": true
+    }
+  ],
+  "existing_package_files_preserved": [
+    {
+      "path": "art/imagegen/concept-invisible-man-codex/palette.json",
+      "unchanged": true
+    }
+  ],
+  "image_copy_verification": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13364-1e79-7ef3-a66c-93d81d522762\\exec-74becb94-671f-4e9f-ac13-98277aea8ef9.png",
+      "saved_path": "art/imagegen/concept-invisible-man-codex/concepts/invisible-man-design-front-g1.png",
+      "sha256": "5cbcf655193e9bd65f814ae928622f5e2fa8248c14fcd20eaac12956079aef29",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13364-1e79-7ef3-a66c-93d81d522762\\exec-5ca47901-3752-42e3-824c-c00ad8152ee4.png",
+      "saved_path": "art/imagegen/concept-invisible-man-codex/concepts/invisible-man-design-front-g2.png",
+      "sha256": "de86108455a88092235ad0b029135cbe106af89720a74a32ac27c3fc3ee5affa",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-invisible-man-codex/design/invisible-man-front.png",
+    "generation": 2,
+    "byte_identical": true,
+    "sha256": "de86108455a88092235ad0b029135cbe106af89720a74a32ac27c3fc3ee5affa"
+  },
+  "text_encoding": "UTF-8 without BOM, written by Python"
+}

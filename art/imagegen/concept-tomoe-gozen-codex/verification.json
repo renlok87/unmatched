@@ -1,0 +1,207 @@
+{
+  "schema": "unmatched.concept-verification/1",
+  "card_id": "ASSET-TOMOE-GOZEN-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "scope_note": "Agent-authored writes are confined to this package. The image_gen-owned original outside the package is the explicitly required exception and remains untouched. No git commands, Unreal access, Tripo, SYNTX or downloads were used.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "invocation": "candidate-initial-before-copy-recovered",
+      "exit_code": null,
+      "shell_exit_code": 1,
+      "classified_exit_code": 2,
+      "exit_code_note": "The shell tool exposed exit_code=1. The script exit code was not separately captured; the ERROR text identifies an input error (InputError returns 2). It was treated as an input/tool error, never as a failed image check.",
+      "report": null,
+      "expected_report": "art/imagegen/concept-tomoe-gozen-codex/checks/design-front-g1/checks-report.json",
+      "error": "ERROR: нет каталога набора art\\imagegen\\concept-tomoe-gozen-codex\\design",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-tomoe-gozen-codex/design --key tomoe-gozen --views front --role hero --min-top-pct 4 --out art/imagegen/concept-tomoe-gozen-codex/checks/design-front-g1"
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "invocation": "candidate-after-copy",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-tomoe-gozen-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "scope": "front",
+          "result": "WARN",
+          "value": 1.519,
+          "limit": ">= 4.0 %",
+          "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "invocation": "final-selected",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-tomoe-gozen-codex/design/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "scope": "front",
+          "result": "WARN",
+          "value": 1.519,
+          "limit": ">= 4.0 %",
+          "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке, один фронтальный вид. Текста, логотипов и водяного знака не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": false,
+      "note": "Лицо и корпус обращены фронтально, без поворота 3/4. Однако вдоль верхнего края подставки видна узкая верхняя поверхность, её край слегка изгибается; строгое требование вида подставки с ребра не выполнено."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Нагината, волосы, ноги и подставка целиком в кадре. Фон визуально ровный тёмно-серый, без пола и падающей тени; небольшая пиксельная вариация тона присутствует. Рамка: медиана RGB 46/46/48, p99 отклонения 4."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Нагината в собственной правой руке, слева для зрителя. Локти согнуты, предплечья отделены от корпуса видимыми зазорами; правая рука поддерживает древко, левая свободна. Поза стоя, не T/A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: naginata in the RIGHT hand; red lacquered o-yoroi armour; white headband; long black hair;",
+      "passed": true,
+      "note": "Все четыре якоря видимы: нагината справа у фигуры, красные ламеллярные доспехи о-ёрой, белая повязка и длинные чёрные волосы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Красный лак, синие шнуры, чёрные волосы и золотая отделка представлены. Подставка тёмно-каменная, без командного цвета, цветного кольца и металлической ленты. Белая повязка и нейтральное лезвие соответствуют описанию."
+    }
+  ],
+  "core_limitations": [
+    {
+      "item": "FORBIDDEN: extra weapons",
+      "passed": false,
+      "note": "На поясе имеется дополнительный меч в ножнах; CORE запрещает extra weapons."
+    },
+    {
+      "item": "FRAMING: highest point y >= 4%",
+      "passed": false,
+      "note": "Верх маски y=1,519%; это WARN view.frame_top, а не основание для повторной генерации."
+    },
+    {
+      "item": "FRAMING: pedestal bottom y93%",
+      "passed": false,
+      "note": "Низ маски подставки y=95,994%, центр x=49,954%. Нижняя линия отличается от y93%, но обрезки нет."
+    },
+    {
+      "item": "PEDESTAL: diameter about 0.55 of figure height",
+      "passed": false,
+      "note": "Подставка визуально шире заданного ориентировочного отношения: около 0,65 высоты фигуры без оружия. Изображение не корректировалось."
+    }
+  ],
+  "generations_per_view": [
+    {
+      "view": "design-front",
+      "used": 1,
+      "allowed": 2,
+      "selected_generation": 1
+    }
+  ],
+  "limit_reached": [],
+  "retry_stopped_due_to_input_error": true,
+  "errors": [
+    {
+      "step": "copy-and-generation-record-preparation",
+      "type": "shell-argument-quoting",
+      "resolved": true,
+      "error": "SyntaxError: unterminated triple-quoted string literal. PowerShell native argument passing removed embedded quotes from the Python source. Recovered with ASCII base64-encoded Python source; the image was copied unchanged."
+    },
+    {
+      "step": "initial-candidate-check",
+      "type": "input",
+      "resolved_for_file_validation": true,
+      "regeneration_stopped": true,
+      "note": "Checker was mistakenly invoked after the preceding preparation command failed. The design folder did not yet exist. Subsequent candidate and final checks returned 0; no second image_gen call was made."
+    },
+    {
+      "step": "documentation-write-command",
+      "type": "process-command-length",
+      "resolved": true,
+      "note": "The combined documentation command exceeded Windows process argument length before running. Recovered by writing each document in a separate shorter Python invocation."
+    }
+  ],
+  "unmet_requirements": [
+    {
+      "item": "automatic retry after visual checklist failure",
+      "note": "The orthographic-pedestal checklist item failed, but the initial input error stopped further image generation as instructed. One of the two permitted generations remains unused."
+    },
+    {
+      "item": "initial checker actual exit code",
+      "note": "The initial direct shell invocation did not separately capture the Python script exit code. Shell status 1 and the full input-error message are preserved above."
+    }
+  ],
+  "visual_review": {
+    "performed": true,
+    "selected_file": "art/imagegen/concept-tomoe-gozen-codex/design/tomoe-gozen-front.png",
+    "note": "Reviewed the full generated image and its package copy. Not an acceptance score; artistic acceptance remains with the acceptor."
+  },
+  "processes": {
+    "background_processes_started": [],
+    "cleanup_required": false
+  },
+  "generated_at": "2026-10-13T08:38:54+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-tomoe-gozen-codex/palette.json",
+      "sha256_before": "f97f892701c37ff1200c8ff655bc79f28393c0b07de00826a7fafc7ed3307fb1",
+      "sha256_after": "f97f892701c37ff1200c8ff655bc79f28393c0b07de00826a7fafc7ed3307fb1",
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_unchanged": true,
+  "image_integrity": {
+    "sha256": "dffd47153ec5f6f8196467b868b5f432d736a64ac9d69e20be02c50113eb1c16",
+    "original_unchanged": true,
+    "candidate_unchanged": true,
+    "selected_is_byte_copy": true,
+    "retouched": false,
+    "resized": false,
+    "cropped": false,
+    "recoloured": false,
+    "reencoded": false
+  }
+}

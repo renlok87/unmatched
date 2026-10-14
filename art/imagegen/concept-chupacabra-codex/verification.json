@@ -1,0 +1,160 @@
+{
+  "run_id": "ASSET-CHUPACABRA-001-1a-2026-10-13",
+  "date": "2026-10-13T08:25:43+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-chupacabra-codex/palette.json",
+      "before_sha256": "0d2a099c8528d706763c9a547b6ef9a0474fd79f70f2dcb0fcba9830bcf7970c",
+      "after_sha256": "0d2a099c8528d706763c9a547b6ef9a0474fd79f70f2dcb0fcba9830bcf7970c",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "write_scope": {
+    "package": "art/imagegen/concept-chupacabra-codex",
+    "basis": "All executor write destinations and validator outputs were restricted to this package; tool-owned generated originals are the explicitly required exception and were retained. No repository-wide scan or git commands were used."
+  },
+  "preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-chupacabra-codex/palette.json",
+      "sha256": "0d2a099c8528d706763c9a547b6ef9a0474fd79f70f2dcb0fcba9830bcf7970c",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-chupacabra-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-chupacabra-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-chupacabra-codex/design/checks-report.json"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной подставке из двух дисков; дополнительных ракурсов, текста и знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура смотрит прямо в камеру; фронтальная симметрия лица и ног сохранена. Видны боковые стенки дисков и фаска; плоскость верха не видна, верхний передний край горизонтальный."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, шипы, хвост, когти и оба диска целиком в кадре. Фон ровный тёмный нейтральный серый: медиана рамки RGB [45, 45, 46], p99 отклонения 2. Верхнее поле 2,762% отмечено отдельно как разрешённый WARN."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Обе кисти пустые; обе руки отделены от торса заметными просветами. Локти согнуты, предплечья направлены вниз; нейтральная поза миниатюры."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: wiry reptilian beast on hind legs; spiny back ridge; grey-green scales; big dark eyes; long claws",
+      "passed": true,
+      "note": "Видны жилистый торс, две задние ноги, серо-зелёная чешуя, гребень вдоль спины слева по силуэту и хвосту, крупные тёмно-красные глаза с чёрными зрачками и длинные костяные когти."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Серо-зелёная кожа, тёмный гребень, костяные когти и клыки, красный акцент глаз присутствуют. Подставка тёмная каменная, без командного цвета, цветного кольца и металлической ленты."
+    }
+  ],
+  "candidate_visual_failures": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "У подставки g1 видна узкая полоса верхней поверхности; это единственная причина CORRECTION."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": []
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_budget": {
+    "allowed_this_run": 2,
+    "used_this_run": 2
+  },
+  "selected_generations": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "passed": false,
+      "measured_pct": 2.762,
+      "requested_min_pct": 4.0,
+      "severity": "WARN",
+      "note": "Разрешённое предупреждение; верхнее поле меньше CORE, но фигура не обрезана. WARN не является причиной ретрая и не является незакрытым пунктом CHECKLIST."
+    }
+  ],
+  "raw_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13454-d869-7d50-8f2d-c288247f275e\\exec-6711973a-8925-4ca1-98c9-de1905f8202b.png",
+      "saved_path": "art/imagegen/concept-chupacabra-codex/concepts/chupacabra-design-front-g1.png",
+      "sha256": "4bc6b9597e78b65135243357bcec2319199085de9be1c0d4b9001ce5d3d3c67d",
+      "bytes": 1793983,
+      "byte_identical": true,
+      "original_retained": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13454-d869-7d50-8f2d-c288247f275e\\exec-fbf7052e-5f6f-4411-90ee-ad0b09ae14a6.png",
+      "saved_path": "art/imagegen/concept-chupacabra-codex/concepts/chupacabra-design-front-g2.png",
+      "sha256": "077ae69992b66d664ebebedaa9179805d96ef5d3eae374bcca022f057f80eab7",
+      "bytes": 1913133,
+      "byte_identical": true,
+      "original_retained": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-chupacabra-codex/design/chupacabra-front.png",
+    "generation": 2,
+    "sha256": "077ae69992b66d664ebebedaa9179805d96ef5d3eae374bcca022f057f80eab7",
+    "byte_identical_to_candidate": true
+  },
+  "image_retouching": false,
+  "input_errors": [],
+  "processes_left_running": [],
+  "text_encoding": "UTF-8 without BOM; Path.write_text and json.dumps(ensure_ascii=False, indent=2)",
+  "commands_run_from_repository_root": true
+}

@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-13T04:26:31.554930+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-wayward-sister-codex/palette.json",
+      "sha256_before": "ee7eaf8a4133e2913d98df04cbb6db509b1db04838fc27d040223434dd6130bf",
+      "sha256_after": "ee7eaf8a4133e2913d98df04cbb6db509b1db04838fc27d040223434dd6130bf",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Repository writes confined to this package. Tool-managed originals outside repository are the explicitly required exception; paths recorded in generation-records.json.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна подставка, один вид; текста и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фронтально; верх подставки не виден, передние края горизонтальны. Орто и уровень камеры оценены глазами."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Ничего не обрезано. Фон ровный тёмно-серый: контрольные медианы RGB 46–47, p99 рамки 2; слабый пиксельный шум."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Посох справа у фигуры, слева для зрителя; оба рукава отделены от корпуса просветами, локти согнуты."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: crooked staff in the figure's own RIGHT hand; hooded ragged shawl; long grey hair; cauldron charm at the belt",
+      "passed": true,
+      "note": "Видны кривой посох, рваная шаль с капюшоном, длинная седина и котелок на поясе."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневый, почти чёрный, мшисто-зелёный и фиолетовый присутствуют; командного цвета и обода нет. Точное совпадение HEX не заявляется."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_this_run": 2,
+  "generation_limit": 2,
+  "selected_per_view": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "expected": "y >= 4%",
+      "observed": "2.970%",
+      "severity": "WARN",
+      "note": "No retry for WARN; not a failed CHECKLIST item."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE FRAMING pedestal bottom",
+      "expected": "y=93%",
+      "observed": "94.890%",
+      "severity": "recorded deviation",
+      "note": "Entire pedestal visible; exact target not achieved."
+    },
+    {
+      "view": "design-front",
+      "item": "camera parameters",
+      "note": "Judged visually; actual camera metadata unavailable."
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "original_sha256": "62eaaa2fc83253ab164d2eb6fb5149389fb60601f5a32a715a9eae8540f66cfe",
+      "saved_sha256": "62eaaa2fc83253ab164d2eb6fb5149389fb60601f5a32a715a9eae8540f66cfe",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_sha256": "efe4f6bbd66cc369505038b930eedd67c85fd6ffb9f75e92ba6dca588f9ff6d1",
+      "saved_sha256": "efe4f6bbd66cc369505038b930eedd67c85fd6ffb9f75e92ba6dca588f9ff6d1",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-wayward-sister-codex/design/wayward-sister-front.png",
+    "generation": 2,
+    "sha256": "efe4f6bbd66cc369505038b930eedd67c85fd6ffb9f75e92ba6dca588f9ff6d1",
+    "byte_identical": true
+  },
+  "existing_package_files_unchanged": true,
+  "tool_errors": [
+    {
+      "tool": "openskills",
+      "error": "ENOTCACHED; read local skill directly; npm reported no logs written.",
+      "resolved": true
+    },
+    {
+      "tool": "exec_command",
+      "error": "CreateProcess error 206, command too long; rejected before process start. Split document writing into shorter commands.",
+      "resolved": true
+    }
+  ],
+  "process_cleanup": "No background process started; shell and checker processes exited."
+}

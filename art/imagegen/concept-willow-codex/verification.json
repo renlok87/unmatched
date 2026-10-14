@@ -1,0 +1,540 @@
+{
+  "schema": "unmatched.concept-verification/1",
+  "card_id": "ASSET-WILLOW-001",
+  "stage": "1a",
+  "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1",
+  "date": "2026-10-13T09:51:44+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-willow-codex/palette.json",
+      "before_sha256": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+      "after_sha256": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+      "unchanged": true,
+      "bytes": 301
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Repository files explicitly written by this task. Authorized image_gen autosaves outside the repository are logged as original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate",
+      "stdout": "WARN view.frame_top         front    value=3.039 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate",
+      "stdout": "WARN view.frame_top         front    value=3.315 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.907, 0.132, 0.034, 0.022, 0.017, 0.017, 0.013, 0.012, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/checks/design-front-g2/selected-final-checks-report.json",
+      "phase": "selected_final",
+      "stdout": "WARN view.frame_top         front    value=3.315 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.907, 0.132, 0.034, 0.022, 0.017, 0.017, 0.013, 0.012, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-willow-codex/design/checks-report.json\n",
+      "stderr": "",
+      "original_report": "art/imagegen/concept-willow-codex/design/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/checks/design-front-g3/checks-report.json",
+      "phase": "candidate",
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1",
+      "stdout": "WARN view.frame_top         front    value=3.315 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g3/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/checks/design-front-g4/checks-report.json",
+      "phase": "candidate",
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1",
+      "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g4/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-willow-codex/design/checks-report.json",
+      "phase": "selected_final",
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1",
+      "stdout": "PASS: PASS 13 WARN 0 FAIL 0 → art/imagegen/concept-willow-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух дисков; нет коллажа, второго вида, текста, логотипа или водяного знака."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Лицо и корпус фронтальны; обе передние кромки подставки горизонтальны, верхняя плоскость не видна. Светлая узкая кромка читается как фаска."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, свечение, обувь и подставка целиком в кадре. Простой тёмно-серый фон без видимого пола, падающей тени или выраженной виньетки; небольшая фактура и пиксельная вариация отмечены в limitations."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Обе кисти пустые; свечение является заклинанием. Между руками и корпусом есть просветы, локти согнуты; поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: long red hair; colourful layered cardigan; long skirt; glowing spell in a raised hand",
+      "passed": true,
+      "note": "Видны длинные красные волосы до груди, зелёный вязаный кардиган поверх фиолетового топа, длинная фиолетовая юбка и голубое заклинание в поднятой руке. Костюм читается как современная богемная одежда."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Представлены красные волосы, зелёный кардиган, фиолетовая юбка и бледно-голубое свечение. Натуральные оттенки и оливковые участки кардигана отмечены как ограничение; подставка тёмная без командного цвета, цветного кольца или металлической полосы."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Виден верх подставки и перспективное закругление передней кромки. Повтор вызван этим пунктом CHECKLIST; WARN верхнего поля не был причиной повтора."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все шесть пунктов визуального CHECKLIST пройдены; выбран g2."
+    },
+    {
+      "view": "design-front",
+      "generation": 3,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Скрипт прошёл, но виден узкий верх подставки. Повтор вызван этим пунктом CHECKLIST; допустимый WARN view.frame_top не был причиной повтора.",
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "failed_items": [],
+      "note": "Все шесть пунктов CHECKLIST пройдены; выбран g4 за исправленный ракурс и сохранённые якоря.",
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13-fix1"
+    }
+  ],
+  "preexisting_package_files_preserved": [
+    {
+      "path": "art/imagegen/concept-willow-codex/checks/design-front-g1/checks-report.json",
+      "sha256_before": "147e9f48b690ab3ea2994416c4ef430c5a7f9b6958c26b03f4842213c43f4b0e",
+      "sha256_after": "147e9f48b690ab3ea2994416c4ef430c5a7f9b6958c26b03f4842213c43f4b0e",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-willow-codex/checks/design-front-g2/checks-report.json",
+      "sha256_before": "2d86980bbc976492f564ebe66ee17083014a362f33e3420879fed77641f9078e",
+      "sha256_after": "2d86980bbc976492f564ebe66ee17083014a362f33e3420879fed77641f9078e",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g1.png",
+      "sha256_before": "4a8cddc0a690d15592e25e30f586f580f5eae949c54342b1f4a1335656f5daa1",
+      "sha256_after": "4a8cddc0a690d15592e25e30f586f580f5eae949c54342b1f4a1335656f5daa1",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g2.png",
+      "sha256_before": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d",
+      "sha256_after": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-willow-codex/palette.json",
+      "sha256_before": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+      "sha256_after": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+      "unchanged": true
+    }
+  ],
+  "copy_verification": [
+    {
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a1347d-1fc8-7bd3-ab4f-8f9c991ad842/exec-e81faffb-978a-4ca8-aa93-a31b73109d4f.png",
+      "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g1.png",
+      "sha256": "4a8cddc0a690d15592e25e30f586f580f5eae949c54342b1f4a1335656f5daa1",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a1347d-1fc8-7bd3-ab4f-8f9c991ad842/exec-5558e369-f94a-4012-94d7-ec1bca07e6f7.png",
+      "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g2.png",
+      "sha256": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d",
+      "byte_identical": true
+    },
+    {
+      "generation": 3,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a134a2-201c-74f2-be1e-bb181bbdf33c/exec-68dcd87d-b9a8-4bdd-b38b-2344d0de089a.png",
+      "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g3.png",
+      "sha256": "0d04a42ce191119fa22c6010959485ea91782e838cf01e995b82dad03b69243c",
+      "byte_identical": true
+    },
+    {
+      "generation": 4,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a134a2-201c-74f2-be1e-bb181bbdf33c/exec-77c0a6bc-af3a-4927-8ccb-77c057a83927.png",
+      "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g4.png",
+      "sha256": "bed9369db14e7edb6346961e86b947a476506b6792acdcd4940223f41228ec17",
+      "byte_identical": true
+    }
+  ],
+  "selected": {
+    "view": "design-front",
+    "generation": 4,
+    "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g4.png",
+    "design_path": "art/imagegen/concept-willow-codex/design/willow-front.png",
+    "sha256": "bed9369db14e7edb6346961e86b947a476506b6792acdcd4940223f41228ec17",
+    "byte_identical_to_original": true
+  },
+  "generations_per_view": {
+    "design-front": 4
+  },
+  "generations_per_view_this_run": {
+    "design-front": 2
+  },
+  "previous_design_front_generations": 2,
+  "generation_limit_this_run": 2,
+  "generations_used_this_run": 2,
+  "limit_reached": [],
+  "warnings": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 4,
+      "item": "CORE pedestal bottom y93%",
+      "required_pct": 93,
+      "actual_pct": 95.235,
+      "blocking": false,
+      "note": "Подставка целиком в кадре. Изображение не перемещалось и не обрезалось."
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "item": "CORE pedestal center x50%",
+      "required_pct": 50,
+      "actual_pct": 49.862,
+      "blocking": false,
+      "note": "Небольшое отклонение от математического центра; пиксели не менялись."
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "item": "CORE perfectly flat single-tone background",
+      "blocking": false,
+      "border_p99_deviation": 4,
+      "note": "Сохраняется мелкая фактура и небольшая пиксельная вариация. Визуально фон простой тёмно-серый; border и neutral checks PASS."
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "item": "P exact palette swatches under natural material shading",
+      "blocking": false,
+      "note": "Основные цвета и голубой акцент представлены. Волосы имеют тёплые блики, зелёный кардиган местами оливковый; точное совпадение RGB со свотчами не заявляется. Художественную оценку коррекции P выполняет приёмщик."
+    }
+  ],
+  "prompts_exact_matches_tool_calls": true,
+  "restrictions": {
+    "git_commands_run": false,
+    "unreal_accessed": false,
+    "downloads_performed": false,
+    "tripo_used": false,
+    "syntx_used": false,
+    "generated_images_modified": false,
+    "tool_originals_preserved": true,
+    "text_encoding": "UTF-8 without BOM",
+    "package_text_written_by": "Python Path.write_text; json.dumps ensure_ascii=False indent=2",
+    "background_processes_started": []
+  },
+  "write_scope_proof": {
+    "method": "All explicit writes targeted this package. No repository-wide snapshot was taken. Python bytecode was disabled. All synchronous command processes completed. Earlier raw concepts, candidate reports and palette were hash-verified.",
+    "explicit_repository_write_root": "art/imagegen/concept-willow-codex"
+  },
+  "errors": [],
+  "resolved_operational_errors": [
+    {
+      "error": "Windows CreateProcess command-line length limit, error 206, while preparing package metadata.",
+      "resolution": "The rejected command never launched; split metadata writes into smaller Python commands."
+    },
+    {
+      "error": "PowerShell native argument quoting stripped embedded JSON in a Python command; Python failed before file writes or the checker invocation.",
+      "resolution": "Transferred subsequent ASCII Python scripts through base64; no extra image generation or checker error occurred."
+    },
+    {
+      "error": "First reconstruction of the historical final report changed numeric JSON formatting.",
+      "resolution": "Recreated it from the unchanged g2 candidate report and the original final timestamp; its SHA-256 now exactly matches the pre-run final report."
+    }
+  ],
+  "run_history": [
+    {
+      "run_id": "ASSET-WILLOW-001-1a-2026-10-13",
+      "verification": {
+        "checks": [
+          {
+            "view": "design-front",
+            "generation": 1,
+            "exit_code": 0,
+            "report": "art/imagegen/concept-willow-codex/checks/design-front-g1/checks-report.json",
+            "phase": "candidate",
+            "stdout": "WARN view.frame_top         front    value=3.039 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g1/checks-report.json\n",
+            "stderr": ""
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "exit_code": 0,
+            "report": "art/imagegen/concept-willow-codex/checks/design-front-g2/checks-report.json",
+            "phase": "candidate",
+            "stdout": "WARN view.frame_top         front    value=3.315 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.907, 0.132, 0.034, 0.022, 0.017, 0.017, 0.013, 0.012, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-willow-codex/checks/design-front-g2/checks-report.json\n",
+            "stderr": ""
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "exit_code": 0,
+            "report": "art/imagegen/concept-willow-codex/design/checks-report.json",
+            "phase": "selected_final",
+            "stdout": "WARN view.frame_top         front    value=3.315 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nWARN view.single_component  front    value=[1.907, 0.132, 0.034, 0.022, 0.017, 0.017, 0.013, 0.012, 0.009, 0.008] limit=прочие < 0.5 %  # одна крупная связная фигура\nPASS: PASS 11 WARN 2 FAIL 0 → art/imagegen/concept-willow-codex/design/checks-report.json\n",
+            "stderr": ""
+          }
+        ],
+        "checklist": [
+          {
+            "view": "design-front",
+            "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+            "passed": true,
+            "note": "Одна фигура и одна двухъярусная подставка; дополнительных видов, текста, букв, логотипов и водяных знаков нет."
+          },
+          {
+            "view": "design-front",
+            "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+            "passed": true,
+            "note": "Лицо и корпус фронтальны; верх подставки скрыт, передние кромки горизонтальны. Заметного наклона камеры или трёхчетвертного разворота нет."
+          },
+          {
+            "view": "design-front",
+            "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+            "passed": true,
+            "note": "Фигура, свечение, обе стопы и подставка целиком в кадре. Простой тёмно-серый фон без заметного градиента, виньетки, пола и падающей тени. Мелкая фактура фона отмечена как ограничение."
+          },
+          {
+            "view": "design-front",
+            "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+            "passed": true,
+            "note": "Оружия и предметов в руках нет; между рукавами и корпусом видны просветы, локти согнуты. Поза не T и не A."
+          },
+          {
+            "view": "design-front",
+            "item": "every identity anchor is visible: long red hair; colourful layered cardigan; long skirt; glowing spell in a raised hand",
+            "passed": true,
+            "note": "Читаются длинные рыжие волосы, зелёный многослойный кардиган с фиолетовыми вставками, длинная фиолетовая юбка и голубое свечение поднятой кисти."
+          },
+          {
+            "view": "design-front",
+            "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+            "passed": true,
+            "note": "Красные волосы, зелёный кардиган, фиолетовая юбка и бледно-голубое свечение представлены. Обувь, украшения и вышивка сдержанных оттенков; тёмная подставка без командного цвета, цветного кольца или металлической полосы."
+          }
+        ],
+        "candidate_reviews": [
+          {
+            "view": "design-front",
+            "generation": 1,
+            "failed_items": [
+              "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+            ],
+            "note": "Виден верх подставки и перспективное закругление передней кромки. Повтор вызван этим пунктом CHECKLIST; WARN верхнего поля не был причиной повтора."
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "failed_items": [],
+            "note": "Все шесть пунктов визуального CHECKLIST пройдены; выбран g2."
+          }
+        ],
+        "schema": "unmatched.concept-verification/1",
+        "card_id": "ASSET-WILLOW-001",
+        "stage": "1a",
+        "date": "2026-10-13T09:10:45+00:00",
+        "status": "предложено",
+        "source_unchanged": true,
+        "source_verification": [
+          {
+            "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+            "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+            "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+            "unchanged": true,
+            "bytes": 2034907
+          },
+          {
+            "path": "art/imagegen/concept-willow-codex/palette.json",
+            "before_sha256": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+            "after_sha256": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+            "unchanged": true,
+            "bytes": 301
+          }
+        ],
+        "outside_folder": [],
+        "outside_folder_scope": "Repository files explicitly written by this task. Tool-managed original autosaves outside the repository are authorized by the task and logged in copy_verification.",
+        "preexisting_package_files_preserved": [
+          {
+            "path": "art/imagegen/concept-willow-codex/palette.json",
+            "sha256_before": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+            "sha256_after": "c1f8c5a36428c28b5723c6a3b3eb0e38cb2bc34ea4967a594498bfad9db3d38e",
+            "unchanged": true
+          }
+        ],
+        "copy_verification": [
+          {
+            "generation": 1,
+            "original_path": "C:/Users/ren/.codex/generated_images/01a1347d-1fc8-7bd3-ab4f-8f9c991ad842/exec-e81faffb-978a-4ca8-aa93-a31b73109d4f.png",
+            "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g1.png",
+            "sha256": "4a8cddc0a690d15592e25e30f586f580f5eae949c54342b1f4a1335656f5daa1",
+            "byte_identical": true
+          },
+          {
+            "generation": 2,
+            "original_path": "C:/Users/ren/.codex/generated_images/01a1347d-1fc8-7bd3-ab4f-8f9c991ad842/exec-5558e369-f94a-4012-94d7-ec1bca07e6f7.png",
+            "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g2.png",
+            "sha256": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d",
+            "byte_identical": true
+          }
+        ],
+        "selected": {
+          "view": "design-front",
+          "generation": 2,
+          "saved_path": "art/imagegen/concept-willow-codex/concepts/willow-design-front-g2.png",
+          "design_path": "art/imagegen/concept-willow-codex/design/willow-front.png",
+          "sha256": "501f9dc3c757d48c72aa55c42e93e800e357d509a76442d7e6a2faa4387fbb3d",
+          "byte_identical_to_original": true
+        },
+        "generations_per_view": {
+          "design-front": 2
+        },
+        "generation_limit_this_run": 2,
+        "generations_used_this_run": 2,
+        "limit_reached": [],
+        "warnings": [
+          {
+            "view": "design-front",
+            "generation": 2,
+            "check_id": "view.frame_top",
+            "value": 3.315,
+            "limit": ">= 4.0 %",
+            "note": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "check_id": "view.single_component",
+            "value": [
+              1.907,
+              0.132,
+              0.034,
+              0.022,
+              0.017,
+              0.017,
+              0.013,
+              0.012,
+              0.009,
+              0.008
+            ],
+            "limit": "прочие < 0.5 %",
+            "note": "одна крупная связная фигура"
+          }
+        ],
+        "limitations": [
+          {
+            "view": "design-front",
+            "generation": 2,
+            "item": "CORE highest point y >= 4%",
+            "required_min_pct": 4,
+            "actual_pct": 3.315,
+            "blocking": false,
+            "note": "view.frame_top is an allowed WARN; it did not trigger the retry."
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "item": "CORE pedestal bottom y93%",
+            "required_pct": 93,
+            "actual_pct": 96.133,
+            "blocking": false,
+            "note": "The whole pedestal is visible; no crop or reposition was performed."
+          },
+          {
+            "view": "design-front",
+            "generation": 2,
+            "item": "CORE perfectly flat single-tone background",
+            "blocking": false,
+            "border_p99_deviation": 2.0,
+            "note": "Fine texture and small pixel variation remain. Visually no distinct gradient, vignette, floor or cast shadow; border and neutral-background checks PASS."
+          }
+        ],
+        "restrictions": {
+          "git_commands_run": false,
+          "unreal_accessed": false,
+          "downloads_performed": false,
+          "tripo_used": false,
+          "syntx_used": false,
+          "generated_images_modified": false,
+          "tool_originals_preserved": true,
+          "text_encoding": "UTF-8 without BOM",
+          "package_text_written_by": "Python Path.write_text; json.dumps ensure_ascii=False indent=2",
+          "background_processes_started": []
+        },
+        "write_scope_proof": {
+          "method": "All explicit task file-write operations targeted this package. No repository-wide snapshot was taken. Python child bytecode was disabled for checks. All command processes completed.",
+          "explicit_repository_write_root": "art/imagegen/concept-willow-codex"
+        },
+        "errors": [],
+        "resolved_operational_errors": [
+          {
+            "error": "Windows CreateProcess command-line length limit, error 206, while preparing package metadata.",
+            "resolution": "The rejected command never launched; split metadata writes into smaller Python commands."
+          }
+        ],
+        "text_encoding_verified": true
+      },
+      "selected_final_report_archive": "art/imagegen/concept-willow-codex/checks/design-front-g2/selected-final-checks-report.json"
+    }
+  ],
+  "text_encoding_verified": true
+}

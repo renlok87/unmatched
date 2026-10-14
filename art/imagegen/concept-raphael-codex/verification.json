@@ -1,0 +1,261 @@
+{
+  "card_id": "ASSET-RAPHAEL-001",
+  "stage": "1a",
+  "run_id": "ASSET-RAPHAEL-001-1a-2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все управляемые этим заданием записи сделаны внутри пакета. Оригиналы image_gen — предусмотренное заданием исключение, оставлены на месте; их абсолютные пути записаны только в original_path. Аудит относится к действиям этого запуска; состояние параллельных сессий не проверялось.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raphael-codex/checks/design-front-g1/checks-report.json",
+      "phase": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "verdict": "PASS",
+      "input_matches_generation": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raphael-codex/checks/design-front-g2/checks-report.json",
+      "phase": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "verdict": "PASS",
+      "input_matches_generation": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-raphael-codex/design/checks-report.json",
+      "phase": "selected",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "verdict": "PASS",
+      "input_matches_generation": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-01",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке. Коллажей, второго вида, надписей, букв, логотипов и водяных знаков не обнаружено."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-02",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура смотрит прямо в камеру; визуально фронтальный ортографический вид. Верхняя плоскость подставки скрыта, передние края дисков горизонтальны."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-03",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, оба сая и подставка полностью в кадре. Визуально однородный тёмно-серый фон без пола и падающей тени; скрипт измерил небольшую вариацию тона границы, p99 = 5."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-04",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "В обеих руках саи, поэтому запрет оружия не выполнен. Руки отделены от корпуса видимыми зазорами, локти согнуты; поза не T и не A. Запрет противоречит SUBJECT и обязательным IDENTITY ANCHORS; CORE оставлен дословно, удаление саев нарушило бы якоря."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-05",
+      "item": "every identity anchor is visible: a sai in each hand; red eye mask with tails; brown shell on the back; scowling face;",
+      "passed": true,
+      "note": "В каждой кисти по одному саю; красная глазная маска с двумя хвостами, коричневые края спинного панциря над плечами и по бокам, нахмуренный оскал читаются."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "CHECKLIST-06",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Зелёная кожа, коричневый панцирь и кожа ремней, красная маска и стальные саи присутствуют. Командной маркировки, цветного кольца и металлической полосы на подставке нет. Дополнительный охристый тон пластрона отмечен отдельно как отклонение от CORE."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "failed_ids": [
+        "CHECKLIST-04"
+      ]
+    }
+  ],
+  "candidate_assessments": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "script_exit_code": 0,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Верхняя плоскость подставки видна, передний край закруглён. Все якоря присутствуют. Поле до верха 5,663%, низ подставки 95,166%. Исправлялся только ракурс подставки; устранить конфликт запрета оружия без нарушения CORE невозможно."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "script_exit_code": 0,
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Ракурс подставки исправлен. Оскал яснее; руки и саи разнесены. Изменились расположение хвостов маски, ремни и цвет обмоток предплечий. Выбран как лучший из двух."
+    }
+  ],
+  "core_deviations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "POSE: No weapon or held object.",
+      "met": false,
+      "note": "Конфликт с SUBJECT и IDENTITY ANCHORS; саи сохранены, CHECKLIST-04 failed."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "PEDESTAL: diameter about 0.55 of the figure height.",
+      "met": false,
+      "note": "По изображению диаметр около 850 px, высота фигуры без подставки около 1133 px: отношение около 0,75, больше 0,55. Оценка визуальная, без изменения изображения."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "FRAMING: centred at x50% with its bottom at y93%.",
+      "met": false,
+      "note": "По скрипту центр подставки x48,895%, низ y93,854%; точные целевые координаты не достигнуты. Все проверки поля прошли."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "PALETTE: These are the main colours plus one accent; no other strong colours.",
+      "met": false,
+      "note": "Основные цвета и стальной акцент видны, но передний пластрон имеет заметный дополнительный жёлто-охристый оттенок. Попиксельное совпадение с hex не заявляется."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background.",
+      "met": null,
+      "note": "Визуально фон ровный, без выраженного градиента; строгая попиксельная однородность не достигнута: p99 отклонения границы 5, нейтральность |R-G|/|G-B| = 1. CHECKLIST-03 пройден по визуальному критерию и результату скрипта."
+    }
+  ],
+  "no_pixel_edits": true,
+  "execution_notes": [
+    "Первая команда копирования g1 завершилась SyntaxError из-за обработки кавычек PowerShell до выполнения записей; команда исправлена, побайтное копирование выполнено без нового вызова image_gen.",
+    "Одна команда записи документации отклонена Windows из-за превышения длины командной строки до выполнения записей; текст записан отдельными Python-командами через ASCII base64, UTF-8 без BOM."
+  ],
+  "small_decisions": [
+    "При неразрешимом конфликте сохранены обязательные саи, а запрет оружия отмечен как failed; CORE не изменялся.",
+    "Ретрай направлен только на видимую верхнюю поверхность подставки; WARN и тонкие детали не были причиной ретрая.",
+    "g2 выбран за исправленный ракурс подставки и более отчётливую злую мимику.",
+    "Палитра и единственный референс не менялись; все пути пакета записаны относительно корня репозитория."
+  ],
+  "errors": [],
+  "date": "2026-10-13T07:51:15+00:00",
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-raphael-codex/palette.json",
+      "sha256_before": "c15ddcd50c5e6a3e635d2c5363a3c62b8977b7ad3d6cb7af03628a56e49354c1",
+      "sha256_after": "c15ddcd50c5e6a3e635d2c5363a3c62b8977b7ad3d6cb7af03628a56e49354c1",
+      "unchanged": true
+    }
+  ],
+  "preserved_existing_package_files": [
+    {
+      "path": "art/imagegen/concept-raphael-codex/palette.json",
+      "sha256_before": "c15ddcd50c5e6a3e635d2c5363a3c62b8977b7ad3d6cb7af03628a56e49354c1",
+      "sha256_after": "c15ddcd50c5e6a3e635d2c5363a3c62b8977b7ad3d6cb7af03628a56e49354c1",
+      "unchanged": true
+    }
+  ],
+  "byte_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13434-7d93-7d10-afda-db64438572eb\\exec-77c5d549-f28d-4488-b42a-32ad8e5f4a55.png",
+      "saved_path": "art/imagegen/concept-raphael-codex/concepts/raphael-design-front-g1.png",
+      "original_sha256": "8b162496e4dd0ed45ff2aa7f46833130b5e1582bd8950b21178bf9b6b7493977",
+      "saved_sha256": "8b162496e4dd0ed45ff2aa7f46833130b5e1582bd8950b21178bf9b6b7493977",
+      "identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13434-7d93-7d10-afda-db64438572eb\\exec-c0b66a52-35fb-416a-9111-ce0960eb8808.png",
+      "saved_path": "art/imagegen/concept-raphael-codex/concepts/raphael-design-front-g2.png",
+      "original_sha256": "53ae19762bc777d34a0b4e4985ce465ba627ec61d5e469ebd2be30d92ec1ddd7",
+      "saved_sha256": "53ae19762bc777d34a0b4e4985ce465ba627ec61d5e469ebd2be30d92ec1ddd7",
+      "identical": true
+    }
+  ],
+  "selected_copy": {
+    "source": "art/imagegen/concept-raphael-codex/concepts/raphael-design-front-g2.png",
+    "saved_path": "art/imagegen/concept-raphael-codex/design/raphael-front.png",
+    "identical": true,
+    "sha256": "53ae19762bc777d34a0b4e4985ce465ba627ec61d5e469ebd2be30d92ec1ddd7"
+  },
+  "write_audit": {
+    "method": "All command write destinations were explicitly confined to this package; checker report outputs were confined to checks/ and design/. Generator originals are the explicit task exception. No repository-wide scan or git command was used.",
+    "package_files_written": [
+      "art/imagegen/concept-raphael-codex/README.md",
+      "art/imagegen/concept-raphael-codex/checks/design-front-g1/checks-report.json",
+      "art/imagegen/concept-raphael-codex/checks/design-front-g2/checks-report.json",
+      "art/imagegen/concept-raphael-codex/concepts/raphael-design-front-g1.png",
+      "art/imagegen/concept-raphael-codex/concepts/raphael-design-front-g2.png",
+      "art/imagegen/concept-raphael-codex/design/checks-report.json",
+      "art/imagegen/concept-raphael-codex/design/raphael-front.png",
+      "art/imagegen/concept-raphael-codex/generation-records.json",
+      "art/imagegen/concept-raphael-codex/manifest-sha256.json",
+      "art/imagegen/concept-raphael-codex/prompts.md",
+      "art/imagegen/concept-raphael-codex/prompts/concept-prompts.json",
+      "art/imagegen/concept-raphael-codex/source-hashes-before.json",
+      "art/imagegen/concept-raphael-codex/verification.json"
+    ]
+  },
+  "text_encoding": {
+    "encoding": "utf-8",
+    "bom": false,
+    "writer": "Python Path.write_text; JSON json.dumps ensure_ascii=False indent=2"
+  }
+}

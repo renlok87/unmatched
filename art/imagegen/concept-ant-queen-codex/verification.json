@@ -1,0 +1,191 @@
+{
+  "card_id": "ASSET-ANT-QUEEN-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:09:31+00:00",
+  "source_unchanged": true,
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-ant-queen-codex/palette.json",
+      "sha256_before": "0e7f9fdccbf3c8e91ece87af7c6e3297b551c94a3ebfd12bf3e7a082465144c4",
+      "sha256_after": "0e7f9fdccbf3c8e91ece87af7c6e3297b551c94a3ebfd12bf3e7a082465144c4",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Все самостоятельные записи ограничены пакетом. Собственные оригиналы image_gen вне пакета разрешены заданием и оставлены на месте; пути указаны в поле original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ant-queen-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ant-queen-codex/checks/design-front-g2/checks-report-before-copy-error.json",
+      "run": "accidental_pre_copy",
+      "note": "После синтаксической ошибки команды копирования фактически проверен g1; исходный отчёт сохранён побайтно до исправленного прогона g2.",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ant-queen-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-ant-queen-codex/design/checks-report.json",
+      "run": "final_selected",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна муравьиная фигура и одна двухъярусная подставка; второго вида, текста, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура смотрит строго фронтально; гребень, глаза, жвалы и пары конечностей расположены фронтально. Два диска показаны ребром: горизонтальные верхние края прямые, площадь верхней поверхности не видна. Поворота в три четверти и взгляда сверху нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Гребень, усики, все шесть конечностей и подставка целиком в кадре. Фон визуально ровный тёмно-серый, без пола, виньетки и падающей тени; автоматическая проверка рамки PASS (p99 отклонения 3 RGB). Верх 4,903%, низ 92,749%, центр подставки x50%."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и предметов нет. Верхняя пара конечностей свободна, согнута в суставах и отделена от корпуса видимыми промежутками. Конечности не образуют T- или A-позу; четыре остальные ноги образуют симметричную опору."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: giant ant; glossy red exoskeleton; swollen abdomen; six legs; crown-like head crest",
+      "passed": true,
+      "note": "Все пять якорей видны: гигантский муравей, глянцевый тёмно-красный экзоскелет, большое сегментированное брюшко, три пары конечностей (шесть ног) и коронообразный головной гребень. Также видны усики и жвалы."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Панцирь красный и тёмно-красный, ноги почти чёрные, глаза янтарные. Тёплые блики принадлежат красному панцирю; командной окраски нет. Подставка тёмно-серая, без цветного кольца и металлической полосы."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "core_deviations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE PEDESTAL: diameter about 0.55 of the figure height",
+      "passed": false,
+      "note": "Подставка шире заданной пропорции: по визуальным границам её ширина около 855 px, высота фигуры без подставки около 1150 px; отношение примерно 0,74 вместо 0,55. Это не пункт CHECKLIST и не FAIL скрипта; дополнительная генерация по этому основанию не делалась."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE SUBJECT: small crown-like head crest",
+      "passed": false,
+      "note": "Коронообразный гребень хорошо читается, но получился крупным и высоким относительно головы. Размер small не выдержан в строгом прочтении; числовой порог в задании отсутствует. Сам якорь CHECKLIST присутствует."
+    }
+  ],
+  "limitations": [
+    "Круглую форму основания в плане нельзя независимо доказать по одному фронтальному виду.",
+    "Согласованность нескольких видов не проверялась: этап 1a содержит только design-front."
+  ],
+  "candidate_visual_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Верхняя поверхность подставки видна; передний край изгибается. Остальные пункты визуального CHECKLIST пройдены."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [],
+      "note": "Выбранный кандидат; все шесть пунктов CHECKLIST пройдены."
+    }
+  ],
+  "operational_errors": [
+    {
+      "step": "copy_g2_first_attempt",
+      "error": "SyntaxError: unterminated string literal (detected at line 16)",
+      "effect": "Копирование не началось; последующая проверка прочитала g1. Ошибочный промежуточный отчёт сохранён отдельно. Затем копирование и проверка g2 успешно повторены."
+    },
+    {
+      "step": "package_writer_first_attempt",
+      "error": "CreateProcessAsUserW failed: 206 (command length limit)",
+      "effect": "Процесс не запустился и ничего не записал. Документация затем записана отдельными короткими Python-командами."
+    }
+  ],
+  "raw_images_unmodified": true,
+  "copies": [
+    {
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13445-f01c-7772-a254-a983ef3c4421/exec-65a15c50-cb0f-4486-9857-1fa6017e595d.png",
+      "saved_path": "art/imagegen/concept-ant-queen-codex/concepts/ant-queen-design-front-g1.png",
+      "sha256": "12b7c4ce117cbbe54b2fe2ec2a45eaf982c09e032da1556161be9fce05fe44d0",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13445-f01c-7772-a254-a983ef3c4421/exec-47d0dca7-85b0-458e-8aa2-9c5702e0534b.png",
+      "saved_path": "art/imagegen/concept-ant-queen-codex/concepts/ant-queen-design-front-g2.png",
+      "sha256": "28005ce49c33cfd69f9762d52184628eefa0cbee77311d91989c5abc3f82cb88",
+      "byte_identical": true
+    }
+  ],
+  "selected_design": {
+    "path": "art/imagegen/concept-ant-queen-codex/design/ant-queen-front.png",
+    "sha256": "28005ce49c33cfd69f9762d52184628eefa0cbee77311d91989c5abc3f82cb88",
+    "byte_identical_to_selected_generation": true
+  },
+  "started_background_processes": [],
+  "status": "предложено"
+}

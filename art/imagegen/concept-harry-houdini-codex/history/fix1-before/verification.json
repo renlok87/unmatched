@@ -1,0 +1,146 @@
+{
+  "card_id": "ASSET-HARRY-HOUDINI-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:35:04.710018+05:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-harry-houdini-codex/palette.json",
+      "before_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "after_sha256": "421bf57921b8a9a2a6c6268af23853723d9ddc22f36a633ade54cd361610ba84",
+      "bytes": 296,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Agent-written files; automatic image_gen originals are the authorized exception logged as original_path.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-harry-houdini-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна двухъярусная подставка; надписей и коллажа нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Прямой фронтальный вид; верх подставки не виден, кромки горизонтальны."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": false,
+      "note": "Фигура целиком видна. Слабая пятнистая неоднородность фона сохраняется; строго ровная заливка не достигнута."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Ладони открыты и пусты, руки опущены с зазорами, локти мягко согнуты. Цепь обвивает предплечье."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: iron chains over the shoulders; padlock hanging at the chest; rolled white sleeves; black waistcoat",
+      "passed": true,
+      "note": "Чётко видны цепи на плечах, замок на груди, закатанные белые рукава и чёрный жилет."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный костюм, белая рубашка, железные цепи и латунный замок. Командных цветов и полос на базе нет. Проверено визуально."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_per_run": 2,
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ]
+    }
+  ],
+  "selected": {
+    "design-front": 2
+  },
+  "image_byte_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g1.png",
+      "matches_original": true,
+      "sha256": "beb476b5e3ce7536fc811deff3486afd1eca3d31a36ebbfc87bc044297b8e87e"
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-harry-houdini-codex/concepts/harry-houdini-design-front-g2.png",
+      "matches_original": true,
+      "sha256": "cb0bce49c150c102d932aa86e825d8abebda41a09d9e5c2de3b197ab04dbd481"
+    }
+  ],
+  "selected_design_matches_candidate": true,
+  "warnings": [
+    {
+      "id": "view.frame_top",
+      "value_pct": 3.177,
+      "minimum_pct": 4,
+      "retry_reason": false
+    },
+    {
+      "id": "view.single_component",
+      "retry_reason": false,
+      "note": "Dark figure and pedestal yield separate segmentation components; visually one figure and one pedestal."
+    }
+  ],
+  "limitations": [
+    "Slight background mottling remains; failed CHECKLIST item recorded in limit_reached.",
+    "Top 3.177%, bottom 94.13%, base center 49.77%; exact framing targets not fully achieved.",
+    "Only front design; no cross-view consistency claim."
+  ],
+  "errors": [],
+  "tooling_events": [
+    {
+      "action": "write package metadata",
+      "error": "Windows command-line length exceeded; process was not started.",
+      "resolved": true,
+      "resolution": "Split metadata writes into shorter Python commands."
+    }
+  ],
+  "text_encoding": "UTF-8 without BOM",
+  "image_transformations": [],
+  "git_commands_run": false
+}

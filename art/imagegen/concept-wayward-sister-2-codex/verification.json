@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-13T03:29:56.322245+00:00",
+  "status": "proposed",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-wayward-sister-2-codex/palette.json",
+      "sha256": "004abe373386d3aaf145ff944a548dfeee8bfcc1f940068118d9a4ab0c10749a",
+      "bytes": 305,
+      "expected_sha256": "004abe373386d3aaf145ff944a548dfeee8bfcc1f940068118d9a4ab0c10749a",
+      "sha256_after": "004abe373386d3aaf145ff944a548dfeee8bfcc1f940068118d9a4ab0c10749a",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Agent-authored repository files; original tool-owned images are the explicit task exception.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-2-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-2-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-2-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна ведьма, одна двухъярусная подставка; коллажа, текста и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Лицо и корпус прямо к камере; верх подставки не виден, передние края горизонтальны."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Всё целиком; ровный тёмно-серый фон. Контрольные точки RGB около (39,39,40), разброс 1–2 единицы."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own LEFT hand, which appears on the viewer's RIGHT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Левая кисть справа в кадре; под обоими рукавами видны зазоры, локти согнуты, не T/A-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: gnarled wand in the figure's own LEFT hand; herb bundles on a cord belt; tattered grey-green robes",
+      "passed": false,
+      "note": "Травы, верёвочный пояс, рваная серо-зелёная одежда видны. Вместо палочки (wand) получился длинный посох до подставки."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Серо-зелёный, коричневый, костяной белый и фиолетовый присутствуют. Командной окраски, цветного кольца и металлической полосы на подставке нет."
+    }
+  ],
+  "candidate_visual_review": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view",
+        "plain flat dark gray background",
+        "both arms clearly apart from the torso",
+        "gnarled wand"
+      ],
+      "note": "Небольшой вид сверху подставки, неоднородный фон, зазоры закрыты рукавами, длинный посох. Коррекция из трёх строк адресовала первые три пункта."
+    },
+    {
+      "generation": 2,
+      "failed_items": [
+        "gnarled wand"
+      ],
+      "note": "Подставка, фон и зазоры исправлены; оружие осталось длинным посохом."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "every identity anchor is visible: gnarled wand in the figure's own LEFT hand; herb bundles on a cord belt; tattered grey-green robes"
+      ],
+      "note": "Вместо wand — длинный посох. Лимит 2/2 исчерпан; решение принимает приёмщик."
+    }
+  ],
+  "limitations": [
+    "Оружие выглядит длинным посохом вместо палочки; провал пункта идентичности CHECKLIST.",
+    "Верх маски g2: 3.108% вместо >=4%; допустимый WARN view.frame_top.",
+    "Низ подставки g2: 96.271% вместо целевого 93%.",
+    "Создан только design-front; согласованность между видами не проверяется.",
+    "Художественная приёмка не выполнялась; статус предложено."
+  ],
+  "copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-wayward-sister-2-codex/concepts/wayward-sister-2-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1334a-038e-79c0-b947-7d03e5d7583b\\exec-645c0d56-032a-4ee0-a879-5d16ed888d9a.png",
+      "sha256": "6d580e239081f9b294e5e621c7a160be3659196d29970a745c569c0e15073344",
+      "bytes": 2342055,
+      "byte_identical_to_original": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-wayward-sister-2-codex/concepts/wayward-sister-2-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1334a-038e-79c0-b947-7d03e5d7583b\\exec-994584fb-18e5-4f2f-ba28-0320269aab5b.png",
+      "sha256": "95952c566076fa912d5362103a86d47f046c9f4b07973b03432f189271cb04aa",
+      "bytes": 2164285,
+      "byte_identical_to_original": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-wayward-sister-2-codex/design/wayward-sister-2-front.png",
+      "source_path": "art/imagegen/concept-wayward-sister-2-codex/concepts/wayward-sister-2-design-front-g2.png",
+      "sha256": "95952c566076fa912d5362103a86d47f046c9f4b07973b03432f189271cb04aa",
+      "bytes": 2164285,
+      "byte_identical_to_candidate": true
+    }
+  ],
+  "encoding": "UTF-8 without BOM; Python Path.write_text",
+  "preserved_preexisting_files": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-2-codex/palette.json",
+      "sha256": "004abe373386d3aaf145ff944a548dfeee8bfcc1f940068118d9a4ab0c10749a",
+      "bytes": 305
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,145 @@
+{
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 1,
+      "report": null,
+      "error_text": "ERROR: нет каталога набора art\\imagegen\\concept-huntsman-codex\\design",
+      "classification": "input-error",
+      "note": "Ранний вызов после ошибки кавычек команды копирования; отчёт не создан. Команда исправлена, копия создана побайтно и затем проверена. Это не FAIL изображения и не причина повторной генерации."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-huntsman-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-huntsman-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-huntsman-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна двухъярусная подставка. Коллажа, второго вида, текста, букв, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Строго фронтальная фигура. Подставка с ребра, передний край горизонтален, верхняя плоскость не видна. Светлая кромка — фаска камня."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, оружие и подставка в кадре. Фон ровный тёмно-серый, без пола и тени; средние RGB восьми фоновых участков отличаются менее чем на 1,3/255."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Топор в правой руке героя, слева для зрителя. Между руками и корпусом видны просветы. Локти согнуты, поза не T/A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: woodcutter's axe in the figure's own RIGHT hand; hunting horn on the LEFT hip; fur-trimmed cap",
+      "passed": true,
+      "note": "Видны однолезвийный топор на деревянном топорище, рог на левом бедре героя (справа для зрителя), шапка с меховой отделкой."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Зелёная охотничья одежда, коричневая кожа, серый мех, слоновая кость рога. Сталь и небольшая приглушённая латунная фурнитура — локальные детали без дополнительного сильного цвета. Командной окраски и кольца нет."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_budget": 2,
+  "limit_reached": [],
+  "status": "предложено",
+  "outside_folder": [],
+  "outside_folder_note": "Команды записывали только в пакет. Штатные оригиналы image_gen вне пакета — разрешённое исключение; пути записаны в generation-records.json.",
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "CORE pedestal bottom y93%",
+      "target": 93,
+      "actual": 94.682,
+      "note": "Низ y94,682 % вместо y93 %, без обрезки. Пиксели не изменялись."
+    },
+    {
+      "view": "design-front",
+      "item": "CORE pedestal diameter about 0.55 of figure height",
+      "target": 0.55,
+      "actual": 0.563,
+      "note": "Оценка по маске около 0,563 относительно высоты фигуры над основанием; приблизительное измерение."
+    },
+    {
+      "view": "design-front",
+      "item": "BACKGROUND flatness",
+      "note": "Небольшая генеративная зернистость; видимого градиента и виньетки у g2 нет. Разброс средних восьми фоновых участков менее 1,3/255."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Видны верхняя плоскость подставки и градиент/виньетка фона; исправлялись две строки CORRECTION."
+    },
+    {
+      "generation": 2,
+      "failed_items": [],
+      "note": "Все 6 пунктов выполнены после визуального осмотра."
+    }
+  ],
+  "processes_started_and_retained": [],
+  "source_unchanged": true,
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-huntsman-codex/palette.json",
+      "sha256_before": "b8395a957612de5eeea4e6ae1e894e1a0375de49b142d556bf5f96295645bd48",
+      "sha256_after": "b8395a957612de5eeea4e6ae1e894e1a0375de49b142d556bf5f96295645bd48",
+      "unchanged": true
+    }
+  ],
+  "date": "2026-10-13T04:05:32.122098+00:00",
+  "byte_for_byte_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1336a-6ce5-7b22-a04c-331e6aebe9b9\\exec-434393ce-8c59-427f-a370-31df8e898ccf.png",
+      "saved_path": "art/imagegen/concept-huntsman-codex/concepts/huntsman-design-front-g1.png",
+      "unchanged": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1336a-6ce5-7b22-a04c-331e6aebe9b9\\exec-03774acf-baf8-48e1-b9f9-f47ed673c511.png",
+      "saved_path": "art/imagegen/concept-huntsman-codex/concepts/huntsman-design-front-g2.png",
+      "unchanged": true
+    }
+  ]
+}

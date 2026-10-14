@@ -1,0 +1,181 @@
+{
+  "card_id": "ASSET-PIRATE-CREWMAN-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "proposed",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-crewman-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-crewman-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-pirate-crewman-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "One figure and pedestal, no text or collage. The additional sheathed sword is a separate CORE violation."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "g2 faces front; the pedestal front edges are straight horizontal, with no exposed top plane. Visual image assessment, not physical camera calibration."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Figure, weapon and pedestal are fully visible against visually flat dark gray background; border checks PASS."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Axe on viewer left in the own RIGHT hand; both arms separated from torso, lowered with slightly bent elbows."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: boarding axe in the figure's own RIGHT hand; bandana; eyepatch; striped shirt",
+      "passed": true,
+      "note": "Axe, bandana, eyepatch and striped shirt clearly visible."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": false,
+      "note": "White, red and brown present. Brass visible on buckles, but a distinct brass earring cannot confidently be identified: required accent brass earring is not confirmed. No team colour, coloured base ring or metal base band."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_in_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base"
+      ]
+    }
+  ],
+  "core_limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "FORBIDDEN: extra weapons",
+      "note": "Extra sheathed sword on own LEFT hip (viewer RIGHT), present in both candidates."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "PALETTE: accent brass earring #C9A24A",
+      "note": "White, red and brown present. Brass visible on buckles, but a distinct brass earring cannot confidently be identified: required accent brass earring is not confirmed. No team colour, coloured base ring or metal base band."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "FRAMING: bottom at y93%",
+      "note": "Measured mask bottom y94.406%, +1.406 percentage points from target. Top y4.420%, center x50.000%, aspect 3:4. Script has no FAIL for target bottom deviation."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Exposed pedestal top and curved front edge triggered retry. Extra sword violates CORE. WARN view.frame_top (2.693%) was allowed and did not trigger retry."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base"
+      ],
+      "note": "Pedestal view improved, earring unconfirmed, extra sword remains."
+    }
+  ],
+  "errors": [],
+  "generated_pixels_modified": false,
+  "tool_originals_left_in_place": true,
+  "outside_folder_note": "No manual output outside package. The two image_gen-owned originals outside it are explicitly required by the task and are logged as original_path in generation-records.json.",
+  "background_processes_started": [],
+  "decisions": [
+    "Selected g2 for improved pedestal and 13 PASS / 0 WARN / 0 FAIL.",
+    "Conservative visual assessment: unconfirmed earring is a failed palette checklist item.",
+    "CORE unchanged; one CORRECTION line only for failed front-view checklist item.",
+    "Claude handles acceptance and commit."
+  ],
+  "environment_notes": [
+    "npx openskills read was unavailable in local npm cache; skill read directly from disk without installation. A too-long documentation command was rejected before creating a process; files then written using smaller Python commands."
+  ],
+  "source_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-pirate-crewman-codex/palette.json",
+      "before_sha256": "8798ec7b0d366451fcb3743eab42c7b8df62d793f51c7f8045c77aa53bbf5ccf",
+      "after_sha256": "8798ec7b0d366451fcb3743eab42c7b8df62d793f51c7f8045c77aa53bbf5ccf",
+      "unchanged": true
+    }
+  ],
+  "preexisting_package_files_preserved": true,
+  "copy_verification": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-pirate-crewman-codex/concepts/pirate-crewman-design-front-g1.png",
+      "sha256": "833d1de60dbc4fa2cf3f32ec08c577c5db5eaebcb2b1cd32f22a2c8246ec9bd8",
+      "original_equal": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-pirate-crewman-codex/concepts/pirate-crewman-design-front-g2.png",
+      "sha256": "395e7b6a5d6976029bf25dcf33a5cb6c8ce094ec4d0e974cf50a9f6af31151a3",
+      "original_equal": true
+    }
+  ],
+  "selected_copy_equal": true
+}

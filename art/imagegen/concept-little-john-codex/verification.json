@@ -1,0 +1,183 @@
+{
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 1,
+      "report": null,
+      "error_text": "ERROR: нет каталога набора art\\imagegen\\concept-little-john-codex\\design",
+      "classification": "input_error",
+      "note": "Преждевременный запуск после ошибки передачи пути в команде копирования. Обёртка PowerShell вернула 1; это ошибка входа, а не FAIL изображения. Каталог создан после исправления копирования; дополнительная генерация из-за этой ошибки не выполнялась."
+    },
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-john-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-john-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-little-john-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one_subject_one_pedestal_no_text",
+      "passed": true,
+      "note": "Одна фигура, одна двухъярусная подставка. Коллажа, второго вида, текста, логотипов и водяных знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "front_orthographic",
+      "passed": true,
+      "note": "Лицо и корпус направлены фронтально, камера без заметного наклона и разворота. Верх подставки не виден; передние кромки горизонтальны. Светлая тонкая линия верхней фаски не является открытой верхней плоскостью."
+    },
+    {
+      "view": "design-front",
+      "item": "full_frame_flat_background",
+      "passed": true,
+      "note": "Фигура, посох и подставка целиком в кадре. Фон нейтральный тёмно-серый, без заметного градиента, пола или тени. Контрольные пиксели фона RGB 42–44: небольшая фактура генерации, не направленный градиент."
+    },
+    {
+      "view": "design-front",
+      "item": "right_hand_and_arm_separation",
+      "passed": true,
+      "note": "Посох вертикально в собственной правой руке, слева для зрителя. Руки согнуты и отведены от корпуса; фон виден под правым предплечьем и между левым предплечьем и силуэтом одежды. Зелёная ткань частично занимает внутреннюю область подмышки, но не закрывает просвет полностью. Не T- и не A-поза."
+    },
+    {
+      "view": "design-front",
+      "item": "identity_anchors",
+      "passed": true,
+      "note": "Видны вертикальный деревянный посох справа у фигуры, полная коричневая борода, зелёный капюшон на плечах и верёвочный пояс с узлом."
+    },
+    {
+      "view": "design-front",
+      "item": "palette_and_uncoloured_base",
+      "passed": true,
+      "note": "Коричневая шерсть, лесной зелёный, дубовый посох и латунные пряжки присутствуют. Цвет команды, цветное кольцо и металлическая полоса на подставке отсутствуют. Цвета оценены визуально, точные HEX на освещённой поверхности не заявляются."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "candidate_observations": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "script_failures": [],
+      "script_warnings": [
+        "view.frame_top"
+      ],
+      "visual_failed_items": [
+        "front_orthographic",
+        "full_frame_flat_background",
+        "right_hand_and_arm_separation"
+      ],
+      "note": "Видна верхняя плоскость подставки; при первичном визуальном осмотре фон показался неоднородным, а зелёная ткань уменьшала просвет под правой рукой. Коррекция направлена на эти три наблюдения. Пункт фона не является FAIL скрипта."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "script_failures": [],
+      "script_warnings": [
+        "view.frame_top"
+      ],
+      "visual_failed_items": [],
+      "note": "Выбран за улучшенную фронтальную проекцию подставки и отделение рук; однотонность фона дополнительно подтверждена контрольными пикселями."
+    }
+  ],
+  "limitations": [
+    {
+      "item": "view.frame_top",
+      "note": "Верх маски g2: 3,66% вместо минимум 4%. Это WARN, разрешённый заданием и не являющийся причиной повторной генерации."
+    },
+    {
+      "item": "framing.base_bottom",
+      "note": "Низ маски g2: 94,544% вместо заданных y93%; подставка целиком видна, скрипт PASS."
+    },
+    {
+      "item": "pedestal_diameter",
+      "note": "Подставка визуально шире приблизительных 0,55 роста фигуры; сохранена без правки пикселей. Это не отдельный пункт CHECKLIST."
+    }
+  ],
+  "errors": [
+    {
+      "step": "copy_g1",
+      "error_text": "SyntaxError: leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers",
+      "cause": "Кавычки вокруг пути были сняты при передаче Python-кода через PowerShell.",
+      "recovered": true,
+      "note": "Исправлена только команда копирования; оригинал и кандидат не изменялись."
+    },
+    {
+      "step": "write_metadata",
+      "error_text": "CreateProcessAsUserW failed: 206 (command line too long)",
+      "cause": "Все метаданные были переданы одной командой, превышающей лимит Windows.",
+      "recovered": true,
+      "note": "Запись разделена по файлам; неуспешный запуск ничего не записал."
+    }
+  ],
+  "tool_originals_exception": {
+    "note": "Копии, созданные самим image_gen вне пакета, предусмотрены заданием; оригиналы оставлены на месте. outside_folder учитывает только дополнительные изменения исполнителя.",
+    "original_paths": [
+      "C:/Users/ren/.codex/generated_images/01a13330-6401-7893-9532-d0df75a67c38/exec-88301661-bf9c-4765-8f80-c4e2048c4ed2.png",
+      "C:/Users/ren/.codex/generated_images/01a13330-6401-7893-9532-d0df75a67c38/exec-2adcbe9c-b97c-48ca-b40e-47a61e4bb68d.png"
+    ]
+  },
+  "operations": {
+    "git_commands": 0,
+    "unreal_access": false,
+    "downloads": false,
+    "image_retouch": false,
+    "background_processes_started": 0
+  },
+  "sources_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-little-john-codex/palette.json",
+      "sha256": "d0fe613aa9f313a8c54be1993889e1cb9e0ae772dbf55fd3ea43070ebb7c5155",
+      "bytes": 294,
+      "unchanged": true
+    }
+  ],
+  "byte_copies": [
+    {
+      "saved_path": "art/imagegen/concept-little-john-codex/concepts/little-john-design-front-g1.png",
+      "sha256": "a90b579bb37981109a0254849f2ff9ec25c65e63741e023067e03323e329a1ed",
+      "original_identical": true
+    },
+    {
+      "saved_path": "art/imagegen/concept-little-john-codex/concepts/little-john-design-front-g2.png",
+      "sha256": "54d0129ddc8b6d35db9e03af6660402b6546c6eed6ab3d6a35fc43e72dc7d90a",
+      "original_identical": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-little-john-codex/design/little-john-front.png",
+    "sha256": "54d0129ddc8b6d35db9e03af6660402b6546c6eed6ab3d6a35fc43e72dc7d90a",
+    "identical": true
+  }
+}

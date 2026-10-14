@@ -1,0 +1,251 @@
+{
+  "id": "ASSET-SPIKE-001-concept-1a-run-1",
+  "card_id": "ASSET-SPIKE-001",
+  "stage": "1a",
+  "date": "2026-10-13T09:09:17+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-spike-codex/palette.json",
+      "before_sha256": "f5387d32baf8b01498309f86adc739b5542c2584701e930d3851aae6e4a8f461",
+      "after_sha256": "f5387d32baf8b01498309f86adc739b5542c2584701e930d3851aae6e4a8f461",
+      "bytes": 299,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Команды Codex записывали только файлы пакета. Штатные оригиналы image_gen вне пакета разрешены договором задачи, оставлены на месте и отдельно перечислены в copy_integrity.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "kind": "candidate",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-spike-codex/checks/design-front-g1/checks-report.json",
+      "output": "WARN view.frame_top         front    value=1.312 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-spike-codex/checks/design-front-g1/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "kind": "candidate",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-spike-codex/checks/design-front-g2/checks-report.json",
+      "output": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-spike-codex/checks/design-front-g2/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "kind": "selected-final",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-spike-codex/design/checks-report.json",
+      "output": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-spike-codex/design/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна подставка из двух низких дисков. Коллажа, второго вида, текста, букв, логотипа и водяного знака нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фронтальный вид без разворота в три четверти. Подставка строго ребром, верхняя плоскость скрыта; обе передние кромки прямые и горизонтальные. Признаков перспективного схода нет. Оценено визуально, параметры виртуальной камеры неизвестны."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и вся подставка видны, обрезки нет; ровный нейтральный тёмно-серый фон, без пола и фоновой падающей тени. Рамка прошла view.border_uniform и view.bg_neutral. Отступ сверху 2,762% вместо запрошенных минимум 4%: разрешённый WARN view.frame_top, записан как ограничение, сам по себе не нарушает этот пункт CHECKLIST."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и предметов в руках нет. Руки опущены и слегка отделены от корпуса, просветы видны; локти слегка согнуты. T- и A-позы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: platinum blond slicked hair; long black leather duster; black t-shirt; red shirt underneath",
+      "passed": true,
+      "note": "Все четыре якоря видны: платиновые зачёсанные назад волосы, длинный чёрный кожаный плащ, чёрная футболка и раскрытая красная рубашка под плащом."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Чёрный плащ, платиновые волосы, приглушённая красная рубашка и тёмные синевато-серые джинсы соответствуют палитре по виду. Точное совпадение всех пикселей с HEX не заявляется. Подставка тёмная каменная, без командного цвета, цветного кольца и металлического обода."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "items": [
+        {
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура на одной двухдисковой подставке; надписей, логотипов, водяного знака и дополнительных видов нет."
+        },
+        {
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Фигура показана спереди, но верхняя поверхность подставки видна; передняя верхняя кромка подставки дугообразная. Строгая ортография с нулевым возвышением не соблюдена."
+        },
+        {
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и подставка целиком в кадре, фон нейтральный тёмно-серый. Верхний отступ 1,312% — разрешённый WARN view.frame_top; не причина повтора."
+        },
+        {
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Обе кисти пустые, локти слегка согнуты; руки опущены с видимыми просветами относительно корпуса, без T- или A-позы."
+        },
+        {
+          "item": "every identity anchor is visible: platinum blond slicked hair; long black leather duster; black t-shirt; red shirt underneath",
+          "passed": true,
+          "note": "Видны платиновые зачёсанные волосы, длинный чёрный кожаный плащ, чёрная футболка и раскрытая красная рубашка между футболкой и плащом."
+        },
+        {
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Чёрный плащ, платиновые волосы, приглушённая красная рубашка и тёмные джинсы читаются. На тёмной каменной подставке нет командного кольца, цветной полосы или металлического обода."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "items": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура, одна подставка из двух низких дисков. Коллажа, второго вида, текста, букв, логотипа и водяного знака нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Фронтальный вид без разворота в три четверти. Подставка строго ребром, верхняя плоскость скрыта; обе передние кромки прямые и горизонтальные. Признаков перспективного схода нет. Оценено визуально, параметры виртуальной камеры неизвестны."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и вся подставка видны, обрезки нет; ровный нейтральный тёмно-серый фон, без пола и фоновой падающей тени. Рамка прошла view.border_uniform и view.bg_neutral. Отступ сверху 2,762% вместо запрошенных минимум 4%: разрешённый WARN view.frame_top, записан как ограничение, сам по себе не нарушает этот пункт CHECKLIST."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Оружия и предметов в руках нет. Руки опущены и слегка отделены от корпуса, просветы видны; локти слегка согнуты. T- и A-позы нет."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: platinum blond slicked hair; long black leather duster; black t-shirt; red shirt underneath",
+          "passed": true,
+          "note": "Все четыре якоря видны: платиновые зачёсанные назад волосы, длинный чёрный кожаный плащ, чёрная футболка и раскрытая красная рубашка под плащом."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Чёрный плащ, платиновые волосы, приглушённая красная рубашка и тёмные синевато-серые джинсы соответствуют палитре по виду. Точное совпадение всех пикселей с HEX не заявляется. Подставка тёмная каменная, без командного цвета, цветного кольца и металлического обода."
+        }
+      ]
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_generation_per_view": {
+    "design-front": 2
+  },
+  "limit_reached": [],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "level": "WARN",
+      "requested_min_top_pct": 4,
+      "actual_top_pct": 2.762,
+      "note": "Отступ меньше запрошенного CORE. WARN разрешён; обрезки нет, это не провал CHECKLIST и не причина дополнительной генерации."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "camera_parameters",
+      "note": "Генератор не предоставляет параметры камеры. Отсутствие перспективы и видимой верхней поверхности подставки проверены визуально."
+    }
+  ],
+  "copy_integrity": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1347d-1be7-7322-8770-8e04bec901c3\\exec-c4097189-cd22-47a4-8ef9-0e79be8a095b.png",
+      "saved_path": "art/imagegen/concept-spike-codex/concepts/spike-design-front-g1.png",
+      "sha256": "aa33dbfd4a6af35990911c3198fd1e652e62bfc5e0e16ca902c5fb58f6d28586",
+      "bytes": 1994074,
+      "byte_for_byte": true,
+      "original_preserved": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1347d-1be7-7322-8770-8e04bec901c3\\exec-c72aaf5e-2b52-48e7-8a45-6f172d5bc774.png",
+      "saved_path": "art/imagegen/concept-spike-codex/concepts/spike-design-front-g2.png",
+      "sha256": "ffc10fc10ebd927b54a1ed3fb705ea96d7b7adfff199899d313c8933d8675df1",
+      "bytes": 1669985,
+      "byte_for_byte": true,
+      "original_preserved": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-spike-codex/design/spike-front.png",
+    "sha256": "ffc10fc10ebd927b54a1ed3fb705ea96d7b7adfff199899d313c8933d8675df1",
+    "bytes": 1669985,
+    "matches_generation": 2,
+    "byte_for_byte": true
+  },
+  "encoding": {
+    "format": "UTF-8",
+    "bom": false,
+    "writer": "Python Path.write_text; JSON ensure_ascii=False, indent=2"
+  },
+  "process_cleanup": {
+    "persistent_processes_started": 0,
+    "all_command_sessions_completed": true,
+    "system_process_query": "Win32_Process: access denied by environment permissions",
+    "processes_stopped": []
+  },
+  "errors": []
+}

@@ -1,0 +1,174 @@
+{
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json",
+      "stdout": "WARN view.frame_top         front    value=2.141 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json",
+      "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "final": true,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
+      "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "date": "2026-10-13",
+  "card_id": "ASSET-SHERLOCK-HOLMES-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/palette.json",
+      "sha256_before": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+      "sha256_after": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Executor command writes; image_gen original copies are the explicitly required exception and are logged in generation-records.json.",
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна двухъярусная подставка; текста, знаков, коллажа и дополнительных видов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Лицо и корпус направлены прямо на зрителя. Подставка показана с ребра: края горизонтальны, верхняя плоскость не видна; тонкие светлые полосы относятся к фаскам. Оценка визуальная, параметры камеры из изображения восстановить нельзя."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура и подставка целиком в кадре. Фон нейтральный тёмно-серый без сцены, пола и различимого градиента; контрольные пиксели свободного фона около RGB 48–51. Незначительный пиксельный шум сохранён как часть исходной генерации."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Лупа находится в собственной правой руке, слева для зрителя; левая кисть вынесена из кармана, локти согнуты, T/A-позы нет. Однако ткань плаща перекрывает пространство между руками и корпусом: требуемых открытых просветов фона у обеих рук нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+      "passed": true,
+      "note": "Все четыре якоря видны: лупа справа у фигуры, deerstalker, накидка Inverness и изогнутая трубка во рту."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневый твид, серый плащ, тёмно-коричневая трубка и латунная оправа лупы представлены; командных цветов, кольца и металлической полосы на каменной подставке нет. Оттенки изменяются освещением и росписью; точное совпадение каждого пикселя с HEX не предполагается."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": "sherlock-holmes-design-front-g2"
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ]
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    {
+      "id": "view.frame_top",
+      "kind": "WARN",
+      "actual_pct": 1.934,
+      "required_min_pct": 4,
+      "note": "WARN is allowed and does not trigger retry."
+    },
+    {
+      "id": "CORE.FRAMING.base_bottom",
+      "kind": "deviation",
+      "actual_pct": 96.478,
+      "requested_pct": 93,
+      "note": "Pedestal remains fully visible."
+    }
+  ],
+  "candidate_visual_review": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "front orthographic / edge-on pedestal",
+        "both arms clearly apart from the torso"
+      ],
+      "note": "Left hand in pocket; head slightly turned; pedestal top visible. Background was included in correction based on initial visual assessment."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ],
+      "note": "Selected. Background pixel inspection resolved perceived unevenness; cape still obscures both arm gaps."
+    }
+  ],
+  "original_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-c0b2810e-a34d-434a-9a8f-abee46494c9c.png",
+      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g1.png",
+      "sha256_original": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+      "sha256_saved": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-9d74e1b9-ed76-40d9-8bbe-eea75c08d29e.png",
+      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g2.png",
+      "sha256_original": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "sha256_saved": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "byte_identical": true
+    }
+  ],
+  "selected_design_byte_identical": true,
+  "preexisting_files_preserved": [
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/palette.json",
+      "sha256_before": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+      "sha256_after": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+      "unchanged": true
+    }
+  ],
+  "execution_notes": [
+    "A long documentation-write command exceeded Windows command-line length before launch (206). Split into shorter commands; no file was written by the rejected command."
+  ],
+  "text_encoding": {
+    "encoding": "utf-8",
+    "bom": false,
+    "validated": true
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "run_id": "ASSET-JERSEY-DEVIL-001-1a-20261013-corrective-g3",
+  "source_block": {
+    "run_id": "ASSET-JERSEY-DEVIL-001-1a-20261013-corrective-g3",
+    "date": "2026-10-13T09:48:04.715581+00:00",
+    "inputs": [
+      {
+        "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+        "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+        "bytes": 2034907,
+        "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+        "matches_expected": true
+      },
+      {
+        "path": "art/imagegen/concept-jersey-devil-codex/palette.json",
+        "sha256": "dab7a15bef317f5941b68e185c06d342afbee1e8bcad7b955b93c8e647964d5b",
+        "bytes": 292,
+        "expected_sha256": "dab7a15bef317f5941b68e185c06d342afbee1e8bcad7b955b93c8e647964d5b",
+        "matches_expected": true
+      }
+    ],
+    "start_generation": 3,
+    "generations_allowed": 2
+  },
+  "prompt_key": "1a/design-front/g3",
+  "correction": [
+    "- S design-front: Replace the symmetrical straight diagonal arm placement with a natural asymmetric creature stance, clearly bending both elbows at different angles while keeping both hands separated from the torso and preserving the strict front view.",
+    "- P design-front: Shorten both horns into small curved horns and darken the hide midtones toward #4E3A2E while preserving the grey wing membranes, bone-coloured horns and red eyes."
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g3",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/checks/design-front-g3/checks-report.json",
+      "final_selected": false,
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-jersey-devil-codex/checks/design-front-g3"
+      ],
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "warnings": []
+    },
+    {
+      "view": "design-front",
+      "generation": "g4",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/checks/design-front-g4/checks-report.json",
+      "final_selected": false,
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-jersey-devil-codex/checks/design-front-g4"
+      ],
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "warnings": []
+    },
+    {
+      "view": "design-front",
+      "generation": "g4",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+      "final_selected": true,
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4"
+      ],
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "warnings": []
+    }
+  ],
+  "generation_ids": [
+    "ASSET-JERSEY-DEVIL-001/1a/design-front/g3",
+    "ASSET-JERSEY-DEVIL-001/1a/design-front/g4"
+  ],
+  "background_processes_started": [],
+  "g4_correction": [
+    "- S design-front: Replace the symmetrical straight diagonal arm placement with a natural asymmetric creature stance, clearly bending both elbows at different angles while keeping both hands separated from the torso and preserving the strict front view.",
+    "- P design-front: Shorten both horns into small curved horns and darken the hide midtones toward #4E3A2E while preserving the grey wing membranes, bone-coloured horns and red eyes.",
+    "- CHECKLIST strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible: a strip of the pedestal top surface and a curved front edge are visible -> show both low stacked discs exactly edge-on, hide the entire top surface and keep their front edges straight and horizontal, with zero camera elevation."
+  ],
+  "selected_generation": "g4",
+  "complete": true
+}

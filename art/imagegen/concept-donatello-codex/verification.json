@@ -1,0 +1,238 @@
+{
+  "schema": "unmatched.concept-verification/1",
+  "card_id": "ASSET-DONATELLO-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes_before": 2034907,
+      "bytes_after": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-donatello-codex/palette.json",
+      "before_sha256": "eb042c63322efce438644fb2f35d154c8d8a7f133758f52c44a3837bd4e02ee2",
+      "after_sha256": "eb042c63322efce438644fb2f35d154c8d8a7f133758f52c44a3837bd4e02ee2",
+      "bytes_before": 299,
+      "bytes_after": 299,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "write_scope_audit": {
+    "method": "explicit write destinations and checker output directories; tool originals are the package-contract exception",
+    "allowed_folder": "art/imagegen/concept-donatello-codex",
+    "preexisting_files_preserved": [
+      "art/imagegen/concept-donatello-codex/palette.json"
+    ],
+    "all_package_writes_within_allowed_folder": true,
+    "external_tool_originals_preserved": true,
+    "git_commands_run": false,
+    "unreal_opened_or_modified": false,
+    "tripo_or_syntx_used": false,
+    "downloads_performed": false
+  },
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-donatello-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-donatello-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-donatello-codex/design/checks-report.json",
+      "run": "selected-final",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна черепаха-ниндзя на одной двухъярусной подставке; второго вида, коллажа, текста, логотипа и водяного знака нет. WARN view.single_component относится к маске и не указывает на вторую фигуру."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус обращены прямо к камере. У g2 верхняя площадка подставки скрыта, передние границы дисков горизонтальны; разворота 3/4 нет. Оценка сделана по изображению."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, весь посох, хвосты маски и подставка целиком в кадре. Фон нейтральный тёмно-серый, без сцены, пола или заметной падающей тени. Верх маски 4,213%; низ 94,751%; оценка центра базы x48,665%. Последние два значения отклоняются от CORE и перечислены в limitations."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Посох удерживается обеими руками: запрет на предмет в руках нарушен, хотя SUBJECT и IDENTITY ANCHORS требуют именно этот посох. Руки согнуты, не T/A. Справа в кадре просвет заметен; слева он частично занят панцирем и поднятым предплечьем, поэтому полная отделённость обеих рук от торса не подтверждена."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: long wooden bo staff held in both hands; purple eye mask with tails; brown shell on the back; belt with pouches and knee pads;",
+      "passed": true,
+      "note": "Длинный деревянный бо-посох удерживается двумя руками; видны фиолетовая маска и оба хвоста, коричневые верхние/боковые края спинного панциря за плечами, пояс с подсумками и два наколенника."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Есть зелёная кожа, коричневый панцирь/кожа, фиолетовая маска и тёплое дерево посоха. Оттенки переданы с вариациями матовой росписи, без требования пиксельного равенства HEX. Подставка тёмно-каменная, без командного цвета, цветного кольца или металлической ленты."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level; pedestal edge-on",
+        "No weapon or held object."
+      ],
+      "note": "Видна верхняя площадка подставки; обязательный посох присутствует вопреки запрету."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ],
+      "note": "Ракурс подставки улучшен; посох присутствует вопреки запрету; просвет обеих рук не подтверждён полностью."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_in_run": 2,
+  "selected_per_view": {
+    "design-front": 2
+  },
+  "selected_file": "art/imagegen/concept-donatello-codex/design/donatello-front.png",
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "contradictory_staff_requirements",
+      "passed": false,
+      "note": "SUBJECT/IDENTITY ANCHORS требуют посох в обеих руках; POSE/CHECKLIST запрещают предмет в руках. Оба требования сохранены в точном CORE; одновременное выполнение невозможно."
+    },
+    {
+      "view": "design-front",
+      "item": "both_arms_clearly_apart",
+      "passed": false,
+      "note": "У руки слева в кадре просвет частично перекрыт панцирем и поднятым предплечьем."
+    },
+    {
+      "view": "design-front",
+      "item": "pedestal_center_x",
+      "passed": false,
+      "expected_pct": 50,
+      "measured_pct": 48.665,
+      "note": "Центр оценён маской скрипта; точное x50% не достигнуто."
+    },
+    {
+      "view": "design-front",
+      "item": "pedestal_bottom_y",
+      "passed": false,
+      "expected_pct": 93,
+      "measured_pct": 94.751,
+      "note": "Низ по маске скрипта; точное y93% не достигнуто."
+    },
+    {
+      "view": "design-front",
+      "item": "pedestal_diameter_to_figure_height",
+      "passed": false,
+      "expected_approx": 0.55,
+      "visual_estimate_approx": 0.7,
+      "note": "Визуальная оценка относительно высоты самого тела без вынесенного вверх посоха; подставка шире ориентира CORE."
+    },
+    {
+      "view": "design-front",
+      "item": "view.single_component",
+      "passed": true,
+      "severity": "WARN",
+      "note": "Допустимый WARN; визуально в изображении одна фигура. Не использован как основание для перегенерации."
+    }
+  ],
+  "byte_identity": [
+    {
+      "generation": 1,
+      "original_sha256": "78a3c810fdab7f2d522db76dfd76554ae5d88af659e2a6919564eeb0b4be8607",
+      "saved_sha256": "78a3c810fdab7f2d522db76dfd76554ae5d88af659e2a6919564eeb0b4be8607",
+      "matched": true
+    },
+    {
+      "generation": 2,
+      "original_sha256": "b714a97000e6f6427df483b133b5dd7c3507da628beb5209b480c66fcd4fa8a7",
+      "saved_sha256": "b714a97000e6f6427df483b133b5dd7c3507da628beb5209b480c66fcd4fa8a7",
+      "matched": true
+    }
+  ],
+  "selected_sha256": "b714a97000e6f6427df483b133b5dd7c3507da628beb5209b480c66fcd4fa8a7",
+  "final_script_exit_code": 0,
+  "processes": {
+    "background_processes_started": [],
+    "command_sessions_left_running": [],
+    "inventory_query": "Win32_Process query denied by sandbox (HRESULT 0x80041003). All task commands were synchronous and returned completion; no background command or persistent session was created."
+  },
+  "errors": [
+    {
+      "tool": "exec_command",
+      "phase": "write_documents",
+      "code": "CreateProcessAsUserW 206",
+      "recovered": true,
+      "note": "Combined command exceeded the Windows command-line length limit; it did not start. Documents were written with shorter base64 payloads through Python."
+    },
+    {
+      "tool": "exec_command",
+      "phase": "process_inventory",
+      "code": "HRESULT 0x80041003",
+      "recovered": false,
+      "note": "Read-only Win32_Process query was denied. No process was terminated. No background process was started by this task."
+    }
+  ],
+  "notes": [
+    "openskills read failed with ENOTCACHED; installed SKILL.md was read directly; no package was downloaded.",
+    "Only the listed reference image and palette were used as asset inputs. Asset-card provenance file was not read.",
+    "This package proposes the design and does not claim artistic acceptance."
+  ]
+}

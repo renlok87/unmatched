@@ -1,0 +1,224 @@
+{
+  "card_id": "ASSET-RAT-KING-001",
+  "stage": "1a",
+  "date": "2026-10-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rat-king-codex/checks/design-front-g1/checks-report.json",
+      "run": "candidate",
+      "stdout": "WARN view.frame_top         front    value=2.141 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-rat-king-codex/checks/design-front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rat-king-codex/checks/design-front-g2/checks-report.json",
+      "run": "candidate",
+      "stdout": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-rat-king-codex/checks/design-front-g2/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-rat-king-codex/design/checks-report.json",
+      "run": "final",
+      "stdout": "WARN view.frame_top         front    value=2.762 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-rat-king-codex/design/checks-report.json\n",
+      "stderr": ""
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Один персонаж с двумя предусмотренными крысами, одна подставка; текста и лишних видов нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "По визуальному осмотру сохранённого PNG: фигура направлена строго фронтально, обе ступени подставки видны с ребра, горизонтальные кромки прямые; верхняя плоскость не показана."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Фигура, посох и подставка целиком видны; фон визуально ровный тёмно-серый. Верхний отступ 2,762 % — WARN автопроверки, обрезки нет."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Посох в собственной правой руке слева для зрителя; локти согнуты, обе руки отведены от корпуса и имеют видимые просветы."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: crooked staff in the RIGHT hand; ragged bandage wrappings; hooded cloak; rats on the shoulders",
+      "passed": true,
+      "note": "Кривой посох, рваные серые бинты, коричневый плащ с капюшоном и две крысы на плечах читаются."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Серые бинты и крысы, коричневый плащ и красные глаза; командного цвета и цветной полосы на подставке нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_generation": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [],
+  "warnings": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "view.frame_top",
+      "result": "WARN",
+      "actual_pct": 2.762,
+      "required_min_pct": 4,
+      "note": "Высшая точка посоха ближе к верхнему краю, чем заданные 4 %. WARN разрешён заданием и не является поводом для ретрая."
+    }
+  ],
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "CORE / staff decoration",
+      "note": "В g2 появился непрошенный декоративный череп на посохе. Он не входит в заданные identity anchors; соответствие запрету CORE на extra heads оставлено приёмщику. Изображение не ретушировалось."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "items": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Один персонаж с двумя предусмотренными крысами, одна подставка; текста и лишних видов нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Персонаж фронтальный, но видна верхняя поверхность подставки; нулевая высота камеры не выдержана."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура, посох и подставка целиком в кадре; фон визуально ровный тёмно-серый."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Посох в собственной правой руке слева для зрителя; локти согнуты, обе руки отведены от корпуса и имеют видимые просветы."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: crooked staff in the RIGHT hand; ragged bandage wrappings; hooded cloak; rats on the shoulders",
+          "passed": true,
+          "note": "Кривой посох, рваные серые бинты, коричневый плащ с капюшоном и две крысы на плечах читаются."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Серые бинты и крысы, коричневый плащ и красные глаза; командного цвета и цветной полосы на подставке нет."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "items": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Один персонаж с двумя предусмотренными крысами, одна подставка; текста и лишних видов нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "По визуальному осмотру сохранённого PNG: фигура направлена строго фронтально, обе ступени подставки видны с ребра, горизонтальные кромки прямые; верхняя плоскость не показана."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура, посох и подставка целиком видны; фон визуально ровный тёмно-серый. Верхний отступ 2,762 % — WARN автопроверки, обрезки нет."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Посох в собственной правой руке слева для зрителя; локти согнуты, обе руки отведены от корпуса и имеют видимые просветы."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: crooked staff in the RIGHT hand; ragged bandage wrappings; hooded cloak; rats on the shoulders",
+          "passed": true,
+          "note": "Кривой посох, рваные серые бинты, коричневый плащ с капюшоном и две крысы на плечах читаются."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Серые бинты и крысы, коричневый плащ и красные глаза; командного цвета и цветной полосы на подставке нет."
+        }
+      ]
+    }
+  ],
+  "scope_note": "Записи и копии задания находятся только в art/imagegen/concept-rat-king-codex/. Два исходных PNG созданы самим image_gen вне пакета по явно разрешённому договору; они оставлены на своих местах, пути указаны в generation-records.json.",
+  "no_image_postprocessing": true,
+  "process_note": "Оба запуска проверки кандидатов и финальный запуск завершились; фоновые процессы задания не запускались.",
+  "source_hashes_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-rat-king-codex/palette.json",
+      "before_sha256": "c6611b2f5f158906c04bacce54cfdc12cecd2c6717d67392740ee9e440f9354d",
+      "after_sha256": "c6611b2f5f158906c04bacce54cfdc12cecd2c6717d67392740ee9e440f9354d",
+      "unchanged": true
+    }
+  ],
+  "preexisting_files_unchanged": true,
+  "image_copy_checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "original_sha256": "4ea2cc9a50cb82945be798d747a9a2785cb7ecfb6010cf4501fb9a498d690e1b",
+      "saved_sha256": "4ea2cc9a50cb82945be798d747a9a2785cb7ecfb6010cf4501fb9a498d690e1b",
+      "byte_identical": true
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "original_sha256": "00b2061d9dd26a9b10bc6dfe4d512f898c7ca5bdb476d763480e67c0b24ce831",
+      "saved_sha256": "00b2061d9dd26a9b10bc6dfe4d512f898c7ca5bdb476d763480e67c0b24ce831",
+      "byte_identical": true
+    }
+  ],
+  "selected_design_sha256": "00b2061d9dd26a9b10bc6dfe4d512f898c7ca5bdb476d763480e67c0b24ce831"
+}

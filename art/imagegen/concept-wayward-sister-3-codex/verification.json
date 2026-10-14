@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-13T03:33:19+00:00",
+  "card_id": "ASSET-WAYWARD-SISTER-3-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-wayward-sister-3-codex/palette.json",
+      "sha256_before": "72f41d5f3e84c9b1c345b041f7d2ea9ccd081e2a60ec90fc62d9a972f043ce77",
+      "sha256_after": "72f41d5f3e84c9b1c345b041f7d2ea9ccd081e2a60ec90fc62d9a972f043ce77",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_scope": "Repository writes are confined to the package. Automatically saved image_gen originals outside the repository are the required exception and remain untouched.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-3-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-3-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wayward-sister-3-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура, одна подставка; второго вида, коллажа, текста, логотипа или водяного знака не обнаружено."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": false,
+      "note": "Фигура фронтальная, без поворота в три четверти; передний край подставки горизонтален. Однако над верхним диском видна узкая полоска верхней плоскости: строгое требование «верх не виден» не выполнено полностью."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, капюшон, дым, ступни и подставка целиком в кадре. Фон визуально нейтральный тёмно-серый, без выраженного градиента, пола и падающей тени; рамка прошла проверку однородности."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "Оружия нет; руки согнуты, поза не T и не A. Удерживаемый обеими руками котелок буквально нарушает запрет held object, но обязателен по SUBJECT и IDENTITY ANCHORS неизменного CORE. Чёткие просветы фона между каждой рукой и корпусом также не подтверждены: рукава и плащ закрывают эти зоны."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: small cauldron held with both hands; pointed cowl; patched dark cloak; green smoke;",
+      "passed": true,
+      "note": "Небольшой железный котелок у живота в обеих руках, остроконечный капюшон, тёмный плащ с заплатами и зелёный дым присутствуют. В g1 вместо капюшона была шляпа; g2 исправил этот якорь."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Чёрный плащ, коричневые заплаты, серое железо и зелёный дым присутствуют; командного цвета, цветного кольца или металлического пояса на подставке нет. Попиксельное совпадение hex не заявляется: материалы имеют светотень."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "generations_used_this_run": 2,
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ]
+    }
+  ],
+  "selected": {
+    "design-front": 2
+  },
+  "selected_file": "art/imagegen/concept-wayward-sister-3-codex/design/wayward-sister-3-front.png",
+  "selected_byte_identical": true,
+  "selected_sha256": "3d7db902b711c0046d7172d62fad75805930c8cd09c102cf63c5f03caa986bc1",
+  "copy_proof": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1334d-667d-7682-b86b-7fbbbda4992a\\exec-e51e26ba-fa96-4e08-8a21-cc4f3a4c430f.png",
+      "saved_path": "art/imagegen/concept-wayward-sister-3-codex/concepts/wayward-sister-3-design-front-g1.png",
+      "sha256_original": "3a4e0270acd09a0621b4c067665b2da7c9557642cdc897e6529b27299e545b17",
+      "sha256_saved": "3a4e0270acd09a0621b4c067665b2da7c9557642cdc897e6529b27299e545b17",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1334d-667d-7682-b86b-7fbbbda4992a\\exec-dbf81297-a526-48ae-8bbc-34ee14d1f1a6.png",
+      "saved_path": "art/imagegen/concept-wayward-sister-3-codex/concepts/wayward-sister-3-design-front-g2.png",
+      "sha256_original": "3d7db902b711c0046d7172d62fad75805930c8cd09c102cf63c5f03caa986bc1",
+      "sha256_saved": "3d7db902b711c0046d7172d62fad75805930c8cd09c102cf63c5f03caa986bc1",
+      "byte_identical": true
+    }
+  ],
+  "final_exit_code": 0,
+  "warnings": [
+    {
+      "id": "view.frame_top",
+      "scope": "front",
+      "result": "WARN",
+      "value": 3.522,
+      "limit": ">= 4.0 %",
+      "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "WARN",
+      "value": [
+        1.99,
+        0.075,
+        0.019,
+        0.012,
+        0.012,
+        0.008,
+        0.007,
+        0.006,
+        0.006,
+        0.006
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    }
+  ],
+  "framing_measurements": {
+    "area_pct": 36.32,
+    "filled_area_pct": 36.32,
+    "components_kept": 3,
+    "main_component_pct": 34.255,
+    "other_components_pct": [
+      1.99,
+      0.075,
+      0.019,
+      0.012,
+      0.012,
+      0.008,
+      0.007,
+      0.006,
+      0.006,
+      0.006
+    ],
+    "bbox_px": [
+      165,
+      51,
+      919,
+      1388
+    ],
+    "top_pct": 3.522,
+    "bottom_pct": 95.856,
+    "left_pct": 15.193,
+    "right_pct": 84.622,
+    "height_pct": 92.334,
+    "base_center_x_pct": 49.908,
+    "base_width_pct": 69.429,
+    "base_top_pct_est": 87.983
+  },
+  "prompt_core_unchanged": true,
+  "errors": [],
+  "limitations": [
+    "The literal held-object prohibition conflicts with the required two-handed cauldron. CORE was kept verbatim.",
+    "The checker does not validate orthographic camera, arm separation, identity anchors or absence of text; these were inspected visually.",
+    "The specified checker commands do not include --palette and do not perform palette metrics. Palette presence was judged visually.",
+    "Exact y4/y93 framing was not achieved; upper-margin WARN is allowed by the task."
+  ],
+  "preserved_preexisting_files": [
+    {
+      "path": "art/imagegen/concept-wayward-sister-3-codex/palette.json",
+      "sha256": "72f41d5f3e84c9b1c345b041f7d2ea9ccd081e2a60ec90fc62d9a972f043ce77",
+      "unchanged": true
+    }
+  ],
+  "processes_started_remaining": []
+}

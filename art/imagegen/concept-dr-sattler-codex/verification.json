@@ -1,0 +1,218 @@
+{
+  "card_id": "ASSET-DR-SATTLER-001",
+  "stage": "1a",
+  "date": "2026-10-13T08:49:32+00:00",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-dr-sattler-codex/palette.json",
+      "before_sha256": "34f5ddf563b65a28607f2c7f5ffbf3878bf623224c8c77127620c8b86d757203",
+      "after_sha256": "34f5ddf563b65a28607f2c7f5ffbf3878bf623224c8c77127620c8b86d757203",
+      "unchanged": true,
+      "bytes": 291
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_basis": "All task-controlled writes were restricted to this package. Original files written by image_gen are the explicitly allowed exception and were retained. No full-disk change scan is claimed.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-sattler-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-sattler-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-sattler-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура на одной подставке из двух дисков; дополнительных видов, текста и знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена строго вперёд. Диски показаны с прямыми горизонтальными передними краями; верхняя плоскость не видна. Круглая форма по одному виду с ребра независимо не подтверждается."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, фальшфейер и подставка в кадре. Фон тёмно-серый, визуально ровный; рамка прошла проверку. Предупреждение о верхнем отступе записано отдельно."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Фальшфейер в собственной правой руке фигуры, слева для зрителя. Между каждой рукой и торсом виден просвет; поза асимметричная, не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: flare in the RIGHT hand; khaki field shirt; hiking boots; blonde ponytail",
+      "passed": true,
+      "note": "Фальшфейер, полевая рубашка хаки с закатанными рукавами, походные ботинки и светлый хвост справа за головой читаются."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Хаки на рубашке и шортах, приглушённый розовый на внутренней майке, коричневый на ботинках, красный на фальшфейере. Командного цвета, цветного кольца и металлического обода нет."
+    }
+  ],
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "checklist": [
+        {
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура, одна подставка, нет коллажа, второго вида или надписей."
+        },
+        {
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Фигура фронтальная, но видна эллиптическая верхняя плоскость подставки; вид с ребра не выполнен."
+        },
+        {
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и подставка целиком в кадре на тёмно-сером фоне. Отступ 3,936% — разрешённый WARN."
+        },
+        {
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Фальшфейер в правой руке слева для зрителя; обе руки отделены от торса, поза не T и не A."
+        },
+        {
+          "item": "every identity anchor is visible: flare in the RIGHT hand; khaki field shirt; hiking boots; blonde ponytail",
+          "passed": false,
+          "note": "Фальшфейер, ботинки и хвост видны, но полевая рубашка розовая вместо хаки."
+        },
+        {
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Палитра присутствует; подставка без командного цвета и обода."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "checklist": [
+        {
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура на одной подставке из двух дисков; дополнительных видов, текста и знаков нет."
+        },
+        {
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Фигура обращена строго вперёд. Диски показаны с прямыми горизонтальными передними краями; верхняя плоскость не видна. Круглая форма по одному виду с ребра независимо не подтверждается."
+        },
+        {
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Вся фигура, фальшфейер и подставка в кадре. Фон тёмно-серый, визуально ровный; рамка прошла проверку. Предупреждение о верхнем отступе записано отдельно."
+        },
+        {
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": true,
+          "note": "Фальшфейер в собственной правой руке фигуры, слева для зрителя. Между каждой рукой и торсом виден просвет; поза асимметричная, не T и не A."
+        },
+        {
+          "item": "every identity anchor is visible: flare in the RIGHT hand; khaki field shirt; hiking boots; blonde ponytail",
+          "passed": true,
+          "note": "Фальшфейер, полевая рубашка хаки с закатанными рукавами, походные ботинки и светлый хвост справа за головой читаются."
+        },
+        {
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Хаки на рубашке и шортах, приглушённый розовый на внутренней майке, коричневый на ботинках, красный на фальшфейере. Командного цвета, цветного кольца и металлического обода нет."
+        }
+      ]
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generations_allowed_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "final_script_exit_code": 0,
+  "limit_reached": [],
+  "unmet_core_constraints": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "FRAMING: highest point y >= 4%",
+      "check_id": "view.frame_top",
+      "result": "WARN",
+      "measured_top_pct": 3.591,
+      "required_top_pct": 4,
+      "note": "Allowed WARN; no crop and no retry based on WARN."
+    }
+  ],
+  "design_deviations": [
+    {
+      "view": "design-front",
+      "generation": 2,
+      "item": "field straps and bag",
+      "note": "Generated g2 added brown field straps and a bag not explicitly requested by CORE; retained without image editing."
+    }
+  ],
+  "image_integrity": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1346a-9b54-7d52-ba92-8c91ab349b6d\\exec-bb0a56a1-c7f6-469e-910f-48e7e3255bb7.png",
+      "saved_path": "art/imagegen/concept-dr-sattler-codex/concepts/dr-sattler-design-front-g1.png",
+      "sha256": "934a98fb7a2e2c2270ceb50840e35928261cc0d0f7e2203f6312270ae735df2b",
+      "byte_identical": true,
+      "original_retained": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1346a-9b54-7d52-ba92-8c91ab349b6d\\exec-e4007112-bc65-412b-97cf-eb3b75902e13.png",
+      "saved_path": "art/imagegen/concept-dr-sattler-codex/concepts/dr-sattler-design-front-g2.png",
+      "sha256": "b9636aae177d6510c1baca849ff7f1d148551b7fc7015b30d81ae8776967519f",
+      "byte_identical": true,
+      "original_retained": true
+    }
+  ],
+  "design_copy": {
+    "path": "art/imagegen/concept-dr-sattler-codex/design/dr-sattler-front.png",
+    "generation": 2,
+    "sha256": "b9636aae177d6510c1baca849ff7f1d148551b7fc7015b30d81ae8776967519f",
+    "byte_identical": true
+  },
+  "errors": [],
+  "processes": {
+    "background_services_started": false,
+    "all_shell_commands_completed": true
+  }
+}

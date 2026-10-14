@@ -1,0 +1,209 @@
+{
+  "schema": "unmatched.concept-verification/1",
+  "card_id": "ASSET-MOTHMAN-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "outside_folder_note": "Все действия записи исполнителя ограничены пакетом. Автоматические оригиналы image_gen сохранены инструментом в штатном месте; это разрешённое заданием исключение, их абсолютные original_path записаны в generation-records.json. Оригиналы оставлены на месте.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-mothman-codex/checks/design-front-g1/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 13,
+        "WARN": 0,
+        "FAIL": 0
+      },
+      "date": "2026-10-13T08:17:55+00:00",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-mothman-codex/design --key mothman --views front --role hero --min-top-pct 4 --out art/imagegen/concept-mothman-codex/checks/design-front-g1"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-mothman-codex/checks/design-front-g2/checks-report.json",
+      "final": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "date": "2026-10-13T08:19:23+00:00",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-mothman-codex/design --key mothman --views front --role hero --min-top-pct 4 --out art/imagegen/concept-mothman-codex/checks/design-front-g2"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-mothman-codex/design/checks-report.json",
+      "final": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "date": "2026-10-13T08:19:51+00:00",
+      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-mothman-codex/design --key mothman --views front --role hero --min-top-pct 4"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура и одна подставка из двух дисков; нет второго вида, коллажа, надписей или водяного знака."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере; края обоих дисков горизонтальны, верхняя поверхность подставки скрыта. Визуально нет разворота в три четверти или наклона камеры."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": false,
+      "note": "Фигура, крылья и подставка целиком в кадре. Фон тёмно-серый, но слегка темнеет книзу: пример верхнего пикселя RGB [47,47,49], нижнего [42,43,44]. Строго плоский фон не получился; пункт отмечен failed, хотя автопроверка допускает этот разброс."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": true,
+      "note": "Оружия и предметов нет; руки отделены от корпуса, локти слегка согнуты, кисти свободно опущены. Это свободная нейтральная стойка, а не жёсткая T- или A-поза; за промежутками видны крылья."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: huge moth wings spread behind; glowing red eyes; furry grey-brown body; thin clawed limbs",
+      "passed": true,
+      "note": "Видны крупные расправленные крылья мотылька, яркие красные глаза, серо-коричневое скульптурное опушение и тонкие конечности с когтями."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Серо-коричневый мех, коричневые и тёмные участки крыльев, красный акцент глаз присутствуют. Подставка тёмная, без командного цвета, цветного кольца или металлической полосы; точное совпадение каждого пикселя с hex не заявляется."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_generation": {
+    "design-front": 2
+  },
+  "selected_file": "art/imagegen/concept-mothman-codex/design/mothman-front.png",
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Обе разрешённые генерации использованы. Сохранён лучший кандидат g2; решение о приемлемости слабой неравномерности фона остаётся приёмщику."
+    }
+  ],
+  "candidate_assessments": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible"
+      ],
+      "note": "Причина повторной генерации — видимая узкая верхняя поверхность подставки. Поздняя сверка также обнаружила небольшую неоднородность фона; g1 не выбран."
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "failed_items": [
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "note": "Верх подставки скрыт. Слабое потемнение фона сохранено и явно отмечено в выбранном CHECKLIST."
+    }
+  ],
+  "limits_not_met": [
+    {
+      "view": "design-front",
+      "item": "view.frame_top",
+      "result": "WARN",
+      "expected_min_top_pct": 4,
+      "actual_top_pct": 3.315,
+      "note": "WARN разрешён заданием и не является причиной повторной генерации; вся фигура в кадре."
+    },
+    {
+      "view": "design-front",
+      "item": "FRAMING pedestal bottom y93%",
+      "target_pct": 93,
+      "actual_pct": 95.373,
+      "note": "Низ подставки ниже заданной линии, но подставка целиком в кадре и автопроверка view.bottom_margin прошла."
+    },
+    {
+      "view": "design-front",
+      "item": "PEDESTAL diameter about 0.55 of figure height",
+      "target_ratio": 0.55,
+      "estimated_ratio": 0.65,
+      "note": "Подставка шире целевой пропорции. Оценка по ширине подставки и расстоянию от верхней точки до её верхнего края; точное 3D-измерение по фронту невозможно."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "note": "Слабое потемнение фона книзу; выбранный CHECKLIST отмечен failed."
+    }
+  ],
+  "errors": [],
+  "execution": {
+    "image_generations": 2,
+    "image_inputs_per_generation": 1,
+    "palette_used_as_image_input": false,
+    "image_transformations": [],
+    "commands_from_repository_root": true,
+    "python_io_encoding": "utf-8",
+    "python_bytecode_disabled": true,
+    "git_commands": 0,
+    "unreal_access": false,
+    "downloads": 0,
+    "process_cleanup": "Все запущенные команды завершились; фоновые процессы исполнителя не создавались."
+  },
+  "date": "2026-10-13T08:25:42+00:00",
+  "source_hashes_after": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-mothman-codex/palette.json",
+      "sha256_before": "38beafd3c41f93a25fe2086d222c479e31000421ceac97c9871842f7b7887b8d",
+      "sha256_after": "38beafd3c41f93a25fe2086d222c479e31000421ceac97c9871842f7b7887b8d",
+      "bytes": 291,
+      "unchanged": true
+    }
+  ],
+  "raw_image_copies": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13453-d74a-7170-93ff-3177a79ed821\\exec-fd38bf5a-bc93-4aa5-bf52-d67621b9423d.png",
+      "saved_path": "art/imagegen/concept-mothman-codex/concepts/mothman-design-front-g1.png",
+      "sha256": "7ac945078fcb492d93bc2fb8ce96863079053ea9c5f381f8130293e173d7df92",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13453-d74a-7170-93ff-3177a79ed821\\exec-9b7da12b-3acc-4cd5-af9e-fd96083c065f.png",
+      "saved_path": "art/imagegen/concept-mothman-codex/concepts/mothman-design-front-g2.png",
+      "sha256": "06c9a9caf078eb0d9c377465e9cabefd03c62995e25e2b387092a4c103960ad9",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy_byte_identical": true,
+  "preexisting_package_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-mothman-codex/palette.json",
+      "unchanged": true
+    }
+  ]
+}

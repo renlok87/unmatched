@@ -1,0 +1,272 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leonardo-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leonardo-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": false,
+      "note": "Одна фигура и одна подставка, без коллажа, второго вида и водяного знака. На круглой синей пряжке виден рельефный эмблемный знак; запрет логотипов отмечен как невыполненный. Буква L не читается однозначно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура смотрит прямо в камеру, без заметного поворота или перспективного сокращения. Оба диска подставки показаны с прямыми горизонтальными передними краями; верхняя поверхность не видна."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Вся фигура, концы клинков и подставка в кадре. Фон визуально ровный тёмно-серый; верх маски 10,221%, низ 92,956%, центр подставки 49,954%."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": false,
+      "note": "В обеих руках по катане: буквальный запрет оружия не выполнен. Руки отведены от корпуса, локти согнуты, зазоры видны; поза не T/A. Условие конфликтует с SUBJECT и IDENTITY ANCHORS неизменяемого CORE."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: two katanas, one in each hand; blue eye mask with tails; brown shell on the back; belt and knee pads;",
+      "passed": true,
+      "note": "Видны две катаны по одной в каждой руке, синяя маска и два хвоста слева для зрителя, коричневый панцирь за плечами и по бокам, пояс и наколенники."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Зелёная кожа, коричневые панцирь и кожаные детали, синяя маска и стальной акцент клинков присутствуют. Цветового кольца, металлической ленты и отдельной командной окраски на подставке нет."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+        "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);"
+      ]
+    }
+  ],
+  "status": "предложено",
+  "candidate_checklists": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+          "passed": true,
+          "note": "Одна фигура и одна подставка из двух дисков; текста, коллажа, дополнительных ракурсов и водяного знака нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+          "passed": false,
+          "note": "Фигура фронтальна, но вдоль стоп видна узкая верхняя поверхность верхнего диска; строгое условие edge-on не выполнено."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+          "passed": true,
+          "note": "Фигура и подставка полностью в кадре; фон тёмно-серый и визуально ровный; скрипт не обнаружил проблем фона или обрезки."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+          "passed": false,
+          "note": "В обеих руках катаны, поэтому запрет оружия не выполнен. Руки отведены, локти согнуты; поза не T/A. CORE одновременно требует эти же катаны."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: two katanas, one in each hand; blue eye mask with tails; brown shell on the back; belt and knee pads;",
+          "passed": true,
+          "note": "Видны две катаны (по одной в каждой руке), синяя маска с двумя хвостами, коричневый панцирь за плечами и по бокам, пояс и наколенники."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+          "passed": true,
+          "note": "Присутствуют зелёная кожа, коричневый панцирь и пояс, синяя маска и стальные клинки; командной окраски, цветного кольца и металлической ленты на подставке нет."
+        }
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+          "passed": false,
+          "note": "Одна фигура и одна подставка, без коллажа, второго вида и водяного знака. На круглой синей пряжке виден рельефный эмблемный знак; запрет логотипов отмечен как невыполненный. Буква L не читается однозначно."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+          "passed": true,
+          "note": "Фигура смотрит прямо в камеру, без заметного поворота или перспективного сокращения. Оба диска подставки показаны с прямыми горизонтальными передними краями; верхняя поверхность не видна."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+          "passed": true,
+          "note": "Вся фигура, концы клинков и подставка в кадре. Фон визуально ровный тёмно-серый; верх маски 10,221%, низ 92,956%, центр подставки 49,954%."
+        },
+        {
+          "view": "design-front",
+          "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+          "passed": false,
+          "note": "В обеих руках по катане: буквальный запрет оружия не выполнен. Руки отведены от корпуса, локти согнуты, зазоры видны; поза не T/A. Условие конфликтует с SUBJECT и IDENTITY ANCHORS неизменяемого CORE."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: two katanas, one in each hand; blue eye mask with tails; brown shell on the back; belt and knee pads;",
+          "passed": true,
+          "note": "Видны две катаны по одной в каждой руке, синяя маска и два хвоста слева для зрителя, коричневый панцирь за плечами и по бокам, пояс и наколенники."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+          "passed": true,
+          "note": "Зелёная кожа, коричневые панцирь и кожаные детали, синяя маска и стальной акцент клинков присутствуют. Цветового кольца, металлической ленты и отдельной командной окраски на подставке нет."
+        }
+      ]
+    }
+  ],
+  "selected": {
+    "design-front": "g2"
+  },
+  "generation_limit": 2,
+  "run_id": "2026-10-13-1a-design-front-r1",
+  "date": "2026-10-13T07:37:27+00:00",
+  "input_verification": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-leonardo-codex/palette.json",
+      "sha256_before": "df248754b40adc1d6a241fde256f3ebd405a23e3c729321a3778a94abc408eb0",
+      "sha256_after": "df248754b40adc1d6a241fde256f3ebd405a23e3c729321a3778a94abc408eb0",
+      "unchanged": true
+    }
+  ],
+  "outside_folder_scope": "outside_folder учитывает записи исполнителя. Собственные внешние копии image_gen разрешены контрактом, оставлены на месте и зарегистрированы в original_path.",
+  "copy_integrity": [
+    {
+      "generation": "g1",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13427-4d62-7323-9fc1-3bf8be6055f2\\exec-f7915091-3856-42c8-b69f-d3d21198f983.png",
+      "saved_path": "art/imagegen/concept-leonardo-codex/concepts/leonardo-design-front-g1.png",
+      "sha256_original": "3816753587936c71fbc8e62d463b4d01c0b903bc349057c9ae5e616fc4fe9308",
+      "sha256_saved": "3816753587936c71fbc8e62d463b4d01c0b903bc349057c9ae5e616fc4fe9308",
+      "byte_identical": true,
+      "original_retained": true
+    },
+    {
+      "generation": "g2",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13427-4d62-7323-9fc1-3bf8be6055f2\\exec-52acb5d5-db87-4478-b718-34898e457df1.png",
+      "saved_path": "art/imagegen/concept-leonardo-codex/concepts/leonardo-design-front-g2.png",
+      "sha256_original": "41cdd7e26c2b8e42b6489fa326893d75daf3e0068a67388389bbbceb099685e3",
+      "sha256_saved": "41cdd7e26c2b8e42b6489fa326893d75daf3e0068a67388389bbbceb099685e3",
+      "byte_identical": true,
+      "original_retained": true
+    }
+  ],
+  "selected_copy": {
+    "path": "art/imagegen/concept-leonardo-codex/design/leonardo-front.png",
+    "generation": "g2",
+    "sha256": "41cdd7e26c2b8e42b6489fa326893d75daf3e0068a67388389bbbceb099685e3",
+    "byte_identical": true
+  },
+  "input_conflicts": [
+    "SUBJECT и IDENTITY ANCHORS требуют две катаны, по одной в каждой руке; POSE и CHECKLIST запрещают оружие или удерживаемые предметы. CORE оставлен дословным; оба требования одновременно невыполнимы."
+  ],
+  "core_observations": [
+    {
+      "item": "two katanas crossed in both hands",
+      "passed": false,
+      "note": "В g1 и g2 по одной катане в каждой руке, но клинки расходятся в стороны и не пересекаются."
+    },
+    {
+      "item": "pedestal diameter about 0.55 of the figure height",
+      "passed": false,
+      "note": "У g2 диаметр подставки визуально около 0,72 высоты фигуры без подставки; приблизительная оценка по изображению."
+    },
+    {
+      "item": "portrait aspect ratio 3:4",
+      "passed": true,
+      "note": "1086/1448 = 0,75. Размеры выбраны инструментом, изображение не масштабировалось."
+    }
+  ],
+  "prompt_integrity": {
+    "g1_core_exact": true,
+    "g2_core_exact": true,
+    "g2_correction_lines": 1,
+    "json_and_markdown_prompts_identical": true,
+    "correction_does_not_address_conflicting_weapon_requirement": true
+  },
+  "generation_calls": {
+    "design-front": 2
+  },
+  "image_operations": {
+    "copy_only": true,
+    "retouch": false,
+    "resize": false,
+    "crop": false,
+    "recolour": false,
+    "reencode": false
+  },
+  "final_script_exit_code": 0,
+  "unmodified_preexisting_package_files": [
+    {
+      "path": "art/imagegen/concept-leonardo-codex/palette.json",
+      "sha256": "df248754b40adc1d6a241fde256f3ebd405a23e3c729321a3778a94abc408eb0",
+      "unchanged": true
+    }
+  ],
+  "processes_started_remaining": [],
+  "text_encoding": "UTF-8 without BOM",
+  "write_paths": [
+    "art/imagegen/concept-leonardo-codex/README.md",
+    "art/imagegen/concept-leonardo-codex/checks/design-front-g1/checks-report.json",
+    "art/imagegen/concept-leonardo-codex/checks/design-front-g2/checks-report.json",
+    "art/imagegen/concept-leonardo-codex/concepts/leonardo-design-front-g1.png",
+    "art/imagegen/concept-leonardo-codex/concepts/leonardo-design-front-g2.png",
+    "art/imagegen/concept-leonardo-codex/design/checks-report.json",
+    "art/imagegen/concept-leonardo-codex/design/leonardo-front.png",
+    "art/imagegen/concept-leonardo-codex/generation-records.json",
+    "art/imagegen/concept-leonardo-codex/manifest-sha256.json",
+    "art/imagegen/concept-leonardo-codex/prompts.md",
+    "art/imagegen/concept-leonardo-codex/prompts/concept-prompts.json",
+    "art/imagegen/concept-leonardo-codex/source-hashes-before.json",
+    "art/imagegen/concept-leonardo-codex/verification.json"
+  ]
+}

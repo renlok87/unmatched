@@ -1,0 +1,283 @@
+{
+  "card_id": "ASSET-JERSEY-DEVIL-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13T08:18:23+00:00",
+  "source_unchanged": true,
+  "source_hashes": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "before_bytes": 2034907,
+      "after_bytes": 2034907,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-jersey-devil-codex/palette.json",
+      "before_sha256": "dab7a15bef317f5941b68e185c06d342afbee1e8bcad7b955b93c8e647964d5b",
+      "after_sha256": "dab7a15bef317f5941b68e185c06d342afbee1e8bcad7b955b93c8e647964d5b",
+      "before_bytes": 292,
+      "after_bytes": 292,
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "scope_note": "All agent-created or modified package files are inside art/imagegen/concept-jersey-devil-codex/. image_gen owns and preserves its required external original copies; their absolute paths are logged under original_path. No repository-wide filesystem comparison is claimed.",
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/checks/design-front-g1/checks-report.json",
+      "final_selected": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "scope": "front",
+          "result": "WARN",
+          "value": 3.729,
+          "limit": ">= 4.0 %",
+          "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-jersey-devil-codex/checks/design-front-g1"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/checks/design-front-g2/checks-report.json",
+      "final_selected": false,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "scope": "front",
+          "result": "WARN",
+          "value": 2.901,
+          "limit": ">= 4.0 %",
+          "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4",
+        "--out",
+        "art/imagegen/concept-jersey-devil-codex/checks/design-front-g2"
+      ]
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-jersey-devil-codex/design/checks-report.json",
+      "final_selected": true,
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "warnings": [
+        {
+          "id": "view.frame_top",
+          "scope": "front",
+          "result": "WARN",
+          "value": 2.901,
+          "limit": ">= 4.0 %",
+          "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-jersey-devil-codex/design",
+        "--key",
+        "jersey-devil",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--min-top-pct",
+        "4"
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "В кадре одна фигура на одной двухъярусной подставке. Коллажа, второго вида, надписей, логотипа и водяного знака не видно."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Лицо и корпус обращены прямо к камере. Подставка показана ребром: верхняя плоскость не видна, передние края горизонтальны. Видимого разворота в три четверти или наклона камеры нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, рога, оба крыла, хвост и вся подставка помещаются в кадр. Фон визуально ровный тёмно-серый; пола и тени на фоне не видно. Отступ сверху не достигает 4% — это отдельный допустимый WARN, обрезки нет."
+    },
+    {
+      "view": "design-front",
+      "item": "No weapon or held object. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Оружия и предметов в кистях нет. Обе руки опущены и слегка отведены от корпуса с видимыми промежутками; локти слегка согнуты, поза не T и не прямая A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: horse-like head with small horns; bat wings; hooved legs; forked tail;",
+      "passed": true,
+      "note": "Читаются вытянутая лошадиная морда с двумя небольшими рогами, два перепончатых крыла летучей мыши, две копытные ноги и хвост с двумя отчётливыми ветвями между ногами."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Присутствуют коричневая шкура, серые перепонки, костяные рога и красные глаза. Нет командного цвета, цветного кольца или металлического пояса на каменной подставке. Цвета оценены визуально, без требования равенства каждого пикселя HEX."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "view": "design-front",
+      "generation": "g1",
+      "selected": false,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;"
+      ],
+      "note": "Подставка снята сверху: видна верхняя поверхность и дуга переднего края. Это стало единственной строкой CORRECTION g2."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "selected": true,
+      "failed_items": [],
+      "note": "Выбран после визуального осмотра; шесть пунктов CHECKLIST пройдены."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generations_this_run": 2,
+  "generation_limit_this_run": 2,
+  "limit_reached": [],
+  "selected": {
+    "view": "design-front",
+    "generation": "g2",
+    "saved_path": "art/imagegen/concept-jersey-devil-codex/concepts/jersey-devil-design-front-g2.png",
+    "design_path": "art/imagegen/concept-jersey-devil-codex/design/jersey-devil-front.png",
+    "sha256": "4b1026265dba8d1cb1ca2917d348377f0464a8da0dc9bb3cb5e40cb7f97a5f16",
+    "width": 1086,
+    "height": 1448,
+    "final_script_exit_code": 0
+  },
+  "limitations": [
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "CORE FRAMING highest point y >= 4%",
+      "check_id": "view.frame_top",
+      "actual_pct": 2.901,
+      "required_min_pct": 4,
+      "classification": "WARN allowed by task",
+      "note": "The upper margin is below the CORE target. The full silhouette is visible. WARN alone is not a reason to retry and is not a failed CHECKLIST item."
+    },
+    {
+      "view": "design-front",
+      "generation": "g2",
+      "item": "CORE FRAMING pedestal bottom y93%",
+      "actual_pct": 94.682,
+      "target_pct": 93,
+      "classification": "prompt placement deviation; no script FAIL",
+      "note": "The pedestal bottom is lower than the requested y93% line; nothing is cropped. This target has no matching FAIL check in the supplied command."
+    }
+  ],
+  "framing": {
+    "aspect_requested": "3:4",
+    "aspect_actual": "3:4",
+    "base_center_x_pct": 50.0,
+    "top_pct": 2.901,
+    "bottom_pct": 94.682
+  },
+  "image_integrity": {
+    "raw_files_modified": false,
+    "copies": [
+      {
+        "generation": "g1",
+        "original_path": "C:/Users/ren/.codex/generated_images/01a1344d-670e-7400-bdc0-ae36e81b842b/exec-d59b9ef8-1b2d-4f38-b595-0ed8be709632.png",
+        "saved_path": "art/imagegen/concept-jersey-devil-codex/concepts/jersey-devil-design-front-g1.png",
+        "sha256": "652a684bf3e45596efac2d2731d992af5eed8b1aca919a431f9c56f22cbb4835",
+        "byte_identical": true,
+        "bytes": 1970280,
+        "width": 1086,
+        "height": 1448
+      },
+      {
+        "generation": "g2",
+        "original_path": "C:/Users/ren/.codex/generated_images/01a1344d-670e-7400-bdc0-ae36e81b842b/exec-8332a62a-bca1-4534-808f-a60bb0f04aa4.png",
+        "saved_path": "art/imagegen/concept-jersey-devil-codex/concepts/jersey-devil-design-front-g2.png",
+        "sha256": "4b1026265dba8d1cb1ca2917d348377f0464a8da0dc9bb3cb5e40cb7f97a5f16",
+        "byte_identical": true,
+        "bytes": 1920495,
+        "width": 1086,
+        "height": 1448
+      }
+    ],
+    "selected_design_byte_identical": true
+  },
+  "prompt_integrity": {
+    "core_unchanged": true,
+    "retry_correction_line_count": 1,
+    "reference_order": [
+      {
+        "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+        "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9"
+      }
+    ]
+  },
+  "encoding": {
+    "text_files": "UTF-8 without BOM; written by Python Path.write_text(encoding=utf-8)",
+    "json_ensure_ascii": false
+  },
+  "errors": [],
+  "background_processes_started": []
+}

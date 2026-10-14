@@ -1,0 +1,102 @@
+{
+ "card_id": "ASSET-LOKI-001",
+ "stage": "1a",
+ "date": "2026-10-13T08:22:58+00:00",
+ "status": "blocked",
+ "source_unchanged": true,
+ "sources": [
+  {
+   "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+   "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+   "unchanged": true,
+   "bytes_before": 2034907,
+   "bytes_after": 2034907
+  },
+  {
+   "path": "art/imagegen/concept-loki-codex/palette.json",
+   "sha256_before": "93df1223f9deee540ea09b7deff62948707dc3b22397905ede54f6f048649f4d",
+   "sha256_after": "93df1223f9deee540ea09b7deff62948707dc3b22397905ede54f6f048649f4d",
+   "expected_sha256": "93df1223f9deee540ea09b7deff62948707dc3b22397905ede54f6f048649f4d",
+   "unchanged": true,
+   "bytes_before": 292,
+   "bytes_after": 292
+  }
+ ],
+ "preexisting_package_files": [
+  {
+   "path": "art/imagegen/concept-loki-codex/palette.json",
+   "sha256_before": "93df1223f9deee540ea09b7deff62948707dc3b22397905ede54f6f048649f4d",
+   "sha256_after": "93df1223f9deee540ea09b7deff62948707dc3b22397905ede54f6f048649f4d",
+   "unchanged": true
+  }
+ ],
+ "outside_folder": [],
+ "outside_folder_audit": {
+  "method": "Explicit write-destination audit for this run; all successful filesystem writes were inside the package. No whole-repository diff was run.",
+  "git_commands_run": false,
+  "unreal_opened": false,
+  "background_processes_started": false,
+  "generated_tool_files": []
+ },
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-loki-codex/design/checks-report.json",
+   "source": "unstability.ai"
+  },
+  {
+   "view": "design-front",
+   "generation": "rc1",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-loki-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [],
+ "checklist_not_evaluated_reason": "No image received and no file selected; this is not a visual PASS.",
+ "generations": {
+  "design-front": 1
+ },
+ "generation_results": {
+  "design-front": {
+   "calls_used": 1,
+   "allowed_this_run": 2,
+   "images_received": 0,
+   "selected_generation": null
+  }
+ },
+ "final_script_exit_code": null,
+ "final_script_not_run_reason": "image_gen output was rejected; design/loki-front.png does not exist.",
+ "limit_reached": [],
+ "errors": [
+  {
+   "view": "design-front",
+   "generation": 1,
+   "tool": "image_gen.imagegen",
+   "http_status": 400,
+   "code": "moderation_blocked",
+   "message": "Your request was rejected by the safety system. If you believe this is an error, contact us at help.openai.com and include the request ID 80d9538e-6175-434e-9d99-f97cd3ca1ff2.",
+   "request_id": "80d9538e-6175-434e-9d99-f97cd3ca1ff2",
+   "moderation_stage": "output",
+   "categories": [
+    "other"
+   ]
+  }
+ ],
+ "limitations": [
+  "No image, candidate checks, final checks report or visual checklist is available because image_gen rejected the output."
+ ],
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+ }
+}

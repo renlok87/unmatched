@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-13",
+  "card_id": "ASSET-PATROCLUS-001",
+  "stage": "1a",
+  "status": "предложено",
+  "source_unchanged": true,
+  "sources": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-patroclus-codex/palette.json",
+      "sha256_before": "fd738e1dc701174cc780f31b49616d55fab4555ffbbdbda5473fadaa440b827f",
+      "sha256_after": "fd738e1dc701174cc780f31b49616d55fab4555ffbbdbda5473fadaa440b827f",
+      "unchanged": true
+    }
+  ],
+  "outside_folder": [],
+  "outside_folder_note": "Записи агента ограничены пакетом. Собственные оригиналы image_gen в штатном каталоге — явно разрешённое исключение. Чужие параллельные сессии не проверялись.",
+  "preexisting_files_unchanged": [
+    {
+      "path": "art/imagegen/concept-patroclus-codex/palette.json",
+      "sha256": "fd738e1dc701174cc780f31b49616d55fab4555ffbbdbda5473fadaa440b827f",
+      "unchanged": true
+    }
+  ],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-patroclus-codex/checks/design-front-g1/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-patroclus-codex/checks/design-front-g2/checks-report.json",
+      "final": false
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-patroclus-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура, одна двухъярусная подставка; текста, букв, логотипа, водяного знака и других видов нет. Узоры — скульптурный орнамент."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": false,
+      "note": "Лицо и корпус фронтальны. Однако за стопами и вдоль верхней кромки видна узкая полоска верхней плоскости подставки: строгое условие не выполнено."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Всё целиком в кадре. Фон ровный тёмно-серый: контрольные точки свободного фона дают RGB 47–49, выраженного градиента и виньетки нет."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Меч в правой руке персонажа, слева у зрителя. Руки отведены от льняного корпуса, промежутки различимы на фоне плаща, локти слегка согнуты; поза не T и не A."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: short sword in the figure's own RIGHT hand; small round shield on the LEFT arm; blue cloak;",
+      "passed": true,
+      "note": "Короткий меч справа у персонажа, небольшой круглый щит на левой руке и синий плащ видны."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Льняной цвет, эгейский синий, бронза и белый плюмаж присутствуют. Кожа и ремни приглушённые. Командной окраски, цветного кольца и металлической полосы на подставке нет."
+    }
+  ],
+  "candidate_reviews": [
+    {
+      "generation": 1,
+      "view": "design-front",
+      "selected": false,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;"
+      ],
+      "note": "Визуально отмечены поворот лица, видимый верх подставки, впечатление неоднородного фона."
+    },
+    {
+      "generation": 2,
+      "view": "design-front",
+      "selected": true,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;"
+      ],
+      "note": "Более точная фронтальность и рамка; остаётся узкая полоска верха подставки."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;"
+      ]
+    }
+  ],
+  "errors": [],
+  "constraints_unmet": [
+    {
+      "item": "view.frame_top",
+      "value_pct": 3.384,
+      "requested_min_pct": 4,
+      "severity": "WARN",
+      "note": "Допустимый WARN; не причина повторной генерации."
+    },
+    {
+      "item": "FRAMING pedestal bottom",
+      "value_pct": 93.715,
+      "requested_pct": 93
+    },
+    {
+      "item": "FRAMING pedestal center",
+      "value_pct": 49.724,
+      "requested_pct": 50
+    },
+    {
+      "item": "CHECKLIST strict front orthographic view",
+      "note": "Лицо и корпус фронтальны. Однако за стопами и вдоль верхней кромки видна узкая полоска верхней плоскости подставки: строгое условие не выполнено."
+    }
+  ],
+  "image_copies": [
+    {
+      "generation": 1,
+      "saved_path": "art/imagegen/concept-patroclus-codex/concepts/patroclus-design-front-g1.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333a-564d-71a1-8bf9-1d7002be3fe1\\exec-ee1876bb-64a0-4bd0-82cb-a29f83c818da.png",
+      "sha256": "7bfc9d17c23ae1f32a773f0613b851548050086817c154d0c21028595b5e320b",
+      "byte_identical": true
+    },
+    {
+      "generation": 2,
+      "saved_path": "art/imagegen/concept-patroclus-codex/concepts/patroclus-design-front-g2.png",
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333a-564d-71a1-8bf9-1d7002be3fe1\\exec-32458222-e010-44fc-b10e-735285b5919f.png",
+      "sha256": "d92f10fa66fc9d0726b79e2981b9db5fd42a66ff2aa6aca8ad1125e538fce8ee",
+      "byte_identical": true
+    }
+  ],
+  "selected_copy_byte_identical": true,
+  "pixel_edits": false,
+  "input_image_order": [
+    "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+  ],
+  "final_script_exit_code": 0,
+  "final_script_summary": {
+    "PASS": 12,
+    "WARN": 1,
+    "FAIL": 0
+  },
+  "palette_validation": "Визуальная проверка; точное совпадение каждого пикселя с HEX не утверждается."
+}

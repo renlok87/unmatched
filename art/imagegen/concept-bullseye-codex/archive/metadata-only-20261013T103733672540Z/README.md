@@ -1,0 +1,12 @@
+# Концепт-пакет ASSET-BULLSEYE-001
+
+## Этап 1a — дизайн-front из unstability.ai
+
+ImageGen Codex и SYNTX (Seedream, Banana) отклонили лицензионного персонажа (`moderation_blocked`). По решению пользователя 2026-10-13 фронт сгенерирован в его подписке unstability.ai: unstability.ai — UltraReal Fine-Tune v4 (Flux.1 D), Permissive, 3:4, High, CFG 3.5, 25 steps.
+
+- Кандидаты: `concepts/bullseye-design-front-u1.png`.
+- Выбран: `bullseye-design-front-u1.png` → `design/bullseye-front.png`.
+- Проверки 1a (`check_concept_views.py --views front --min-top-pct 4`): код 1, вердикт FAIL.
+- Референс качества во входах не использовался (сервис text-to-image без референса).
+- Статус: **предложено** (этап 1a); приёмка Sol — карточка в `evidence/acceptance-concept/`.
+- Фон заменён на ровный нейтральный (46,46,48): сырой кадр сервиса с полом и виньеткой — `design/bullseye-front-raw.png`; сегментация `C:/tmp/concept-wave/rebg.py` (модель фона полином 4-й степени + построчная поправка, рост от рамки), при касании края — поля с уменьшением. Перепроверка 1a: вердикт PASS.

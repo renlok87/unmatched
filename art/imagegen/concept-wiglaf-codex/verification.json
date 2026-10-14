@@ -1,0 +1,139 @@
+{
+  "card_id": "ASSET-WIGLAF-001",
+  "stage": "1a",
+  "status": "предложено",
+  "date": "2026-10-13T03:18:26.163714+00:00",
+  "source_unchanged": true,
+  "source_checks": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true,
+      "bytes": 2034907
+    },
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/palette.json",
+      "before_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+      "after_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+      "unchanged": true,
+      "bytes": 286
+    }
+  ],
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "run": "candidate",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json",
+      "output": "WARN view.frame_top         front    value=3.177 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "run": "candidate",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json",
+      "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "run": "selected-final",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+      "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/design/checks-report.json"
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "passed": true,
+      "note": "Одна фигура, одна двухдисковая подставка; дополнительных видов, фигур и надписей нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "passed": false,
+      "note": "Лицо и корпус фронтальны; щит и подставка фронтальнее g1. Но узкая верхняя полоска подставки ещё различима, щит слегка овальный; требование точно ребром считаю невыполненным."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "passed": true,
+      "note": "Вся фигура, топор, щит и подставка в кадре; фон визуально ровный тёмно-серый. Медиана рамки RGB 40/40/40. Низ 93,094%; верх 3,660% даёт допустимый WARN view.frame_top."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "passed": false,
+      "note": "Топор в собственной правой руке, слева для зрителя; поза не T и не A. Плащ заполняет зазор под правой рукой, щит закрывает левое предплечье. Чистые фоновые зазоры между обеими руками и корпусом не видны."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: hand axe in the figure's own RIGHT hand; round shield with a boar on the LEFT arm; conical helmet",
+      "passed": true,
+      "note": "Топор слева для зрителя, щит с читаемым кабаном справа и конический железный шлем присутствуют. Хват левой руки скрыт щитом."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "passed": true,
+      "note": "Коричневая кожа, зелёный плащ, серое железо и приглушённое красное поле щита присутствуют. Кабан светлого нейтрального тона. Командных цветов и цветных либо металлических поясов на подставке нет."
+    }
+  ],
+  "generations_per_view": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "selected_per_view": {
+    "design-front": 2
+  },
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      ]
+    }
+  ],
+  "raw_copy_checks": [
+    {
+      "generation": 1,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-4fae5a22-4546-4e10-801f-99781b0ae90b.png",
+      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g1.png",
+      "sha256": "b17ad226ee094d196ea56edb7bbf62e00b68d7ff09c5459bfdaa34473f58cae3",
+      "byte_identical": true,
+      "hash_matches_record": true
+    },
+    {
+      "generation": 2,
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-a346a70c-7aea-4ea0-a554-563befe86ec1.png",
+      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g2.png",
+      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+      "byte_identical": true,
+      "hash_matches_record": true
+    }
+  ],
+  "selected_copy_byte_identical": true,
+  "warnings": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "id": "view.frame_top",
+      "top_pct": 3.177
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "id": "view.frame_top",
+      "top_pct": 3.66
+    }
+  ],
+  "errors": [],
+  "outside_folder_note": "Автоматические оригиналы image_gen вне пакета разрешены договором и не входят в outside_folder; команды задачи писали только внутри пакета."
+}

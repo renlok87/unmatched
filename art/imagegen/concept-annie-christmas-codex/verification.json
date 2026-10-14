@@ -1,0 +1,117 @@
+{
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-annie-christmas-codex/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-annie-christmas-codex/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "view": "design-front",
+      "generation": 2,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-annie-christmas-codex/design/checks-report.json",
+      "final": true
+    }
+  ],
+  "checklist": [
+    {
+      "view": "design-front",
+      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark;",
+      "passed": true,
+      "note": "Одна фигура на одной двухъярусной подставке; других видов, надписей и знаков нет."
+    },
+    {
+      "view": "design-front",
+      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+      "passed": true,
+      "note": "Фигура обращена прямо к камере; оба диска показаны ребром, верхняя плоскость не видна, передние края горизонтальны. Ортографичность оценена визуально; параметров камеры у растрового изображения нет."
+    },
+    {
+      "view": "design-front",
+      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;",
+      "passed": true,
+      "note": "Фигура, шест и подставка целиком в кадре. Фон визуально ровный тёмно-серый; медиана RGB 44/44/45, p99 отклонения рамки 2. Небольшой шум пикселей не образует градиент."
+    },
+    {
+      "view": "design-front",
+      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose);",
+      "passed": true,
+      "note": "Шест в собственной правой руке, слева для зрителя; между каждой рукой и торсом виден просвет, локти согнуты. T- и A-позы нет."
+    },
+    {
+      "view": "design-front",
+      "item": "every identity anchor is visible: boat pole upright in the figure's own RIGHT hand; red head wrap; long bead necklace; rolled sleeves;",
+      "passed": true,
+      "note": "Вертикальный деревянный шест справа у фигуры, красный головной платок, длинные многорядные бусы и закатанные рукава ясно читаются."
+    },
+    {
+      "view": "design-front",
+      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base.",
+      "passed": true,
+      "note": "Коричневая юбка и шест, кремовая рубашка, красный платок и бирюзовые бусины присутствуют. Подставка тёмно-каменная, без цветного кольца и металлической полосы."
+    }
+  ],
+  "generations": {
+    "design-front": 2
+  },
+  "generation_limit_this_run": 2,
+  "limit_reached": [],
+  "selected": {
+    "design-front": 2
+  },
+  "limitations": [
+    {
+      "view": "design-front",
+      "item": "FRAMING pedestal bottom y93%",
+      "note": "Низ маски подставки y95,925% вместо y93%; нижний отступ 4,075%, обрезания нет. Все пункты CHECKLIST пройдены; файл не исправлялся."
+    },
+    {
+      "view": "design-front",
+      "item": "raster camera and paint colours",
+      "note": "Ортографичность и палитра подтверждены визуально; точные настройки камеры и постоянные hex всех освещённых поверхностей невозможно доказать по растровому изображению."
+    }
+  ],
+  "candidate_visual_checks": [
+    {
+      "generation": 1,
+      "failed_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible;",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background;"
+      ],
+      "note": "Видна верхняя плоскость подставки и светлый центральный градиент фона. WARN view.frame_top 2,901% сам по себе не являлся причиной повтора."
+    },
+    {
+      "generation": 2,
+      "failed_items": []
+    }
+  ],
+  "byte_identical_copies": true,
+  "write_scope_note": "Все командные записи ограничены пакетом. Разрешённые оригиналы image_gen оставлены в каталоге инструмента и записаны в original_path; они не относятся к outside_folder.",
+  "tool_errors": [],
+  "process_cleanup": "Запускались только завершившиеся команды и встроенный image_gen; фоновые процессы и сервисы не запускались.",
+  "source_inputs": [
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-annie-christmas-codex/palette.json",
+      "sha256": "cfd88ff17f2bf68df2073c75574fcc3af6dd32dcb6ba3b21c9a043901f7977ec",
+      "bytes": 306,
+      "sha256_after": "cfd88ff17f2bf68df2073c75574fcc3af6dd32dcb6ba3b21c9a043901f7977ec",
+      "unchanged": true
+    }
+  ]
+}

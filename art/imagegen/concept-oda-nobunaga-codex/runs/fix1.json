@@ -1,0 +1,96 @@
+{
+  "run": "fix1",
+  "stage": "1a",
+  "view": "design-front",
+  "started_at": "2026-10-13T04:53:56.827868+00:00",
+  "start_generation": 3,
+  "generations_allowed": 2,
+  "generations_used": 2,
+  "prior_generations_used": 2,
+  "checks": [
+    {
+      "view": "design-front",
+      "generation": 3,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g3/checks-report.json",
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g3/console.txt"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g4/checks-report.json",
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/checks/design-front-g4/console.txt"
+    },
+    {
+      "view": "design-front",
+      "generation": 4,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-oda-nobunaga-codex/design/checks-report.json",
+      "final": true,
+      "run": "fix1",
+      "console": "art/imagegen/concept-oda-nobunaga-codex/runs/fix1-final-check-console.txt"
+    }
+  ],
+  "archive": "art/imagegen/concept-oda-nobunaga-codex/history/pre-fix1",
+  "base_task": "docs/game-design/visual/06-tasks/prompts/ASSET-ODA-NOBUNAGA-001-concept.codex.md",
+  "acceptance_card": "art/pipeline-candidates/ASSET-ODA-NOBUNAGA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+  "candidate_inspections": [
+    {
+      "generation": 3,
+      "failed_checklist_items": [
+        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+        "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background"
+      ],
+      "acceptance_correction_status": {
+        "S": {
+          "closed": false,
+          "note": "A wrapped second hilt with a gold cap remains above the scabbard on the figure's LEFT hip (viewer RIGHT)."
+        },
+        "P": {
+          "closed": true,
+          "note": "Cape reads as red-orange vermilion and crest as yellow gold; material shading remains."
+        }
+      },
+      "visual_notes": [
+        "Single subject and one two-disc stone base, no text or collage.",
+        "Front-facing figure, but the pedestal top plane is visible and disc edges curve in depth.",
+        "All parts in frame; background has tonal variation and vignette.",
+        "Drawn katana in own RIGHT hand, arms apart from torso.",
+        "All identity anchors present, but the scabbard is not empty.",
+        "Palette colours present; base has no coloured ring or metal band."
+      ],
+      "retry_reason": "Visible acceptance-card S defect plus failed CHECKLIST pedestal and flat-background requirements. view.frame_top WARN is not a retry reason."
+    },
+    {
+      "generation": 4,
+      "failed_checklist_items": [],
+      "acceptance_correction_status": {
+        "S": {
+          "closed": true,
+          "note": "Визуально: открытое пустое устье ножен, без второй рукояти и гарды; единственная обнажённая катана в правой руке."
+        },
+        "P": {
+          "closed": true,
+          "note": "Визуально: плащ красно-оранжевый, гребень светлый жёлто-золотой; сохранено естественное затенение. Это проверка исполнителя, не приёмка."
+        }
+      },
+      "visual_notes": [
+        "Одна миниатюра, одна подставка из двух низких дисков, один вид. Текста и водяных знаков нет; цветочные эмблемы и завитки ножен читаются как орнамент.",
+        "Лицо, плечи, шлем и стопы фронтальны. Обе ступени подставки имеют прямые горизонтальные кромки; верхняя плоскость не видна, узкие фаски допустимы по CORE. Ортографичность оценена визуально, метаданных камеры нет.",
+        "Фигура, клинок, полумесяц и подставка целиком в кадре. Фон визуально ровный тёмно-серый: контрольные пиксели RGB 39–43, p99 отклонения границы 3. Нет заметного градиента, виньетки, пола или тени на фоне.",
+        "Единственная обнажённая катана в собственной правой руке, слева для зрителя. Руки опущены и слегка согнуты, кисти и предплечья отделены от торса видимыми промежутками; плащ остаётся позади.",
+        "Все четыре якоря видны. Ножны на собственном левом бедре, справа для зрителя, имеют открытое пустое устье; рукояти и гарды второго меча нет.",
+        "Чёрный лак, красно-оранжевая киноварь плаща, тёплое золото ткани и более светлое жёлтое золото гребня присутствуют. Плащ и гребень визуально ближе к #C2462A и #E6C04E; естественное затенение сохранено. Нет командного цвета, цветной или металлической полосы на каменной подставке. Значения исходных материалов генератор не предоставляет."
+      ],
+      "selection_reason": "Приоритет — rework_fix_list карточки: g4 устранил вторую рукоять и гарду и визуально приблизил цвета к палитре. Дополнительно исправлены подставка и ровный фон. У g3 остаётся исходный дефект вооружения; g1/g2 ранее возвращены на доработку. Малый WARN верхнего отступа не перевешивает закрытие дефекта S."
+    }
+  ],
+  "selected": 4,
+  "status": "предложено",
+  "finished_at": "2026-10-13T04:58:47.984729+00:00",
+  "final_script_exit_code": 0,
+  "acceptance_run": false
+}

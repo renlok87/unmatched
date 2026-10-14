@@ -1,0 +1,375 @@
+{
+ "source_unchanged": true,
+ "outside_folder": [],
+ "checks": [
+  {
+   "view": "design-front",
+   "generation": "unstability",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/design/checks-report.json",
+   "source": "unstability.ai",
+   "original_report": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+   "historical": true,
+   "original_final": true
+  },
+  {
+   "view": "design-front",
+   "generation": 1,
+   "record_id": "ASSET-BLACK-WIDOW-001-1a-design-front-u1",
+   "exit_code": 1,
+   "report": "art/imagegen/concept-black-widow-codex/checks/design-front-g1/checks-report.json",
+   "run_id": "metadata-repair-20261013T101213Z",
+   "candidate": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-u1.png",
+   "input_sha256": "febeb2e6165a4889035d056b5782f6497bbf37b4c9eabd028c13fb68e5c58c73",
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-black-widow-codex/checks/_temporary-sets/metadata-repair-20261013T101213Z/design-front-g1",
+    "--key",
+    "black-widow",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--out",
+    "art/imagegen/concept-black-widow-codex/checks/design-front-g1"
+   ],
+   "log": "art/imagegen/concept-black-widow-codex/checks/metadata-repair-20261013T101213Z/design-front-g1.log",
+   "historical_candidate": true,
+   "summary": {
+    "PASS": 10,
+    "WARN": 1,
+    "FAIL": 2
+   },
+   "failed_items": [
+    "view.border_uniform",
+    "view.side_margin"
+   ],
+   "warnings": [
+    "view.single_component"
+   ]
+  },
+  {
+   "view": "design-front",
+   "generation": 2,
+   "record_id": "ASSET-BLACK-WIDOW-001-1a-design-front-g2",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-black-widow-codex/checks/design-front-g2/checks-report.json",
+   "run_id": "metadata-repair-20261013T101213Z",
+   "candidate": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "input_sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-black-widow-codex/checks/_temporary-sets/metadata-repair-20261013T101213Z/design-front-g2",
+    "--key",
+    "black-widow",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4",
+    "--out",
+    "art/imagegen/concept-black-widow-codex/checks/design-front-g2"
+   ],
+   "log": "art/imagegen/concept-black-widow-codex/checks/metadata-repair-20261013T101213Z/design-front-g2.log",
+   "historical_candidate": false,
+   "summary": {
+    "PASS": 13,
+    "WARN": 0,
+    "FAIL": 0
+   },
+   "failed_items": [],
+   "warnings": []
+  },
+  {
+   "view": "design-front",
+   "generation": 2,
+   "record_id": "ASSET-BLACK-WIDOW-001-1a-design-front-g2",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+   "run_id": "metadata-repair-20261013T101213Z",
+   "candidate": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+   "input_sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+   "command": [
+    "tools/art/concept/check_concept_views.py",
+    "--set",
+    "art/imagegen/concept-black-widow-codex/design",
+    "--key",
+    "black-widow",
+    "--views",
+    "front",
+    "--role",
+    "hero",
+    "--min-top-pct",
+    "4"
+   ],
+   "log": "art/imagegen/concept-black-widow-codex/checks/metadata-repair-20261013T101213Z/final-selected.log",
+   "historical_candidate": false,
+   "summary": {
+    "PASS": 13,
+    "WARN": 0,
+    "FAIL": 0
+   },
+   "failed_items": [],
+   "warnings": []
+  },
+  {
+   "view": "design-front",
+   "generation": "rc2",
+   "exit_code": 0,
+   "report": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+   "final": true,
+   "source": "unstability.ai recraft"
+  }
+ ],
+ "checklist": [
+  {
+   "view": "design-front",
+   "item": "one_subject_one_pedestal_no_collage_no_text",
+   "passed": true,
+   "note": "Одна фигура и одна подставка; коллажа, текста и водяного знака не видно.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  },
+  {
+   "view": "design-front",
+   "item": "strict_front_orthographic_level_pedestal_edge_on",
+   "passed": false,
+   "note": "Верх подставки виден: строгий уровень камеры и вид ребром не соблюдены.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  },
+  {
+   "view": "design-front",
+   "item": "whole_subject_and_pedestal_visible_flat_dark_gray_background",
+   "passed": false,
+   "note": "Фигура целиком; слева у подставки светлый остаток маски нарушает ровный фон.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  },
+  {
+   "view": "design-front",
+   "item": "weapon_in_own_right_hand_viewer_left_arms_separated_not_T_or_A",
+   "passed": true,
+   "note": "Пистолет слева для зрителя; руки отделены от корпуса, поза не T/A.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  },
+  {
+   "view": "design-front",
+   "item": "identity_anchors_pistol_black_catsuit_red_hair_red_hourglass_silver_bracelets",
+   "passed": false,
+   "note": "Пряжка: красный круг с перекрестием; однозначный знак песочных часов не подтверждён.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  },
+  {
+   "view": "design-front",
+   "item": "palette_main_accent_present_no_team_color_no_colored_base_band",
+   "passed": true,
+   "note": "Чёрный, красный и серебристый видны; командного цвета нет. Точные hex не оценивались.",
+   "source": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "method": "read-only visual checklist observation of unchanged design; not art acceptance"
+  }
+ ],
+ "limit_reached": [
+  {
+   "view": "design-front",
+   "failed_items": [
+    "strict_front_orthographic_level_pedestal_edge_on",
+    "whole_subject_and_pedestal_visible_flat_dark_gray_background",
+    "identity_anchors_pistol_black_catsuit_red_hair_red_hourglass_silver_bracelets"
+   ],
+   "generations_allowed": 0,
+   "generations_used_this_run": 0,
+   "reason": "Regeneration forbidden in this metadata-only repair; preserved authoritative design. No art acceptance performed."
+  }
+ ],
+ "design_source": {
+  "service": "unstability.ai",
+  "model": "Recraft v4 (regeneration r2); r1 was UltraReal Fine-Tune v4",
+  "by": "Claude (Windows-MCP in the user's Chrome)",
+  "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+  "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+  "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup",
+  "registration": {
+   "record_id": "ASSET-BLACK-WIDOW-001-1a-design-front-g2",
+   "candidate": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+   "source_path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+   "source_sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+   "original_path": "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+   "run_id": "metadata-repair-20261013T101213Z",
+   "postprocess_historical": true,
+   "postprocess_executed_this_run": false,
+   "image_gen_calls_this_run": 0,
+   "source_record_id": "ASSET-BLACK-WIDOW-001-1a-design-front-u1",
+   "raw_source_path": "art/imagegen/concept-black-widow-codex/design/black-widow-front-raw.png",
+   "raw_source_sha256": "d7a4a0bd2a42f1710f1ff6fff64cf79dee7ae342beb382729ac14952a5142467",
+   "exact_historical_transform_chain_revalidated": false
+  }
+ },
+ "status": "proposed",
+ "status_ru": "предложено",
+ "run_id": "metadata-repair-20261013T101213Z",
+ "run_type": "metadata-only corrective registration",
+ "date": "2026-10-13T10:12:13+00:00",
+ "source_unchanged_scope": "All pre-existing PNGs and palette.json; mutable metadata is intentionally updated, original bytes preserved in archive.",
+ "image_gen_calls_this_run": 0,
+ "image_generations_this_run": 0,
+ "generations_allowed_this_run": 0,
+ "all_previous_pngs_unchanged": true,
+ "source_hashes": [
+  {
+   "path": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-u1.png",
+   "before": "febeb2e6165a4889035d056b5782f6497bbf37b4c9eabd028c13fb68e5c58c73",
+   "after": "febeb2e6165a4889035d056b5782f6497bbf37b4c9eabd028c13fb68e5c58c73",
+   "unchanged": true,
+   "bytes": 6147669
+  },
+  {
+   "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front-raw.png",
+   "before": "d7a4a0bd2a42f1710f1ff6fff64cf79dee7ae342beb382729ac14952a5142467",
+   "after": "d7a4a0bd2a42f1710f1ff6fff64cf79dee7ae342beb382729ac14952a5142467",
+   "unchanged": true,
+   "bytes": 1470304
+  },
+  {
+   "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+   "before": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+   "after": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+   "unchanged": true,
+   "bytes": 474964
+  },
+  {
+   "path": "art/imagegen/concept-black-widow-codex/palette.json",
+   "before": "48f65fa2532b72a85a915c56c3c230cc7c44317865d18029a2ce39b2966850a3",
+   "after": "48f65fa2532b72a85a915c56c3c230cc7c44317865d18029a2ce39b2966850a3",
+   "unchanged": true,
+   "bytes": 303
+  }
+ ],
+ "metadata_archive": [
+  {
+   "original": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+   "archive": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/design/checks-report.json",
+   "sha256": "587df6950647f7d70f9d349339ba42c7d01d58851dc50f142f09dd38eeb6f74b",
+   "bytes": 7121,
+   "archive_sha256_after": "587df6950647f7d70f9d349339ba42c7d01d58851dc50f142f09dd38eeb6f74b",
+   "archive_unchanged": true,
+   "current_path_intentionally_updated": true
+  },
+  {
+   "original": "art/imagegen/concept-black-widow-codex/generation-records.json",
+   "archive": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/generation-records.json",
+   "sha256": "bc53ef0d62d7cf01bd4071e9d81310c1cc09470f374b1d20a476852f468cea7b",
+   "bytes": 1492,
+   "archive_sha256_after": "bc53ef0d62d7cf01bd4071e9d81310c1cc09470f374b1d20a476852f468cea7b",
+   "archive_unchanged": true,
+   "current_path_intentionally_updated": true
+  },
+  {
+   "original": "art/imagegen/concept-black-widow-codex/README.md",
+   "archive": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/README.md",
+   "sha256": "357acfa69fe10ea99c6953b2cb0c7030b88243807c313f08f56f0cf33c181131",
+   "bytes": 1510,
+   "archive_sha256_after": "357acfa69fe10ea99c6953b2cb0c7030b88243807c313f08f56f0cf33c181131",
+   "archive_unchanged": true,
+   "current_path_intentionally_updated": true
+  },
+  {
+   "original": "art/imagegen/concept-black-widow-codex/verification.json",
+   "archive": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/verification.json",
+   "sha256": "c05f943349a9f012f4eece735902d89038ecd51d1cb94e63e419d6244cdeb17d",
+   "bytes": 846,
+   "archive_sha256_after": "c05f943349a9f012f4eece735902d89038ecd51d1cb94e63e419d6244cdeb17d",
+   "archive_unchanged": true,
+   "current_path_intentionally_updated": true
+  }
+ ],
+ "historical_verification": {
+  "source_unchanged": true,
+  "outside_folder": [],
+  "checks": [
+   {
+    "view": "design-front",
+    "generation": "unstability",
+    "exit_code": 0,
+    "report": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+    "final": true,
+    "source": "unstability.ai"
+   }
+  ],
+  "checklist": [],
+  "limit_reached": [],
+  "design_source": {
+   "service": "unstability.ai",
+   "model": "UltraReal Fine-Tune v4 (Flux.1 D)",
+   "by": "Claude (Windows-MCP in the user's Chrome)",
+   "reason": "Codex image_gen / SYNTX refuse this licensed character (moderation_blocked); user decision 2026-10-13",
+   "post": "backdrop flattened by C:/tmp/concept-wave/rebg.py, raw frame design/<key>-front-raw.png",
+   "checklist_note": "Claude visually checked: one subject, full body, front view, pedestal, no text or logo after cleanup"
+  }
+ },
+ "selected_candidate": "art/imagegen/concept-black-widow-codex/concepts/black-widow-design-front-g2.png",
+ "selected_sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+ "selected_design_sha256": "734cba4ce1c7b1a2f4d9d56da056f48221a88eb3a7db6b97abd920803b4d54c3",
+ "selected_candidate_byte_identical_to_design": true,
+ "generations": {
+  "design-front": {
+   "historical_generation_records": 1,
+   "metadata_registration_records": 1,
+   "records_total": 2,
+   "image_generations_this_run": 0,
+   "image_gen_calls_this_run": 0,
+   "generations_allowed_this_run": 0
+  }
+ },
+ "historical_failures_are_history": true,
+ "art_acceptance_performed": false,
+ "blockers": [],
+ "limitations": [
+  "Historical unstability.ai download original_path is a placeholder; preserved unchanged in the original record.",
+  "The historical candidate, raw intermediate and normalized design have different hashes. Historical normalization is documented in the archived verification.json#design_source.post; exact transformation steps were not replayed or independently reconstructed.",
+  "Reference image and asset card outside this package were not opened or rehashed in this repair. The historical external prompt used no image references.",
+  "Technical checker code 0 does not establish art acceptance. Visual checklist observations are recorded separately."
+ ],
+ "unmet_contract_constraints": [
+  {
+   "view": "design-front",
+   "item": "portrait_aspect_3_4",
+   "expected": "3:4",
+   "actual": "4:5 (1280x1600)",
+   "modified_this_run": false
+  },
+  {
+   "view": "design-front",
+   "item": "two_low_stacked_discs_edge_on",
+   "note": "One thick pedestal with visible top; exact requested geometry not confirmed.",
+   "modified_this_run": false
+  }
+ ],
+ "prompt_provenance": {
+  "1a/design-front/g2": {
+   "historical": true,
+   "executed_this_run": false,
+   "copied_exactly_from": "1a/design-front/u1",
+   "source_file": "art/imagegen/concept-black-widow-codex/archive/metadata-repair-20261013T101213Z/generation-records.json",
+   "references_used_this_run": []
+  }
+ },
+ "repair_validation": {
+  "record_count": 2,
+  "historical_record_contents_preserved_except_selected": true,
+  "historical_prompt_copied_exactly": true,
+  "all_previous_pngs_unchanged": true,
+  "selected_candidate_byte_identical": true,
+  "all_report_hashes_verified": true,
+  "final_checker_exit_code": 0,
+  "no_art_acceptance_claim": true
+ },
+ "metadata_current_hashes_location": "art/imagegen/concept-black-widow-codex/manifest-sha256.json"
+}
