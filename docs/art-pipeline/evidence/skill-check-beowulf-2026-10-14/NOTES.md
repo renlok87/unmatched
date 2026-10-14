@@ -143,3 +143,36 @@ was a Blender-preview effect), helmet bands still paler (0.36 vs 0.44). Clips ac
 8.8, LungeAttack 8.8, HitReact 9.4, DeathSettle 8.8 — the sleeve-top cut edge went to `known_issues` (D 1.5), no «stage 5
 model» item → no late fix. Registrations: CUE-011/013, cook dirs, fighter names (Беовульф, Виглаф), bench variants of
 both boards. 23 new `.uasset`. ≈ 45 min.
+
+## Stage 7b findings (executor, 2026-10-14 16:55–17:45)
+
+| # | Stage | Finding | Proposed fix |
+|---|---|---|---|
+| C56 | 7b | de011: `UnrealEditor-Cmd` crashed 0xC0000005 after `LogExit` (assets saved, Dissolve test PASS); the tool does not flag a non-zero editor exit | WARN on a non-zero `_editor.exit` after a clean `LogExit` |
+| C57 | 7a/7b | `asset-card.yaml` had no `STAGE7A` block (the 7a executor should write it); `registration_check` does not check card blocks | 7a writes `STAGE7A`; `registration_check` checks the stage blocks |
+| C58 | 7b | `render_bench` `faceRoiSkipped` refers to `SK_Merlin_H2LD`: the face-brightness ROI ignores `-BenchFocusFighter` though K2×5 is shot on the focus hero | ROI from the focus fighter |
+| C59 | 7b | Stage-7b writes to `asset-registry.json` (hand-formatted) and `03-asset-registry.csv` (CRLF) have no tool — scripts in `$W` | one registry writer for the status table (registration §10) |
+| C60 | 7b | `sheet.py` README template lists PNGs and needs hand edits; by ДС-8 only JPEGs go to git | template from the JPEG list |
+| C61 | 3/6/7 | A black gap between the mantle collar and the back of the helmet in DeathSettle f16–21 — visible in the game at K2×1.6 (≈ 5×10 px), K1 2–3 px (reads as a shadow); likely the `neck_top` cap removed at stage 3 (C22). Not caught by any validator nor by the clip acceptors (class C43). Orchestrator decision (delegation): **known issue** for the check figure, not a late fix — recorded in README / CSV / `STAGE7B.open` | the C43 fix (close-ups of the smoke clips at stage 3) and a cap whose back face is culled (C22) |
+| C62 | 7b | AN-18 is still the longest 7b step: 19 of ≈ 37 min (563 s per board) for one hero | K1 once per batch (`--k1-from`), K2 per hero |
+
+Stage 7b result: de010/de011 `--only Beowulf` (no MVP re-saves), Specs() + tests + AudioBank BLADE; build 16 s; S08
+393/393; `registration_check` 12/12; one package (1 min 33 s, stamp 69fd9bf8 + 7b); -Bench both real boards — painted
+Marmoreal backdrop, Sarpedon lit3d path 1, all figures v2, Beowulf in concept colours with the team belt and ring; RENDER
+fingerprints 6/6; AN-145…148 problems 0; cost K1 2.16 ms / K2×5 2.23 ms GPU (within budget); registries per the status
+table; pytest 931 passed / 3 xfailed. ≈ 50 min.
+
+## Check-run timeline (Beowulf, 2026-10-14)
+
+| Stage | Time | Result |
+|---|---|---|
+| 1b download + orthos | 11:50–12:00 | paid draft exported via Claude in Chrome |
+| 1c views + sheet | 12:00–12:30 | Sol 8.8 pass r1 |
+| 2 Tripo H2 | 12:15–12:40 | 95 credits, 20 parts |
+| 3 Blender build | 12:45–15:05 | handover checklist pass (1.5 h of scouting) |
+| 4 acceptance | 15:00–15:30 | Sol 8.1 + Opus 8.1 → pass r1 (no stage 5) |
+| 6 clips + determinism | 15:20–16:10 | 4 clips, full determinism pass after the C38 fix |
+| 7a UE | 16:10–16:55 | one import, apply-mi r3, 4 clips pass first cycle |
+| 7b game | 16:55–17:45 | packaged, both boards, AN-18 |
+
+≈ 6 h wall clock for one figure from 1b to the game (pilot: 7–10 h per figure with r2/r3 reworks). 62 findings.

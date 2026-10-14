@@ -60,6 +60,7 @@ FString S08AudioBank::CharacterKey(const FString& Name) {
   if (Name.Contains(TEXT("angel"), ESearchCase::IgnoreCase)) return TEXT("ANGEL");
   if (Name.Contains(TEXT("leshen"), ESearchCase::IgnoreCase)) return TEXT("ANCIENTLESHEN");
   if (Name.Contains(TEXT("achilles"), ESearchCase::IgnoreCase)) return TEXT("ACHILLES");
+  if (Name.Contains(TEXT("beowulf"), ESearchCase::IgnoreCase)) return TEXT("BEOWULF");  // skill check figure 2026-10-14
   return FString();
 }
 
@@ -71,6 +72,7 @@ FString S08AudioBank::HitType(const FString& Key) {
   if (Key == TEXT("ANGEL")) return TEXT("BLADE");
   if (Key == TEXT("ANCIENTLESHEN")) return TEXT("MAGIC");
   if (Key == TEXT("ACHILLES")) return TEXT("BLADE");
+  if (Key == TEXT("BEOWULF")) return TEXT("BLADE");
   return TEXT("BLUNT");
 }
 

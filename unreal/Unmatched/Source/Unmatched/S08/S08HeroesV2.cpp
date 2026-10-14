@@ -113,6 +113,9 @@ const TArray<FHeroSpec>& Specs() {
       {TEXT("Ancient Leshen"), TEXT("AncientLeshen"), TEXT("H2LD"), true, 55.0f, 50.0f, 55.0f, 55.003f, 73.56f,
        56.0f / 24.0f, 8},
       {TEXT("Achilles"), TEXT("Achilles"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 54.9931f, 2.5f, 7},
+      // Skill check figure 2026-10-14 (stage 7b): Beowulf, ue-import-report.json of 20261014-h2ld-ue-import
+      // (helmet dome 55.0 / skeletal top 55.0149), Idle 2.5 s and contact k.7 from beowulf-h2anim.json.
+      {TEXT("Beowulf"), TEXT("Beowulf"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 55.0149f, 2.5f, 7},
   };
   return Table;
 }

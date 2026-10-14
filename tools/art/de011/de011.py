@@ -45,7 +45,9 @@ LOOKS = ("P1", "P2")
 # capture: both team colours side by side (Arthur P1, Merlin P2, Medusa P1, Harpy P2)
 CAPTURE_LOOKS = {"KingArthur": "P1", "Merlin": "P2", "Medusa": "P1", "Harpy": "P2",
                  # skill pilot 2026-10-14, stage 7b (registration R7-2)
-                 "Angel": "P1", "AncientLeshen": "P2", "Achilles": "P1"}
+                 "Angel": "P1", "AncientLeshen": "P2", "Achilles": "P1",
+                 # skill check figure 2026-10-14, stage 7b (registration R7-2)
+                 "Beowulf": "P2"}
 
 
 def stage_root(key: str, stage: str) -> str:

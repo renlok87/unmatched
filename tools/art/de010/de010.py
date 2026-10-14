@@ -54,7 +54,9 @@ HEROES = [("KingArthur", "H2LD", "ASSET-KING-ARTHUR-001/build-profiles/king-arth
           # skill pilot 2026-10-14, stage 7b (registration R7-1): the spec of the clips imported into UE
           ("Angel", "H2LD", "ASSET-ANGEL-001/build-profiles/angel-h2anim-r2.json", 7),
           ("AncientLeshen", "H2LD", "ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json", 8),
-          ("Achilles", "H2LD", "ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json", 7)]
+          ("Achilles", "H2LD", "ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json", 7),
+          # skill check figure 2026-10-14, stage 7b (registration R7-1)
+          ("Beowulf", "H2LD", "ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json", 7)]
 
 
 def now() -> str:
