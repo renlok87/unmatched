@@ -56,6 +56,9 @@ struct UNMATCHED_API FUmBootModel {
   /** SC-04: the current stage failed or timed out; bRetrying = its retry is in flight. */
   bool bError = false;
   bool bRetrying = false;
+  /** GD-053: the server answered another protocol number (S08Protocol.h) - the error banner says «Сервер другой
+   *  версии» instead of «Сервер недоступен»; -1 = no mismatch, 0 = a server older than the check. */
+  int32 MismatchServer = -1;
   /** SC-05: the own live match was found; bResuming = «Вернуться в партию» pressed. */
   bool bResume = false;
   bool bResuming = false;
@@ -66,7 +69,7 @@ struct UNMATCHED_API FUmBootModel {
   FString BuildCommit;
   bool operator==(const FUmBootModel& O) const {
     return Stage == O.Stage && bHeroesLoaded == O.bHeroesLoaded && Heroes == O.Heroes && HeroesTotal == O.HeroesTotal &&
-           bError == O.bError && bRetrying == O.bRetrying && bResume == O.bResume && bResuming == O.bResuming &&
+           bError == O.bError && bRetrying == O.bRetrying && MismatchServer == O.MismatchServer && bResume == O.bResume && bResuming == O.bResuming &&
            ResumeHero == O.ResumeHero && ResumeOpponent == O.ResumeOpponent && ResumeBoard == O.ResumeBoard &&
            BuildCommit == O.BuildCommit;
   }

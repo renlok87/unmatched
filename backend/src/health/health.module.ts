@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
+import { ServerInfoResolver } from './server-info.resolver';
 import { PrismaModule } from '../database/prisma.module';
 import { RedisModule } from '../redis/redis.module';
 
@@ -19,5 +20,6 @@ import { RedisModule } from '../redis/redis.module';
     RedisModule,
   ],
   controllers: [HealthController],
+  providers: [ServerInfoResolver],
 })
 export class HealthModule {}

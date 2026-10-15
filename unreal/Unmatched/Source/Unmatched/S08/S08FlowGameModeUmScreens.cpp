@@ -20,6 +20,7 @@
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
 #include "S08BoardArt.h"
+#include "S08Protocol.h"
 #include "S08TraceLog.h"
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
@@ -332,6 +333,7 @@ void AS08FlowGameMode::TickUmFlowScreens() {
       R.Model.Stage = EUmBootStage::Heroes;
       R.Model.bHeroesLoaded = false;
       R.Model.bError = R.Model.bRetrying = R.Model.bResume = R.Model.bResuming = false;
+      R.Model.MismatchServer = -1;
       R.bRequested = false;
       R.bPassDone = bAuto;  // -S08Auto: the drive goes on by itself (no second heroList, no resume modal)
       R.StageStartMs = R.PassedAtMs = -1.0;
@@ -384,10 +386,23 @@ void AS08FlowGameMode::TickUmFlowScreens() {
         R.bRequested = true;
         R.StageStartMs = Now;
         Flow->FetchBoards();
+        Flow->FetchServerInfo();  // GD-053: the protocol check rides on the boards stage
       }
-      if (Flow->GetBoardsState() == FS08FlowController::EBootQuery::Done) {
+      const FS08FlowController::EBootQuery Info = Flow->GetServerInfoState();
+      if (Info == FS08FlowController::EBootQuery::Done && Flow->GetServerProtocol() != S08ClientProtocol) {
+        // another protocol: the banner names it, «Повторить» asks again (the server may be updated meanwhile)
+        if (!M.bError || M.bRetrying) {
+          M.MismatchServer = Flow->GetServerProtocol();
+          FS08Trace::Write(FString::Printf(TEXT("BOOT version mismatch server=%d client=%d"), M.MismatchServer, S08ClientProtocol));
+          Fail();
+          R.StageStartMs = Now;
+        }
+      } else if (Flow->GetBoardsState() == FS08FlowController::EBootQuery::Done && Info == FS08FlowController::EBootQuery::Done) {
+        M.MismatchServer = -1;
         if (Pass()) Next(EUmBootStage::Done);
-      } else if (Flow->GetBoardsState() == FS08FlowController::EBootQuery::Failed || UmBoot::TimedOut(R.StageStartMs, Now)) {
+      } else if (Flow->GetBoardsState() == FS08FlowController::EBootQuery::Failed ||
+                 Info == FS08FlowController::EBootQuery::Failed || UmBoot::TimedOut(R.StageStartMs, Now)) {
+        M.MismatchServer = -1;
         const bool bNew = !M.bError || M.bRetrying;
         Fail();
         if (bNew) R.StageStartMs = Now;

@@ -247,6 +247,11 @@ public:
   void FetchBoards();
   EBootQuery GetBoardsState() const { return BoardsState; }
   const TMap<FString, FString>& GetBoardNames() const { return BoardNames; }
+  /** GD-053: serverInfo { protocol } - Done with GetServerProtocol() (0 = an older server without the query,
+   *  Failed = no answer). The BOOT pass compares it with S08ClientProtocol (S08Protocol.h). */
+  void FetchServerInfo();
+  EBootQuery GetServerInfoState() const { return ServerInfoState; }
+  int32 GetServerProtocol() const { return ServerProtocol; }
   /** myGames(status: IN_PROGRESS): the own live match after a restart; GetActiveGame().GameId empty = none. */
   void FetchActiveGame();
   EBootQuery GetActiveGameState() const { return ActiveGameState; }
@@ -877,6 +882,8 @@ private:
   int32 HeroesFailures = 0;
   EBootQuery BoardsState = EBootQuery::Idle;
   TMap<FString, FString> BoardNames;
+  EBootQuery ServerInfoState = EBootQuery::Idle;
+  int32 ServerProtocol = -1;
   EBootQuery ActiveGameState = EBootQuery::Idle;
   FS08RoomState ActiveGame;
   TSharedPtr<FJsonObject> ActiveGameRow;

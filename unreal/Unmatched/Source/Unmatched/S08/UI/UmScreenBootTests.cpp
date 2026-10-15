@@ -104,6 +104,13 @@ bool FUmScreensBootTreeTest::RunTest(const FString& Parameters) {
                                                              B->RetryButton->GetModel().bEnabled);
     TestEqual(TEXT("«ПОВТОРИТЬ» label"), B->RetryButton->GetModel().Label.ToString(), FString(TEXT("Повторить")));
     TestEqual(TEXT("the stage caption stays"), B->GetStageText(), FString(TEXT("Загрузка досок…")));
+    // GD-053: another protocol names the version, not the connection; back to «Сервер недоступен» after it
+    M.MismatchServer = 0;
+    B->ApplyModel(M, 0.0);
+    TestEqual(TEXT("«Сервер другой версии»"), B->ErrorText->GetText().ToString(), FString(TEXT("Сервер другой версии")));
+    M.MismatchServer = -1;
+    B->ApplyModel(M, 0.0);
+    TestEqual(TEXT("«Сервер недоступен» again"), B->ErrorText->GetText().ToString(), FString(TEXT("Сервер недоступен")));
     int32 Retries = 0, Resumes = 0, Lobbies = 0;
     UUmScreenBoot::FInput In;
     In.OnRetry = [&Retries]() { ++Retries; };

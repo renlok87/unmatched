@@ -519,6 +519,10 @@ void UUmScreenBoot::ApplyModel(const FUmBootModel& InModel, double NowMs) {
     BuildText->SetText(UmText::Format(EUmTable::Screens, TEXT("screens.boot.build"), Args));
     BuildText->SetVisibility(Model.BuildCommit.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
   }
+  if (ErrorText) {
+    ErrorText->SetText(UmText::Get(EUmTable::Screens, Model.MismatchServer >= 0 ? TEXT("screens.boot.error.version")
+                                                                                 : TEXT("screens.boot.error.server")));
+  }
   if (ErrorBanner) ErrorBanner->SetVisibility(Model.bError ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
   if (RetryButton) {
     FUmButtonModel B;

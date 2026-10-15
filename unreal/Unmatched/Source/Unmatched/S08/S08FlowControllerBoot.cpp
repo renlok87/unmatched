@@ -5,9 +5,11 @@
 // GD-038: the refresh token stays in memory only, so a fresh client has no session to check: BOOT runs its
 // session stage, goes to LOGIN and continues with the catalogue after the login (ВР-VS7-01).
 #include "S08FlowController.h"
+#include "S08Protocol.h"
 
 namespace {
 const TCHAR* BootBoardsQuery = TEXT("query BL($limit: Int) { boardList(limit: $limit) { items { id name } } }");
+const TCHAR* BootServerInfoQuery = TEXT("query SI { serverInfo { protocol } }");
 const TCHAR* BootActiveGameQuery =
     TEXT("query MA($status: GameStatus) { myGames(filters: { status: $status }) {")
     TEXT(" id code status mode hostId boardId")
@@ -38,6 +40,32 @@ void FS08FlowController::FetchBoards() {
              }
              BoardsState = EBootQuery::Done;
              Trace(FString::Printf(TEXT("BOARDS loaded %d"), BoardNames.Num()));
+           });
+}
+
+void FS08FlowController::FetchServerInfo() {
+  ServerInfoState = EBootQuery::Loading;
+  ServerProtocol = -1;
+  const int32 Gen = AuthGeneration;
+  SendHttp(BootServerInfoQuery, MakeShared<FJsonObject>(),
+           [this, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors, TSharedPtr<FJsonObject> Data, const FString& Body) {
+             if (AuthGeneration != Gen) return;
+             const TSharedPtr<FJsonObject>* Info = nullptr;
+             double Protocol = 0.0;
+             if (bOk && Data.IsValid() && Data->TryGetObjectField(TEXT("serverInfo"), Info) && Info &&
+                 (*Info)->TryGetNumberField(TEXT("protocol"), Protocol)) {
+               ServerProtocol = static_cast<int32>(Protocol);
+             } else if (Body.Contains(TEXT("Cannot query field")) && Body.Contains(TEXT("serverInfo"))) {
+               // HTTP 400 GRAPHQL_VALIDATION_FAILED (the body's JSON escapes the quotes): a server older than the check
+               ServerProtocol = 0;
+             } else {
+               ServerInfoState = EBootQuery::Failed;
+               Trace(TEXT("SERVER info failed: ") + (Errors.Num() ? Errors[0].Message : FString(TEXT("no answer"))));
+               return;
+             }
+             ServerInfoState = EBootQuery::Done;
+             Trace(FString::Printf(TEXT("SERVER protocol=%d client=%d%s"), ServerProtocol, S08ClientProtocol,
+                                   ServerProtocol == S08ClientProtocol ? TEXT("") : TEXT(" MISMATCH")));
            });
 }
 
