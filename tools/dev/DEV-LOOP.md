@@ -45,6 +45,14 @@ python tools/dev/devexec.py stop
 | `Config/*.json`, `*.ini`, ассеты | перечитываются кодом или после `stop`/`start` (10 с) |
 | бэкенд | `docker exec unmatched-backend npm run build && docker compose restart backend` (bind mount) |
 
+- Патч Live Coding живёт только в памяти: перезапуск клиента грузит DLL с диска. Перед `stop`/`start` после патчей —
+  инкрементальная сборка (`build-editor.cjs`, ~20 с), иначе клиент поднимется со старым кодом. То же для правок кода,
+  который строит виджеты при старте (BuildUi): патч его не перестроит, нужен рестарт со сборкой.
+- Структуры (поля `struct`/`UCLASS`, в т.ч. объявленные в `.cpp`, например `FUmHudRuntime`) — только полная сборка:
+  Live Coding поменяет раскладку, а живые объекты останутся старыми.
+- Ввод драйвера: виртуальный курсор Slate (`UsePlatformCursorForCursorUser(false)`), нажатие и отпускание — в разных
+  кадрах; `ViewportHasFocus()` при `-DevExec` считает окно активным. Играть руками в том же окне — `run "cursor os"`.
+- Ошибки компиляции Live Coding `devexec.py lc` печатает из `%LOCALAPPDATA%/UnrealBuildTool/Log.txt`.
 - Пока клиент с `-LiveCoding` жив, Build.bat `UnmatchedEditor` падает во **всех** чекаутах (мьютекс Live Coding,
   `docs/unreal/UE-SESSION-DESIGN.md` F9). Перед полной сборкой — `devexec.py stop`.
 - Кадры uncooked `-game` годятся для итераций; приёмочные кадры по-прежнему из packaged `-Bench` (AGENTS.md).
