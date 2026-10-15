@@ -571,7 +571,9 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   if (bCaption && CaptionPlate) {
     if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("panel"), Px)) CaptionPlate->SetBrush(*Skin);
     if (CaptionText) CaptionText->SetText(UmText::Get(EUmTable::Hud, TEXT("hud.combat.slot.chosen")));
-    UmEdgePlace(CaptionPlate, CardPos - FVector2D(0.0f, CaptionHSu + CaptionGapSu), FVector2D(CardWH.X, CaptionHSu), 4);
+    // HUD v2: the plate's marble rim needs its own room above the card frame
+    const float CapGap = CaptionGapSu + (Theme.HasTextureSkin(TEXT("hud.status.banner")) ? 6.0f : 0.0f);
+    UmEdgePlace(CaptionPlate, CardPos - FVector2D(0.0f, CaptionHSu + CapGap), FVector2D(CardWH.X, CaptionHSu), 4);
   }
   // ---- the ribbon ----
   const FBox2D RibbonSu = RibbonRectSu();
@@ -606,7 +608,8 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
     if (B) {
       TeamChip->SetBrush(*B);
       TeamChip->SetColorAndOpacity(Theme.Color(Model.TeamSlot == 0 ? TEXT("team.p1.screen") : TEXT("team.p2.screen")));
-      UmEdgePlace(TeamChip, RibbonPos + FVector2D(RibbonWH.X - 4.0f - UmTeamChip::HudSu, 0.5f * (BaseH - UmTeamChip::HudSu)),
+      UmEdgePlace(TeamChip, RibbonPos + FVector2D(RibbonWH.X - 4.0f - 2.0f * RowDy - UmTeamChip::HudSu,
+                                                  RowDy + 0.5f * (BaseH - UmTeamChip::HudSu)),
                   FVector2D(UmTeamChip::HudSu), 3);
     }
   }
@@ -617,7 +620,9 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   if (Model.bTimer) {
     // HUD v2: the text and the bar keep inside the panel skin's marble rim (8 su)
     const float Rim = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? 8.0f : 0.0f;
-    UmEdgePlace(TimerText, RibbonPos + FVector2D(6.0f + Rim, BaseH + 1.0f - 0.5f * Rim), FVector2D(RibbonWH.X - 44.0f - Rim, TimerRowSu - 6.0f), 3);
+    // the timer under the role text (x of TagLeftSu), clear of the role disc
+    const float TimerX = Rim > 0.0f ? TagLeftSu + 2.0f * RowDy : 6.0f;
+    UmEdgePlace(TimerText, RibbonPos + FVector2D(TimerX, BaseH + 1.0f), FVector2D(RibbonWH.X - 44.0f - TimerX, TimerRowSu - 6.0f), 3);
     if (TimerTrack) {
       TimerTrack->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("panel.bg.inset")), 0.0f));
       UmEdgePlace(TimerTrack, RibbonPos + FVector2D(Rim, RibbonWH.Y - TimerBarSu - Rim), FVector2D(RibbonWH.X - 2.0f * Rim, TimerBarSu), 3);
