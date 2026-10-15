@@ -659,6 +659,14 @@ void UUmScreenLobby::OnShown() {
   bCreateBusy = false;
   bJoinBusy = false;
   bCreateError = false;
+  // 2026-10-15 PvP playtest: back from a match the lobby still showed the old code and «Игра не найдена» - a shown lobby
+  // starts with an empty code field and no code error
+  CodeErr = EUmCodeError::None;
+  if (CodeBox) {
+    bSettingCode = true;
+    CodeBox->SetText(FText::GetEmpty());
+    bSettingCode = false;
+  }
   RefreshTexts();
   Layout();
   Refresh();

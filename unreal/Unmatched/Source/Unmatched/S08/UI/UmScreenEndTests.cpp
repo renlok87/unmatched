@@ -295,7 +295,7 @@ bool FUmScreensGameOverTreeTest::RunTest(const FString& Parameters) {
     TestEqual(TEXT("«ПОБЕДА»"), G->GetOutcomeText(), FString(TEXT("ПОБЕДА")));
     TestEqual(TEXT("headline by the winning hero"), G->GetHeadlineText(), FString(TEXT("MEDUSA ПОБЕЖДАЕТ")));
     TestEqual(TEXT("reason"), G->GetReasonText(), FString(TEXT("King Arthur: HP достигли 0")));
-    TestEqual(TEXT("«Ход 11 · 0:27»"), G->GetTurnText(), FString(TEXT("Ход 11 · 0:27")));
+    TestEqual(TEXT("«Ход 11 · партия длилась 0:27»"), G->GetTurnText(), FString(TEXT("Ход 11 · партия длилась 0:27")));
     TestEqual(TEXT("left caption"), G->GetCaption(true), FString(TEXT("Вы · HP 11/16 · Победитель")));
     TestEqual(TEXT("right caption"), G->GetCaption(false), FString(TEXT("Соперник · HP 0/18 · Повержен")));
     TestTrue(TEXT("the fallen heart on the loser"), G->IsShownPart(G->RightHeart) && !G->IsShownPart(G->LeftHeart));
@@ -316,7 +316,7 @@ bool FUmScreensGameOverTreeTest::RunTest(const FString& Parameters) {
     G->ApplyModel(D);
     TestEqual(TEXT("defeat state"), G->GetScreenState(), FName(TEXT("defeat")));
     TestEqual(TEXT("«ПОРАЖЕНИЕ»"), G->GetOutcomeText(), FString(TEXT("ПОРАЖЕНИЕ")));
-    TestEqual(TEXT("defeat turn"), G->GetTurnText(), FString(TEXT("Ход 5 · 0:13")));
+    TestEqual(TEXT("defeat turn"), G->GetTurnText(), FString(TEXT("Ход 5 · партия длилась 0:13")));
     TestEqual(TEXT("defeat: the winner left"), G->GetCaption(true), FString(TEXT("Соперник · HP 14/16 · Победитель")));
     // draw: no headline, reason or turn; both fallen
     FUmGameOverModel Dr = RunIVictory();
