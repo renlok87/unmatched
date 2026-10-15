@@ -1,0 +1,76 @@
+{
+  "status": "source-candidate-only",
+  "date": "2026-10-15",
+  "tool": "image_gen.imagegen",
+  "mode": "built-in; new image generation",
+  "generation_calls": 1,
+  "correction_calls": 0,
+  "runtime_accepted": false,
+  "runtime_imported": false,
+  "postprocessing": "none; original and selected PNGs are byte copies of the built-in tool output",
+  "reference_use": "Approved project design opened with view_image before generation. Identity and palette described in the exact prompt. No referenced_image_paths or num_last_images_to_include arguments were passed, following the new-image tool contract.",
+  "output_resolution_note": "Prompt requested a 1024x1024 composition; actual built-in output is 1254x1254. No resize was performed.",
+  "preflight": {
+    "output_folder_existed": false,
+    "filename_lookup_roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content/UI"
+    ],
+    "filename_lookup_extensions": [
+      "png",
+      "webp",
+      "uasset"
+    ],
+    "filename_lookup_predicate": "full path contains the assigned owner name AND portrait or avatar",
+    "matching_owner_portrait_paths_before_generation": [],
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_portrait_keys_observed": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "assigned_owner_runtime_key_present": false,
+    "scope_limitation": "Focused filename and runtime-key lookup, not a repository-wide claim about every image's subject. An unrelated concept-elektra-codex/tmp-metadata-check-asb509mx folder was inaccessible during the broad initial listing; focused rg excluded tmp-metadata-check-*.",
+    "procedure": "Before the generation call, opened this owner's approved design through view_image and ran the focused filename/runtime lookup. Existing concepts were references, not existing portrait sources."
+  },
+  "output": {
+    "original": "original-g1.png",
+    "selected": "portrait-source-candidate.png",
+    "width": 1254,
+    "height": 1254,
+    "encoding": "PNG",
+    "alpha_requested": false,
+    "sha256": "6525a4c6a468e262d33c777d8adacac04c80a592ba11410ed78dff5b432f9ecc",
+    "bytes": 2100465,
+    "tool_original_path": "C:/Users/ren/.codex/generated_images/01a13e1b-2e19-71f1-856f-c7f4a0207845/exec-cff22e33-5821-4771-959b-558f0154cf02.png"
+  },
+  "prompt_file": "prompt-g1.txt",
+  "negative_scope": "No git mutation, code, registry, ledger, imports, paid external service/API, browser automation or subagents. Only the two assigned new candidate folders were written.",
+  "review_method": "Direct visual inspection of each approved design, built-in result and saved selected PNG with view_image. No circular-mask image, runtime UI or thumbnail test was produced.",
+  "owner": {
+    "name": "Dr. Jill Trent",
+    "slug": "dr-jill-trent",
+    "role": "hero owner",
+    "helper_excluded": "Daisy",
+    "roster_file": "scraped-data/api/heroes/dr-jill-trent.json",
+    "roster_sha256": "699e1c780429b956ea734b0160e4fc5718d97cbf5be3498ab911c7a7211ab2de",
+    "identity_check": "fetchedHero.name and fetchedHero.key in local hero file; helper is a separate sidekick; hero-links.json role=hero"
+  },
+  "reference": {
+    "path": "art/imagegen/concept-dr-jill-trent-codex/design/dr-jill-trent-front.png",
+    "role": "approved project design reference, visually inspected",
+    "sha256_before": "0ef8501737ef3d7c33938bf8905f05f20101cb481213e78b0002cf396eb47883",
+    "width": 1086,
+    "height": 1448
+  },
+  "prompt_sha256": "7b6dca1692a606abc31e267c5490558a88eb925448fbcbdb80378c4b61ce2bc3",
+  "tool_arguments": {
+    "prompt": "Use case: stylized-concept\nAsset type: original head-and-shoulders portrait SOURCE CANDIDATE for the project's Dr. Jill Trent roster owner, square 1024 by 1024 composition.\nPrimary request: Create ONE original portrait of the same fictional scientist character established by the approved project miniature design shown in this conversation, art/imagegen/concept-dr-jill-trent-codex/design/dr-jill-trent-front.png. Preserve that design's identity, facial proportions, hair, goggles, clothing and palette. This is Dr. Jill Trent herself, not her helper Daisy.\nScene/backdrop: plain uniform charcoal gray background, no scene, no vignette ornament.\nSubject: fair-skinned adult woman with the approved design's sculpted chestnut-brown 1940s waved hair and rolled curls, silver/chrome round laboratory goggles resting ON TOP of her hair, visible attentive brown eyes below them, defined brows, a calm capable expression, and small lipstick-red lips. Off-white laboratory coat with broad lapels over the muted teal collared buttoned dress. Maintain the approved reference's distinctive vintage scientist appearance.\nStyle/medium: exquisite hand-painted collectible miniature craftsmanship, sculpted coherent volumes, finely painted material surfaces, restrained realistic stylization. A crafted game-character bust illustration/render, not a human photograph, fashion shoot or commercial avatar.\nComposition/framing: centered head and shoulders with upper chest visible, near frontal with only a slight three-quarter turn, both eyes clearly readable and looking toward the viewer. Whole hair silhouette AND the entire goggles must be comfortably inside the image with generous charcoal breathing room above and on both sides. Leave roughly 15 percent top margin and 15 percent side clearance around the head; place the eye line near 43 percent of the image height. Keep the head, ears and goggles within the central 70 percent width so a future centered circular crop has room. Shoulders taper naturally into the lower frame. No raised hands, ray gun, clipboard or props beside the head.\nLighting/mood: soft studio key light and gentle fill; face and both eyes readable, subtle warm skin and crisp chrome highlights, charcoal remains plain. Confident, intelligent, composed.\nColor palette: approved lab white #E6E4DE, dress teal #2F7A78, chrome #A9AEB3, restrained lipstick red #C3302E; chestnut hair and natural fair skin.\nConstraints: one character only, original source art, preserve the approved project identity and palette. Full head and headgear, no top or side clipping. No lettering, symbols, watermark, border, medallion, frame, circular mask, UI, cards, layout sheet, other characters, actor likeness or copied commercial artwork.\n",
+    "transparent_background": false
+  },
+  "selection_reason": "Only generated result; owner identity cues and full square-source headgear remain readable. Composition/style limitations explicitly documented in README.md.",
+  "margin_requirement_fully_met": false
+}

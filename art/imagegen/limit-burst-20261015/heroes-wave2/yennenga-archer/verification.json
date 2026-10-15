@@ -1,0 +1,614 @@
+{
+  "asset_id": "ASSET-YENNENGA-ARCHER-001",
+  "status": "proposed-production-reference-only",
+  "source_unchanged": true,
+  "source_checks": [
+    {
+      "path": "scraped-data/api/heroes/yennenga.json",
+      "sha256": "c6ea69b15d1c8e4848c62db66c1d904f013ce513cbff0778a9e028f2ee867f9d",
+      "bytes": 23302,
+      "after_sha256": "c6ea69b15d1c8e4848c62db66c1d904f013ce513cbff0778a9e028f2ee867f9d",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-yennenga-codex/design/yennenga-front.png",
+      "sha256": "456b1601dfcc54ad684af4f11a143685075a0bd1e8ce78f8810f1870413adae0",
+      "bytes": 1800029,
+      "after_sha256": "456b1601dfcc54ad684af4f11a143685075a0bd1e8ce78f8810f1870413adae0",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/limit-burst-20261015/heroes-wave2/live-roster-evidence.json",
+      "sha256": "b44f58b18eda79b5c8223f108e50a54561a2be22009b782c37166b04e7cdcef8",
+      "bytes": 1139,
+      "after_sha256": "b44f58b18eda79b5c8223f108e50a54561a2be22009b782c37166b04e7cdcef8",
+      "unchanged": true
+    },
+    {
+      "path": "backend/src/games/services/game-initialization.service.ts",
+      "sha256": "ef630298e985892fe3612d191cb32f2309a188c43d26daa0afea74d418c0557e",
+      "bytes": 35611,
+      "after_sha256": "ef630298e985892fe3612d191cb32f2309a188c43d26daa0afea74d418c0557e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/art-pipeline/hero-links.json",
+      "sha256": "118972f5ee9bfdf746f6606964d77a99056054f4879ffb35e36230dcf5222319",
+      "bytes": 4103,
+      "after_sha256": "118972f5ee9bfdf746f6606964d77a99056054f4879ffb35e36230dcf5222319",
+      "unchanged": true
+    }
+  ],
+  "package_writes_only": true,
+  "outside_folder": [],
+  "generated_image_byte_preserved": true,
+  "image_inspected": true,
+  "image_inspected_by": "producing Codex agent (self-review, not independent pipeline acceptance)",
+  "checklist": [
+    {
+      "item": "one complete human figure, one base, no text or extra limbs",
+      "passed": true
+    },
+    {
+      "item": "one bow in own LEFT hand, quiver at own RIGHT hip, ochre wrap, leather tunic/sandals, red headband, empty right hand",
+      "passed": true
+    },
+    {
+      "item": "frontal body with visible arm/background gaps",
+      "passed": true
+    },
+    {
+      "item": "g2 base visually edge-on with no large top ellipse",
+      "passed": true,
+      "note": "Visual observation only; camera parameters cannot be recovered from this raster."
+    },
+    {
+      "item": "exact CORE top/bottom framing",
+      "passed": false,
+      "note": "Selected top 3.936% (required >=4), bottom 94.13% (target93)."
+    }
+  ],
+  "limitations": [
+    "Оба кандидата: 12 PASS / 1 WARN / 0 FAIL; WARN view.frame_top сохранён. Выбранный g2: верх 3.936%, низ 94.13% вместо целевых >=4% / 93%.",
+    "g1 показывает верх подставки; g2 убирает явный верхний эллипс, но строгая ортография камеры математически не подтверждена. Фон визуально почти ровный, полное равенство каждого пикселя не заявлено.",
+    "Два front-кандидата не являются набором 1c. Нужны отдельные intake, независимая design acceptance и следующие гейты; 3D, риг, Tripo, анимация и UE не выполнялись.",
+    "Один archetype для двух runtime Archers; командные кольца, нумерация или baked-in team colours не добавлены.",
+    "Пол, одежда и декоративные полосы — оригинальное решение; историческая точность конкретной одежды или совпадение со сканом жетона не заявляются.",
+    "Тетива тонкая: масштабирование будущей модели требует отдельного контроля; референс не доказывает её пригодность после image-to-3D."
+  ],
+  "pipeline_acceptance": false,
+  "prompt_validation": [
+    {
+      "prompt_file": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/prompts/design-front-g1.txt",
+      "clean_core_only_with_optional_correction": true
+    },
+    {
+      "prompt_file": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/prompts/design-front-g2.txt",
+      "clean_core_only_with_optional_correction": true
+    }
+  ],
+  "three_d_game_or_rig_ready": false,
+  "shared_registry_ledger_or_source_files_modified": false,
+  "background_processes_started": [],
+  "automated_checks": [
+    {
+      "report": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/checks/design-front-g1/checks-report.json",
+      "result": {
+        "schema": "unmatched.concept-checks/1",
+        "tool": "tools/art/concept/check_concept_views.py",
+        "generated_at": "2026-10-15T05:51:51+00:00",
+        "set": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/design",
+        "key": "yennenga-archer",
+        "role": "hero",
+        "views": [
+          "front"
+        ],
+        "inputs": [
+          {
+            "view": "front",
+            "path": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/design/yennenga-archer-front.png",
+            "sha256": "33e723ebb441e5951c329a5fdc58db2b63e97a91a97a3a043c4c461ef315e1a7",
+            "format": "PNG",
+            "mode": "RGB",
+            "size": [
+              1086,
+              1448
+            ]
+          }
+        ],
+        "raw_files_modified": false,
+        "tolerances": {
+          "size_rel_pct": 0.5,
+          "border_band_pct": 2.0,
+          "border_share_min": 0.99,
+          "border_tone_warn": 12,
+          "border_tone_fail": 20,
+          "bg_neutral_max": 6,
+          "bg_between_views_max": 12,
+          "bg_dark_luma_warn": 96,
+          "top_min_pct": 1.0,
+          "bottom_max_pct": 99.0,
+          "side_min_pct": 1.0,
+          "base_bottom_spread_warn_pct": 1.5,
+          "base_bottom_spread_fail_pct": 3.5,
+          "base_center_spread_warn_pct": 2.0,
+          "base_center_spread_fail_pct": 6.5,
+          "height_spread_warn_pct": 3.0,
+          "height_spread_fail_pct": 5.0,
+          "extra_component_warn_pct": 0.5,
+          "mask_area_min_pct": 2.0,
+          "mask_area_max_pct": 90.0,
+          "segment_tone": 14,
+          "segment_min_component_pct": 0.02,
+          "facing_margin": 0.05,
+          "facing_iou_warn": 0.5
+        },
+        "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+        "frame": {
+          "min_top_pct": 4.0
+        },
+        "measurements": {
+          "front": {
+            "size": [
+              1086,
+              1448
+            ],
+            "mode": "RGB",
+            "alpha": {
+              "present": false,
+              "min": 255
+            },
+            "border": {
+              "band_px": 22,
+              "median_rgb": [
+                47.0,
+                48.0,
+                49.0
+              ],
+              "share_within_tone_warn": 1.0,
+              "share_within_tone_fail": 1.0,
+              "p99_deviation": 4.0,
+              "neutral_delta": 1.0,
+              "luma": 47.9
+            },
+            "background_model": {
+              "fit": "quadratic per channel",
+              "residual_std": [
+                1.14,
+                1.03,
+                1.05
+              ],
+              "segment_tone": 14
+            },
+            "mask": {
+              "area_pct": 37.703,
+              "filled_area_pct": 37.703,
+              "components_kept": 1,
+              "main_component_pct": 37.703,
+              "other_components_pct": [],
+              "bbox_px": [
+                188,
+                29,
+                951,
+                1399
+              ],
+              "top_pct": 2.003,
+              "bottom_pct": 96.616,
+              "left_pct": 17.311,
+              "right_pct": 87.569,
+              "height_pct": 94.613,
+              "base_center_x_pct": 49.033,
+              "base_width_pct": 63.444,
+              "base_top_pct_est": 86.326
+            }
+          }
+        },
+        "checks": [
+          {
+            "id": "set.size",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "sizes": {
+                "front": [
+                  1086,
+                  1448
+                ]
+              },
+              "max_delta_pct": 0.0
+            },
+            "limit": "<= 0.5 %",
+            "message": "все виды одного размера и аспекта"
+          },
+          {
+            "id": "set.size_exact",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "front": [
+                1086,
+                1448
+              ]
+            },
+            "limit": "равны до пикселя",
+            "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+          },
+          {
+            "id": "view.alpha",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "present": false,
+              "min": 255
+            },
+            "limit": "без прозрачности",
+            "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+          },
+          {
+            "id": "view.border_uniform",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "share_warn_tone": 1.0,
+              "share_fail_tone": 1.0,
+              "p99_deviation": 4.0
+            },
+            "limit": ">= 0.99 при ±20 (WARN при ±12)",
+            "message": "рамка 2 % кадра — ровный фон без объектов"
+          },
+          {
+            "id": "view.bg_neutral",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              47.0,
+              48.0,
+              49.0
+            ],
+            "limit": "|R-G|,|G-B| <= 6",
+            "message": "фон нейтрально-серый"
+          },
+          {
+            "id": "view.bg_dark",
+            "scope": "front",
+            "result": "PASS",
+            "value": 47.9,
+            "limit": "<= 96",
+            "message": "фон тёмно-серый (норма hero-quality-v1)"
+          },
+          {
+            "id": "view.mask",
+            "scope": "front",
+            "result": "PASS",
+            "value": 37.703,
+            "limit": "2.0..90.0 %",
+            "message": "маска фигуры правдоподобна"
+          },
+          {
+            "id": "view.top_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 2.003,
+            "limit": ">= 1.0 %",
+            "message": "верх фигуры не касается края"
+          },
+          {
+            "id": "view.frame_top",
+            "scope": "front",
+            "result": "WARN",
+            "value": 2.003,
+            "limit": ">= 4.0 %",
+            "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "id": "view.bottom_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 96.616,
+            "limit": "<= 99.0 %",
+            "message": "низ подставки в кадре"
+          },
+          {
+            "id": "view.side_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 12.431,
+            "limit": ">= 1.0 %",
+            "message": "фигура не обрезана по бокам"
+          },
+          {
+            "id": "view.single_component",
+            "scope": "front",
+            "result": "PASS",
+            "value": [],
+            "limit": "прочие < 0.5 %",
+            "message": "одна крупная связная фигура"
+          },
+          {
+            "id": "set.bg_same",
+            "scope": "set",
+            "result": "PASS",
+            "value": 0.0,
+            "limit": "<= 12",
+            "message": "один фон на набор"
+          }
+        ],
+        "summary": {
+          "PASS": 12,
+          "WARN": 1,
+          "FAIL": 0
+        },
+        "verdict": "PASS",
+        "palette": {
+          "path": null,
+          "asset_id": null,
+          "swatches": []
+        },
+        "sheet": null
+      }
+    },
+    {
+      "report": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/checks/design-front-g2/checks-report.json",
+      "result": {
+        "schema": "unmatched.concept-checks/1",
+        "tool": "tools/art/concept/check_concept_views.py",
+        "generated_at": "2026-10-15T05:53:35+00:00",
+        "set": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/design",
+        "key": "yennenga-archer",
+        "role": "hero",
+        "views": [
+          "front"
+        ],
+        "inputs": [
+          {
+            "view": "front",
+            "path": "art/imagegen/limit-burst-20261015/heroes-wave2/yennenga-archer/design/yennenga-archer-front.png",
+            "sha256": "31fb347614db6949768c85736a9b0c90790515b606966952d61746a67b07feca",
+            "format": "PNG",
+            "mode": "RGB",
+            "size": [
+              1086,
+              1448
+            ]
+          }
+        ],
+        "raw_files_modified": false,
+        "tolerances": {
+          "size_rel_pct": 0.5,
+          "border_band_pct": 2.0,
+          "border_share_min": 0.99,
+          "border_tone_warn": 12,
+          "border_tone_fail": 20,
+          "bg_neutral_max": 6,
+          "bg_between_views_max": 12,
+          "bg_dark_luma_warn": 96,
+          "top_min_pct": 1.0,
+          "bottom_max_pct": 99.0,
+          "side_min_pct": 1.0,
+          "base_bottom_spread_warn_pct": 1.5,
+          "base_bottom_spread_fail_pct": 3.5,
+          "base_center_spread_warn_pct": 2.0,
+          "base_center_spread_fail_pct": 6.5,
+          "height_spread_warn_pct": 3.0,
+          "height_spread_fail_pct": 5.0,
+          "extra_component_warn_pct": 0.5,
+          "mask_area_min_pct": 2.0,
+          "mask_area_max_pct": 90.0,
+          "segment_tone": 14,
+          "segment_min_component_pct": 0.02,
+          "facing_margin": 0.05,
+          "facing_iou_warn": 0.5
+        },
+        "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+        "frame": {
+          "min_top_pct": 4.0
+        },
+        "measurements": {
+          "front": {
+            "size": [
+              1086,
+              1448
+            ],
+            "mode": "RGB",
+            "alpha": {
+              "present": false,
+              "min": 255
+            },
+            "border": {
+              "band_px": 22,
+              "median_rgb": [
+                44.0,
+                45.0,
+                47.0
+              ],
+              "share_within_tone_warn": 1.0,
+              "share_within_tone_fail": 1.0,
+              "p99_deviation": 2.0,
+              "neutral_delta": 2.0,
+              "luma": 44.9
+            },
+            "background_model": {
+              "fit": "quadratic per channel",
+              "residual_std": [
+                1.0,
+                0.83,
+                0.85
+              ],
+              "segment_tone": 14
+            },
+            "mask": {
+              "area_pct": 35.368,
+              "filled_area_pct": 35.368,
+              "components_kept": 1,
+              "main_component_pct": 35.368,
+              "other_components_pct": [],
+              "bbox_px": [
+                186,
+                57,
+                933,
+                1363
+              ],
+              "top_pct": 3.936,
+              "bottom_pct": 94.13,
+              "left_pct": 17.127,
+              "right_pct": 85.912,
+              "height_pct": 90.193,
+              "base_center_x_pct": 48.803,
+              "base_width_pct": 63.352,
+              "base_top_pct_est": 85.912
+            }
+          }
+        },
+        "checks": [
+          {
+            "id": "set.size",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "sizes": {
+                "front": [
+                  1086,
+                  1448
+                ]
+              },
+              "max_delta_pct": 0.0
+            },
+            "limit": "<= 0.5 %",
+            "message": "все виды одного размера и аспекта"
+          },
+          {
+            "id": "set.size_exact",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "front": [
+                1086,
+                1448
+              ]
+            },
+            "limit": "равны до пикселя",
+            "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+          },
+          {
+            "id": "view.alpha",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "present": false,
+              "min": 255
+            },
+            "limit": "без прозрачности",
+            "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+          },
+          {
+            "id": "view.border_uniform",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "share_warn_tone": 1.0,
+              "share_fail_tone": 1.0,
+              "p99_deviation": 2.0
+            },
+            "limit": ">= 0.99 при ±20 (WARN при ±12)",
+            "message": "рамка 2 % кадра — ровный фон без объектов"
+          },
+          {
+            "id": "view.bg_neutral",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              44.0,
+              45.0,
+              47.0
+            ],
+            "limit": "|R-G|,|G-B| <= 6",
+            "message": "фон нейтрально-серый"
+          },
+          {
+            "id": "view.bg_dark",
+            "scope": "front",
+            "result": "PASS",
+            "value": 44.9,
+            "limit": "<= 96",
+            "message": "фон тёмно-серый (норма hero-quality-v1)"
+          },
+          {
+            "id": "view.mask",
+            "scope": "front",
+            "result": "PASS",
+            "value": 35.368,
+            "limit": "2.0..90.0 %",
+            "message": "маска фигуры правдоподобна"
+          },
+          {
+            "id": "view.top_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 3.936,
+            "limit": ">= 1.0 %",
+            "message": "верх фигуры не касается края"
+          },
+          {
+            "id": "view.frame_top",
+            "scope": "front",
+            "result": "WARN",
+            "value": 3.936,
+            "limit": ">= 4.0 %",
+            "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "id": "view.bottom_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 94.13,
+            "limit": "<= 99.0 %",
+            "message": "низ подставки в кадре"
+          },
+          {
+            "id": "view.side_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 14.088,
+            "limit": ">= 1.0 %",
+            "message": "фигура не обрезана по бокам"
+          },
+          {
+            "id": "view.single_component",
+            "scope": "front",
+            "result": "PASS",
+            "value": [],
+            "limit": "прочие < 0.5 %",
+            "message": "одна крупная связная фигура"
+          },
+          {
+            "id": "set.bg_same",
+            "scope": "set",
+            "result": "PASS",
+            "value": 0.0,
+            "limit": "<= 12",
+            "message": "один фон на набор"
+          }
+        ],
+        "summary": {
+          "PASS": 12,
+          "WARN": 1,
+          "FAIL": 0
+        },
+        "verdict": "PASS",
+        "palette": {
+          "path": null,
+          "asset_id": null,
+          "swatches": []
+        },
+        "sheet": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "queried_utc": "2026-10-15T05:50:15.691509+00:00",
+  "source": "read-only PostgreSQL Hero.name + Hero.sidekicks query via docker exec; existing postgres service, no service started",
+  "sql": "SELECT row_to_json(t) FROM (SELECT name, sidekicks FROM \"Hero\" WHERE name IN ('Annie Christmas','Dr. Sattler','Yennenga')) t;",
+  "rows": [
+    {
+      "name": "Dr. Sattler",
+      "sidekicks": [
+        {
+          "name": "Dr. Malcolm",
+          "health": "7",
+          "movement": "2",
+          "attackType": "melee"
+        }
+      ]
+    },
+    {
+      "name": "Annie Christmas",
+      "sidekicks": [
+        {
+          "name": "Charlie",
+          "health": "8",
+          "movement": "2",
+          "attackType": "range"
+        }
+      ]
+    },
+    {
+      "name": "Yennenga",
+      "sidekicks": [
+        {
+          "name": "Archers",
+          "health": "2",
+          "movement": "2",
+          "attackType": "range"
+        },
+        {
+          "name": "Archers",
+          "health": "2",
+          "movement": "2",
+          "attackType": "range"
+        }
+      ]
+    }
+  ]
+}
