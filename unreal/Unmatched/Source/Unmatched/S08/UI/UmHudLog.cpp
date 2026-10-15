@@ -269,8 +269,13 @@ void UUmHudLog::SetFrame(const FUmLogFrame& InFrame) {
 
 void UUmHudLog::Relayout() {
   // HUD v2: the content box inside the rim inset of SetFrame (8 su each side)
-  const float W = static_cast<float>(Frame.SizeSu.X) - (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 0.0f);
-  const float First = UmHudLog::FirstRowSu(Frame);
+  const bool bV2 = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner"));
+  const float W = static_cast<float>(Frame.SizeSu.X) - (bV2 ? 16.0f : 0.0f);
+  // 2026-10-15 playtest (720p): the short column (104 su) minus the v2 rims keeps 88 su - the title at the top and the
+  // three rows right under it, the third row was cut by the bottom rim
+  const bool bShortV2 = bV2 && !Frame.bClassS && !Frame.bTall;
+  const float HeaderY = bShortV2 ? 0.0f : UmHudLog::HeaderYSu;
+  const float First = bShortV2 ? 21.0f : UmHudLog::FirstRowSu(Frame);
   const float ListH = UmHudLog::RowSu * static_cast<float>(UmHudLog::VisibleRows(Frame));
   auto Place = [](UWidget* Wd, float X, float Y, float SW, float SH) {
     if (UCanvasPanelSlot* S = Wd ? Cast<UCanvasPanelSlot>(Wd->Slot) : nullptr) {
@@ -278,7 +283,7 @@ void UUmHudLog::Relayout() {
       S->SetSize(FVector2D(SW, SH));
     }
   };
-  Place(Title, UmHudLog::TurnXSu, UmHudLog::HeaderYSu, W - 2.0f * UmHudLog::TurnXSu, 22.0f);
+  Place(Title, UmHudLog::TurnXSu, HeaderY, W - 2.0f * UmHudLog::TurnXSu, 22.0f);
   Place(Empty, UmHudLog::TurnXSu, First, W - 2.0f * UmHudLog::TurnXSu, UmHudLog::RowSu);
   Place(Scroll, 0.0f, First, W, ListH);
   if (Scroll) {

@@ -1,5 +1,6 @@
 // VS-3 SC-01: the confirm dialog - see UmConfirmDialog.h.
 #include "UmConfirmDialog.h"
+#include "UmTextFit.h"
 
 #include "UmButton.h"
 #include "UmGameHud.h"
@@ -122,7 +123,16 @@ void UUmConfirmDialog::SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter
 void UUmConfirmDialog::ApplyContent() {
   if (Title) Title->SetText(Request.Title);
   if (Message) Message->SetText(Request.Message);
-  const FVector2D Size(FrameWSu, FrameHSu);
+  // 2026-10-15 playtest: one line of message in a 360 su frame left a big empty plate («Покинуть партию») - the frame
+  // takes the message's rows (body 16 su, ~22 su a row), 360 su at most
+  int32 Rows = 1;
+  const float TextW = FrameWSu - 2.0f * PadSu;
+  const float MsgW = UmTextFit::WidthSu(Request.Message, FName(TEXT("type.body")));
+  if (MsgW > 0.0f) Rows = FMath::Max(1, FMath::CeilToInt(MsgW / (TextW - 8.0f)));
+  for (const TCHAR C : Request.Message.ToString()) Rows += C == TCHAR(10) ? 1 : 0;
+  const float FrameH = FMath::Clamp(3.0f * PadSu + 36.0f + 8.0f + Rows * 22.0f + 8.0f + ButtonHSu, 180.0f, FrameHSu);
+  SetFrameSize(FVector2D(FrameWSu, FrameH));
+  const FVector2D Size(FrameWSu, FrameH);
   // inside the frame: 16 su padding, the title row 36 su (type.title 28), the message under it
   UmDlgPlace(Title, FVector2D(PadSu), FVector2D(Size.X - 2.0f * PadSu, 36.0f));
   UmDlgPlace(Message, FVector2D(PadSu, PadSu + 36.0f + 8.0f), FVector2D(Size.X - 2.0f * PadSu, Size.Y - 3.0f * PadSu - 36.0f - 8.0f - ButtonHSu));

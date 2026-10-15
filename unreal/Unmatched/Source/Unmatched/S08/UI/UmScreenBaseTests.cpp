@@ -137,8 +137,11 @@ bool FUmScreensBaseShotTest::RunTest(const FString& Parameters) {
                     Lines[0]);
     TestTrue(FString::Printf(TEXT("04 §4.5 line: %s"), *Lines[0]), M.FindNext());
     const FBox2D Frame = D->FrameRectSu();
-    TestTrue(TEXT("the frame 640 x 360 centred at 1080p (640,360)"), FMath::IsNearlyEqual(Frame.Min.X, 640.0) && FMath::IsNearlyEqual(Frame.Min.Y, 360.0) &&
-                                                                        FMath::IsNearlyEqual(Frame.GetSize().X, 640.0) && FMath::IsNearlyEqual(Frame.GetSize().Y, 360.0));
+    // 2026-10-15: the frame takes the message's rows (one row: 180..360 su high), 640 wide, centred at 1080p
+    TestTrue(FString::Printf(TEXT("the frame 640 wide, 180..360 high, centred at 1080p (%.0f,%.0f %.0fx%.0f)"), Frame.Min.X, Frame.Min.Y,
+                             Frame.GetSize().X, Frame.GetSize().Y),
+             FMath::IsNearlyEqual(Frame.Min.X, 640.0) && FMath::IsNearlyEqual(Frame.GetSize().X, 640.0) && Frame.GetSize().Y >= 180.0 &&
+                 Frame.GetSize().Y < 360.0 && FMath::IsNearlyEqual(Frame.Min.Y + 0.5 * Frame.GetSize().Y, 540.0, 1.0));
   }
   TestEqual(TEXT("the title from ST_Screens"), D->Title->GetText().ToString(), FString(TEXT("Покинуть партию")));
   // Esc = Cancel, once; the dialog goes in 120 ms
