@@ -31,8 +31,11 @@ function Invoke-Restic([string[]]$Arguments) {
     $script:commandNumber++
     $script:stdoutPath = Join-Path $logDir ('{0:D2}.out.log' -f $script:commandNumber)
     $script:stderrPath = Join-Path $logDir ('{0:D2}.err.log' -f $script:commandNumber)
+    # restic parses this option as a command line: backslashes are escapes.
+    # Forward slashes plus single quotes preserve Windows paths with spaces.
+    $rcloneProgram = "'" + $settings.rclone_exe.Replace('\', '/').Replace("'", "'\''") + "'"
     $common = @('--repo', $settings.repository, '--cache-dir', (Join-Path $StateDir 'cache'),
-        '--retry-lock', '1m', '-o', ('rclone.program=' + $settings.rclone_exe))
+        '--retry-lock', '1m', '-o', ('rclone.program=' + $rcloneProgram))
     # Redirection streams output to disk. Exit 3 (partial backup) remains a failure.
     $oldPreference = $ErrorActionPreference
     try {

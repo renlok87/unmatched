@@ -2,6 +2,7 @@
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -11,8 +12,8 @@ STATE = Path(os.environ.get("LOCALAPPDATA", ".")) / "UnmatchedBackup"
 POWERSHELL = Path(os.environ.get("WINDIR", "C:/Windows")) / "System32/WindowsPowerShell/v1.0/powershell.exe"
 
 
-@unittest.skipUnless(os.name == "nt" and (STATE / "bin/restic.exe").is_file(),
-                     "Requires Windows and locally installed restic")
+@unittest.skipUnless(os.name == "nt" and all((STATE / "bin" / n).is_file() for n in ("restic.exe", "rclone.exe")),
+                     "Requires Windows and locally installed restic/rclone")
 class BackupRoundTrip(unittest.TestCase):
     def test_preserves_untracked_assets_and_history_without_caches_or_secrets(self):
         # Catches broad gitignore/Saved exclusions, lost old versions, and a false
@@ -24,6 +25,9 @@ class BackupRoundTrip(unittest.TestCase):
             state = root / "state"
             source.mkdir()
             state.mkdir()
+            rclone = root / "bin with spaces/rclone.exe"
+            rclone.parent.mkdir()
+            shutil.copy2(STATE / "bin/rclone.exe", rclone)
             assets = {
                 "art/hero/model.blend": b"original blender source",
                 "art/hero/model.blend1": b"previous blender source",
@@ -49,10 +53,10 @@ class BackupRoundTrip(unittest.TestCase):
                 path.write_bytes(content)
             config = {
                 "project_root": str(source),
-                "repository": str(root / "repository"),
+                "repository": "rclone::local:" + (root / "repository").as_posix(),
                 "tag": "unmatched-assets",
                 "restic_exe": str(STATE / "bin/restic.exe"),
-                "rclone_exe": str(STATE / "bin/rclone.exe"),
+                "rclone_exe": str(rclone),
                 "use_vss": False,
             }
             (state / "settings.json").write_text(json.dumps(config), encoding="utf-8")
@@ -101,7 +105,7 @@ class BackupRoundTrip(unittest.TestCase):
             # Never restore over an existing directory, including the live source.
             run("Restore", "-Target", str(source), success=False)
             config = json.loads((state / "settings.json").read_text(encoding="utf-8-sig"))
-            config["repository"] = str(root / "does-not-exist")
+            config["repository"] = "rclone::local:" + (root / "does-not-exist").as_posix()
             (state / "settings.json").write_text(json.dumps(config), encoding="utf-8")
             run("Backup", success=False)
             after = json.loads((state / "status.json").read_text(encoding="utf-8-sig"))
