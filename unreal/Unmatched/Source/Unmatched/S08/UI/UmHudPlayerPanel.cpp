@@ -84,6 +84,12 @@ const TCHAR* StateName(EUmPanelState State) {
 
 const TCHAR* ShotId(EUmPanelSide Side) { return Side == EUmPanelSide::Opp ? TEXT("UI-HUD-PANEL-OPP") : TEXT("UI-HUD-PANEL-LOC"); }
 
+/** 2026-10-15 (fonts): the Lora name (type.heading DisplayBold) has a taller ascender and line than Roboto - its text box
+ *  starts 3 su higher so the caps keep the mockup's y 12 and the descenders clear the status tag under them. */
+float NameLiftSu() {
+  return UUmHudTheme::Get().Font(TEXT("type.heading")).TypefaceFontName == FName(TEXT("DisplayBold")) ? 3.0f : 0.0f;
+}
+
 FText StatusText(EUmPanelState State) {
   switch (State) {
     case EUmPanelState::Own: return UmText::Get(EUmTable::Hud, TEXT("hud.panel.status.own")).ToUpper();
@@ -214,7 +220,7 @@ bool UUmHudPlayerPanel::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Att
   // the places of class L (ApplyGeometry moves them for the class of the window)
   const UmHudPanel::FGeom G = UmHudPanel::Geometry(false, InSide);
   UmPanelPlace(PortraitW, G.RingPos, false, FVector2D(G.RingSu, G.RingSu));
-  UmPanelPlace(Name, FVector2D(G.TextX, G.NameTop), bOpp);
+  UmPanelPlace(Name, FVector2D(G.TextX, G.NameTop - UmHudPanel::NameLiftSu()), bOpp);
   UmPanelPlace(Status, FVector2D(G.TextX, G.StatusTop), bOpp);
   UmPanelPlace(Hp, FVector2D(G.TextX, G.HpTop), bOpp);
   UmPanelPlace(Tracker, FVector2D(G.TrackerX, G.TrackerTop), !bOpp);
@@ -323,7 +329,7 @@ void UUmHudPlayerPanel::ApplyGeometry() {
     if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), PxPerSu)) Panel->SetBrush(*Skin);
   }
   UmPanelPlace(Portrait, G.RingPos, false, FVector2D(G.RingSu, G.RingSu));
-  UmPanelPlace(NameText, FVector2D(G.TextX, G.NameTop), bOpp);
+  UmPanelPlace(NameText, FVector2D(G.TextX, G.NameTop - UmHudPanel::NameLiftSu()), bOpp);
   UmPanelPlace(StatusRow, FVector2D(G.TextX, G.StatusTop), bOpp);
   UmPanelPlace(HpRow, FVector2D(G.TextX, G.HpTop), bOpp);
   UmPanelPlace(TrackerRow, FVector2D(G.TrackerX, G.TrackerTop), !bOpp);

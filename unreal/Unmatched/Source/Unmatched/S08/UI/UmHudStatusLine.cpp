@@ -245,7 +245,7 @@ bool UUmHudStatusLine::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Atta
   if (!Attach(Dot, RowWidget)) return Fail(TEXT("PulseDot"));
   UmStatusRowSlot(Dot, FMargin(0.0f, 0.0f, UmHudStatus::DotGapSu, 0.0f));
   UTextBlock* Text = UmStatusMake<UTextBlock>(Tree, TEXT("StatusText"));
-  Text->SetFont(Theme.Font(TEXT("type.heading")));
+  Text->SetFont(Theme.Font(TEXT("type.status")));
   Text->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
   Text->SetShadowOffset(FVector2D::ZeroVector);
   Text->SetJustification(ETextJustify::Center);
@@ -312,7 +312,7 @@ bool UUmHudStatusLine::Initialize() {
     for (UTextBlock* Key : KeyTexts) {
       if (Key) Key->SetFont(UUmHudTheme::Get().Font(TEXT("type.tag")));
     }
-    if (StatusText) StatusText->SetFont(UUmHudTheme::Get().Font(TEXT("type.heading")));
+    if (StatusText) StatusText->SetFont(UUmHudTheme::Get().Font(TEXT("type.status")));
     SetVisibility(ESlateVisibility::SelfHitTestInvisible);
     if (Frame) Frame->SetVisibility(ESlateVisibility::Collapsed);  // nothing until the first line
   }
@@ -411,7 +411,7 @@ void UUmHudStatusLine::Render() {
   const float RimSu = UmHudStatus::BannerRimSu();  // the marble rims above and below: the field keeps the text's height
   const float PadX = FMath::Max(Theme.SpaceSu(TEXT("space.m")), EndsSu + 6.0f);
   const float Room = FMath::Max(0.0f, StatusFrame.MaxWidthSu - 2.0f * PadX - Extras);
-  const float Base = UmTypeSu(Theme, TEXT("type.heading"));
+  const float Base = UmTypeSu(Theme, TEXT("type.status"));
   const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
                             [this](const FString& T, float S) { return MeasureSu(T, S); });
@@ -436,7 +436,7 @@ void UUmHudStatusLine::Render() {
     Body->SetVisibility(FitNow.bEllipsis ? ESlateVisibility::Visible : ESlateVisibility::HitTestInvisible);
   }
   if (StatusText) {
-    FSlateFontInfo Font = Theme.Font(TEXT("type.heading"));
+    FSlateFontInfo Font = Theme.Font(TEXT("type.status"));
     Font.Size = UmHudTheme::PointsFromSu(FitNow.SizeSu);
     StatusText->SetFont(Font);
     StatusText->SetText(FText::FromString(FitNow.Display));

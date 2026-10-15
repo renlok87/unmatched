@@ -9,7 +9,7 @@
 namespace S08HudTokens {
 
 /** sha256 of hud-style-tokens.json (CRLF -> LF) this header was generated from. */
-inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("1cf42f4966e9d2cf8e15e088c11892f0d960f4c7e48b19eb555a63675090d72f");
+inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("71eb7ee938f2d9dbfc9d884bb7b6c03910b8ad97f130933641192846c6b5e6d2");
 
 // ---- colours (61) ----
 inline constexpr FColor Color_AccentWarm = FColor(0xFF, 0xB4, 0x5C, 0xFF);  // accent.warm #FFB45C
@@ -84,9 +84,9 @@ inline constexpr float Alpha_RingSmoulder = 0.35f;  // ring.smoulder
 inline constexpr float Alpha_RingSmoulderS = 0.55f;  // ring.smoulder.s
 inline constexpr float Alpha_StateDisabledOpacity = 0.4f;  // state.disabled.opacity
 
-// ---- type scale (9), su at 1080p / 100 %; face = typeface of the default Slate composite font ----
+// ---- type scale (10), su at 1080p / 100 %; face = typeface of the default Slate composite font ----
 inline constexpr int32 TypeSu_Banner = 36;  // type.banner
-inline constexpr const TCHAR* TypeFace_Banner = TEXT("BoldCondensed");
+inline constexpr const TCHAR* TypeFace_Banner = TEXT("DisplayBold");
 inline constexpr bool TypeCaps_Banner = true;
 inline constexpr int32 TypeSu_Body = 16;  // type.body
 inline constexpr const TCHAR* TypeFace_Body = TEXT("Regular");
@@ -101,16 +101,19 @@ inline constexpr int32 TypeSu_Damage = 24;  // type.damage
 inline constexpr const TCHAR* TypeFace_Damage = TEXT("BoldCondensed");
 inline constexpr bool TypeCaps_Damage = false;
 inline constexpr int32 TypeSu_Display = 48;  // type.display
-inline constexpr const TCHAR* TypeFace_Display = TEXT("BoldCondensed");
+inline constexpr const TCHAR* TypeFace_Display = TEXT("DisplayBold");
 inline constexpr bool TypeCaps_Display = true;
 inline constexpr int32 TypeSu_Heading = 24;  // type.heading
-inline constexpr const TCHAR* TypeFace_Heading = TEXT("BoldCondensed");
+inline constexpr const TCHAR* TypeFace_Heading = TEXT("DisplayBold");
 inline constexpr bool TypeCaps_Heading = false;
+inline constexpr int32 TypeSu_Status = 24;  // type.status
+inline constexpr const TCHAR* TypeFace_Status = TEXT("BoldCondensed");
+inline constexpr bool TypeCaps_Status = false;
 inline constexpr int32 TypeSu_Tag = 14;  // type.tag
 inline constexpr const TCHAR* TypeFace_Tag = TEXT("BoldCondensed");
 inline constexpr bool TypeCaps_Tag = false;
 inline constexpr int32 TypeSu_Title = 28;  // type.title
-inline constexpr const TCHAR* TypeFace_Title = TEXT("BoldCondensed");
+inline constexpr const TCHAR* TypeFace_Title = TEXT("DisplayBold");
 inline constexpr bool TypeCaps_Title = false;
 
 // ---- Space (6) ----
@@ -235,15 +238,16 @@ inline constexpr FScalarToken kAlphas[] = {
     {TEXT("state.disabled.opacity"), 0.4f},
 };
 inline constexpr FTypeToken kTypes[] = {
-    {TEXT("type.banner"), 36, TEXT("BoldCondensed"), true},
+    {TEXT("type.banner"), 36, TEXT("DisplayBold"), true},
     {TEXT("type.body"), 16, TEXT("Regular"), false},
     {TEXT("type.button"), 20, TEXT("BoldCondensed"), true},
     {TEXT("type.caption"), 14, TEXT("Regular"), false},
     {TEXT("type.damage"), 24, TEXT("BoldCondensed"), false},
-    {TEXT("type.display"), 48, TEXT("BoldCondensed"), true},
-    {TEXT("type.heading"), 24, TEXT("BoldCondensed"), false},
+    {TEXT("type.display"), 48, TEXT("DisplayBold"), true},
+    {TEXT("type.heading"), 24, TEXT("DisplayBold"), false},
+    {TEXT("type.status"), 24, TEXT("BoldCondensed"), false},
     {TEXT("type.tag"), 14, TEXT("BoldCondensed"), false},
-    {TEXT("type.title"), 28, TEXT("BoldCondensed"), false},
+    {TEXT("type.title"), 28, TEXT("DisplayBold"), false},
 };
 inline constexpr FScalarToken kSpace[] = {
     {TEXT("panel.padding"), 12.0f},

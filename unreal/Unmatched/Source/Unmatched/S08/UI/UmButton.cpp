@@ -150,6 +150,12 @@ T* UmBtnFind(UWidgetTree* Tree, const TCHAR* Name) {
 /** Disc variant: the icon 48 su and the caption under it; the others: icon (24) left, label, key chip right. */
 constexpr float UmBtnDiscIconSu = 48.0f;
 constexpr float UmBtnInlineIconSu = 24.0f;
+// 2026-10-15 (fonts): under the HUD v2 marble cell skin (a texture btn.normal) the disc caption sat on the cell's bottom
+// rim and «КОНЕЦ ХОДА» ran under the side rims - the disc 6 su smaller and 2 su lower, the caption baseline 5 su higher,
+// the caption scaled down (to 75 % at most) to fit between the side rims
+constexpr float UmBtnDiscV2RimSu = 5.0f;
+constexpr float UmBtnDiscV2ShrinkSu = 6.0f;
+constexpr float UmBtnDiscV2DropSu = 2.0f;
 
 void UmBtnPlace(UWidget* Widget, int32 Row, int32 Column, const FMargin& Padding,
                 EHorizontalAlignment H = HAlign_Center, EVerticalAlignment V = VAlign_Center) {
@@ -334,15 +340,29 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   }
   // grid: disc = icon over its caption, the chip under; inline = icon, label, chip in a row
   const float Gap = Theme.SpaceSu(TEXT("tag.padding.x"));
-  const float DiscSu = Model.DiscSu > 0.0f ? Model.DiscSu : UmBtnDiscIconSu;
+  const float RimSu = bDisc && Theme.HasTextureSkin(TEXT("btn.normal")) ? UmBtnDiscV2RimSu : 0.0f;
+  const float DiscSu = (Model.DiscSu > 0.0f ? Model.DiscSu : UmBtnDiscIconSu) - (RimSu > 0.0f ? UmBtnDiscV2ShrinkSu : 0.0f);
+  const float DiscTopSu = UmButton::DiscTopSu + (RimSu > 0.0f ? UmBtnDiscV2DropSu : 0.0f);
   DiscRingSu = bDisc ? DiscSu : 0.0f;
+  if (bDisc && Label && RimSu > 0.0f && !Label->GetText().IsEmpty() && FSlateApplication::IsInitialized() &&
+      FSlateApplication::Get().GetRenderer()) {
+    const float Scale = FMath::Max(0.1f, UmHudScale::Current().PxPerSu());
+    FSlateFontInfo Font = Theme.Font(TEXT("type.tag"));
+    const TSharedRef<FSlateFontMeasure> M = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+    const float TextW = static_cast<float>(M->Measure(Label->GetText(), Font, Scale).X) / Scale;
+    const float Room = (Model.MinWidthSu > 0.0f ? Model.MinWidthSu : UmButton::MinWidthSu(Model.Variant)) - 2.0f * RimSu - 2.0f;
+    if (TextW > Room && TextW > 1.0f) {
+      Font.Size = FMath::Max(0.75f, Room / TextW) * Font.Size;
+      Label->SetFont(Font);
+    }
+  }
   if (bDisc) {
     // VS-4 HB-43 (04 §2.14, ВР-VS2-HB42-12 / -13): the disc centred at y + 4; the caption box under it so that its
     // baseline lies at y + 67 su (every caption of the row on one line); the chip 20 x 20 su 2 su from the cell's
     // top-right corner, over the disc rim at most (ВР-VS2-HB42-08)
-    const float CaptionTop = UmButton::DiscCaptionBaselineSu - UmButton::TagAscentSu(UmHudScale::Current().PxPerSu());
-    UmBtnPlace(Icon, 0, 0, FMargin(0.0f, UmButton::DiscTopSu, 0.0f, 0.0f), HAlign_Center, VAlign_Top);
-    UmBtnPlace(Label, 1, 0, FMargin(0.0f, FMath::Max(0.0f, CaptionTop - UmButton::DiscTopSu - DiscSu), 0.0f, 0.0f), HAlign_Center,
+    const float CaptionTop = UmButton::DiscCaptionBaselineSu - RimSu - UmButton::TagAscentSu(UmHudScale::Current().PxPerSu());
+    UmBtnPlace(Icon, 0, 0, FMargin(0.0f, DiscTopSu, 0.0f, 0.0f), HAlign_Center, VAlign_Top);
+    UmBtnPlace(Label, 1, 0, FMargin(0.0f, FMath::Max(0.0f, CaptionTop - DiscTopSu - DiscSu), 0.0f, 0.0f), HAlign_Center,
                VAlign_Top);
     UmBtnPlace(KeyChip, 0, 0, FMargin(0.0f, UmButton::DiscChipInsetSu, UmButton::DiscChipInsetSu, 0.0f), HAlign_Right, VAlign_Top);
   } else {
@@ -404,7 +424,8 @@ void UUmButton::ApplyDiscRing() {
   // the 72 su bezel of the kit around its 64 su disc: x1.125 of the drawn disc, centred on it
   const float RingSu = DiscRingSu * 1.125f;
   DiscRing->SetDesiredSizeOverride(FVector2D(RingSu, RingSu));
-  UmBtnPlace(DiscRing, 0, 0, FMargin(0.0f, FMath::Max(0.0f, UmButton::DiscTopSu - 0.5f * (RingSu - DiscRingSu)), 0.0f, 0.0f),
+  const float DiscTopSu = UmButton::DiscTopSu + (Theme.HasTextureSkin(TEXT("btn.normal")) ? UmBtnDiscV2DropSu : 0.0f);
+  UmBtnPlace(DiscRing, 0, 0, FMargin(0.0f, FMath::Max(0.0f, DiscTopSu - 0.5f * (RingSu - DiscRingSu)), 0.0f, 0.0f),
              HAlign_Center, VAlign_Top);
   DiscRing->SetVisibility(ESlateVisibility::HitTestInvisible);
 }

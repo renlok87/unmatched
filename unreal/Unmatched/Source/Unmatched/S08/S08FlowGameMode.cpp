@@ -6516,8 +6516,9 @@ void AS08FlowGameMode::RefreshHud() {
                     ConfirmDraft();
                   },
                   FMargin(14, 8), FLinearColor::White,
+                  // 2026-10-15 (fonts): the HUD's button face (type.button, Roboto Bold Condensed), not Slate Bold 14
                   SNew(STextBlock).Text(bDraftLines ? FText::FromString(TEXT("CONFIRM MANEUVER (Enter)")) : ConfirmText)
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
+                       .Font(UUmHudTheme::Get().Font(TEXT("type.button"))))] +
          SHorizontalBox::Slot().AutoWidth()
              [MakeHudPress(
                   FName(TEXT("hud.maneuver.clear")),
@@ -6528,7 +6529,7 @@ void AS08FlowGameMode::RefreshHud() {
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(bDraftLines ? FText::FromString(TEXT("CLEAR DRAFT (Esc)"))
                                                     : UmText::Get(EUmTable::Ms, TEXT("ms.btn.reset")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
+                       .Font(UUmHudTheme::Get().Font(TEXT("type.button"))))]];
   } else if (bUmPending && (bDiscard || CommandUi.Mode == ES09CommandMode::PendingChoice ||
                             (CommandUi.Mode == ES09CommandMode::AttackDraft && CommandUi.IsAttackAbilityPromptOpen()) ||
                             (CommandUi.Mode == ES09CommandMode::None && CommandUi.bHasPendingChoice))) {

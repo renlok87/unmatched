@@ -168,7 +168,7 @@ class UNMATCHED_API UUmHudStatusLine : public UUserWidget {
   bool IsReduced() const;
   double Now() const;
   /** Width (su) of one line of Text in the typeface of Token at the em SizeSu. */
-  float MeasureSu(const FString& Text, float SizeSu, const TCHAR* Token = TEXT("type.heading")) const;
+  float MeasureSu(const FString& Text, float SizeSu, const TCHAR* Token = TEXT("type.status")) const;
 
   UPROPERTY()
   TArray<TObjectPtr<UWidget>> KeyBoxes;

@@ -3,7 +3,11 @@
 #include "../S08HudTokens.generated.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Engine/Texture2D.h"
+#include "Fonts/CompositeFont.h"
+#include "HAL/FileManager.h"
 #include "HAL/PlatformTime.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Paths.h"
 #include "Misc/PackageName.h"
 #include "Styling/CoreStyle.h"
 #include "UObject/Package.h"
@@ -31,6 +35,34 @@ bool ParseHex(const FString& Hex, FColor& Out) {
   }
   Out = FColor::FromHex(H);
   return true;
+}
+
+/** HUD display face (2026-10-15, user: «сделай что-то со шрифтами»): titles, banners, hero names and the status line
+ *  in Lora Bold (OFL, Latin + Cyrillic, Content/UM/Fonts/TTF, staged as UFS) over the marble HUD v2 frames; numbers,
+ *  buttons, tags and body text stay Roboto Bold Condensed - the card language. Glyphs Lora lacks (arrows, circled digits)
+ *  fall back to Roboto Bold Condensed. Rollback: -S08FontLegacy (the default Slate font everywhere). Null when the TTF
+ *  is missing (the caller then uses Roboto BoldCondensed). */
+TSharedPtr<const FCompositeFont> DisplayFont() {
+  static TSharedPtr<const FCompositeFont> Font;
+  static bool bTried = false;
+  if (bTried) return Font;
+  bTried = true;
+  if (FParse::Param(FCommandLine::Get(), TEXT("S08FontLegacy"))) {
+    UE_LOG(LogUmHudTheme, Display, TEXT("UMHUDTHEME display font legacy (-S08FontLegacy): Roboto"));
+    return Font;
+  }
+  const FString Lora = FPaths::ProjectContentDir() / TEXT("UM/Fonts/TTF/Lora-Bold.ttf");
+  if (!IFileManager::Get().FileExists(*Lora)) {
+    UE_LOG(LogUmHudTheme, Warning, TEXT("UMHUDTHEME display font missing %s: Roboto"), *Lora);
+    return Font;
+  }
+  const FString Roboto = FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-BoldCondensed.ttf");
+  TSharedRef<FStandaloneCompositeFont> Made = MakeShared<FStandaloneCompositeFont>();
+  Made->DefaultTypeface.AppendFont(TEXT("DisplayBold"), Lora, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+  Made->FallbackTypeface.Typeface.AppendFont(TEXT("DisplayBold"), Roboto, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+  Font = Made;
+  UE_LOG(LogUmHudTheme, Display, TEXT("UMHUDTHEME display font Lora-Bold"));
+  return Font;
 }
 }  // namespace
 
@@ -104,6 +136,12 @@ FSlateFontInfo UUmHudTheme::Font(FName Token) const {
     Size = Found->Size;
   } else {
     WarnMissing(TEXT("type"), Token);
+  }
+  if (Typeface == FName(TEXT("DisplayBold"))) {
+    if (const TSharedPtr<const FCompositeFont> Display = DisplayFont()) {
+      return FSlateFontInfo(Display, UmHudTheme::PointsFromSu(Size), Typeface);
+    }
+    Typeface = FName(TEXT("BoldCondensed"));
   }
   // Empty FontObject: the typeface of the default Slate composite font (Roboto, Engine/Content/Slate/Fonts).
   // VS-2 HB-15 (ВР-VS2-41): a type.* token is the em in su (02 §3.3: type.banner 36 su = 36 px at 1080p), Slate

@@ -211,7 +211,7 @@ def main() -> int:
     p.add_argument("--packaged", action="store_true")
     p.add_argument("--vsai", action="store_true", help="auto login + VS_AI game (S08_EMAIL/S08_PASSWORD)")
     p.add_argument("--hero", default="")
-    p.add_argument("--email", default="test1@unmatched.com")
+    p.add_argument("--email", default="veteran@unmatched.com")  # never test1 - the user plays on it (AGENTS.md)
     p.add_argument("--password", default="password123")
     p.add_argument("--mute", action="store_true")
     p.add_argument("--extra", default="")

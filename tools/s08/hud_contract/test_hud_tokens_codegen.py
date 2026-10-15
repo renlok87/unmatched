@@ -70,7 +70,8 @@ class AliasTests(unittest.TestCase):
             self.assertTrue(c[name]["source"].startswith("02 §"), name)
         self.assertEqual({n: ty[n]["su"] for n in ty if n.startswith("type.")},
                          {"type.display": 48, "type.banner": 36, "type.title": 28, "type.heading": 24, "type.button": 20,
-                          "type.body": 16, "type.caption": 14, "type.tag": 14, "type.damage": 24})
+                          "type.body": 16, "type.caption": 14, "type.tag": 14, "type.damage": 24,
+                          "type.status": 24})  # + type.status: the status line in Roboto (2026-10-15 fonts)
         self.assertEqual([r[n]["px"] for n in ("radius.s", "radius.m", "radius.l")], [4, 6, 8])
         self.assertEqual(TOKENS["opacity"]["state.disabled.opacity"]["value"], 0.4)
         # existing hex stay (HB-03 dont): card.*, team.*, turn.flash.*
