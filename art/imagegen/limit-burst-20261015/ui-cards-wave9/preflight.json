@@ -1,0 +1,263 @@
+{
+  "card_id": "CP-35",
+  "date": "2026-10-15",
+  "source_only": true,
+  "root_GO_received": true,
+  "live_evidence_reused": "dated-owner-evidence.json",
+  "live_queried_utc": "2026-10-15T06:28:41.887445+00:00",
+  "fresh_DB_claimed": false,
+  "alias": "Raw/live owner Shakespeare maps to existing canonical reference key william-shakespeare; portrait key remains shakespeare.",
+  "actor_representative_count": 3,
+  "entries": [
+    {
+      "asset_key": "titania",
+      "reference": "art/imagegen/concept-titania-codex/design/titania-front.png",
+      "reference_sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+      "portrait_key": "portrait:titania",
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "formal_card": {
+        "path": "art/pipeline-candidates/ASSET-TITANIA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+        "sha256": "c4366b7ce79250bb29e5f343e909aed7c14e5e0e93831b5cda86295a9fe10aed",
+        "data": {
+          "schema": "unmatched.concept-acceptance/1",
+          "kind": "concept",
+          "asset_id": "ASSET-TITANIA-001",
+          "clip": null,
+          "cycle": "r1",
+          "date": "2026-10-13",
+          "previous_card": null,
+          "accepted_object": [
+            {
+              "path": "art/imagegen/concept-titania-codex/design/titania-front.png",
+              "sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c"
+            }
+          ],
+          "frames": {
+            "dir": "art/imagegen/concept-titania-codex/design",
+            "files": [
+              "titania-front.png",
+              "checks-report.json"
+            ]
+          },
+          "reports": [
+            "art/imagegen/concept-titania-codex/design/checks-report.json",
+            "art/imagegen/concept-titania-codex/generation-records.json",
+            "art/imagegen/concept-titania-codex/verification.json"
+          ],
+          "gates": {
+            "G-CHECKS": {
+              "status": "PASS",
+              "source": "art/imagegen/concept-titania-codex/design/checks-report.json",
+              "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.WARN = 1; verification.json#checks: финальный запуск exit_code = 0.",
+              "source_defect": null
+            }
+          },
+          "scores": {
+            "S": {
+              "value": 2,
+              "rationale": "titania-front.png: Титания из KEY и DESCRIPTION_EN узнаётся как величественная королева фей благодаря цветочной короне, четырём прозрачным стрекозиным крыльям, серебряным волосам и жесту со светящейся пыльцой. Контуры крыльев и платья ясные, обе руки отделены от корпуса, кисти читаются; поза асимметричная, не T и не A. Тонкие прожилки крыльев, веточки короны и подвески различимы; проверка их геометрии относится к отложенным этапам 3–4.",
+              "frames": [
+                "titania-front.png"
+              ]
+            },
+            "C": {
+              "value": 1.5,
+              "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+              "frames": [
+                "titania-front.png"
+              ]
+            },
+            "Q": {
+              "value": 2,
+              "rationale": "titania-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Внутри силуэта проработаны жилки листьев и лепестков, сетка крыльев, пряди волос, цветы и золотые украшения. Кожа, растительный наряд, металл, прозрачные мембраны и каменная подставка отчётливо различаются по материалу и объёму.",
+              "frames": [
+                "titania-front.png"
+              ]
+            },
+            "P": {
+              "value": 1.5,
+              "rationale": "titania-front.png: все пять якорей ANCHORS_EN присутствуют, основные цветовые группы и золотое свечение сохранены. Есть отклонение тона от PALETTE и palette.json: листья выглядят более оливковыми относительно #4E7A3A, лепестки — более приглушёнными и тёплыми относительно #D96A9A. Серебряные волосы и золотая пыльца читаются уверенно.",
+              "frames": [
+                "titania-front.png"
+              ]
+            }
+          },
+          "score": 8.8,
+          "verdict": "pass",
+          "verdict_reason": null,
+          "rework_fix_list": [],
+          "known_issues": [
+            {
+              "item": "P",
+              "frame": "titania-front.png",
+              "note": "Оливковый тон листьев и приглушённый тёплый розовый лепестков отклоняются от заданных цветов; все цветовые группы и якоря сохранены."
+            },
+            {
+              "item": "S",
+              "frame": "titania-front.png",
+              "note": "Тонкие мембраны и прожилки крыльев, веточки короны, подвески и отдельные частицы пыльцы требуют проверки переноса в геометрию на отложенных этапах 3–4. Вторая стопа скрыта платьем; её положение по одному фронтальному виду не подтверждается."
+            },
+            {
+              "item": "G-CHECKS",
+              "frame": "checks-report.json",
+              "note": "view.frame_top: верхний отступ 3.246% при целевом минимуме 4%; WARN, без обрезания фигуры и без FAIL гейта."
+            }
+          ],
+          "acceptor": {
+            "profile": "Sol 6.1 xhigh",
+            "session_id": "codex:01a13494-21cb-7a51-bf89-f88e33b9b981"
+          },
+          "executor_session_id": "codex:01a13460-2a80-7230-9385-a1ff60363bbc",
+          "decided_by": "delegated (ВР-реестр 2026-10-06)",
+          "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+        }
+      },
+      "paired_final": null,
+      "override": null,
+      "portrait_found_in_waves1_7_or_gallery": false,
+      "reference_status": "single-card concept-front pass8.8; no paired final or override found; no acceptance inherited by portrait",
+      "source_readme": "art/imagegen/concept-titania-codex/README.md"
+    },
+    {
+      "asset_key": "shakespeare",
+      "reference": "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+      "reference_sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f",
+      "portrait_key": "portrait:shakespeare",
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "formal_card": {
+        "path": "art/pipeline-candidates/ASSET-WILLIAM-SHAKESPEARE-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+        "sha256": "54e0707ded07f12b915976177dffd8139bba4a7e2ba53338facc3e62aae77369",
+        "data": {
+          "schema": "unmatched.concept-acceptance/1",
+          "kind": "concept",
+          "asset_id": "ASSET-WILLIAM-SHAKESPEARE-001",
+          "clip": null,
+          "cycle": "r1",
+          "date": "2026-10-13",
+          "previous_card": null,
+          "accepted_object": [
+            {
+              "path": "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+              "sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f"
+            }
+          ],
+          "frames": {
+            "dir": "art/imagegen/concept-william-shakespeare-codex/design",
+            "files": [
+              "william-shakespeare-front.png",
+              "checks-report.json"
+            ]
+          },
+          "reports": [
+            "art/imagegen/concept-william-shakespeare-codex/design/checks-report.json",
+            "art/imagegen/concept-william-shakespeare-codex/generation-records.json",
+            "art/imagegen/concept-william-shakespeare-codex/verification.json"
+          ],
+          "gates": {
+            "G-CHECKS": {
+              "status": "PASS",
+              "source": "art/imagegen/concept-william-shakespeare-codex/design/checks-report.json",
+              "note": "checks-report.json#summary.FAIL = 0; checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0",
+              "source_defect": null
+            }
+          },
+          "scores": {
+            "S": {
+              "value": 1.5,
+              "rationale": "william-shakespeare-front.png: персонаж узнаваем; перо и раскрытая книга выступают за корпус и ясно читаются, кисти различимы, локти согнуты, поза не T/A. До 2 не дотягивает отделение рук: книга и плащ закрывают фоновый просвет у собственной левой руки, рука с пером также частично читается на фоне плаща. Это ограничение разделения силуэта, без потери главных признаков.",
+              "frames": [
+                "william-shakespeare-front.png"
+              ]
+            },
+            "C": {
+              "value": 1.5,
+              "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+              "frames": [
+                "william-shakespeare-front.png"
+              ]
+            },
+            "Q": {
+              "value": 2,
+              "rationale": "william-shakespeare-front.png: уровень расписанной коллекционной миниатюры сопоставим с medusa-quality-reference.png. Проработаны жаккард камзола, вышивка плаща, кружево воротника и манжет, пряди волос и бороды, бородки пера, страницы и рельеф обложки. Ткань, кожа, металл и бумага различаются по фактуре и бликам; детализация сохраняется внутри силуэта.",
+              "frames": [
+                "william-shakespeare-front.png"
+              ]
+            },
+            "P": {
+              "value": 2,
+              "rationale": "william-shakespeare-front.png: основные цвета соответствуют PALETTE — тёплый чёрный камзол, белый воротник, пергаментные страницы и красное перо. Приглушённая бронзовая отделка подчинена основной гамме. Все четыре якоря видны: перо в собственной правой руке слева для зрителя, раскрытая книга в левой, остроконечная борода и белый отложной воротник.",
+              "frames": [
+                "william-shakespeare-front.png"
+              ]
+            }
+          },
+          "score": 8.8,
+          "verdict": "pass",
+          "verdict_reason": null,
+          "rework_fix_list": [],
+          "known_issues": [
+            {
+              "item": "S",
+              "frame": "william-shakespeare-front.png",
+              "note": "Два ясных фоновых просвета между руками и корпусом не подтверждаются; особенно слева у фигуры просвет закрывают книга и плащ. Это согласуется с verification.json#limit_reached и учтено в S = 1.5; самостоятельным FAIL гейта не является."
+            },
+            {
+              "item": "S",
+              "frame": "william-shakespeare-front.png",
+              "note": "Плащ достигает колен и заметно длиннее short cape из DESCRIPTION_EN. Отклонение принято по делегированию: оно не скрывает перо, книгу и остальные якоря."
+            },
+            {
+              "item": "S",
+              "frame": "william-shakespeare-front.png",
+              "note": "Тонкий стержень пера и его бородки читаются в концепте; толщину и сохранность этих частей в геометрии следует проверить на этапах 3–4."
+            }
+          ],
+          "acceptor": {
+            "profile": "Sol 6.1 xhigh",
+            "session_id": "codex:01a13399-396e-7442-bb9d-713232640590"
+          },
+          "executor_session_id": "codex:01a13361-7457-7382-bea9-44dd20fce40a",
+          "decided_by": "delegated (ВР-реестр 2026-10-06)",
+          "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+        }
+      },
+      "paired_final": null,
+      "override": null,
+      "portrait_found_in_waves1_7_or_gallery": false,
+      "reference_status": "single-card concept-front pass8.8; no paired final or override found; no acceptance inherited by portrait",
+      "source_readme": "art/imagegen/concept-william-shakespeare-codex/README.md"
+    },
+    {
+      "asset_key": "oberon",
+      "reference": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
+      "reference_sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
+      "portrait_key": "portrait:titania:oberon",
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "formal_card": null,
+      "paired_final": null,
+      "override": null,
+      "portrait_found_in_waves1_7_or_gallery": false,
+      "reference_status": "proposed/source-only; no formal stage acceptance",
+      "selected_attempt": 2,
+      "source_readme": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/README.md"
+    },
+    {
+      "asset_key": "actor",
+      "reference": "art/imagegen/limit-burst-20261015/helpers-wave6/actor/design-front.png",
+      "reference_sha256": "973137064a64480113e15b6123dda915f5cfac25f6d71de016db3ac6becd124f",
+      "portrait_key": "portrait:shakespeare:actor",
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "formal_card": null,
+      "paired_final": null,
+      "override": null,
+      "portrait_found_in_waves1_7_or_gallery": false,
+      "reference_status": "proposed/source-only; no formal stage acceptance",
+      "selected_attempt": 1,
+      "source_readme": "art/imagegen/limit-burst-20261015/helpers-wave6/actor/README.md"
+    }
+  ]
+}
