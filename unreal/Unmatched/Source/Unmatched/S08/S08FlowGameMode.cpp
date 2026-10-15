@@ -5043,7 +5043,7 @@ void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
       for (const FS08BoardFighter& F : Fighters) {
         const FVector World = BoardModel.CellToWorld(F.X, F.Y);
         FVector2D Screen(0, 0);
-        const bool bProjected = PC->ProjectWorldLocationToScreen(World, Screen, true);
+        const bool bProjected = PC->ProjectWorldLocationToScreen(World, Screen, false);
         FS08Trace::Write(FString::Printf(
             TEXT("SHOT fighter %s pos=(%d,%d) world=(%.0f,%.0f,%.0f) screen=(%.0f,%.0f) projected=%d alive=%d"),
             *F.Id, F.X, F.Y, World.X, World.Y, World.Z, Screen.X, Screen.Y,
@@ -5073,10 +5073,10 @@ void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
         }
         const FVector Head = Skel->GetSocketLocation(TEXT("Head"));
         FVector2D HeadScreen(0, 0), TopScreen(0, 0), BottomScreen(0, 0);
-        const bool bHead = PC->ProjectWorldLocationToScreen(Head, HeadScreen, true);
-        const bool bTop = PC->ProjectWorldLocationToScreen(Head + FVector(0, 0, 6), TopScreen, true);
+        const bool bHead = PC->ProjectWorldLocationToScreen(Head, HeadScreen, false);
+        const bool bTop = PC->ProjectWorldLocationToScreen(Head + FVector(0, 0, 6), TopScreen, false);
         const bool bBottom =
-            PC->ProjectWorldLocationToScreen(Head - FVector(0, 0, 6), BottomScreen, true);
+            PC->ProjectWorldLocationToScreen(Head - FVector(0, 0, 6), BottomScreen, false);
         FS08Trace::Write(FString::Printf(
             TEXT("SHOT head fighter=%s socket=Head mesh=%s world=(%.1f,%.1f,%.1f) screen=(%.1f,%.1f) top=(%.1f,%.1f) bottom=(%.1f,%.1f) headPx=%.1f projected=%d"),
             *F.Id, *Skel->GetSkeletalMeshAsset()->GetName(), Head.X, Head.Y, Head.Z,
@@ -7648,7 +7648,9 @@ bool AS08FlowGameMode::WidgetViewportRect(const TSharedPtr<SWidget>& Widget, FS0
 
 bool AS08FlowGameMode::ProjectToViewport(const FVector& World, FVector2D& OutScreen) const {
   const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
-  return PC && PC->ProjectWorldLocationToScreen(World, OutScreen, true);
+  // HUD widgets span the whole viewport. Player-relative projection removes the constrained camera rectangle's
+  // origin, shifting every world-anchored widget into the letterbox/pillarbox on non-16:9 windows.
+  return PC && PC->ProjectWorldLocationToScreen(World, OutScreen, /*bPlayerViewportRelative=*/false);
 }
 
 const FS08BoardFighter* AS08FlowGameMode::FindFighter(const FString& FighterId) const {

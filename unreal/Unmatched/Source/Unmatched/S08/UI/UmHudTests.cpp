@@ -788,4 +788,26 @@ bool FUmHudThemeSkinsTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudFieldLetterboxTest, "Unmatched.S08.Hud.Field.Letterbox",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudFieldLetterboxTest::RunTest(const FString&) {
+  UmHudField::FView View;
+  View.ViewportPx = FVector2D(2560, 1440);
+  View.OriginPx = FVector2D(1280, 0);  // 16:9 camera inside a 5120x1440 game viewport
+  FVector2D Screen;
+  TestTrue(TEXT("point in front projects"), UmHudField::Project(View, FVector(100, 0, 0), Screen));
+  TestTrue(TEXT("centre includes pillarbox origin"), Screen.Equals(FVector2D(2560, 720), 0.01));
+  const FBox2D Wide = UmHudField::CellsEnvelopePx(View, {FVector(100, 0, 0)}, 5);
+  View.OriginPx = FVector2D::ZeroVector;
+  const FBox2D Plain = UmHudField::CellsEnvelopePx(View, {FVector(100, 0, 0)}, 5);
+  TestTrue(TEXT("field shifts with the rendered camera rectangle"),
+           (Wide.Min - Plain.Min).Equals(FVector2D(1280, 0), 0.01) &&
+           (Wide.Max - Plain.Max).Equals(FVector2D(1280, 0), 0.01));
+  View.ViewportPx = FVector2D(1920, 1080);
+  View.OriginPx = FVector2D(0, 60);  // 16:9 inside 1920x1200
+  TestTrue(TEXT("letterbox projects"), UmHudField::Project(View, FVector(100, 0, 0), Screen));
+  TestTrue(TEXT("centre includes top bar"), Screen.Equals(FVector2D(960, 600), 0.01));
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

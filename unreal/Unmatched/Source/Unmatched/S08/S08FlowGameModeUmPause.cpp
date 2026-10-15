@@ -25,6 +25,7 @@
 
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
+#include "S08DisplaySettings.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
 #include "S08UserSettings.h"
@@ -253,7 +254,15 @@ void AS08FlowGameMode::ApplyUmPauseSetting(FName Key, const FString& Value) {
   US08UserSettings* Settings = US08UserSettings::Get();
   if (!Settings) return;
   const FString K = Key.ToString();
-  if (K == TEXT("graphics")) {
+  if (K == TEXT("windowMode") || K == TEXT("resolution")) {
+    FString Error;
+    if (!S08Display::Apply(Key, Value, Error)) {
+      FS08Trace::Write(FString::Printf(TEXT("SETTINGS refused %s=%s error=%s"), *K, *Value, *Error));
+      return;
+    }
+    FS08Trace::Write(FString::Printf(TEXT("SETTINGS set %s=%s source=pause"), *K, *Value));
+    UmHudScale::Refresh();
+  } else if (K == TEXT("graphics")) {
     // SC-30 (ВР-H10): GameUserSettings overall scalability; the resolution quality stays 100 - r.ScreenPercentage, the
     // FPS cap and dynamic resolution are never touched (AGENTS.md «Unreal GPU load», ВР-VS7-50)
     const int32 Level = FMath::Clamp(FCString::Atoi(*Value), 0, 2);
@@ -365,6 +374,10 @@ void AS08FlowGameMode::TickUmPause(const FString& Route) {
     M.Language = UmPsCulture();
     M.UiScaleMin = FMath::Min(Scale.Window.X, Scale.Window.Y) > 0 && FMath::Min(Scale.Window.X, Scale.Window.Y) < 1080 ? 100 : 75;  // ВР-62
     M.Graphics = UmPsGraphicsLevel();
+    const FS08DisplaySettings Display = S08Display::Read();
+    M.WindowMode = Display.WindowMode;
+    M.Resolution = Display.Resolution;
+    M.Resolutions = Display.Resolutions;
     P->ApplyModel(M);
     if (bNested) return;  // a commit or the opening refreshed the model: the gate, the frames and the drive run in the frame's tick
     // ---- the gate lines: once per change of the state and its fields (the leave dialog writes state=confirm)

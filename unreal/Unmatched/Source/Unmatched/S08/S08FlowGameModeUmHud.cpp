@@ -132,6 +132,8 @@
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
+#include "Engine/LocalPlayer.h"
+#include "SceneView.h"
 #include "Engine/World.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/SlateUser.h"
@@ -409,6 +411,16 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
     View.Rotation = R.CamRot;
     View.HFovDeg = R.CamFov;
     View.ViewportPx = Viewport;
+    if (const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr) {
+      if (const ULocalPlayer* Player = PC->GetLocalPlayer()) {
+        FSceneViewProjectionData Projection;
+        if (Player->GetProjectionData(GEngine->GameViewport->Viewport, Projection)) {
+          const FIntRect Rect = Projection.GetConstrainedViewRect();
+          View.ViewportPx = FVector2D(Rect.Width(), Rect.Height());
+          View.OriginPx = FVector2D(Rect.Min);
+        }
+      }
+    }
     R.FieldPx = UmHudField::CellsEnvelopePx(View, Centres, Radius);
     if (R.FieldPx.bIsValid) FieldSu = FBox2D(R.FieldPx.Min / PxPerSu, R.FieldPx.Max / PxPerSu);
     // VS-4 HB-40: each space's rect (centre +- radius) - the toasts' and the subtitle's obstacles (04 §2.12)

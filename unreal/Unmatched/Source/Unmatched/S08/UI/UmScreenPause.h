@@ -72,6 +72,9 @@ struct UNMATCHED_API FUmPauseModel {
   bool bReducedMotion = false;
   // Графика (SC-30): 2 high, 1 medium, 0 low, -1 none of them (custom / epic)
   int32 Graphics = 2;
+  int32 WindowMode = 1;
+  FIntPoint Resolution = FIntPoint(1920, 1080);
+  TArray<FIntPoint> Resolutions = {FIntPoint(1920, 1080)};
   bool bClassS = false;
   bool operator==(const FUmPauseModel& O) const {
     return Context == O.Context && DefenseSeconds == O.DefenseSeconds && bSyncing == O.bSyncing && Master == O.Master &&
@@ -79,7 +82,8 @@ struct UNMATCHED_API FUmPauseModel {
            bAmbienceMuted == O.bAmbienceMuted && bSubtitles == O.bSubtitles && bDescribeSounds == O.bDescribeSounds &&
            Language == O.Language && UiScale == O.UiScale && UiScaleMin == O.UiScaleMin && bRuleHints == O.bRuleHints &&
            KeyHints == O.KeyHints && bKeyChips == O.bKeyChips && AnimSpeed == O.AnimSpeed && bReducedMotion == O.bReducedMotion &&
-           Graphics == O.Graphics && bClassS == O.bClassS;
+           Graphics == O.Graphics && WindowMode == O.WindowMode && Resolution == O.Resolution &&
+           Resolutions == O.Resolutions && bClassS == O.bClassS;
   }
 };
 

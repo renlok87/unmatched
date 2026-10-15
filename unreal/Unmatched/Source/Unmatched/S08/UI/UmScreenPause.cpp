@@ -1,5 +1,6 @@
 // VS-7 S4 SC-24...SC-30: the PAUSE modal and the settings - see UmScreenPause.h.
 #include "UmScreenPause.h"
+#include "../S08DisplaySettings.h"
 
 #include "UmButton.h"
 #include "UmGameHud.h"
@@ -152,6 +153,21 @@ TArray<FUmSettingRowModel> Rows(const FUmPauseModel& M, EUmPauseTab Tab) {
                                    FString::FromInt(M.Graphics));
       Q.Note = S(TEXT("settings.graphics.note"));
       Out.Add(Q);
+      Out.Add(Chips(TEXT("windowMode"), TEXT("settings.graphics.window_mode"),
+                    {{TEXT("settings.graphics.window_mode.windowed"), TEXT("2")},
+                     {TEXT("settings.graphics.window_mode.borderless"), TEXT("1")},
+                     {TEXT("settings.graphics.window_mode.fullscreen"), TEXT("0")}}, FString::FromInt(M.WindowMode)));
+      FUmSettingRowModel Resolution;
+      Resolution.Key = TEXT("resolution");
+      Resolution.Kind = EUmSettingKind::Chips;
+      Resolution.Label = S(TEXT("settings.graphics.resolution"));
+      for (const FIntPoint& R : M.Resolutions) {
+        if (R == M.Resolution) Resolution.Selected = Resolution.Chips.Num();
+        Resolution.Chips.Add(FText::AsCultureInvariant(FString::Printf(TEXT("%d × %d"), R.X, R.Y)));
+        Resolution.ChipValues.Add(S08Display::ResolutionValue(R));
+      }
+      if (M.WindowMode == 1) Resolution.Note = S(TEXT("settings.graphics.resolution.desktop"));
+      Out.Add(MoveTemp(Resolution));
       break;
     }
   }

@@ -125,6 +125,8 @@ struct FView {
   FRotator Rotation = FRotator::ZeroRotator;
   float HFovDeg = 35.0f;
   FVector2D ViewportPx = FVector2D(1920.0, 1080.0);
+  /** Constrained camera rectangle's origin inside the full game viewport (letterbox/pillarbox). */
+  FVector2D OriginPx = FVector2D::ZeroVector;
 };
 /** World point -> viewport px; false behind the camera. */
 UNMATCHED_API bool Project(const FView& View, const FVector& World, FVector2D& OutPx);

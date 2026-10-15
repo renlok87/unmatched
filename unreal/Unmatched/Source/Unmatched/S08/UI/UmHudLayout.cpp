@@ -319,7 +319,7 @@ bool Project(const FView& View, const FVector& World, FVector2D& OutPx) {
   const double HalfTanV = HalfTanH * View.ViewportPx.Y / View.ViewportPx.X;
   const double NdcX = FVector::DotProduct(D, Right) / (Depth * HalfTanH);
   const double NdcY = FVector::DotProduct(D, Up) / (Depth * HalfTanV);
-  OutPx = FVector2D((0.5 + 0.5 * NdcX) * View.ViewportPx.X, (0.5 - 0.5 * NdcY) * View.ViewportPx.Y);
+  OutPx = View.OriginPx + FVector2D((0.5 + 0.5 * NdcX) * View.ViewportPx.X, (0.5 - 0.5 * NdcY) * View.ViewportPx.Y);
   return true;
 }
 

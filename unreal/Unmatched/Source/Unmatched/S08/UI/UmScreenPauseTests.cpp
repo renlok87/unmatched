@@ -15,6 +15,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "../S08UserSettings.h"
+#include "../S08DisplaySettings.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Internationalization/Internationalization.h"
@@ -122,11 +123,15 @@ bool FUmScreensPauseModelTest::RunTest(const FString& Parameters) {
   }
   for (const FUmSettingRowModel& R : Game) TestFalse(TEXT("no shake row"), R.Key == FName(TEXT("shake")));
   const TArray<FUmSettingRowModel> Gfx = UmPause::Rows(M, EUmPauseTab::Graphics);
-  TestEqual(TEXT("graphics: 1 row"), Gfx.Num(), 1);
-  if (Gfx.Num() == 1) {
+  TestEqual(TEXT("graphics: quality, window mode and resolution"), Gfx.Num(), 3);
+  if (Gfx.Num() == 3) {
     TestEqual(TEXT("«Высокое» selected"), Gfx[0].Selected, 0);
     TestEqual(TEXT("the values 2 / 1 / 0"), FString::Join(Gfx[0].ChipValues, TEXT(",")), FString(TEXT("2,1,0")));
     TestEqual(TEXT("the note"), Gfx[0].Note.ToString(), FString(TEXT("Масштаб экрана 100 % и лимит 60 кадров/с не меняются")));
+    TestEqual(TEXT("window mode row"), Gfx[1].Key, FName(TEXT("windowMode")));
+    TestEqual(TEXT("three window modes"), Gfx[1].ChipValues.Num(), 3);
+    TestEqual(TEXT("resolution row"), Gfx[2].Key, FName(TEXT("resolution")));
+    TestTrue(TEXT("current resolution is selectable"), Gfx[2].Selected >= 0);
   }
   // ---- the modal cap of 04 §1.8
   TestEqual(TEXT("1080p cap 800"), UmPause::MaxModalHSu(FVector2D(1920.0, 1080.0), false), 800.0f);
@@ -286,6 +291,19 @@ bool FUmScreensPauseTreeTest::RunTest(const FString& Parameters) {
       R->SimulateChip(2);
       TestEqual(TEXT("graphics commit"), Commits.Last(), FString(TEXT("graphics=0")));
     }
+    M.WindowMode = 2;
+    M.Resolutions = S08Display::ResolutionOptions({5120, 1440}, M.Resolution);
+    P->ApplyModel(M);
+    if (UUmSettingRow* R = P->FindRow(TEXT("windowMode"))) {
+      R->SimulateChip(1);
+      TestEqual(TEXT("window mode commit"), Commits.Last(), FString(TEXT("windowMode=1")));
+    } else AddError(TEXT("window mode row missing"));
+    if (UUmSettingRow* R = P->FindRow(TEXT("resolution"))) {
+      const int32 Index = R->GetModel().ChipValues.Find(TEXT("2560x1440"));
+      TestTrue(TEXT("1440p choice exists"), Index >= 0);
+      if (Index >= 0) R->SimulateChip(Index);
+      TestEqual(TEXT("resolution commit"), Commits.Last(), FString(TEXT("resolution=2560x1440")));
+    } else AddError(TEXT("resolution row missing"));
     TestTrue(TEXT("Esc = «Продолжить»"), P->HandleEscape() && Continues == 1);
     // ---- the canvases: every row fits, the footer stays visible, the rows scroll where they must
     struct FCanvas {
