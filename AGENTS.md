@@ -237,6 +237,43 @@ User request: «Конечно, делай и закрепи это в осно�
   - copy the staged build with `tools/s08/sync-staged-build.ps1 -From <worktree>`. It refuses when the stamp commit differs from the main HEAD; do not repackage.
 - **Packaging trap.** A new or renamed `Config/**.json` reaches the pak only after the game makefile is regenerated: touch `unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs`, then build the game target with `-MaxParallelActions=4`.
 
+## Live Coding dev loop for edits and bug fixes (user decision 2026-10-15, binding)
+
+The user's words: «Я не хочу полностью пересобирать игру каждый раз во время фикса. Запусти ее так чтобы ты мог
+интерактивно ее фиксить», then «Закрепи дополнительно правила лайфкодинга при правках, изменений, фиксе багов, чтобы можно
+было делать вещи быстрее». Tool and details: `tools/dev/devexec.py`, `tools/dev/DEV-LOOP.md` (`S08/S08DevExec.cpp`).
+
+- **Default for every gameplay, HUD or visual bug fix and code change of the client:** one uncooked client
+  `python tools/dev/devexec.py start` (`UnrealEditor.exe Unmatched.uproject -game -LiveCoding -DevExec=C:\tmp\devexec`),
+  started once and kept for the whole task. No packaging and no packaged client while iterating.
+- **Pick the cheapest path for each edit:**
+
+  | Edit | Path | Typical time |
+  |---|---|---|
+  | function body in a `.cpp` (logic, layout numbers, texts, colours in code) | `devexec.py lc` | 8–20 s |
+  | `Config/**/*.json`, layouts, art profiles | re-read in the client (live tune) or `stop`/`start` | ≤ 10 s |
+  | code that only runs at startup (BuildUi, widget trees), a new `.cpp`, headers, struct / UCLASS / UPROPERTY fields (also structs declared in a `.cpp`) | `devexec.py stop` → `node tools/s08/build-editor.cjs UnmatchedEditor Win64 Development -Project=<uproject> -WaitMutex` → `start` | ~20 s build + 10 s start |
+  | backend | `docker exec unmatched-backend npm run build && docker compose restart backend` | ~40 s |
+
+  A Live Coding patch lives only in memory: before any restart after patches, run the incremental build, or the client
+  comes back with the old code. Never patch a struct layout through Live Coding.
+- **Verify in the running client, not by reasoning:** reproduce first, then fix, then `devexec.py run "…"` input
+  (synthetic Slate clicks, keys, text — the user's mouse is never touched) and `devexec.py shot <name>`; read the PNG.
+  The game trace `unreal/Unmatched/Saved/S08/trace-*.log` (INPUT / TOAST / PENDING / MODE / HUD lines) is the first
+  diagnostic. Use test accounts from `backend/prisma/seed.ts`, never the account the user plays with (test1).
+- **Resolutions:** check HUD changes with `run "res 1920x1080w" … "res 2560x1080w" "res 3840x1080w" "res 1440x1080w"
+  "res 1280x720w"` and shots in the same session.
+- **Parallel work:** playtests and research go to cheap subagents (Sonnet / Haiku) driving the same client through
+  `devexec.py`, while the main session edits code. One client = one input channel: one driving agent at a time, or
+  extra clients with their own `DEVEXEC_DIR` and account. Compilation is serial for the whole machine.
+- **Locks:** while a `-LiveCoding` client lives, Build.bat of UnmatchedEditor fails in every checkout (Live Coding
+  mutex), and `safe-integrate.sh` of other sessions waits on the running UnrealEditor of the main checkout. Stop the
+  client before a full build, before packaging and at the end of the task (`devexec.py stop` kills only its own PID).
+- **Gates stay light:** after the fix, only the UE tests of the touched area
+  (`node tools/s08/run-ue-tests.cjs "<filter>" <log>`, client stopped) and the backend specs of the touched files.
+  Package once at the end of the task, only when the user's normal launch must get the fix (Iteration speed rules
+  above). Frames from this client are for iteration; acceptance frames still come from a fresh packaged `-Bench`.
+
 ## Board scenes and heroes (user decisions, binding)
 
 The user's words on 2026-10-04: «закрепи это в главных правилах проекта, как собираются сцены с героями». They gave
