@@ -215,6 +215,9 @@ class FS08DevExec {
                           FModifierKeysState());
     App.ProcessMouseMoveEvent(E);
     LastPos = P;
+    // the OS asks for the cursor shape on every real move (WM_SETCURSOR -> QueryCursor); the faux cursor gets no such
+    // message, so its shape stayed at the last capture change (a disabled «Войти» drew «unavailable» over the BOOT modal)
+    App.QueryCursor();
   }
 
   void Button(const FVector2D& P, const FKey& Btn, bool bDown) {
