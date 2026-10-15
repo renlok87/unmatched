@@ -37,11 +37,12 @@ bool ParseHex(const FString& Hex, FColor& Out) {
   return true;
 }
 
-/** HUD display face (2026-10-15, user: «сделай что-то со шрифтами»): titles, banners, hero names and the status line
- *  in Lora Bold (OFL, Latin + Cyrillic, Content/UM/Fonts/TTF, staged as UFS) over the marble HUD v2 frames; numbers,
- *  buttons, tags and body text stay Roboto Bold Condensed - the card language. Glyphs Lora lacks (arrows, circled digits)
- *  fall back to Roboto Bold Condensed. Rollback: -S08FontLegacy (the default Slate font everywhere). Null when the TTF
- *  is missing (the caller then uses Roboto BoldCondensed). */
+/** HUD display face (2026-10-15, user: «сделай что-то со шрифтами»; 2026-10-16: «Только шрифт подбери новый» - Lora
+ *  replaced): titles, banners, hero names in Philosopher Bold (OFL, Latin + Cyrillic, classical Greek-inspired forms,
+ *  Content/UM/Fonts/TTF, staged as UFS) over the marble HUD v2 frames; numbers, buttons, tags, body text and the status
+ *  line stay Roboto Bold Condensed - the card language. Glyphs Philosopher lacks (arrows, circled digits) fall back to
+ *  Roboto Bold Condensed. Rollback: -S08FontLegacy (the default Slate font everywhere). Null when the TTF is missing
+ *  (the caller then uses Roboto BoldCondensed). */
 TSharedPtr<const FCompositeFont> DisplayFont() {
   static TSharedPtr<const FCompositeFont> Font;
   static bool bTried = false;
@@ -51,17 +52,17 @@ TSharedPtr<const FCompositeFont> DisplayFont() {
     UE_LOG(LogUmHudTheme, Display, TEXT("UMHUDTHEME display font legacy (-S08FontLegacy): Roboto"));
     return Font;
   }
-  const FString Lora = FPaths::ProjectContentDir() / TEXT("UM/Fonts/TTF/Lora-Bold.ttf");
-  if (!IFileManager::Get().FileExists(*Lora)) {
-    UE_LOG(LogUmHudTheme, Warning, TEXT("UMHUDTHEME display font missing %s: Roboto"), *Lora);
+  const FString Face = FPaths::ProjectContentDir() / TEXT("UM/Fonts/TTF/Philosopher-Bold.ttf");
+  if (!IFileManager::Get().FileExists(*Face)) {
+    UE_LOG(LogUmHudTheme, Warning, TEXT("UMHUDTHEME display font missing %s: Roboto"), *Face);
     return Font;
   }
   const FString Roboto = FPaths::EngineContentDir() / TEXT("Slate/Fonts/Roboto-BoldCondensed.ttf");
   TSharedRef<FStandaloneCompositeFont> Made = MakeShared<FStandaloneCompositeFont>();
-  Made->DefaultTypeface.AppendFont(TEXT("DisplayBold"), Lora, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
+  Made->DefaultTypeface.AppendFont(TEXT("DisplayBold"), Face, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
   Made->FallbackTypeface.Typeface.AppendFont(TEXT("DisplayBold"), Roboto, EFontHinting::Default, EFontLoadingPolicy::LazyLoad);
   Font = Made;
-  UE_LOG(LogUmHudTheme, Display, TEXT("UMHUDTHEME display font Lora-Bold"));
+  UE_LOG(LogUmHudTheme, Display, TEXT("UMHUDTHEME display font Philosopher-Bold"));
   return Font;
 }
 }  // namespace

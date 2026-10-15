@@ -29,7 +29,7 @@ TOKENS = REPO / "docs/unreal/contracts/hud/hud-style-tokens.json"
 HEADER = REPO / "unreal/Unmatched/Source/Unmatched/S08/S08HudTokens.generated.h"
 SHA_RE = re.compile(r'kTokensJsonSha256\s*=\s*TEXT\("([0-9a-f]{64})"\)')
 HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
-FACES = ("BoldCondensed", "Bold", "Regular", "DisplayBold")  # DisplayBold = Lora Bold (UmHudTheme, 2026-10-15)
+FACES = ("BoldCondensed", "Bold", "Regular", "DisplayBold")  # DisplayBold = Philosopher Bold (UmHudTheme, 2026-10-16)
 
 
 class TokenError(ValueError):
