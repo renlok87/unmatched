@@ -1,0 +1,942 @@
+{
+  "schema": "unmatched.h2-bake-profile/1",
+  "profile_version": 2,
+  "profile_id": "patroclus-h2-bake/1",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "status": "предложено",
+  "expected_part_count": 24,
+  "sources": {
+    "source_spec": "art/pipeline-candidates/ASSET-PATROCLUS-001/source-specs/tripo-e0b4d474-h2.json",
+    "parts_glb": {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-parts24.glb",
+      "bytes": 44515584,
+      "sha256": "18477a384a870befeff1d3f54f4c270f57435f508f8b3f670e9b440ea0f9f557"
+    },
+    "tex_glb": {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-tex8k-pbr.glb",
+      "bytes": 87845524,
+      "sha256": "17097e9603256226a6b8057dfd5e0eba2a20cfb5cf9f24f36cd1a12db05c7ed6"
+    }
+  },
+  "parts": {
+    "tripo_part_0": {
+      "mesh": "body",
+      "role": "cape and shoulder drape with clasp",
+      "cloth": true
+    },
+    "tripo_part_1": {
+      "mesh": "base",
+      "role": "two-tier circular pedestal with foot contact cutouts"
+    },
+    "tripo_part_2": {
+      "mesh": "body",
+      "role": "round shield, decorated face and rear shell"
+    },
+    "tripo_part_3": {
+      "mesh": "body",
+      "role": "linen corslet front with diagonal strap, belt, hanging tabs and side scabbard/strap forms"
+    },
+    "tripo_part_4": {
+      "mesh": "body",
+      "role": "helmet plume / crest"
+    },
+    "tripo_part_5": {
+      "mesh": "body",
+      "role": "face, ears and neck surface"
+    },
+    "tripo_part_6": {
+      "mesh": "body",
+      "role": "helmet and hair shell"
+    },
+    "tripo_part_7": {
+      "mesh": "body",
+      "role": "own-right greave, sandal and lower leg"
+    },
+    "tripo_part_8": {
+      "mesh": "weapon",
+      "role": "short sword blade and guard"
+    },
+    "tripo_part_9": {
+      "mesh": "body",
+      "role": "own-right bracer / forearm shell"
+    },
+    "tripo_part_10": {
+      "mesh": "body",
+      "role": "own-left exposed thigh and knee"
+    },
+    "tripo_part_11": {
+      "mesh": "body",
+      "role": "own-left bracer / forearm shell behind shield"
+    },
+    "tripo_part_12": {
+      "mesh": "body",
+      "role": "own-left greave, sandal and lower leg"
+    },
+    "tripo_part_13": {
+      "mesh": "body",
+      "role": "lower pleated linen tunic / skirt hem",
+      "cloth": true
+    },
+    "tripo_part_14": {
+      "mesh": "body",
+      "role": "own-right exposed thigh and knee"
+    },
+    "tripo_part_15": {
+      "mesh": "body",
+      "role": "own-right upper arm and exposed elbow region"
+    },
+    "tripo_part_16": {
+      "mesh": "body",
+      "role": "own-right fist around sword grip"
+    },
+    "tripo_part_17": {
+      "mesh": "body",
+      "role": "own-left upper arm and exposed elbow region"
+    },
+    "tripo_part_18": {
+      "mesh": "body",
+      "role": "own-left hand at rear shield grip"
+    },
+    "tripo_part_19": {
+      "mesh": "body",
+      "role": "own-left small tunic waist/flank panel beneath belt"
+    },
+    "tripo_part_20": {
+      "mesh": "body",
+      "role": "own-right small tunic waist/flank panel beneath belt"
+    },
+    "tripo_part_21": {
+      "mesh": "body",
+      "role": "sword pommel with adjoining hand/grip surface fragment"
+    },
+    "tripo_part_22": {
+      "mesh": "body",
+      "role": "own-left exposed toes"
+    },
+    "tripo_part_23": {
+      "mesh": "body",
+      "role": "own-right exposed toes"
+    }
+  },
+  "scale": {
+    "figure_top_m": 0.43,
+    "base_diameter_m": 0.24,
+    "base_height_m": 0.05,
+    "figure_top_part": "tripo_part_4"
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "samples_per_part": 4000,
+    "seed": 0,
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [],
+    "min_score_after_fix": 0.5,
+    "note": "Empty before first prepare per HANDBOOK 4.2; actual negative parts must be reviewed and adopted in a NEW profile, no threshold relaxation."
+  },
+  "retopo": {
+    "method": "decimate-collapse",
+    "seed": 0,
+    "deviation_samples": 40000,
+    "target_tris": {
+      "tripo_part_0": 5000,
+      "tripo_part_1": 1600,
+      "tripo_part_2": 2600,
+      "tripo_part_3": 3500,
+      "tripo_part_4": 2000,
+      "tripo_part_5": 3500,
+      "tripo_part_6": 2300,
+      "tripo_part_7": 1600,
+      "tripo_part_8": 1200,
+      "tripo_part_9": 650,
+      "tripo_part_10": 700,
+      "tripo_part_11": 650,
+      "tripo_part_12": 1600,
+      "tripo_part_13": 2200,
+      "tripo_part_14": 700,
+      "tripo_part_15": 1000,
+      "tripo_part_16": 700,
+      "tripo_part_17": 950,
+      "tripo_part_18": 700,
+      "tripo_part_19": 200,
+      "tripo_part_20": 200,
+      "tripo_part_21": 200,
+      "tripo_part_22": 200,
+      "tripo_part_23": 200
+    },
+    "dense_regions": [
+      {
+        "part": "tripo_part_5",
+        "name": "face",
+        "box_m": [
+          [
+            -0.024,
+            -0.024,
+            0.338
+          ],
+          [
+            0.021,
+            0.005,
+            0.374
+          ]
+        ],
+        "target_tris": 1600,
+        "note": "Proposed front facial subregion inside actual measured face bounds; verify eyes/nose/mouth after LP."
+      }
+    ],
+    "cleanup": {
+      "merge_distance_m": 1e-06,
+      "degenerate_distance_m": 1e-07,
+      "tiny_island_area_m2": 2e-07,
+      "degenerate_area_m2": 1e-10
+    },
+    "caps": [],
+    "note": "Own scout starting budget 32550 figure + 1600 base. No actual LP produced; caps/shells must remain within 45000 figure/2500 base limits."
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "runtime_px": 2048,
+    "min_gap_px": 8,
+    "pack_margin_fraction": 0.0013,
+    "max_overlap_px": 0,
+    "density_reference_part": "tripo_part_3",
+    "texel_priority": {
+      "default": 1.0,
+      "parts": {
+        "tripo_part_0": 1.0,
+        "tripo_part_1": 0.45,
+        "tripo_part_2": 1.0,
+        "tripo_part_3": 1.0,
+        "tripo_part_4": 1.0,
+        "tripo_part_5": 2.0,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 1.0,
+        "tripo_part_8": 1.5,
+        "tripo_part_9": 1.0,
+        "tripo_part_10": 1.0,
+        "tripo_part_11": 1.0,
+        "tripo_part_12": 1.0,
+        "tripo_part_13": 1.0,
+        "tripo_part_14": 1.0,
+        "tripo_part_15": 1.0,
+        "tripo_part_16": 1.75,
+        "tripo_part_17": 1.0,
+        "tripo_part_18": 1.75,
+        "tripo_part_19": 1.0,
+        "tripo_part_20": 1.0,
+        "tripo_part_21": 1.5,
+        "tripo_part_22": 1.0,
+        "tripo_part_23": 1.0
+      },
+      "regions": []
+    },
+    "charts": {
+      "unwrap_method": "MINIMUM_STRETCH",
+      "normal_penalty": 3.0,
+      "max_rounds": 6,
+      "max_overlap_share": 0.0,
+      "max_stretch_log_p95": 0.5,
+      "chart_area_cm2": {
+        "default": 18,
+        "tripo_part_0": 38,
+        "tripo_part_1": 120,
+        "tripo_part_5": 7,
+        "tripo_part_8": 6,
+        "tripo_part_16": 6,
+        "tripo_part_18": 6
+      },
+      "regions": [],
+      "stretch_min_faces": 12,
+      "smooth_iterations": 4,
+      "note": "Unexecuted initial charts proposal for own part roles; validate on actual LP before bake."
+    }
+  },
+  "rig": {
+    "skeleton": "UM_HUMANOID_17_v2",
+    "armature_object": "SKEL_UM_Humanoid",
+    "character": "Patroclus",
+    "weapon_bone": "weapon.R",
+    "max_influences": 4,
+    "clean_below": 0.01,
+    "weights": {
+      "tripo_part_0": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.22,
+          0.25
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.2,
+        "leg_full_z": 0.1,
+        "leg_max": 0.4,
+        "side_band_m": 0.016
+      },
+      "tripo_part_2": {
+        "kind": "rigid",
+        "bone": "arm_lower.L"
+      },
+      "tripo_part_3": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.235,
+          0.265
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.21,
+        "leg_full_z": 0.18,
+        "leg_max": 0.35,
+        "side_band_m": 0.016
+      },
+      "tripo_part_4": {
+        "kind": "rigid",
+        "bone": "head"
+      },
+      "tripo_part_5": {
+        "kind": "zblend",
+        "stops": [
+          [
+            "spine",
+            0.327
+          ],
+          [
+            "head",
+            0.343
+          ]
+        ]
+      },
+      "tripo_part_6": {
+        "kind": "rigid",
+        "bone": "head"
+      },
+      "tripo_part_7": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_8": {
+        "kind": "rigid",
+        "bone": "weapon.R"
+      },
+      "tripo_part_9": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_10": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_11": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_12": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_13": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.22,
+          0.25
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.2,
+        "leg_full_z": 0.18,
+        "leg_max": 0.4,
+        "side_band_m": 0.016
+      },
+      "tripo_part_14": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_15": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_16": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_17": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_18": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.01,
+          0.012,
+          0.007
+        ]
+      },
+      "tripo_part_19": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.235,
+          0.265
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.21,
+        "leg_full_z": 0.18,
+        "leg_max": 0.35,
+        "side_band_m": 0.016
+      },
+      "tripo_part_20": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.235,
+          0.265
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.21,
+        "leg_full_z": 0.18,
+        "leg_max": 0.35,
+        "side_band_m": 0.016
+      },
+      "tripo_part_21": {
+        "kind": "rigid",
+        "bone": "weapon.R"
+      },
+      "tripo_part_22": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_23": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      }
+    },
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.045
+        ]
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0,
+          0.195
+        ],
+        [
+          0,
+          0,
+          0.248
+        ]
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0,
+          0.248
+        ],
+        [
+          0,
+          0,
+          0.323
+        ]
+      ],
+      [
+        "head",
+        "spine",
+        [
+          -0.0020669749999999995,
+          -0.0008056950000000002,
+          0.328
+        ],
+        [
+          0.0006569699999999998,
+          -0.013111155,
+          0.368
+        ]
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.035121374999999996,
+          0.00735011,
+          0.292
+        ],
+        [
+          0.06095857,
+          0.0020127400000000007,
+          0.258
+        ]
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.06095857,
+          0.0020127400000000007,
+          0.258
+        ],
+        [
+          0.07023167999999999,
+          -0.01022483,
+          0.23
+        ]
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.07023167999999999,
+          -0.01022483,
+          0.23
+        ],
+        [
+          0.06416543499999999,
+          -0.025654250000000003,
+          0.21
+        ]
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.040850515,
+          0.0015883600000000005,
+          0.303
+        ],
+        [
+          -0.060984615000000006,
+          0.003222604999999999,
+          0.258
+        ]
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.060984615000000006,
+          0.003222604999999999,
+          0.258
+        ],
+        [
+          -0.074128395,
+          -0.003740645,
+          0.226
+        ]
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.074128395,
+          -0.003740645,
+          0.226
+        ],
+        [
+          -0.07713988,
+          -0.006833170000000001,
+          0.207
+        ]
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.02441817,
+          -0.004959245000000001,
+          0.19
+        ],
+        [
+          0.036337425,
+          0.00501608,
+          0.133
+        ]
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.036337425,
+          0.00501608,
+          0.133
+        ],
+        [
+          0.042878945,
+          0.0066571799999999995,
+          0.073
+        ]
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.042878945,
+          0.0066571799999999995,
+          0.073
+        ],
+        [
+          0.05536939,
+          -0.02482752,
+          0.0555
+        ]
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.02450985,
+          -0.00480762,
+          0.19
+        ],
+        [
+          -0.036513674999999995,
+          0.00586465,
+          0.133
+        ]
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.036513674999999995,
+          0.00586465,
+          0.133
+        ],
+        [
+          -0.04285502,
+          0.006695254999999999,
+          0.073
+        ]
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.04285502,
+          0.006695254999999999,
+          0.073
+        ],
+        [
+          -0.055349065,
+          -0.024748225,
+          0.0555
+        ]
+      ],
+      [
+        "weapon.R",
+        "hand.R",
+        [
+          -0.07700035499999999,
+          -0.0065349499999999994,
+          0.214927495
+        ],
+        [
+          -0.09354792763405087,
+          -0.03739438222178882,
+          0.19559169186515107
+        ]
+      ]
+    ],
+    "bones_note": "Own HP sections in measurements-own-hp.json. Provisional, not LP/rig acceptance. Remeasure on actual LP after retopo. Hips/spine centreline is explicit anatomical proposal; blade axis PCA and fist bounds locate initial grip.",
+    "seam_radius_m": 0.001,
+    "seam_pairs": [],
+    "junctions": [],
+    "pending": "No LP closure inventory or joint deformation tests yet. Empty junction/seam lists are NOT evidence of no repairs needed. Cape shell decision remains unresolved; no donor shell/cap list."
+  },
+  "textures": {
+    "prefix": "T_Patroclus_H2",
+    "team_mask": {
+      "cloth_parts": [
+        "tripo_part_0",
+        "tripo_part_13"
+      ],
+      "base_band": {
+        "part": "tripo_part_1",
+        "normal_z_abs_max": 0.35
+      }
+    },
+    "edge_extend_px": 16,
+    "maps": {
+      "BC": "sRGB RGB 8bit from own de-lit Tripo",
+      "N": "UE DirectX tangent normal",
+      "N_OpenGL": "Blender OpenGL tangent normal",
+      "ORM": "R AO / G Roughness / B Metallic",
+      "TeamMask": "legacy RG cloth/base mask; own thresholds pending"
+    },
+    "ao_gate": {
+      "min_range_p1_p99": 32,
+      "min_occluded_fraction": 0.02,
+      "occluded_below": 250
+    },
+    "pending": "Mixed bronze/linen/leather/hair parts require measured own masks and cloth HSV after actual BC bake. No donor metal mask or whole-part helmet-metal classification. Base lower-tier band height awaits own LP/BC measurement."
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "target": "bone_head",
+      "location_uu": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "target_m": [
+        -0.001703075,
+        0.0028747700000000004,
+        0.34799062000000003
+      ],
+      "location_uu": null
+    }
+  ],
+  "exports": {
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "skeletal_fbx": "SK_Patroclus_H2.fbx",
+    "base_fbx": "SM_Patroclus_H2_Base.fbx"
+  },
+  "meshes": {
+    "body": "SK_Patroclus_H2_Body",
+    "weapon": "SK_Patroclus_H2_Sword",
+    "base": "SM_Patroclus_H2_Base"
+  },
+  "materials": {
+    "atlas": "M_Patroclus_H2_Atlas"
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "own_right_weapon_side": "-X"
+  },
+  "preview": {
+    "frame": {
+      "checks_report": "art/imagegen/concept-patroclus-codex/checks-report.json",
+      "side": "right"
+    },
+    "concepts": {
+      "front": "art/imagegen/concept-patroclus-codex/patroclus-front.png",
+      "side": "art/imagegen/concept-patroclus-codex/patroclus-side.png",
+      "back": "art/imagegen/concept-patroclus-codex/patroclus-back.png"
+    }
+  },
+  "history": {
+    "previous_profiles": [],
+    "basis": "own scout plus separately measured own HP; no donor part IDs/bones/masks/caps"
+  },
+  "execution_scope": {
+    "allowed_stages": [
+      "prepare"
+    ],
+    "ready_for_all": false,
+    "note": "This descriptive scope is not an enforced runner guard. Use run_bounded.py prepare only; later stages require separate authorization and completed LP/material/closure investigations."
+  },
+  "intake_decisions": {
+    "game_role": "sidekick",
+    "asset_card_ROLE": "hero",
+    "asset_card_GAME_ROLE": "sidekick",
+    "conflict": "asset-card role fields conflict; no source/card mutation here",
+    "scale_authority": "parent explicitly adopts plume top 0.43 m and base diameter 0.24 m × height 0.05 m in this profile",
+    "figure_top_m": 0.43,
+    "base_diameter_m": 0.24,
+    "base_height_m": 0.05,
+    "decided_by": "delegated, parent instruction 2026-10-15"
+  },
+  "bake": {
+    "device": "CPU",
+    "resolution": 4096,
+    "ao": {
+      "samples": 128,
+      "distance_m": 0.0344,
+      "seed": 0,
+      "note": "0.08 × own 0.43 m plume-top scale; unexecuted proposal"
+    },
+    "normal": {
+      "space": "TANGENT",
+      "include_tripo_normal_map": true,
+      "samples": 1
+    },
+    "emission": {
+      "samples": 1
+    },
+    "cage": {
+      "extrusion_from": "own retopo lo_to_hi and hi_to_lo p99, not yet measured",
+      "factor": 1.5,
+      "min_m": 0.0006,
+      "max_m": 0.004,
+      "max_ray_factor": 2.5
+    },
+    "hit_check": {
+      "max_miss_share_warn": 0.01
+    },
+    "ao_exclusions": [],
+    "note": "Not run. CPU selected for later repeatability; actual cage/AO exclusions require own LP and contact measurements."
+  },
+  "landmark_evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/measurements-own-hp.json",
+  "pending_before_later_stages": [
+    "HP anchors must be checked on actual LP; no rig authored.",
+    "Inspect actual LP loop/contact inventory after retopo before selecting closure, cap, junction or shell.",
+    "Test hidden sword grip continuity and part21-to-fist seam; no handle bridge implementation authorized.",
+    "Author own material and team masks from actual baked BC; mixed helmet/hair and pommel/fist must remain mixed.",
+    "Author own K2, seams, closeup and deformation frame configuration; no donor cameras or masks.",
+    "Proceed one stage at a time only after parent review; this profile is prepare-only."
+  ],
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "rig_authored": false,
+    "lp_authored": false,
+    "baked": false
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "unmatched.patroclus-prepare-verification/1",
+  "passed": true,
+  "checks": {
+    "profile_valid_v2": true,
+    "actual_prepare_pass_5_of_5": true,
+    "only_prepare_pipeline_stage": true,
+    "geometry_identity_all24": true,
+    "source_triangles_1967447": true,
+    "orientation_all24_score1_no_flips": true,
+    "parts_glb_source_untouched": true,
+    "tex_glb_source_untouched": true,
+    "own_measurement_untouched_source": true,
+    "own17_bones_match_measurement": true,
+    "prepared_hp_not_mutated_by_preview": true,
+    "three_actual8k_images": true,
+    "six_valid_current_pngs": true,
+    "measure_process_finished_script_pinned_threads4": true,
+    "prepare_process_finished_script_pinned_threads4": true,
+    "preview_process_finished_script_pinned_threads4": true,
+    "accepted1c_inputs_unchanged": true
+  },
+  "prepare_checks_passed": 5,
+  "source_part_count": 24,
+  "source_triangles_each": 1967447,
+  "current_pngs": [
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-front-texture.png",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "80874eb96c4dd42af8e99a3f34fe99af961820d8ae83f48c3627412e82ce0b3c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-right-texture.png",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "99034dc04fd12f18cd3c5528d0c9e87416011ba37af0a24760755dc7a1b14d07"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-back-texture.png",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "6d1b806993fdbba87e5b98b174a50da223a9f94122fea918fce43fdb6194e87b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-front34-parts.png",
+      "dimensions": [
+        1080,
+        1440
+      ],
+      "sha256": "833779b767f3fa67f730404cc7d017b98fd23a89923235a9a04c3708d41eca03"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-right-grip.png",
+      "dimensions": [
+        1200,
+        1200
+      ],
+      "sha256": "5a00990b19cda2e20e7884af8d5d5f4aa722b93e2c772794d1b22d9fa047659a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/diagnostic-preview/prepared-hp-left-shield-rear.png",
+      "dimensions": [
+        1200,
+        1200
+      ],
+      "sha256": "11e0198dc5d30ae3198e25ebba15cf7e4354c1fce3460c90f6124a6c2cea07de"
+    }
+  ],
+  "processes": [
+    {
+      "mode": "measure",
+      "pid": 52532,
+      "exit_code": 0,
+      "child_reaped": true,
+      "live_at_verification": false
+    },
+    {
+      "mode": "prepare",
+      "pid": 49096,
+      "exit_code": 0,
+      "child_reaped": true,
+      "live_at_verification": false
+    },
+    {
+      "mode": "preview",
+      "pid": 97720,
+      "exit_code": 0,
+      "child_reaped": true,
+      "live_at_verification": false
+    }
+  ],
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "rig_authored": false,
+    "lp_authored": false,
+    "baked": false
+  },
+  "limitations": [
+    "HP landmarks are provisional; LP must be measured later.",
+    "Local own-left knee opening and foot cutouts need LP loop inventory before closure.",
+    "Shield rear hand partly occluded; no grip clearance claim.",
+    "Card ROLE hero / GAME_ROLE sidekick conflict retained.",
+    "Diagnostic Workbench previews do not evaluate full PBR material or establish formal acceptance."
+  ]
+}

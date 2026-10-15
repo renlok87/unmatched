@@ -1,7 +1,7 @@
 {
   "schema": "unmatched.rig-contract/2",
-  "revision": "v2-2026-10-14",
-  "previous_revision": "v2-2026-10-13 (добавлен персонаж Beowulf — фигура-проверка 3d-model-pipeline 2026-10-14; кости не менялись); до неё v2-2026-09-29 (добавлены персонажи Achilles, Angel, AncientLeshen — пилот 3d-model-pipeline 2026-10-13; кости не менялись)",
+  "revision": "v2-2026-10-15",
+  "previous_revision": "v2-2026-10-14 (до регистрации Patroclus для H2 2026-10-15; кости не менялись); до неё v2-2026-10-13 (добавлен персонаж Beowulf — фигура-проверка 3d-model-pipeline 2026-10-14; кости не менялись); до неё v2-2026-09-29 (добавлены персонажи Achilles, Angel, AncientLeshen — пилот 3d-model-pipeline 2026-10-13; кости не менялись)",
   "status": "предложено",
   "status_note": "Контракт v2 (волна 4, W4-D, меморандум engine-gate §1 п.6): кость 0 = SKEL_UM_Humanoid у всех (SKEL_Medusa в новых клипах — FAIL), кость оружия по стороне (weapon.L / weapon.R), ref-поза по UM_FBX_v1 (лицо +X), кадр 0 и последний кадр = rest (кроме terminal), bForceRootLock при импорте клипов, цепочки ik_chains для IK Rig / IK Retargeter. Базовый скелет измерен на ASSET-MEDUSA-001 (P1.6) и на кандидатах Arthur/Merlin/Harpy (CLI 20260928-cli-um-fbx-v1). Художественно не принят; числа проб не являются бюджетами.",
   "default_skeleton": "UM_HUMANOID_17_v2",
@@ -14,7 +14,7 @@
   "skeletons": {
     "UM_HUMANOID_17_v2": {
       "status": "предложено",
-      "applies_to": ["ASSET-MEDUSA-001 (после пересборки по v2)", "ASSET-KING-ARTHUR-001", "ASSET-MERLIN-001", "ASSET-HARPY-001 (крылья = руки, без оружия)", "ASSET-ACHILLES-001", "ASSET-ANGEL-001", "ASSET-ANCIENT-LESHEN-001 (без оружия)", "ASSET-BEOWULF-001"],
+      "applies_to": ["ASSET-MEDUSA-001 (после пересборки по v2)", "ASSET-KING-ARTHUR-001", "ASSET-MERLIN-001", "ASSET-HARPY-001 (крылья = руки, без оружия)", "ASSET-ACHILLES-001", "ASSET-ANGEL-001", "ASSET-ANCIENT-LESHEN-001 (без оружия)", "ASSET-BEOWULF-001", "ASSET-PATROCLUS-001"],
       "applies_to_note": "все новые клипы и все пересборки SK. Существующие файлы v1 (черновики Medusa, SK кандидатов CLI 20260928) остаются на UM_HUMANOID_17_v1 до пересборки",
       "blender_units": "1 unit = 1 m, Z-up, лицом к -Y (авторский кадр); в экспортированном FBX лицо +X (UM_FBX_v1, ref_pose)",
       "armature_object": {
@@ -61,7 +61,8 @@
         "Achilles": {"asset_id": "ASSET-ACHILLES-001", "weapon_bone": "weapon.R", "weapon": "копьё в правой руке", "ue_weapon_bone": "weapon_R"},
         "Angel": {"asset_id": "ASSET-ANGEL-001", "weapon_bone": "weapon.R", "weapon": "меч в правой руке", "ue_weapon_bone": "weapon_R"},
         "AncientLeshen": {"asset_id": "ASSET-ANCIENT-LESHEN-001", "weapon_bone": null, "weapon": "нет (удар когтями-ветвями)", "note": "без оружия, как Harpy: сокет Weapon (точка удара) крепится к hand.L/hand.R профилем"},
-        "Beowulf": {"asset_id": "ASSET-BEOWULF-001", "weapon_bone": "weapon.R", "weapon": "меч в правой руке (круглый щит на левом предплечье — без своей кости, П3-2)", "ue_weapon_bone": "weapon_R"}
+        "Beowulf": {"asset_id": "ASSET-BEOWULF-001", "weapon_bone": "weapon.R", "weapon": "меч в правой руке (круглый щит на левом предплечье — без своей кости, П3-2)", "ue_weapon_bone": "weapon_R"},
+        "Patroclus": {"asset_id": "ASSET-PATROCLUS-001", "weapon_bone": "weapon.R", "weapon": "короткий меч в правой руке; щит на левом предплечье без отдельной кости", "ue_weapon_bone": "weapon_R"}
       },
       "side_convention": ".L = левая сторона персонажа = +X в Blender при взгляде персонажа в -Y (авторский кадр). После поворота UM_FBX_v1 .L = +Y в кадре FBX",
       "ue_names": "импортёр UE заменяет '.' на '_' (arm_upper.L -> arm_upper_L, weapon.R -> weapon_R); объект арматуры становится костью 0: 17 костей у Harpy, 18 у героев с оружием",
@@ -235,7 +236,7 @@
       "import_uniform_scale": "для клипов не задавать (значение по умолчанию), как import_clip в import_medusa_candidate.py"
     },
     "sockets_v2": [
-      {"name": "Weapon", "bone_by_character": {"Medusa": "weapon_L", "Arthur": "weapon_R", "Merlin": "weapon_R", "Harpy": "профиль (точка удара когтей на hand_L/hand_R)", "Achilles": "weapon_R", "Angel": "weapon_R", "AncientLeshen": "профиль (точка удара на hand_L/hand_R)", "Beowulf": "weapon_R"}, "offset": [0, 0, 0], "note": "сокет на меше (USkeletalMesh::AddSocket, bAddToSkeleton=false), общий скелет ему не мешает"},
+      {"name": "Weapon", "bone_by_character": {"Medusa": "weapon_L", "Arthur": "weapon_R", "Merlin": "weapon_R", "Harpy": "профиль (точка удара когтей на hand_L/hand_R)", "Achilles": "weapon_R", "Angel": "weapon_R", "AncientLeshen": "профиль (точка удара на hand_L/hand_R)", "Beowulf": "weapon_R", "Patroclus": "weapon_R"}, "offset": [0, 0, 0], "note": "сокет на меше (USkeletalMesh::AddSocket, bAddToSkeleton=false), общий скелет ему не мешает"},
       {"name": "Head", "bone": "head", "offset": "по правилу socket_offset_rule или профилю героя", "note": "без изменений против v1"}
     ],
     "skeleton_asset": "общий Skeleton на персонажа; общий на гуманоидов — не доказано (бриф §9 п.3). v2 снимает два препятствия (кость 0 и родитель оружия), решение об общем скелете / CompatibleSkeletons — после первого принятого клипа, по прототипу",

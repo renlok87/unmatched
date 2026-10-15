@@ -69,7 +69,7 @@ Studio каждый раз предупреждала, что модель не 
 | `leg_upper.L` / `.R` | hips | `leg_upper_L/R` | ±3, 0, 19 | бедро |
 | `leg_lower.L` / `.R` | leg_upper | `leg_lower_L/R` | ±3.8, −1.2, 12 | голень |
 | `foot.L` / `.R` | leg_lower | `foot_L/R` | ±4, −1.5, 6.5 | стопа |
-| `weapon.L` / `weapon.R` (v2) | `hand.L` / `hand.R`; у героя только своя: Medusa `weapon.L`, Arthur, Merlin, Achilles, Angel и Beowulf `weapon.R`, у Harpy и AncientLeshen нет | `weapon_L` / `weapon_R` | 11.2, −6, 27.5 (Medusa, `weapon.L`) | оружие, жёсткий вес 100 %. В v1 было одно имя `weapon` с разными родителями — в v2 запрещено (§0 п.3) |
+| `weapon.L` / `weapon.R` (v2) | `hand.L` / `hand.R`; у героя только своя: Medusa `weapon.L`, Arthur, Merlin, Achilles, Angel, Beowulf и Patroclus `weapon.R`, у Harpy и AncientLeshen нет | `weapon_L` / `weapon_R` | 11.2, −6, 27.5 (Medusa, `weapon.L`) | оружие, жёсткий вес 100 %. В v1 было одно имя `weapon` с разными родителями — в v2 запрещено (§0 п.3) |
 
 Сторона: `.L` — левая сторона персонажа. При взгляде персонажа в −Y это +X в Blender. У Medusa на этой стороне лук.
 
@@ -125,7 +125,7 @@ bake_anim_force_startend_keying=True, mesh_smooth_type="FACE"
 
 | Сокет | Кость | Смещение | Примечание |
 | --- | --- | --- | --- |
-| `Weapon` | v2: `weapon_L` (Medusa) / `weapon_R` (Arthur, Merlin, Achilles, Angel, Beowulf); у Harpy и AncientLeshen — точка удара по профилю; v1: `weapon` | (0, 0, 0) | кандидат ART004. В S05 сокет был на `hand_L` (0, 2, 0). Сокет живёт на меше (`bAddToSkeleton=false`), общий скелет ему не мешает |
+| `Weapon` | v2: `weapon_L` (Medusa) / `weapon_R` (Arthur, Merlin, Achilles, Angel, Beowulf, Patroclus); у Harpy и AncientLeshen — точка удара по профилю; v1: `weapon` | (0, 0, 0) | кандидат ART004. В S05 сокет был на `hand_L` (0, 2, 0). Сокет живёт на меше (`bAddToSkeleton=false`), общий скелет ему не мешает |
 | `Head` | `head` | (0, 0, 4) | кандидат ART004. В S05 было (0, 0, 8) |
 
 Смещение в пространстве кости UE (предложено, CLI 0.5.0, этап 3 T3.3). UM_FBX_v1 не корректирует оси костей (primary Y, secondary X), экспорт поворачивает rest-позу жёстко (`roll=True`), а импорт FBX в UE зеркалит Y каждой локальной трансформы. Поэтому смещение сокета в UE bone space = (x, −y, z) смещения в пространстве кости Blender. С живым замером Medusa это согласуется: UE (0, 0, 4) на вертикальной кости `head` дало точку в 4 uu впереди. Знак вдоль кости (y) пока не измерен. Build героев пишет цель, смещение в кости Blender и прогноз (`sockets[].offset_ue_bone_local_uu_predicted`); ue-import ставит прогноз, если в профиле `location_uu: null`. Head, uu: Arthur (-0,151; 4,127; 0,048) → (-0,151; -4,127; 0,048) (цель в UE (-0,169; 0,151; 49,921)); Merlin (0,019; 2,026; 0,255) → (0,019; -2,026; 0,255) (цель в UE (0,195; -0,019; 37,893)); Harpy (-0,406; 4,028; 2,226) → (-0,406; -4,028; 2,226) (цель в UE (5,232; 0,485; 33,063)). Проверка — живой `get_socket_location(Head)` против цели ±0,05 uu на UE-этапе героев.
