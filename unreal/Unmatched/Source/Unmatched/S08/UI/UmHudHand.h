@@ -307,6 +307,10 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   };
   UUmCardWidget* Acquire(const FString& InstanceId);
   void Release(UUmCardWidget* W);
+  /** RC acceptance 2026-10-15 (B1, P1): a pool widget wired to a card long gone stayed visible over the first slot and
+   *  took its clicks («press-miss» for minutes). After every model: each live card's widget is wired to its own id, one
+   *  widget per card, and a pool widget that is neither live nor leaving is collapsed and free (once). */
+  void HealPool();
   void EnsurePool(int32 Count);
   void Relayout(bool bAnimate);
   void ApplyCardStates();

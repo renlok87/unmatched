@@ -1708,10 +1708,23 @@ void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, con
       FString CatalogId = InstanceId;
       CatalogId.Split(TEXT("::"), &CatalogId, nullptr);
       Index = Own->Cards.IndexOfByPredicate([&CatalogId](const FS09CardView& C) { return !C.bHidden && C.CardId == CatalogId; });
+      // RC acceptance 2026-10-15 (B1, P1): a widget still wired to a card that left took the click - the card the hand
+      // itself has under the pointer (its row geometry, HoverIndex) is the one the player meant
+      if (Index == INDEX_NONE && Self->UmHud.IsValid()) {
+        if (const UUmHudHand* Hand = Self->UmHud->Hand.Get()) {
+          const FUmHandModel& HM = Hand->GetModel();
+          const int32 H = Hand->GetHoverIndex();
+          if (HM.Cards.IsValidIndex(H)) {
+            const FString Under = HM.Cards[H].Card.InstanceId;
+            Index = Own->Cards.IndexOfByPredicate([&Under](const FS09CardView& C) { return C.InstanceId == Under; });
+          }
+        }
+      }
       TArray<FString> Ids;
       for (const FS09CardView& C : Own->Cards) Ids.Add(C.InstanceId);
-      FS08Trace::Write(FString::Printf(TEXT("HUD-HAND press-miss id=%s fallback=%d hand=%s"), *InstanceId,
-                                       Index, *FString::Join(Ids, TEXT(","))));
+      FS08Trace::Write(FString::Printf(TEXT("HUD-HAND press-miss id=%s fallback=%d hand=%s hover=%d"), *InstanceId,
+                                       Index, *FString::Join(Ids, TEXT(",")),
+                                       Self->UmHud.IsValid() && Self->UmHud->Hand.IsValid() ? Self->UmHud->Hand->GetHoverIndex() : -2));
     }
     if (Index == INDEX_NONE) {
       Self->ShowReason(FS09Reason::Make(TEXT("why.state.changed")), 3.0f);

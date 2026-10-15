@@ -111,6 +111,7 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
     OutShorter->Add(FText::FromString(NoPlayer.TrimStartAndEnd()));
     // the card and the moves alone («Крылатое буйство: без движения») when even that does not fit the row
     OutShorter->Add(FText::FromString(Card + TEXT(": ") + Inline));
+    OutShorter->Add(FText::FromString(Card));  // RC acceptance B2: a long card name alone (the tooltip keeps all)
   }
   if (OutShorter && Trail.Moves.Num() == 0 && !bEffect) {
     // 2026-10-15 playtest: «Медуза: манёвр: без движе…» - a maneuver without moves had no shorter form; without the

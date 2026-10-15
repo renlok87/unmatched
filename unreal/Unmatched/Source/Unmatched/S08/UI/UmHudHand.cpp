@@ -1,6 +1,8 @@
 // VS-3 HB-24 / HB-25: HAND - see UmHudHand.h.
 #include "UmHudHand.h"
 
+#include "../S08TraceLog.h"
+
 #include "UmWorldLayer.h"
 
 #include "../../S09/S09HandLimit.h"
@@ -508,10 +510,73 @@ UUmCardWidget* UUmHudHand::Acquire(const FString& InstanceId) {
   if (Free.Num() == 0) return nullptr;
   UUmCardWidget* W = Free.Pop();
   WireCard(W, InstanceId);
+  W->SetVisualHitTest(true);
   W->SetVisibility(ESlateVisibility::Visible);
   W->SetRenderOpacity(1.0f);
   W->SetRenderTransform(FWidgetTransform());
   return W;
+}
+
+void UUmHudHand::HealPool() {
+  TSet<UUmCardWidget*> Used;
+  int32 Rewired = 0, Orphans = 0;
+  for (auto It = Live.CreateIterator(); It; ++It) {
+    UUmCardWidget* W = It.Value();
+    if (!W || Used.Contains(W)) {
+      // two cards on one widget: the second gets its own
+      UUmCardWidget* Fresh = nullptr;
+      Free.Remove(W);
+      if (Free.Num() == 0) EnsurePool(Pool.Num() + 1);
+      while (Free.Num() > 0 && !Fresh) {
+        UUmCardWidget* C = Free.Pop();
+        if (C && !Used.Contains(C)) Fresh = C;
+      }
+      if (Fresh) {
+        WireCard(Fresh, It.Key());
+        Fresh->SetVisibility(ESlateVisibility::Visible);
+        It.Value() = Fresh;
+        W = Fresh;
+        ++Rewired;
+      }
+    }
+    if (!W) continue;
+    Used.Add(W);
+    const FName Want(*(TEXT("hand.") + It.Key()));
+    if (W->GetPressId() != Want) {
+      WireCard(W, It.Key());
+      ++Rewired;
+    }
+    Free.Remove(W);
+  }
+  for (const FLeaving& L : Leaving) {
+    if (UUmCardWidget* W = L.W.Get()) {
+      Used.Add(W);
+      Free.Remove(W);
+    }
+  }
+  TSet<UUmCardWidget*> FreeSet;
+  TArray<TObjectPtr<UUmCardWidget>> Unique;
+  for (const TObjectPtr<UUmCardWidget>& W : Free) {
+    if (W && !FreeSet.Contains(W.Get())) {
+      FreeSet.Add(W.Get());
+      Unique.Add(W);
+    }
+  }
+  Free = MoveTemp(Unique);
+  for (const TObjectPtr<UUmCardWidget>& W : Pool) {
+    if (!W || Used.Contains(W.Get())) continue;
+    if (W->GetVisibility() != ESlateVisibility::Collapsed) {
+      W->SetVisibility(ESlateVisibility::Collapsed);
+      ++Orphans;
+    }
+    if (!FreeSet.Contains(W.Get())) {
+      Free.Add(W);
+      FreeSet.Add(W.Get());
+    }
+  }
+  if (Rewired > 0 || Orphans > 0) {
+    FS08Trace::Write(FString::Printf(TEXT("HUD-HAND heal rewired=%d orphans=%d live=%d free=%d"), Rewired, Orphans, Live.Num(), Free.Num()));
+  }
 }
 
 void UUmHudHand::Release(UUmCardWidget* W) {
@@ -620,6 +685,8 @@ void UUmHudHand::ApplyModel(const FUmHandModel& InModel) {
     }
     if (W) {
       W->SetVisibility(ESlateVisibility::HitTestInvisible);
+      // RC acceptance B1: the drawn card (Visible for the raised preview) kept taking clicks while it left
+      W->SetVisualHitTest(false);
       W->SetHover(false);
       W->PlayPlayedFlash(Frame.SpeedMul);  // VS-4 CP-21: 500 ms x UI-ACC-013 speed, reduced 100, «Нет» none
       if (W->GetFlashMs() > 0.0f) PlayedFlashes.Add(W->GetFlashMs());
@@ -659,6 +726,7 @@ void UUmHudHand::ApplyModel(const FUmHandModel& InModel) {
     if (Arrived.Contains(L.Key)) continue;
     if (const UCanvasPanelSlot* S = L.Value ? Cast<UCanvasPanelSlot>(L.Value->Slot) : nullptr) OldPos.Add(L.Key, S->GetPosition());
   }
+  HealPool();
   Relayout(true);
   ApplyCardStates();
   // ---- the lowering (SD-26)

@@ -134,6 +134,15 @@ void UmEdgeShow(UWidget* W, bool bOn, ESlateVisibility On = ESlateVisibility::Hi
   if (W->GetVisibility() != Want) W->SetVisibility(Want);
 }
 
+// RC acceptance 2026-10-15 (B3): a collapsed button gets no mouse-leave - its «Время вышло — сервер решает сам» tooltip
+// stayed on screen after the defense window closed; hiding the edge drops the hover of its buttons
+void UmEdgeUnhover(UWidget* W) {
+  if (UUmButton* B = Cast<UUmButton>(W)) {
+    B->SimulateHover(false);
+    B->SetToolTipText(FText::GetEmpty());
+  }
+}
+
 void UmEdgeText(UTextBlock* T, FName Type, FName Color) {
   if (!T) return;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
@@ -443,6 +452,8 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   using namespace UmHudCombatEdge;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (!Model.bShow || Model.State == EUmEdgeState::Hidden) {
+    UmEdgeUnhover(DefendButton);
+    UmEdgeUnhover(NoDefenseButton);
     // the leave keeps drawing the last state until it ends
     if (!IsLeaving()) {
       SetVisibility(ESlateVisibility::Collapsed);
@@ -679,6 +690,7 @@ void UUmHudCombatEdge::ApplyButtons() {
   // primary button in its place (the slot says «Защититься нечем»)
   const bool bNothing = Model.DefendWhy.Key == FName(TEXT("why.defense.none"));
   if (DefendButton) DefendButton->SetVisibility(bNothing ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+  if (bNothing) UmEdgeUnhover(DefendButton);
   if (DefendButton && !bNothing) {
     FUmButtonModel B;
     B.Variant = EUmButtonVariant::Primary;
