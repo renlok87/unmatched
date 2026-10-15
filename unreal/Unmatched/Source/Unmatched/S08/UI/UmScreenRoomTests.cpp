@@ -146,6 +146,9 @@ bool FUmScreensRoomModelTest::RunTest(const FString& Parameters) {
   TestEqual(TEXT("opponent not ready: why.room.not.ready"), UmRoom::StartWhy(M), FName(TEXT("why.room.not.ready")));
   M.bOppReady = true;
   TestTrue(TEXT("both ready: Start open"), UmRoom::StartWhy(M).IsNone());
+  M.bOppHeroUnsupported = true;  // GD-053: the other seat's hero is outside the client roster
+  TestEqual(TEXT("unsupported opponent hero: why.room.hero.unsupported"), UmRoom::StartWhy(M), FName(TEXT("why.room.hero.unsupported")));
+  M.bOppHeroUnsupported = false;
   TestEqual(TEXT("both ready: ready"), FString(UmRoom::StateName(EUmRoomPhase::Room, M)), FString(TEXT("ready")));
   TestEqual(TEXT("countdown wins"), FString(UmRoom::StateName(EUmRoomPhase::Countdown, M)), FString(TEXT("countdown")));
   FUmRoomModel Ai = Base(true);

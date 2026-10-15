@@ -64,6 +64,7 @@ const FRow GRows[] = {
     {TEXT("why.hero.taken"), TEXT("Taken by the opponent")},
     {TEXT("why.room.not.ready"), TEXT("The opponent is not ready")},
     {TEXT("why.room.no.hero"), TEXT("Choose a hero")},
+    {TEXT("why.room.hero.unsupported"), TEXT("The opponent's hero is not playable in this build yet")},  // GD-053
     {TEXT("why.room.board.locked"), TEXT("The board is chosen when the room is created")},
     // ---- ms.* (03 §9) ----
     {TEXT("ms.begin.already"), TEXT("Maneuver already begun — Enter confirms")},

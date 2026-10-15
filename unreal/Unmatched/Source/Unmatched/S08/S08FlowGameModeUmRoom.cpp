@@ -508,6 +508,12 @@ void AS08FlowGameMode::TickUmRoom(bool bShowing) {
   M.bOwnReady = MeP && MeP->bIsReady;
   M.bOppPresent = OppP != nullptr || bVsAi;
   M.bOppHero = (OppP && !OppP->HeroId.IsEmpty()) || bVsAi;
+  if (OppP && !OppP->HeroId.IsEmpty() && !bVsAi) {
+    const FS08HeroEntry* OppHero = UmRmHero(Heroes, OppP->HeroId);
+    bool bInRoster = false;
+    for (const TCHAR* Name : UmRmRoster) bInRoster |= OppHero && OppHero->Name == Name;
+    M.bOppHeroUnsupported = OppHero && !bInRoster;
+  }
   M.bOppReady = (OppP && OppP->bIsReady) || bVsAi;
   M.bBusy = R.bBusy;
   if (!OwnHero.IsEmpty()) {

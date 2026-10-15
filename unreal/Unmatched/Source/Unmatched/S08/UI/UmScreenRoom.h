@@ -73,6 +73,9 @@ struct UNMATCHED_API FUmRoomModel {
   /** The opponent seat: none (waiting), joined, with a hero, ready; VS_AI: the bot counts as ready (ВР-VS4-SC17-01). */
   bool bOppPresent = false;
   bool bOppHero = false;
+  /** GD-053 (2026-10-15): the other seat picked a hero outside the client's roster (its cards use mechanics this build
+   *  does not play) - the start is blocked with why.room.hero.unsupported instead of a match that cannot be played. */
+  bool bOppHeroUnsupported = false;
   bool bOppReady = false;
   /** The picked hero's deck: the sum of copies (-1 = not known yet). */
   int32 DeckCount = -1;

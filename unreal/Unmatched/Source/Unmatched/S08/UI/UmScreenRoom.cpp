@@ -74,6 +74,7 @@ const TCHAR* StateName(EUmRoomPhase Phase, const FUmRoomModel& M) {
 
 FName StartWhy(const FUmRoomModel& M) {
   if (M.OwnHeroId.IsEmpty()) return FName(TEXT("why.room.no.hero"));
+  if (M.bOppHeroUnsupported) return FName(TEXT("why.room.hero.unsupported"));
   if (M.bVsAi) return M.bOwnReady ? NAME_None : FName(TEXT("why.room.not.ready"));
   if (!M.bOwnReady || !M.bOppPresent || !M.bOppHero || !M.bOppReady) return FName(TEXT("why.room.not.ready"));
   return NAME_None;
