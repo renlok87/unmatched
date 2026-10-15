@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-e0b4d474-h2",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "service": "tripo-studio",
+  "task_id": "e0b4d474-e9bd-40d4-b382-7ab52571564d",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/e0b4d474-e9bd-40d4-b382-7ab52571564d",
+  "date": "2026-10-15",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-front.png",
+        "sha256": "9006ed813844b46a08f6ef2a58ff6a889eb1dca5700a3b70b272ce78359401cd"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-side.png",
+        "sha256": "cf6c70fbee00280e888d4ea0a075b34705d9a40835b9390052babdc042154c18"
+      },
+      "back": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-back.png",
+        "sha256": "fae2471de96e4efe90040806405dd39ef84627be097c651b43e164af784b2b6b"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-patroclus-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_right (SIDE_VIEW: right в карточке), подан в слот RIGHT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20505.0,
+        "balance_after": 20445.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20445.0,
+        "balance_after": 20415.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20415.0,
+        "balance_after": 20410.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-parts24.glb",
+      "expected_sha256": "18477a384a870befeff1d3f54f4c270f57435f508f8b3f670e9b440ea0f9f557",
+      "expected_bytes": 44515584,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-tex8k-pbr.glb",
+      "expected_sha256": "17097e9603256226a6b8057dfd5e0eba2a20cfb5cf9f24f36cd1a12db05c7ed6",
+      "expected_bytes": 87845524,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 24,
+      "glb_triangles": 1967447,
+      "glb_materials": 0,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 24,
+      "glb_triangles": 1967447,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

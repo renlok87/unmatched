@@ -1,0 +1,75 @@
+{
+  "schema": "patroclus.h2-prep-recipe-reuse/1",
+  "donors": [
+    {
+      "character": "Achilles",
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2-bake-h2-r3.json",
+      "bytes": 92681,
+      "sha256": "5231ef85fc7873c62fc31889107a1779c95d14555e03208da0bddb7cec2b17c6",
+      "reusable_patterns_and_limits": [
+        "Right weapon.R / own-left shield on arm_lower.L without new shield bone",
+        "Split weapon: one mesh weapon, remaining fragments body rigid weapon.R",
+        "Position-based identical limb chains across separate upper arm/bracer/fist parts",
+        "rig.junctions pattern for shoulder cuts opening during forward arm poses",
+        "Do not copy exact cape caps, weights bands, part numbers or 0.55/0.30/0.06 hero scale"
+      ]
+    },
+    {
+      "character": "Beowulf",
+      "path": "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2-bake-h2-t4.json",
+      "bytes": 41790,
+      "sha256": "4ce685cc09784f22fde85377407fc941a399693e1c88987191e5bc134946d254",
+      "reusable_patterns_and_limits": [
+        "Current profile_version 2, explicit face/density reference/base-band part and preview.frame",
+        "Right sword and separate left shield precedent, neck/collar seam checks",
+        "Separate material classes inside mixed geometry, measured base_band.height_m",
+        "v2 backside-only cap check and shell face tagging; do not blindly copy cloth_shell list",
+        "Do not inherit exact tunic/collar cut treatment or metallic colour thresholds"
+      ]
+    },
+    {
+      "character": "Merlin",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+      "bytes": 28594,
+      "sha256": "65062c1d792fd5787a6ceff0916960293a9534e3e1b217a0702c759d9e1bc27d",
+      "reusable_patterns_and_limits": [
+        "Sidekick base_footprint_m 0.24,0.24,0.05; hood top 0.45m is helper scale precedent",
+        "weapon.R under hand.R; grip point derived from real contact loops",
+        "Source/textured identity and seam inventory discipline",
+        "Legacy driver/schema, Smart UV and custom assembly are historical; use current generic h2_bake instead"
+      ]
+    }
+  ],
+  "current_generic_tools": [
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py",
+      "bytes": 31832,
+      "sha256": "cd48429eeb4a7c0c26c9294bc13de1482c777e4579055323357b9c2e7107fc63"
+    },
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/profile.py",
+      "bytes": 36801,
+      "sha256": "f65e08180b3abca64499ca0e46d342f2dbb54d6b9bd045b47b6f420adcd12296"
+    },
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/st_prepare.py",
+      "bytes": 15476,
+      "sha256": "7ba475bc865cceeebd0d1cd2b2eb5ded629aaf5727bd13f77eea82eef4759bc0"
+    },
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/st_close.py",
+      "bytes": 31464,
+      "sha256": "3ad1228d48e0ab7d44e04ef091ea8ef4826d78a82f5798846e8b6a8006086c3d"
+    },
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/st_rig.py",
+      "bytes": 32016,
+      "sha256": "2401640ab90d063673227e9907a9993b007f6a9184615a9dd6d1e9c7d8d75f83"
+    },
+    {
+      "path": "tools/tripo-pipeline/blender/h2_bake/bl_util.py",
+      "bytes": 9149,
+      "sha256": "59a464eb9280a3fd98ff5668f30ad0a24c3052459cc984b9602b441fe3692875"
+    }
+  ]
+}

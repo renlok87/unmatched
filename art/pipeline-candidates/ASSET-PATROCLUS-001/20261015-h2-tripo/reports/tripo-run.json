@@ -1,0 +1,772 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-88",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "date": "2026-10-15",
+  "service": "tripo-studio",
+  "performed_by": "Root orchestrator via Codex cua_repl Chrome UI; actual button prices and fresh balances, GLB export to Downloads and byte-identical move to source. Local post_h2 registration/render spent 0 credits.",
+  "tasks": [
+    {
+      "task_id": "e0b4d474-e9bd-40d4-b382-7ab52571564d",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/e0b4d474-e9bd-40d4-b382-7ab52571564d"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-front.png",
+        "sha256": "9006ed813844b46a08f6ef2a58ff6a889eb1dca5700a3b70b272ce78359401cd"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-side.png",
+        "sha256": "cf6c70fbee00280e888d4ea0a075b34705d9a40835b9390052babdc042154c18"
+      },
+      "back": {
+        "path": "art/imagegen/concept-patroclus-codex/patroclus-back.png",
+        "sha256": "fae2471de96e4efe90040806405dd39ef84627be097c651b43e164af784b2b6b"
+      }
+    },
+    "slot_mapping": "FRONT=front, RIGHT=side, BACK=back, LEFT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_right (SIDE_VIEW: right в карточке), подан в слот RIGHT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "Watson draft H3.1 Private, parts OFF, texture OFF, Ultra 2M triangle; prior settings checkpoint recorded",
+    "studio_settings_after": "H2 Balanced parts, texture generation 8K and Remove Lighting enabled, PBR completed, Pack UV export ON; no restoration for next task"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20505.0,
+        "balance_after": 20445.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20445.0,
+        "balance_after": 20415.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20415.0,
+        "balance_after": 20410.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-parts24.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "18477a384a870befeff1d3f54f4c270f57435f508f8b3f670e9b440ea0f9f557",
+      "bytes": 44515584,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 24,
+      "triangles": 1967447,
+      "materials": 0,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "Mesh_0",
+          "triangles": 596290
+        },
+        {
+          "name": "Mesh_1",
+          "triangles": 186864
+        },
+        {
+          "name": "Mesh_10",
+          "triangles": 26504
+        },
+        {
+          "name": "Mesh_11",
+          "triangles": 31046
+        },
+        {
+          "name": "Mesh_12",
+          "triangles": 107970
+        },
+        {
+          "name": "Mesh_13",
+          "triangles": 99931
+        },
+        {
+          "name": "Mesh_14",
+          "triangles": 24504
+        },
+        {
+          "name": "Mesh_15",
+          "triangles": 22380
+        },
+        {
+          "name": "Mesh_16",
+          "triangles": 17032
+        },
+        {
+          "name": "Mesh_17",
+          "triangles": 15170
+        },
+        {
+          "name": "Mesh_18",
+          "triangles": 14668
+        },
+        {
+          "name": "Mesh_19",
+          "triangles": 10134
+        },
+        {
+          "name": "Mesh_2",
+          "triangles": 172226
+        },
+        {
+          "name": "Mesh_20",
+          "triangles": 9501
+        },
+        {
+          "name": "Mesh_21",
+          "triangles": 7455
+        },
+        {
+          "name": "Mesh_22",
+          "triangles": 4438
+        },
+        {
+          "name": "Mesh_23",
+          "triangles": 4327
+        },
+        {
+          "name": "Mesh_3",
+          "triangles": 156889
+        },
+        {
+          "name": "Mesh_4",
+          "triangles": 134621
+        },
+        {
+          "name": "Mesh_5",
+          "triangles": 26175
+        },
+        {
+          "name": "Mesh_6",
+          "triangles": 110986
+        },
+        {
+          "name": "Mesh_7",
+          "triangles": 109239
+        },
+        {
+          "name": "Mesh_8",
+          "triangles": 38344
+        },
+        {
+          "name": "Mesh_9",
+          "triangles": 40753
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/source/patroclus-h2-tripo-e0b4d474-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "17097e9603256226a6b8057dfd5e0eba2a20cfb5cf9f24f36cd1a12db05c7ed6",
+      "bytes": 87845524,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 24,
+      "triangles": 1967447,
+      "materials": 1,
+      "images": 3,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "Mesh_0",
+          "triangles": 596290
+        },
+        {
+          "name": "Mesh_1",
+          "triangles": 186864
+        },
+        {
+          "name": "Mesh_10",
+          "triangles": 26504
+        },
+        {
+          "name": "Mesh_11",
+          "triangles": 31046
+        },
+        {
+          "name": "Mesh_12",
+          "triangles": 107970
+        },
+        {
+          "name": "Mesh_13",
+          "triangles": 99931
+        },
+        {
+          "name": "Mesh_14",
+          "triangles": 24504
+        },
+        {
+          "name": "Mesh_15",
+          "triangles": 22380
+        },
+        {
+          "name": "Mesh_16",
+          "triangles": 17032
+        },
+        {
+          "name": "Mesh_17",
+          "triangles": 15170
+        },
+        {
+          "name": "Mesh_18",
+          "triangles": 14668
+        },
+        {
+          "name": "Mesh_19",
+          "triangles": 10134
+        },
+        {
+          "name": "Mesh_2",
+          "triangles": 172226
+        },
+        {
+          "name": "Mesh_20",
+          "triangles": 9501
+        },
+        {
+          "name": "Mesh_21",
+          "triangles": 7455
+        },
+        {
+          "name": "Mesh_22",
+          "triangles": 4438
+        },
+        {
+          "name": "Mesh_23",
+          "triangles": 4327
+        },
+        {
+          "name": "Mesh_3",
+          "triangles": 156889
+        },
+        {
+          "name": "Mesh_4",
+          "triangles": 134621
+        },
+        {
+          "name": "Mesh_5",
+          "triangles": 26175
+        },
+        {
+          "name": "Mesh_6",
+          "triangles": 110986
+        },
+        {
+          "name": "Mesh_7",
+          "triangles": 109239
+        },
+        {
+          "name": "Mesh_8",
+          "triangles": 38344
+        },
+        {
+          "name": "Mesh_9",
+          "triangles": 40753
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "Mesh_0",
+      "tris": 596290,
+      "min": [
+        -0.1742,
+        -0.3555,
+        -0.0644
+      ],
+      "max": [
+        0.1799,
+        0.3178,
+        0.1209
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "Mesh_1",
+      "tris": 186864,
+      "min": [
+        -0.2429,
+        -0.0436,
+        -0.2391
+      ],
+      "max": [
+        0.2494,
+        0.0462,
+        0.2473
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "Mesh_10",
+      "tris": 26504,
+      "min": [
+        -0.0515,
+        -0.0781,
+        -0.0518
+      ],
+      "max": [
+        0.0465,
+        0.0836,
+        0.049
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "Mesh_11",
+      "tris": 31046,
+      "min": [
+        -0.0334,
+        -0.0428,
+        -0.0475
+      ],
+      "max": [
+        0.0303,
+        0.0581,
+        0.0468
+      ]
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "Mesh_12",
+      "tris": 107970,
+      "min": [
+        -0.0541,
+        -0.095,
+        -0.0531
+      ],
+      "max": [
+        0.0622,
+        0.1207,
+        0.0966
+      ]
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "Mesh_13",
+      "tris": 99931,
+      "min": [
+        -0.1197,
+        -0.058,
+        -0.1
+      ],
+      "max": [
+        0.1263,
+        0.1052,
+        0.0482
+      ]
+    },
+    {
+      "node": "tripo_part_14",
+      "mesh": "Mesh_14",
+      "tris": 24504,
+      "min": [
+        -0.0443,
+        -0.0789,
+        -0.0525
+      ],
+      "max": [
+        0.0534,
+        0.0835,
+        0.0495
+      ]
+    },
+    {
+      "node": "tripo_part_15",
+      "mesh": "Mesh_15",
+      "tris": 22380,
+      "min": [
+        -0.0466,
+        -0.0777,
+        -0.0382
+      ],
+      "max": [
+        0.0502,
+        0.0903,
+        0.0378
+      ]
+    },
+    {
+      "node": "tripo_part_16",
+      "mesh": "Mesh_16",
+      "tris": 17032,
+      "min": [
+        -0.0293,
+        -0.0272,
+        -0.0328
+      ],
+      "max": [
+        0.0209,
+        0.0381,
+        0.0277
+      ]
+    },
+    {
+      "node": "tripo_part_17",
+      "mesh": "Mesh_17",
+      "tris": 15170,
+      "min": [
+        -0.0542,
+        -0.0576,
+        -0.0351
+      ],
+      "max": [
+        0.0437,
+        0.0617,
+        0.0278
+      ]
+    },
+    {
+      "node": "tripo_part_18",
+      "mesh": "Mesh_18",
+      "tris": 14668,
+      "min": [
+        -0.0253,
+        -0.0253,
+        -0.0311
+      ],
+      "max": [
+        0.0268,
+        0.0396,
+        0.0271
+      ]
+    },
+    {
+      "node": "tripo_part_19",
+      "mesh": "Mesh_19",
+      "tris": 10134,
+      "min": [
+        -0.0229,
+        -0.0391,
+        -0.04
+      ],
+      "max": [
+        0.0151,
+        0.0189,
+        0.0532
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "Mesh_2",
+      "tris": 172226,
+      "min": [
+        -0.0559,
+        -0.1269,
+        -0.1192
+      ],
+      "max": [
+        0.0379,
+        0.1231,
+        0.1123
+      ]
+    },
+    {
+      "node": "tripo_part_20",
+      "mesh": "Mesh_20",
+      "tris": 9501,
+      "min": [
+        -0.016,
+        -0.0401,
+        -0.0371
+      ],
+      "max": [
+        0.0217,
+        0.0187,
+        0.0562
+      ]
+    },
+    {
+      "node": "tripo_part_21",
+      "mesh": "Mesh_21",
+      "tris": 7455,
+      "min": [
+        -0.0146,
+        -0.0239,
+        -0.02
+      ],
+      "max": [
+        0.0174,
+        0.0183,
+        0.0284
+      ]
+    },
+    {
+      "node": "tripo_part_22",
+      "mesh": "Mesh_22",
+      "tris": 4438,
+      "min": [
+        -0.03,
+        -0.007,
+        -0.0278
+      ],
+      "max": [
+        0.0263,
+        0.0087,
+        0.021
+      ]
+    },
+    {
+      "node": "tripo_part_23",
+      "mesh": "Mesh_23",
+      "tris": 4327,
+      "min": [
+        -0.026,
+        -0.0073,
+        -0.0285
+      ],
+      "max": [
+        0.0294,
+        0.0088,
+        0.0225
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "Mesh_3",
+      "tris": 156889,
+      "min": [
+        -0.0981,
+        -0.1622,
+        -0.0879
+      ],
+      "max": [
+        0.1197,
+        0.1532,
+        0.0503
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "Mesh_4",
+      "tris": 134621,
+      "min": [
+        -0.0449,
+        -0.1299,
+        -0.0729
+      ],
+      "max": [
+        0.0386,
+        0.082,
+        0.1256
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "Mesh_5",
+      "tris": 26175,
+      "min": [
+        -0.052,
+        -0.0622,
+        -0.0735
+      ],
+      "max": [
+        0.0497,
+        0.0502,
+        0.0412
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "Mesh_6",
+      "tris": 110986,
+      "min": [
+        -0.0614,
+        -0.0764,
+        -0.0689
+      ],
+      "max": [
+        0.0547,
+        0.0913,
+        0.0863
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "Mesh_7",
+      "tris": 109239,
+      "min": [
+        -0.0616,
+        -0.0953,
+        -0.0531
+      ],
+      "max": [
+        0.0544,
+        0.1205,
+        0.0957
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "Mesh_8",
+      "tris": 38344,
+      "min": [
+        -0.0826,
+        -0.0937,
+        -0.0911
+      ],
+      "max": [
+        0.0606,
+        0.0654,
+        0.1525
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "Mesh_9",
+      "tris": 40753,
+      "min": [
+        -0.0306,
+        -0.0486,
+        -0.0438
+      ],
+      "max": [
+        0.0413,
+        0.0544,
+        0.0353
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-e0b4d474-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/preview",
+    "out": "ender-dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-PATROCLUS-001\\20261015-h2-tripo\\preview\\draft-orthos-7ythc_d3 --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "embedded_textures": [
+    {
+      "name": "patroclus-h2-tripo-e0b4d474-tex8k-pbr_normal",
+      "mime_type": "image/jpeg",
+      "format": "JPEG",
+      "size": [
+        8192,
+        8192
+      ],
+      "bytes": 8543035,
+      "sha256": "a7f4a0e706e65b2741c2ba7e88eb07bf65b06d680a705898996a5318deedfa72"
+    },
+    {
+      "name": "patroclus-h2-tripo-e0b4d474-tex8k-pbr_basecolor",
+      "mime_type": "image/jpeg",
+      "format": "JPEG",
+      "size": [
+        8192,
+        8192
+      ],
+      "bytes": 18036519,
+      "sha256": "d296f81146a020a7c2037b5faabfccfbab146b436f6f1fce34be705dc79a9f42"
+    },
+    {
+      "name": "patroclus-h2-tripo-e0b4d474-tex8k-pbr_rm",
+      "mime_type": "image/jpeg",
+      "format": "JPEG",
+      "size": [
+        8192,
+        8192
+      ],
+      "bytes": 8491410,
+      "sha256": "391b52556dd8435ec740ce4d35a5f5ffc19a29c8fa51d864cccab1e3e53acedf"
+    }
+  ],
+  "source_registration_snapshot_note": "register-source records evidence hashes at registration, before post_h2 writes the completed tripo-run report; the report hash there is the initial {} placeholder. credits-ledger is append-only and has later CP33 rows. Original registered file/spec hashes remain correct. Final content is pinned in reports/completion-checkpoint.json and this run manifest.",
+  "visual_inspection": {
+    "reviewer": "root",
+    "views_opened": [
+      "front",
+      "right",
+      "left",
+      "back"
+    ],
+    "result": "source candidate retained",
+    "observations": [
+      "Own-right sword and own-left round shield; white plume, bronze helmet and greaves, linen corslet and blue cape retained.",
+      "Full figure and two-tier base visible in all four neutral orthographic previews.",
+      "Right side gives the weapon grip view; left shield profile occludes the hand."
+    ],
+    "limits": [
+      "High-poly source only: no retopology, bake, skinning, rig, animation, model art acceptance or Unreal import.",
+      "Fine grip continuity, mixed-material masks and cape closure remain stage3 checks listed in the separate 24-part prep."
+    ]
+  }
+}
