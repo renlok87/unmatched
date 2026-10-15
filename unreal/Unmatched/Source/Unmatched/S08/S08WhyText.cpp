@@ -52,6 +52,7 @@ const FRow GRows[] = {
     {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
     {TEXT("why.defense.pick"), TEXT("Pick a defense card in your hand")},  // VS-3 HB-30 (ВР-VS3-51)
     {TEXT("why.boost.pick"), TEXT("Pick a card with BOOST in your hand")},  // 2026-10-15 playtest: BOOST_CHOICE
+    {TEXT("why.target.pick"), TEXT("Click a highlighted fighter on the board")},  // 2026-10-15 playtest: TARGET_FIGHTER
     {TEXT("why.pick.count"), TEXT("Make your choice: {need} needed, {have} chosen")},  // VS-4 HB-35 (ВР-VS4-08)
     // VS-1 HB-05: the screen reasons of visual/04-hud-spec.md §6.1
     {TEXT("why.login.fields"), TEXT("Enter your email and password")},
@@ -81,6 +82,8 @@ const FRow GRows[] = {
     {TEXT("ms.choice.object"), TEXT("Choose what to move")},
     // DE-020 (W-11; 02-ux-ui-spec §4.6, SD-19, SD-28, SD-56): serving the deferred choices
     {TEXT("ms.choice.target"), TEXT("Choose a target (up to {n})")},
+    {TEXT("ms.log.attack"), TEXT("{attacker} → {target}: {damage} damage")},  // 2026-10-15 playtest: combats in the journal
+    {TEXT("ms.choice.target.board"), TEXT("Choose a target on the board")},  // 2026-10-15 playtest: one target, no «(up to 1)»
     {TEXT("ms.pending.opp.turn"), TEXT("Your choice during the opponent's turn")},
     {TEXT("ms.pending.collapsed"), TEXT("Your choice is waiting: {choice}")},
     {TEXT("ms.pending.again"), TEXT("Again: {choice}")},
@@ -117,6 +120,7 @@ const FRow GRows[] = {
     {TEXT("ms.status.attack.go"), TEXT("Attack {target} (Enter)")},
     {TEXT("ms.status.scheme"), TEXT("Choose a scheme card and play it (Enter)")},
     {TEXT("ms.status.defend"), TEXT("You are attacked: choose a defense card or No defense (N)")},
+    {TEXT("ms.status.defend.none"), TEXT("You are attacked: nothing to defend with - press No defense (N)")},  // 2026-10-15
     {TEXT("ms.status.resolve"), TEXT("Resolve the combat (R)")},
     {TEXT("ms.status.discard"), TEXT("Hand over the limit: discard {n}")},
     {TEXT("ms.status.confirm"), TEXT("Confirm (Enter)")},

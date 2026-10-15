@@ -104,6 +104,14 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
     OutShorter->Add(FText::FromString(Inline));
     if (First != Inline) OutShorter->Add(FText::FromString(First));
   }
+  if (OutShorter && Trail.Moves.Num() == 0 && !bEffect) {
+    // 2026-10-15 playtest: «Медуза: манёвр: без движе…» - a maneuver without moves had no shorter form; without the
+    // player (the stripe names the side, the tooltip keeps all) it reads «манёвр: без движения»
+    FString NoPlayer = Ms(TEXT("ms.log.maneuver"), {{TEXT("player"), FString()}, {TEXT("boostPart"), FString()},
+                                                     {TEXT("moves"), Inline}}).ToString();
+    NoPlayer.RemoveFromStart(TEXT(": "));
+    OutShorter->Add(FText::FromString(NoPlayer.TrimStartAndEnd()));
+  }
   if (bEffect) {
     OutText = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}});
     OutFull = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Full}});

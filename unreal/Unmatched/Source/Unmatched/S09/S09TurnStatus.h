@@ -42,6 +42,8 @@ struct UNMATCHED_API FS09TurnStatusInput {
   bool bOpponentChoice = false;
   /** Combat open and I attack (the defense window is theirs). */
   bool bCombatAttacking = false;
+  /** CombatDefense with no legal defense card in my hand (2026-10-15: the line then names the only way out). */
+  bool bNoLegalDefense = false;
   // the opponent
   ES09OpponentVerb OpponentVerb = ES09OpponentVerb::None;
   FString OpponentName;

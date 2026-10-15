@@ -344,6 +344,34 @@ FUmPendingPlan Plan(const FUmPendingModel& M, const FUmPendingFrame& F, const TM
     const float HH = P.HintRows > 0 ? 16.0f + (P.HintRows - 1) * BodyLineSu : 0.0f;
     const float Inner = TH + (TH > 0.0f && HH > 0.0f ? 4.0f : 0.0f) + HH;
     const float H = FMath::Max(CompactMinHSu, FMath::Max(BW > 0.0f ? ButtonHSu : 0.0f, Inner) + 16.0f);
+    // 2026-10-15 playtest: three buttons («Отказаться», «Подтвердить», «Свернуть») squeezed the hint into a 7-row column
+    // beside them - «stacked»: the card name, the hint across the whole plate, the buttons right in a row under it
+    if (BW > 0.0f && P.HintRows >= 4) {
+      const float FullW = W - 2.0f * Pad;
+      const float TitleWS = FullW - IconW - (QueueW > 0.0f ? QueueW + 8.0f : 0.0f);
+      const int32 TRowsS = M.Title.IsEmpty() ? 0 : UmPdRows(M.Title, TitleWS, 24.0f, Heading, Measure);
+      const int32 HRowsS = UmPdRows(M.Text, FullW, 16.0f, BodyTok, Measure);
+      const float THS = TRowsS > 0 ? 24.0f + (TRowsS - 1) * TitleLineSu : 0.0f;
+      const float HHS = 16.0f + (HRowsS - 1) * BodyLineSu;
+      const float TextH = THS + (THS > 0.0f ? 4.0f : 0.0f) + HHS;
+      const float HS = FMath::Max(CompactMinHSu, 8.0f + TextH + 8.0f + ButtonHSu + 8.0f);
+      if (HS < H) {
+        P.TitleRows = TRowsS;
+        P.HintRows = HRowsS;
+        P.Panel = UmPdBox(X, Y, W, HS);
+        const float Top = Y + 8.0f;
+        if (IconW > 0.0f) P.Icon = UmPdBox(X + Pad, Top, 24.0f, 24.0f);
+        if (TRowsS > 0) {
+          const float Drawn = FMath::Min(TitleWS, FMath::CeilToFloat(Measure(M.Title, 24.0f, Heading)) + TextSlackSu);
+          const float TitleBoxW = TRowsS > 1 ? TitleWS : Drawn;
+          P.Title = UmPdBox(X + Pad + IconW, Top, TitleBoxW, THS);
+          if (QueueW > 0.0f) P.Queue = UmPdBox(X + Pad + IconW + TitleBoxW + 8.0f, Top, QueueW, OrderChipSu);
+        }
+        P.Hint = UmPdBox(X + Pad, Top + THS + (THS > 0.0f ? 4.0f : 0.0f), FullW, HHS);
+        PlaceButtons(X + W - Pad, Top + TextH + 8.0f);
+        return P;
+      }
+    }
     // HB-34 «title-full»: the card name across the plate, the hint beside the buttons in the second row - taken when
     // it is lower (a long EN name wraps in «text-left», «The Hounds of Mighty Zeus» beside two buttons)
     if (BW > 0.0f && P.TitleRows > 0) {
@@ -602,7 +630,13 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
     } else if (T == TEXT("TARGET_FIGHTER")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Board;
-      M.Text = Printed;
+      // 2026-10-15 playtest: the target is clicked on the board, then confirmed - the panel had no «Подтвердить» and
+      // never said that only Enter sends the pick (A Momentary Glance stood still for a mouse player)
+      const bool bPicked = !Ui.PendingFighterId.IsEmpty();
+      const FString Hint = UmPdString(TEXT("why.target.pick"));
+      M.Text = bPicked || Hint.IsEmpty() ? Printed : (Printed.IsEmpty() ? Hint : Printed + TEXT(" ") + Hint);
+      M.bConfirm = true;
+      M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(TEXT("why.target.pick")));
     } else if (T == TEXT("CHOOSE_SPACE")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Board;

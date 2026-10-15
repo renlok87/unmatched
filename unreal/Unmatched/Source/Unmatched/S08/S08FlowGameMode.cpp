@@ -738,6 +738,12 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   LastCombatResult.ShownAt = Elapsed;
   FS08Trace::Write(FString::Printf(TEXT("COMBAT-RESULT seq=%d damage=%d role=%s"),
                                    Snapshot.SequenceNumber, LastCombatResult.Damage, ResultRole));
+  {
+    const FS08BoardFighter* Attacker = NewFighters.FindByPredicate(
+        [&PrevCombat](const FS08BoardFighter& F) { return F.Id == PrevCombat.AttackerId; });
+    UmHudLogCombat(PrevCombat.AttackerId, Attacker ? Attacker->OwnerId : FString(), PrevCombat.TargetFighterId, Damage,
+                   Snapshot.SequenceNumber);
+  }
   // DE-018: the result is applied; its presentation is the combat staging (a reconnect without the opening HP has
   // no known damage and no staging: the snapshot shows the final state, CUE on_reconnect = skip).
   // VS-6 FX-36 (D4): a combat that closed while the link was lost lands as the final state, no staging

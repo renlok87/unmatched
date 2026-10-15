@@ -91,7 +91,7 @@ TArray<FString> KeyHints(FName LineKey) {
     return {TEXT("hud.key.confirm")};
   }
   if (K == TEXT("ms.status.attack.card")) return {TEXT("hud.key.card_slot")};
-  if (K == TEXT("ms.status.defend")) return {TEXT("hud.key.no_defense")};
+  if (K == TEXT("ms.status.defend") || K == TEXT("ms.status.defend.none")) return {TEXT("hud.key.no_defense")};
   if (K == TEXT("ms.status.resolve")) return {TEXT("hud.key.resolve")};
   return {};
 }

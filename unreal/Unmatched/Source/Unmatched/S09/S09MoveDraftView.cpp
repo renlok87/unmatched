@@ -44,6 +44,15 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
         }
       }
     }
+    // 2026-10-15 playtest: a TARGET_FIGHTER head (A Momentary Glance) - the V-17 rings under its legal targets, only
+    // the picked one once clicked (the board never showed who may be picked, the panel said «щёлкните подсвеченного»)
+    if (Ui.bHasPendingChoice && Ui.PendingChoice.Type == TEXT("TARGET_FIGHTER")) {
+      if (!Ui.PendingFighterId.IsEmpty()) {
+        In.CandidateFighterIds.Add(Ui.PendingFighterId);
+      } else {
+        Ui.PendingLegalFighters(Fighters, In.CandidateFighterIds);
+      }
+    }
     return In;
   }
   // V-01 / V-02 of the selected fighter (draft MS-S-06/07, or the MS-S-02 inspection before the draw)

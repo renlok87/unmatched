@@ -17,7 +17,10 @@ FS09Reason Line(const FS09TurnStatusInput& In) {
     return Left > 0 ? FS09Reason::Make(TEXT("ms.status.discard")).Arg(TEXT("n"), Left)
                     : FS09Reason::Make(TEXT("ms.status.confirm"));
   }
-  if (In.Mode == ES09CommandMode::CombatDefense) return FS09Reason::Make(TEXT("ms.status.defend"));
+  if (In.Mode == ES09CommandMode::CombatDefense) {
+    // 2026-10-15 playtest: with nothing to defend with «выберите карту защиты» asked for the impossible
+    return FS09Reason::Make(In.bNoLegalDefense ? TEXT("ms.status.defend.none") : TEXT("ms.status.defend"));
+  }
   if (In.Mode == ES09CommandMode::CombatResolve) {
     return In.bOpponentChoice ? FS09Reason::Make(TEXT("why.wait.opponent.choice"))
                               : FS09Reason::Make(TEXT("ms.status.resolve"));

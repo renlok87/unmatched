@@ -2630,6 +2630,43 @@ void AS08FlowGameMode::TickUmFeed() {
   }
 }
 
+void AS08FlowGameMode::UmHudLogCombat(const FString& AttackerId, const FString& AttackerOwnerId, const FString& TargetId,
+                                      int32 Damage, int32 Seq) {
+  // 2026-10-15 playtest: the journal listed only moves - the bot's two attacks left no line at all
+  if (!UmHud.IsValid() || !UmHud->Feed.LogOnUmg() || Damage < 0) return;
+  FUmHudRuntime& R = *UmHud;
+  auto Name = [this](const FString& Id) -> FString {
+    const FS08BoardFighter* F = FindFighter(Id);
+    return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
+  };
+  FUmLogEntry E;
+  E.Seq = Seq;
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Seq && R.SeqTurns[I].Player == AttackerOwnerId) E.Turn = R.SeqTurns[I].Turn;
+  }
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Seq) E.Turn = R.SeqTurns[I].Turn;
+  }
+  // the stripe: the attacker's team as the board draws it (as the moves' rows)
+  if (const FS08BoardFighter* Attacker = FindFighter(AttackerId)) {
+    if (BoardActor) {
+      E.TeamSlot = S08TeamLook(BoardActor->TeamOfFighter(*Attacker), Attacker->OwnerId == ViewerIdNow(),
+                               BoardActor->GetTeamColorMode()) == ES08TeamSlot::P2 ? 1 : 0;
+    }
+  }
+  FFormatNamedArguments Args;
+  Args.Add(TEXT("attacker"), FText::FromString(Name(AttackerId)));
+  Args.Add(TEXT("target"), FText::FromString(Name(TargetId)));
+  Args.Add(TEXT("damage"), Damage);
+  E.Text = E.Full = UmText::Format(EUmTable::Ms, TEXT("ms.log.attack"), Args);
+  // the shorter form without the attacker (the stripe names the side, the tooltip keeps all): «→ Медуза: урон 6»
+  Args.Add(TEXT("attacker"), FText::GetEmpty());
+  E.Shorter.Add(FText::FromString(UmText::Format(EUmTable::Ms, TEXT("ms.log.attack"), Args).ToString().TrimStartAndEnd()));
+  R.Feed.PushLog(E, static_cast<double>(NowMs()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d kind=combat damage=%d total=%d"), E.Seq, E.Turn,
+                                   E.TeamSlot, Damage, R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
+}
+
 void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters) {
   if (!UmHud.IsValid() || !UmHud->Feed.LogOnUmg()) return;
   FUmHudRuntime& R = *UmHud;

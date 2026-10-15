@@ -370,6 +370,9 @@ FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
       In.TargetName = Label(CommandUi.AttackTargetId);
       In.bAttackCard = !CommandUi.AttackCardId.IsEmpty();
       break;
+    case ES09CommandMode::CombatDefense:
+      In.bNoLegalDefense = Flow.IsValid() && !CommandUi.HasLegalDefenseCard(Flow->GetAppliedSnapshot(), Fighters);
+      break;
     case ES09CommandMode::DiscardDraft:
       In.DiscardNeed = CommandUi.PendingDiscard.Count;
       In.DiscardChosen = CommandUi.DiscardSelection.Num();

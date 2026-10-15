@@ -1380,6 +1380,8 @@ private:
   void TickUmFeed();
   /** A revealed trail's line (TickOpponentView, after FS09EventFeed took it). */
   void UmHudLogTrail(const struct FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters);
+  /** 2026-10-15 playtest: one journal row per closed combat («Король Артур → Медуза: урон 6», ms.log.attack). */
+  void UmHudLogCombat(const FString& AttackerId, const FString& AttackerOwnerId, const FString& TargetId, int32 Damage, int32 Seq);
   /** ShowReason: the UMG toast of a keyed message (CUE-004 refusals, the skipped effect, ...). */
   void UmHudToastReason(const FS09Reason& Reason, float Seconds);
   /** RefreshUi: what the Slate toast line still shows - all of it with -S08SlateHud=toast, the non-keyed developer

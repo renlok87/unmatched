@@ -204,7 +204,9 @@ FS09PendingStep S09DescribePendingStep(const FS09CommandUi& Ui, const FS08Snapsh
     Out.Steps = 1;
     Out.Step = 1;
     Out.N = 1;
-    Out.Prompt = FS09Reason::Make(TEXT("ms.choice.target")).Arg(TEXT("n"), 1);
+    // 2026-10-15 playtest: one target - «Выберите цель на поле», «(до 1)» read as an optional choice
+    Out.Prompt = Head.Type == TEXT("TARGET_FIGHTER") ? FS09Reason::Make(TEXT("ms.choice.target.board"))
+                                                     : FS09Reason::Make(TEXT("ms.choice.target")).Arg(TEXT("n"), 1);
   }
   return Out;
 }

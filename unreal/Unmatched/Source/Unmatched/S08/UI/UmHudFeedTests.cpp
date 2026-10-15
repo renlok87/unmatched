@@ -909,12 +909,14 @@ bool FUmHudLogShortRowTest::RunTest(const FString&) {
   TestTrue(TEXT("340 su: the moves alone"), UmHudLog::PickRowText(E, 340.0f, Fake).EqualTo(Shorter[0]));  // 2026-10-15: «→ 1 клетка»
   TestTrue(TEXT("240 su: the first move"), UmHudLog::PickRowText(E, 240.0f, Fake).EqualTo(Shorter[1]));
   TestTrue(TEXT("nothing fits: the shortest, with its arrow"), UmHudLog::PickRowText(E, 40.0f, Fake).ToString().Contains(TEXT("→")));
-  // a stay has no arrow and no shorter form
+  // a stay has no arrow; 2026-10-15 playtest: one shorter form without the player («манёвр: без движения»)
   FS09LastMovement S = T;
   S.Moves.Reset();
   S.bBoost = false;
   UmHudLog::DescribeTrail(S, FString(), {}, Player, Fighter, Cell, Text, Full, &Shorter);
-  TestEqual(TEXT("«без движения»: no shorter form"), Shorter.Num(), 0);
+  TestEqual(TEXT("«без движения»: one shorter form"), Shorter.Num(), 1);
+  TestTrue(TEXT("«без движения»: the shorter form drops the player"),
+           Shorter.Num() == 1 && Shorter[0].ToString().Len() < Text.ToString().Len() && !Shorter[0].ToString().StartsWith(TEXT(":")));
   // the widget at 1080p (300 su column): what the row draws fits the text width and shows «→»
   UUmHudLog* Log = CreateWidget<UUmHudLog>(W.World, UUmHudLog::StaticClass());
   if (!TestNotNull(TEXT("log"), Log)) return false;

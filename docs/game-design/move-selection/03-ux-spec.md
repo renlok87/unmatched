@@ -589,6 +589,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.status.attack.go` | Атакуйте {target} (Enter) | Attack {target} (Enter) |
 | `ms.status.scheme` | Выберите карту схемы и сыграйте её (Enter) | Choose a scheme card and play it (Enter) |
 | `ms.status.defend` | Вас атакуют: выберите карту защиты или «Без защиты» (N) | You are attacked: choose a defense card or No defense (N) |
+| `ms.status.defend.none` | Вас атакуют: защититься нечем — нажмите «Без защиты» (N) | You are attacked: nothing to defend with - press No defense (N) |
 | `ms.status.resolve` | Завершите бой (R) | Resolve the combat (R) |
 | `ms.status.discard` | Рука больше предела: сбросьте {n} | Hand over the limit: discard {n} |
 | `ms.status.confirm` | Подтвердите (Enter) | Confirm (Enter) |
@@ -597,6 +598,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.hint.close` | Нажмите, чтобы закрыть | Click to close |
 | `ms.choice.object` | Выберите, кого переместить | Choose what to move |
 | `ms.choice.target` | Выберите цель (до {n}) | Choose a target (up to {n}) |
+| `ms.choice.target.board` | Выберите цель на поле | Choose a target on the board |
 | `ms.pending.opp.turn` | Ваш выбор в ход соперника | Your choice during the opponent's turn |
 | `ms.pending.collapsed` | Ваш выбор ждёт: {choice} | Your choice is waiting: {choice} |
 | `ms.pending.again` | Снова: {choice} | Again: {choice} |
@@ -607,6 +609,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.btn.boost.attack` | Атаковать с BOOST (Enter) | Attack with BOOST (Enter) |
 | `ms.btn.noboost` | Атаковать без BOOST (N) | Attack without BOOST (N) |
 | `ms.log.maneuver` | {player}: манёвр{boostPart}: {moves} | {player}: maneuver{boostPart}: {moves} |
+| `ms.log.attack` | {attacker} → {target}: урон {damage} | {attacker} → {target}: {damage} damage |
 | `ms.log.boost.part` | , буст +{n} ({cardName}) | , boost +{n} ({cardName}) |
 | `ms.log.move` | {fighterName} {from}→{to} | {fighterName} {from}→{to} |
 | `ms.log.move.steps` | {fighterName} → {n} клетк(а/и/ок) | {fighterName} → {n} space(s) |
