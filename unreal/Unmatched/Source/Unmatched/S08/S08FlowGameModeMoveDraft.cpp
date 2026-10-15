@@ -19,7 +19,8 @@ bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSe
   // MS-S-12: a pending MOVE / PLACE head of this viewer (V-11 / V-12)
   const bool bPending = CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice &&
                         (CommandUi.PendingChoice.Type == TEXT("MOVE") || CommandUi.PendingChoice.Type == TEXT("PLACE") ||
-                         CommandUi.PendingChoice.Type == TEXT("TARGET_FIGHTER"));  // 2026-10-15: the target rings
+                         CommandUi.PendingChoice.Type == TEXT("TARGET_FIGHTER") ||
+                         CommandUi.PendingChoice.Type == TEXT("CHOOSE_SPACE"));  // 2026-10-15: target / space rings
   // MS-T-17: the last move V-14 / V-15 joins every view while MS-P-03 holds it
   const FS08MoveDraftInput::FLastMove Last = LastMovePlateInput();
   if (!bDraft && !bInspect && !bPending) {

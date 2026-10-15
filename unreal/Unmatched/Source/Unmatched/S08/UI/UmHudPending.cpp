@@ -332,8 +332,10 @@ FUmPendingPlan Plan(const FUmPendingModel& M, const FUmPendingFrame& F, const TM
   const float IconW = M.Icon.IsNone() ? 0.0f : 32.0f;
   if (!F.bClassS && !bBoost) {
     // class L: two rows (card name with its glyph and queue chip; the hint) and the buttons right (HB-34 «text-left»)
-    const float W = CompactLSu;
     const float Pad = 12.0f;
+    // 2026-10-15 playtest: four buttons («Оставить на месте», «Отказаться», «Подтвердить», «Свернуть») ran 10 su past
+    // the plate's left rim - the plate grows to its buttons (centred), never narrower than CompactLSu
+    const float W = FMath::Max(CompactLSu, BW + 2.0f * Pad + 8.0f);
     const float X = 0.5f * (CW - W);
     const float Y = F.TopSu;
     const float Left = W - 2.0f * Pad - (BW > 0.0f ? BW + 12.0f : 0.0f);
@@ -608,7 +610,9 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       const bool bOrder = H.Mode == TEXT("ORDER");
       M.View = EUmPendingView::Modal;
       M.Body = bOrder ? EUmPendingBody::Order : EUmPendingBody::Pick;
-      M.Text = Printed;
+      // 2026-10-15 playtest: the ORDER step showed the same card text as the pick and nothing on what to click
+      const FString OrderHint = bOrder ? UmPdString(TEXT("why.order.pick")) : FString();
+      M.Text = OrderHint.IsEmpty() ? Printed : Printed + TEXT(" ") + OrderHint;
       M.HeroSlug = In.OwnHeroSlug;
       for (const FS09CardView& C : In.Revealed) {
         FUmPendingCard Card;
@@ -629,6 +633,10 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       M.Icon = FName(T == TEXT("MOVE") ? TEXT("state-pending-move") : TEXT("state-pending-place"));
       M.Text = In.MovePrompt.IsSet() ? UmHudStatus::LineText(In.MovePrompt, FS09TurnStatusInput()).ToString() : Printed;
       M.bStay = T == TEXT("MOVE") && In.bCanStay;
+      // 2026-10-15 playtest («Управляя штормом»): a destination was set, but only Enter sent it - the panel had no
+      // «Подтвердить» (MOVE / PLACE now confirm like the target and space choices)
+      M.bConfirm = true;
+      M.ConfirmWhy = Busy(Ui.bPendingCellSet ? FS09Reason() : FS09Reason::Make(TEXT("why.space.pick")));
     } else if (T == TEXT("TARGET_FIGHTER")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Board;
@@ -644,7 +652,13 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Board;
       M.Icon = FName(TEXT("state-pending-place"));
-      M.Text = FirstSentence(Printed);
+      // 2026-10-15 playtest («Беспокойные духи»): no lit spaces, no button and the status «Выберите цель (до 1)» - the
+      // panel says to click a lit space and confirms like the target choice
+      const bool bPicked = Ui.bPendingCellSet;
+      const FString Hint = UmPdString(TEXT("why.space.pick"));
+      M.Text = Hint.IsEmpty() ? FirstSentence(Printed) : FirstSentence(Printed) + TEXT(" ") + Hint;
+      M.bConfirm = true;
+      M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(TEXT("why.space.pick")));
     } else if (T == TEXT("DISCARD_CARDS")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Discard;

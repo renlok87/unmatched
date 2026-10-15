@@ -564,7 +564,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.badge.steps` | {steps}/{allowance} | {steps}/{allowance} |
 | `ms.badge.steps.boost` | {steps}/{allowance} · нужно +{required} | {steps}/{allowance} · needs +{required} |
 | `ms.badge.attack.from` | Отсюда можно атаковать: {n} | Can attack from here: {n} |
-| `ms.pending.move` | Выбор эффекта: переместите {fighterName} до {n} | Effect choice: move {fighterName} up to {n} |
+| `ms.pending.move` | Выбор эффекта: {fighterName} — переместите до {n} | Effect choice: move {fighterName} up to {n} |
 | `ms.pending.move.enemy` | Вы двигаете бойца соперника: {fighterName} | You are moving an opponent's fighter: {fighterName} |
 | `ms.pending.place` | Выбор эффекта: поместите {fighterName} | Effect choice: place {fighterName} |
 | `ms.btn.stay` | Оставить на месте | Stay in place |
@@ -582,7 +582,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.status.action` | Выберите действие: манёвр (M), атака (A) или схема (G) | Choose an action: maneuver (M), attack (A) or scheme (G) |
 | `ms.status.end` | Действий не осталось: завершите ход (E) | No actions left: end your turn (E) |
 | `ms.status.fighter` | Выберите бойца, который пойдёт | Choose a fighter to move |
-| `ms.status.space` | Выберите клетку для {fighterName}; Enter — подтвердить манёвр | Choose a space for {fighterName}; Enter confirms the maneuver |
+| `ms.status.space` | {fighterName}: выберите клетку; Enter — подтвердить манёвр | Choose a space for {fighterName}; Enter confirms the maneuver |
 | `ms.status.attacker` | Выберите атакующего бойца | Choose the attacking fighter |
 | `ms.status.target` | Выберите цель для {fighterName} | Choose a target for {fighterName} |
 | `ms.status.attack.card` | Выберите карту атаки против {target} (1–9) | Choose an attack card against {target} (1–9) |
@@ -599,6 +599,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.choice.object` | Выберите, кого переместить | Choose what to move |
 | `ms.choice.target` | Выберите цель (до {n}) | Choose a target (up to {n}) |
 | `ms.choice.target.board` | Выберите цель на поле | Choose a target on the board |
+| `ms.choice.space.board` | Выберите клетку на поле | Choose a space on the board |
 | `ms.pending.opp.turn` | Ваш выбор в ход соперника | Your choice during the opponent's turn |
 | `ms.pending.collapsed` | Ваш выбор ждёт: {choice} | Your choice is waiting: {choice} |
 | `ms.pending.again` | Снова: {choice} | Again: {choice} |

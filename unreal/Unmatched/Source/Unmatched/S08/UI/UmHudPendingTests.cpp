@@ -540,7 +540,9 @@ bool FUmPendingFormsTest::RunTest(const FString&) {
   TestEqual(TEXT("MOVE: the move glyph"), M.Icon, FName(TEXT("state-pending-move")));
   TestEqual(TEXT("MOVE: «ещё 2»"), M.QueueMore, 2);
   TestTrue(TEXT("MOVE: «Оставить на месте», «Свернуть», no «Отказаться» (up to - not «you may»)"), M.bStay && M.bCollapse && !M.bDecline);
-  TestFalse(TEXT("MOVE: no confirm button (the space is the answer)"), M.bConfirm);
+  // 2026-10-15 playtest: the space alone did not send the move (only Enter did) - MOVE confirms, disabled until a space
+  TestTrue(TEXT("MOVE: «Подтвердить», disabled until a space is set (why.space.pick)"),
+           M.bConfirm && M.ConfirmWhy.Key == FName(TEXT("why.space.pick")));
   UUmHudPending* P = CreateWidget<UUmHudPending>(W.World, UUmHudPending::StaticClass());
   if (!TestNotNull(TEXT("pending"), P)) return false;
   P->SetFrame(Frame(Canvases[0]));

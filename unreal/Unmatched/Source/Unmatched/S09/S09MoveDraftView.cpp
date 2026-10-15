@@ -44,6 +44,18 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
         }
       }
     }
+    // 2026-10-15 playtest («Беспокойные духи»): a CHOOSE_SPACE head lights its legal spaces (V-12 ring, board.choice)
+    // until one is picked, then the picked space alone; Source "space" keeps the rings on the choice-only layer
+    if (Ui.bHasPendingChoice && Ui.PendingChoice.Type == TEXT("CHOOSE_SPACE")) {
+      In.bPending = true;
+      In.bPendingPlace = true;
+      In.Source = TEXT("space");
+      if (Ui.bPendingCellSet) {
+        In.PendingCells.Add(FS08BoardModel::CellKey(Ui.PendingCellX, Ui.PendingCellY));
+      } else {
+        In.PendingCells = Ui.ComputePendingCells(FS08Snapshot(), Board, Fighters);
+      }
+    }
     // 2026-10-15 playtest: a TARGET_FIGHTER head (A Momentary Glance) - the V-17 rings under its legal targets, only
     // the picked one once clicked (the board never showed who may be picked, the panel said «щёлкните подсвеченного»)
     if (Ui.bHasPendingChoice && Ui.PendingChoice.Type == TEXT("TARGET_FIGHTER")) {

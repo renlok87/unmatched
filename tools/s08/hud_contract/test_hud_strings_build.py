@@ -25,7 +25,7 @@ class RepoTests(unittest.TestCase):
     def test_tables_and_namespaces(self):
         self.assertEqual({n: t["namespace"] for n, t in hs.TABLES.items()},
                          {"ST_Hud": "hud", "ST_Screens": "screens", "ST_Ms": "ms", "ST_Why": "why"})
-        self.assertEqual(len(ROWS["ST_Why"]), 52)  # 40 + 8 screen reasons of 04 §6.1 + why.defense.pick (VS-3 HB-30) + why.pick.count (VS-4 HB-35) + why.boost.pick, why.target.pick (2026-10-15)
+        self.assertEqual(len(ROWS["ST_Why"]), 54)  # 40 + 8 screen reasons of 04 §6.1 + why.defense.pick (VS-3 HB-30) + why.pick.count (VS-4 HB-35) + why.boost.pick, why.target.pick, why.order.pick, why.space.pick (2026-10-15)
         for key in ("why.login.fields", "why.code.length", "why.room.started", "why.room.full", "why.hero.taken",
                     "why.room.not.ready", "why.room.no.hero", "why.room.board.locked"):
             self.assertIn(key, {r["Key"] for r in ROWS["ST_Why"]})

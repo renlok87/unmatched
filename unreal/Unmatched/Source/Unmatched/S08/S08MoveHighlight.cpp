@@ -530,8 +530,9 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& InView) {
   if (bChoiceOnly) {
     // VS-6: without -S08MovePlates only the choice layer - the V-17 rings (DE-017), the FX-14 path, the pulse
     TArray<FS08PlateView> Kept;
+    const bool bSpaceChoice = View.Source == TEXT("space");  // CHOOSE_SPACE: its V-12 rings stay (2026-10-15)
     for (const FS08PlateView& P : View.Plates) {
-      if (P.Ring != ES08RingState::Candidate) continue;
+      if (P.Ring != ES08RingState::Candidate && !(bSpaceChoice && P.Ring == ES08RingState::PendingPlace)) continue;
       FS08PlateView C = P;
       C.Outline = ES08OutlineState::None;
       C.bPathDot = false;

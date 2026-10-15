@@ -1997,6 +1997,7 @@ void AS08FlowGameMode::HandleClick() {
       }
       ToastUntil = Elapsed + 3.0f;
       RefreshUi();
+      RefreshHud();  // 2026-10-15 playtest: the UMG panel's «Подтвердить» follows the pick in this frame
       return;
     }
     int32 CellX, CellY;
@@ -2019,6 +2020,9 @@ void AS08FlowGameMode::HandleClick() {
     }
     ToastUntil = Elapsed + 3.0f;
     RefreshUi();
+    // 2026-10-15 playtest: the UMG choice panel kept «Подтвердить» disabled after the pick (refused why.space.pick) until
+    // the next snapshot - the panel model is built in RefreshHud
+    RefreshHud();
     return;
   }
   if (CommandUi.Mode == ES09CommandMode::CombatDefense ||
