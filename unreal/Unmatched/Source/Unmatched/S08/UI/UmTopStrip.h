@@ -20,11 +20,13 @@
 #include "../S08ArtHud.h"
 #include "../S08ArtLook.h"
 #include "UmConnectionBadge.h"
+#include "../../S09/S09TurnStrip.h"
 
 class UUmGameHud;
 class UUmHudBanner;
 class UUmHudStatusLine;
 class UUmHudTop;
+class UUmHudTurnStrip;
 class UWidget;
 
 struct UNMATCHED_API FUmTopStripFrame {
@@ -33,6 +35,9 @@ struct UNMATCHED_API FUmTopStripFrame {
   float StatusMaxWidthSu = 880.0f;
   /** UI-ACC-017 (HB-43): the key chips of STATUS. */
   bool bKeyHints = false;
+  /** HB-50: the layout left room for the compact turn strip only; reduced motion stops its pulse. */
+  bool bTurnStripCompact = false;
+  bool bReducedMotion = false;
 };
 
 struct UNMATCHED_API FUmTopStripTick {
@@ -67,6 +72,8 @@ class UNMATCHED_API FUmTopStrip {
   FString Tick(const FUmTopStripTick& T);
   /** The STATUS line (false: STATUS is on Slate). */
   bool ApplyStatus(const FS09TurnStatusInput& In);
+  /** HB-50: the turn strip (false: rolled back / not built). Returns the model's Key() through OutKey. */
+  bool ApplyTurnStrip(const FS09TurnStripModel& Model, FString* OutKey = nullptr);
   /** SHOT lines of the visible blocks; RectOf gives a widget's viewport px rect (empty when not drawn). */
   void CollectShotLines(TArray<FString>& Out, TFunctionRef<FS08ScreenRect(UWidget*)> RectOf) const;
 
@@ -77,11 +84,15 @@ class UNMATCHED_API FUmTopStrip {
   UUmHudTop* GetTop() const { return Top.Get(); }
   UUmHudStatusLine* GetStatus() const { return Status.Get(); }
   UUmHudBanner* GetBanner() const { return Banner.Get(); }
+  UUmHudTurnStrip* GetTurnStrip() const { return TurnStrip.Get(); }
 
  private:
   TWeakObjectPtr<UUmHudTop> Top;
   TWeakObjectPtr<UUmHudStatusLine> Status;
   TWeakObjectPtr<UUmHudBanner> Banner;
+  TWeakObjectPtr<UUmHudTurnStrip> TurnStrip;
+  FS09TurnStripModel StripModel;
+  FString LastStripKey;
   FUmTopStripFrame Frame;
   bool bWasReady = false;
   double InFlightSince = -1.0;

@@ -121,6 +121,7 @@
 #include "UI/UmHudTheme.h"
 #include "UI/UmHudTop.h"
 #include "UI/UmText.h"
+#include "UI/UmHudTurnStrip.h"
 #include "UI/UmTopStrip.h"
 #include "UI/UmWorldGallery.h"
 #include "UI/UmZoneBadges.h"
@@ -477,6 +478,8 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   StripFrame.PxPerSu = R.Layout.PxPerSu;
   const FBox2D StatusRect = R.Layout.Rect(EUmHudBlock::Status);
   StripFrame.StatusMaxWidthSu = StatusRect.bIsValid ? static_cast<float>(StatusRect.Max.X - StatusRect.Min.X) : 600.0f;
+  StripFrame.bTurnStripCompact = R.Layout.bTurnStripCompact;  // HB-50
+  StripFrame.bReducedMotion = MoveMotion.bReducedMotion;
   StripFrame.bKeyHints = UmKeyHintsNow();  // VS-4 HB-43: UI-ACC-017 (04 §2.11) - the STATUS chips with the ACTIONS ones
   R.TopStrip.SetFrame(StripFrame);
   const FBox2D OppHandRect = R.Layout.Rect(EUmHudBlock::OppHand);  // VS-2 HB-18...HB-21
@@ -1138,6 +1141,7 @@ void AS08FlowGameMode::TickUmHud() {
   TickUmCardFlashCue();  // VS-4 CP-21: the done line of the CUE-006 show
   if (UUmHudHand* Hand = UmHud->Hand.Get()) Hand->StepAnimating();  // VS-3 (ВР-VS3-69): the card tweens of the hand
   TickUmTopStrip();  // VS-2 HB-14...HB-16
+  TickUmTurnStrip();  // HB-50: the turn stage strip
   TickUmPanels();    // VS-2 HB-18...HB-21
   RefreshUmCombat();  // VS-3 HB-30...HB-33: the staging's clock moves the edges and the centre
   FUmHudRuntime& R = *UmHud;
@@ -1395,6 +1399,53 @@ float AS08FlowGameMode::UmHudPanelLocRightSu() const {
   const UUmHudPlayerPanel* Loc = UmHud->Panels.GetLoc();
   const FBox2D Rect = UmHud->Layout.Rect(EUmHudBlock::PanelLoc);
   return Loc && UmGameHudSlots::ShownByProperty(Loc) && Rect.bIsValid ? static_cast<float>(Rect.Max.X) : 0.0f;
+}
+
+void AS08FlowGameMode::TickUmTurnStrip() {
+  if (!UmHud.IsValid() || !UmHud->TopStrip.GetTurnStrip()) return;
+  FS09TurnStripInput In;
+  In.bShow = Hud.bValid && !Hud.bGameOver && !IsResultScreenShown();
+  In.bOwnTurn = Hud.bViewerTurn;
+  const FS09ActionTracker::FSlots Side = Hud.bViewerTurn ? ActionTracker.Own() : ActionTracker.Opponent();
+  In.Slots = FMath::Max(1, Side.Slots);
+  for (int32 I = 0; I < Side.Spent; ++I) In.Spent.Add(ActionTracker.SpentType(I));
+  const FS09PlayerPanel* Active = Hud.bViewerTurn ? Hud.ViewerPanel() : Hud.OpponentPanel();
+  const int32 Limit = Active && Active->HandMaxSize > 0 ? Active->HandMaxSize : 7;
+  In.bOverLimit = Active && Active->HandCount > Limit;
+  In.bDiscardNow = Hud.bHasPendingDiscard && Hud.PendingDiscard.Count > 0;
+  const FS09TurnStatusInput Status = BuildTurnStatusInput();
+  const bool bChoice = CommandUi.Mode == ES09CommandMode::PendingChoice || Status.bOpponentChoice;
+  const bool bCombat = CommandUi.Combat.bPresent && Hud.Phase.StartsWith(TEXT("COMBAT"));
+  const FName Attack(TEXT("attack"));
+  auto Run = [&In](FName Type, ES09StripStep Step, bool bSpent) {
+    In.Current = Type;
+    In.Step = Step;
+    In.bStepSpent = bSpent;
+  };
+  if (bCombat && Hud.Phase == TEXT("COMBAT")) {
+    Run(Attack, ES09StripStep::AttackDefense, true);
+    In.bMyStep = !Hud.bViewerTurn && CommandUi.Mode == ES09CommandMode::CombatDefense;
+  } else if (bCombat) {
+    Run(Attack, ES09StripStep::AttackReveal, true);
+  } else if (CombatStage.IsActive()) {
+    Run(Attack, CombatStage.ShowsOutcome(NowMs()) ? ES09StripStep::AttackResult : ES09StripStep::AttackReveal, true);
+  } else if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+    Run(Attack, ES09StripStep::AttackDeclare, false);
+  } else if (CommandUi.Mode == ES09CommandMode::SchemeChoice) {
+    Run(FName(TEXT("scheme")), ES09StripStep::SchemePlay, false);
+  } else if (Flow.IsValid() && !FS08Contracts::PendingManeuverId(Flow->GetAppliedSnapshot()).IsEmpty()) {
+    Run(FName(TEXT("maneuver")), ES09StripStep::ManeuverMove, true);
+  } else if (bChoice && In.Spent.Num() > 0 && !In.Spent.Last().IsNone()) {
+    // a deferred choice of the last action (an after-combat effect, the scheme's effect, a maneuver's PLACE)
+    const FName Last = In.Spent.Last();
+    Run(Last,
+        Last == Attack                ? ES09StripStep::AttackResult
+        : Last == TEXT("scheme")      ? ES09StripStep::SchemeEffect
+                                      : ES09StripStep::ManeuverMove,
+        true);
+  }
+  In.bChoice = bChoice;
+  UmHud->TopStrip.ApplyTurnStrip(S09TurnStrip::Build(In));
 }
 
 void AS08FlowGameMode::TickUmTopStrip() {
@@ -2608,6 +2659,9 @@ void AS08FlowGameMode::TickUmFeed() {
   if (Shown(R.Panels.GetOppHand())) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::OppHand));
   if (R.Layout.HasRect(EUmHudBlock::Decks)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Decks));
   if (R.Layout.HasRect(EUmHudBlock::Actions)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Actions));
+  if (const UUmHudTurnStrip* Strip = R.TopStrip.GetTurnStrip()) {  // HB-50: the plate as drawn (it hugs its nodes)
+    if (Shown(Strip) && R.Layout.HasRect(EUmHudBlock::TurnStrip)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::TurnStrip));
+  }
   if (const UUmHudLog* LogW = R.Feed.GetLog()) {
     if (!R.Layout.bClassS && Shown(LogW)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Log));
   }

@@ -6,6 +6,8 @@
 #include "UmHudBanner.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTop.h"
+#include "UmHudTurnStrip.h"
+#include "../S08TraceLog.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Border.h"
 
@@ -59,6 +61,19 @@ TArray<FString> FUmTopStrip::Build(UUmGameHud& Game, const S08ArtLook::FS08Slate
   } else {
     Fields.Add(TEXT("banner=slate"));
   }
+  // HB-50 (2026-10-16): the turn strip, rollback -S08SlateHud=turnstrip (none)
+  if (!Blocks.IsSlate(FName(TEXT("turnstrip")))) {
+    TurnStrip = CreateWidget<UUmHudTurnStrip>(&Game, UUmHudTurnStrip::StaticClass());
+    if (TurnStrip.IsValid() && Game.SetBlock(EUmGameSlot::TurnStrip, TurnStrip.Get())) {
+      TurnStrip->SetVisibility(ESlateVisibility::Collapsed);  // shown with the live match HUD and a model
+      Fields.Add(TEXT("turnstrip=umg"));
+    } else {
+      TurnStrip = nullptr;
+      Fields.Add(TEXT("turnstrip=failed"));
+    }
+  } else {
+    Fields.Add(TEXT("turnstrip=none"));
+  }
   Lines.Add(TEXT("HUD-TOPSTRIP ") + FString::Join(Fields, TEXT(" ")));
   return Lines;
 }
@@ -73,6 +88,7 @@ void FUmTopStrip::SetFrame(const FUmTopStripFrame& InFrame) {
     S->SetFrame(F);
   }
   if (UUmHudBanner* B = Banner.Get()) B->SetPxPerSu(Frame.PxPerSu);
+  if (TurnStrip.IsValid()) ApplyTurnStrip(StripModel);
 }
 
 FUmConnInput FUmTopStrip::ConnInput(const FUmTopStripTick& T) {
@@ -108,6 +124,7 @@ FString FUmTopStrip::Tick(const FUmTopStripTick& T) {
     const ESlateVisibility Vis = bShown ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed;
     if (UUmHudTop* TopW = Top.Get()) TopW->SetVisibility(Vis);
     if (UUmHudStatusLine* S = Status.Get()) S->SetVisibility(Vis);
+    if (TurnStrip.IsValid()) ApplyTurnStrip(StripModel);  // the strip follows the live match HUD with its last model
   }
   if (UUmHudTop* TopW = Top.Get()) {
     if (bShown) {
@@ -127,6 +144,27 @@ FString FUmTopStrip::Tick(const FUmTopStripTick& T) {
   return Line;
 }
 
+bool FUmTopStrip::ApplyTurnStrip(const FS09TurnStripModel& Model, FString* OutKey) {
+  UUmHudTurnStrip* S = TurnStrip.Get();
+  if (!S) return false;
+  StripModel = Model;
+  FS09TurnStripModel Shown = Model;
+  Shown.bShow = Model.bShow && bShown;
+  FUmTurnStripFrame F;
+  F.bClassS = Frame.bClassS;
+  F.bCompact = Frame.bTurnStripCompact;
+  F.PxPerSu = Frame.PxPerSu;
+  F.bReducedMotion = Frame.bReducedMotion;
+  S->ApplyModel(Shown, F);
+  const FString Key = Shown.Key();
+  if (Key != LastStripKey) {
+    LastStripKey = Key;
+    FS08Trace::Write(FString::Printf(TEXT("HUD-TURNSTRIP %s mode=%s"), *Key, F.bCompact ? TEXT("compact") : TEXT("full")));
+  }
+  if (OutKey) *OutKey = Key;
+  return true;
+}
+
 bool FUmTopStrip::ApplyStatus(const FS09TurnStatusInput& In) {
   UUmHudStatusLine* S = Status.Get();
   if (!S) return false;
@@ -142,4 +180,7 @@ void FUmTopStrip::CollectShotLines(TArray<FString>& Out, TFunctionRef<FS08Screen
     if (UmGameHudSlots::ShownByProperty(S)) S->CollectShotLines(Out, RectOf(S->Body.Get()));
   }
   if (const UUmHudBanner* B = Banner.Get()) B->CollectShotLines(Out, RectOf(B->Plate.Get()));
+  if (const UUmHudTurnStrip* T = TurnStrip.Get()) {
+    if (UmGameHudSlots::ShownByProperty(T)) T->CollectShotLines(Out, RectOf(T->Plate.Get()));
+  }
 }

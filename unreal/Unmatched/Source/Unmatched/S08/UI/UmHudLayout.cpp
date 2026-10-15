@@ -1,5 +1,6 @@
 // VS-2 HB-06: the layout of the GAME screen - see UmHudLayout.h.
 #include "UmHudLayout.h"
+#include "UmHudTurnStrip.h"
 
 namespace UmHudLayout {
 namespace {
@@ -34,6 +35,7 @@ const TCHAR* BlockName(EUmHudBlock Block) {
     case EUmHudBlock::Toast: return TEXT("toast");
     case EUmHudBlock::Sub: return TEXT("sub");
     case EUmHudBlock::Decks: return TEXT("decks");
+    case EUmHudBlock::TurnStrip: return TEXT("turnstrip");
     case EUmHudBlock::DeckPanel: return TEXT("deckpanel");
     case EUmHudBlock::Actions: return TEXT("actions");
     default: return TEXT("?");
@@ -180,6 +182,35 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::DeckPanel, UmLayoutBox(W - M - 300.0f, DeckTop, 300.0f, Decks.Min.Y - GapSu - DeckTop));
     L.HandLeftSu = PanelLoc.Max.X + HandGapLeftSu;
     L.HandRightSu = Actions.Min.X - HandGapRight;
+  }
+  // HB-50 (2026-10-16, TURN-STRIP.md): the turn strip in the TOP row, right of «Ход N», as high as TOP. The full strip
+  // (with the sub-step tray) when STATUS keeps >= 640 su (L) / 440 su (S) centred between it and its mirror; else the
+  // compact one (four nodes); else none. STATUS stays centred and narrows to that room when it must.
+  {
+    const FBox2D TopR = L.Rect(EUmHudBlock::Top);
+    const FBox2D StatusR = L.Rect(EUmHudBlock::Status);
+    const float X0 = static_cast<float>(TopR.Max.X) + GapSu;
+    const float StripH = static_cast<float>(TopR.Max.Y - TopR.Min.Y);
+    const float StatusW = static_cast<float>(StatusR.Max.X - StatusR.Min.X);
+    const float Floor = FMath::Min(StatusW, L.bClassS ? 440.0f : 640.0f);
+    auto Room = [W, X0](float StripW) { return W - 2.0f * (X0 + StripW + GapSu); };
+    const float Full = UmHudTurnStrip::FullWidthSu(L.bClassS);
+    const float Compact = UmHudTurnStrip::CompactWidthSu(L.bClassS);
+    float StripW = 0.0f;
+    if (Room(Full) >= Floor) {
+      StripW = Full;
+    } else if (Room(Compact) >= Floor) {
+      StripW = Compact;
+      L.bTurnStripCompact = true;
+    }
+    if (StripW > 0.0f) {
+      Set(EUmHudBlock::TurnStrip, UmLayoutBox(X0, static_cast<float>(TopR.Min.Y), StripW, StripH));
+      const float NewW = FMath::Min(StatusW, Room(StripW));
+      if (NewW < StatusW) {
+        Set(EUmHudBlock::Status, UmLayoutBox(0.5f * (W - NewW), static_cast<float>(StatusR.Min.Y), NewW,
+                                             static_cast<float>(StatusR.Max.Y - StatusR.Min.Y)));
+      }
+    }
   }
   // ВР-VS2-10: OPP-HAND (the backs of the opponent's hand) keeps out of FIELD - its width is the room right of the
   // cells (the step of the backs shrinks, 04 §2.3), never under 120 su. Sarpedon at 1137.8 su: 201 of 220.

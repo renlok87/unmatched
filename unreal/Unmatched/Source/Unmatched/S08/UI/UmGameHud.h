@@ -33,6 +33,7 @@ enum class EUmGameSlot : uint8 {
   Banner,
   Toast,
   Sub,
+  TurnStrip,  // HB-50 (2026-10-16): created in code when the WBP has no such slot
   Num
 };
 constexpr int32 UmGameSlotCount = static_cast<int32>(EUmGameSlot::Num);
@@ -118,9 +119,13 @@ class UNMATCHED_API UUmGameHud : public UUserWidget {
   TObjectPtr<USizeBox> Toast;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional))
   TObjectPtr<USizeBox> Sub;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional))
+  TObjectPtr<USizeBox> TurnStrip;
 
  private:
   void BindSlotsFromTree();
+  /** HB-50: a slot the WBP lacks (TurnStrip, added after WBP_UI_SCR_GAME) is made in its canvas. */
+  void EnsureSlots();
   FUmHudLayout Layout;
   FString ScreenState = TEXT("own");
   bool bCodeDefaultTree = false;

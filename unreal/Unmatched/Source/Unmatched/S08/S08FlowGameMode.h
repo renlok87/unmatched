@@ -1319,6 +1319,9 @@ private:
   // VS-2 HB-14...HB-16: TOP + CONN, STATUS and the banner (S08/UI/UmHudTop, UmHudStatusLine, UmHudBanner)
   void BuildUmTopStrip();
   void TickUmTopStrip();
+  /** HB-50 (2026-10-16): the turn strip model from the tracker, the combat, the drafts, pendingManeuver, choices and the
+   *  discard (S09TurnStrip::Build). */
+  void TickUmTurnStrip();
   /** The UMG STATUS took the line (false: -S08SlateHud=status, the Slate text in the hand panel stays). */
   bool ApplyUmHudStatus(const FS09TurnStatusInput& In);
   void HandleUmTopPress(const TCHAR* What);

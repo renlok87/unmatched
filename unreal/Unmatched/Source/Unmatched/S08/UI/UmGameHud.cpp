@@ -32,6 +32,7 @@ const TCHAR* SlotName(EUmGameSlot Slot) {
     case EUmGameSlot::Banner: return TEXT("Banner");
     case EUmGameSlot::Toast: return TEXT("Toast");
     case EUmGameSlot::Sub: return TEXT("Sub");
+    case EUmGameSlot::TurnStrip: return TEXT("TurnStrip");
     default: return TEXT("?");
   }
 }
@@ -86,6 +87,7 @@ FBox2D SlotRect(const FUmHudLayout& Layout, EUmGameSlot Slot) {
       // VS-4 HB-39: class S has no column - the slot is the list under TOP (360 x 320, open from «Журнал», ВР-H07)
       return Layout.bClassS ? UmHudLog::ListRectSu(Layout.Rect(EUmHudBlock::Top)) : Layout.Rect(EUmHudBlock::Log);
     case EUmGameSlot::Banner: return Layout.Rect(EUmHudBlock::Banner);
+    case EUmGameSlot::TurnStrip: return Layout.Rect(EUmHudBlock::TurnStrip);
     case EUmGameSlot::Toast:
     case EUmGameSlot::Sub:
       // VS-4 HB-40 / HB-41: the whole canvas - the stack and the capsule place themselves by the chain of 04 §2.12
@@ -115,6 +117,7 @@ FName SlotKey(EUmGameSlot Slot) {
     case EUmGameSlot::Banner: return FName(TEXT("banner"));
     case EUmGameSlot::Toast: return FName(TEXT("toast"));
     case EUmGameSlot::Sub: return FName(TEXT("sub"));
+    case EUmGameSlot::TurnStrip: return FName(TEXT("turnstrip"));
     default: return NAME_None;
   }
 }
@@ -180,8 +183,23 @@ bool UUmGameHud::Initialize() {
     if (!bCodeDefaultTree) UE_LOG(LogTemp, Error, TEXT("UMHUD game default tree: %s"), *Error);
     BindSlotsFromTree();
   }
+  if (bFirst) EnsureSlots();
   if (bFirst) SetVisibility(ESlateVisibility::SelfHitTestInvisible);
   return bFirst;
+}
+
+void UUmGameHud::EnsureSlots() {
+  if (!WidgetTree || !Canvas) return;
+  if (!TurnStrip) {
+    USizeBox* Box = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), FName(TEXT("TurnStrip")));
+    Box->SetVisibility(ESlateVisibility::HitTestInvisible);
+    if (UCanvasPanelSlot* CanvasSlot = Canvas->AddChildToCanvas(Box)) {
+      CanvasSlot->SetAnchors(FAnchors(0.0f, 0.0f));
+      CanvasSlot->SetAlignment(FVector2D::ZeroVector);
+      CanvasSlot->SetAutoSize(false);
+      TurnStrip = Box;
+    }
+  }
 }
 
 void UUmGameHud::BindSlotsFromTree() {
@@ -191,7 +209,7 @@ void UUmGameHud::BindSlotsFromTree() {
   TObjectPtr<USizeBox>* Slots[UmGameSlotCount] = {&Top,          &Status,      &PanelLoc,    &PanelOpp,   &OppHand,
                                                   &Hand,         &Decks,       &DeckPanel,   &Actions,    &CombatCenter,
                                                   &CombatEdgeL,  &CombatEdgeR, &Pending,     &SourceSlot, &Log,
-                                                  &Banner,       &Toast,       &Sub};
+                                                  &Banner,       &Toast,       &Sub,         &TurnStrip};
   for (int32 I = 0; I < UmGameSlotCount; ++I) {
     *Slots[I] = Cast<USizeBox>(Tree->FindWidget(FName(UmGameHudSlots::SlotName(static_cast<EUmGameSlot>(I)))));
   }
@@ -201,7 +219,7 @@ USizeBox* UUmGameHud::GetSlot(EUmGameSlot Which) const {
   const TObjectPtr<USizeBox> Slots[UmGameSlotCount] = {Top,         Status,      PanelLoc, PanelOpp,   OppHand, Hand,
                                                        Decks,       DeckPanel,   Actions,  CombatCenter, CombatEdgeL,
                                                        CombatEdgeR, Pending,     SourceSlot, Log,      Banner,  Toast,
-                                                       Sub};
+                                                       Sub,         TurnStrip};
   const int32 I = static_cast<int32>(Which);
   return I >= 0 && I < UmGameSlotCount ? Slots[I].Get() : nullptr;
 }

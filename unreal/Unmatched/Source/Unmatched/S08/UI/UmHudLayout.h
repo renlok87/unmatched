@@ -49,6 +49,7 @@ enum class EUmHudBlock : uint8 {
   Decks,
   DeckPanel,
   Actions,
+  TurnStrip,  // HB-50 (2026-10-16): the turn stage strip, in the TOP row
   Num
 };
 constexpr int32 UmHudBlockCount = static_cast<int32>(EUmHudBlock::Num);
@@ -96,6 +97,8 @@ struct UNMATCHED_API FUmHudLayout {
   double DeckPanelTransientPx2 = 0.0;
   /** VS-3 HB-27: the EN chip widths of DECKS (the UI language; the RU widths otherwise). */
   bool bEnglishChips = false;
+  /** HB-50: the turn strip shows only its four nodes (no sub-step tray): the full one would squeeze STATUS. */
+  bool bTurnStripCompact = false;
 
   /** CanvasSu = window / PxPerSu (fractional: 1137.78 x 640 at 1280x720 150 %); Field in su or null. */
   static FUmHudLayout Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu);

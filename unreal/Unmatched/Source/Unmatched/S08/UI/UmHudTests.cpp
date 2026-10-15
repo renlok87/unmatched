@@ -167,8 +167,8 @@ bool FUmHudRootTreeTest::RunTest(const FString&) {
     TestTrue(TEXT("the cache box takes no mouse"), Cache->GetVisibility() == ESlateVisibility::SelfHitTestInvisible);
   }
   TestTrue(TEXT("the same GAME screen on the second call"), Root->EnsureGameHud() == Game);
-  TestTrue(FString::Printf(TEXT("GAME: Canvas + 18 slots bound (missing %s)"), *Missing), Game->HasAllParts(&Missing));
-  TestEqual(TEXT("18 slots (04 §4.2)"), UmGameSlotCount, 18);
+  TestTrue(FString::Printf(TEXT("GAME: Canvas + 19 slots bound (missing %s)"), *Missing), Game->HasAllParts(&Missing));
+  TestEqual(TEXT("19 slots (04 §4.2 + HB-50 TurnStrip)"), UmGameSlotCount, 19);
   for (int32 I = 0; I < UmGameSlotCount; ++I) {
     const EUmGameSlot Slot = static_cast<EUmGameSlot>(I);
     USizeBox* Box = Game->GetSlot(Slot);
@@ -260,7 +260,10 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     const FUmHudLayout L = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, nullptr);
     const FString W = TEXT("1080p");
     RectIs(*this, L, EUmHudBlock::Top, 24, 24, 252, 44, W);
-    RectIs(*this, L, EUmHudBlock::Status, 520, 24, 880, 48, W);
+    // HB-50: the full turn strip right of TOP; STATUS stays centred, 732 su between the strip and its mirror
+    RectIs(*this, L, EUmHudBlock::TurnStrip, 284, 24, 302, 44, W);
+    TestFalse(TEXT("1080p: the full turn strip"), L.bTurnStripCompact);
+    RectIs(*this, L, EUmHudBlock::Status, 594, 24, 732, 48, W);
     RectIs(*this, L, EUmHudBlock::Banner, 750, 144, 420, 64, W);
     RectIs(*this, L, EUmHudBlock::SourceSlot, 24, 84, 190, 264, W);
     // VS-3 HB-30 / HB-31 (HB-29 delta 04): the own ribbon with the timer row (56 su), the buttons under it at x 32
@@ -290,6 +293,8 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     const FString W = TEXT("720p");
     TestFalse(TEXT("720p: the 720p column (not tall)"), L.bTall);
     RectIs(*this, L, EUmHudBlock::Status, 0.5f * (1706.667f - 720.0f), 24, 720, 48, W);
+    RectIs(*this, L, EUmHudBlock::TurnStrip, 284, 24, 174, 44, W);  // HB-50: compact, STATUS untouched
+    TestTrue(TEXT("720p: the compact turn strip"), L.bTurnStripCompact);
     RectIs(*this, L, EUmHudBlock::CombatR, 1452.67f, 360, 230, 351, W);
     RectIs(*this, L, EUmHudBlock::Defend, 32, 112, 230, 104, W);  // HB-29: at the top left (PANEL-LOC from y 800)
     RectIs(*this, L, EUmHudBlock::Log, 24, 688, 300, 104, W);
@@ -321,7 +326,9 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     const FUmHudLayout S720 = FUmHudLayout::Compute(FVector2D(1280.0 / 1.125, 640.0), 1.125f, nullptr);
     RectIs(*this, S720, EUmHudBlock::DeckPanel, 821.78f, 120, 300, 392, TEXT("S 1138x640 su"));
     TestEqual(TEXT("720p 150 %: STATUS at two lines stays over the deck panel header"), S720.DeckPanelBlocksPx2, 0.0);
-    RectIs(*this, L, EUmHudBlock::Status, 340, 16, 600, 48, W);  // VS-2 HB-15: one-line capsule 48 su
+    // VS-2 HB-15: one-line capsule 48 su; HB-50: centred between the compact turn strip and its mirror (468 su)
+    RectIs(*this, L, EUmHudBlock::Status, 406, 16, 468, 48, W);
+    RectIs(*this, L, EUmHudBlock::TurnStrip, 260, 16, 138, 40, W);
     RectIs(*this, L, EUmHudBlock::Banner, 430, 72, 420, 64, W);  // VS-2 HB-16 (ВР-VS2-45): under STATUS
     TestFalse(TEXT("S: no LOG rect"), L.HasRect(EUmHudBlock::Log));
   }
