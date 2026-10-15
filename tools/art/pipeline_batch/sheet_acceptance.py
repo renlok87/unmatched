@@ -228,7 +228,7 @@ class Sheet:
             if not (f.is_file() and b.sha256(f) == item["sha256"] and f.stat().st_size == item["bytes"]):
                 raise RuntimeError("manifest mismatch " + name)
             listed.add(f.resolve())
-        actual = {f.resolve() for f in p.rglob("*") if f.is_file() and f.name != "manifest-sha256.json"}
+        actual = {f.resolve() for f in p.rglob("*") if f.is_file() and f != p / "manifest-sha256.json"}
         if listed != actual:
             raise RuntimeError("manifest coverage mismatch")
         bad = [self.rel(f) for f in p.rglob("*") if f.suffix in (".md", ".json") and (

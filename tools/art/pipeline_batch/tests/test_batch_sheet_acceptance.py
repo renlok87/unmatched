@@ -137,6 +137,42 @@ def sheet(repo: Path, work: Path, **extra):
                                   "exe": "codex-not-used", "model": "m", "effort": "low", "user_quote": [], **extra})())
 
 
+@pytest.mark.parametrize("manifest_form", ["mapping", "list"])
+@pytest.mark.parametrize("damage", ["intact", "unlisted", "missing", "hash", "bytes"])
+def test_preflight_checks_nested_historical_manifest(tmp_path, manifest_form, damage):
+    repo = make_repo(tmp_path)
+    p = repo / f"art/imagegen/concept-{K}-codex"
+    manifest = p / "manifest-sha256.json"
+    archived = p / "history/20261013/preexisting-metadata/manifest-sha256.json"
+    archived.parent.mkdir(parents=True)
+    shutil.copy2(manifest, archived)
+    name = archived.relative_to(p).as_posix()
+    m = json.loads(manifest.read_text(encoding="utf-8"))
+    m["files"][name] = {"sha256": b.sha256(archived), "bytes": archived.stat().st_size}
+    if damage == "unlisted":
+        del m["files"][name]
+    elif damage == "missing":
+        archived.unlink()
+    elif damage == "hash":
+        archived.write_bytes(archived.read_bytes().replace(b'"files"', b'"other"', 1))  # same byte count
+    elif damage == "bytes":
+        m["files"][name]["bytes"] += 1  # correct hash, wrong byte count
+    if manifest_form == "list":
+        m["files"] = [dict(path=path, **item) for path, item in m["files"].items()]
+    manifest.write_text(json.dumps(m), encoding="utf-8")
+    s = sheet(repo, tmp_path / "work")
+    row = {"asset_id": AID, "key": K, "package": b.rel(p, repo)}
+    if damage == "intact":
+        s.preflight(row, 1)
+        result = json.loads((s.ev_dir(AID, 1) / "launcher-preflight.json").read_text(encoding="utf-8"))
+        assert result["manifest"] is True and result["recheck_same"] is True
+        assert result["package_hashes"][b.rel(archived, repo)] == b.sha256(archived)
+    else:
+        error = "manifest coverage mismatch" if damage == "unlisted" else "manifest mismatch " + name
+        with pytest.raises(RuntimeError, match=error):
+            s.preflight(row, 1)
+
+
 def test_preflight_creates_missing_cycle_folder(tmp_path):
     """C8: каталог цикла заводит сам инструмент; неизвестный ассет — по-прежнему ошибка, без каталогов-сирот."""
     repo = make_repo(tmp_path)
