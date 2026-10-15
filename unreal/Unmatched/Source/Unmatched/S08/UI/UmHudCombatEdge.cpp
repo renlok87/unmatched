@@ -589,14 +589,16 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   }
   UmEdgeShow(RoleIcon, true);
   UmEdgeIcon(RoleIcon, Model.Role == EUmEdgeRole::Attack ? TEXT("action-attack") : TEXT("action-defense"), DiscSu);
-  UmEdgePlace(RoleIcon, RibbonPos + FVector2D(3.0f, 0.5f * (BaseH - DiscSu)), FVector2D(DiscSu), 3);
+  // HUD v2: in the two-row (timer) ribbon the role row sits under the panel skin's top rim
+  const float RowDy = Model.bTimer && Theme.HasTextureSkin(TEXT("hud.status.banner")) ? 5.0f : 0.0f;
+  UmEdgePlace(RoleIcon, RibbonPos + FVector2D(3.0f + 2.0f * RowDy, RowDy + 0.5f * (BaseH - DiscSu)), FVector2D(DiscSu), 3);
   if (RoleText) {
     UmEdgeShow(RoleText, true);
     RoleText->SetText(Role);
     RoleText->SetWrapTextAt(TagRoomSu(bS));
     const float Row = bS ? TagRowSSu : TagRowLSu;
     const float TextH = TagRows * Row;
-    UmEdgePlace(RoleText, RibbonPos + FVector2D(TagLeftSu, 0.5f * (BaseH - TextH)), FVector2D(TagRoomSu(bS) + 2.0f, TextH), 3);
+    UmEdgePlace(RoleText, RibbonPos + FVector2D(TagLeftSu + 2.0f * RowDy, RowDy + 0.5f * (BaseH - TextH)), FVector2D(TagRoomSu(bS) + 2.0f, TextH), 3);
   }
   if (TeamChip) {
     const FSlateBrush* B = UmEdgeChip(Model.TeamSlot, Px);
@@ -620,7 +622,8 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
       TimerTrack->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("panel.bg.inset")), 0.0f));
       UmEdgePlace(TimerTrack, RibbonPos + FVector2D(Rim, RibbonWH.Y - TimerBarSu - Rim), FVector2D(RibbonWH.X - 2.0f * Rim, TimerBarSu), 3);
     }
-    if (TimerBar) TimerBar->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("card.cream")), 0.0f));
+    // the bar fill in gold leaf on the v2 rim (cream blended into the marble), cream on v1
+    if (TimerBar) TimerBar->SetBrush(FSlateRoundedBoxBrush(Theme.Color(Rim > 0.0f ? TEXT("turn.flash.yellow") : TEXT("card.cream")), 0.0f));
     if (WarnIcon) UmEdgeIcon(WarnIcon, TEXT("state-warning"), WarnSu);
     UmEdgePlace(WarnIcon, RibbonPos + FVector2D(RibbonWH.X - 8.0f - WarnSu, BaseH), FVector2D(WarnSu), 4);
     if (WarnEdge) {

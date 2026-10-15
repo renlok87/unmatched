@@ -1980,7 +1980,9 @@ bool AS08FlowGameMode::UmCombatOnUmg() const { return UmHud.IsValid() && UmHud->
 bool AS08FlowGameMode::UmCombatCenterOnUmg() const { return UmHud.IsValid() && UmHud->Combat.CenterOnUmg(); }
 
 bool AS08FlowGameMode::UmCombatOwnsDefenseWindow() const {
-  return UmCombatOnUmg() && UmHud->Combat.DrawsDefenseWindow() && !S08ArtLook::S08Markers();
+  // 2026-10-15 playtest: the UMG edge draws the window from its next refresh - until then the English Slate block
+  // flashed for a frame; with the UMG combat on, the Slate block never draws (the gate layer keeps it)
+  return UmCombatOnUmg() && !S08ArtLook::S08Markers();
 }
 
 void AS08FlowGameMode::RefreshUmCombat() {

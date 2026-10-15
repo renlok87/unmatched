@@ -555,7 +555,8 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       M.View = EUmPendingView::Toast;
       FFormatNamedArguments A;
       A.Add(TEXT("choice"), FText::FromString(In.RememberedChoice));
-      M.Text = In.RememberedChoice.IsEmpty() ? FString() : UmPdString(TEXT("ms.pending.remembered"), &A);
+      // 2026-10-15 playtest: with nothing remembered the bar showed only the source name - the printed text says what
+      M.Text = In.RememberedChoice.IsEmpty() ? FirstSentence(Printed) : UmPdString(TEXT("ms.pending.remembered"), &A);
       M.QueueMore = 0;
       M.bDecline = H.bOptional;  // 2026-10-15 playtest: the X chip only when the choice may be declined
       return M;
