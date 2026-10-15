@@ -96,7 +96,11 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** HUD v2 (art/imagegen/hud-v2-codex): the ornament skin V2Key when imported, else Fallback (the v1 skin key) - one
    *  call per widget keeps the old look wherever the kit has no such piece. */
   const FSlateBrush* SkinV2(FName V2Key, FName Fallback, float PxPerSu) const;
-  static constexpr float SkinX2MinPxPerSu = 1.5f;
+  /** 2026-10-16: was 1.5. Slate draws a Box brush's 9-slice borders at the TEXTURE's native pixels (ElementBatcher
+   *  AddBoxElements: ResourceProxy->ActualSize through the inverse layout transform), not at ImageSize - the x2 PNG at
+   *  1.5 px per su drew the HUD v2 marble rims and meander ends 1.33x too large (the status cartouche's dark band
+   *  shrank to ~12 px and the text ran over the ends). x2 maps 1 : 1 from 2.0 (4K, UI 200 %), like CardFrameX2MinPxPerSu. */
+  static constexpr float SkinX2MinPxPerSu = 2.0f;
   /** VS-3 CP-14 (ВР-VS3-16, refines CP-14 p. 3 "x2 from 1.333"): the card frame skins card.frame.* take their x2 texture
    *  from DPI x UI scale >= 2.0, where it maps 1 : 1 or larger. Below, the x2 PNG would be minified (1.5 px per su =
    *  0.75 of its texels, no mips by CP-14): the 0.45 cream arc of the idle corner sampled unevenly into a bright spot

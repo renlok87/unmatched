@@ -783,8 +783,9 @@ bool FUmHudThemeSkinsTest::RunTest(const FString&) {
       TestTrue(FString::Printf(TEXT("%s: stretch 'none' = DrawAs Image (the checkbox)"), *Key.ToString()),
                X1->DrawAs == ESlateBrushDrawType::Image && Key.ToString().StartsWith(TEXT("check.")));
     }
-    TestTrue(FString::Printf(TEXT("%s: x2 at 150 %%, x1 at 100 %%"), *Key.ToString()),
-             Theme->SkinFor(Key, 1.5f) == X2 && Theme->SkinFor(Key, 1.0f) == X1 && Theme->SkinFor(Key, 0.75f) == X1);
+    TestTrue(FString::Printf(TEXT("%s: x2 from 200 %%, x1 at 150 %% and below (Box borders draw at texture pixels)"), *Key.ToString()),
+             Theme->SkinFor(Key, 2.0f) == X2 && Theme->SkinFor(Key, 1.5f) == X1 && Theme->SkinFor(Key, 1.0f) == X1 &&
+                 Theme->SkinFor(Key, 0.75f) == X1);
   }
   TestEqual(TEXT("all 29 from the HB-08 package"), Textures, S08HudTokens::kNumSkins);
   return true;
