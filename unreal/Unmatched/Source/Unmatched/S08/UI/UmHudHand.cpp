@@ -585,6 +585,16 @@ void UUmHudHand::SetFrame(const FUmHandFrame& InFrame) {
   }
 }
 
+void UUmHudHand::ResyncCards() {
+  for (const TPair<FString, TObjectPtr<UUmCardWidget>>& L : Live) Release(L.Value);
+  Live.Reset();
+  for (const FLeaving& L : Leaving) Release(L.W.Get());
+  Leaving.Reset();
+  HandedOff.Reset();
+  PlacedNow.Reset();
+  bHasModel = false;
+}
+
 void UUmHudHand::ApplyModel(const FUmHandModel& InModel) {
   if (bHasModel && InModel == Model) return;
   const bool bFirst = !bHasModel;

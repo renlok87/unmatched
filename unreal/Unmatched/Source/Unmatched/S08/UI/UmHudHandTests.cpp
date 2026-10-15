@@ -422,6 +422,11 @@ bool FUmHandInputTest::RunTest(const FString&) {
   At(H, 4000.0);
   TestTrue(TEXT("tooltip «Только для Гарпии» over the hovered card"),
            H->IsTooltipShown() && H->GetTooltipText().ToString().Contains(UmWorldLayer::DisplayNameOf(TEXT("Harpy"))));
+  // 2026-10-15 playtest: a press-miss resyncs the hand - the same model wires every card again (no stale widget)
+  H->ResyncCards();
+  H->ApplyModel(A);
+  TestTrue(TEXT("resync: every card has its widget again"), H->FindCard(A.Cards[0].Card.InstanceId) != nullptr &&
+                                                           H->FindCard(A.Cards[0].Card.InstanceId)->GetPressId() == FName(*(TEXT("hand.") + A.Cards[0].Card.InstanceId)));
   H->SetHoverIndex(2);
   TestFalse(TEXT("no tooltip without an exact key"), H->IsTooltipShown());
   // the unplayable card without a why goes on to the owner (the game logic answers)

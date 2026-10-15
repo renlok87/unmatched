@@ -225,6 +225,9 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   const FUmHandFrame& GetFrame() const { return Frame; }
   /** The one data input (П1): a snapshot, a selection, a mode change. Same model = no work. */
   void ApplyModel(const FUmHandModel& InModel);
+  /** 2026-10-15 playtest: a press named a card no longer in the hand (5 misses in a row: the model did not change, the
+   *  stale widget stayed) - every card widget goes back to the pool and the next ApplyModel wires them again. */
+  void ResyncCards();
   const FUmHandModel& GetModel() const { return Model; }
   /** OnPress(outcome, instance id) answers a resolved press of a card; OnInspect(instance id) the right button;
    *  OnPlay(instance id) the double click. */

@@ -1714,6 +1714,8 @@ void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, con
     }
     if (Index == INDEX_NONE) {
       Self->ShowReason(FS09Reason::Make(TEXT("why.state.changed")), 3.0f);
+      // the same model would keep the stale widget: the hand rewires every card from the current hand
+      if (Self->UmHud.IsValid() && Self->UmHud->Hand.IsValid()) Self->UmHud->Hand->ResyncCards();
       Self->RefreshHud();  // the hand widget redraws from the current hand
       return;
     }
