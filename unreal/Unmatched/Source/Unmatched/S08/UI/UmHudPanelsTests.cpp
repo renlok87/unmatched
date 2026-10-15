@@ -467,6 +467,19 @@ bool FUmHudPlayerPanelOppMirrorTest::RunTest(const FString&) {
   TestEqual(TEXT("the hero's cross: fallen"),
             UmHudPanel::StateName(UmHudPanel::Gather(EUmPanelSide::Opp, TEXT("p1"), FString(), Fighters, true, true, false, Always, Mem).State),
             TEXT("fallen"));
+  // 2026-10-15 playtest: a second game in the same client reuses the board ids («f-0-hero» was Medusa, now King Arthur)
+  // - the sidekicks of the first game must not stay in the memory
+  {
+    UmHudPanel::FSideMemory Two;
+    TArray<FS08BoardFighter> G1 = {Fighter(TEXT("f-0-hero"), TEXT("p1"), TEXT("Medusa"), true, 16, 16, TEXT("medusa")),
+                                   Fighter(TEXT("f-0-sk1"), TEXT("p1"), TEXT("Harpies 2"), false, 1, 1, TEXT("medusa"))};
+    UmHudPanel::Gather(EUmPanelSide::Own, TEXT("p1"), FString(), G1, true, false, false, Never, Two);
+    TArray<FS08BoardFighter> G2 = {Fighter(TEXT("f-0-hero"), TEXT("p1"), TEXT("King Arthur"), true, 18, 18, TEXT("king-arthur")),
+                                   Fighter(TEXT("f-0-sk0"), TEXT("p1"), TEXT("Merlin"), false, 7, 7, TEXT("king-arthur"))};
+    const FUmPlayerPanelModel M2 = UmHudPanel::Gather(EUmPanelSide::Own, TEXT("p1"), FString(), G2, true, false, false, Never, Two);
+    TestTrue(TEXT("second game, same hero id: only Merlin, no Harpy of the first game"),
+             M2.Sidekicks.Num() == 1 && M2.Sidekicks[0].Name == TEXT("Merlin") && M2.Sidekicks[0].MaxHp == 7);
+  }
   TArray<FString> Lines;
   P->SetVisibility(ESlateVisibility::Visible);
   P->CollectShotLines(Lines, FS08ScreenRect(1556.0f, 24.0f, 1896.0f, 160.0f));

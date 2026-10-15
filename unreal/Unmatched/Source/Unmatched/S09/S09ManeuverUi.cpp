@@ -45,7 +45,8 @@ bool PlayableByBanner(const FS09CardView& Card, const FString& FighterName) {
   const FString Banner = Card.BannerName.TrimStartAndEnd().ToLower();
   if (Banner.IsEmpty() || Banner == TEXT("any")) return true;
   const FString Name = FighterName.ToLower();
-  return Name.Contains(Banner) || Banner.Contains(Name);
+  // 2026-10-15 playtest: «Harpy» is in neither «harpies 2» nor the reverse - the server's singular / number rule too
+  return Name.Contains(Banner) || Banner.Contains(Name) || FS09CommandUi::BannerAllowsFighter(Card.BannerName, FighterName);
 }
 
 // Own-hand cards of the given types whose banner FighterName satisfies.

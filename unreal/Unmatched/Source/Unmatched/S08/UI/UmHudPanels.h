@@ -32,6 +32,8 @@ namespace UmHudPanel {
  *  hero id (a new hero = a new game: Known starts again). */
 struct UNMATCHED_API FSideMemory {
   FString HeroId;
+  /** id + server name of the hero: the board ids repeat between games ("f-0-hero" is Medusa, then King Arthur). */
+  FString HeroKey;
   FString HeroName;
   int32 HeroMaxHp = 0;
   TMap<FString, FUmSidekickView> Sidekicks;

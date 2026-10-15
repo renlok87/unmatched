@@ -10,6 +10,7 @@
 #include "UmHudLayout.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
+#include "UmTextFit.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -294,6 +295,18 @@ void UUmHudDecks::ApplyContent() {
   const bool bS = Frame.bClassS;
   if (DeckCount) DeckCount->SetText(UmHudDecks::DeckLabel(Model, bS));
   if (DiscardCount) DiscardCount->SetText(UmHudDecks::DiscardLabel(Model, bS));
+  // 2026-10-15 playtest: «Сброс 10» touched the chip's right rim under the HUD v2 skin (2560x1080 read «Сброс 1C») -
+  // a count that does not fit between the text start and the rim steps down to type.tag
+  if (Frame.RectSu.bIsValid) {
+    const float TextLeft = bS ? UmHudDecks::TextLeftSSu : UmHudDecks::TextLeftLSu;
+    for (int32 I = 0; I < 2; ++I) {
+      UTextBlock* T = I == 0 ? DeckCount.Get() : DiscardCount.Get();
+      if (!T) continue;
+      const FBox2D Chip = ChipRectSu(I);
+      const float Room = static_cast<float>(Chip.Max.X - Chip.Min.X) - TextLeft - 1.0f;
+      T->SetFont(UUmHudTheme::Get().Font(UmTextFit::PickToken(T->GetText(), Room, {FName(TEXT("type.button")), FName(TEXT("type.tag"))})));
+    }
+  }
   // the mini cards: S draws the 32 x 45 widget at 18 / 32 of its size (ScaleToFit) - its fit takes that px per su
   FUmCardState State;
   State.Show = EUmCardShow::MiniChip;

@@ -1,5 +1,6 @@
 // VS-7 SC-17: one seat of the ROOM - see UmRoomSlot.h.
 #include "UmRoomSlot.h"
+#include "UmWorldLayer.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "UmHeroCard.h"
@@ -141,7 +142,7 @@ void UUmRoomSlot::Apply(const FUmRoomSlotModel& InModel, const FVector2D& InSize
     Hero = Model.HeroName;
     if (Model.bDetails) {
       Hero += TEXT(" · ") + Stats(Model.Hp, Model.Move).ToString();
-      if (!Model.SidekickName.IsEmpty()) Kick = TEXT("+ ") + UmRoomUi::SidekickLine(Model.SidekickName, Model.SidekickCount, Model.SidekickHp, FString(), false);
+      if (!Model.SidekickName.IsEmpty()) Kick = TEXT("+ ") + UmRoomUi::SidekickLine(UmWorldLayer::DisplayNameOf(Model.SidekickName),  /* 2026-10-15: «Гарпии», not «Harpies» */ Model.SidekickCount, Model.SidekickHp, FString(), false);
     }
   }
   if (HeroLine) {

@@ -109,6 +109,8 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
     FString NoPlayer = Ms(TEXT("ms.log.effect"), {{TEXT("player"), FString()}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}}).ToString();
     NoPlayer.RemoveFromStart(TEXT(": "));
     OutShorter->Add(FText::FromString(NoPlayer.TrimStartAndEnd()));
+    // the card and the moves alone («Крылатое буйство: без движения») when even that does not fit the row
+    OutShorter->Add(FText::FromString(Card + TEXT(": ") + Inline));
   }
   if (OutShorter && Trail.Moves.Num() == 0 && !bEffect) {
     // 2026-10-15 playtest: «Медуза: манёвр: без движе…» - a maneuver without moves had no shorter form; without the

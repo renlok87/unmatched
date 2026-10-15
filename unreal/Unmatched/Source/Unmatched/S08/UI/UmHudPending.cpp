@@ -409,7 +409,9 @@ FUmPendingPlan Plan(const FUmPendingModel& M, const FUmPendingFrame& F, const TM
       P.Queue = UmPdBox(X + Pad + IconW, TextTop, QueueW, OrderChipSu);
     }
     if (P.HintRows > 0) P.Hint = UmPdBox(X + Pad, TextTop + TH + (TH > 0.0f ? 4.0f : 0.0f), Left, HH);
-    PlaceButtons(X + W - Pad, Y + 0.5f * (H - ButtonHSu));
+    // 2026-10-15 playtest: the hint changes after a pick («Крылатое буйство»: fighter -> space) and the plate's height
+    // with it - the buttons keep the top row (8 su) instead of the centre, so they do not jump under the cursor
+    PlaceButtons(X + W - Pad, Y + FMath::Min(8.0f, 0.5f * (H - ButtonHSu)));
     return P;
   }
   // class S (and BOOST anywhere): one row - glyph, card name, queue chip, buttons; the hint stays in STATUS

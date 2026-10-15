@@ -244,7 +244,7 @@ bool FUmScreensRoomTreeTest::RunTest(const FString& Parameters) {
     if (UUmRoomSlot* S0 = R->GetSlot(0)) {
       TestEqual(TEXT("slot 1 name"), S0->GetNameText(), FString(TEXT("ProGamer")));
       TestEqual(TEXT("slot 1 hero line"), S0->GetHeroLine(), FString(TEXT("Medusa · HP 16 · ход 3")));
-      TestEqual(TEXT("slot 1 sidekick line"), S0->GetSidekickLine(), FString(TEXT("+ Harpies ×3 · HP 1")));
+      TestEqual(TEXT("slot 1 sidekick line"), S0->GetSidekickLine(), FString(TEXT("+ Гарпии ×3 · HP 1")  /* 2026-10-15: the sidekick on the UI language */));
       TestEqual(TEXT("slot 1 «Не готов»"), S0->GetReadyText(), FString(TEXT("Не готов")));
       TestFalse(TEXT("no ✓ when not ready"), S0->IsReadyGlyphShown());
     }

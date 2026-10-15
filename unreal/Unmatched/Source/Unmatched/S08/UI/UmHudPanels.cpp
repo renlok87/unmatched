@@ -41,10 +41,14 @@ FUmPlayerPanelModel Gather(EUmPanelSide Side, const FString& PlayerId, const FSt
       break;
     }
   }
-  if (Hero && Hero->Id != Memory.HeroId) {
-    // a new hero id = a new game (or the first frame): the sidekicks seen start again
+  const FString HeroKey = Hero ? Hero->Id + TEXT("|") + Hero->Name : FString();
+  if (Hero && HeroKey != Memory.HeroKey) {
+    // a new hero = a new game (or the first frame): the sidekicks seen start again. 2026-10-15 playtest: the id alone
+    // repeats between games («f-0-hero» Medusa, then King Arthur) - the second room kept two dead Harpies beside
+    // Merlin and Harpy 1 showed Merlin's max HP «1/7»
     Memory = FSideMemory();
     Memory.HeroId = Hero->Id;
+    Memory.HeroKey = HeroKey;
   }
   if (Hero) Memory.HeroMaxHp = FMath::Max(Memory.HeroMaxHp, Hero->MaxHealth);
   const FString FighterName = Hero ? (Hero->Label.IsEmpty() ? Hero->Name : Hero->Label) : FString();
