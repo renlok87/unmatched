@@ -1003,6 +1003,7 @@ export class GameStateService {
       boostValue: number | null;
       bannerName: string | null;
       text: string | null;
+      textRu: string | null;
       count: number;
     }>;
   }> {
@@ -1041,6 +1042,7 @@ export class GameStateService {
           boostValue: printedValue(card.boostValue),
           bannerName: card.bannerName ?? null,
           text: card.text ?? null,
+          textRu: card.textRu ?? null,
           count,
         }));
         cards.sort(

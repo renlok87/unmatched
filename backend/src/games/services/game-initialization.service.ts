@@ -238,6 +238,7 @@ export class GameInitializationService {
           effects: this.resolveCardEffects(card),
           // Текст эффекта — едет в state (рука/колода/сброс) для playScheme
           text: card.text ?? undefined,
+          textRu: card.textRu ?? undefined,
           // Кто может играть карту ('Any'/имя бойца) — bannerAllows-валидация
           bannerName: card.bannerName ?? undefined,
         }));

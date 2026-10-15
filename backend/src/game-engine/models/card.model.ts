@@ -36,6 +36,8 @@ export interface Card {
   // Текст эффекта карты из БД (Card.text) — для отображения/ручного применения
   // в Game Tester при розыгрыше scheme-карт (авто-эффекты best-effort)
   readonly text?: string;
+  /** Русский печатный текст карты (Card.textRu) — для клиента на русском; пусто → text */
+  readonly textRu?: string;
   /** Кто может играть карту: 'Any'/пусто — любой боец, иначе имя бойца
    *  ('Medusa', 'Harpy'). Валидация — bannerAllows в game-rules.validator */
   readonly bannerName?: string;

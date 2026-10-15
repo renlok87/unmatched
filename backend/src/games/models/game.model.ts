@@ -127,6 +127,10 @@ export class DeckListCardResponse {
   @Field(() => String, { nullable: true })
   text: string | null;
 
+  /** The printed Russian text (Card.textRu); null -> text. */
+  @Field(() => String, { nullable: true })
+  textRu: string | null;
+
   /** Copies of this card in the deck. */
   @Field(() => Int)
   count: number;
