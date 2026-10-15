@@ -184,6 +184,7 @@ struct FUmHudRuntime {
   };
   TArray<FSeqTurn> SeqTurns;
   FString FeedGameId;  // the match the log and SeqTurns belong to (a new game id clears both)
+  FString InspectSeenHead;  // the own pending head the inspector already gave way to (2026-10-15)
   bool bStreamSeenReady = false;
   bool bReconnecting = false;
   int32 ReconnectSeq = 0;
@@ -2264,6 +2265,26 @@ void AS08FlowGameMode::RefreshUmPending() {
   FUmHudRuntime& R = *UmHud;
   UUmHudPending* P = R.Pending.Get();
   if (!P) return;
+  // 2026-10-15 playtest (GD-035 / GD-047): a choice of mine that opens while the card inspector covers the screen (the
+  // start-of-turn ability) stayed hidden under it - a new own head closes the inspector once; reopening it is the
+  // player's call
+  {
+    // also the defense window and the hand-limit discard: every window that waits on me
+    FString Head;
+    if (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice) {
+      Head = CommandUi.PendingChoice.Id;
+    } else if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
+      Head = TEXT("defense:") + CommandUi.Combat.AttackerId + TEXT(">") + CommandUi.Combat.TargetFighterId;
+    } else if (CommandUi.Mode == ES09CommandMode::DiscardDraft) {
+      Head = FString::Printf(TEXT("discard:%d"), Hud.SequenceNumber);
+    }
+    if (!Head.IsEmpty() && Head != R.InspectSeenHead) {
+      R.InspectSeenHead = Head;
+      if (UUmScreenInspect* S = R.Inspect.Get()) {
+        if (S->IsOpen()) S->Close(TEXT("choice"));
+      }
+    }
+  }
   UmHudPending::FUmPendingInput In;
   const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
   In.bLive = Flow.IsValid() && Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();

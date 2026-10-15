@@ -101,7 +101,10 @@ UNMATCHED_API int32 WrapLines(const FString& Text, float WrapSu, float SizeSu, F
                               float* OutWidestSu = nullptr, TArray<FString>* OutLines = nullptr);
 /** ВР-VS2-46: the size and line count for Text in TextRoomSu (Sizes from big to small); none fits two lines - the
  *  smallest size and the text cut with «…» to two lines. */
-UNMATCHED_API FUmStatusFit Fit(const FString& Text, float TextRoomSu, const TArray<float>& Sizes, FMeasureSu Measure);
+/** bOneLineFirst (2026-10-15, the HUD v2 cartouche stretches only horizontally - a second line stretched its marble rims
+ *  over the text at UI 150 %): every size on one line before any size on two. */
+UNMATCHED_API FUmStatusFit Fit(const FString& Text, float TextRoomSu, const TArray<float>& Sizes, FMeasureSu Measure,
+                               bool bOneLineFirst = false);
 /** The capsule height of a fit: max(48, lines x pitch + 2 x inset), inset = (48 - pitch of the 24 su line) / 2. */
 UNMATCHED_API float BodyHeightSu(const FUmStatusFit& Fit, float BaseSizeSu);
 }  // namespace UmHudStatus

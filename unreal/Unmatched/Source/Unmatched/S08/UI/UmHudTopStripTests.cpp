@@ -456,6 +456,8 @@ bool FUmHudStatusKeysTest::RunTest(const FString&) {
     float Width;
     int32 Lines;
   } Widths[] = {{TEXT("L 1080p 880"), 880.0f, 1}, {TEXT("L 720p 720"), 720.0f, 1}, {TEXT("S 600 (720p and 1080p at 150 %)"), 600.0f, 2}};
+  // 2026-10-15: the HUD v2 cartouche stretches only horizontally - one line at a smaller size comes before two lines
+  const bool bCartouche = UmHudStatus::BannerRimSu() > 0.0f;
   for (const auto& Wd : Widths) {
     Frame.MaxWidthSu = Wd.Width;
     Line->SetFrame(Frame);
@@ -463,8 +465,10 @@ bool FUmHudStatusKeysTest::RunTest(const FString&) {
     const FUmStatusFit& Fit = Line->GetFit();
     AddInfo(FString::Printf(TEXT("defend %s: %d lines, %.0f su, width %.0f, height %.0f: '%s'"), Wd.Name, Fit.Lines,
                             Fit.SizeSu, Line->GetBodySizeSu().X, Line->GetBodySizeSu().Y, *Fit.Display.Replace(TEXT("\n"), TEXT(" | "))));
-    TestEqual(FString::Printf(TEXT("defend %s: lines"), Wd.Name), Fit.Lines, Wd.Lines);
-    TestEqual(FString::Printf(TEXT("defend %s: 24 su"), Wd.Name), Fit.SizeSu, 24.0f);
+    const int32 WantLines = bCartouche ? 1 : Wd.Lines;
+    TestEqual(FString::Printf(TEXT("defend %s: lines"), Wd.Name), Fit.Lines, WantLines);
+    if (!bCartouche || Wd.Lines == 1) TestEqual(FString::Printf(TEXT("defend %s: 24 su"), Wd.Name), Fit.SizeSu, 24.0f);
+    if (bCartouche && Wd.Lines == 2) TestTrue(FString::Printf(TEXT("defend %s: one line, 20 or 16 su"), Wd.Name), Fit.SizeSu < 24.0f);
     TestFalse(FString::Printf(TEXT("defend %s: no «…»"), Wd.Name), Fit.bEllipsis);
     TestTrue(FString::Printf(TEXT("defend %s: within the width"), Wd.Name), Line->GetBodySizeSu().X <= Wd.Width);
     TArray<FString> Rows;
@@ -472,7 +476,7 @@ bool FUmHudStatusKeysTest::RunTest(const FString&) {
     bool bWhole = false;
     for (const FString& R : Rows) bWhole |= R.Contains(TEXT("«Без\x00A0защиты»"));
     TestTrue(FString::Printf(TEXT("defend %s: «Без защиты» on one line"), Wd.Name), bWhole);
-    if (Wd.Lines == 2) TestEqual(TEXT("two lines: the capsule 78 su (CX-08)"), static_cast<float>(Line->GetBodySizeSu().Y), 78.0f + 2.0f * UmHudStatus::BannerRimSu());
+    if (WantLines == 2) TestEqual(TEXT("two lines: the capsule 78 su (CX-08)"), static_cast<float>(Line->GetBodySizeSu().Y), 78.0f + 2.0f * UmHudStatus::BannerRimSu());
   }
   // still longer: 20, 16, then «…» with the full text in the tooltip
   {

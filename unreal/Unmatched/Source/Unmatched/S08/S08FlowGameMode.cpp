@@ -1994,6 +1994,9 @@ void AS08FlowGameMode::HandleClick() {
                                                  *FighterActor->GetFighter().Label);
       } else {
         Toast = TEXT("pending pick rejected: ") + Reason;
+        // 2026-10-15 playtest (720p, «Мимолётный взгляд»): a click on a fighter outside the choice said nothing on
+        // screen (the Slate toast is debug-only) - the UMG toast names what to click
+        UmHudToastReason(FS09Reason::Make(bTakesCell && !bTakesFighter ? TEXT("why.space.pick") : TEXT("why.target.pick")), 3.0f);
       }
       ToastUntil = Elapsed + 3.0f;
       RefreshUi();

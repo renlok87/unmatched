@@ -134,9 +134,22 @@ int32 WrapLines(const FString& Text, float WrapSu, float SizeSu, FMeasureSu Meas
   return Lines.Num();
 }
 
-FUmStatusFit Fit(const FString& Text, float TextRoomSu, const TArray<float>& Sizes, FMeasureSu Measure) {
+FUmStatusFit Fit(const FString& Text, float TextRoomSu, const TArray<float>& Sizes, FMeasureSu Measure, bool bOneLineFirst) {
   FUmStatusFit Out;
   const FString Bound = BindQuotes(Text);
+  if (bOneLineFirst) {
+    for (const float Size : Sizes) {
+      float Widest = 0.0f;
+      TArray<FString> Lines;
+      if (WrapLines(Bound, TextRoomSu, Size, Measure, &Widest, &Lines) <= 1 && Widest <= TextRoomSu + 0.5f) {
+        Out.Display = FString::Join(Lines, TEXT(""));  // one line: nothing to join
+        Out.SizeSu = Size;
+        Out.Lines = Lines.Num();
+        Out.TextWidthSu = Widest;
+        return Out;
+      }
+    }
+  }
   for (const float Size : Sizes) {
     float Widest = 0.0f;
     TArray<FString> Lines;
@@ -414,7 +427,7 @@ void UUmHudStatusLine::Render() {
   const float Base = UmTypeSu(Theme, TEXT("type.status"));
   const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
-                            [this](const FString& T, float S) { return MeasureSu(T, S); });
+                            [this](const FString& T, float S) { return MeasureSu(T, S); }, RimSu > 0.0f);
   const float Height = UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
   const float Width = FMath::Min(StatusFrame.MaxWidthSu, FMath::CeilToFloat(FitNow.TextWidthSu) + 2.0f * PadX + Extras);
   BodySizeSu = FVector2D(Width, Height);
