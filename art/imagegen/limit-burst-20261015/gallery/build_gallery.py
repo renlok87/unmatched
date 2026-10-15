@@ -41,6 +41,9 @@ NAMES = {
     "actor": "Актёр", "metalhead": "Металхед", "misty-knight": "Мисти Найт", "splinter": "Сплинтер",
     "april-oneil": "Эйприл О’Нил", "april-o-neil": "Эйприл О’Нил", "casey-jones": "Кейси Джонс",
     "dijkstra": "Дийкстра", "mariahill": "Мария Хилл",
+    "black-panther": "Чёрная Пантера", "black-widow": "Чёрная Вдова",
+    "doctor-strange": "Доктор Стрэндж", "elektra": "Электра",
+    "titania": "Титания", "shakespeare": "Шекспир", "william-shakespeare": "Шекспир", "oberon": "Оберон",
 }
 TYPE_LABELS = {"portraits": "Портрет", "helper-ref": "Референс помощника", "formalconcept": "Формальный концепт 1c"}
 STATUS_LABELS = {"proposed": "Предложен исходник", "alternative": "Архивный вариант", "pass": "Концепт 1c принят", "rejected": "Возвращён на этап 1", "blocked": "PNG не создан"}
@@ -191,24 +194,41 @@ def formal_entry(key: str, card_path: Path) -> dict:
     }
 
 
-def blocked_geralt() -> dict | None:
-    package = BURST / "owner-portraits-wave5/geralt-of-rivia"
-    error_path = package / "tool-error-g1.json"
-    if not error_path.is_file():
-        return None
+def review_paths(burst: Path) -> list[tuple[int, Path]]:
+    """Existing numeric review directories, ordered numerically; no future waves invented."""
+    directories = {1: burst / "review"}
+    for path in burst.iterdir():
+        match = re.fullmatch(r"review-wave([1-9][0-9]*)", path.name)
+        if path.is_dir() and match and int(match[1]) >= 2:
+            directories[int(match[1])] = path
+    return [(wave, path / "independent-review-index.json") for wave, path in sorted(directories.items())]
+
+
+def blocked_entry(row: dict, index: Path, wave: int) -> dict:
+    asset = row["asset"]
+    if not isinstance(asset, str) or not asset or row.get("candidate_exists") or row.get("reviewed_as_image"):
+        raise ValueError("Blocked review must describe an absent image: " + rel(index))
+    error_path = repo_path(row["error_evidence"])
     error = read_json(error_path)
-    if error.get("code") != "moderation_blocked":
-        return None
-    if (package / "portrait-source-candidate.png").exists():
-        ERRORS.append("Geralt has both a blocked record and an image; inspect source state before cataloguing.")
-        return None
-    return {"id": "blocked:portrait:geralt-of-rivia", "asset": "portrait:geralt-of-rivia", "slug": "geralt-of-rivia", "label": NAMES["geralt-of-rivia"],
-        "type": "portraits", "type_label": "Портрет", "status": "blocked", "status_label": STATUS_LABELS["blocked"],
-        "batch": "5", "batch_label": "Волна 5", "description": "Генератор отклонил вывод: HTTP400 moderation_blocked. Изображение не создано.",
-        "limits": ["PNG отсутствует; здесь нет превью или синтетической замены.", "Отказ относится к вызову инструмента, а не к художественной приёмке.", "Повтор с обходом отказа и платный fallback не выполнялись."],
-        "images": [], "producer_readme": rel(package / "README.md"), "independent_review": None, "review_index": None,
+    expected = row.get("error_evidence_sha256")
+    if expected is not None and INPUTS[rel(error_path)] != expected:
+        raise ValueError("Blocked error SHA differs from frozen review: " + rel(error_path))
+    package = error_path.parent
+    if row.get("file") or any((package / name).exists() for name in ("portrait-source-candidate.png", "portrait-source.png", "design-front.png")):
+        raise ValueError("Blocked review has an output image; inspect source state: " + asset)
+    slug = asset.rsplit(":", 1)[-1]
+    kind = "portraits" if asset.startswith("portrait:") else "helper-ref"
+    review_readme = index.parent / "README.md"
+    request = row.get("request_id") or error.get("request_id")
+    return {"id": "blocked:" + asset, "asset": asset, "slug": slug, "label": NAMES.get(slug, slug.replace("-", " ").title()),
+        "type": kind, "type_label": TYPE_LABELS[kind], "status": "blocked", "status_label": STATUS_LABELS["blocked"],
+        "batch": str(wave), "batch_label": "Волна " + str(wave),
+        "description": row.get("reason") or "Неуспешный вызов генератора. Изображение не создано.",
+        "limits": ["PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.", "Отказ относится к вызову инструмента, а не к художественной приёмке."],
+        "images": [], "producer_readme": optional_link(rel(package / "README.md")),
+        "independent_review": rel(review_readme) if review_readme.is_file() else rel(index), "review_index": rel(index),
         "formal_card": None, "diagnostic": rel(error_path), "score": None, "runtime_accepted": False,
-        "pipeline_stage_accepted": False, "reference": "request ID " + str(error.get("request_id", "")),
+        "pipeline_stage_accepted": False, "reference": "request ID " + str(request) if request else "",
     }
 
 
@@ -233,6 +253,9 @@ class PageParser(HTMLParser):
         self.scripts = {}
         self.script_id = None
         self.cards = 0
+        self.card_images = {}
+        self.card_png_links = {}
+        self.current_card = None
 
     def handle_starttag(self, tag, attrs):
         attr = dict(attrs)
@@ -242,6 +265,16 @@ class PageParser(HTMLParser):
             self.ids.add(attr["id"])
         if tag == "article" and attr.get("data-id"):
             self.cards += 1
+            self.current_card = attr["data-id"]
+            self.card_images[self.current_card] = []
+            self.card_png_links[self.current_card] = []
+        if tag == "img":
+            if any(key in attr and not attr[key] for key in ("src", "data-image")):
+                raise ValueError("Empty HTML image source")
+            if self.current_card and attr.get("data-image"):
+                self.card_images[self.current_card].append(attr["data-image"])
+        if tag == "a" and self.current_card and str(attr.get("data-repo", "")).lower().endswith(".png"):
+            self.card_png_links[self.current_card].append(attr["data-repo"])
         if tag == "script":
             self.script_id = attr.get("id")
             self.scripts[self.script_id] = ""
@@ -253,6 +286,8 @@ class PageParser(HTMLParser):
             raise ValueError("HTML tags not balanced at </" + tag + ">")
         if tag == "script":
             self.script_id = None
+        if tag == "article":
+            self.current_card = None
 
     def handle_data(self, text):
         if self.script_id is not None:
@@ -260,11 +295,13 @@ class PageParser(HTMLParser):
 
 
 def main() -> int:
+    INPUTS.clear()
+    ERRORS.clear()
+    PENDING.clear()
     sources = {}
+    blocked = {}
     indexes = []
-    for wave in range(1, 8):
-        directory = "review" if wave == 1 else "review-wave" + str(wave)
-        index = BURST / directory / "independent-review-index.json"
+    for wave, index in review_paths(BURST):
         if not index.is_file():
             PENDING.append({"wave": wave, "reason": "Индекс пока отсутствует"})
             continue
@@ -279,7 +316,13 @@ def main() -> int:
                 sources[entry["images"][0]["path"]] = entry
             except (ValueError, KeyError, OSError) as exc:
                 ERRORS.append(str(exc))
-    entries = list(sources.values())
+        for row in data.get("blocked_outputs", []):
+            try:
+                entry = blocked_entry(row, index, wave)
+                blocked[entry["asset"]] = entry  # Later frozen evidence replaces the same blocked asset, without duplicates.
+            except (ValueError, KeyError, OSError) as exc:
+                ERRORS.append(str(exc))
+    entries = list(sources.values()) + list(blocked.values())
     for key in ["patroclus", "wiglaf", "sherlock-holmes", "dr-watson"]:
         directory = ROOT / ("art/pipeline-candidates/ASSET-" + key.upper() + "-001/evidence/acceptance-concept")
         candidates = sorted(directory.glob("*-sheet-*/card.json"))
@@ -290,16 +333,6 @@ def main() -> int:
             entries.append(formal_entry(key, candidates[-1]))
         except (ValueError, KeyError, OSError) as exc:
             ERRORS.append(str(exc))
-    blocked = blocked_geralt()
-    if blocked:
-        for index_record in indexes:
-            if index_record["wave"] == 5:
-                index_path = repo_path(index_record["path"])
-                if "geralt-of-rivia" in json.dumps(read_json(index_path), ensure_ascii=False):
-                    review_readme = index_path.parent / "README.md"
-                    blocked["independent_review"] = rel(review_readme) if review_readme.is_file() else rel(index_path)
-                    blocked["review_index"] = rel(index_path)
-        entries.append(blocked)
     entries.sort(key=lambda i: ({"portraits": 0, "helper-ref": 1, "formalconcept": 2}[i["type"]], i["label"].casefold()))
     counts = {"entries": len(entries), "png_views": sum(len(e["images"]) for e in entries), "types": dict(Counter(e["type"] for e in entries)), "statuses": dict(Counter(e["status"] for e in entries))}
     data = {"schema": "unmatched.local-gallery/1", "built_at_utc": datetime.now(timezone.utc).isoformat(), "scope": "Frozen independent source reviews plus actual formal 1c cards. No runtime acceptance inferred.", "counts": counts, "review_indexes": indexes, "pending_reviews": PENDING, "entries": entries}
@@ -313,6 +346,15 @@ def main() -> int:
     parser.feed(html)
     parser.close()
     assert not parser.stack and parser.cards == len(entries)
+    assert len({entry["id"] for entry in entries}) == len(entries), "Duplicate gallery entry id"
+    for entry in entries:
+        expected = [entry["images"][0]["path"]] if entry["images"] else []
+        assert parser.card_images[entry["id"]] == expected
+        if entry["status"] == "blocked":
+            assert not entry["images"] and not parser.card_png_links[entry["id"]]
+            assert entry.get("sha256") is None and entry["score"] is None
+        if entry["type"] != "formalconcept":
+            assert entry["pipeline_stage_accepted"] is False and entry["runtime_accepted"] is False
     assert json.loads(parser.scripts["gallery-data"]) == data
     assert 'object-fit: contain' in html and 'object-fit: cover' not in html
     js_check = "node unavailable; JSON/HTML/path/hash validation performed"
@@ -328,7 +370,7 @@ def main() -> int:
     changed = [p for p, before in INPUTS.items() if sha(repo_path(p)) != before]
     if changed:
         ERRORS.extend("Input changed during build: " + p for p in changed)
-    verification = {"counts": counts, "json_parsed": True, "html_parsed_balanced": True, "embedded_json_matches_data": True, "javascript_syntax": js_check, "uncropped_thumbnails": "object-fit: contain; original width/height; only actual PNG paths", "geralt_has_no_image": not blocked or not blocked["images"], "input_content_files_verified": len(INPUTS), "source_content_unchanged_during_build": not changed, "pending_reviews": PENDING, "errors": ERRORS, "network_gui_server_framework_build_used": False, "source_writes": [], "output_directory_only": rel(GALLERY)}
+    verification = {"counts": counts, "json_parsed": True, "html_parsed_balanced": True, "embedded_json_matches_data": True, "javascript_syntax": js_check, "uncropped_thumbnails": "object-fit: contain; original width/height; only actual PNG paths", "numeric_review_waves": [item["wave"] for item in indexes], "blocked_entries_text_only": all(not entry["images"] for entry in blocked.values()), "blocked_asset_ids_unique": len(blocked) == len({entry["asset"] for entry in blocked.values()}), "html_images_match_actual_entries": True, "empty_image_sources": 0, "source_entries_inherit_no_formal_acceptance": True, "geralt_has_no_image": not blocked.get("portrait:geralt-of-rivia", {}).get("images"), "input_content_files_verified": len(INPUTS), "source_content_unchanged_during_build": not changed, "pending_reviews": PENDING, "errors": ERRORS, "network_gui_server_framework_build_used": False, "source_writes": [], "output_directory_only": rel(GALLERY)}
     write("gallery-data.json", json_text(data))
     write("index.html", html)
     write("verification.json", json_text(verification))

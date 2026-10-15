@@ -1,0 +1,653 @@
+{
+  "card_id": "CP-34",
+  "date": "2026-10-15",
+  "source_only": true,
+  "root_GO_received": true,
+  "live_evidence": "live-owner-evidence.json",
+  "identity_note": "Hero table has no slug column; exact raw key/name is paired with live Hero id/name.",
+  "entries": [
+    {
+      "asset_key": "black-panther",
+      "reference": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+      "reference_sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+      "matched_current_png_cards": [
+        {
+          "path": "art/pipeline-candidates/ASSET-BLACK-PANTHER-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "sha256": "fdf6690ed5b7047817a33f90111a5ca47c7b1546e9b85bb3a0f02b53a1f40ba7",
+          "data": {
+            "schema": "unmatched.concept-acceptance/1",
+            "kind": "concept",
+            "asset_id": "ASSET-BLACK-PANTHER-001",
+            "clip": null,
+            "cycle": "r2",
+            "date": "2026-10-13",
+            "previous_card": "art/pipeline-candidates/ASSET-BLACK-PANTHER-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+            "accepted_object": [
+              {
+                "path": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+                "sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3"
+              }
+            ],
+            "frames": {
+              "dir": "art/imagegen/concept-black-panther-codex/design",
+              "files": [
+                "black-panther-front.png",
+                "checks-report.json"
+              ]
+            },
+            "reports": [
+              "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+              "art/imagegen/concept-black-panther-codex/generation-records.json",
+              "art/imagegen/concept-black-panther-codex/verification.json"
+            ],
+            "gates": {
+              "G-CHECKS": {
+                "status": "PASS",
+                "source": "art/imagegen/concept-black-panther-codex/design/checks-report.json",
+                "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+                "source_defect": null
+              }
+            },
+            "scores": {
+              "S": {
+                "value": 2,
+                "rationale": "Узнаётся именно Black Panther: пантерная маска с острыми ушами, облегающий чёрный костюм и серебряное ожерелье. Полная фигура читается; руки и кисти отделены от корпуса, ноги разделены, тонкие выступающие детали видны. Стойка с опущенными руками не является T/A-позой. Несоответствие формы когтей учтено в P.",
+                "frames": [
+                  "black-panther-front.png"
+                ]
+              },
+              "C": {
+                "value": 1.5,
+                "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+                "frames": [
+                  "black-panther-front.png"
+                ]
+              },
+              "Q": {
+                "value": 1,
+                "rationale": "Миниатюра объёмная, фактура костюма и серебряные элементы различимы, но исполнение явно ниже QUALITY_REFERENCE: сильная зернистость покрывает костюм, детали пальцев и обуви беднее, серебряное ожерелье выглядит преимущественно контурным рисунком. Замечание r1 по кистям и обуви полностью не закрыто. Слева между рукой и корпусом также виден угловатый серый фрагмент фона.",
+                "frames": [
+                  "black-panther-front.png"
+                ]
+              },
+              "P": {
+                "value": 1,
+                "rationale": "Чёрный и тёмно-серый костюм, серебряное ожерелье, острые уши и белые глазные щели соответствуют заявке; замечание r1 по глазам закрыто. Когти теперь отчётливо видны, однако якорь finger claws передан неверно: вместо коротких когтей на кончиках пальцев изображены длинные изогнутые клинки, доходящие почти до колен и напоминающие оружие другого персонажа.",
+                "frames": [
+                  "black-panther-front.png"
+                ]
+              }
+            },
+            "score": 6.9,
+            "verdict": "return_to_stage_1",
+            "verdict_reason": "По concept-sheet.md §11 итоговый score 6,9 ниже порога 8,0: детализация явно уступает эталону, а характерные пальцевые когти Black Panther заменены длинными клинками.",
+            "rework_fix_list": [
+              {
+                "item": "Q",
+                "frame": "black-panther-front.png",
+                "fix": "Render a clean premium painted-resin miniature with restrained matte suit texture, crisp sculpted glove fingers and boot seams, dimensional silver necklace details, and a uniform dark-grey background without grainy speckling or angular grey patches.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "P",
+                "frame": "black-panther-front.png",
+                "fix": "Replace the long Wolverine-like hand blades with short sharp silver nail claws on the fingertips of both slightly open hands, preserving Black Panther's pointed-ear mask, white eye slits, black and dark-grey suit, and silver necklace.",
+                "tool": "Codex 1a"
+              }
+            ],
+            "known_issues": [],
+            "acceptor": {
+              "profile": "Sol 6.1 xhigh",
+              "session_id": "codex:01a13509-f9f5-7792-b271-fe6ccae35b71"
+            },
+            "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+            "decided_by": "delegated (ВР-реестр 2026-10-06)",
+            "status_note": ""
+          }
+        }
+      ],
+      "paired_final": null,
+      "separate_user_override": {
+        "path": "art/pipeline-candidates/ASSET-BLACK-PANTHER-001/evidence/acceptance-concept/20261013-front-r2/user-decision.json",
+        "sha256": "3671dd98bb872e513fdead4e50a0971ec54d8f3f4434bf7aafe42d649bd05806",
+        "data": {
+          "asset_id": "ASSET-BLACK-PANTHER-001",
+          "decision": "proceed_to_stage_1b",
+          "decided_by": "user",
+          "date": "2026-10-13",
+          "quote": "Пустить их дальше с текущими фронтами",
+          "record": "docs/game-design/decisions/2026-10-13-licensed-concepts-user-accepted.md",
+          "design_front": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+          "acceptor_card": "art/pipeline-candidates/ASSET-BLACK-PANTHER-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "acceptor_verdict": "return_to_stage_1",
+          "acceptor_score": 6.9,
+          "note": "user override of escalate_user (concept-sheet.md §10); the card verdict is unchanged"
+        }
+      },
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "portrait_candidate_found_in_frozen_waves1_7_or_gallery": false,
+      "historical_source_moderation_notes_preserved_not_retried": true
+    },
+    {
+      "asset_key": "black-widow",
+      "reference": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+      "reference_sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7",
+      "matched_current_png_cards": [
+        {
+          "path": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/card-2.json",
+          "sha256": "8ef289bb7429d4136084ffb4f1dc14252470609f3840fd5eb26c117ebfffa390",
+          "data": {
+            "schema": "unmatched.concept-acceptance/1",
+            "kind": "concept",
+            "asset_id": "ASSET-BLACK-WIDOW-001",
+            "cycle": "r2",
+            "date": "2026-10-13",
+            "previous_card": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+            "accepted_object": [
+              {
+                "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+                "sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7"
+              }
+            ],
+            "frames": {
+              "dir": "art/imagegen/concept-black-widow-codex/design",
+              "files": [
+                "black-widow-front.png",
+                "checks-report.json"
+              ]
+            },
+            "reports": [
+              "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+              "art/imagegen/concept-black-widow-codex/generation-records.json",
+              "art/imagegen/concept-black-widow-codex/verification.json"
+            ],
+            "gates": {
+              "G-CHECKS": {
+                "status": "PASS",
+                "source": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+                "note": "checks-report.json#summary = PASS 13, WARN 0, FAIL 0; #verdict = PASS; #inputs[0].sha256 = 21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7 (текущий r2 front, совпадает с accepted_object)"
+              }
+            },
+            "scores": {
+              "S": {
+                "value": 2,
+                "rationale": "black-widow-front.png: узнаётся именно Black Widow из комиксов Marvel, а не общий архетип агента: волнистые рыжие волосы до плеч, чёрный тактический комбинезон с высоким воротом и швами, красная пряжка-песочные часы на поясе, серебряные браслеты на обоих запястьях, пистолет в собственной ПРАВОЙ руке (слева в кадре, WEAPON_HAND=right). Поза по §4.4: обе ступни на подставке, вес ровно, руки отведены примерно на 12° от вертикали, локти слегка согнуты, между предплечьями и талией/подсумками виден фон; это не T- и не A-поза. Силуэт ясный, лишних или недостающих частей нет, оружие одно. Тонкая часть помечена для этапов 3–4: пистолет почти чёрный на тёмно-сером фоне, ствол узкий, кисть плотно охватывает рукоять; читается.",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "C": {
+                "value": 1.5,
+                "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "Q": {
+                "value": 1.5,
+                "rationale": "black-widow-front.png против medusa-quality-reference.png: уровень расписанной коллекционной миниатюры есть — скульптурные швы и стёганые панели комбинезона, фактура кожи, ремень с подсумками, гравированные серебряные браслеты, прописанное лицо и пряди волос, детализированный пистолет; материалы (кожа костюма, металл, кожа лица, волосы, камень) различимы. Отдельные зоны беднее эталона: голенища сапог и голени почти гладкие, перчатки простые, верхний край подставки с грубыми светлыми сколами; плотность орнамента и смена материалов ниже, чем у Medusa (золото, меандр, змеиные мотивы).",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "P": {
+                "value": 1.5,
+                "rationale": "black-widow-front.png и checks-report.json#palette: все цвета и якоря на месте — suit black доминирует (figure_share_within_40_pct 63.89), hair red на волосах, bracelet silver на обоих браслетах (0.22), акцент hourglass red на пряжке. Отклонение тона: волосы написаны ярче и насыщеннее #A8321E (доля hair red 2.09 при площади волос заметно больше) и почти совпадают с акцентом #C8322A (1.76, в основном за счёт пикселей волос), поэтому акцент не отделён от волос по тону; блики костюма уходят в холодный сине-серый от нейтрального #18181C.",
+                "frames": [
+                  "black-widow-front.png",
+                  "checks-report.json"
+                ]
+              }
+            },
+            "score": 8.1,
+            "verdict": "pass",
+            "rework_fix_list": [],
+            "known_issues": [
+              {
+                "item": "P",
+                "frame": "black-widow-front.png",
+                "note": "Волосы ярко-алые, светлее и насыщеннее hair red #A8321E и почти одного тона с акцентом hourglass red #C8322A; на этапах 2–3 держать волосы в более тёмном кирпично-рыжем, чтобы пряжка оставалась единственным акцентом."
+              },
+              {
+                "item": "P",
+                "frame": "checks-report.json",
+                "note": "palette.swatches: hair red 2.09 %, hourglass red 1.76 % (в основном пиксели волос), bracelet silver 0.22 %; блики костюма холодные сине-серые против нейтрального #18181C."
+              },
+              {
+                "item": "Q",
+                "frame": "black-widow-front.png",
+                "note": "Голенища сапог, голени и перчатки беднее деталями, чем остальной костюм; верхний край подставки с грубыми светлыми сколами."
+              },
+              {
+                "item": "Q",
+                "frame": "black-widow-front.png",
+                "note": "Подставка — один толстый диск грубого камня, видна сверху, а не строго с ребра, как просит CORE-1A; учесть при генерации в Tripo и сборке H2."
+              },
+              {
+                "item": "S",
+                "frame": "black-widow-front.png",
+                "note": "Тонкая часть для этапов 3–4: пистолет почти чёрный на тёмно-сером фоне, ствол узкий, кисть плотно охватывает рукоять — проверить читаемость оружия и отделение кисти weapon.R после Tripo."
+              }
+            ],
+            "acceptor": {
+              "profile": "Opus xhigh",
+              "session_id": "workflow:acceptor2-ASSET-BLACK-WIDOW-001-r2"
+            },
+            "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+            "decided_by": "delegated (ВР-реестр 2026-10-06)",
+            "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+          }
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "sha256": "48cea779020798be22306dfac897b3332b543fd14c9fcd51116dfddbcc1bd39b",
+          "data": {
+            "schema": "unmatched.concept-acceptance/1",
+            "kind": "concept",
+            "asset_id": "ASSET-BLACK-WIDOW-001",
+            "clip": null,
+            "cycle": "r2",
+            "date": "2026-10-13",
+            "previous_card": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+            "accepted_object": [
+              {
+                "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+                "sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7"
+              }
+            ],
+            "frames": {
+              "dir": "art/imagegen/concept-black-widow-codex/design",
+              "files": [
+                "black-widow-front.png",
+                "checks-report.json"
+              ]
+            },
+            "reports": [
+              "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+              "art/imagegen/concept-black-widow-codex/generation-records.json",
+              "art/imagegen/concept-black-widow-codex/verification.json"
+            ],
+            "gates": {
+              "G-CHECKS": {
+                "status": "PASS",
+                "source": "art/imagegen/concept-black-widow-codex/design/checks-report.json",
+                "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS; inputs[0].sha256 совпадает с accepted_object.",
+                "source_defect": null
+              }
+            },
+            "scores": {
+              "S": {
+                "value": 2,
+                "rationale": "black-widow-front.png: узнаётся именно Чёрная Вдова Marvel — красные волосы до плеч, чёрный тактический комбинезон, серебряные браслеты, красные песочные часы и пистолет в собственной правой руке, слева для зрителя. Обе руки отделены от корпуса, стопы стоят на подставке, поза не T/A. Замечание r1 о слиянии пистолета с бедром и кобурой закрыто; хват и контур оружия читаются. Тонкую спусковую скобу следует сохранить читаемой на этапах 3–4.",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "C": {
+                "value": 1.5,
+                "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "Q": {
+                "value": 1.5,
+                "rationale": "black-widow-front.png: расписанная коллекционная миниатюра с отчётливыми прядями, швами и панелями костюма, рельефом браслетов и деталями пистолета; качество близко к medusa-quality-reference.png. По сравнению с r1 кисти и оружие значительно чётче, отдельного светлого остатка возле подставки нет. До уровня эталона не хватает более тонкой моделировки лица и пальцев; зернистая фактура местами грубее, по контуру остаётся светлая окантовка.",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              },
+              "P": {
+                "value": 1.5,
+                "rationale": "black-widow-front.png: все пять якорей присутствуют и расположены правильно. Ошибочная эмблема r1 заменена однозначными красными песочными часами; чёрный костюм и серебряные браслеты различимы. Волосы остаются ярче и насыщеннее заданного приглушённого #A8321E, поэтому полное совпадение палитры не подтверждено.",
+                "frames": [
+                  "black-widow-front.png"
+                ]
+              }
+            },
+            "score": 8.1,
+            "verdict": "pass",
+            "verdict_reason": null,
+            "rework_fix_list": [],
+            "known_issues": [
+              {
+                "item": "Q",
+                "frame": "black-widow-front.png",
+                "note": "Тонкая светлая окантовка заметна вокруг отдельных участков волос, рук и оружия; учтена в Q."
+              },
+              {
+                "item": "P",
+                "frame": "black-widow-front.png",
+                "note": "Волосы ярче заданного #A8321E; замечание r1 о тоне закрыто частично, эмблема песочных часов исправлена."
+              },
+              {
+                "item": "S",
+                "frame": "black-widow-front.png",
+                "note": "Верхняя поверхность подставки по-прежнему видна; строгая ортопроекция с подставкой ребром этим дизайн-front не подтверждена."
+              }
+            ],
+            "acceptor": {
+              "profile": "Sol 6.1 xhigh",
+              "session_id": "codex:01a1350e-42f7-77d2-88bf-a3d912827ce1"
+            },
+            "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+            "decided_by": "delegated (ВР-реестр 2026-10-06)",
+            "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+          }
+        }
+      ],
+      "paired_final": {
+        "path": "art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/final.json",
+        "sha256": "410038cd5f9ee372f0386002d3b2de40f1389cbfd4d2bd2af4fa1a940d4a3f8b",
+        "data": {
+          "schema": "unmatched.acceptance-final/1",
+          "asset_id": "ASSET-BLACK-WIDOW-001",
+          "cycle": "r2",
+          "cards": [
+            {
+              "path": "C:/Users/ren/WebstormProjects/unmached/unmached/art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+              "profile": "Sol 6.1 xhigh",
+              "session_id": "codex:01a1350e-42f7-77d2-88bf-a3d912827ce1",
+              "score": 8.1,
+              "verdict": "pass"
+            },
+            {
+              "path": "C:/Users/ren/WebstormProjects/unmached/unmached/art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/card-2.json",
+              "profile": "Opus xhigh",
+              "session_id": "workflow:acceptor2-ASSET-BLACK-WIDOW-001-r2",
+              "score": 8.1,
+              "verdict": "pass"
+            }
+          ],
+          "score": 8.1,
+          "verdict": "pass",
+          "source_card": "C:/Users/ren/WebstormProjects/unmached/unmached/art/pipeline-candidates/ASSET-BLACK-WIDOW-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "same_profile_fallback": false,
+          "rule": "score = минимум двух; вердикт — карточки с меньшим score, строже — если у другой маршрут строже"
+        }
+      },
+      "separate_user_override": null,
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "portrait_candidate_found_in_frozen_waves1_7_or_gallery": false,
+      "historical_source_moderation_notes_preserved_not_retried": true
+    },
+    {
+      "asset_key": "doctor-strange",
+      "reference": "art/imagegen/concept-doctor-strange-codex/design/doctor-strange-front.png",
+      "reference_sha256": "507e2f853e78f6c3a724b9ed0bb7361c7fe82f3ff080da1dbb59721e015f1543",
+      "matched_current_png_cards": [
+        {
+          "path": "art/pipeline-candidates/ASSET-DOCTOR-STRANGE-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "sha256": "186c14bf01d524348b6a4abca2a81dad9c28b4791f75dc48602f4cb6e2995a34",
+          "data": {
+            "schema": "unmatched.concept-acceptance/1",
+            "kind": "concept",
+            "asset_id": "ASSET-DOCTOR-STRANGE-001",
+            "clip": null,
+            "cycle": "r2",
+            "date": "2026-10-13",
+            "previous_card": "art/pipeline-candidates/ASSET-DOCTOR-STRANGE-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+            "accepted_object": [
+              {
+                "path": "art/imagegen/concept-doctor-strange-codex/design/doctor-strange-front.png",
+                "sha256": "507e2f853e78f6c3a724b9ed0bb7361c7fe82f3ff080da1dbb59721e015f1543"
+              }
+            ],
+            "frames": {
+              "dir": "art/imagegen/concept-doctor-strange-codex/design",
+              "files": [
+                "doctor-strange-front.png",
+                "checks-report.json"
+              ]
+            },
+            "reports": [
+              "art/imagegen/concept-doctor-strange-codex/design/checks-report.json",
+              "art/imagegen/concept-doctor-strange-codex/generation-records.json",
+              "art/imagegen/concept-doctor-strange-codex/verification.json"
+            ],
+            "gates": {
+              "G-CHECKS": {
+                "status": "PASS",
+                "source": "art/imagegen/concept-doctor-strange-codex/design/checks-report.json",
+                "note": "checks-report.json#summary.PASS = 13; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; checks-report.json#verdict = PASS",
+                "source_defect": null
+              }
+            },
+            "scores": {
+              "S": {
+                "value": 1.5,
+                "rationale": "В doctor-strange-front.png узнаётся именно комиксный Doctor Strange: высокий воротник красного плаща, синяя туника, жёлтые перчатки, седина, эспаньолка и поднятая правая рука с мистическим жестом. Поза не T и не A. Замечание r1 об опущенной левой кисти не закрыто: она перекрывает тунику, зазора нет. Плащ полностью скрывает стопы и не позволяет прочитать стойку по §4.4. Ракурс подставки ближе к требуемому виду с ребра.",
+                "frames": [
+                  "doctor-strange-front.png"
+                ]
+              },
+              "C": {
+                "value": 1.5,
+                "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+                "frames": [
+                  "doctor-strange-front.png"
+                ]
+              },
+              "Q": {
+                "value": 1.5,
+                "rationale": "В doctor-strange-front.png проработаны лицо, пряди волос, пальцы, швы, цепь и гравировка медальона; прежнее замечание r1 о бедной детализации частично закрыто. До medusa-quality-reference.png не дотягивает исполнение ткани: плащ и туника покрыты грубой повторяющейся фактурой и сильными глянцевыми бликами. Материалы различимы, но ткань выглядит ближе к лакированной поверхности, чем к тонко расписанной ткани эталона.",
+                "frames": [
+                  "doctor-strange-front.png"
+                ]
+              },
+              "P": {
+                "value": 1,
+                "rationale": "В doctor-strange-front.png основные цветовые семейства и золотой акцент присутствуют. Неоново-жёлтые перчатки r1 исправлены до охристого тона, но плащ остаётся ярко-алым вместо приглушённого #A3242A, туника заметно насыщеннее #22305E. Один именованный якорь потерян: большой золотой медальон имеет пустой чёрный круг в центре, без читаемого мотива глаза, поэтому Eye of Agamotto не опознаётся как конкретный амулет.",
+                "frames": [
+                  "doctor-strange-front.png"
+                ]
+              }
+            },
+            "score": 6.9,
+            "verdict": "return_to_stage_1",
+            "verdict_reason": "G-CHECKS пройден, все измерения не ниже 1.0, но сумма S+C+Q+P = 5.5 даёт 6.9/10 после округления half-up, ниже порога 8.0. Необходимо отделить опущенную руку, показать стойку, улучшить материалы ткани, восстановить узнаваемый Eye of Agamotto и скорректировать тона палитры.",
+            "rework_fix_list": [
+              {
+                "item": "S",
+                "frame": "doctor-strange-front.png",
+                "fix": "Move Doctor Strange's lowered left forearm and hand outward to create a clear visible gap from the tunic while preserving the raised right-hand mystic gesture.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "S",
+                "frame": "doctor-strange-front.png",
+                "fix": "Keep the cloak clear of the lower legs so both feet are visibly planted evenly on the pedestal, using a level frontal orthographic camera with the pedestal seen exactly edge-on.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "Q",
+                "frame": "doctor-strange-front.png",
+                "fix": "Match the Medusa quality reference by replacing the coarse glossy texture on the cloak and tunic with fine matte fabric grain, controlled painted shading, crisp seams, and convincing sculpted folds while preserving the detailed face, hair, gloves, chain, and gold engraving.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "P",
+                "frame": "doctor-strange-front.png",
+                "fix": "Render the Eye of Agamotto as a recognizable golden eye amulet with a clearly sculpted eye motif instead of an empty black circular center.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "P",
+                "frame": "doctor-strange-front.png",
+                "fix": "Match painted midtones to tunic blue #22305E, cloak red #A3242A, glove yellow #D9B23A, and amulet gold #D4AE45, reducing the vivid scarlet cloak and saturated blue tunic to the specified muted tones.",
+                "tool": "Codex 1a"
+              }
+            ],
+            "known_issues": [],
+            "acceptor": {
+              "profile": "Sol 6.1 xhigh",
+              "session_id": "codex:01a134ff-8949-7f01-a1c5-b57a415feac7"
+            },
+            "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+            "decided_by": "delegated (ВР-реестр 2026-10-06)",
+            "status_note": ""
+          }
+        }
+      ],
+      "paired_final": null,
+      "separate_user_override": {
+        "path": "art/pipeline-candidates/ASSET-DOCTOR-STRANGE-001/evidence/acceptance-concept/20261013-front-r2/user-decision.json",
+        "sha256": "99567777ec14f354aa61d4a51417c07cee9a97c8c3a54a2ba223cbbec0d2e00f",
+        "data": {
+          "asset_id": "ASSET-DOCTOR-STRANGE-001",
+          "decision": "proceed_to_stage_1b",
+          "decided_by": "user",
+          "date": "2026-10-13",
+          "quote": "Пустить их дальше с текущими фронтами",
+          "record": "docs/game-design/decisions/2026-10-13-licensed-concepts-user-accepted.md",
+          "design_front": "art/imagegen/concept-doctor-strange-codex/design/doctor-strange-front.png",
+          "acceptor_card": "art/pipeline-candidates/ASSET-DOCTOR-STRANGE-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "acceptor_verdict": "return_to_stage_1",
+          "acceptor_score": 6.9,
+          "note": "user override of escalate_user (concept-sheet.md §10); the card verdict is unchanged"
+        }
+      },
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "portrait_candidate_found_in_frozen_waves1_7_or_gallery": false,
+      "historical_source_moderation_notes_preserved_not_retried": true
+    },
+    {
+      "asset_key": "elektra",
+      "reference": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+      "reference_sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6",
+      "matched_current_png_cards": [
+        {
+          "path": "art/pipeline-candidates/ASSET-ELEKTRA-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "sha256": "26633739c656fe698412a040dea67e265f863d830c91b9b41cd5214a5bf00a48",
+          "data": {
+            "schema": "unmatched.concept-acceptance/1",
+            "kind": "concept",
+            "asset_id": "ASSET-ELEKTRA-001",
+            "clip": null,
+            "cycle": "r2",
+            "date": "2026-10-13",
+            "previous_card": "art/pipeline-candidates/ASSET-ELEKTRA-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+            "accepted_object": [
+              {
+                "path": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+                "sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6"
+              }
+            ],
+            "frames": {
+              "dir": "art/imagegen/concept-elektra-codex/design",
+              "files": [
+                "elektra-front.png",
+                "checks-report.json"
+              ]
+            },
+            "reports": [
+              "art/imagegen/concept-elektra-codex/design/checks-report.json",
+              "art/imagegen/concept-elektra-codex/generation-records.json",
+              "art/imagegen/concept-elektra-codex/verification.json"
+            ],
+            "gates": {
+              "G-CHECKS": {
+                "status": "PASS",
+                "source": "art/imagegen/concept-elektra-codex/design/checks-report.json",
+                "note": "art/imagegen/concept-elektra-codex/design/checks-report.json#summary.PASS = 13; art/imagegen/concept-elektra-codex/design/checks-report.json#summary.WARN = 0; art/imagegen/concept-elektra-codex/design/checks-report.json#summary.FAIL = 0; art/imagegen/concept-elektra-codex/design/checks-report.json#verdict = PASS",
+                "source_defect": null
+              }
+            },
+            "scores": {
+              "S": {
+                "value": 2,
+                "rationale": "elektra-front.png: Электра узнаётся по сочетанию парных саев, красного костюма, длинной красной повязки и пояса, тёмных волос. В отличие от r1, центральные клинки и два боковых зубца каждого сая ясно читаются. Руки и оружие отделены от корпуса, концы повязки свободны, фигура целиком видна. Обе стопы стоят на подставке, локти слегка согнуты; поза не T и не A.",
+                "frames": [
+                  "elektra-front.png"
+                ]
+              },
+              "C": {
+                "value": 1.5,
+                "rationale": "1a: один вид, C не оценивается; фиксированное значение concept-sheet.md §11",
+                "frames": [
+                  "elektra-front.png"
+                ]
+              },
+              "Q": {
+                "value": 1,
+                "rationale": "elektra-front.png: объёмная миниатюра, кожа, волосы, ткань и металл различимы. Однако против medusa-quality-reference.png фактура красной одежды и металла чрезмерно грубая и зернистая, кисти и обмотки рукоятей проработаны проще, широкие блестящие участки одежды подавляют тонкую роспись. По контуру фигуры и подставки заметна светлая кайма. Серого участка справа от подставки, отмеченного в r1, больше нет, но общий уровень завершённости явно ниже эталона.",
+                "frames": [
+                  "elektra-front.png"
+                ]
+              },
+              "P": {
+                "value": 1.5,
+                "rationale": "elektra-front.png: все цветовые семейства и якоря присутствуют; замечание r1 об отсутствующем длинном конце пояса закрыто. Красный костюм, чёрные волосы и стальные саи различимы. При этом одежда и пояс выглядят более насыщенно малиновыми, чем заданные #A3242A и более тёплый акцент #C8322A; пояс почти повторяет тон костюма.",
+                "frames": [
+                  "elektra-front.png"
+                ]
+              }
+            },
+            "score": 7.5,
+            "verdict": "return_to_stage_1",
+            "verdict_reason": "По concept-sheet.md §11 score = (2 + 1.5 + 1 + 1.5) / 8 × 10 = 7.5 < 8.0: требуется новый цикл 1a. G-CHECKS PASS; основные замечания — качество отделки ниже эталона и отклонение красных тонов палитры.",
+            "rework_fix_list": [
+              {
+                "item": "Q",
+                "frame": "elektra-front.png",
+                "fix": "Match medusa-quality-reference.png's painted collectible finish with finely resolved glove fingers, clean grip wraps, crisp garment folds and controlled matte shading, replacing coarse surface noise and broad glossy chest patches.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "Q",
+                "frame": "elektra-front.png",
+                "fix": "Remove the pale contour halos around the figure, weapons and pedestal while preserving natural material highlights against a uniformly flat neutral dark gray background.",
+                "tool": "Codex 1a"
+              },
+              {
+                "item": "P",
+                "frame": "elektra-front.png",
+                "fix": "Use muted outfit red #A3242A and a visibly warmer sash red #C8322A instead of saturated crimson, preserving black hair #1A1719, steel sai #B8BEC4 and all existing character anchors.",
+                "tool": "Codex 1a"
+              }
+            ],
+            "known_issues": [
+              {
+                "item": "S",
+                "frame": "elektra-front.png",
+                "note": "Замечание r1 о строго реберном ракурсе подставки не закрыто: её верхняя поверхность по-прежнему видна. Это не скрывает силуэт или якоря персонажа, но требует внимания при следующей генерации."
+              }
+            ],
+            "acceptor": {
+              "profile": "Sol 6.1 xhigh",
+              "session_id": "codex:01a13525-ef30-79f3-8e84-451555546301"
+            },
+            "executor_session_id": "codex:01a134fa-9511-76c2-a295-98ad709fec31",
+            "decided_by": "delegated (ВР-реестр 2026-10-06)",
+            "status_note": ""
+          }
+        }
+      ],
+      "paired_final": null,
+      "separate_user_override": {
+        "path": "art/pipeline-candidates/ASSET-ELEKTRA-001/evidence/acceptance-concept/20261013-front-r2/user-decision.json",
+        "sha256": "7cebb88cda571a099e80541275539d259fd1af4dc2b4d5014b6fea21953740c4",
+        "data": {
+          "asset_id": "ASSET-ELEKTRA-001",
+          "decision": "proceed_to_stage_1b",
+          "decided_by": "user",
+          "date": "2026-10-13",
+          "quote": "Пустить их дальше с текущими фронтами",
+          "record": "docs/game-design/decisions/2026-10-13-licensed-concepts-user-accepted.md",
+          "design_front": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+          "acceptor_card": "art/pipeline-candidates/ASSET-ELEKTRA-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+          "acceptor_verdict": "return_to_stage_1",
+          "acceptor_score": 7.5,
+          "note": "user override of escalate_user (concept-sheet.md §10); the card verdict is unchanged"
+        }
+      },
+      "whole_head_visual_inspected": true,
+      "whole_head_present": true,
+      "portrait_candidate_found_in_frozen_waves1_7_or_gallery": false,
+      "historical_source_moderation_notes_preserved_not_retried": true
+    }
+  ]
+}

@@ -1,18 +1,18 @@
 {
   "schema": "unmatched.local-gallery/1",
-  "built_at_utc": "2026-10-15T06:58:51.066089+00:00",
+  "built_at_utc": "2026-10-15T07:17:48.718375+00:00",
   "scope": "Frozen independent source reviews plus actual formal 1c cards. No runtime acceptance inferred.",
   "counts": {
-    "entries": 66,
+    "entries": 70,
     "png_views": 73,
     "types": {
-      "portraits": 39,
+      "portraits": 43,
       "helper-ref": 23,
       "formalconcept": 4
     },
     "statuses": {
       "proposed": 60,
-      "blocked": 1,
+      "blocked": 5,
       "alternative": 1,
       "rejected": 1,
       "pass": 3
@@ -60,6 +60,12 @@
       "sha256": "016e6602b6fbbb0af685f81556417fe0e43086802a5244e469ca693160818f11",
       "wave": 7,
       "frozen_at_utc": "2026-10-15T06:58:01.097356+00:00"
+    },
+    {
+      "path": "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+      "sha256": "4ebcba257018f8a1f9b42d13f3af72747b92751eb79bf68b7578f5b6bc462a94",
+      "wave": 8,
+      "frozen_at_utc": "2026-10-15T07:11:57.057657+00:00"
     }
   ],
   "pending_reviews": [],
@@ -549,11 +555,10 @@
       "status_label": "PNG не создан",
       "batch": "5",
       "batch_label": "Волна 5",
-      "description": "Генератор отклонил вывод: HTTP400 moderation_blocked. Изображение не создано.",
+      "description": "HTTP400 moderation_blocked at output stage/categories other. Exact request/error retained; no retry, synthetic placeholder, image hash or crop claim.",
       "limits": [
-        "PNG отсутствует; здесь нет превью или синтетической замены.",
-        "Отказ относится к вызову инструмента, а не к художественной приёмке.",
-        "Повтор с обходом отказа и платный fallback не выполнялись."
+        "PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.",
+        "Отказ относится к вызову инструмента, а не к художественной приёмке."
       ],
       "images": [],
       "producer_readme": "art/imagegen/limit-burst-20261015/owner-portraits-wave5/geralt-of-rivia/README.md",
@@ -720,6 +725,33 @@
       "runtime_accepted": false,
       "pipeline_stage_accepted": false,
       "reference": "art/imagegen/concept-dr-jill-trent-codex/design/dr-jill-trent-front.png"
+    },
+    {
+      "id": "blocked:portrait:doctor-strange",
+      "asset": "portrait:doctor-strange",
+      "slug": "doctor-strange",
+      "label": "Доктор Стрэндж",
+      "type": "portraits",
+      "type_label": "Портрет",
+      "status": "blocked",
+      "status_label": "PNG не создан",
+      "batch": "8",
+      "batch_label": "Волна 8",
+      "description": "HTTP 400 moderation_blocked at output stage, category other. Exact prompt, arguments and error retained. No retry, fallback, synthetic placeholder, image hash, dimensions, full100 or native-circle output claim.",
+      "limits": [
+        "PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.",
+        "Отказ относится к вызову инструмента, а не к художественной приёмке."
+      ],
+      "images": [],
+      "producer_readme": null,
+      "independent_review": "art/imagegen/limit-burst-20261015/review-wave8/README.md",
+      "review_index": "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+      "formal_card": null,
+      "diagnostic": "art/imagegen/limit-burst-20261015/owner-portraits-wave8/doctor-strange/tool-error-g1.json",
+      "score": null,
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "reference": "request ID b5d45fc8-1e4b-40b1-aec0-6c0db2675dc3"
     },
     {
       "id": "source:art/imagegen/limit-burst-20261015/ui-cards-wave3/dr-sattler/portrait-source.png",
@@ -1509,6 +1541,60 @@
       "reference": "art/imagegen/concept-blackbeard-codex/design/blackbeard-front.png"
     },
     {
+      "id": "blocked:portrait:black-widow",
+      "asset": "portrait:black-widow",
+      "slug": "black-widow",
+      "label": "Чёрная Вдова",
+      "type": "portraits",
+      "type_label": "Портрет",
+      "status": "blocked",
+      "status_label": "PNG не создан",
+      "batch": "8",
+      "batch_label": "Волна 8",
+      "description": "HTTP 400 moderation_blocked at output stage, category other. Exact prompt, arguments and error retained. No retry, fallback, synthetic placeholder, image hash, dimensions, full100 or native-circle output claim.",
+      "limits": [
+        "PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.",
+        "Отказ относится к вызову инструмента, а не к художественной приёмке."
+      ],
+      "images": [],
+      "producer_readme": null,
+      "independent_review": "art/imagegen/limit-burst-20261015/review-wave8/README.md",
+      "review_index": "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+      "formal_card": null,
+      "diagnostic": "art/imagegen/limit-burst-20261015/owner-portraits-wave8/black-widow/tool-error-g1.json",
+      "score": null,
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "reference": "request ID 9229a7d0-9bfc-427b-9310-aadfdce3f959"
+    },
+    {
+      "id": "blocked:portrait:black-panther",
+      "asset": "portrait:black-panther",
+      "slug": "black-panther",
+      "label": "Чёрная Пантера",
+      "type": "portraits",
+      "type_label": "Портрет",
+      "status": "blocked",
+      "status_label": "PNG не создан",
+      "batch": "8",
+      "batch_label": "Волна 8",
+      "description": "HTTP 400 moderation_blocked at output stage, category other. Exact prompt, arguments and error retained. No retry, fallback, synthetic placeholder, image hash, dimensions, full100 or native-circle output claim.",
+      "limits": [
+        "PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.",
+        "Отказ относится к вызову инструмента, а не к художественной приёмке."
+      ],
+      "images": [],
+      "producer_readme": null,
+      "independent_review": "art/imagegen/limit-burst-20261015/review-wave8/README.md",
+      "review_index": "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+      "formal_card": null,
+      "diagnostic": "art/imagegen/limit-burst-20261015/owner-portraits-wave8/black-panther/tool-error-g1.json",
+      "score": null,
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "reference": "request ID 6a717c68-a0c4-4193-9fca-913ae9b9ed58"
+    },
+    {
       "id": "source:art/imagegen/limit-burst-20261015/ui-cards/sherlock-holmes/portrait-source.png",
       "asset": "portrait:sherlock-holmes",
       "slug": "sherlock-holmes",
@@ -1548,6 +1634,33 @@
       "reference": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png"
     },
     {
+      "id": "blocked:portrait:elektra",
+      "asset": "portrait:elektra",
+      "slug": "elektra",
+      "label": "Электра",
+      "type": "portraits",
+      "type_label": "Портрет",
+      "status": "blocked",
+      "status_label": "PNG не создан",
+      "batch": "8",
+      "batch_label": "Волна 8",
+      "description": "HTTP 400 moderation_blocked at output stage, category other. Exact prompt, arguments and error retained. No retry, fallback, synthetic placeholder, image hash, dimensions, full100 or native-circle output claim.",
+      "limits": [
+        "PNG отсутствует; здесь нет превью, SHA изображения или синтетической замены.",
+        "Отказ относится к вызову инструмента, а не к художественной приёмке."
+      ],
+      "images": [],
+      "producer_readme": null,
+      "independent_review": "art/imagegen/limit-burst-20261015/review-wave8/README.md",
+      "review_index": "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+      "formal_card": null,
+      "diagnostic": "art/imagegen/limit-burst-20261015/owner-portraits-wave8/elektra/tool-error-g1.json",
+      "score": null,
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "reference": "request ID 8b31205a-81c0-4d58-b27b-065e2de417ba"
+    },
+    {
       "id": "source:art/imagegen/limit-burst-20261015/owner-portraits-wave2/annie-christmas/portrait-source-candidate.png",
       "asset": "portrait:annie-christmas",
       "slug": "annie-christmas",
@@ -1585,44 +1698,6 @@
       "runtime_accepted": false,
       "pipeline_stage_accepted": false,
       "reference": "art/imagegen/concept-annie-christmas-codex/design/annie-christmas-front.png"
-    },
-    {
-      "id": "source:art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
-      "asset": "helper:titania:oberon",
-      "slug": "oberon",
-      "label": "Oberon",
-      "type": "helper-ref",
-      "type_label": "Референс помощника",
-      "status": "proposed",
-      "status_label": "Предложен исходник",
-      "batch": "6",
-      "batch_label": "Волна 6",
-      "description": "Adult male fae king, green/bronze leaf coat, small crown and right-hand staff; left empty, full silhouette. Top6.51%, bottom86.85% miss6/90; slight outward toes.",
-      "limits": [
-        "New original design proposal; hand overlaps, exact orthographic camera and hidden pedestal plan are not accepted. No model/rig/runtime acceptance."
-      ],
-      "recommendation": "",
-      "crop_review": "",
-      "native_review": "",
-      "disposition": "keep_proposed_original_reference",
-      "images": [
-        {
-          "path": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
-          "sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
-          "width": 1024,
-          "height": 1536,
-          "label": "Исходный PNG"
-        }
-      ],
-      "producer_readme": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/README.md",
-      "independent_review": "art/imagegen/limit-burst-20261015/review-wave6/README.md",
-      "review_index": "art/imagegen/limit-burst-20261015/review-wave6/independent-review-index.json",
-      "diagnostic": null,
-      "formal_card": null,
-      "score": null,
-      "runtime_accepted": false,
-      "pipeline_stage_accepted": false,
-      "reference": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/README.md"
     },
     {
       "id": "source:art/imagegen/limit-burst-20261015/helpers-wave5/the-hand/design-front.png",
@@ -2259,6 +2334,44 @@
       "runtime_accepted": false,
       "pipeline_stage_accepted": false,
       "reference": "art/imagegen/limit-burst-20261015/helpers-wave5/misty-knight/README.md"
+    },
+    {
+      "id": "source:art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
+      "asset": "helper:titania:oberon",
+      "slug": "oberon",
+      "label": "Оберон",
+      "type": "helper-ref",
+      "type_label": "Референс помощника",
+      "status": "proposed",
+      "status_label": "Предложен исходник",
+      "batch": "6",
+      "batch_label": "Волна 6",
+      "description": "Adult male fae king, green/bronze leaf coat, small crown and right-hand staff; left empty, full silhouette. Top6.51%, bottom86.85% miss6/90; slight outward toes.",
+      "limits": [
+        "New original design proposal; hand overlaps, exact orthographic camera and hidden pedestal plan are not accepted. No model/rig/runtime acceptance."
+      ],
+      "recommendation": "",
+      "crop_review": "",
+      "native_review": "",
+      "disposition": "keep_proposed_original_reference",
+      "images": [
+        {
+          "path": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
+          "sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
+          "width": 1024,
+          "height": 1536,
+          "label": "Исходный PNG"
+        }
+      ],
+      "producer_readme": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/README.md",
+      "independent_review": "art/imagegen/limit-burst-20261015/review-wave6/README.md",
+      "review_index": "art/imagegen/limit-burst-20261015/review-wave6/independent-review-index.json",
+      "diagnostic": null,
+      "formal_card": null,
+      "score": null,
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "reference": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/README.md"
     },
     {
       "id": "source:art/imagegen/limit-burst-20261015/helpers-wave5/ingen-worker/design-front.png",
