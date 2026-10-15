@@ -148,7 +148,7 @@ export class GameInitializationService {
       );
       occupied.add(`${basePos.x}:${basePos.y}`);
       const heroFighterId = `f-${seat}-hero`;
-      const sidekicks = this.parseSidekicks(hero.sidekicks);
+      const sidekicks = this.parseSidekicks(hero.sidekicks, hero.properties);
       // Слаг для HeroAbilityRegistry: handlers ключуются 'daredevil'/'ms-marvel',
       // heroId — cuid. Пишем и герою, и сайдкикам (handler ищет бойцов героя)
       const heroSlug = slugifyHeroName(hero.name);
@@ -717,12 +717,20 @@ export class GameInitializationService {
 
   private parseSidekicks(
     raw: unknown,
+    properties?: unknown,
   ): { name?: string; health?: number; movement?: number; attackType: AttackType }[] {
     if (!raw) return [];
     const value = typeof raw === 'string' ? this.tryParse(raw) : raw;
     if (!Array.isArray(value)) return [];
+    // Скрейп заполнил героям без помощника заглушку {name: "Unknown", health: 1}
+    // (T. Rex, Deadpool, Bruce Lee…); с properties.hasSidekick === false такая
+    // запись — не боец, иначе на поле появляется лишняя фигура «Unknown».
+    const noSidekick = (properties as { hasSidekick?: unknown } | null)?.hasSidekick === false;
+    const entries = noSidekick
+      ? value.filter((sk: any) => sk?.name && String(sk.name).trim().toLowerCase() !== 'unknown')
+      : value;
     // Разворачиваем записи с count/quantity в отдельных бойцов
-    return value.flatMap((sk: any) => {
+    return entries.flatMap((sk: any) => {
       const count = Math.min(4, Math.max(1, Number(sk?.count ?? sk?.quantity ?? 1) || 1));
       return Array.from({ length: count }, (_, i) => ({
         name: count > 1 && sk?.name ? `${sk.name} ${i + 1}` : sk?.name,

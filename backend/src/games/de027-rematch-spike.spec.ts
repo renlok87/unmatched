@@ -29,7 +29,7 @@ const SARPEDON_BOARD_ID = 'c7fa64a26c29a0835f2383e63';
 const AI_EMAIL = 'ai@unmached.local';
 
 type UserRow = { id: string; email: string; username: string; avatar: string | null };
-type HeroRow = { id: string; health: number; hasCards: boolean };
+type HeroRow = { id: string; name?: string; health: number; hasCards: boolean };
 type GameRow = {
   id: string;
   code: string | null;
@@ -180,7 +180,7 @@ class LobbyStore {
   hero = {
     findUnique: async ({ where }: any) => this.heroes.find((h) => h.id === where.id) ?? null,
     findMany: async () =>
-      this.heroes.filter((h) => h.hasCards).map((h) => ({ id: h.id, health: h.health })),
+      this.heroes.filter((h) => h.hasCards).map((h) => ({ id: h.id, name: h.name, health: h.health })),
   };
 
   board = {
@@ -434,6 +434,22 @@ describe('DE-027 spike: "Play again" with the same line-up (Q-203)', () => {
     expect(heroOf(started, 'arthur-player')).toBe('hero-arthur');
     // The strongest FREE hero with a deck: Medusa (16), not the deckless 20-health one.
     expect(heroOf(started, 'ai-bot')).toBe('hero-medusa');
+  });
+
+  it('VS_AI: the bot plays a hero of the client roster, not the 27-health T. Rex without a figure', async () => {
+    store.heroes = [
+      { id: 'hero-trex', name: 'T. Rex', health: 27, hasCards: true },
+      { id: 'hero-arthur', name: 'King Arthur', health: 18, hasCards: true },
+      { id: 'hero-medusa', name: 'Medusa', health: 16, hasCards: true },
+    ];
+    const { service } = buildService(store);
+
+    const room = await service.createGame({ mode: GameMode.VS_AI }, 'medusa-player');
+    await service.selectHero(room.id, 'medusa-player', 'hero-medusa');
+    await service.toggleReady(room.id, 'medusa-player');
+    const started = await service.startGame(room.id, 'medusa-player');
+
+    expect(heroOf(started, 'ai-bot')).toBe('hero-arthur');
   });
 
   it('a finished game does not count toward the active-games limit', async () => {

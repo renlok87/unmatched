@@ -33,6 +33,8 @@ export class GameService {
   private readonly GAMES_LIST_CACHE_PREFIX = 'games:list:';
   private readonly MAX_ACTIVE_GAMES = 5; // Максимум активных игр на пользователя
   private readonly AI_USER_EMAIL = 'ai@unmached.local'; // системный юзер-бот (VS_AI)
+  /** VS_AI: герои, за которых играет бот, по порядку предпочтения — ростер UE-клиента (ВР-02). */
+  static readonly AI_HERO_ROSTER: readonly string[] = ['King Arthur', 'Medusa'];
   private aiUserIdCache: string | null = null;
 
   constructor(
@@ -829,7 +831,7 @@ export class GameService {
 
     const allHeroes = await this.prisma.hero.findMany({
       where: { cards: { some: {} } },
-      select: { id: true, health: true },
+      select: { id: true, name: true, health: true },
     });
     // DE-027 spike (review IMPL 2026-10-05): the human's hero is excluded, otherwise
     // startGame rejects the room ("Два игрока не могут играть одного героя") whenever
@@ -845,8 +847,16 @@ export class GameService {
     if (heroes.length === 0) {
       throw new BadRequestException('Нет героев с картами для ИИ-оппонента');
     }
+    // Ростер клиента (UE ROOM ВР-02, S08FlowGameModeUmRoom.cpp UmRmRoster): только у этих героев есть
+    // фигуры, портреты и карты. Бот берёт свободного героя ростера; «сильнейший по health» (T. Rex 27 HP —
+    // без модели, белые блоки на поле) остаётся запасным путём, если ростер занят или не сидирован.
+    const rosterHero = GameService.AI_HERO_ROSTER.map((name) => heroes.find((h) => h.name === name)).find(
+      (h): h is (typeof heroes)[number] => Boolean(h),
+    );
     // Сильнейший по health среди свободных; при равенстве — первый (тай-брейк произвольный).
-    const heroId = heroes.reduce((best, h) => ((h.health ?? 0) > (best.health ?? 0) ? h : best)).id;
+    const heroId =
+      rosterHero?.id ??
+      heroes.reduce((best, h) => ((h.health ?? 0) > (best.health ?? 0) ? h : best)).id;
 
     await this.prisma.$transaction(async (tx) => {
       await tx.game.update({ where: { id: gameId }, data: { opponentId: aiUserId } });
