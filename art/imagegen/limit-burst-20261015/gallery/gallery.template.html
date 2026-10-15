@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Каталог мастерской · Unmatched</title>
+<style>
+:root{--bg:#13191a;--panel:#1b2223;--ink:#eee8da;--muted:#aab3ae;--line:#34403e;--brass:#d3af75;--green:#a6c6ac;--red:#e0a28e;--serif:"Book Antiqua",Palatino,Georgia,serif;--body:"Trebuchet MS",Candara,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button{cursor:pointer}a{color:var(--brass);text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brass);outline-offset:5px}button{color:inherit}button:disabled{cursor:default}::selection{background:#b38d51;color:#101717}[hidden]{display:none!important}
+.shell{max-width:1510px;margin:auto;padding:0 42px}.masthead{display:flex;justify-content:space-between;gap:18px;padding:24px 0 18px;border-bottom:1px solid var(--line);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}.brand{color:var(--brass)}.intro{display:grid;grid-template-columns:1fr 380px;gap:60px;padding:38px 0 28px;align-items:end}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--brass);margin:0 0 12px}h1{font:normal clamp(36px,4.2vw,62px)/1.06 var(--serif);letter-spacing:-1.6px;margin:0 0 14px}.intro-copy{color:var(--muted);max-width:660px;margin:0}.inventory{border-left:1px solid var(--line);padding-left:25px}.inventory-number{font:normal 56px/1 var(--serif);color:var(--brass);display:inline-block;margin-right:12px}.inventory small{color:var(--muted)}.inventory p{margin:10px 0 0;color:var(--muted);font-size:12px}.inventory .ready{color:var(--ink)}
+.tools{position:sticky;top:0;z-index:2;background:var(--bg);padding:16px 0 14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.tool-row{display:grid;grid-template-columns:minmax(220px,1fr) 220px 180px;gap:12px}.search-label{position:relative}.search-label span{position:absolute;left:15px;top:10px;font-size:19px;color:var(--brass);pointer-events:none}.search-label input{width:100%;padding:11px 15px 11px 43px;border:1px solid var(--line);background:#1b2323;color:var(--ink);border-radius:0}input::placeholder{color:#9ca7a2}select{width:100%;border:1px solid var(--line);background:#1b2323;color:var(--ink);padding:10px 12px;border-radius:0}.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.tab{padding:8px 13px;border:1px solid transparent;background:transparent;color:var(--muted);font-size:13px}.tab strong{font:normal 11px var(--body);padding-left:6px;opacity:.75}.tab[aria-pressed="true"]{border-color:var(--brass);color:var(--brass);background:#252b27}.tab:hover{color:var(--ink)}
+.result-line{display:flex;justify-content:space-between;gap:20px;margin:19px 0 15px;color:var(--muted);font-size:12px}.result-line em{font-style:normal;color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px 18px;align-items:start}.asset-card{background:var(--panel);border:1px solid var(--line);min-width:0;transition:border-color .15s}.asset-card:hover{border-color:#778278}.card-top{height:44px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:10px;letter-spacing:.04em;border-bottom:1px solid var(--line)}.score{font:normal 23px/1 var(--serif);color:var(--brass)}.score small{font:10px var(--body);color:var(--muted);padding-left:4px}.preview{width:100%;height:355px;padding:12px;display:flex;align-items:center;justify-content:center;border:0;border-bottom:1px solid var(--line);background:#242a2a}.preview img{width:100%;height:100%;object-fit: contain;object-position:center;display:block}.card-body{padding:15px 15px 0}.status{font-size:10px;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;color:var(--brass)}.status::before{content:"";width:5px;height:5px;background:currentColor;border-radius:50%}.status-pass{color:var(--green)}.status-rejected{color:var(--red)}.status-blocked,.status-alternative{color:var(--muted)}.card-body h2{font:normal 26px/1.15 var(--serif);margin:9px 0 5px}.asset-key{font:10px/1.6 Consolas,monospace;color:var(--muted);overflow-wrap:anywhere;margin:0;min-height:32px}.card-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px solid var(--line);margin-top:12px;padding:12px 0}.text-button{padding:0;background:transparent;border:0;font-size:12px;text-align:left}.text-button span{color:var(--brass);padding-left:4px}.text-button:hover{text-decoration:underline;text-underline-offset:4px}.direct,.no-png{font-size:10px;white-space:nowrap}.no-png{color:var(--muted)}.blocked-message{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:12px}.blocked-message strong{font:normal 24px var(--serif);color:var(--ink)}.blocked-sign{font:normal 62px var(--serif);color:#8c9891}.empty{padding:55px 20px;border:1px solid var(--line);text-align:center;color:var(--muted)}.empty h2{font:normal 27px var(--serif);color:var(--ink)}footer{margin-top:48px;padding:22px 0 36px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:26px;color:var(--muted);font-size:11px}footer p{margin:0;max-width:760px}.footer-links{white-space:nowrap}.footer-links a{margin-left:15px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+dialog{width:min(1280px,calc(100vw - 36px));max-height:calc(100vh - 36px);border:1px solid #6b756b;padding:0;background:var(--bg);color:var(--ink)}dialog::backdrop{background:#080d0de8}.dialog-head{padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid var(--line)}.dialog-head h2{font:normal 30px var(--serif);margin:0}.close{border:1px solid var(--line);padding:6px 12px;background:var(--panel);font-size:12px}.detail-layout{display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(290px,1fr)}.detail-picture{background:#232a2a;padding:20px;display:flex;flex-direction:column;min-width:0}.detail-image-area{min-height:330px;display:flex;align-items:center;justify-content:center;flex:1}.detail-image-area img{display:block;width:100%;height:auto;max-height:67vh;object-fit: contain}.detail-views{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.detail-views button{background:transparent;color:var(--muted);border:1px solid var(--line);padding:6px 11px;font-size:11px}.detail-views button[aria-pressed="true"]{border-color:var(--brass);color:var(--brass)}.detail-copy{padding:22px;max-height:79vh;overflow-y:auto}.detail-copy p{font-size:13px;color:var(--muted)}.detail-copy h3{font:normal 21px var(--serif);margin:24px 0 9px}.detail-copy ul{padding-left:18px;color:var(--muted);font-size:12px}.detail-copy li+li{margin-top:9px}.detail-key{font:11px Consolas,monospace;color:var(--muted);overflow-wrap:anywhere;margin-top:9px}.scope-note{border-left:2px solid var(--brass);padding-left:13px;font-size:12px;margin:19px 0;color:var(--ink)}.file-links{display:flex;flex-wrap:wrap;gap:8px}.file-links a{border:1px solid var(--line);padding:7px 10px;font-size:11px;text-decoration:none}.file-links a:hover{border-color:var(--brass)}.hash-box{font:10px/1.65 Consolas,monospace;overflow-wrap:anywhere;background:#1e2726;border:1px solid var(--line);padding:11px;color:var(--muted);white-space:pre-wrap}.detail-reference{font-size:11px!important;overflow-wrap:anywhere}.load-note{font-size:12px;color:var(--red);text-align:center}.detail-score{margin-left:12px;color:var(--brass);font-size:13px}
+@media(min-width:1400px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:850px){.shell{padding:0 22px}.intro{grid-template-columns:1fr;gap:22px;padding:28px 0}.inventory{display:none}.tool-row{grid-template-columns:1fr 1fr}.search-label{grid-column:1/-1}.detail-layout{grid-template-columns:1fr}.detail-copy{max-height:none}.detail-image-area img{max-height:55vh}.detail-copy{overflow:visible}dialog{overflow-y:auto}.masthead span:last-child{letter-spacing:0}.preview{height:340px}footer{flex-direction:column}}@media(max-width:480px){.shell{padding:0 14px}.tool-row{grid-template-columns:1fr}.search-label{grid-column:auto}.grid{grid-template-columns:1fr}.tabs{gap:0}.tab{padding:7px 9px;font-size:11px}.result-line{flex-direction:column;gap:4px}.masthead{font-size:9px}.dialog-head h2{font-size:25px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+<div class="masthead"><span class="brand">Unmatched · мастерская</span><span>Локальный архив / 15 октября 2026</span></div>
+<div class="intro"><div><p class="eyebrow">Изображения, происхождение, ревью</p><h1>Каталог мастерской</h1><p class="intro-copy">Портреты и референсы помощников — кандидаты исходников. Формальные оценки листов 1c показаны отдельно, с их реальными карточками приёмки.</p></div><aside class="inventory" aria-label="Состояние каталога"><span class="inventory-number">__TOTAL__</span><small>записей в каталоге</small><p id="inventory-summary"></p><p id="pending-summary"></p></aside></div>
+</header>
+<main>
+<section class="tools" aria-label="Поиск и фильтры">
+<div class="tool-row"><label class="search-label"><span aria-hidden="true">⌕</span><span class="sr-only">Поиск по персонажам, ключам и ограничениям</span><input id="search" type="search" placeholder="Имя, ключ или слово из ревью…" autocomplete="off"></label><label><span class="sr-only">Статус</span><select id="status"><option value="all">Все статусы</option><option value="proposed">Предложенные исходники</option><option value="alternative">Архивные варианты</option><option value="pass">Принятые концепты 1c</option><option value="rejected">Возвращённые на этап 1</option><option value="blocked">PNG не создан</option></select></label><label><span class="sr-only">Партия</span><select id="batch"><option value="all">Все партии</option></select></label></div>
+<div class="tabs" role="group" aria-label="Тип результата"><button class="tab" data-type="all" aria-pressed="true">Все <strong data-count="all"></strong></button><button class="tab" data-type="portraits" aria-pressed="false">Портреты <strong data-count="portraits"></strong></button><button class="tab" data-type="helper-ref" aria-pressed="false">Помощники · референсы <strong data-count="helper-ref"></strong></button><button class="tab" data-type="formalconcept" aria-pressed="false">Формальные концепты <strong data-count="formalconcept"></strong></button></div>
+</section>
+<div class="result-line"><span id="result-count" aria-live="polite">__TOTAL__ записей</span><span>Весь исходный кадр · исходные пропорции · PNG без обрезки</span></div>
+<noscript><p class="scope-note">Для поиска, фильтров и просмотра изображений включите JavaScript. Ссылки «Открыть PNG» ведут к реальным локальным файлам.</p></noscript>
+<section id="grid" class="grid" aria-label="Результаты">__GALLERY_CARDS__</section>
+<section id="empty" class="empty" hidden><h2>Совпадений нет</h2><p>Попробуйте другое имя или сбросьте фильтры.</p><button id="reset" class="close">Сбросить фильтры</button></section>
+</main>
+<footer><p>Оценка концепта относится к указанным 2D-видам. Модели, риг, анимация и runtime здесь не принимаются. Каталог собран: __BUILT_AT__.</p><div class="footer-links"><a data-repo="art/imagegen/limit-burst-20261015/gallery/gallery-data.json" href="gallery-data.json" target="_blank" rel="noopener">Данные JSON</a><a data-repo="art/imagegen/limit-burst-20261015/gallery/verification.json" href="verification.json" target="_blank" rel="noopener">Проверка сборки</a></div></footer>
+</div>
+<dialog id="detail" aria-labelledby="detail-title"><div class="dialog-head"><h2 id="detail-title"></h2><button id="close" class="close" autofocus>Закрыть · Esc</button></div><div class="detail-layout"><div class="detail-picture"><div class="detail-image-area"><img id="detail-image" alt="" hidden><div id="detail-blocked" class="blocked-message" hidden><span class="blocked-sign" aria-hidden="true">×</span><strong>Изображение не создано</strong><span>В пакете сохранены запрос и ошибка сервиса.</span></div><p id="detail-load-error" class="load-note" hidden>Файл не загрузился. Откройте ссылку на исходный PNG ниже.</p></div><div id="detail-views" class="detail-views"></div></div><div class="detail-copy"><div><span id="detail-status" class="status"></span><span id="detail-score" class="detail-score"></span></div><div id="detail-key" class="detail-key"></div><div id="detail-scope" class="scope-note"></div><p id="detail-description"></p><h3>Ограничения из ревью</h3><ul id="detail-limits"></ul><p id="detail-crop"></p><p id="detail-native"></p><h3>Файлы и проверка</h3><div id="detail-links" class="file-links"></div><h3>Исходный файл</h3><div id="detail-hash" class="hash-box"></div><p id="detail-reference" class="detail-reference"></p></div></div></dialog>
+<script id="gallery-data" type="application/json">__GALLERY_DATA__</script>
+<script id="gallery-ui">
+"use strict";
+(() => {
+  const data = JSON.parse(document.getElementById("gallery-data").textContent);
+  const entries = data.entries;
+  const byId = new Map(entries.map(entry => [entry.id, entry]));
+  const el = id => document.getElementById(id);
+  const state = {type: "all"};
+  const normalize = value => String(value).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("ru").replace(/ё/g, "е");
+  const searchable = new Map(entries.map(entry => [entry.id, normalize([entry.label, entry.asset, entry.slug, entry.type_label, entry.description, ...(entry.limits || [])].join(" "))]));
+  const repoUrl = path => location.protocol === "file:" ? "../../../../" + path.split("/").map(encodeURIComponent).join("/") : "/__art-hub/file?path=" + encodeURIComponent(path);
+  document.querySelectorAll("[data-image]").forEach(image => {image.src = repoUrl(image.dataset.image);});
+  document.querySelectorAll("[data-repo]").forEach(link => {link.href = repoUrl(link.dataset.repo);});
+  document.querySelectorAll("[data-count]").forEach(count => {count.textContent = count.dataset.count === "all" ? entries.length : entries.filter(e => e.type === count.dataset.count).length;});
+  const batches = [...new Set(entries.map(e => e.batch))].sort((a,b) => a === "formal" ? 1 : b === "formal" ? -1 : Number(a)-Number(b));
+  batches.forEach(value => {const option = document.createElement("option");option.value = value;option.textContent = value === "formal" ? "Формальная приёмка 1c" : "Волна " + value;el("batch").append(option);});
+  el("inventory-summary").textContent = data.counts.png_views + " проверенных PNG · " + data.review_indexes.length + " замороженных индексов ревью";
+  const pending = data.pending_reviews.filter(item => item.wave).map(item => item.wave);
+  el("pending-summary").textContent = pending.length ? "Ревью волн " + pending.join(", ") + " ещё не включены." : "Все доступные замороженные волны включены.";
+  function filter() {
+    const query = normalize(el("search").value.trim());
+    const status = el("status").value;
+    const batch = el("batch").value;
+    let visible = 0;
+    document.querySelectorAll(".asset-card").forEach(card => {
+      const entry = byId.get(card.dataset.id);
+      const match = (state.type === "all" || entry.type === state.type) && (status === "all" || entry.status === status) && (batch === "all" || entry.batch === batch) && (!query || searchable.get(entry.id).includes(query));
+      card.hidden = !match;
+      visible += match ? 1 : 0;
+    });
+    el("result-count").textContent = "Показано " + visible + " из " + entries.length;
+    el("empty").hidden = visible !== 0;
+  }
+  el("search").addEventListener("input", filter);
+  el("status").addEventListener("change", filter);
+  el("batch").addEventListener("change", filter);
+  document.querySelectorAll("[data-type]").forEach(button => button.addEventListener("click", () => {state.type = button.dataset.type;document.querySelectorAll("[data-type]").forEach(tab => tab.setAttribute("aria-pressed", String(tab === button)));filter();}));
+  el("reset").addEventListener("click", () => {state.type = "all";el("search").value = "";el("status").value = "all";el("batch").value = "all";document.querySelectorAll("[data-type]").forEach(tab => tab.setAttribute("aria-pressed", String(tab.dataset.type === "all")));filter();el("search").focus();});
+  function link(label, path) {
+    if (!path) return;
+    const anchor = document.createElement("a");anchor.textContent = label;anchor.href = repoUrl(path);anchor.target = "_blank";anchor.rel = "noopener";el("detail-links").append(anchor);
+  }
+  function frame(entry, index) {
+    const picture = entry.images[index];
+    el("detail-load-error").hidden = true;
+    if (!picture) {el("detail-image").hidden = true;el("detail-image").removeAttribute("src");el("detail-blocked").hidden = false;el("detail-hash").textContent = "PNG отсутствует. SHA изображения не существует.";return;}
+    el("detail-blocked").hidden = true;el("detail-image").hidden = false;el("detail-image").src = repoUrl(picture.path);el("detail-image").alt = entry.label + " · " + picture.label;
+    el("detail-hash").textContent = picture.label + " · " + picture.width + " × " + picture.height + " px\n" + picture.path + "\nSHA256 " + picture.sha256;
+    el("detail-views").querySelectorAll("button").forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
+  }
+  function open(id) {
+    const entry = byId.get(id);if (!entry) return;
+    el("detail-title").textContent = entry.label;
+    el("detail-status").textContent = entry.status_label;el("detail-status").className = "status status-" + entry.status;
+    el("detail-score").textContent = entry.score == null ? "" : String(entry.score).replace(".", ",") + "/10 · только 1c";
+    el("detail-key").textContent = entry.asset + " · " + entry.batch_label;
+    el("detail-scope").textContent = entry.type === "formalconcept" ? "Реальная карточка формальной приёмки концепта 1c. Её оценка связана с SHA трёх показанных видов; последующие этапы здесь не приняты." : entry.status === "blocked" ? "Текстовая запись неуспешного вызова. Изображения нет." : "Ревью исходника: портрет или референс остаётся предложением. Формальная приёмка 1a/1c и runtime из этого ревью не следуют.";
+    el("detail-description").textContent = entry.description;
+    el("detail-limits").replaceChildren();(entry.limits || []).forEach(text => {const li = document.createElement("li");li.textContent = text;el("detail-limits").append(li);});
+    el("detail-crop").textContent = entry.crop_review ? "Круговая обрезка: " + entry.crop_review : "";
+    el("detail-native").textContent = entry.native_review ? "Малый размер: " + entry.native_review : "";
+    el("detail-reference").textContent = entry.reference ? "Основание / reference: " + entry.reference : "";
+    el("detail-links").replaceChildren();link("README автора", entry.producer_readme);link(entry.type === "formalconcept" ? "Карточка приёмки" : "Независимое ревью", entry.independent_review);if (entry.review_index && entry.review_index !== entry.independent_review) link("Индекс ревью JSON", entry.review_index);link(entry.status === "blocked" ? "Фактическая ошибка" : "Лист проверки", entry.diagnostic);entry.images.forEach(picture => link(picture.label + " · PNG ↗", picture.path));
+    el("detail-views").replaceChildren();entry.images.forEach((picture, i) => {const button = document.createElement("button");button.textContent = picture.label;button.setAttribute("aria-pressed", String(i === 0));button.addEventListener("click", () => frame(entry, i));el("detail-views").append(button);});
+    frame(entry, 0);el("detail").showModal();
+  }
+  document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => open(button.dataset.open)));
+  el("detail-image").addEventListener("error", () => {el("detail-load-error").hidden = false;});
+  el("close").addEventListener("click", () => el("detail").close());
+  el("detail").addEventListener("click", event => {if (event.target === el("detail")) {const box = el("detail").getBoundingClientRect();if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) el("detail").close();}});
+  filter();
+})();
+</script>
+</body>
+</html>

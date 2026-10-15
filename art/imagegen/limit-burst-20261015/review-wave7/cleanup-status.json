@@ -1,0 +1,33 @@
+{
+  "schema": "unmatched.burst-review-cleanup/1",
+  "recorded_at_utc": "2026-10-15T06:58:01.097356+00:00",
+  "scope": "Only temporary services started by art_hub_audit; shared/user/MCP services untouched.",
+  "vite": {
+    "pid": 6860,
+    "executable": "C:\\nvm4w\\nodejs\\node.exe",
+    "command_line": "\"C:\\nvm4w\\nodejs\\node.exe\" node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5480 --strictPort",
+    "parent_pid": 49008,
+    "parent_status_before_stop": "already exited",
+    "identity_verified_before_stop": true,
+    "started_by_this_auditor": true,
+    "action": "stopped exact PID after executable and full argv check",
+    "verification": {
+      "pid_absent": true,
+      "port_5480_listener_count": 0
+    }
+  },
+  "postgres": {
+    "container": "unmatched-postgres",
+    "started_by_this_auditor": true,
+    "prior_stopped_at_utc": "2026-10-15T05:30:22.598905827Z",
+    "started_at_utc": "2026-10-15T05:36:44.3995794Z",
+    "usage_check": "pg_stat_activity for unmatched showed only the auditor psql query, no application connections; production and live audits complete.",
+    "action": "docker stop unmatched-postgres; no remove, compose down or volume changes",
+    "verification": {
+      "running": false,
+      "status": "exited",
+      "finished_at_utc": "2026-10-15T06:57:14.329127782Z"
+    }
+  },
+  "other_processes": "No other auditor-owned long-lived process remains. Temporary audit IAB tab closed earlier. Parent owns CLI worker cleanup."
+}
