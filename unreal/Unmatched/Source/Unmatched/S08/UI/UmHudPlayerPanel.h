@@ -226,5 +226,11 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
   FS09OnHudPressOutcome OnOutcome;
   UPROPERTY(Transient) TObjectPtr<UWidget> SidekickTip;
   UPROPERTY(Transient) TArray<TObjectPtr<UObject>> KeepAlive;  // the MIDs of the mini portraits
+  /** HUD v2 (art/imagegen/hud-v2-codex, theme skins hud.portrait.frame[.active][.64]): the marble-and-gold medallion
+   *  over the portrait circle; absent while the theme has no such texture (the old ring stays alone). */
+  UPROPERTY(Transient) TObjectPtr<UImage> PortraitFrame;
+  void ApplyPortraitFrame();
+  float AppliedRingSu = 0.0f;
+  bool bFrameActive = false;
   TArray<FUmPortraitShown> MiniShown;  // CP-10 / CP-12: what each mini portrait shows (the PORTRAIT lines)
 };

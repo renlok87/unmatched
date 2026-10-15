@@ -38,9 +38,17 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGE = ROOT / "art/imagegen/hud-skins-v1-codex"
+# --package=<repo-relative dir> picks another skin package with the same contract (HUD v2 2026-10-15:
+# art/imagegen/hud-v2-codex, exports in kit/x1 + kit/x2 - the export folder is "vector" or "kit", whichever exists).
+PACKAGE = ROOT / next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--package=")),
+                      "art/imagegen/hud-skins-v1-codex")
 MARGINS = PACKAGE / "slice-margins.json"
 REPORT = PACKAGE / "ue-import-report.json"
+
+
+def export_dir(package: Path) -> str:
+    """The folder of the x1 / x2 exports: vector/ (HB-08) or kit/ (HUD v2)."""
+    return "vector" if (package / "vector/x1").is_dir() else "kit"
 TOKENS = ROOT / "docs/unreal/contracts/hud/hud-style-tokens.json"
 DEST = "/Game/S08/UI/Skins"
 THEME = "/Game/S08/UI/Theme/DA_UmHudTheme"
@@ -51,10 +59,16 @@ CAMEL_RE = re.compile(r"[A-Z][a-z0-9]*")
 def skin_key(file_name: str) -> str:
     """T_Skin_BtnPrimary_Hover.png -> btn.primary.hover (CamelCase and '_' split, lower case, dots)."""
     stem = Path(file_name).stem
-    if not stem.startswith("T_Skin_"):
-        raise ValueError(f"{file_name}: not a T_Skin_* file")
-    parts: list[str] = []
-    for chunk in stem[len("T_Skin_"):].split("_"):
+    # HUD v2 (2026-10-15): the ornament pieces T_Hud_<Name> bind as "hud.<name parts>" (T_Hud_PortraitFrame_Active_64
+    # -> hud.portrait.frame.active.64); a chunk of digits is one part
+    prefix = "T_Skin_" if stem.startswith("T_Skin_") else "T_Hud_" if stem.startswith("T_Hud_") else ""
+    if not prefix:
+        raise ValueError(f"{file_name}: not a T_Skin_* / T_Hud_* file")
+    parts: list[str] = ["hud"] if prefix == "T_Hud_" else []
+    for chunk in stem[len(prefix):].split("_"):
+        if chunk.isdigit():
+            parts.append(chunk)
+            continue
         words = CAMEL_RE.findall(chunk)
         if "".join(words) != chunk:
             raise ValueError(f"{file_name}: chunk {chunk!r} is not CamelCase")
@@ -78,9 +92,13 @@ def plan(package: Path = PACKAGE) -> list[dict]:
     """One entry per skin: key, asset names, files, PNG sizes, margins (px per file) and stretch."""
     margins = json.loads((package / "slice-margins.json").read_text(encoding="utf-8"))["files"]
     out = []
-    for x1 in sorted((package / "vector/x1").glob("T_Skin_*.png")):
+    exports = export_dir(package)
+    files = sorted((package / exports / "x1").glob("T_Skin_*.png"))
+    if "--with-hud" in sys.argv[1:]:
+        files += sorted((package / exports / "x1").glob("T_Hud_*.png"))
+    for x1 in files:
         name = x1.stem
-        x2 = package / "vector/x2" / x1.name
+        x2 = package / exports / "x2" / x1.name
         if not x2.exists():
             raise RuntimeError(f"{x2}: the x2 export is missing")
         entry = {"key": skin_key(x1.name), "name": name, "assets": {}, "files": {}, "sizes": {}, "margins": {}}
@@ -98,7 +116,7 @@ def plan(package: Path = PACKAGE) -> list[dict]:
             if m["left"] + m["right"] >= w or m["top"] + m["bottom"] >= h:
                 if m["stretch"] != "none":
                     raise RuntimeError(f"{rel}: margins {m} do not fit {w}x{h}")
-            entry["assets"][scale] = f"T_Skin_{name[len('T_Skin_'):]}" + ("" if scale == "x1" else "_x2")
+            entry["assets"][scale] = name + ("" if scale == "x1" else "_x2")  # T_Skin_<Name> / T_Hud_<Name>
             entry["files"][scale] = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(path)
             entry["sha256"] = entry.get("sha256", {})
             entry["sha256"][scale] = hashlib.sha256(data).hexdigest()
@@ -112,7 +130,7 @@ def plan(package: Path = PACKAGE) -> list[dict]:
 def check_plan(entries: list[dict]) -> list[str]:
     """Problems of a plan: the keys must be the 29 token skins; x2 must be twice x1 (+-2 px)."""
     errors = []
-    keys = sorted(e["key"] for e in entries)
+    keys = sorted(e["key"] for e in entries if not e["key"].startswith("hud."))
     want = token_skin_keys()
     if keys != want:
         errors.append(f"skin keys {sorted(set(keys) ^ set(want))} differ from hud-style-tokens.json skins")

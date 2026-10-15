@@ -1,0 +1,244 @@
+# HUD v2 — Этап B: prompts
+
+6 built-in ImageGen calls / budget 35. RGB masters on pure #00FF00; Pillow creates alpha. B01/B02 use A-styleguide as style reference only.
+
+## B01
+
+Use case: stylized-concept. Asset type: game HUD ornamental source master, direction A Marble Acropolis. The reference image is STYLE REFERENCE ONLY, do not reproduce the sheet. Paint ONE isolated empty rectangular UI panel frame, front-on orthographic, centered on a completely uniform PURE #00FF00 chroma-green background, including a pure green empty inner rectangle. Opaque RGB, no transparency. Landscape canvas. Frame occupies most of image with generous green safety border. Shape: slim carved IVORY WHITE MARBLE rim, delicate antique gold leaf double filigree line, tiny Greek meander relief confined entirely to four corners, restrained small laurel ornaments confined to corners. Straight horizontal and vertical middle edges MUST be plain continuous uniform profiles with zero repeating ornaments and no long-axis gradients; all interesting detail in square corner regions. Premium museum board-game craft, warm highlights, crisp antialiased edges. Rim approximately 24 pixels wide at 1024px frame width, corner ornament extends 60 pixels. Inner and outer boundaries clean, no perspective or drop shadow. NO text, letters, numerals, icons, portraits, cards, logos, checkerboard. Color must be white marble and warm gold, never brass or dark bronze. High resolution 1536x1024 desired.
+
+## B02
+
+Use case: stylized-concept. Asset type: isolated game HUD portrait medallion source master. Generate ONE circular ring front-on centered on uniform PURE #00FF00 chroma green background, inner circle pure green too, RGB opaque no transparency. 1024x1024. Direction Marble Acropolis: ivory white polished marble circular rim, two fine warm gold-leaf concentric bevel lines, delicate engraved Greek meander around rim, two small balanced gold laurel sprigs attached at lower-left and lower-right, slim circular silhouette. Ring outer diameter 850 pixels, inner circular hole diameter 660 pixels, NO portrait, no inner disk. Gold metallic highlights softly warm, museum quality luxury board game, clean antialiased edges. Strict radial symmetry of actual circular ring, no ellipse or perspective, no lighting falloff in green, no shadow on green, no glow, no letters or symbols or icons or logos. Reference is style only.
+
+## B03
+
+Use case: stylized-concept. Asset type: ONE isolated circular game HUD action button bezel source master, same Marble Acropolis collection. Front-on perfect true circle on completely flat uniform PURE #00FF00 background, hole inside ALSO PURE #00FF00. RGB OPAQUE not transparency. Square high resolution. Entire bezel centered, ample empty green border. Outer ring diameter 840px, inner circular clear hole diameter 690px. Thin outer warm gold-leaf line, narrow ivory marble bevel band, thin recessed navy enamel groove and fine inner gold edge. Exactly four tiny geometric engraved Greek key details at the cardinal positions in the marble band, refined crisp geometry. No laurels, no wings or protrusions, no glyph inside, no icon, no text. Disc is separate at runtime. Luxury Greek board game jewelry-like craft with discreet warm specular light. Must be a geometrically accurate orthographic circle, no oval, no perspective, no drop shadow, no glow, no watermark.
+
+## B04
+
+Use case: stylized-concept. Asset type: ONE isolated L-shaped ornamental top-left corner master for a marble Greek game HUD modal. Opaque RGB, uniform PURE #00FF00 green background outside and in empty inside. 1024 square. Paint a large elegant 90-degree L frame corner, occupying upper-left to center with ample green border around all sides. Ivory white carved marble rail 65 pixels thick, fine double gold-leaf bevel, authentic geometric Greek key / meander in the elbow, a small refined gold acanthus curl and laurel spray at the outside corner. The L has horizontal arm to the right and vertical arm downward, each approximately 650px long. Arms have completely straight plain ends and consistent cross section so they can be cut and extended. Ornament at the elbow only, not distributed down rails. Dark navy tiny enamel accents allowed only in gold filigree relief. Premium museum board game, restrained, crisp, softly lit, no extreme shadow, no glow on green. Empty frame, no words, no runes, no icons, no lettering, no full panel, no text or numerals, no perspective.
+
+## B05
+
+Use case: stylized-concept. Asset type: ONE isolated empty horizontal Greek game HUD status cartouche / ribbon source master. Opaque RGB on perfectly uniform PURE #00FF00 green outside AND pure green blank insert area. Wide 1536x1024 canvas, the thin long banner centered occupying width 1400 and height 260, generous green space top/bottom. Marble Acropolis collection: slim ivory white marble rim, fine double gold-leaf bevel, navy enamel accents only within small symmetrical meander ornaments at LEFT and RIGHT ENDS. The clear green inner insert is a simple long rectangle with slightly cut corners. Terminal ends are elegant stepped Greek key cartouches, no dangling scroll, no wings, no laurels underneath, low profile. The LONG horizontal central rails are completely straight, PLAIN, same cross section all along, no varying detail or gradients along length. Restrained luxury museum board game, warm finely crafted crisp gold, no text, no numerals, no glyphs, no logo, no icons, no perspective, no drop shadow, no glow on green.
+
+## B06
+
+Use case: stylized-concept. Asset type: ONE isolated straight horizontal seamless ornamental Greek meander border strip for Marble Acropolis game HUD. Opaque RGB on uniform PURE #00FF00 green, never transparency. Wide canvas 1536x1024. A single long slender gold-leaf Greek key meander strip runs horizontally centered, from x100 to1436, height100 pixels. Actual perfectly regular orthogonal interlocking Greek-key pattern, eight identical square spiral repeat cells all the same size. Ivory marble thin inlaid band behind the golden meander, fine gold upper and lower rails. Front-on orthographic, no perspective, uniform lighting along whole length, no curl or terminal ornament. Repeating left and right edges intended for horizontal tiling. Leave wide empty green safety border. Crisp square 90-degree corners in pattern, premium carved marble and gold material, no letters, no words, no glyphs, no icons, no captions, no shadow or glow on green.
+
+<!-- STAGE-B-END -->
+
+# HUD v2: ImageGen prompts
+
+12 calls. Edit: P01-P03, P05-P07, P09-P11.
+
+## P01 - A-1-own-turn.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/01-maneuver-own-turn.png
+
+Use case: compositing / ui-mockup. EDIT the supplied real game screenshot into a production-quality original Russian board-game HUD concept. Landscape 16:9, output 1920x1080. The supplied screenshot is the EDIT TARGET. Repaint ONLY HUD, never the game scene.
+Direction A «Мраморный акрополь»: slim ivory/white marble panel frames, fine gold-leaf filigree and geometric Greek meander corners, deep navy #061623 enamel text insets, cream #F9EBDB typography, warm lantern reflections. Sophisticated museum-quality board game, restrained handcrafted ornament, no heavy fantasy clutter. Make it visibly designed and cohesive, never prototype rectangles.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+
+## P02 - A-2-combat.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/03-combat-attack.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first image, a real game screenshot. Supporting image is the own-turn HUD style from this direction: match its materials and component language. Landscape 16:9 1920x1080. Direction A «Мраморный акрополь»: ivory/white marble frames with thin gold leaf Greek meander corners and restrained filigree; deep navy enamel insets, warm lantern highlights. Premium, precise, slim, original ornament.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: this is a COMBAT concept. Keep all standard edge components, but show combat card modules outside board: left x24..270 y350..710, right x1650..1896 y350..710. Use authentic Medusa and Arthur Russian card scans from source. Left label exactly «АТАКА · Медуза», large value «3». Right label «ЗАЩИТА · Король Артур», large value «1». Left below card two beautifully styled buttons «ЗАЩИТИТЬСЯ», «БЕЗ ЗАЩИТЫ», timer «27 с». Center RESULT compact at x690..1230 y160..214: «3 : 1 · Медуза побеждает» (above board field). Single top status «Выберите карту защиты». Journal becomes a compact left edge strip above combat card (x24..320 y270..340) with «Журнал» and «Х1 Медуза: манёвр: без движения». Own hand has six real scans at bottom with one subtly raised, not the huge hover card blocking the board in source. No central modal, no English text, no choice panel. Preserve board, figures and painted garden exactly.
+
+## P03 - A-3-choice.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/05-choice-banner.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first real game screenshot. Second image supports matching the own-turn HUD style. 16:9 landscape 1920x1080. Direction A «Мраморный акрополь»: ivory/white marble frames with thin gold leaf Greek meander corners and restrained filigree; deep navy enamel insets, warm lantern highlights. Premium, precise, slim, original ornament.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: show a beautifully designed card-effect choice module ONLY in the open top-centre backdrop above board, x530..1380 y86..210. Title EXACT «Второй выстрел». One readable sentence EXACT «ВО ВРЕМЯ БОЯ: Можете УСИЛИТЬ эту атаку.». Primary button «ПОДТВЕРДИТЬ», secondary «СВЕРНУТЬ (C)». Top single status «Сделайте выбор…». Preserve real combat card scans on left and right edges, captions «АТАКА · Медуза» and «ЗАЩИТА · Король Артур». Six recognisable own card scans along bottom; one raised slightly, caption «Рука 6/7». Remove the old English source choice texts and old error overlay in the lower board. Keep every circle and figure unobstructed; board and garden unchanged. All standard player panels, 5 opponent backs, deck/discard, action discs, log, HP plates remain. No additional invented text.
+
+## P04 - A-4-styleguide.png
+
+Input: None
+
+Use case: ui-mockup / original game UI component design sheet. Generate a beautiful professional HUD component style sheet, landscape 16:9 1920x1080. Direction A «Мраморный акрополь»: ivory/white marble frames with thin gold leaf Greek meander corners and restrained filigree; deep navy enamel insets, warm lantern highlights. Premium, precise, slim, original ornament.
+Absolutely NO game screenshot, NO board map, NO card scans, NO copyrighted logos, NO brand marks. A pure original component design sheet on a uniform deep navy presentation surface. Clean modular grid with generous spacing and readable Russian labels, Roboto Bold Condensed. Title exactly «A · Мраморный акрополь». Make this a cohesive comprehensive kit, not assorted game props.
+Top palette row labelled with accurate hex swatches: #061623 navy, #F9EBDB cream, #F4EFE4 ivory, #C6A15A gold, #6B4E8F violet, #DC2F33 red, #FDBE72 orange, #656B70 grey.
+Include two EMPTY panel frame sizes, one wide and one small; leave text areas empty. Portrait medallion with an ORIGINAL unbranded feminine stone silhouette, not a source portrait. Small HP plate «16/16» and heart. Empty card-hand slot and a neighbouring raised HOVER slot with restrained glow, no card art. Status banner «Выберите действие: манёвр, атака или схема» with M A G key chips. Typography sample exactly «Ход 1», «16/16», «ВАШ ХОД».
+Main component grid: four ACTION ROWS × four STATE COLUMNS. Row labels exactly «МАНЁВР», «АТАКА», «СХЕМА», «КОНЕЦ ХОДА». Column labels exactly «Обычное», «Наведение», «Нажатие», «Недоступно». Each row must have ALL FOUR states, total sixteen buttons. Accepted action disc language: flat violet circle with cream bootprints, red circle with cream sharp starburst, gold-orange circle with NAVY lightning, grey circle with cream arrow-to-bar. Keep these discs FLAT original crisp printed tokens, never relief or metallic discs. Surrounding button frame follows direction materials. Normal crisp; hover brighter outline+gentle light; pressed inset; disabled desaturated but legible. Exact hotkeys M,A,G,E.
+Include primary text button «ПОДТВЕРДИТЬ» and secondary «СВЕРНУТЬ (C)». Labels «Панели», «Портрет», «Здоровье», «Рука», «Статус», «Типографика» may appear. Text >=18px, numbers big, contrast >=4.5:1. Everything entirely within canvas, no overlapping swatches or components. No English except hotkeys and hex codes. Original ornament only.
+
+## P05 - B-1-own-turn.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/01-maneuver-own-turn.png
+
+Use case: compositing / ui-mockup. EDIT the supplied screenshot, repaint ONLY the HUD layer. 16:9 landscape, 1920x1080. Direction B «Бронза и пергамент»: premium physical tabletop HUD. Dark polished walnut frames, aged bronze hairline fittings and engraved corner brackets, ivory parchment inner plates with dark navy readable text, portrait medallions mounted in wine-red wax seals, embossed dark chocolate leather action-button surrounds. Warm, tactile, refined; NO ivory-marble architecture or Greek-meander motif. Keep accepted coloured discs flat and unchanged inside leather buttons.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+
+## P06 - B-2-combat.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/03-combat-attack.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first image, a real game screenshot. Supporting image is the own-turn HUD style from this direction: match its materials and component language. Landscape 16:9 1920x1080. Direction B «Бронза и пергамент»: premium physical tabletop HUD. Dark polished walnut frames, aged bronze hairline fittings and engraved corner brackets, ivory parchment inner plates with dark navy readable text, portrait medallions mounted in wine-red wax seals, embossed dark chocolate leather action-button surrounds. Warm, tactile, refined; NO ivory-marble architecture or Greek-meander motif. Keep accepted coloured discs flat and unchanged inside leather buttons.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: this is a COMBAT concept. Keep all standard edge components, but show combat card modules outside board: left x24..270 y350..710, right x1650..1896 y350..710. Use authentic Medusa and Arthur Russian card scans from source. Left label exactly «АТАКА · Медуза», large value «3». Right label «ЗАЩИТА · Король Артур», large value «1». Left below card two beautifully styled buttons «ЗАЩИТИТЬСЯ», «БЕЗ ЗАЩИТЫ», timer «27 с». Center RESULT compact at x690..1230 y160..214: «3 : 1 · Медуза побеждает» (above board field). Single top status «Выберите карту защиты». Journal becomes a compact left edge strip above combat card (x24..320 y270..340) with «Журнал» and «Х1 Медуза: манёвр: без движения». Own hand has six real scans at bottom with one subtly raised, not the huge hover card blocking the board in source. No central modal, no English text, no choice panel. Preserve board, figures and painted garden exactly.
+
+## P07 - B-3-choice.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/05-choice-banner.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first real game screenshot. Second image supports matching the own-turn HUD style. 16:9 landscape 1920x1080. Direction B «Бронза и пергамент»: premium physical tabletop HUD. Dark polished walnut frames, aged bronze hairline fittings and engraved corner brackets, ivory parchment inner plates with dark navy readable text, portrait medallions mounted in wine-red wax seals, embossed dark chocolate leather action-button surrounds. Warm, tactile, refined; NO ivory-marble architecture or Greek-meander motif. Keep accepted coloured discs flat and unchanged inside leather buttons.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: show a beautifully designed card-effect choice module ONLY in the open top-centre backdrop above board, x530..1380 y86..210. Title EXACT «Второй выстрел». One readable sentence EXACT «ВО ВРЕМЯ БОЯ: Можете УСИЛИТЬ эту атаку.». Primary button «ПОДТВЕРДИТЬ», secondary «СВЕРНУТЬ (C)». Top single status «Сделайте выбор…». Preserve real combat card scans on left and right edges, captions «АТАКА · Медуза» and «ЗАЩИТА · Король Артур». Six recognisable own card scans along bottom; one raised slightly, caption «Рука 6/7». Remove the old English source choice texts and old error overlay in the lower board. Keep every circle and figure unobstructed; board and garden unchanged. All standard player panels, 5 opponent backs, deck/discard, action discs, log, HP plates remain. No additional invented text.
+
+## P08 - B-4-styleguide.png
+
+Input: None
+
+Use case: ui-mockup / original game UI component design sheet. Generate a beautiful professional HUD component style sheet, landscape 16:9 1920x1080. Direction B «Бронза и пергамент»: premium physical tabletop HUD. Dark polished walnut frames, aged bronze hairline fittings and engraved corner brackets, ivory parchment inner plates with dark navy readable text, portrait medallions mounted in wine-red wax seals, embossed dark chocolate leather action-button surrounds. Warm, tactile, refined; NO ivory-marble architecture or Greek-meander motif. Keep accepted coloured discs flat and unchanged inside leather buttons.
+Absolutely NO game screenshot, NO board map, NO card scans, NO copyrighted logos, NO brand marks. A pure original component design sheet on a uniform deep navy presentation surface. Clean modular grid with generous spacing and readable Russian labels, Roboto Bold Condensed. Title exactly «B · Бронза и пергамент». Make this a cohesive comprehensive kit, not assorted game props.
+Top palette row labelled with accurate hex swatches: #061623 navy, #F9EBDB cream, #34241E walnut, #A9804E bronze, #EBD9AF parchment, #6B4E8F violet, #DC2F33 red, #FDBE72 orange, #656B70 grey.
+Include two EMPTY panel frame sizes, one wide and one small; leave text areas empty. Portrait medallion with an ORIGINAL unbranded feminine stone silhouette, not a source portrait. Small HP plate «16/16» and heart. Empty card-hand slot and a neighbouring raised HOVER slot with restrained glow, no card art. Status banner «Выберите действие: манёвр, атака или схема» with M A G key chips. Typography sample exactly «Ход 1», «16/16», «ВАШ ХОД».
+Main component grid: four ACTION ROWS × four STATE COLUMNS. Row labels exactly «МАНЁВР», «АТАКА», «СХЕМА», «КОНЕЦ ХОДА». Column labels exactly «Обычное», «Наведение», «Нажатие», «Недоступно». Each row must have ALL FOUR states, total sixteen buttons. Accepted action disc language: flat violet circle with cream bootprints, red circle with cream sharp starburst, gold-orange circle with NAVY lightning, grey circle with cream arrow-to-bar. Keep these discs FLAT original crisp printed tokens, never relief or metallic discs. Surrounding button frame follows direction materials. Normal crisp; hover brighter outline+gentle light; pressed inset; disabled desaturated but legible. Exact hotkeys M,A,G,E.
+Include primary text button «ПОДТВЕРДИТЬ» and secondary «СВЕРНУТЬ (C)». Labels «Панели», «Портрет», «Здоровье», «Рука», «Статус», «Типографика» may appear. Text >=18px, numbers big, contrast >=4.5:1. Everything entirely within canvas, no overlapping swatches or components. No English except hotkeys and hex codes. Original ornament only.
+
+## P09 - C-1-own-turn.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/01-maneuver-own-turn.png
+
+Use case: compositing / ui-mockup. EDIT the supplied screenshot, repaint ONLY the HUD layer. 16:9 landscape, 1920x1080. Direction C «Цифровое издание»: confidently modern premium digital board-game HUD. Deep navy glass panels with subtle gradients, crisp thin cream edges, controlled translucency, clean asymmetric corner cuts, bold condensed typography and spacious hierarchy. Coloured action discs are the main visual accents. Small warm cream turn accent. Minimal ornament, NO gold filigree, NO wood, NO marble, NO heavy fantasy borders. Beautifully polished digital app, avoid flat prototype blocks.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+
+## P10 - C-2-combat.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/03-combat-attack.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first image, a real game screenshot. Supporting image is the own-turn HUD style from this direction: match its materials and component language. Landscape 16:9 1920x1080. Direction C «Цифровое издание»: confidently modern premium digital board-game HUD. Deep navy glass panels with subtle gradients, crisp thin cream edges, controlled translucency, clean asymmetric corner cuts, bold condensed typography and spacious hierarchy. Coloured action discs are the main visual accents. Small warm cream turn accent. Minimal ornament, NO gold filigree, NO wood, NO marble, NO heavy fantasy borders. Beautifully polished digital app, avoid flat prototype blocks.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: this is a COMBAT concept. Keep all standard edge components, but show combat card modules outside board: left x24..270 y350..710, right x1650..1896 y350..710. Use authentic Medusa and Arthur Russian card scans from source. Left label exactly «АТАКА · Медуза», large value «3». Right label «ЗАЩИТА · Король Артур», large value «1». Left below card two beautifully styled buttons «ЗАЩИТИТЬСЯ», «БЕЗ ЗАЩИТЫ», timer «27 с». Center RESULT compact at x690..1230 y160..214: «3 : 1 · Медуза побеждает» (above board field). Single top status «Выберите карту защиты». Journal becomes a compact left edge strip above combat card (x24..320 y270..340) with «Журнал» and «Х1 Медуза: манёвр: без движения». Own hand has six real scans at bottom with one subtly raised, not the huge hover card blocking the board in source. No central modal, no English text, no choice panel. Preserve board, figures and painted garden exactly.
+
+## P11 - C-3-choice.png
+
+Input: scraped-data/derived/hud-v2-codex/refs/05-choice-banner.png
+
+Use case: compositing / ui-mockup. EDIT TARGET is first real game screenshot. Second image supports matching the own-turn HUD style. 16:9 landscape 1920x1080. Direction C «Цифровое издание»: confidently modern premium digital board-game HUD. Deep navy glass panels with subtle gradients, crisp thin cream edges, controlled translucency, clean asymmetric corner cuts, bold condensed typography and spacious hierarchy. Coloured action discs are the main visual accents. Small warm cream turn accent. Minimal ornament, NO gold filigree, NO wood, NO marble, NO heavy fantasy borders. Beautifully polished digital app, avoid flat prototype blocks.
+ABSOLUTE INVARIANTS: keep the exact painted Marmoreal board, circles, all six 3D figures, cherry-blossom night garden backdrop, camera and lighting of input image. Keep board pixels unchanged. No board re-layout. HUD only on edges above backdrop. Board is in trapezoid from (395,250) to (1515,250) to (1590,870) to (333,870); NOTHING opaque on circles or figures, except existing tiny HP plates.
+Layout in 1920x1080 coordinates: turn plate x24..290 y24..78. Status x560..1360 y24..90. Opponent x1560..1896 y24..258. Own panel x24..380 y916..1060. Journal x24..320 y716..904. Hand x490..1430 at bottom, cards peeking up from y900, one hovered card rises to y865 maximum. Deck/discard and actions x1550..1896 y906..1060. Keep the open middle. Remove old maneuver draft buttons and old status overlays; use only the new status.
+ALL text must be accurate Russian, Roboto Bold Condensed, readable >=18 px, large HP numerals. Write exactly:
+top-left menu ☰, three connection bars, «Ход 1».
+Top-centre single-line «Выберите действие: манёвр, атака или схема» plus separate M A G key chips.
+Own hero: authentic portrait medallion from source, «Медуза», «ВАШ ХОД», heart «16/16», three labelled sidekicks «Гарпия 1», «Гарпия 2», «Гарпия 3», each «1/1», exactly two full action pips.
+Opponent: authentic King Arthur portrait, «Король Артур», «ЖДЁТ», heart «18/18», «Мерлин 7/7», exactly five visible card backs (original geometric snake/sword-inspired navy and coral backs WITHOUT logos), «Рука 5 · колода 25 · сброс 0».
+Hand: exactly six recognisable REAL RUSSIAN CARD SCANS taken from input, never invent replacement card illustrations; caption «Рука 6/7». One card raised and thin warm hover edge.
+Bottom right piles «Колода 24», «Сброс 0».
+Action bar four coloured discs matching accepted source: violet bootprints, red sharp starburst, gold-orange lightning, grey end-turn arrow. Keep discs FLAT and crisp, not metallic. Labels exactly «МАНЁВР» M, «АТАКА» A, «СХЕМА» G, «КОНЕЦ ХОДА» E. Marble/gold surrounds can carry the material treatment.
+Journal «Журнал», entry «Х1 Медуза: манёвр: без движения».
+Small fighter HP plates stay in existing positions: «16/16», «1/1», «1/1», «1/1», «18/18», «7/7», harpy digits ①②③, gold own-team and blue opponent-team marks.
+No combat or choice overlay in this image. No logos, no Unmatched/Restoration/Mondo trade dress, no English except specified keyboard letters, no additional labels or decorative pseudo-text. Contrast at least 4.5:1. Focus on beautiful complete HUD while preserving scene exactly.
+STATE OVERRIDE: show a beautifully designed card-effect choice module ONLY in the open top-centre backdrop above board, x530..1380 y86..210. Title EXACT «Второй выстрел». One readable sentence EXACT «ВО ВРЕМЯ БОЯ: Можете УСИЛИТЬ эту атаку.». Primary button «ПОДТВЕРДИТЬ», secondary «СВЕРНУТЬ (C)». Top single status «Сделайте выбор…». Preserve real combat card scans on left and right edges, captions «АТАКА · Медуза» and «ЗАЩИТА · Король Артур». Six recognisable own card scans along bottom; one raised slightly, caption «Рука 6/7». Remove the old English source choice texts and old error overlay in the lower board. Keep every circle and figure unobstructed; board and garden unchanged. All standard player panels, 5 opponent backs, deck/discard, action discs, log, HP plates remain. No additional invented text.
+
+## P12 - C-4-styleguide.png
+
+Input: None
+
+Use case: ui-mockup / original game UI component design sheet. Generate a beautiful professional HUD component style sheet, landscape 16:9 1920x1080. Direction C «Цифровое издание»: confidently modern premium digital board-game HUD. Deep navy glass panels with subtle gradients, crisp thin cream edges, controlled translucency, clean asymmetric corner cuts, bold condensed typography and spacious hierarchy. Coloured action discs are the main visual accents. Small warm cream turn accent. Minimal ornament, NO gold filigree, NO wood, NO marble, NO heavy fantasy borders. Beautifully polished digital app, avoid flat prototype blocks.
+Absolutely NO game screenshot, NO board map, NO card scans, NO copyrighted logos, NO brand marks. A pure original component design sheet on a uniform deep navy presentation surface. Clean modular grid with generous spacing and readable Russian labels, Roboto Bold Condensed. Title exactly «C · Цифровое издание». Make this a cohesive comprehensive kit, not assorted game props.
+Top palette row labelled with accurate hex swatches: #061623 navy, #F9EBDB cream, #122C42 glass, #8DABB9 edge, #6B4E8F violet, #DC2F33 red, #FDBE72 orange, #656B70 grey.
+Include two EMPTY panel frame sizes, one wide and one small; leave text areas empty. Portrait medallion with an ORIGINAL unbranded feminine stone silhouette, not a source portrait. Small HP plate «16/16» and heart. Empty card-hand slot and a neighbouring raised HOVER slot with restrained glow, no card art. Status banner «Выберите действие: манёвр, атака или схема» with M A G key chips. Typography sample exactly «Ход 1», «16/16», «ВАШ ХОД».
+Main component grid: four ACTION ROWS × four STATE COLUMNS. Row labels exactly «МАНЁВР», «АТАКА», «СХЕМА», «КОНЕЦ ХОДА». Column labels exactly «Обычное», «Наведение», «Нажатие», «Недоступно». Each row must have ALL FOUR states, total sixteen buttons. Accepted action disc language: flat violet circle with cream bootprints, red circle with cream sharp starburst, gold-orange circle with NAVY lightning, grey circle with cream arrow-to-bar. Keep these discs FLAT original crisp printed tokens, never relief or metallic discs. Surrounding button frame follows direction materials. Normal crisp; hover brighter outline+gentle light; pressed inset; disabled desaturated but legible. Exact hotkeys M,A,G,E.
+Include primary text button «ПОДТВЕРДИТЬ» and secondary «СВЕРНУТЬ (C)». Labels «Панели», «Портрет», «Здоровье», «Рука», «Статус», «Типографика» may appear. Text >=18px, numbers big, contrast >=4.5:1. Everything entirely within canvas, no overlapping swatches or components. No English except hotkeys and hex codes. Original ornament only.

@@ -1,0 +1,976 @@
+{
+  "direction": "A Marble Acropolis",
+  "font": "Roboto Bold Condensed",
+  "icons": "hud-icons-v3",
+  "alpha": "straight RGBA, zero RGB at zero alpha",
+  "tint": "white",
+  "margin_normalization": "L/R divided by full PNG width, T/B by full PNG height",
+  "focus": {
+    "overlay_only": false,
+    "full_body_skin": true,
+    "canvas_outset_su": 5,
+    "reason": "B2 hard body-colour contract overrides B transparent focus choice"
+  },
+  "checkbox": {
+    "nominal_su": 24,
+    "canvas_su": 26,
+    "separate_glyph": "ui-check"
+  },
+  "widgets": {
+    "T_Skin_Panel": {
+      "size_su": [
+        120,
+        104
+      ],
+      "slice_su": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_PanelInset": {
+      "size_su": [
+        88,
+        72
+      ],
+      "slice_su": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "body_color": "#15232E",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Modal": {
+      "size_su": [
+        120,
+        104
+      ],
+      "slice_su": [
+        28,
+        28,
+        28,
+        28
+      ],
+      "body_color": "#061623",
+      "body_opacity": 1.0,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Normal": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Hover": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#1E2B35",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Pressed": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#040E17",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Disabled": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Focus": {
+      "size_su": [
+        58,
+        50
+      ],
+      "slice_su": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Btn_Selected": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#0D7A89",
+      "body_opacity": 1.0,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_BtnPrimary_Normal": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#F2C14E",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_BtnPrimary_Hover": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#F3C55B",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_BtnPrimary_Pressed": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#D5AA45",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_BtnPrimary_Disabled": {
+      "size_su": [
+        48,
+        40
+      ],
+      "slice_su": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "body_color": "#4E5457",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_BtnPrimary_Focus": {
+      "size_su": [
+        58,
+        50
+      ],
+      "slice_su": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "body_color": "#F2C14E",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Toast": {
+      "size_su": [
+        96,
+        72
+      ],
+      "slice_su": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_ToastWarning": {
+      "size_su": [
+        96,
+        72
+      ],
+      "slice_su": [
+        24,
+        24,
+        24,
+        24
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Capsule": {
+      "size_su": [
+        44,
+        36
+      ],
+      "slice_su": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Tag": {
+      "size_su": [
+        44,
+        36
+      ],
+      "slice_su": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Chip": {
+      "size_su": [
+        44,
+        36
+      ],
+      "slice_su": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_KeyChip": {
+      "size_su": [
+        38,
+        38
+      ],
+      "slice_su": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "body_color": "#15232E",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_ProgressTrack": {
+      "size_su": [
+        28,
+        12
+      ],
+      "slice_su": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "body_color": "#15232E",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_ProgressFill": {
+      "size_su": [
+        28,
+        12
+      ],
+      "slice_su": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "body_color": "#0D7A89",
+      "body_opacity": 1.0,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_SliderTrack": {
+      "size_su": [
+        28,
+        12
+      ],
+      "slice_su": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "body_color": "#15232E",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_SliderThumb": {
+      "size_su": [
+        32,
+        32
+      ],
+      "slice_su": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "body_color": "#FAF8F2",
+      "body_opacity": 1.0,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Check_Off": {
+      "size_su": [
+        32,
+        32
+      ],
+      "slice_su": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "none"
+    },
+    "T_Skin_Check_On": {
+      "size_su": [
+        32,
+        32
+      ],
+      "slice_su": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "body_color": "#0D7A89",
+      "body_opacity": 1.0,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "none"
+    },
+    "T_Skin_Input_Normal": {
+      "size_su": [
+        46,
+        38
+      ],
+      "slice_su": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Input_Focus": {
+      "size_su": [
+        56,
+        48
+      ],
+      "slice_su": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Skin_Input_Error": {
+      "size_su": [
+        46,
+        38
+      ],
+      "slice_su": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_PortraitFrame": {
+      "size_su": [
+        88,
+        88
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 54,
+      "stretch": "none"
+    },
+    "T_Hud_PortraitFrame_Active": {
+      "size_su": [
+        88,
+        88
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 54,
+      "stretch": "none"
+    },
+    "T_Hud_PortraitFrame_64": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 42,
+      "stretch": "none"
+    },
+    "T_Hud_PortraitFrame_Active_64": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 42,
+      "stretch": "none"
+    },
+    "T_Hud_ActionRing_Normal": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 48,
+      "stretch": "none"
+    },
+    "T_Hud_ActionRing_Hover": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 48,
+      "stretch": "none"
+    },
+    "T_Hud_ActionRing_Pressed": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 48,
+      "stretch": "none"
+    },
+    "T_Hud_ActionRing_Disabled": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 48,
+      "stretch": "none"
+    },
+    "T_Hud_ActionRing_Active": {
+      "size_su": [
+        72,
+        72
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 48,
+      "stretch": "none"
+    },
+    "T_Hud_HpPlate": {
+      "size_su": [
+        128,
+        40
+      ],
+      "slice_su": [
+        40,
+        10,
+        12,
+        10
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_StatusBanner": {
+      "size_su": [
+        256,
+        56
+      ],
+      "slice_su": [
+        48,
+        16,
+        48,
+        16
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_TurnPlate": {
+      "size_su": [
+        144,
+        56
+      ],
+      "slice_su": [
+        26,
+        16,
+        26,
+        16
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_HandTray": {
+      "size_su": [
+        256,
+        56
+      ],
+      "slice_su": [
+        28,
+        20,
+        28,
+        20
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_PileFrame": {
+      "size_su": [
+        112,
+        48
+      ],
+      "slice_su": [
+        24,
+        20,
+        24,
+        20
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_ActionPlate": {
+      "size_su": [
+        80,
+        112
+      ],
+      "slice_su": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_KeyBadge": {
+      "size_su": [
+        26,
+        26
+      ],
+      "slice_su": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "body_color": "#F2C14E",
+      "body_opacity": 1,
+      "text_color": "#061623",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_SidekickRing": {
+      "size_su": [
+        36,
+        36
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": 25,
+      "stretch": "none"
+    },
+    "T_Hud_CardGlow_Hover": {
+      "size_su": [
+        174,
+        232
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "none"
+    },
+    "T_Hud_CardGlow_Selected": {
+      "size_su": [
+        174,
+        232
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "none"
+    },
+    "T_Hud_CardBackSlot": {
+      "size_su": [
+        28,
+        38
+      ],
+      "slice_su": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_CombatRibbon_Attack": {
+      "size_su": [
+        230,
+        40
+      ],
+      "slice_su": [
+        28,
+        12,
+        28,
+        12
+      ],
+      "body_color": "#7F242C",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_CombatRibbon_Defense": {
+      "size_su": [
+        230,
+        40
+      ],
+      "slice_su": [
+        28,
+        12,
+        28,
+        12
+      ],
+      "body_color": "#173F68",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_CombatFrame": {
+      "size_su": [
+        250,
+        342
+      ],
+      "slice_su": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "nine_slice"
+    },
+    "T_Hud_VersusBadge": {
+      "size_su": [
+        160,
+        48
+      ],
+      "slice_su": [
+        28,
+        14,
+        28,
+        14
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_FighterPlate": {
+      "size_su": [
+        128,
+        32
+      ],
+      "slice_su": [
+        29,
+        12,
+        14,
+        8
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_FighterPlate_Enemy": {
+      "size_su": [
+        128,
+        32
+      ],
+      "slice_su": [
+        29,
+        12,
+        14,
+        8
+      ],
+      "body_color": "#061623",
+      "body_opacity": 0.92,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "horizontal"
+    },
+    "T_Hud_Divider": {
+      "size_su": [
+        128,
+        8
+      ],
+      "slice_su": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "body_color": null,
+      "body_opacity": null,
+      "text_color": "#F2EDE4",
+      "insert_diameter_su": null,
+      "stretch": "tile_x"
+    }
+  },
+  "runtime_import_verified": false,
+  "stage": "B2",
+  "body_contract": "Exact v1 RGB and opacity; fixed live text colours; contrast exceptions are in verification.json.stage_b2"
+}

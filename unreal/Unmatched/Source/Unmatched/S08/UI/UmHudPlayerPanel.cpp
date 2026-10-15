@@ -328,6 +328,8 @@ void UUmHudPlayerPanel::ApplyGeometry() {
   UmPanelPlace(HpRow, FVector2D(G.TextX, G.HpTop), bOpp);
   UmPanelPlace(TrackerRow, FVector2D(G.TrackerX, G.TrackerTop), !bOpp);
   UmPanelPlace(SidekickRow, FVector2D(G.TextX, G.SidekickTop), bOpp);
+  AppliedRingSu = G.RingSu;
+  ApplyPortraitFrame();
   if (Portrait) {
     Portrait->SetPanelGeometry(G.RingSu, G.DiscSu, G.TrackerSu);
     Portrait->SetRingSmoulder(UmHudPanel::RingSmoulder(bClassS));  // ВР-43: L 0.35, S 0.55
@@ -336,6 +338,37 @@ void UUmHudPlayerPanel::ApplyGeometry() {
 }
 
 // ------------------------------------------------------------------------------------------------- model
+
+void UUmHudPlayerPanel::ApplyPortraitFrame() {
+  UCanvasPanel* FrameCanvas = Portrait ? Cast<UCanvasPanel>(Portrait->GetParent()) : nullptr;
+  if (!FrameCanvas || !WidgetTree || AppliedRingSu <= 0.0f) return;
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  // the own panel's 80 su ring takes the 88 su medallion, the opponent's 64 su one the 72 su medallion (x1.1)
+  const bool bSmall = AppliedRingSu < 72.0f;
+  const FString Key = FString::Printf(TEXT("hud.portrait.frame%s%s"), bFrameActive ? TEXT(".active") : TEXT(""),
+                                      bSmall ? TEXT(".64") : TEXT(""));
+  if (!Theme.HasTextureSkin(FName(*Key))) {
+    if (PortraitFrame) PortraitFrame->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
+  if (!PortraitFrame) {
+    PortraitFrame = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("PortraitFrameV2")));
+    FrameCanvas->AddChild(PortraitFrame);
+  }
+  if (const FSlateBrush* Brush = Theme.SkinFor(FName(*Key), AppliedPxPerSu)) PortraitFrame->SetBrush(*Brush);
+  PortraitFrame->SetVisibility(ESlateVisibility::HitTestInvisible);
+  const float FrameSu = AppliedRingSu * 1.1f;
+  if (UCanvasPanelSlot* PortraitSlot = Cast<UCanvasPanelSlot>(Portrait->Slot)) {
+    if (UCanvasPanelSlot* FrameSlot = Cast<UCanvasPanelSlot>(PortraitFrame->Slot)) {
+      const FVector2D Inset((FrameSu - AppliedRingSu) * 0.5f);
+      FrameSlot->SetAnchors(PortraitSlot->GetAnchors());
+      FrameSlot->SetAlignment(PortraitSlot->GetAlignment());
+      FrameSlot->SetPosition(PortraitSlot->GetPosition() - Inset);
+      FrameSlot->SetSize(FVector2D(FrameSu, FrameSu));
+      FrameSlot->SetZOrder(PortraitSlot->GetZOrder() + 1);
+    }
+  }
+}
 
 UWidget* UUmHudPlayerPanel::MakeMiniPortrait(const FUmSidekickView& S) {
   // VS-2 CP-10 / CP-12: the sidekick's avatar in the circle of the accepted CP-07 crop (one picture for the three
@@ -521,6 +554,12 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
     const bool bFade = !bFirst && !IsReduced() && StatusText && !UmHudPanel::StatusText(Old.State).IsEmpty();
     StatusFadeStart = bFade ? Now() : -1.0;
     if (!bFade) ApplyStatus(Model.State);
+    // HUD v2: the warm «your turn» medallion while this side acts
+    const bool bActive = Model.State == EUmPanelState::Own;
+    if (bActive != bFrameActive || !PortraitFrame) {
+      bFrameActive = bActive;
+      ApplyPortraitFrame();
+    }
     if (Portrait) {
       // CP-08 / 04 §2.2: the fallen hero's circle loses its colour (the cross on the heart is the portrait's AB-8)
       const bool bFallen = Model.State == EUmPanelState::Fallen;

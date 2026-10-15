@@ -394,13 +394,22 @@ void UUmHudStatusLine::Render() {
     }
   }
   // ВР-VS2-46: the text room, the fit (24 -> 20 -> 16 su, two lines, then «…»), the capsule from the drawn text
-  const float PadX = Theme.SpaceSu(TEXT("space.m"));
+  // HUD v2: the cartouche's meander ends keep the text off them - the brush's own left margin (fraction x image su)
+  float EndsSu = 0.0f;
+  float RimSu = 0.0f;  // the marble rims above and below the navy field: the field keeps the text's height
+  if (Theme.HasTextureSkin(TEXT("hud.status.banner"))) {
+    if (const FSlateBrush* Banner = Theme.Skin(TEXT("hud.status.banner"))) {
+      EndsSu = FMath::Max(Banner->Margin.Left, Banner->Margin.Right) * Banner->ImageSize.X;
+      RimSu = FMath::Max(0.0f, FMath::Max(Banner->Margin.Top, Banner->Margin.Bottom) * Banner->ImageSize.Y - 6.0f);
+    }
+  }
+  const float PadX = FMath::Max(Theme.SpaceSu(TEXT("space.m")), EndsSu + 6.0f);
   const float Room = FMath::Max(0.0f, StatusFrame.MaxWidthSu - 2.0f * PadX - Extras);
   const float Base = UmTypeSu(Theme, TEXT("type.heading"));
   const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
                             [this](const FString& T, float S) { return MeasureSu(T, S); });
-  const float Height = UmHudStatus::BodyHeightSu(FitNow, Base);
+  const float Height = UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
   const float Width = FMath::Min(StatusFrame.MaxWidthSu, FMath::CeilToFloat(FitNow.TextWidthSu) + 2.0f * PadX + Extras);
   BodySizeSu = FVector2D(Width, Height);
   if (BodyBox) {
@@ -412,8 +421,10 @@ void UUmHudStatusLine::Render() {
     BodyBox->SetHeightOverride(Height);
   }
   if (Body) {
-    if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("capsule"), StatusFrame.PxPerSu)) Body->SetBrush(*Skin);
-    Body->SetPadding(FMargin(PadX, 0.0f));
+    // HUD v2 (art/imagegen/hud-v2-codex): the marble cartouche with meander ends when the theme has it, else the capsule
+    const FName BannerKey = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? FName(TEXT("hud.status.banner")) : FName(TEXT("capsule"));
+    if (const FSlateBrush* Skin = Theme.SkinFor(BannerKey, StatusFrame.PxPerSu)) Body->SetBrush(*Skin);
+    Body->SetPadding(FMargin(PadX, RimSu));
     // «…»: the full text in the tooltip - the capsule then takes the hover
     Body->SetToolTipText(FitNow.bEllipsis ? FText::FromString(FullText) : FText::GetEmpty());
     Body->SetVisibility(FitNow.bEllipsis ? ESlateVisibility::Visible : ESlateVisibility::HitTestInvisible);

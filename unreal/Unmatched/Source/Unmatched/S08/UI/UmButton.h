@@ -184,6 +184,11 @@ class UNMATCHED_API UUmButton : public UUserWidget {
 
  private:
   void Restyle();
+  /** HUD v2 (art/imagegen/hud-v2-codex): the marble-and-gold bezel over a Disc cell's icon, theme skins
+   *  hud.action.ring.{normal,hover,pressed,disabled,active}; nothing while the theme has none. */
+  void ApplyDiscRing();
+  UPROPERTY(Transient) TObjectPtr<UImage> DiscRing;
+  float DiscRingSu = 0.0f;
   void Step();
   /** VS-7 Frames: a label wider than the button (a long locale, the pseudo-locale +30 %, class S) steps its font down to
    *  fit the width it got (to 70 % at most) - the text never runs past the body. */

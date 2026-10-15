@@ -335,6 +335,7 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   // grid: disc = icon over its caption, the chip under; inline = icon, label, chip in a row
   const float Gap = Theme.SpaceSu(TEXT("tag.padding.x"));
   const float DiscSu = Model.DiscSu > 0.0f ? Model.DiscSu : UmBtnDiscIconSu;
+  DiscRingSu = bDisc ? DiscSu : 0.0f;
   if (bDisc) {
     // VS-4 HB-43 (04 §2.14, ВР-VS2-HB42-12 / -13): the disc centred at y + 4; the caption box under it so that its
     // baseline lies at y + 67 su (every caption of the row on one line); the chip 20 x 20 su 2 su from the cell's
@@ -382,6 +383,32 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   Restyle();
 }
 
+void UUmButton::ApplyDiscRing() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const TCHAR* StateKey = State == EUmButtonState::Hover     ? TEXT("hover")
+                          : State == EUmButtonState::Pressed  ? TEXT("pressed")
+                          : (State == EUmButtonState::Disabled || State == EUmButtonState::Busy) ? TEXT("disabled")
+                          : State == EUmButtonState::Selected ? TEXT("active")
+                                                              : TEXT("normal");
+  const FName Key(*FString::Printf(TEXT("hud.action.ring.%s"), StateKey));
+  const bool bShow = DiscRingSu > 0.0f && Content && WidgetTree && Theme.HasTextureSkin(Key);
+  if (!bShow) {
+    if (DiscRing) DiscRing->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
+  if (!DiscRing) {
+    DiscRing = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("DiscRingV2")));
+    Content->AddChildToGrid(DiscRing, 0, 0);
+  }
+  if (const FSlateBrush* Brush = Theme.SkinFor(Key, UmHudScale::Current().PxPerSu())) DiscRing->SetBrush(*Brush);
+  // the 72 su bezel of the kit around its 64 su disc: x1.125 of the drawn disc, centred on it
+  const float RingSu = DiscRingSu * 1.125f;
+  DiscRing->SetDesiredSizeOverride(FVector2D(RingSu, RingSu));
+  UmBtnPlace(DiscRing, 0, 0, FMargin(0.0f, FMath::Max(0.0f, UmButton::DiscTopSu - 0.5f * (RingSu - DiscRingSu)), 0.0f, 0.0f),
+             HAlign_Center, VAlign_Top);
+  DiscRing->SetVisibility(ESlateVisibility::HitTestInvisible);
+}
+
 void UUmButton::Restyle() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const EUmButtonState Old = State;
@@ -400,6 +427,7 @@ void UUmButton::Restyle() {
   if (Label) Label->SetColorAndOpacity(FSlateColor(Theme.Color(UmButton::TextColorTokenFor(Model, State))));
   if (KeyText) KeyText->SetColorAndOpacity(FSlateColor(Theme.Color(bOff ? TEXT("text.secondary") : TEXT("text.primary"))));
   if (Icon) Icon->SetRenderOpacity(bOff ? Theme.Alpha(TEXT("state.disabled.opacity")) : 1.0f);
+  ApplyDiscRing();
   // VS-2 HB-12 (04 §3.2): the pointer over a pressable button, "denied" over a disabled one (with its why.*); while a
   // command is in flight every registered cursor shows the hourglass anyway (UUmHudRoot::TickCursors)
   SetCursor(State == EUmButtonState::Disabled ? EMouseCursor::SlashedCircle : EMouseCursor::Hand);
