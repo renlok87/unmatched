@@ -1,0 +1,201 @@
+/* Direction A "Стол" — HUD as physical Unmatched components lying on the table edge.
+   One material (printed card stock), one ink, one rule weight, team accents only. */
+@font-face { font-family: "Philosopher"; src: url("../../../../../unreal/Unmatched/Content/UM/Fonts/TTF/Philosopher-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "RobotoC"; src: url("../../../../../art/imagegen/anim-move-sheet-codex/_tools/fonts/Roboto-BoldCondensed.ttf"); font-weight: 700; }
+@font-face { font-family: "Roboto"; src: url("../../../../../art/imagegen/anim-move-sheet-codex/_tools/fonts/Roboto-Regular.ttf"); font-weight: 400; }
+
+:root {
+  --paper: #ece3cf;          /* card stock */
+  --paper-2: #e1d6bd;        /* inner panel */
+  --ink: #1d1a17;            /* print ink */
+  --ink-2: #5b5246;          /* secondary ink */
+  --rule: #8a7a5c;           /* single hairline rule */
+  --gold: #c9a24a;           /* player team accent (C-11) */
+  --steel: #7f9fbf;          /* opponent team accent (C-11) */
+  --cta: #c9a24a;            /* the ONE call-to-action fill */
+  --shadow: 0 10px 24px rgba(0,0,0,.55), 0 2px 4px rgba(0,0,0,.6);
+  --M: 8px;                  /* grid module */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0b0d12; }
+.scene { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.scene::after { /* table-edge vignette so components read as lying on the table rim */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(6,7,10,.78) 0, rgba(6,7,10,0) 260px),
+              linear-gradient(to bottom, rgba(6,7,10,.55) 0, rgba(6,7,10,0) 150px);
+}
+.abs { position: absolute; }
+
+/* ---------- printed component ---------- */
+.stock { background: var(--paper); color: var(--ink); border-radius: 10px; box-shadow: var(--shadow);
+  outline: 1px solid rgba(0,0,0,.35); }
+.stock .inner { position: absolute; inset: 6px; border: 1px solid var(--rule); border-radius: 6px; pointer-events: none; }
+.name { font-family: "Philosopher"; font-weight: 700; letter-spacing: .01em; }
+.caps { font-family: "RobotoC"; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.body { font-family: "Roboto"; }
+
+/* ---------- hero card (player board) ---------- */
+.hero { width: 420px; height: 184px; }
+.hero .art { position: absolute; left: 0; top: 0; bottom: 0; width: 150px; border-radius: 10px 0 0 10px;
+  background-size: cover; background-position: center 18%; }
+.hero .band { position: absolute; left: 150px; top: 0; bottom: 0; width: 6px; }
+.hero .txt { position: absolute; left: 172px; top: 16px; right: 16px; }
+.hero .txt .name { font-size: 30px; line-height: 32px; }
+.hero .txt .meta { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.hero .side { position: absolute; left: 172px; bottom: 16px; display: flex; gap: 10px; align-items: center; }
+
+/* health dial — the Unmatched health tracker, one per fighter */
+.dial { border-radius: 50%; display: grid; place-items: center; position: relative;
+  background: radial-gradient(circle at 50% 40%, #fbf6ea 0, #e6dcc4 70%, #cbbd9c 100%);
+  box-shadow: inset 0 0 0 2px var(--ink), inset 0 0 0 5px var(--paper), inset 0 0 0 6px var(--rule), 0 3px 6px rgba(0,0,0,.45); }
+.dial b { font-family: "RobotoC"; color: var(--ink); line-height: 1; }
+.dial.big { width: 92px; height: 92px; } .dial.big b { font-size: 46px; }
+.dial.mid { width: 52px; height: 52px; } .dial.mid b { font-size: 26px; }
+.dial.small { width: 34px; height: 34px; } .dial.small b { font-size: 18px; }
+.dial .of { position: absolute; bottom: 13px; font: 700 11px "RobotoC"; color: var(--ink-2); }
+.dial.team-gold { box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 6px var(--paper), inset 0 0 0 7px var(--rule), 0 3px 6px rgba(0,0,0,.45); }
+.dial.team-steel { box-shadow: inset 0 0 0 3px var(--steel), inset 0 0 0 6px var(--paper), inset 0 0 0 7px var(--rule), 0 3px 6px rgba(0,0,0,.45); }
+.dial.hurt b { color: #9b2b1f; }
+
+/* ---------- cards ---------- */
+.card { position: absolute; width: 200px; height: 278px; border-radius: 9px; background-size: cover;
+  box-shadow: var(--shadow); }
+.card.lift { transform: translateY(-34px) scale(1.04); box-shadow: 0 0 0 3px var(--gold), var(--shadow); }
+.card.dim { filter: saturate(.35) brightness(.55); }
+.back { position: absolute; width: 120px; height: 166px; border-radius: 7px; background-size: cover; box-shadow: var(--shadow); }
+
+/* stacks (deck / discard) — a pile with visible thickness and the count printed on a paper slip */
+.pile { position: absolute; width: 112px; height: 156px; }
+.pile .c { position: absolute; inset: 0; border-radius: 7px; background-size: cover; box-shadow: 0 1px 0 rgba(0,0,0,.6); }
+.pile .slip { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); padding: 3px 12px;
+  background: var(--paper); color: var(--ink); border-radius: 4px; font: 700 18px "RobotoC"; box-shadow: var(--shadow);
+  white-space: nowrap; }
+.pile .slip i { font: 400 12px "Roboto"; color: var(--ink-2); font-style: normal; margin-left: 4px; }
+.pile.empty .c { border: 2px dashed rgba(236,227,207,.45); background: rgba(10,10,12,.35); box-shadow: none; }
+
+/* ---------- the one decision area ---------- */
+.prompt { font: 400 19px "Roboto"; color: #f3ecdc; text-shadow: 0 2px 6px rgba(0,0,0,.9); }
+.prompt b { font-family: "RobotoC"; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); font-size: 15px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 64px; padding: 0 30px;
+  border-radius: 8px; font: 700 22px "RobotoC"; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.btn.primary { background: var(--cta); color: #17130c; box-shadow: var(--shadow), inset 0 -3px 0 rgba(0,0,0,.25); }
+.btn.secondary { background: rgba(14,15,19,.82); color: #efe6d2; box-shadow: inset 0 0 0 1.5px rgba(236,227,207,.55); height: 48px; font-size: 16px; padding: 0 16px; white-space: nowrap; }
+.pips { display: flex; gap: 8px; align-items: center; font: 700 14px "RobotoC"; color: #efe6d2; letter-spacing: .08em; text-transform: uppercase; }
+.pip { width: 12px; height: 12px; transform: rotate(45deg); border: 2px solid var(--gold); }
+.pip.on { background: var(--gold); }
+
+/* ---------- quiet chrome ---------- */
+.ghost { color: #efe6d2; font: 700 16px "RobotoC"; letter-spacing: .08em; text-transform: uppercase; text-shadow: 0 2px 6px #000; }
+.iconbtn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(14,15,19,.7);
+  box-shadow: inset 0 0 0 1.5px rgba(236,227,207,.5); color: #efe6d2; font: 700 20px "Roboto"; }
+.feed { padding: 10px 14px; border-radius: 8px; background: linear-gradient(90deg, rgba(8,9,12,.72), rgba(8,9,12,0)); font: 400 15px/22px "Roboto"; color: rgba(243,236,220,.92); text-shadow: 0 1px 4px #000; }
+.feed div { opacity: .95 } .feed div + div { opacity: .7 } .feed div + div + div { opacity: .45 }
+.feed b { font-family: "RobotoC"; letter-spacing: .03em; }
+
+/* board-side tokens */
+.basedial { position: absolute; }
+.note { position: absolute; font: 700 15px "RobotoC"; color: #fff; background: #c4362a; border-radius: 4px; padding: 2px 8px; letter-spacing: .04em; }
+.callout { position: absolute; font: 400 14px "Roboto"; color: #fff; background: rgba(200,40,40,.92); padding: 4px 10px; border-radius: 4px; }
+
+/* ---------- material variants (one composition, three materials) ---------- */
+:root { --display: "Philosopher"; }
+.name { font-family: var(--display); }
+body.f-cormorant { --display: "Cormorant SC"; }
+body.f-cormorant .name { font-weight: 700; letter-spacing: .02em; }
+body.f-forum { --display: "Forum"; }
+body.f-forum .name { font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
+
+/* M2: dark card stock with one gold hairline (R5 hybrid C+A) */
+body.m-dark .stock { background: linear-gradient(180deg, #1c1f26 0, #131519 100%); color: #f1e9d6;
+  outline: 1px solid rgba(200,168,98,.55); }
+body.m-dark .stock .inner { border-color: rgba(200,168,98,.35); }
+body.m-dark .stock .meta, body.m-dark .stock .body { color: #b8ae9c !important; }
+
+/* M3: marble slab with bronze rim (R5 direction B) */
+body.m-bronze .stock { color: #efe7d6;
+  background:
+    radial-gradient(120% 80% at 20% 10%, rgba(255,255,255,.06), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,.025) 0 2px, transparent 2px 23px),
+    linear-gradient(160deg, #2f3833 0, #232a27 55%, #1b201e 100%);
+  box-shadow: inset 0 0 0 3px #7d5f37, inset 0 0 0 4px #c9a35f, inset 0 0 0 6px #4b3a22, var(--shadow); outline: none; border-radius: 4px; }
+body.m-bronze .stock .art { border-radius: 4px 0 0 4px; }
+body.m-bronze .stock .inner { display: none; }
+body.m-bronze .stock .meta, body.m-bronze .stock .body { color: #b9b4a6 !important; }
+body.m-bronze .dial { background: radial-gradient(circle at 40% 35%, #e3c58a 0, #b38a4f 45%, #6e5230 100%);
+  box-shadow: inset 0 0 0 2px #3a2c18, inset 0 2px 3px rgba(255,255,255,.35), 0 3px 6px rgba(0,0,0,.5); }
+body.m-bronze .dial b { color: #1c140a; }
+body.m-bronze .btn.primary { background: linear-gradient(180deg, #d9b56c, #a9813f); }
+
+/* hero identity colour (backend Hero.color): band + faint tint of the card body; team colour stays on bases */
+:root { --hero-medusa: #42ab47; --hero-arthur: #e35456; }
+body.m-dark .stock.tint-medusa { background: linear-gradient(180deg, rgba(66,171,71,.16), rgba(66,171,71,.04) 60%), linear-gradient(180deg, #1c1f26 0, #131519 100%); }
+body.m-dark .stock.tint-arthur { background: linear-gradient(180deg, rgba(227,84,86,.16), rgba(227,84,86,.04) 60%), linear-gradient(180deg, #1c1f26 0, #131519 100%); }
+
+/* ---------- v2 after reviews ---------- */
+:root { --team-p1: #E8C06A; --team-p2: #5A7F9F; --choice: #E6F2FA; }
+.dial.team-p1 { box-shadow: inset 0 0 0 3px var(--team-p1), inset 0 0 0 6px var(--paper), inset 0 0 0 7px var(--rule), 0 3px 6px rgba(0,0,0,.45); }
+.dial.team-p2 { box-shadow: inset 0 0 0 3px var(--team-p2), inset 0 0 0 6px var(--paper), inset 0 0 0 7px var(--rule), 0 3px 6px rgba(0,0,0,.45); }
+.dial.dead { background: radial-gradient(circle at 50% 40%, #3a3631 0, #24211d 100%); }
+.dial.dead b { color: #8d8576; text-decoration: line-through; }
+.feed { font-size: 18px; line-height: 26px; }
+.feed .fh { font: 700 16px RobotoC; letter-spacing: .08em; text-transform: uppercase; color: #cfc6b3; opacity: .9 !important; margin-bottom: 2px; }
+.feed div + div { opacity: 1; } .feed div + div + div { opacity: .82; } .feed div + div + div + div { opacity: .64; }
+.strip { height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 10px 10px 0 0;
+  background: rgba(10,11,14,.82); box-shadow: inset 0 1px 0 rgba(200,168,98,.45); }
+.strip .sep { width: 14px; height: 2px; background: rgba(236,227,207,.35); }
+.strip .node { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 14px RobotoC; }
+.strip .node-off { border: 2px dashed rgba(236,227,207,.3); color: rgba(236,227,207,.4); }
+.strip .node-next { border: 2px solid rgba(236,227,207,.6); color: #efe6d2; }
+.strip .node-now { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 3px var(--team-p1); }
+.strip .stage { margin-left: 10px; font: 400 18px Roboto; color: #efe6d2; white-space: nowrap; }
+.question { padding: 10px 16px; border-radius: 10px; text-align: right; line-height: 1.3;
+  background: rgba(8,9,12,.84); font: 400 21px Roboto; color: #f3ecdc; z-index: 5; box-shadow: inset 0 1px 0 rgba(200,168,98,.45); }
+.event { left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 6px 20px; border-radius: 20px;
+  background: rgba(8,9,12,.72); font: 700 22px RobotoC; letter-spacing: .05em; text-transform: uppercase; color: #efe6d2; }
+.tag { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 4px 10px; font: 700 18px RobotoC;
+  box-shadow: var(--shadow); white-space: nowrap; }
+.card.picked { box-shadow: 0 0 0 3px var(--team-p1), var(--shadow); z-index: 4; }
+.card.marked { box-shadow: 0 0 0 3px #d9483f, var(--shadow); z-index: 3; }
+.card.marked::after { content: "сброс"; position: absolute; left: 50%; top: -30px; transform: translateX(-50%);
+  background: #d9483f; color: #fff; font: 700 16px RobotoC; letter-spacing: .06em; text-transform: uppercase; padding: 2px 10px; border-radius: 4px; }
+.act { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 76px; }
+.act img { filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
+.pile .slip { font-size: 20px; } .pile .slip i { font-size: 18px; }
+.btn.secondary { font-size: 18px; }
+
+.countchip { background: var(--paper); color: var(--ink); border-radius: 4px; padding: 0 7px; font: 700 18px RobotoC; box-shadow: var(--shadow); }
+.activeslot { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.activeslot .mini { width: 150px; height: 208px; border-radius: 8px; background-size: cover; box-shadow: 0 0 0 3px var(--team-p2), var(--shadow); }
+.abil { margin-top: 6px; font: 400 16px/20px Roboto; color: #cfc4ad; max-width: 230px; white-space: normal; display: none; }
+.card.hovered { box-shadow: 0 0 0 3px #f3ecdc, var(--shadow); z-index: 4; }
+.card.big { box-shadow: 0 0 0 3px #f3ecdc, 0 24px 48px rgba(0,0,0,.7); border-radius: 12px; }
+.choicep { display: flex; gap: 14px; padding: 14px; align-items: flex-start; }
+.choicep .mini { flex: none; width: 96px; height: 134px; border-radius: 6px; background-size: cover; box-shadow: var(--shadow); }
+.choicep .ct { padding-top: 2px; } .choicep .cn { font: 700 22px "Cormorant SC"; color: #f1e9d6; }
+.choicep .cx { font: 400 18px/24px Roboto; color: #e2d9c6; margin-top: 6px; }
+.note2 { width: 420px; padding: 8px 12px; border-radius: 8px; background: rgba(8,9,12,.84); font: 400 18px/23px Roboto; color: #efe6d2; box-shadow: inset 3px 0 0 var(--team-p1); }
+
+/* ---------- real material plates (Codex ImageGen, art/imagegen/hud-table-materials-codex) ---------- */
+body[class*="t-"] .stock { background-color: transparent !important; background-size: 100% 100% !important; outline: none; box-shadow: var(--shadow); color: #f1e9d6; }
+body[class*="t-"] .stock .inner { display: none; }
+body[class*="t-"] .stock .meta, body[class*="t-"] .stock .body { color: #c9bfab !important; }
+body[class*="t-"] .dial.big, body[class*="t-"] .dial.mid { background-size: 100% 100% !important; box-shadow: 0 3px 6px rgba(0,0,0,.5) !important; }
+body[class*="t-"] .dial.big { width: 94px; height: 94px; } body[class*="t-"] .dial.big b { font-size: 33px; } body[class*="t-"] .hero .side { bottom: 8px; }
+body[class*="t-"] .dial.mid { width: 62px; height: 62px; } body[class*="t-"] .dial.mid b { font-size: 21px; }
+body[class*="t-"] .dial b { color: var(--ink); }
+body[class*="t-"] .pile .slip { background-size: 100% 100% !important; background-color: transparent; box-shadow: 0 2px 4px rgba(0,0,0,.5); }
+body[class*="t-"] .question, body[class*="t-"] .strip { background-size: 100% 100% !important; background-color: transparent; box-shadow: none; }
+body.t-R3 .stock { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/R3/hero-card-plate.png") !important; }
+body.t-R3 .dial.big, body.t-R3 .dial.mid { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/R3/hp-dial.png") !important; }
+body.t-R3 .pile .slip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/R3/pile-slip.png"); }
+body.t-R3 .question, body.t-R3 .strip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/R3/question-strip.png"); }
+body.t-M2 .stock { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M2/hero-card-plate.png") !important; }
+body.t-M2 .dial.big, body.t-M2 .dial.mid { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M2/hp-dial.png") !important; }
+body.t-M2 .pile .slip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M2/pile-slip.png"); }
+body.t-M2 .question, body.t-M2 .strip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M2/question-strip.png"); }
+body.t-M3 .stock { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M3/hero-card-plate.png") !important; }
+body.t-M3 .dial.big, body.t-M3 .dial.mid { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M3/hp-dial.png") !important; }
+body.t-M3 .pile .slip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M3/pile-slip.png"); }
+body.t-M3 .question, body.t-M3 .strip { background-image: url("../../../../../art/imagegen/hud-table-materials-codex/M3/question-strip.png"); }
+body[class*="t-"] .stock .art { border-radius: 14px 0 0 14px; }
+body.t-R3 .stock .art { left: 8px; top: 8px; bottom: 8px; border-radius: 8px 0 0 8px; }

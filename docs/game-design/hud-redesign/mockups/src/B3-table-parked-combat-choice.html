@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&family=Forum&display=block"><link rel="stylesheet" href="_table.css"><style>
+.vs { position:absolute; left:50%; top:250px; transform:translateX(-50%); width:900px; height:420px; }
+.vs .c { position:absolute; top:0; width:270px; height:376px; border-radius:12px; background-size:cover; box-shadow:0 18px 40px rgba(0,0,0,.7); }
+.vs .score { position:absolute; left:50%; top:110px; transform:translateX(-50%); text-align:center; color:#f3ecdc; white-space:nowrap; }
+.vs .score .n { font:700 96px "Cormorant SC"; line-height:1; text-shadow:0 4px 18px #000; }
+.vs .score .n span { color:var(--team-p1); }
+.vs .score .v { margin-top:12px; line-height:1.25; font:700 20px RobotoC; letter-spacing:.06em; text-transform:uppercase; text-shadow:0 2px 8px #000; }
+.vs .tag2 { position:absolute; top:388px; font:700 18px RobotoC; letter-spacing:.06em; text-transform:uppercase; color:#efe6d2; text-shadow:0 2px 6px #000; }
+.steps { position:absolute; left:50%; top:700px; transform:translateX(-50%); display:flex; gap:10px; }
+.steps div { font:700 18px RobotoC; letter-spacing:.05em; text-transform:uppercase; color:#efe6d2; padding:6px 14px; border-radius:18px; background:rgba(10,11,14,.8); box-shadow: inset 0 0 0 1px rgba(236,227,207,.35); white-space:nowrap; }
+.steps div.now { background:var(--paper); color:var(--ink); box-shadow:none; }
+.steps div.done { opacity:.55; }
+.parked { position:absolute; width:170px; height:236px; border-radius:9px; background-size:cover; box-shadow:var(--shadow); }
+
+html,body{width:1920px;height:1080px}</style></head>
+<body class="m-dark f-cormorant">
+<div class="scene" style="background-image:url('../../../../../docs/art-pipeline/evidence/beowulf-20261014/bench-marmoreal/bench-K1-1920x1080.jpg')"></div>
+<div class="abs iconbtn" style="left:24px;top:22px">≡</div><div class="abs ghost" style="left:82px;top:31px;font-size:18px">Ход 4 · ход соперника</div>
+<div class="abs stock hero tint-arthur" style="right:24px;top:20px;width:404px;height:140px;">
+  <div class="art" style="width:120px;background-image:url('../../../../../scraped-data/derived/ue-media-v1/avatars/king-arthur.png')"></div>
+  <div class="band" style="left:120px;background:var(--hero-arthur)"></div>
+  <div class="txt" style="left:138px;top:8px">
+    <div class="name" style="font-size:26px;line-height:28px">Король Артур</div>
+    <div class="meta body" style="font-size:18px">ждёт ваш выбор</div>
+  </div>
+  <div style="position:absolute;right:10px;top:10px;display:flex;gap:4px"><img src="../../../../../art/imagegen/hud-icons-de012-codex/vector-codex/1024/slot-filled-maneuver.png" style="width:28px;height:28px;display:block"><img src="../../../../../art/imagegen/hud-icons-de012-codex/vector-codex/1024/slot-filled-attack.png" style="width:28px;height:28px;display:block"></div>
+  <div class="side" style="left:138px;bottom:10px">
+    <div class="dial mid team-p2"><b>16</b></div>
+    <div class="body" style="font-size:18px;color:var(--ink-2);margin-left:4px">Мерлин</div>
+    <div class="dial small team-p2 hurt"><b>5</b></div>
+  </div>
+  <div class="inner"></div>
+</div>
+<div class="abs" style="right:448px;top:28px;width:125px;height:79px"><div class="back" style="width:52px;height:71px;left:0px;top:0;transform:rotate(-4.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/backs/king-arthur.png')"></div><div class="back" style="width:52px;height:71px;left:21px;top:0;transform:rotate(0.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/backs/king-arthur.png')"></div><div class="back" style="width:52px;height:71px;left:42px;top:0;transform:rotate(4.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/backs/king-arthur.png')"></div><div class="abs countchip" style="left:80px;top:47px">3</div></div>
+<div class="abs ghost" style="right:30px;top:168px;font-size:18px;opacity:.9">колода 22 · сброс 2</div>
+<div class="parked" style="left:40px;top:300px;background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/dash.ru.png');box-shadow:0 0 0 3px var(--team-p1),var(--shadow)"></div><div class="abs ghost" style="left:40px;top:546px;font-size:18px">Защита · 3</div><div class="parked" style="right:40px;top:220px;background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/king-arthur/aid-the-chosen-one.ru.png')"></div><div class="abs ghost" style="right:40px;top:466px;font-size:18px">Атака · 4</div>
+<div class="abs" style="left:453px;top:452px;width:124px;height:76px;border-radius:50%;border:3px solid var(--team-p1);box-shadow:0 0 14px var(--team-p1)"></div><div class="abs tag" style="left:571px;top:430px">Медуза</div>
+<div class="abs" style="left:578px;top:572px;width:124px;height:76px;border-radius:50%;border:3px dashed var(--choice);box-shadow:0 0 14px var(--choice)"></div>
+<div class="abs" style="left:498px;top:342px;width:124px;height:76px;border-radius:50%;border:3px dashed var(--choice);box-shadow:0 0 14px var(--choice)"></div>
+<div class="abs" style="left:598px;top:382px;width:124px;height:76px;border-radius:50%;border:3px dashed var(--choice);box-shadow:0 0 14px var(--choice)"></div>
+<div class="abs event" style="top:150px">Бой: 4 : 3 · Медуза получает 1 урон</div>
+<div class="abs strip" style="left:24px;top:826px;width:420px"><img src="../../../../../art/imagegen/hud-icons-de012-codex/vector-codex/1024/marker-action-slot-de.png" style="width:34px;height:34px;display:block"><span class="sep"></span><img src="../../../../../art/imagegen/hud-icons-de012-codex/vector-codex/1024/marker-action-slot-de.png" style="width:34px;height:34px;display:block"><span class="sep"></span><span class="node node-off">≤7</span><span class="stage">после боя: «Рывок»</span></div>
+<div class="abs stock hero tint-medusa" style="left:24px;bottom:24px;width:420px;height:184px;">
+  <div class="art" style="width:150px;background-image:url('../../../../../scraped-data/derived/ue-media-v1/avatars/medusa.png')"></div>
+  <div class="band" style="left:150px;background:var(--hero-medusa)"></div>
+  <div class="txt" style="left:170px"><div class="name" style="font-size:32px;line-height:34px">Медуза</div>
+    <div class="meta body" style="font-size:18px">движение 3 · дальний бой</div><div class="abil">Начало хода: 1 урон бойцу соперника в зоне Медузы</div></div>
+  <div class="side" style="left:170px">
+    <div class="dial big team-p1"><b>15</b></div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-left:10px">
+      <div class="body" style="font-size:18px;color:var(--ink-2)">Гарпии</div>
+      <div style="display:flex;gap:5px"><div class="dial small team-p1"><b>1</b></div><div class="dial small team-p1"><b>2</b></div><div class="dial small team-p1"><b>3</b></div></div>
+    </div>
+  </div>
+  <div class="inner"></div>
+</div>
+<div class="card dim" style="left:494px;top:866px;width:200px;height:278px;transform:rotate(-4.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/gaze-of-stone.ru.png')"></div>
+<div class="card dim" style="left:666px;top:862px;width:200px;height:278px;transform:rotate(-2.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/the-hounds-of-mighty-zeus.ru.png')"></div>
+<div class="card dim" style="left:838px;top:858px;width:200px;height:278px;transform:rotate(0.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/a-momentary-glance.ru.png')"></div>
+<div class="card dim" style="left:1010px;top:862px;width:200px;height:278px;transform:rotate(2.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/regroup.ru.png')"></div>
+<div class="card dim" style="left:1182px;top:866px;width:200px;height:278px;transform:rotate(4.0deg);background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/second-shot.ru.png')"></div>
+<div class="pile" style="right:400px;bottom:36px;width:112px;height:156px">
+  <div class="c" style="transform:translate(3px,3px);background-image:url('../../../../../scraped-data/derived/ue-media-v1/backs/medusa.png');filter:brightness(.55)"></div>
+  <div class="c" style="background-image:url('../../../../../scraped-data/derived/ue-media-v1/backs/medusa.png')"></div>
+  <div class="slip">21<i>колода</i></div>
+</div><div class="pile" style="right:272px;bottom:36px;width:112px;height:156px">
+  <div class="c" style="background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/snipe.ru.png')"></div>
+  <div class="slip">3<i>сброс</i></div>
+</div>
+<div class="abs stock choicep" style="right:24px;bottom:190px;width:430px"><div class="mini" style="background-image:url('../../../../../scraped-data/derived/ue-media-v1/cards/medusa/dash.ru.png')"></div><div class="ct"><div class="cn">Рывок · после боя</div><div class="cx">Переместите Медузу на расстояние до 3 клеток. Щёлкните клетку</div></div><div class="inner"></div></div>
+<div class="abs btn primary" style="right:28px;bottom:86px;width:220px;">Готово</div><div class="abs btn secondary" style="right:28px;bottom:24px;width:220px">Остаться на месте</div>
+</body></html>
