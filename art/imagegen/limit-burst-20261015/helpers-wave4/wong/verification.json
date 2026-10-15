@@ -1,0 +1,111 @@
+{
+  "task_id": "AN-152",
+  "status": "proposed/source-only",
+  "checked_utc": "2026-10-15T06:20:14.311152+00:00",
+  "owner_and_stats": {
+    "owner": "Doctor Strange",
+    "helper": "Wong",
+    "count": 1,
+    "health": 6,
+    "movement": 2,
+    "attack": "range",
+    "raw_and_evidence_agree": true,
+    "evidence_live_snapshot_not_requeried": true
+  },
+  "source_preflight": {
+    "evidence_matches": [],
+    "filename_search_matches": [],
+    "limitation": "rg filename search reported access denied for one unrelated concept-elektra-codex temporary directory; no claim of exhaustive content search."
+  },
+  "source_hashes_match": true,
+  "all_generated_attempts_preserved": true,
+  "tool_originals_vs_saved_copies_byte_identical": true,
+  "selected_vs_attempt_02_byte_identical": true,
+  "png_decode_and_integrity": "passed for both tool originals, both saved attempts and design-front.png",
+  "image_dimensions": [
+    1024,
+    1536
+  ],
+  "generation_calls": 2,
+  "correction_calls": 1,
+  "requirement_checks": {
+    "adult_humanoid": "visually consistent",
+    "front_design_and_full_figure": "visually consistent; strict camera projection unproven",
+    "short_dark_hair_no_headgear": "visually consistent",
+    "empty_hands_visible_with_limb_gaps": "visually consistent; overlapped finger contours limit exact digit audit",
+    "distinct_from_owner_identity_and_costume": "visually consistent; no legal or likeness certification",
+    "exact_6_percent_top_margin": "FAIL: approximately 7% in selected output",
+    "base_bottom_at_90_percent": "FAIL: approximately 86.1% in selected output",
+    "two_disc_edge_on_stone_pedestal": "visually consistent side bands; circular plan unproven",
+    "uniform_plain_charcoal": "PARTIAL: plain charcoal with subtle tonal variation",
+    "no_vfx_ground_scene_text_ui": "visually consistent"
+  },
+  "all_requested_visual_criteria_pass": false,
+  "actual_failures_by_attempt": [
+    {
+      "attempt": 1,
+      "selected": false,
+      "inspection": "Full tool-rendered image visually inspected; saved output opened with view_image; read-only pixel scan corroborated approximate vertical boundaries.",
+      "observed_framing": {
+        "canvas": [
+          1024,
+          1536
+        ],
+        "hair_top_y_approx": 49,
+        "top_margin_percent_approx": 3.2,
+        "base_bottom_y_approx": 1413,
+        "base_bottom_percent_approx": 92.0,
+        "target_top_percent": 6,
+        "target_base_bottom_percent": 90,
+        "measurement_method": "Visual estimate corroborated by centerline pixel values; approximate, not a certified segmentation."
+      },
+      "actual_failures": [
+        "Top margin approximately 3.2%, below the requested 6%.",
+        "Base bottom approximately 92%, below the requested y=90% boundary.",
+        "Charcoal background has mild tonal variation rather than a perfectly uniform fill."
+      ],
+      "identity": "Adult stocky East Asian male scholar; ochre robe and plain brown sash differ from owner red cloak, blue fitted coat, silver hair, beard, gold gloves and medallions. No actor was requested or referenced; exclusive originality or absence of resemblance cannot be certified.",
+      "hands": "Both empty hands and thumbs visible with relaxed fingers, separated from torso by clear gaps. Some finger contours overlap naturally, so exact digit topology is not certified from this front image.",
+      "correction_reason": "Actual framing failure only; one targeted correction used."
+    },
+    {
+      "attempt": 2,
+      "selected": true,
+      "inspection": "Full tool-rendered correction visually inspected; selected local PNG opened with view_image; read-only pixel scan corroborated approximate vertical boundaries.",
+      "observed_framing": {
+        "canvas": [
+          1024,
+          1536
+        ],
+        "hair_top_y_approx": 108,
+        "top_margin_percent_approx": 7.0,
+        "base_bottom_y_approx": 1323,
+        "base_bottom_percent_approx": 86.1,
+        "target_top_percent": 6,
+        "target_base_bottom_percent": 90,
+        "measurement_method": "Visual estimate corroborated by centerline pixel values; approximate, not a certified segmentation."
+      },
+      "actual_failures": [
+        "Exact 6% top margin not achieved: approximately 7%.",
+        "Exact base-bottom y=90% not achieved: approximately 86.1%, leaving about 13.9% below.",
+        "Charcoal background retains mild tonal variation rather than a perfectly uniform fill."
+      ],
+      "identity": "Mature original-intent adult East Asian male scholar with stocky body, short dark hair, calm face, ochre-brown robes, broad plain sash and indigo trousers. No headgear. No owner identity or full costume copy apparent. Actor-likeness exclusivity is not independently established.",
+      "hands": "Both empty hands fully inside frame and separated from torso; relaxed fingers and visible thumbs. Front projection overlaps some finger contours; this is not hand topology proof.",
+      "pose": "Front-facing head, torso and legs; gently bent relaxed arms and visible charcoal gaps at elbows/forearms and between lower legs. Visually consistent with orthographic front intent; a single raster cannot establish exact camera projection.",
+      "pedestal": "One continuous dark stone plinth with two stacked side bands, horizontal join, nearly flat upper boundary and no broad visible top ellipse. Circular plan and geometric exactness cannot be proved in a front raster.",
+      "selection_reason": "Keeps a clear full silhouette and at least 6% top clearance while preserving design and hand readability. Selected as proposed source only despite remaining exact-framing failures.",
+      "further_correction": "None; allowed one-correction budget exhausted."
+    }
+  ],
+  "limitations": [
+    "Single raster only: no back or side design, mesh, topology, rig, gameplay readability, import, engine render, production quality gate or formal acceptance verified.",
+    "Original-intent design without actor or franchise image inputs; uniqueness and all possible likenesses cannot be certified.",
+    "Owner evidence supplies mechanics and relationship, not this proposed visual identity.",
+    "Filename search had one access-denied unrelated temporary directory, documented in preflight."
+  ],
+  "independent_review": "pending with root",
+  "ownership_scope": "Only art/imagegen/limit-burst-20261015/helpers-wave4/wong was written. No git, ledger, registry, code, services or agents touched.",
+  "processes_started": "Only short-lived read/write/hash/inspection Python and PowerShell commands; no background services or continuing build processes started.",
+  "manifest": "manifest-sha256.json includes every file under this folder except itself; final read-only verification performed separately."
+}

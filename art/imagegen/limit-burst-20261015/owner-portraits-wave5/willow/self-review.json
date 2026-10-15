@@ -1,0 +1,53 @@
+{
+  "task_id": "CP-31",
+  "status": "source-candidate-only",
+  "reviewer": "producing Codex agent self-review, not independent acceptance",
+  "reviewed_at_utc": "2026-10-15T06:34:57.121408+00:00",
+  "generated_image_inspected": true,
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "source_sha256": "ae1921d806256e69332e9697b8342f2ccdf099866a6e605fff96845c4f11d4d4",
+  "generation_calls": 1,
+  "correction_calls": 0,
+  "observations": {
+    "identity": "Long copper-red sculpted hair, green embroidered knit, purple top and simple necklace follow the current owner-design cues. Everyday form is shown without hands, spells or Dark Willow features.",
+    "style": "Sculpted coherent hair/costume masses and detailed matte painted surfaces. Facial skin rendering is highly realistic; physical resin provenance and a pixel-identical original face are not claimed.",
+    "source_framing": "About 6% above the hair instead of the requested 18%; whole head and main hair tips remain inside the full100 circle.",
+    "full100_circle": "Whole head/hair and high collar where present remain inside the circle of diameter100% of the square. Outer shoulders and lower chest corners are removed as expected. No tighter zoom/crop was tested.",
+    "native80": "Red hair framing the face and green/purple costume remain readable; necklace and embroidery become small accents.",
+    "native40": "Red hair, light central face, green shoulders and purple top remain distinct; pendant, individual eyes and floral embroidery are not reliably readable.",
+    "grayscale80_160": "Hair, face planes and collar remain visible in grayscale previews; colour-only costume distinctions and fine ornament are reduced.",
+    "background": "Plain charcoal studio backdrop with slight tonal variation; no UI, text, frame, watermark or scenery observed. Exact flatness is not claimed."
+  },
+  "checklist": [
+    {
+      "item": "one adult head-and-shoulders portrait; no hands, pedestal or text/UI",
+      "passed": true
+    },
+    {
+      "item": "whole head/hair/high collar safe in full100 circle",
+      "passed": true
+    },
+    {
+      "item": "requested about18% upper breathing room",
+      "passed": false,
+      "note": "About 6% above the hair instead of the requested 18%; whole head and main hair tips remain inside the full100 circle."
+    },
+    {
+      "item": "broad identity and costume cues readable at native80/40",
+      "passed": true,
+      "note": "Fine identity details are limited; source review is not runtime acceptance."
+    }
+  ],
+  "limitations": [
+    "About 6% above the hair instead of the requested 18%; whole head and main hair tips remain inside the full100 circle.",
+    "The referenced figure is formally unaccepted (r2 score6.3) with no adjacent user override. Root specifically authorized this independent source-only portrait; this is not acceptance of that figure.",
+    "Outer shoulder/chest corners are cut by the circular mask; keep full100 without tighter zoom.",
+    "No runtime widget, DPI, interaction state, UE import or independent acceptance tested by this producing agent."
+  ],
+  "actual_head_or_identity_failure_requiring_correction_observed": false,
+  "runtime_accepted": false,
+  "independent_review_pending": true
+}

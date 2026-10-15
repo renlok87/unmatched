@@ -1,0 +1,15 @@
+# Independent visual review — wave 4
+
+Frozen independent review of **12 actual selected PNGs**: CP-29 four owner portraits, CP-30 four existing support portraits and AN-152 four new helper front references. All source PNGs and their canonical or proposed design references were personally opened. No production pixels, global registry, source files or runtime files were edited. Exact paths, SHA256, dimensions and individual dispositions are in `independent-review-index.json`.
+
+All twelve are kept as proposed original sources or references. **No formal 1a, model, rig, runtime, registry or shared portrait-style acceptance is given.**
+
+The CP-29 reviewer diagnostic sheet supplies full100, grayscale, actual 80/40 px circles, explicitly labeled nearest enlargements and a centered 90% crop comparison. Full100 preserves all four heads/headgear. A 90% crop cuts Blackbeard's highest hat edge and the bottom of Houdini's brass padlock. Oda's entire gold crescent and Bruce Lee's hair/ears remain inside full100. Fine face and small ornament details are limited at 40 px, especially Houdini's smaller head. Lower outer shoulders naturally leave the circle.
+
+The CP-30 producer sheet was personally inspected at actual target 40 px and diagnostic 80 px. Full100 retains Bess's white feather, Huntsman's fur cap, Rosencrantz's yellow plume and Ashigaru's entire jingasa. Broad silhouettes/face contrast remain, while precise facial and ornament details are limited. Bess uses the actual helper key `bess`; Ashigaru represents Oda's existing `Honor Guard` alias. Rosencrantz is the existing single visual representative of `Rosencrantz & Guildenstern`, not a complete pair portrait. Current C++ produces `rosencrantz--guildenstern`, while import normalization produces one hyphen; the unresolved alias remains an integration limit.
+
+The new helper designs are original interpretations of verified names, owners and mechanics. Shuri selects attempt01: full silhouette and near-90% base, but top about2.9% misses6%. Maria Hill and Wong select attempt02 with clear figures but base bottoms about85.2%/86.1%, short of requested90%. Dandelion selects attempt02 with right hand on the lute neck and left hand supporting the bowl; feather top about2.5%, overlapping digits and lute/torso overlap remain. All four remain useful front design sources; separated modeling geometry, calibrated orthographic projection and circular base plans are not established. No further generation or retouch was requested for these limits.
+
+Final verification: all **12/12** selected source hashes match. The final three producer group manifests independently verify **154 members with zero mismatches**, including root coordinator metadata and nested manifests. The Oda/Bruce producer verification files also supply 22 embedded input/output checks, verified separately; these overlap some group members and are not an extra output count. The reviewer manifest excludes only itself.
+
+This folder is frozen. Subsequent waves must use a new review folder; earlier frozen review folders remain unchanged.

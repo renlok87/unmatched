@@ -1,0 +1,90 @@
+{
+  "task_id": "AN-153",
+  "subject": "dijkstra",
+  "status": "proposed/source-only",
+  "checked_utc": "2026-10-15T06:22:43.541476+00:00",
+  "evidence_path": "art/imagegen/limit-burst-20261015/helpers-wave5/owner-evidence.json",
+  "evidence_sha256": "c57a5d4b42b3fa613ec998781551d8e596ea62e9a20c50cce58834395180237b",
+  "evidence_queried_utc": "2026-10-15T06:18:12.460273+00:00",
+  "owner_row": {
+    "priority": "next",
+    "proposed_asset_id": "ASSET-DIJKSTRA-001",
+    "content_key": "dijkstra",
+    "game_name": "Dijkstra",
+    "owner": "Philippa",
+    "owner_slug": "philippa",
+    "game_role": "sidekick",
+    "recommended_kind": "humanoid source reference",
+    "count": 1,
+    "health": 6,
+    "movement": 2,
+    "attack": "melee",
+    "raw_path": "scraped-data/api/heroes/philippa.json",
+    "raw_sha256": "12d1afabbf423a375c8bb82bdfcc70ad58a0e29749db4057b48f6d8f3d1f790c",
+    "raw_sidekicks": [
+      {
+        "move": "2",
+        "name": "Dijkstra",
+        "attack": "melee",
+        "startHealth": "6"
+      }
+    ],
+    "live_sidekicks": [
+      {
+        "name": "Dijkstra",
+        "health": "6",
+        "movement": "2",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/BaHYP8NMlFG4KWkk6ACcJ.webp",
+        "attackType": "melee"
+      }
+    ],
+    "owner_reference": "art/imagegen/concept-philippa-codex/design/philippa-front.png",
+    "owner_reference_sha256": "cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c",
+    "notes": "Named humanoid reference; no actor likeness target."
+  },
+  "raw_path": "scraped-data/api/heroes/philippa.json",
+  "raw_sha256": "12d1afabbf423a375c8bb82bdfcc70ad58a0e29749db4057b48f6d8f3d1f790c",
+  "decoded_raw_owner": "Philippa",
+  "decoded_raw_sidekicks": [
+    {
+      "move": "2",
+      "name": "Dijkstra",
+      "attack": "melee",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/BaHYP8NMlFG4KWkk6ACcJ.webp",
+      "startHealth": "6"
+    }
+  ],
+  "owner_and_stats_match_evidence": true,
+  "references": [
+    {
+      "role": "owner_quality_cohort_palette_only",
+      "path": "art/imagegen/concept-philippa-codex/design/philippa-front.png",
+      "sha256": "cd85663d7e77ba9bca7e89e9aaefe499ce7478f4dc0a79b9593b0998b8e4139c",
+      "bytes": 740345,
+      "dimensions": [
+        896,
+        1152
+      ],
+      "opened_with_view_image_before_generation": true
+    },
+    {
+      "role": "quality_only",
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "dimensions": [
+        1021,
+        1540
+      ],
+      "opened_with_view_image_before_generation": true
+    }
+  ],
+  "absence_check": {
+    "evidence_statement": "rg of root asset-card.yaml names/keys, hero-links aliases and exact helper concept/current wave paths found no produced references for these six names. Assigned wave4 helpers and all earlier waves excluded.",
+    "local_source_filename_search": "rg --files art/imagegen -g !**/tmp-* | Select-String -Pattern dijkstra",
+    "local_registry_content_search": "rg -n -i dijkstra art/imagegen -g asset-card.yaml -g *hero-links* -g !**/tmp-*",
+    "matches": [],
+    "limitation": "Temporary directories excluded after initial unrestricted file listing encountered one inaccessible unrelated Elektra temporary directory. No matches in completed scoped searches. Absence is a source-path/registry check, not a visual similarity search."
+  },
+  "scope": "Only assigned new dijkstra folder; no git, ledger, registry, code, service changes or agents."
+}

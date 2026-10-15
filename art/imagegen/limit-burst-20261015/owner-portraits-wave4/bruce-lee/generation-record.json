@@ -1,0 +1,177 @@
+{
+  "task_card": "CP-29",
+  "status": "source-candidate-only",
+  "owner": {
+    "name": "Bruce Lee",
+    "key": "bruce-lee",
+    "role": "hero",
+    "helper_note": "Live capture has Unknown placeholder; raw has empty-name zero-value helper. Owner name agrees, helper is not used."
+  },
+  "tool": "image_gen.imagegen",
+  "mode": "built-in new image generation",
+  "generation_calls": 1,
+  "correction_calls": 0,
+  "tool_arguments_file": "tool-arguments-g1.json",
+  "prompt_file": "prompt-g1.txt",
+  "prompt_sha256": "d93c5ab74988ed0374679e8f1a24e6ef2818c335775c27bbcbd24ae11d729075",
+  "reference": {
+    "path": "art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png",
+    "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+    "bytes": 1544620,
+    "width": 1086,
+    "height": 1448,
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "chunk_crc_valid": true,
+    "compressed_stream_valid": true,
+    "chunk_count": 4,
+    "role": "own canonical accepted 1a design; opened with view_image before call",
+    "sha256_before": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+    "sha256_after": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+    "acceptance_card": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+    "acceptance_card_sha256": "56794a90f886530ffefee4807fcd88f47ee74658e6fb69ff021d885dfc8c002e",
+    "canonical_verdict": "pass",
+    "acceptance_stage": "1a",
+    "accepted_hash_matches": true,
+    "reference_use": "Viewed and described in exact prompt. No referenced_image_paths or num_last_images_to_include passed for this new image, following tool contract."
+  },
+  "roster_evidence": {
+    "raw": {
+      "path": "scraped-data/api/heroes/bruce-lee.json",
+      "sha256": "810ee1001fe60a3032429d6ddfea1171fa93d1af0c11ec390bc51fb92bc263dc",
+      "bytes": 21539
+    },
+    "raw_key": "bruce-lee",
+    "raw_name": "Bruce Lee",
+    "hero_link": null,
+    "hero_links_sha256": "118972f5ee9bfdf746f6606964d77a99056054f4879ffb35e36230dcf5222319",
+    "live_capture": {
+      "path": "art/imagegen/limit-burst-20261015/heroes-wave3/live-roster-evidence.json",
+      "sha256": "685d34838924a6ea52fa210fd588c4bc15d7be6e7a0b04102fad31777a38bd41",
+      "bytes": 20512
+    },
+    "live_capture_queried_utc": "2026-10-15T05:58:04.783135+00:00",
+    "live_capture_source": "Read-only current PostgreSQL Hero.name + Hero.sidekicks, no service started",
+    "matching_live_row": [
+      {
+        "name": "Bruce Lee",
+        "sidekicks": [
+          {
+            "name": "Unknown",
+            "health": 1,
+            "movement": 1,
+            "attackType": "melee"
+          }
+        ]
+      }
+    ],
+    "fresh_live_query_succeeded": false,
+    "fresh_query_limitation": "GraphQL :3000/:3120 connection refused; Docker API access denied; local backend pg module not installed. No services started or dependencies installed. Existing same-day live capture agrees with raw owner name/key; hero-links has no Bruce Lee entry.",
+    "hero_link_note": "No Bruce Lee mapping in hero-links.json. Raw key plus same-day captured live owner name establish identity."
+  },
+  "preflight": {
+    "before_own_generation_call": true,
+    "own_reference_opened_with_view_image": true,
+    "output_folder_existed_before_task": false,
+    "focused_filename_roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content/UI"
+    ],
+    "extensions": [
+      "png",
+      "webp",
+      "jpg",
+      "jpeg",
+      "uasset"
+    ],
+    "predicate": "full path contains own slug AND portrait or avatar",
+    "portrait_matches_before_generation": [],
+    "lookup_errors": [],
+    "excluded_temp_directories": "tmp-metadata-check-*",
+    "earlier_wave_duplicate_found": false,
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "own_runtime_key_present": false,
+    "scope_limitation": "Focused filename/runtime lookup only, not visual audit of all unnamed images."
+  },
+  "output": {
+    "tool_original": {
+      "path": "C:/Users/ren/.codex/generated_images/01a13e30-ffac-76b3-be4e-c6c13046a9eb/exec-2567dfc1-dab4-4afc-bcf4-473ac50efd7b.png",
+      "sha256": "134d3c6b016d2fb8e92fd8dc268fb20c7b83d97d6f0e096ff18bdccb39edb7d9",
+      "bytes": 1983015,
+      "width": 1254,
+      "height": 1254,
+      "bit_depth": 8,
+      "png_color_type": 2,
+      "chunk_crc_valid": true,
+      "compressed_stream_valid": true,
+      "chunk_count": 4
+    },
+    "original": {
+      "path": "art/imagegen/limit-burst-20261015/owner-portraits-wave4/bruce-lee/original-g1.png",
+      "sha256": "134d3c6b016d2fb8e92fd8dc268fb20c7b83d97d6f0e096ff18bdccb39edb7d9",
+      "bytes": 1983015,
+      "width": 1254,
+      "height": 1254,
+      "bit_depth": 8,
+      "png_color_type": 2,
+      "chunk_crc_valid": true,
+      "compressed_stream_valid": true,
+      "chunk_count": 4
+    },
+    "selected": {
+      "path": "art/imagegen/limit-burst-20261015/owner-portraits-wave4/bruce-lee/portrait-source-candidate.png",
+      "sha256": "134d3c6b016d2fb8e92fd8dc268fb20c7b83d97d6f0e096ff18bdccb39edb7d9",
+      "bytes": 1983015,
+      "width": 1254,
+      "height": 1254,
+      "bit_depth": 8,
+      "png_color_type": 2,
+      "chunk_crc_valid": true,
+      "compressed_stream_valid": true,
+      "chunk_count": 4
+    },
+    "copies_byte_identical": true,
+    "requested_composition": [
+      1024,
+      1024
+    ],
+    "actual_dimensions": [
+      1254,
+      1254
+    ],
+    "resolution_note": "Built-in returned 1254 square; no resize performed.",
+    "postprocessing": "none; no crop, resize, padding, repaint, reencoding or alpha edits",
+    "crop": "full100 unchanged complete square source"
+  },
+  "self_review": {
+    "file": "README.md",
+    "method": "Viewed canonical design, generated result, and saved selected PNG with view_image",
+    "whole_head_headgear_visible_in_square": true,
+    "eyes_centered_readable": true,
+    "lettering_ui_frame_seen": false,
+    "headroom_estimate_pct": 14,
+    "eyes_y_estimate_pct": 44,
+    "estimates_are_visual_not_segmentation_measurements": true,
+    "generous_headroom_preference_fully_met": false,
+    "circular_crop_limitation": "Circle loses outer shoulders and some black sleeve stripes. Full head/hair appear inside full100 circle; no native crop tested.",
+    "native_circular_crop_validation_performed": false,
+    "reason_no_correction": "No actual square-source clipping or clear identity failure observed; margin/style limitations recorded."
+  },
+  "runtime_imported": false,
+  "runtime_accepted": false,
+  "paid_external_services_used": false,
+  "git_mutations": false,
+  "shared_file_mutations": false,
+  "subagents_spawned": false,
+  "background_processes_started": false,
+  "scope": "Only own assigned new oda-nobunaga and bruce-lee subfolders; generated tool originals remain in default tool folder."
+}

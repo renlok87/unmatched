@@ -1,0 +1,38 @@
+{
+  "attempt": 2,
+  "reviewed_utc": "2026-10-15T06:20:33.377382+00:00",
+  "review_method": "Direct visual inspection of displayed tool output and copied design-front.png using view_image. Framing coordinates are approximate human observations, not an independently measured acceptance gate.",
+  "disposition": "selected_as_proposed_source_only_with_recorded_framing_failure",
+  "actual_failures": [
+    {
+      "criterion": "base_bottom_at_90_percent",
+      "observed_y_px_approx": 1308,
+      "canvas_height": 1536,
+      "observed_percent_approx": 85.2,
+      "requested_percent": 90,
+      "status": "fail",
+      "consequence": "Approximately 14.8% charcoal below base rather than requested 10%; no further call or postprocessing permitted."
+    }
+  ],
+  "observations": {
+    "hair_top": {
+      "observed_y_px_approx": 93,
+      "observed_percent_approx": 6.1,
+      "requested_percent": 6,
+      "status": "approximately_met"
+    },
+    "full_figure": "Full hair silhouette, body, both hands, pistol, boots and base remain uncropped.",
+    "front_view": "Head, shoulders and hips visually square to camera; no visible three-quarter torso turn. Camera math cannot be proven from a generated raster.",
+    "pose": "Relaxed arms with mild elbow bends and charcoal gaps around arms and between legs.",
+    "hands": "Both bare hands visible, left relaxed with curled digits, right gripping pistol; no obvious missing or extra digits at this resolution. Exact five-finger topology and trigger-finger contact require independent review.",
+    "pistol": "In anatomical right hand (viewer left), muzzle down and outward, clear of body/feet; no firing effect.",
+    "pedestal": "One base, two low stacked discs, straight upper edge and no exposed stone top. Circular planform is requested and inferred, not independently provable from edge-on view.",
+    "identity_and_costume": "Adult woman with short dark-brown hair and slate-blue field jacket/trousers, simple pouches and plain boots. Visually distinct from owner red hair, black catsuit, wrist cuffs and hourglass emblem. No named real person requested or reference actor used; global lack of resemblance cannot be certified.",
+    "background": "Plain charcoal with subtle studio tonal variation, not perfectly uniform RGB. No scene, VFX, text, UI or visible logos.",
+    "correction_drift": "Correction slightly changes garment/face shading and small details as generative editing can; identity remains visually consistent but not pixel-locked."
+  },
+  "selection_reason": "Attempt 2 satisfies the requested approximate 6% top margin while retaining readable full figure, visible hands and edge-on base. Attempt 1 has a closer base position but fails top margin. Neither fulfills all exact framing requirements. Both originals are retained for root review.",
+  "formal_acceptance": false,
+  "game_ready": false,
+  "independent_review": "Pending root-coordinated review; this is worker self-review only."
+}

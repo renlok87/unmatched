@@ -1,0 +1,114 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-15",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png",
+      "sha256": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05"
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-side.png",
+      "sha256": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6"
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-back.png",
+      "sha256": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sherlock-holmes-codex",
+    "files": [
+      "sheet-sherlock-holmes.png",
+      "sherlock-holmes-front.png",
+      "sherlock-holmes-side.png",
+      "sherlock-holmes-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sherlock-holmes-codex/checks-report.json",
+    "art/imagegen/concept-sherlock-holmes-codex/generation-records.json",
+    "art/imagegen/concept-sherlock-holmes-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sherlock-holmes-codex/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.WARN = 0; summary.PASS = 33. verification.json фиксирует exit_code = 0 итоговой проверки.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В sherlock-holmes-front.png, sherlock-holmes-side.png и sherlock-holmes-back.png персонаж узнаваем: головной убор и поднятая лупа отчётливо выступают в силуэте; трубка читается спереди и в профиль. Поза естественная, не T/A. Руки близки к корпусу, ткань плаща перекрывает просветы между руками и торсом, особенно у опущенной кисти. Тонкие мундштук, цепочка и оправа различимы; их сохранность требует проверки на этапах 3–4.",
+      "frames": [
+        "sherlock-holmes-front.png",
+        "sherlock-holmes-side.png",
+        "sherlock-holmes-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На sheet-sherlock-holmes.png согласованы стойка, пропорции, положение кистей, длина одежды и двухъярусная подставка. sherlock-holmes-side.png соответствует заданному левому профилю и ortho_left; sherlock-holmes-back.png — строгий вид сзади. Лупа остаётся в собственной правой руке: слева для зрителя спереди и справа сзади. Относительно дизайна и орто сохранены основные формы; между видами немного различаются рисунок твида, пряди волос и завороты складок плаща.",
+      "frames": [
+        "sheet-sherlock-holmes.png",
+        "sherlock-holmes-front.png",
+        "sherlock-holmes-side.png",
+        "sherlock-holmes-back.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "sherlock-holmes-front.png показывает уровень расписанной коллекционной миниатюры, сопоставимый с эталоном Medusa: проработаны лицо, пальцы, пуговицы, цепочка, твид и кожаная обувь. В sherlock-holmes-side.png и sherlock-holmes-back.png сохраняются фактура ткани, объём складок и детализация волос. Латунь, стекло, кожа, ткань и камень различимы; детализация присутствует внутри силуэта.",
+      "frames": [
+        "sherlock-holmes-front.png",
+        "sherlock-holmes-side.png",
+        "sherlock-holmes-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Свотчи sheet-sherlock-holmes.png соответствуют PALETTE и окраске фигуры: коричневый твид, серый плащ, тёмная трубка и латунная оправа. В sherlock-holmes-front.png и sherlock-holmes-side.png присутствуют все четыре якоря утверждённого дизайна. В sherlock-holmes-back.png сохранены видимые сзади якоря; трубка закономерно скрыта головой. Командных цветов на подставке нет.",
+      "frames": [
+        "sheet-sherlock-holmes.png",
+        "sherlock-holmes-front.png",
+        "sherlock-holmes-side.png",
+        "sherlock-holmes-back.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sherlock-holmes-front.png",
+      "note": "Плащ перекрывает фоновые просветы между руками и корпусом; ограничение уже присутствует в утверждённом дизайне и черновых орто. Кисти и лупа остаются различимыми."
+    },
+    {
+      "item": "S",
+      "frame": "sherlock-holmes-side.png",
+      "note": "Тонкие мундштук трубки, цепочка и оправа требуют проверки сохранности геометрии и читаемости на этапах 3–4."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-sherlock-holmes.png",
+      "note": "Мелкие различия рисунка ткани, прядей волос и складок плаща между видами допустимы для концепт-листа; точное геометрическое совпадение растровыми изображениями не подтверждается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13e39-c13d-7be2-bbc1-2df7d71f4cae"
+  },
+  "executor_session_id": "codex-app:01a13e0b-a911-7190-9a60-c87273f3db77",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c, r1: художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). G-CHECKS PASS, оценка 8,8/10."
+}

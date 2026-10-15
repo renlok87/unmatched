@@ -1,0 +1,77 @@
+{
+  "checked_at_utc": "2026-10-15T06:27:42.127276+00:00",
+  "task": "CP-32",
+  "status": "source-candidate-only",
+  "cp32_registration": {
+    "path": "art/imagegen/limit-burst-20261015/task-map-owner-wave6.json",
+    "sha256": "38ee28ba7f04cc375a811cd69f2229eadd465fde95af7b85e6ce828f3cfc44f0"
+  },
+  "reference_opened_with_view_image": true,
+  "source": {
+    "path": "art/imagegen/concept-bigfoot-codex/design/bigfoot-front.png",
+    "sha256": "303886f1404a81b14c43483050894774c37129585ac8e1754054a1a9a64e9c31",
+    "dimensions": [
+      1086,
+      1448
+    ]
+  },
+  "acceptance": {
+    "path": "art/pipeline-candidates/ASSET-BIGFOOT-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+    "sha256": "443cbb6253d96c023001afafce3d407a4cf9cd03c34470e9285efeff122d76bb",
+    "verdict": "pass",
+    "score": 9.4,
+    "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)",
+    "actual_status": "accepted by delegated concept acceptance; hash matches",
+    "accepted": true,
+    "useroverride": false,
+    "rejected": false,
+    "hash_matches": true,
+    "package_readme_and_verification_status": "предложено",
+    "registry_status": "proposed; planned",
+    "note": "Concept acceptance applies to source concept only, not this portrait or any later model stage."
+  },
+  "roster": {
+    "path": "scraped-data/api/heroes/bigfoot.json",
+    "sha256": "94941a2afc89f3c17f36e17c68b2ee8180ed3e834031d2d4517c9a87a4a34b9d",
+    "row": {
+      "id": 12,
+      "name": "Bigfoot",
+      "key": "bigfoot"
+    },
+    "method": "Resolve fetchedHero and key from repository raw roster data. No avatar image opened.",
+    "runtime_candidate_key": "portrait:bigfoot",
+    "runtime_key_exists": false
+  },
+  "focused_absence_lookup": {
+    "roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content"
+    ],
+    "matching_portrait_or_avatar_files": [],
+    "rg_exit_code": 2,
+    "rg_stderr": "rg: art/imagegen\\concept-elektra-codex\\tmp-metadata-check-asb509mx: Отказано в доступе. (os error 5)\n",
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "requested_key_absent": true,
+    "scope": "Focused subject filename lookup including earlier waves, plus exact runtime registry keys. Does not claim exhaustive visual deduplication.",
+    "earlier_waves_lookup": {
+      "roots": [
+        "art/imagegen/limit-burst-20261015",
+        "art/cards-v1",
+        "unreal/Unmatched/Content"
+      ],
+      "excluded": "own newly created bigfoot candidate folder",
+      "matches": [],
+      "note": "This narrower lookup has no unreadable concept directory; broad lookup warning is retained above."
+    }
+  },
+  "planned_review": "full100 centered circle [0.5,0.5,1.0] on entire square; native 40px and 80px; no zoom or crop of original."
+}

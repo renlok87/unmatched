@@ -1,0 +1,179 @@
+{
+  "task_id": "AN-154",
+  "proposed_asset_id": "ASSET-OBERON-001",
+  "subject": "Oberon",
+  "owner": "Titania",
+  "status": "proposed/source-only",
+  "purpose": "Single original adult humanoid front design reference; no stage0 registration or game integration.",
+  "human_task_registration": "User explicitly states task was registered before calls. Worker did not access or edit ledger.",
+  "engine": "Built-in image_gen.imagegen",
+  "calls": 2,
+  "initial_calls": 1,
+  "corrections": 1,
+  "correction_budget_exhausted": true,
+  "correction_trigger": "Actual framing failure in attempt 01; no identity or hand failure used to authorize another call.",
+  "selected_file": "design-front.png",
+  "selected_attempt": 2,
+  "selected_result": {
+    "path": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/design-front.png",
+    "sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
+    "bytes": 1837674,
+    "width": 1024,
+    "height": 1536,
+    "format": "PNG",
+    "mode": "RGB"
+  },
+  "selection_reason": "Attempt 02 restores at least 6% clear top margin and remains complete. Exact 6% top and 90% bottom targets are still missed. Total absolute framing-position error is smaller than attempt 01; this is a proposed source with exceptions.",
+  "references": [
+    {
+      "path": "art/imagegen/concept-titania-codex/design/titania-front.png",
+      "sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+      "bytes": 2286435,
+      "width": 1086,
+      "height": 1448,
+      "format": "PNG",
+      "mode": "RGB",
+      "role": "Owner: palette, woodland cohort and quality only; not identity or costume copying.",
+      "opened_with_view_image_before_generation": true,
+      "attached_to_initial_generation": false,
+      "initial_generation_use": "Inspected visually; characteristics described in prompt. No reference-image tool argument on new generation."
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "width": 1021,
+      "height": 1540,
+      "format": "PNG",
+      "mode": "RGB",
+      "role": "Quality: sculptural material detail and anatomical finish only.",
+      "opened_with_view_image_before_generation": true,
+      "attached_to_initial_generation": false,
+      "initial_generation_use": "Inspected visually; characteristics described in prompt. No reference-image tool argument on new generation."
+    }
+  ],
+  "owner_evidence_path": "art/imagegen/limit-burst-20261015/helpers-wave6/owner-evidence.json",
+  "owner_evidence_sha256": "114987eaa22c911f9ebd4618cd9cc18c78c124e812303f9a678becddb1666dc5",
+  "owner_raw_path": "scraped-data/api/heroes/titania.json",
+  "owner_raw_sha256": "f2e163b8264605430f57bf3630b607cdf4ceb3ae643914635e5ad3d74f0b0774",
+  "owner_reference_sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+  "attempts": [
+    {
+      "attempt": 1,
+      "intent": "generate",
+      "tool": "image_gen.imagegen",
+      "tool_metadata_file": "tool-attempt-01.json",
+      "tool_model": "Not exposed by built-in tool; no model identity inferred.",
+      "started": {
+        "current_time": "2026-10-15 06:30:56 UTC"
+      },
+      "finished": {
+        "current_time": "2026-10-15 06:31:29 UTC"
+      },
+      "prompt_file": "prompt-attempt-01.txt",
+      "exact_prompt": "Use case: stylized-concept\nAsset type: ORIGINAL adult humanoid FRONT DESIGN REFERENCE, source-only proposal for Oberon, Titania's sidekick. Create ONE image of ONE character.\nScene/backdrop: plain uniform charcoal background, no environment, no floor scene, no props beyond the single staff and the specified pedestal.\nSubject: an original adult male fae king, clearly mature about 40, tall slender humanlike anatomy, handsome angular masculine face with composed expression, long dark hair with silver streaks, subtly pointed ears. A simple low twig-like bronze crown, small and fully in frame; it must not resemble antlers. Forest-green layered brocade coat with restrained bronze leaf embroidery and a fitted waist, knee-length divided coat tails, fitted brown trousers and brown boots. Quiet woodland royalty expressed through tailoring, not extravagant armor.\nDesign relationship: the inspected Titania owner reference informs ONLY the rich green / warm bronze woodland palette and premium miniature-render cohort. Give Oberon a distinct masculine face, hair, silhouette and tailored costume. Do not copy Titania's face, floral dress, petal layers, wings, flowers or costume wholesale. The inspected Medusa quality reference informs ONLY crisp sculptural material definition, clear anatomy and high finish. Do not copy her identity, snakes, weapon, costume or camera angle.\nPose and hands: strict FRONT orthographic view. Face, shoulders, chest, pelvis and both boot toes square directly to the viewer, no body twist, no perspective or three-quarter view. Relaxed standing stance with feet comfortably apart. BOTH arms gently bent at the elbows and held clear of the torso, with visible charcoal background gaps around each arm and between the legs. Both bare hands fully visible and anatomically plausible. His OWN RIGHT hand (on the viewer's LEFT) grips ONE short solid unbranched wooden staff lowered beside his right thigh. Entire staff visible, about forearm-to-shin length, not a full-height pole, no glowing or floating parts. His OWN LEFT hand (viewer RIGHT) is empty, gently open, fingers visible and clearly separated from the coat and body. No crossed hands.\nComposition/framing: portrait canvas. Complete crown, hair, head, both hands, entire staff, coat, trousers, both boots and entire pedestal all in frame. Crown highest point at 6% of image height, leave a clear 6% top margin. The entire two-disc pedestal's bottom edge is at exactly 90% of image height, leaving 10% plain charcoal below. Plenty of side space. One single round dark stone pedestal built as exactly TWO stacked discs. Camera is exactly level and pedestal is exactly EDGE-ON: two straight horizontal front stone bands and rounded lateral edges; NO visible upper surface, NO ellipse or oval top, NO exposed top plane. Do not tilt camera downward. Boots meet the top horizontal edge.\nStyle/medium: highly finished collectible fantasy figure design render, crisp sculpted face, realistic brocade weave, restrained bronze embroidery, believable cloth folds, dark leather boots, matte dark stone. Soft neutral studio key and gentle fill reveal details without dramatic effects.\nConstraints: original adult humanoid design; no recognizable actor, existing franchise art or copied key art. No wings, antlers, floating leaves, magic, aura, glow, particles, VFX, action scene, ground scene, extra characters, animals, extra weapons, text, logos, labels, border, watermark or UI. Do not imitate cropping, magic effects or pedestal perspective from either quality reference.",
+      "tool_arguments": {
+        "prompt": "Use case: stylized-concept\nAsset type: ORIGINAL adult humanoid FRONT DESIGN REFERENCE, source-only proposal for Oberon, Titania's sidekick. Create ONE image of ONE character.\nScene/backdrop: plain uniform charcoal background, no environment, no floor scene, no props beyond the single staff and the specified pedestal.\nSubject: an original adult male fae king, clearly mature about 40, tall slender humanlike anatomy, handsome angular masculine face with composed expression, long dark hair with silver streaks, subtly pointed ears. A simple low twig-like bronze crown, small and fully in frame; it must not resemble antlers. Forest-green layered brocade coat with restrained bronze leaf embroidery and a fitted waist, knee-length divided coat tails, fitted brown trousers and brown boots. Quiet woodland royalty expressed through tailoring, not extravagant armor.\nDesign relationship: the inspected Titania owner reference informs ONLY the rich green / warm bronze woodland palette and premium miniature-render cohort. Give Oberon a distinct masculine face, hair, silhouette and tailored costume. Do not copy Titania's face, floral dress, petal layers, wings, flowers or costume wholesale. The inspected Medusa quality reference informs ONLY crisp sculptural material definition, clear anatomy and high finish. Do not copy her identity, snakes, weapon, costume or camera angle.\nPose and hands: strict FRONT orthographic view. Face, shoulders, chest, pelvis and both boot toes square directly to the viewer, no body twist, no perspective or three-quarter view. Relaxed standing stance with feet comfortably apart. BOTH arms gently bent at the elbows and held clear of the torso, with visible charcoal background gaps around each arm and between the legs. Both bare hands fully visible and anatomically plausible. His OWN RIGHT hand (on the viewer's LEFT) grips ONE short solid unbranched wooden staff lowered beside his right thigh. Entire staff visible, about forearm-to-shin length, not a full-height pole, no glowing or floating parts. His OWN LEFT hand (viewer RIGHT) is empty, gently open, fingers visible and clearly separated from the coat and body. No crossed hands.\nComposition/framing: portrait canvas. Complete crown, hair, head, both hands, entire staff, coat, trousers, both boots and entire pedestal all in frame. Crown highest point at 6% of image height, leave a clear 6% top margin. The entire two-disc pedestal's bottom edge is at exactly 90% of image height, leaving 10% plain charcoal below. Plenty of side space. One single round dark stone pedestal built as exactly TWO stacked discs. Camera is exactly level and pedestal is exactly EDGE-ON: two straight horizontal front stone bands and rounded lateral edges; NO visible upper surface, NO ellipse or oval top, NO exposed top plane. Do not tilt camera downward. Boots meet the top horizontal edge.\nStyle/medium: highly finished collectible fantasy figure design render, crisp sculpted face, realistic brocade weave, restrained bronze embroidery, believable cloth folds, dark leather boots, matte dark stone. Soft neutral studio key and gentle fill reveal details without dramatic effects.\nConstraints: original adult humanoid design; no recognizable actor, existing franchise art or copied key art. No wings, antlers, floating leaves, magic, aura, glow, particles, VFX, action scene, ground scene, extra characters, animals, extra weapons, text, logos, labels, border, watermark or UI. Do not imitate cropping, magic effects or pedestal perspective from either quality reference.",
+        "transparent_background": false
+      },
+      "tool_original": {
+        "path": "C:/Users/ren/.codex/generated_images/01a13e40-95e2-7311-a38a-72467f29649c/exec-c9c9e3a4-48ce-4abe-b022-1576586436c2.png",
+        "sha256": "b0e3509a4f5a8256f518b76187030704fccf4090da57c05a32afde36c43236e7",
+        "bytes": 1788101,
+        "width": 1024,
+        "height": 1536,
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "saved_result": {
+        "path": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/attempt-01.png",
+        "sha256": "b0e3509a4f5a8256f518b76187030704fccf4090da57c05a32afde36c43236e7",
+        "bytes": 1788101,
+        "width": 1024,
+        "height": 1536,
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "byte_identical_original_and_saved_result": true,
+      "postprocessing": "None: byte-for-byte filesystem copy only.",
+      "selected": false,
+      "framing_measurement": {
+        "file": "attempt-01.png",
+        "method": "For each row, RGB background median of outer 120-pixel strips; within columns 180..849 require at least 3 pixels with max-channel difference >30. Approximate silhouette bounds, not a certified segmentation.",
+        "top_y_px": 48,
+        "bottom_y_px": 1353,
+        "height_px": 1536,
+        "top_pct": 3.125,
+        "bottom_pct": 88.086,
+        "requested_top_pct": 6,
+        "requested_bottom_pct": 90
+      }
+    },
+    {
+      "attempt": 2,
+      "intent": "edit",
+      "tool": "image_gen.imagegen",
+      "tool_metadata_file": "tool-attempt-02.json",
+      "tool_model": "Not exposed by built-in tool; no model identity inferred.",
+      "started": {
+        "current_time": "2026-10-15 06:32:09 UTC"
+      },
+      "finished": {
+        "current_time": "2026-10-15 06:32:41 UTC"
+      },
+      "prompt_file": "prompt-attempt-02.txt",
+      "exact_prompt": "Use case: precise-object-edit\nAsset type: ORIGINAL Oberon FRONT DESIGN REFERENCE; proposed/source-only.\nEdit the supplied Oberon image with ONE targeted change: correct only the full-asset framing. The actual first image has the crown highest point around 3% from the top and the pedestal bottom around 88%, which fail the requested positions.\nKeep the output canvas 1024 x 1536. Uniformly reposition and, only as needed, minimally rescale the COMPLETE figure plus pedestal together so the highest crown point is at y=92 (6% down from the top), and the lowest pedestal edge is at y=1382 (90% down from the top). This leaves 6% clear charcoal above the crown and 10% below the pedestal. Keep the complete staff, both hands, boots and both pedestal discs in frame. Keep the group centered horizontally. Do not enlarge the head or crop anything.\nPreserve the same original adult male fae king identity, face, dark silver-streaked hair, low twig crown, forest-green brocade coat, bronze leaf embroidery, brown trousers and boots, relaxed gently bent arms, clear charcoal gaps, visible bare hands, single short solid lowered staff in his OWN RIGHT hand on viewer LEFT, and empty visible left hand on viewer RIGHT. Preserve strict FRONT orthographic alignment, plain charcoal background, soft neutral studio lighting and crisp miniature-render quality. Preserve ONE round dark two-disc stone pedestal exactly edge-on, two straight horizontal stone bands, no visible top plane or oval top. No extra props, wings, antlers, magic, VFX, scene, text or UI. Change only the framing, preserve the design and anatomical details.",
+      "tool_arguments": {
+        "prompt": "Use case: precise-object-edit\nAsset type: ORIGINAL Oberon FRONT DESIGN REFERENCE; proposed/source-only.\nEdit the supplied Oberon image with ONE targeted change: correct only the full-asset framing. The actual first image has the crown highest point around 3% from the top and the pedestal bottom around 88%, which fail the requested positions.\nKeep the output canvas 1024 x 1536. Uniformly reposition and, only as needed, minimally rescale the COMPLETE figure plus pedestal together so the highest crown point is at y=92 (6% down from the top), and the lowest pedestal edge is at y=1382 (90% down from the top). This leaves 6% clear charcoal above the crown and 10% below the pedestal. Keep the complete staff, both hands, boots and both pedestal discs in frame. Keep the group centered horizontally. Do not enlarge the head or crop anything.\nPreserve the same original adult male fae king identity, face, dark silver-streaked hair, low twig crown, forest-green brocade coat, bronze leaf embroidery, brown trousers and boots, relaxed gently bent arms, clear charcoal gaps, visible bare hands, single short solid lowered staff in his OWN RIGHT hand on viewer LEFT, and empty visible left hand on viewer RIGHT. Preserve strict FRONT orthographic alignment, plain charcoal background, soft neutral studio lighting and crisp miniature-render quality. Preserve ONE round dark two-disc stone pedestal exactly edge-on, two straight horizontal stone bands, no visible top plane or oval top. No extra props, wings, antlers, magic, VFX, scene, text or UI. Change only the framing, preserve the design and anatomical details.",
+        "referenced_image_paths": [
+          "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/limit-burst-20261015/helpers-wave6/oberon/attempt-01.png"
+        ],
+        "transparent_background": false
+      },
+      "tool_original": {
+        "path": "C:/Users/ren/.codex/generated_images/01a13e40-95e2-7311-a38a-72467f29649c/exec-5b22f876-410d-4282-b384-a0c0ef99eef7.png",
+        "sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
+        "bytes": 1837674,
+        "width": 1024,
+        "height": 1536,
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "saved_result": {
+        "path": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon/attempt-02.png",
+        "sha256": "b7274384401ead5234a16e8ef0387906824fa4dafb96bb9064aec0c76401445c",
+        "bytes": 1837674,
+        "width": 1024,
+        "height": 1536,
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "byte_identical_original_and_saved_result": true,
+      "postprocessing": "None: byte-for-byte filesystem copy only.",
+      "selected": true,
+      "framing_measurement": {
+        "file": "attempt-02.png",
+        "method": "For each row, RGB background median of outer 120-pixel strips; within columns 180..849 require at least 3 pixels with max-channel difference >30. Approximate silhouette bounds, not a certified segmentation.",
+        "top_y_px": 100,
+        "bottom_y_px": 1334,
+        "height_px": 1536,
+        "top_pct": 6.51,
+        "bottom_pct": 86.849,
+        "requested_top_pct": 6,
+        "requested_bottom_pct": 90
+      }
+    }
+  ],
+  "generation_policy": {
+    "purchases": false,
+    "external_generation_fallback": false,
+    "commercial_scans": false,
+    "actor_likeness_requested": false,
+    "franchise_key_art_copying_requested": false,
+    "formal_acceptance_claimed": false,
+    "game_ready_claimed": false,
+    "stage0_registration": false,
+    "owner_acceptance_inherited": false
+  },
+  "independent_review": "Pending; root coordinates independent review."
+}

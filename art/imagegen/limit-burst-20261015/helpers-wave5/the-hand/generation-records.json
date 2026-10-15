@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "task_id": "AN-153",
+  "subject": "The Hand",
+  "content_key": "the-hand",
+  "owner": "Elektra",
+  "status": "proposed/source-only",
+  "formal_acceptance": false,
+  "game_ready": false,
+  "stage0_registration": false,
+  "execution": {
+    "tool": "image_gen.imagegen",
+    "mode": "built-in",
+    "generation_calls": 1,
+    "correction_calls": 1,
+    "total_calls": 2,
+    "external_fallback": false,
+    "purchases": false,
+    "model": "Not exposed by the built-in tool; not inferred.",
+    "image_postprocessing": "None: file copies only; no crop, resize, repaint or re-encoding."
+  },
+  "reference_handling": {
+    "references_opened_with_view_image_before_first_call": true,
+    "initial_call_reference_parameters": "Neither referenced_image_paths nor num_last_images_to_include supplied for the brand-new generation. References were inspected in conversation and used to author quality/cohort/palette constraints.",
+    "owner_role": "Quality/cohort/palette only; distinct masked male troop identity and costume.",
+    "medusa_role": "Rendering/material/anatomy quality only.",
+    "inputs": [
+      {
+        "path": "art/imagegen/limit-burst-20261015/helpers-wave5/owner-evidence.json",
+        "sha256": "c57a5d4b42b3fa613ec998781551d8e596ea62e9a20c50cce58834395180237b",
+        "bytes": 11819
+      },
+      {
+        "path": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+        "sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6",
+        "bytes": 590404,
+        "dimensions": [
+          896,
+          1152
+        ],
+        "mode": "RGB"
+      },
+      {
+        "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+        "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+        "bytes": 2034907,
+        "dimensions": [
+          1021,
+          1540
+        ],
+        "mode": "RGB"
+      },
+      {
+        "path": "scraped-data/api/heroes/elektra.json",
+        "sha256": "d296df22a687d9a82e77834b8c068de48565190de4bedd80bc5a7516c99faf7b",
+        "bytes": 18563
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "kind": "new generation",
+      "selected": false,
+      "started_utc": "2026-10-15T06:22:48.009Z",
+      "completed_utc": "2026-10-15T06:23:21.030Z",
+      "prompt_file": "prompts/attempt-01.txt",
+      "prompt_exact": "Use case: stylized-concept.\nAsset type: one ORIGINAL adult humanoid FRONT DESIGN REFERENCE, source-only, for one representative of a four-person support group. Create exactly one figure in one portrait image, preferably 1024 x 1536.\n\nScene/backdrop: uniform plain charcoal studio background, no environment, ground plane, cast ground shadow, fog or vignette. A single round dark stone pedestal made of exactly TWO stacked shallow stone discs. The pedestal is seen exactly edge-on: its upper and lower boundaries are horizontal, NO visible top surface or ellipse, no third tier, no rubble or surrounding scenery.\n\nSubject: an original adult male masked stealth swordsman, approximately 30 years old, believable athletic human proportions. A sober, anonymous troop member with visible natural eyes and brow, a close-fitting charcoal cloth coif and lower-face cloth mask. Entire headgear included. Charcoal layered cloth wraps across a fitted tunic, restrained narrow crimson waist sash with short tucked ends, fitted cloth trousers, flexible dark boots, separated wrapped forearms. The costume is practical cloth, with readable seams, weave, soft fold transitions and discreet weathering. No ornate armor. This is an original design rather than a copy of a published character, actor or franchise costume.\n\nPose and hands: STRICT FRONT orthographic elevation, perfectly frontal head, chest, pelvis, knees and feet, no three-quarter turn, no perspective foreshortening, no looking down at the figure. Relaxed standing stance, both arms gently bent at the elbows and slightly separated from the torso; clear background gaps between each forearm and body and between the legs. Both hands fully visible, anatomically coherent human fingers. His anatomical RIGHT hand (on the LEFT side of the image) holds exactly ONE short straight sword in a conventional secure grip. The sword is lowered diagonally down and outward to image-left, completely clear of the thigh and boot. Show an unmistakable separate wrist, wrapped grip, modest guard and steel blade, with no blade emerging from the wrist or blending with fingers. His anatomical LEFT hand (on the RIGHT side of the image) is EMPTY, open and relaxed, fingers gently curved and legible, separated from the sash and thigh. No other weapons, scabbards, blades or equipment.\n\nComposition/framing: centered full figure from entire coif to boot soles and complete pedestal, generous lateral margins including the sword tip. Highest point of headgear at 6% of image height, pedestal bottom edge at exactly 90% of image height, leaving 10% plain background below it. Never crop hands, headgear, feet, sword or pedestal. Keep the framing frontal and technically legible rather than cinematic. Stand both feet solidly on the pedestal while showing only its edge-on side faces; no exposed top plane.\n\nStyle/medium and reference roles: premium stylized realistic sculptural game-character concept render, crisp silhouette, believable detailed cloth and steel, controlled neutral studio lighting that makes charcoal layers readable. The inspected Elektra project reference is ONLY a quality/cohort and charcoal/crimson palette guide: do NOT copy her identity, face, red outfit, long sash, headband or paired weapons. The inspected Medusa quality reference is ONLY a rendering/material/anatomy benchmark: do NOT copy snakes, bow, jewelry, drapery, identity, perspective, pose or pedestal. Follow THIS front-reference composition over either reference's framing.\n\nConstraints: one adult original humanoid, one short sword in his own RIGHT hand only, left hand empty, exactly two pedestal discs, strict FRONT orthographic, clean limb gaps, visible hands, plain charcoal background. No magic, particles, glow, smoke, blood, action effects, VFX, scene, text, captions, watermark, logos, franchise insignia, UI, extra figure or alternate view. This is one representative source design, not four variants or a game-ready asset.\n",
+      "arguments": {
+        "prompt": "Use case: stylized-concept.\nAsset type: one ORIGINAL adult humanoid FRONT DESIGN REFERENCE, source-only, for one representative of a four-person support group. Create exactly one figure in one portrait image, preferably 1024 x 1536.\n\nScene/backdrop: uniform plain charcoal studio background, no environment, ground plane, cast ground shadow, fog or vignette. A single round dark stone pedestal made of exactly TWO stacked shallow stone discs. The pedestal is seen exactly edge-on: its upper and lower boundaries are horizontal, NO visible top surface or ellipse, no third tier, no rubble or surrounding scenery.\n\nSubject: an original adult male masked stealth swordsman, approximately 30 years old, believable athletic human proportions. A sober, anonymous troop member with visible natural eyes and brow, a close-fitting charcoal cloth coif and lower-face cloth mask. Entire headgear included. Charcoal layered cloth wraps across a fitted tunic, restrained narrow crimson waist sash with short tucked ends, fitted cloth trousers, flexible dark boots, separated wrapped forearms. The costume is practical cloth, with readable seams, weave, soft fold transitions and discreet weathering. No ornate armor. This is an original design rather than a copy of a published character, actor or franchise costume.\n\nPose and hands: STRICT FRONT orthographic elevation, perfectly frontal head, chest, pelvis, knees and feet, no three-quarter turn, no perspective foreshortening, no looking down at the figure. Relaxed standing stance, both arms gently bent at the elbows and slightly separated from the torso; clear background gaps between each forearm and body and between the legs. Both hands fully visible, anatomically coherent human fingers. His anatomical RIGHT hand (on the LEFT side of the image) holds exactly ONE short straight sword in a conventional secure grip. The sword is lowered diagonally down and outward to image-left, completely clear of the thigh and boot. Show an unmistakable separate wrist, wrapped grip, modest guard and steel blade, with no blade emerging from the wrist or blending with fingers. His anatomical LEFT hand (on the RIGHT side of the image) is EMPTY, open and relaxed, fingers gently curved and legible, separated from the sash and thigh. No other weapons, scabbards, blades or equipment.\n\nComposition/framing: centered full figure from entire coif to boot soles and complete pedestal, generous lateral margins including the sword tip. Highest point of headgear at 6% of image height, pedestal bottom edge at exactly 90% of image height, leaving 10% plain background below it. Never crop hands, headgear, feet, sword or pedestal. Keep the framing frontal and technically legible rather than cinematic. Stand both feet solidly on the pedestal while showing only its edge-on side faces; no exposed top plane.\n\nStyle/medium and reference roles: premium stylized realistic sculptural game-character concept render, crisp silhouette, believable detailed cloth and steel, controlled neutral studio lighting that makes charcoal layers readable. The inspected Elektra project reference is ONLY a quality/cohort and charcoal/crimson palette guide: do NOT copy her identity, face, red outfit, long sash, headband or paired weapons. The inspected Medusa quality reference is ONLY a rendering/material/anatomy benchmark: do NOT copy snakes, bow, jewelry, drapery, identity, perspective, pose or pedestal. Follow THIS front-reference composition over either reference's framing.\n\nConstraints: one adult original humanoid, one short sword in his own RIGHT hand only, left hand empty, exactly two pedestal discs, strict FRONT orthographic, clean limb gaps, visible hands, plain charcoal background. No magic, particles, glow, smoke, blood, action effects, VFX, scene, text, captions, watermark, logos, franchise insignia, UI, extra figure or alternate view. This is one representative source design, not four variants or a game-ready asset.\n",
+        "transparent_background": false
+      },
+      "tool_output_hint": "Generated images are saved to C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d as C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d\\exec-87c7c14a-a57d-4b02-8984-dcf766fff7bc.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "original": {
+        "path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d\\exec-87c7c14a-a57d-4b02-8984-dcf766fff7bc.png",
+        "sha256": "bd6434fe1e62774065382cbcc59e2ee1b82a25f8f727b2ec8db159b1fbb4501e",
+        "bytes": 1933242,
+        "dimensions": [
+          1024,
+          1536
+        ],
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "preserved_result": {
+        "path": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\limit-burst-20261015\\helpers-wave5\\the-hand\\attempts\\attempt-01.png",
+        "sha256": "bd6434fe1e62774065382cbcc59e2ee1b82a25f8f727b2ec8db159b1fbb4501e",
+        "bytes": 1933242,
+        "dimensions": [
+          1024,
+          1536
+        ],
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "byte_identical": true,
+      "review_file": "attempt-01-self-review.json",
+      "correction_trigger": "Actual framing: coif begins near y=59 rather than y=92; narrow pedestal top lip visible; base bottom near y=1393 rather than y=1382."
+    },
+    {
+      "attempt": 2,
+      "kind": "single targeted correction",
+      "selected": true,
+      "started_utc": "2026-10-15T06:24:14.315Z",
+      "completed_utc": "2026-10-15T06:24:39.090Z",
+      "prompt_file": "prompts/attempt-02-correction.txt",
+      "prompt_exact": "Use case: precise-object-edit.\nAsset type: correction of the attached original adult humanoid FRONT DESIGN REFERENCE, proposed/source-only. Produce one portrait 1024 x 1536 image.\n\nEdit the supplied image ONLY to correct its measured framing and pedestal camera projection. Preserve the SAME original adult male masked stealth swordsman, face and eyes, charcoal layered cloth tunic and wraps, restrained crimson sash, trousers, boots, pose, anatomy, visible hands, exact single sword held in his anatomical RIGHT hand on image-left, empty relaxed anatomical LEFT hand on image-right, materials and crisp rendering. Do not redesign the character or add any object.\n\nActual framing failure in the supplied image: the coif begins around pixel y=59 of 1536 (3.8% from the top), whereas the requirement is a 6% top margin. Reframe the complete existing figure and pedestal together so the highest point of the coif is at y=92 (6% of image height) and the lowest edge of the pedestal is at y=1382 (90% of image height). Leave 10% clean plain charcoal background below the pedestal. Keep all sword, hands, feet, coif and pedestal fully visible, with generous horizontal margins. No crop or head enlargement.\n\nKeep STRICT FRONT ORTHOGRAPHIC elevation, head, chest and pelvis facing straight at the viewer. Keep the clear background gaps around arms and between legs. Make the single round dark stone pedestal exactly TWO shallow stacked discs viewed EXACTLY EDGE-ON: two side faces only, level horizontal edges, absolutely NO visible upper surface, NO visible top ellipse, NO raised rear rim, no third tier. The supplied slight top lip must disappear. Boot soles meet the level pedestal edge.\n\nPlain uniform charcoal studio background without vignette, floor, cast ground shadow, environment, text, logos, UI, smoke or VFX. Preserve all identity and hand details while correcting only framing/projection. One figure, one sword, two pedestal discs. This remains one representative source design, not four variants or a game-ready asset.\n",
+      "arguments": {
+        "prompt": "Use case: precise-object-edit.\nAsset type: correction of the attached original adult humanoid FRONT DESIGN REFERENCE, proposed/source-only. Produce one portrait 1024 x 1536 image.\n\nEdit the supplied image ONLY to correct its measured framing and pedestal camera projection. Preserve the SAME original adult male masked stealth swordsman, face and eyes, charcoal layered cloth tunic and wraps, restrained crimson sash, trousers, boots, pose, anatomy, visible hands, exact single sword held in his anatomical RIGHT hand on image-left, empty relaxed anatomical LEFT hand on image-right, materials and crisp rendering. Do not redesign the character or add any object.\n\nActual framing failure in the supplied image: the coif begins around pixel y=59 of 1536 (3.8% from the top), whereas the requirement is a 6% top margin. Reframe the complete existing figure and pedestal together so the highest point of the coif is at y=92 (6% of image height) and the lowest edge of the pedestal is at y=1382 (90% of image height). Leave 10% clean plain charcoal background below the pedestal. Keep all sword, hands, feet, coif and pedestal fully visible, with generous horizontal margins. No crop or head enlargement.\n\nKeep STRICT FRONT ORTHOGRAPHIC elevation, head, chest and pelvis facing straight at the viewer. Keep the clear background gaps around arms and between legs. Make the single round dark stone pedestal exactly TWO shallow stacked discs viewed EXACTLY EDGE-ON: two side faces only, level horizontal edges, absolutely NO visible upper surface, NO visible top ellipse, NO raised rear rim, no third tier. The supplied slight top lip must disappear. Boot soles meet the level pedestal edge.\n\nPlain uniform charcoal studio background without vignette, floor, cast ground shadow, environment, text, logos, UI, smoke or VFX. Preserve all identity and hand details while correcting only framing/projection. One figure, one sword, two pedestal discs. This remains one representative source design, not four variants or a game-ready asset.\n",
+        "referenced_image_paths": [
+          "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/limit-burst-20261015/helpers-wave5/the-hand/attempts/attempt-01.png"
+        ],
+        "transparent_background": false
+      },
+      "tool_output_hint": "Generated images are saved to C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d as C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d\\exec-4f6af737-5ea7-4473-b217-6542bd77a8f4.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+      "original": {
+        "path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e38-e8df-7f90-983a-43543fe1f29d\\exec-4f6af737-5ea7-4473-b217-6542bd77a8f4.png",
+        "sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+        "bytes": 1801168,
+        "dimensions": [
+          1024,
+          1536
+        ],
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "preserved_result": {
+        "path": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\limit-burst-20261015\\helpers-wave5\\the-hand\\attempts\\attempt-02.png",
+        "sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+        "bytes": 1801168,
+        "dimensions": [
+          1024,
+          1536
+        ],
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "selected_result": {
+        "path": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\limit-burst-20261015\\helpers-wave5\\the-hand\\design-front.png",
+        "sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+        "bytes": 1801168,
+        "dimensions": [
+          1024,
+          1536
+        ],
+        "format": "PNG",
+        "mode": "RGB"
+      },
+      "byte_identical": true,
+      "review_file": "self-review.json",
+      "selection_reason": "Improved top margin and edge-on two-disc pedestal; retained visual identity and hand arrangement. Base-bottom placement regressed and remains an explicit failure; source selected for independent review, not accepted."
+    }
+  ],
+  "selected_design": "design-front.png",
+  "selected_sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+  "independent_review": {
+    "status": "pending",
+    "coordinator": "root",
+    "worker_review_only": true
+  },
+  "scope": {
+    "owned_folder": "art/imagegen/limit-burst-20261015/helpers-wave5/the-hand",
+    "git_touched": false,
+    "ledger_touched": false,
+    "registries_touched": false,
+    "code_touched": false,
+    "running_services_touched": false,
+    "agents_spawned": false
+  }
+}

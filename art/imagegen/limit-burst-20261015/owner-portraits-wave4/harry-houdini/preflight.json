@@ -1,0 +1,63 @@
+{
+  "checked_at_utc": "2026-10-15T06:16:22.854616+00:00",
+  "task": "CP-29",
+  "status": "source-candidate-only",
+  "reference_opened_with_view_image": true,
+  "reference": {
+    "path": "art/imagegen/concept-harry-houdini-codex/design/harry-houdini-front.png",
+    "sha256": "4575f2b099942b9358e31cf17d682c4a30ae7b8b213b0953fff0e91fcb03af14"
+  },
+  "accepted_1a": {
+    "card": "art/pipeline-candidates/ASSET-HARRY-HOUDINI-001/evidence/acceptance-concept/20261013-front-r2/card.json",
+    "card_sha256": "b21e29fb65b3a8eb5d23af26ea5004d5ac116dccc67b4b4d40fddd269352b89a",
+    "verdict": "pass",
+    "score": 8.8,
+    "hash_matches": true
+  },
+  "raw_roster": {
+    "path": "scraped-data/api/heroes/harry-houdini.json",
+    "sha256": "55a02fd4d667a84af9698ffc7f8dabba31c8883395e8e252136f50ba6cda995b",
+    "name": "Harry Houdini",
+    "key": "harry-houdini",
+    "raw_id": 30
+  },
+  "live_roster": {
+    "queried_direct_postgresql_read_only": true,
+    "row": {
+      "id": "cmq7d7az300l8wi74ysbd5lx7",
+      "name": "Harry Houdini",
+      "sidekicks": [
+        {
+          "name": "Bess",
+          "health": "5",
+          "movement": "2",
+          "attackType": "melee"
+        }
+      ]
+    },
+    "query": "SELECT row_to_json(t) FROM (SELECT id, name, sidekicks FROM \"Hero\" WHERE name='Harry Houdini') t;",
+    "runtime_portrait_key": "portrait:harry-houdini",
+    "key_note": "Raw key is canonical slug; live Hero model uses cuid ID and name, not a separate slug column. Runtime key is the requested portrait namespace, not an existing entry."
+  },
+  "focused_absence_lookup": {
+    "roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content"
+    ],
+    "matching_portrait_or_avatar_files": [],
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "requested_key_absent": true,
+    "scope": "Named source lookup only, not every image in the repository; raw avatars not opened or used.",
+    "rg_stderr": "rg: art/imagegen\\concept-elektra-codex\\tmp-metadata-check-asb509mx: РћС‚РєР°Р·Р°РЅРѕ РІ РґРѕСЃС‚СѓРїРµ. (os error 5)"
+  },
+  "crop": "full100; future centered circle diameter equals entire square side; no source crop or zoom"
+}

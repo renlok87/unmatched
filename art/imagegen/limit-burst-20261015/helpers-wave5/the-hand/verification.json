@@ -1,0 +1,132 @@
+{
+  "task_id": "AN-153",
+  "status": "proposed/source-only",
+  "verified_utc": "2026-10-15T06:26:25.110057+00:00",
+  "evidence_integrity": "pass",
+  "visual_requirements_all_met": false,
+  "formal_acceptance": false,
+  "game_ready": false,
+  "stage0_registration": false,
+  "independent_review": "pending; root coordinates",
+  "original_and_preserved_images": [
+    {
+      "attempt": 1,
+      "original_sha256": "bd6434fe1e62774065382cbcc59e2ee1b82a25f8f727b2ec8db159b1fbb4501e",
+      "preserved_sha256": "bd6434fe1e62774065382cbcc59e2ee1b82a25f8f727b2ec8db159b1fbb4501e",
+      "byte_identical": true,
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "decodes": true
+    },
+    {
+      "attempt": 2,
+      "original_sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+      "preserved_sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+      "byte_identical": true,
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "decodes": true
+    }
+  ],
+  "selected_design": {
+    "path": "design-front.png",
+    "sha256": "695c173eb1af9e437cd710580e94254df3b8cf047336fea10f7cae2f683f973a",
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "byte_identical_to_attempt": 2
+  },
+  "input_checks": [
+    {
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave5/owner-evidence.json",
+      "expected_sha256": "c57a5d4b42b3fa613ec998781551d8e596ea62e9a20c50cce58834395180237b",
+      "current_sha256": "c57a5d4b42b3fa613ec998781551d8e596ea62e9a20c50cce58834395180237b",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-elektra-codex/design/elektra-front.png",
+      "expected_sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6",
+      "current_sha256": "6c4578488f4db02ea9e6724c765fb01f4d3b3fc1ed66b263c13e1cafbde224c6",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "expected_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "current_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "scraped-data/api/heroes/elektra.json",
+      "expected_sha256": "d296df22a687d9a82e77834b8c068de48565190de4bedd80bc5a7516c99faf7b",
+      "current_sha256": "d296df22a687d9a82e77834b8c068de48565190de4bedd80bc5a7516c99faf7b",
+      "unchanged": true
+    }
+  ],
+  "prompt_checks": [
+    {
+      "attempt": 1,
+      "path": "prompts/attempt-01.txt",
+      "exact_text_matches_tool_argument": true,
+      "sha256": "731860bae817c67730ac020355808470a022dffcbf0b55bfed5efdbd0c80ac01"
+    },
+    {
+      "attempt": 2,
+      "path": "prompts/attempt-02-correction.txt",
+      "exact_text_matches_tool_argument": true,
+      "sha256": "d63dce6ea457d5b73af557b4c744d3f166dd2434c5a757bb75121e46fa91448a"
+    }
+  ],
+  "owner_stats_verified": {
+    "owner": "Elektra",
+    "helper": "The Hand",
+    "count": 4,
+    "per_instance": {
+      "health": 1,
+      "movement": 2,
+      "attack": "melee"
+    },
+    "flattened_nodes_2_data_owner_index": 1,
+    "helper_indices": [
+      11,
+      16,
+      17,
+      18
+    ]
+  },
+  "absence_check": {
+    "evidence_confirms_no_prior_same_helper_source": true,
+    "local_path_scan_found_same_source": false,
+    "scan_limitation": "One unrelated inaccessible tmp-metadata-check directory under concept-elektra-codex was reported by rg; no claim of exhaustive inspection inside that directory. Fresh owner-evidence records the earlier registry/alias/exact-path absence check."
+  },
+  "budget": {
+    "generation_calls": 1,
+    "correction_calls": 1,
+    "total_calls": 2,
+    "within_limit": true
+  },
+  "self_review_file": "self-review.json",
+  "unresolved_visual_failures": [
+    "Pedestal bottom at approximately 85.81%, not 90%.",
+    "Headgear margin approximately 6.25%, not exactly 6%.",
+    "Charcoal background has a subtle gradient/vignette; faint diffuse shading remains below base."
+  ],
+  "manifest": {
+    "path": "manifest-sha256.json",
+    "coverage": "All files recursively under assigned folder except manifest-sha256.json itself. Final verifier recomputes coverage and each hash."
+  },
+  "scope": {
+    "owned_folder": "art/imagegen/limit-burst-20261015/helpers-wave5/the-hand",
+    "git_touched": false,
+    "ledger_touched": false,
+    "registries_touched": false,
+    "code_touched": false,
+    "running_services_touched": false,
+    "agents_spawned": false
+  },
+  "process_lifecycle": "Only short-lived shell/Python commands used for read/copy/hash/metadata; no persistent process or service started."
+}

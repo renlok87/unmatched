@@ -1,0 +1,140 @@
+{
+  "task": "AN-153",
+  "subject": "ingen-worker",
+  "status": "proposed",
+  "scope": "source-only",
+  "checked_utc": "2026-10-15T06:22:39.444310+00:00",
+  "owner": "Robert Muldoon",
+  "evidence_row": {
+    "priority": "next",
+    "proposed_asset_id": "ASSET-INGEN-WORKER-001",
+    "content_key": "ingen-worker",
+    "game_name": "Ingen Worker",
+    "owner": "Robert Muldoon",
+    "owner_slug": "robert-muldoon",
+    "game_role": "sidekick",
+    "recommended_kind": "humanoid source reference",
+    "count": 3,
+    "health": 1,
+    "movement": 3,
+    "attack": "range",
+    "raw_path": "scraped-data/api/heroes/robert-muldoon.json",
+    "raw_sha256": "4054f52a0b2b6ec021e87b1b72eb91f6a4d7810129f1814703137d962eb1a2e8",
+    "raw_sidekicks": [
+      {
+        "move": "3",
+        "name": "Ingen Worker",
+        "attack": "range",
+        "startHealth": "1"
+      },
+      {
+        "move": "3",
+        "name": "Ingen Worker",
+        "attack": "range",
+        "startHealth": "1"
+      },
+      {
+        "move": "3",
+        "name": "Ingen Worker",
+        "attack": "range",
+        "startHealth": "1"
+      }
+    ],
+    "live_sidekicks": [
+      {
+        "name": "Ingen Worker",
+        "health": "1",
+        "movement": "3",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/dZH3X5Qyq3Fd_A5mRZpJl.webp",
+        "attackType": "range"
+      },
+      {
+        "name": "Ingen Worker",
+        "health": "1",
+        "movement": "3",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/EITgot4QniFNEL1Dw_l9p.webp",
+        "attackType": "range"
+      },
+      {
+        "name": "Ingen Worker",
+        "health": "1",
+        "movement": "3",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/wpBiKqADJ_d9bCeyXphQ_.webp",
+        "attackType": "range"
+      }
+    ],
+    "owner_reference": "art/imagegen/concept-robert-muldoon-codex/design/robert-muldoon-front.png",
+    "owner_reference_sha256": "b3bed1b981227bac38fc0306d3a2c59b21c992511907d425587ce310fb09c6c5",
+    "notes": "Raw/live contain three equal-stat instances with three distinct avatar URLs. One reference is representative, not evidence of three completed character variants."
+  },
+  "verified_raw_sidekicks": [
+    {
+      "move": "3",
+      "name": "Ingen Worker",
+      "attack": "range",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/dZH3X5Qyq3Fd_A5mRZpJl.webp",
+      "startHealth": "1"
+    },
+    {
+      "move": "3",
+      "name": "Ingen Worker",
+      "attack": "range",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/EITgot4QniFNEL1Dw_l9p.webp",
+      "startHealth": "1"
+    },
+    {
+      "move": "3",
+      "name": "Ingen Worker",
+      "attack": "range",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/wpBiKqADJ_d9bCeyXphQ_.webp",
+      "startHealth": "1"
+    }
+  ],
+  "inputs": [
+    {
+      "role": "owner_cohort_palette_quality",
+      "path": "art/imagegen/concept-robert-muldoon-codex/design/robert-muldoon-front.png",
+      "sha256": "b3bed1b981227bac38fc0306d3a2c59b21c992511907d425587ce310fb09c6c5",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "view_image_inspected_before_generation": true
+    },
+    {
+      "role": "raw_owner_stats",
+      "path": "scraped-data/api/heroes/robert-muldoon.json",
+      "sha256": "4054f52a0b2b6ec021e87b1b72eb91f6a4d7810129f1814703137d962eb1a2e8"
+    },
+    {
+      "role": "quality_only",
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "dimensions": [
+        1021,
+        1540
+      ],
+      "mode": "RGB",
+      "view_image_inspected_before_generation": true
+    },
+    {
+      "role": "owner_evidence",
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave5/owner-evidence.json",
+      "sha256": "c57a5d4b42b3fa613ec998781551d8e596ea62e9a20c50cce58834395180237b"
+    }
+  ],
+  "absence_check": {
+    "evidence_statement": "rg of root asset-card.yaml names/keys, hero-links aliases and exact helper concept/current wave paths found no produced references for these six names. Assigned wave4 helpers and all earlier waves excluded.",
+    "local_filename_path_scan_root": "art/imagegen",
+    "existing_ingen_paths_before_folder_creation": [],
+    "result": "No same-helper source found in readable paths; corroborated by provided owner-evidence check.",
+    "limitations": [
+      "Unrelated concept-elektra-codex/tmp-metadata-check-asb509mx temporary directory returned access denied; not inspected."
+    ],
+    "target_folder_preexisting": false
+  },
+  "reference_usage": "Quality/cohort/palette only; no identity or wholesale costume copy. References opened with view_image; this is new generation, not an edit.",
+  "live_query_note": "Live row is supplied in owner-evidence.json; this worker did not query running services. Raw flattened nodes[2].data resolved and verified locally.",
+  "three_variations_made": false
+}

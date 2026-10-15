@@ -1,0 +1,24 @@
+{
+  "id": "CP-30",
+  "asset_key": "rosencrantz",
+  "key": "portrait:hamlet:rosencrantz--guildenstern",
+  "normalizedAlias": "portrait:hamlet:rosencrantz-guildenstern",
+  "name": "Rosencrantz",
+  "actualSidekickName": "Rosencrantz & Guildenstern",
+  "owner": "Hamlet",
+  "ownerSlug": "hamlet",
+  "targetSize": 40,
+  "reference": "art/imagegen/concept-rosencrantz-codex/design/rosencrantz-front.png",
+  "date": "2026-10-15",
+  "status": "предложено",
+  "stage": "original-raster-source-candidate",
+  "heroLinkConfirmed": true,
+  "rosterEvidence": "Live /__art-hub/data heroLink plus raw heroes/hamlet.json indexed sidekicks",
+  "absenceEvidence": "No existing source-candidate portrait files for asset key found in art/; runtime media key absent in S08CardMedia.",
+  "consumer": "UmHudPanels::SidekickKey and UmPortrait::SlugOf -> UmCardMedia::FindPortrait; owner-based key preserves actual raw label.",
+  "limitations": [
+    "Runtime C++ SlugOf retains both spaces around removed ampersand => double hyphen; Python import slug would collapse to single hyphen. Alias/import normalization decision pending.",
+    "Canonical source shows one Rosencrantz; actual consumer data names the pair Rosencrantz & Guildenstern. This does not claim a complete pair portrait."
+  ],
+  "scope": "No runtime/import/key fixes, formal acceptance, git, ledger or shared registry edits."
+}

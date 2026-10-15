@@ -1,0 +1,69 @@
+{
+  "checked_at_utc": "2026-10-15T06:15:12.698850+00:00",
+  "task": "CP-29",
+  "status": "source-candidate-only",
+  "reference_opened_with_view_image": true,
+  "reference": {
+    "path": "art/imagegen/concept-blackbeard-codex/design/blackbeard-front.png",
+    "sha256": "05d18b22077fb04a8da587d5637bb0917c37d8042ac495aeca282caeed2d3197"
+  },
+  "accepted_1a": {
+    "card": "art/pipeline-candidates/ASSET-BLACKBEARD-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+    "card_sha256": "cc64d51e1751f7f2565622efaa886ca1637528f289566d6ce37d74d327ad823c",
+    "verdict": "pass",
+    "score": 9.4,
+    "hash_matches": true
+  },
+  "raw_roster": {
+    "path": "scraped-data/api/heroes/blackbeard.json",
+    "sha256": "7bdb8f9167ed2037d68a94a4a730723dada0aae14c02d3a918df92e036eae544",
+    "name": "Blackbeard",
+    "key": "blackbeard",
+    "raw_id": 62
+  },
+  "live_roster": {
+    "queried_direct_postgresql_read_only": true,
+    "row": {
+      "id": "cmq7d7anq006jwi749fshotgz",
+      "name": "Blackbeard",
+      "sidekicks": [
+        {
+          "name": "Seadog",
+          "health": "1",
+          "movement": "2",
+          "attackType": "melee"
+        },
+        {
+          "name": "Seadog",
+          "health": "1",
+          "movement": "2",
+          "attackType": "melee"
+        }
+      ]
+    },
+    "query": "SELECT row_to_json(t) FROM (SELECT id, name, sidekicks FROM \"Hero\" WHERE name='Blackbeard') t;",
+    "runtime_portrait_key": "portrait:blackbeard",
+    "key_note": "Raw key is canonical slug; live Hero model uses cuid ID and name, not a separate slug column. Runtime key is the requested portrait namespace, not an existing entry."
+  },
+  "focused_absence_lookup": {
+    "roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content"
+    ],
+    "matching_portrait_or_avatar_files": [],
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "requested_key_absent": true,
+    "scope": "Named source lookup only, not every image in the repository; raw avatars not opened or used.",
+    "rg_stderr": "rg: art/imagegen\\concept-elektra-codex\\tmp-metadata-check-asb509mx: РћС‚РєР°Р·Р°РЅРѕ РІ РґРѕСЃС‚СѓРїРµ. (os error 5)"
+  },
+  "crop": "full100; future centered circle diameter equals entire square side; no source crop or zoom"
+}

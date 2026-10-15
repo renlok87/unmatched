@@ -1,0 +1,47 @@
+$OutputEncoding = [Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+$env:PYTHONIOENCODING='utf-8'
+$argsForCodex = @(
+'exec',
+'--ignore-user-config',
+'-m',
+'gpt-6.1-sol',
+'-c',
+'model_reasoning_effort="xhigh"',
+'-c',
+'windows.sandbox="unelevated"',
+'-s',
+'read-only',
+'-C',
+'C:\Users\ren\WebstormProjects\unmached\unmached',
+'--skip-git-repo-check',
+'--output-schema',
+'C:\Users\ren\WebstormProjects\unmached\unmached\tools\art\acceptance\asset-acceptance-2.output-concept.schema.json',
+'-o',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\evidence\acceptance-concept\20261015-sheet-r1\card.json',
+'--json',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\concept-sherlock-holmes-codex\sherlock-holmes-front.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\concept-sherlock-holmes-codex\sherlock-holmes-side.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\concept-sherlock-holmes-codex\sherlock-holmes-back.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\concept-sherlock-holmes-codex\sheet-sherlock-holmes.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\concept-sherlock-holmes-codex\design\sherlock-holmes-front.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\20261015-draft-tripo\orthos\ortho_back.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\20261015-draft-tripo\orthos\ortho_front.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\20261015-draft-tripo\orthos\ortho_left.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\20261015-draft-tripo\orthos\ortho_right.png',
+'-i',
+'C:\Users\ren\WebstormProjects\unmached\unmached\art\imagegen\hero-quality-v1\reference\medusa-quality-reference.png',
+'--',
+'-'
+)
+Get-Content 'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\evidence\acceptance-concept\20261015-sheet-r1\acceptor-1-prompt.md' -Raw -Encoding UTF8 | & 'C:\Users\ren\AppData\Local\OpenAI\Codex\bin\9614f1d9b40d9c4f\codex.exe' @argsForCodex 2> 'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\evidence\acceptance-concept\20261015-sheet-r1\acceptor-1-stderr.txt' | Out-File -Encoding utf8 'C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-SHERLOCK-HOLMES-001\evidence\acceptance-concept\20261015-sheet-r1\acceptor-1-events.jsonl'
+exit $LASTEXITCODE

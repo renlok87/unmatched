@@ -1,0 +1,51 @@
+{
+  "query": "SELECT row_to_json(t) FROM (SELECT name, sidekicks FROM \"Hero\" ORDER BY name) t;",
+  "rows_total": 84,
+  "rows": [
+    {
+      "name": "Geralt of Rivia",
+      "sidekicks": [
+        {
+          "name": "Dandelion",
+          "health": "5",
+          "movement": "2",
+          "attackType": "range"
+        }
+      ]
+    },
+    {
+      "name": "Philippa",
+      "sidekicks": [
+        {
+          "name": "Dijkstra",
+          "health": "6",
+          "movement": "2",
+          "attackType": "melee"
+        }
+      ]
+    },
+    {
+      "name": "Spike",
+      "sidekicks": [
+        {
+          "name": "Drusilla",
+          "health": "7",
+          "movement": "2",
+          "attackType": "melee"
+        }
+      ]
+    },
+    {
+      "name": "Willow",
+      "sidekicks": [
+        {
+          "name": "Tara",
+          "health": "6",
+          "movement": "2",
+          "attackType": "range"
+        }
+      ]
+    }
+  ],
+  "queried_at_utc": "2026-10-15T06:27:35.196392+00:00"
+}

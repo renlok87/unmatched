@@ -1,0 +1,123 @@
+{
+  "task_id": "AN-152",
+  "verified_utc": "2026-10-15T06:20:33.377382+00:00",
+  "status": "proposed/source-only",
+  "verification_scope": "File integrity, owner/stat evidence, exact prompt persistence and worker visual self-review. Not formal art acceptance.",
+  "overall_visual_constraints": "partial; one known remaining framing failure",
+  "owner_stats_check": {
+    "pass": true,
+    "owner": "Black Widow",
+    "helper": {
+      "name": "Maria Hill",
+      "startHealth": "6",
+      "move": "2",
+      "attack": "range"
+    },
+    "count_from_evidence": 1,
+    "live_vs_raw_match_in_supplied_evidence": true,
+    "live_database_not_requeried_by_worker": true
+  },
+  "reference_integrity": [
+    {
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave4/owner-evidence.json",
+      "sha256": "635828f112fbef0e8acfbe30849a6888c0492833bda6199d9e013eb012d1a2e5",
+      "unchanged_since_preflight": true
+    },
+    {
+      "path": "scraped-data/api/heroes/black-widow.json",
+      "sha256": "5908bed681cd71f1e27f06bdf26c79b05703d70947cbea1acae023aadfa1e0ec",
+      "unchanged_since_preflight": true
+    },
+    {
+      "path": "art/imagegen/concept-black-widow-codex/design/black-widow-front.png",
+      "sha256": "21fd280abcacca3d2ebbc27b813b66e5a350a63158db43110e52a9497554b4f7",
+      "unchanged_since_preflight": true
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged_since_preflight": true
+    }
+  ],
+  "references_opened_before_generation": true,
+  "duplicate_check": {
+    "evidence_matching_production_png_or_card_paths": [],
+    "local_scan_file": "duplicate-scan.json",
+    "local_matches_excluding_own_folder": [],
+    "exhaustive": false,
+    "limitation": "Read error for unrelated art/imagegen/concept-elektra-codex/tmp-metadata-check-asb509mx."
+  },
+  "attempt_integrity": [
+    {
+      "attempt": 1,
+      "original_sha256": "cd70f5210a24f1616e14b3112f03d2bbd87de34238125f7c2e6dde0f63368bf2",
+      "preserved_sha256": "cd70f5210a24f1616e14b3112f03d2bbd87de34238125f7c2e6dde0f63368bf2",
+      "original_dimensions": [
+        1024,
+        1536
+      ],
+      "preserved_dimensions": [
+        1024,
+        1536
+      ],
+      "bytes_identical": true,
+      "exact_prompt_file_matches_request": true
+    },
+    {
+      "attempt": 2,
+      "original_sha256": "a0124444a3d61fee08a6cf8005446614ec543e9a97472ce5213cafaaed8c256d",
+      "preserved_sha256": "a0124444a3d61fee08a6cf8005446614ec543e9a97472ce5213cafaaed8c256d",
+      "original_dimensions": [
+        1024,
+        1536
+      ],
+      "preserved_dimensions": [
+        1024,
+        1536
+      ],
+      "bytes_identical": true,
+      "exact_prompt_file_matches_request": true
+    }
+  ],
+  "selected_integrity": {
+    "path": "design-front.png",
+    "sha256": "a0124444a3d61fee08a6cf8005446614ec543e9a97472ce5213cafaaed8c256d",
+    "bytes": 1682519,
+    "width": 1024,
+    "height": 1536,
+    "mode": "RGB",
+    "format": "PNG",
+    "byte_identical_to_attempt_02": true
+  },
+  "self_reviews": [
+    "attempts/attempt-01.self-review.json",
+    "attempts/attempt-02.self-review.json"
+  ],
+  "known_failures": [
+    {
+      "criterion": "base_bottom_at_90_percent",
+      "observed_y_px_approx": 1308,
+      "canvas_height": 1536,
+      "observed_percent_approx": 85.2,
+      "requested_percent": 90,
+      "status": "fail",
+      "consequence": "Approximately 14.8% charcoal below base rather than requested 10%; no further call or postprocessing permitted."
+    }
+  ],
+  "call_budget": {
+    "initial": 1,
+    "corrections": 1,
+    "additional_calls": 0
+  },
+  "stage0_registration": false,
+  "formal_acceptance": false,
+  "game_ready": false,
+  "independent_review": "Pending root-coordinated review.",
+  "ownership": {
+    "writes_limited_to": "art/imagegen/limit-burst-20261015/helpers-wave4/maria-hill/",
+    "git_ledger_registries_code_services_modified": false,
+    "subagents_spawned": 0,
+    "background_processes_started": 0
+  },
+  "manifest_policy": "manifest-sha256.json includes every local file except itself; inspect actual manifest verification command output for final digest check."
+}

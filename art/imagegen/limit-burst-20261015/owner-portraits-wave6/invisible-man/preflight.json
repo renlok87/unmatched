@@ -1,0 +1,67 @@
+{
+  "checked_at_utc": "2026-10-15T06:29:10.863161+00:00",
+  "task": "CP-32",
+  "status": "source-candidate-only",
+  "cp32_registration": {
+    "path": "art/imagegen/limit-burst-20261015/task-map-owner-wave6.json",
+    "sha256": "38ee28ba7f04cc375a811cd69f2229eadd465fde95af7b85e6ce828f3cfc44f0"
+  },
+  "reference_opened_with_view_image": true,
+  "source": {
+    "path": "art/imagegen/concept-invisible-man-codex/design/invisible-man-front.png",
+    "sha256": "de86108455a88092235ad0b029135cbe106af89720a74a32ac27c3fc3ee5affa",
+    "dimensions": [
+      1086,
+      1448
+    ]
+  },
+  "acceptance": {
+    "path": "art/pipeline-candidates/ASSET-INVISIBLE-MAN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+    "sha256": "df30a4f3c68ce38ba6aa55d997506dc9fbefe4c238159f538103aaf59b8e6888",
+    "verdict": "pass",
+    "score": 9.4,
+    "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)",
+    "actual_status": "accepted by delegated concept acceptance; hash matches",
+    "accepted": true,
+    "useroverride": false,
+    "rejected": false,
+    "hash_matches": true,
+    "package_readme_and_verification_status": "предложено",
+    "registry_status": "proposed; planned",
+    "note": "Concept acceptance applies to source concept only, not this portrait or any later model stage."
+  },
+  "roster": {
+    "path": "scraped-data/api/heroes/invisible-man.json",
+    "sha256": "3c53757daa9a1ac4e5f533052d115e939f8770b54435f515d95c9911f5f4f77c",
+    "row": {
+      "id": 7,
+      "name": "Invisible Man",
+      "key": "invisible-man"
+    },
+    "method": "Resolve fetchedHero and key from repository raw roster data. No avatar image opened.",
+    "runtime_candidate_key": "portrait:invisible-man",
+    "runtime_key_exists": false
+  },
+  "focused_absence_lookup": {
+    "roots": [
+      "art/imagegen/limit-burst-20261015",
+      "art/cards-v1",
+      "unreal/Unmatched/Content"
+    ],
+    "matching_portrait_or_avatar_files": [],
+    "rg_exit_code": 0,
+    "rg_stderr": "",
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "requested_key_absent": true,
+    "scope": "Focused subject filename lookup in earlier limit-burst waves, cards-v1 and Content, plus exact runtime registry keys. Initial broad art/imagegen lookup found no match but could not read an unrelated Elektra temporary directory; not exhaustive visual deduplication."
+  },
+  "planned_review": "full100 centered circle [0.5,0.5,1.0] on entire square; native 40px and 80px; no zoom or crop of original."
+}

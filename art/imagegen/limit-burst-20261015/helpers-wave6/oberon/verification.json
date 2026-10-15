@@ -1,0 +1,130 @@
+{
+  "task_id": "AN-154",
+  "status": "proposed/source-only",
+  "checked_utc": "2026-10-15T06:34:34.999387+00:00",
+  "review_type": "Worker self-review plus hash/raw-data verification; not independent review or formal acceptance.",
+  "actual_failures": [
+    "Attempt 01: top 3.125%, bottom 88.086%; requested 6% / 90%.",
+    "Attempt 02 selected: exact top 6.510%, bottom 86.849%; requested 6% / 90%. Correction improved top clearance but did not resolve bottom placement."
+  ],
+  "checks": [
+    {
+      "criterion": "Owner and statistics",
+      "result": "verified",
+      "details": "Supplied evidence and independently decoded local raw nodes[2].data: Titania / Oberon, count 1, health 6, movement 2, melee. Evidence/raw/owner-image hashes matched before generation."
+    },
+    {
+      "criterion": "No existing same helper source",
+      "result": "supported_with_limitations",
+      "details": "Supplied root absence audit plus case-insensitive art filename/path scan found no Oberon source before folder creation. One unrelated Elektra temporary folder was unreadable. No semantic image similarity search was performed."
+    },
+    {
+      "criterion": "Original adult masculine fae identity",
+      "result": "self_review_pass",
+      "details": "Clearly mature male with angular face, dark silver-streaked hair, low twig crown, green tailored coat, brown trousers/boots. Distinct from owner identity and floral winged silhouette. No recognizable actor was requested or intentionally used; originality is not a legal clearance."
+    },
+    {
+      "criterion": "Full figure and headgear",
+      "result": "self_review_pass",
+      "details": "Crown, both hands, complete staff, boots and two-disc pedestal all visible without cropping."
+    },
+    {
+      "criterion": "Exact 6% top margin",
+      "result": "fail_exact_target",
+      "details": "Selected top approximately y=100/1536 = 6.510%; requested 6%. Minimum 6% clearance is present, exact target is missed."
+    },
+    {
+      "criterion": "Pedestal bottom at 90%",
+      "result": "fail",
+      "details": "Selected bottom approximately y=1334/1536 = 86.849%; requested 90%. About 13.15% empty space remains below."
+    },
+    {
+      "criterion": "Strict frontal orthographic appearance",
+      "result": "self_review_apparent_front",
+      "details": "Face, torso and pelvis face forward without visible body twist or foreshortening. Boot toes splay mildly outward. A camera projection cannot be mathematically certified from a generated raster."
+    },
+    {
+      "criterion": "Relaxed bent arms and limb gaps",
+      "result": "self_review_pass",
+      "details": "Elbows subtly flexed, both arms clear of torso, visible charcoal gaps on each side and between trousered legs. Pose is restrained rather than strongly bent."
+    },
+    {
+      "criterion": "Visible hands and staff side",
+      "result": "self_review_pass_with_limitations",
+      "details": "Own RIGHT hand at viewer LEFT visibly grips one lowered short solid staff; own LEFT hand at viewer RIGHT is empty and separated from coat. Hands look plausible at full-image inspection; curled gripping fingers partly occlude one another, not a certified anatomical digit reconstruction."
+    },
+    {
+      "criterion": "One round two-disc dark stone pedestal edge-on",
+      "result": "self_review_pass_with_limitation",
+      "details": "Exactly two stacked dark stone front bands, horizontal edge-on silhouette, no visible elliptical top surface. Circular footprint is specified in prompt but cannot be independently recovered from this edge-on raster."
+    },
+    {
+      "criterion": "Plain charcoal / no VFX / no scene / no text or UI",
+      "result": "self_review_pass",
+      "details": "Charcoal studio background with mild tonal falloff. No magic effects, wings, antlers, floating leaves, extra characters, scene, text or UI visible."
+    },
+    {
+      "criterion": "Source preservation",
+      "result": "verified",
+      "details": "Every original attempt copied without alteration. SHA256 and dimensions match tool-original files; selected file equals attempt 02 byte-for-byte."
+    }
+  ],
+  "framing_measurements": [
+    {
+      "file": "attempt-01.png",
+      "method": "For each row, RGB background median of outer 120-pixel strips; within columns 180..849 require at least 3 pixels with max-channel difference >30. Approximate silhouette bounds, not a certified segmentation.",
+      "top_y_px": 48,
+      "bottom_y_px": 1353,
+      "height_px": 1536,
+      "top_pct": 3.125,
+      "bottom_pct": 88.086,
+      "requested_top_pct": 6,
+      "requested_bottom_pct": 90
+    },
+    {
+      "file": "attempt-02.png",
+      "method": "For each row, RGB background median of outer 120-pixel strips; within columns 180..849 require at least 3 pixels with max-channel difference >30. Approximate silhouette bounds, not a certified segmentation.",
+      "top_y_px": 100,
+      "bottom_y_px": 1334,
+      "height_px": 1536,
+      "top_pct": 6.51,
+      "bottom_pct": 86.849,
+      "requested_top_pct": 6,
+      "requested_bottom_pct": 90
+    }
+  ],
+  "owner_raw_verification": {
+    "decoded_owner": "Titania",
+    "decoded_owner_key": "titania",
+    "decoded_sidekicks": [
+      {
+        "move": "2",
+        "name": "Oberon",
+        "attack": "melee",
+        "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/Yjiame4Tws6PmxbH4EYt7.webp",
+        "startHealth": "6"
+      }
+    ],
+    "count": 1,
+    "raw_sha256": "f2e163b8264605430f57bf3630b607cdf4ceb3ae643914635e5ad3d74f0b0774",
+    "expected_raw_sha256": "f2e163b8264605430f57bf3630b607cdf4ceb3ae643914635e5ad3d74f0b0774",
+    "owner_reference_sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c",
+    "expected_owner_reference_sha256": "4ac3ad11fb814d93035d46d524588a48692430894dc8ecba50fb784e151f561c"
+  },
+  "limitations": [
+    "Raster front reference only: no 3D mesh, rig, textures, scale proof, turnarounds or engine validation.",
+    "Framing remains outside exact requested targets after the single allowed correction; no further calls authorized.",
+    "Formal owner acceptance is not inherited.",
+    "Independent review is pending and coordinated by root."
+  ],
+  "scope": {
+    "only_authored_folder": "art/imagegen/limit-burst-20261015/helpers-wave6/oberon",
+    "git_ledger_registries_code_services_modified": false,
+    "agents_spawned": false,
+    "background_processes_started": false,
+    "process_cleanup": "Only synchronous Python/shell calls were started and exited; no persistent process to stop."
+  },
+  "accepted": false,
+  "game_ready": false,
+  "stage0_registered": false
+}

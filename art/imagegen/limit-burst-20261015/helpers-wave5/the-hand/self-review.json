@@ -1,0 +1,97 @@
+{
+  "task_id": "AN-153",
+  "status": "proposed/source-only",
+  "selected_attempt": 2,
+  "selected_design": "design-front.png",
+  "review_type": "worker self-review only; not formal acceptance",
+  "method": "Inspected complete built-in generated images and invoked view_image on preserved copies/selected file. Pillow pixel samples used only to estimate framing; no image editing.",
+  "criteria": [
+    {
+      "criterion": "One original adult masked humanoid representative",
+      "assessment": "visual_pass",
+      "evidence": "Single adult male, dark fitted coif and mask, natural eyes/brow; original generic stealth-troop design, no actor likeness request."
+    },
+    {
+      "criterion": "Distinct from owner identity and costume",
+      "assessment": "visual_pass",
+      "evidence": "Male masked cloth troop with subdued crimson waist accent, no red Elektra costume, long sash, headband, hair silhouette or paired weapons."
+    },
+    {
+      "criterion": "Strict front orthographic reference",
+      "assessment": "visual_pass_with_limitation",
+      "evidence": "Head/chest/pelvis read frontal and centered without obvious three-quarter body turn. Feet turn slightly outward in a relaxed stance. True mathematical camera projection cannot be certified from a generated raster."
+    },
+    {
+      "criterion": "Relaxed bent arms and limb gaps",
+      "assessment": "visual_pass",
+      "evidence": "Both elbows mildly bent, both arms separated from torso with background gaps; visible gap between legs."
+    },
+    {
+      "criterion": "Hands visible; one short sword in own RIGHT hand; own LEFT hand empty",
+      "assessment": "visual_pass_with_occlusion",
+      "evidence": "Viewer-left hand securely holds one lowered diagonal-outward sword; viewer-right hand empty with relaxed curved fingers. Wrist, guard and blade distinguishable; gripping fingers naturally occluded, so every digit cannot be independently counted."
+    },
+    {
+      "criterion": "Entire figure, headgear, sword and pedestal uncropped",
+      "assessment": "visual_pass",
+      "evidence": "Full coif, hands, blade tip, boots and both pedestal tiers remain inside frame."
+    },
+    {
+      "criterion": "Headgear top at 6%",
+      "assessment": "approximate_only",
+      "evidence": "Visual/pixel samples place top around y=96 of 1536 (6.25%); requested y=92.16 (6%).",
+      "observed_y_px_approx": 96,
+      "observed_percent_approx": 6.25,
+      "target_percent": 6
+    },
+    {
+      "criterion": "Pedestal bottom at 90%",
+      "assessment": "fail",
+      "evidence": "Correction placed the bottom around y=1318 of 1536 (85.81%), leaving about 14.19% below, instead of requested 10%.",
+      "observed_y_px_approx": 1318,
+      "observed_percent_approx": 85.81,
+      "target_y_px": 1382.4,
+      "target_percent": 90
+    },
+    {
+      "criterion": "Single dark two-disc stone pedestal edge-on, no visible top",
+      "assessment": "visual_pass_with_limitation",
+      "evidence": "Exactly two dark stone side faces and near-level horizontal boundaries; no appreciable exposed upper ellipse in corrected result. Round plan shape is intended but cannot be proven from an edge-on raster."
+    },
+    {
+      "criterion": "Plain charcoal background",
+      "assessment": "partial",
+      "evidence": "No scene or floor; background remains a subtle charcoal lighting gradient/vignette instead of perfectly uniform charcoal. Faint diffuse shading remains below base."
+    },
+    {
+      "criterion": "No extra weapons, VFX, scenery, text, UI or franchise insignia",
+      "assessment": "visual_pass",
+      "evidence": "One figure and one sword only; no visible lettering, logo, VFX, extra weapons or ground scene."
+    }
+  ],
+  "actual_remaining_failures": [
+    "Pedestal bottom at approximately 85.81%, not 90%.",
+    "Headgear margin approximately 6.25%, not exactly 6%.",
+    "Charcoal background has a subtle gradient/vignette; faint diffuse shading remains below base."
+  ],
+  "correction_effect": "Improved top margin and eliminated appreciable exposed pedestal top; base-bottom position regressed. No third call permitted.",
+  "call_budget": {
+    "initial": 1,
+    "correction": 1,
+    "total": 2,
+    "remaining": 0
+  },
+  "independent_review": "pending; root coordinates",
+  "representative_count": 1,
+  "confirmed_game_instances": 4,
+  "not_four_variants": true,
+  "formal_acceptance": false,
+  "stage0_registration": false,
+  "game_ready": false,
+  "limitations": [
+    "Single raster front design only; no back/side views, model, topology, rig, animation, textures, gameplay integration or game-scale testing.",
+    "Costume, mask, sword and palette placement are proposed art choices; only owner/count/stats are confirmed by raw/live evidence.",
+    "Visual originality is a design intent and no franchise key art, actor image, commercial scan or external generator was used.",
+    "The no-prior-source assertion relies on owner-evidence plus a local path scan; one unrelated inaccessible metadata directory was not exhaustively searched."
+  ]
+}

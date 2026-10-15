@@ -1,0 +1,108 @@
+{
+  "task_id": "AN-152",
+  "status": "proposed",
+  "scope": "source-only",
+  "registration": "User states task AN-152 is registered before calls; worker does not read or edit ledger.",
+  "evidence_shortlist_entry": {
+    "proposed_asset_id": "ASSET-SHURI-001",
+    "content_key": "shuri",
+    "game_name": "Shuri",
+    "game_role": "sidekick",
+    "recommended_anatomy": "humanoid",
+    "anatomy_note": "Original adult human reference interpretation proposed; source confirms owner/name/mechanics, not a detailed visual design.",
+    "owner": "Black Panther",
+    "owner_slug": "black-panther",
+    "count": 1,
+    "health": 6,
+    "movement": 2,
+    "attack": "range",
+    "live_sidekicks": [
+      {
+        "name": "Shuri",
+        "health": "6",
+        "movement": "2",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/sYUUC_eJ5vb8F7UhVEbaP.webp",
+        "attackType": "range"
+      }
+    ],
+    "raw_sidekicks": [
+      {
+        "move": "2",
+        "name": "Shuri",
+        "attack": "range",
+        "startHealth": "6"
+      }
+    ],
+    "raw_path": "scraped-data/api/heroes/black-panther.json",
+    "raw_sha256": "9d87b74c63036065c1e634c9f053533843ab7b65ad108512ac4c25dd8895bee4",
+    "owner_reference": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+    "owner_reference_sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+    "matching_production_png_or_card_paths": [],
+    "disposition": "eligible_missing_source_reference_only"
+  },
+  "raw_owner_name": "Black Panther",
+  "decoded_raw_sidekicks": [
+    {
+      "move": "2",
+      "name": "Shuri",
+      "attack": "range",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/sYUUC_eJ5vb8F7UhVEbaP.webp",
+      "startHealth": "6"
+    }
+  ],
+  "owner_and_statistics_verified": true,
+  "inputs": [
+    {
+      "role": "owner_raw",
+      "path": "scraped-data/api/heroes/black-panther.json",
+      "sha256": "9d87b74c63036065c1e634c9f053533843ab7b65ad108512ac4c25dd8895bee4",
+      "expected_sha256": "9d87b74c63036065c1e634c9f053533843ab7b65ad108512ac4c25dd8895bee4",
+      "hash_matches_evidence": true,
+      "viewed_with_view_image_before_generation": false
+    },
+    {
+      "role": "owner_reference",
+      "path": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+      "sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+      "expected_sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+      "hash_matches_evidence": true,
+      "viewed_with_view_image_before_generation": true,
+      "dimensions": [
+        896,
+        1152
+      ]
+    },
+    {
+      "role": "owner_evidence",
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave4/owner-evidence.json",
+      "sha256": "635828f112fbef0e8acfbe30849a6888c0492833bda6199d9e013eb012d1a2e5",
+      "expected_sha256": null,
+      "hash_matches_evidence": null,
+      "viewed_with_view_image_before_generation": false
+    },
+    {
+      "role": "quality_reference",
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "expected_sha256": null,
+      "hash_matches_evidence": null,
+      "viewed_with_view_image_before_generation": true,
+      "dimensions": [
+        1021,
+        1540
+      ]
+    }
+  ],
+  "same_helper_source_check": {
+    "evidence_matching_production_png_or_card_paths": [],
+    "current_rg_inventory_scopes": [
+      "art/imagegen",
+      "public"
+    ],
+    "matching_existing_paths": [],
+    "rg_exit_code": 2,
+    "unreadable_inventory_caveat": "rg: art/imagegen\\concept-elektra-codex\\tmp-metadata-check-asb509mx: Отказано в доступе. (os error 5)",
+    "conclusion": "No matching path found in readable inventory; evidence shortlist reports no existing production PNG/card path."
+  },
+  "reference_use": "Quality, cohort and palette only; original identity and costume. New generation, no edit target."
+}

@@ -1,0 +1,146 @@
+{
+  "task_id": "AN-154",
+  "subject": "Actor",
+  "owner": "Shakespeare",
+  "status": "proposed/source-only",
+  "asset_scope": "One original adult humanoid front reference representing one of the three Actor sidekicks. Three distinct live-avatar variations were not produced.",
+  "review_type": "Worker self-review only; root coordinates independent review.",
+  "formal_acceptance": false,
+  "game_ready": false,
+  "stage0_registration": false,
+  "all_exact_image_requirements_passed": false,
+  "owner_evidence_verified": true,
+  "raw_decoded_owner_helper_count": 3,
+  "verified_stats": {
+    "count": 3,
+    "health_each": 1,
+    "movement": 2,
+    "attack": "melee"
+  },
+  "owner_mapping": {
+    "raw_owner_key": "shakespeare",
+    "existing_owner_reference_key": "william-shakespeare"
+  },
+  "same_helper_source_absence": {
+    "scope": "art/imagegen path names matching actor, actors or shakespeare-actor; own assigned folder did not exist before this task",
+    "matches": [],
+    "limitation": "rg reported access denied in unrelated concept-elektra-codex/tmp-metadata-check-asb509mx; no exhaustive whole-repository absence claim"
+  },
+  "all_external_inputs_unchanged_by_hash": true,
+  "originals_and_saved_attempts_identical": true,
+  "selected": {
+    "attempt": 1,
+    "file": "design-front.png",
+    "sha256": "973137064a64480113e15b6123dda915f5cfac25f6d71de016db3ac6becd124f",
+    "bytes": 1759070,
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "format": "PNG",
+    "mode": "RGB",
+    "identical_to_saved_attempt": true,
+    "identical_to_tool_original": true
+  },
+  "references_opened_before_generation": [
+    "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+    "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+  ],
+  "reviewed_with_view_image": [
+    "attempt-01.png",
+    "attempt-02.png"
+  ],
+  "visual_checks": [
+    {
+      "criterion": "Original adult identity separated from Shakespeare owner",
+      "self_review": "pass",
+      "observations": "Full auburn curls, clean-shaven broad youthful face and practical amber doublet differ visibly from the bald-crowned bearded owner in an ornate dark costume."
+    },
+    {
+      "criterion": "Front view and complete silhouette",
+      "self_review": "visual pass; mathematical camera projection not provable from raster",
+      "observations": "Head, shoulders and torso face straight forward; whole cap, both hands, mask, shoes and base are inside the frame."
+    },
+    {
+      "criterion": "Relaxed bent arms and limb gaps",
+      "self_review": "pass",
+      "observations": "Gently bent low arms have visible charcoal separation from torso; legs are modestly separated."
+    },
+    {
+      "criterion": "Correct hand assignment and visible hands",
+      "self_review": "visual pass with anatomy limitation",
+      "observations": "Mask held in anatomical left hand at viewer right; anatomical right hand at viewer left is empty. Both hands visible with plausible relaxed/gripping silhouettes. Several fingers overlap naturally, so individual five-digit anatomy is not independently certified."
+    },
+    {
+      "criterion": "Theatre costume and palette",
+      "self_review": "pass",
+      "observations": "Muted amber doublet, burgundy hose and cap, cream small ruff and cuffs, dark soft leather shoes. No book/quill/cloak or owner costume duplication."
+    },
+    {
+      "criterion": "One dark two-disc pedestal exactly edge-on without visible top",
+      "self_review": "visual pass; depth not measurable from raster",
+      "observations": "Two straight dark stone bands separated by one seam. No readable ellipse or upper stone surface is visible. Round plan is a requested design property and cannot be established from this single edge-on front image."
+    },
+    {
+      "criterion": "Plain charcoal background; no text, UI, VFX or scene",
+      "self_review": "pass",
+      "observations": "Charcoal studio backdrop has mild generated tonal variation; no scenic objects, floor scene, typography, UI or effects visible."
+    },
+    {
+      "criterion": "Exact 6% top and 90% base margins",
+      "self_review": "fail",
+      "observations": "Both attempts miss the specified margins; see measured/inspected estimates."
+    }
+  ],
+  "framing_target": {
+    "cap_top_percent": 6,
+    "pedestal_bottom_percent": 90,
+    "canvas": [
+      1024,
+      1536
+    ]
+  },
+  "framing_measurement_method": "Cap top estimated by burgundy color threshold in upper central region; stone bottom estimated from visible lower edge and sampled adjacent pixel rows. Approximate measurements, not a validated segmentation mask.",
+  "attempt_framing": [
+    {
+      "attempt": 1,
+      "cap_top_px_approx": 34,
+      "cap_top_percent_approx": 2.214,
+      "pedestal_bottom_px_approx": 1397,
+      "pedestal_bottom_percent_approx": 90.951,
+      "actual_failures": [
+        "Top margin is about 2.2%, short of required 6%.",
+        "Pedestal bottom is about 91.0%, rather than specified 90%."
+      ],
+      "selected": true
+    },
+    {
+      "attempt": 2,
+      "cap_top_px_approx": 111,
+      "cap_top_percent_approx": 7.227,
+      "pedestal_bottom_px_approx": 1244,
+      "pedestal_bottom_percent_approx": 80.99,
+      "actual_failures": [
+        "Top margin is about 7.2%, rather than specified 6%.",
+        "Pedestal bottom is about 81.0%; correction overshrank/repositioned the group instead of keeping bottom at 90%.",
+        "Correction slightly rerendered face and costume rather than applying an exact geometric reframing."
+      ],
+      "selected": false
+    }
+  ],
+  "remaining_limitations": [
+    "Exact framing requirements remain unmet; selected image is a proposal requiring independent review and framing resolution.",
+    "Only one front raster; no side/back views, topology, rig, scale, engine import, animation or gameplay validation.",
+    "Original art intent and visible separation from owner assessed; no exhaustive likeness or copyright uniqueness certification.",
+    "No formal owner acceptance inherited; source existence/hashes and mechanics do not certify costume or equipment.",
+    "Absence search is scoped and reported one unrelated inaccessible folder. Root evidence supplies broader prior absence audit."
+  ],
+  "call_budget": {
+    "initial_calls": 1,
+    "correction_calls": 1,
+    "additional_calls_allowed_or_made": 0
+  },
+  "workspace_mutations": "Only files in assigned actor folder. No git, ledger, registries, code, services, purchases, external generation or agent spawning.",
+  "process_lifecycle": "Only foreground PowerShell/Python tooling; all returned exit 0 after the noted preflight decoder error was resolved. No persistent process or development service was started.",
+  "verified_utc": "2026-10-15T06:34:20.192752+00:00"
+}

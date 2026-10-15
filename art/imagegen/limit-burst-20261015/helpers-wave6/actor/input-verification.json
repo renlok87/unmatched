@@ -1,0 +1,151 @@
+{
+  "task_id": "AN-154",
+  "status": "proposed/source-only",
+  "evidence_entry": {
+    "proposed_asset_id": "ASSET-SHAKESPEARE-ACTOR-001",
+    "content_key": "shakespeare-actor",
+    "game_name": "Actor",
+    "game_role": "sidekick",
+    "recommended_anatomy": "humanoid original adult reference",
+    "owner": "Shakespeare",
+    "owner_slug": "shakespeare",
+    "raw_owner_key": "shakespeare",
+    "owner_existing_ref_key": "william-shakespeare",
+    "count": 3,
+    "health": 1,
+    "movement": 2,
+    "attack": "melee",
+    "live_sidekicks": [
+      {
+        "name": "Actor",
+        "health": "1",
+        "movement": "2",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/hbQ6WG0TcQ6VASLvqYwsv.webp",
+        "attackType": "melee"
+      },
+      {
+        "name": "Actor",
+        "health": "1",
+        "movement": "2",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/vhRJXLkRuEFX5yzUzr-3t.webp",
+        "attackType": "melee"
+      },
+      {
+        "name": "Actor",
+        "health": "1",
+        "movement": "2",
+        "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/PnnMfoBIJMYvJzq_7yFk8.webp",
+        "attackType": "melee"
+      }
+    ],
+    "raw_sidekicks": [
+      {
+        "move": "2",
+        "name": "Actor",
+        "attack": "melee",
+        "startHealth": "1"
+      },
+      {
+        "move": "2",
+        "name": "Actor",
+        "attack": "melee",
+        "startHealth": "1"
+      },
+      {
+        "move": "2",
+        "name": "Actor",
+        "attack": "melee",
+        "startHealth": "1"
+      }
+    ],
+    "raw_path": "scraped-data/api/heroes/shakespeare.json",
+    "raw_sha256": "b71d17d71c55501f6d55b09662fc94ab5035e78a02a135cfd165f7acd871b823",
+    "owner_reference": "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+    "owner_reference_sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f",
+    "owner_reference_acceptance_inherited": false,
+    "notes": [
+      "Raw/live establish name, owner and mechanics, not actor likeness, costume, exact anatomy, weapons or equipment. New design must remain an original proposed reference only.",
+      "Three same-stat Actor rows have distinct avatar URLs; one source design represents the group and is not proof of three distinct finished variants.",
+      "Raw owner key shakespeare differs from existing owner content/ref key william-shakespeare; preserve explicit mapping."
+    ]
+  },
+  "inputs": [
+    {
+      "role": "owner",
+      "path": "art/imagegen/concept-william-shakespeare-codex/design/william-shakespeare-front.png",
+      "sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f",
+      "bytes": 1764475,
+      "expected_sha256": "7fa862f1ee8292c64a131da0ebfbf137b6999ffb5807f18db268e1118c16a50f",
+      "matches_evidence": true,
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "mode": "RGB"
+    },
+    {
+      "role": "raw_owner",
+      "path": "scraped-data/api/heroes/shakespeare.json",
+      "sha256": "b71d17d71c55501f6d55b09662fc94ab5035e78a02a135cfd165f7acd871b823",
+      "bytes": 27738,
+      "expected_sha256": "b71d17d71c55501f6d55b09662fc94ab5035e78a02a135cfd165f7acd871b823",
+      "matches_evidence": true
+    },
+    {
+      "role": "owner_evidence",
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave6/owner-evidence.json",
+      "sha256": "114987eaa22c911f9ebd4618cd9cc18c78c124e812303f9a678becddb1666dc5",
+      "bytes": 8448,
+      "expected_sha256": null,
+      "matches_evidence": null
+    },
+    {
+      "role": "quality",
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "expected_sha256": null,
+      "matches_evidence": null,
+      "dimensions": [
+        1021,
+        1540
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "raw_decoded_actor_rows": [
+    {
+      "move": "2",
+      "name": "Actor",
+      "attack": "melee",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/hbQ6WG0TcQ6VASLvqYwsv.webp",
+      "startHealth": "1"
+    },
+    {
+      "move": "2",
+      "name": "Actor",
+      "attack": "melee",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/vhRJXLkRuEFX5yzUzr-3t.webp",
+      "startHealth": "1"
+    },
+    {
+      "move": "2",
+      "name": "Actor",
+      "attack": "melee",
+      "avatar": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/PnnMfoBIJMYvJzq_7yFk8.webp",
+      "startHealth": "1"
+    }
+  ],
+  "evidence_existing_source_absence_statement": "Focused root asset-card names, existing hero-link aliases and helper concept/current prior-wave source paths were checked. No exact helper source was found. Assigned earlier-wave helpers excluded. No source pixel or global registry mutation.",
+  "worker_source_search": {
+    "scope": "art/imagegen path names matching actor, actors or shakespeare-actor; own assigned folder did not exist before this task",
+    "matches": [],
+    "limitation": "rg reported access denied in unrelated concept-elektra-codex/tmp-metadata-check-asb509mx; no exhaustive whole-repository absence claim"
+  },
+  "references_opened_with_view_image_before_generation": true,
+  "stage0_registration_performed": false,
+  "formal_acceptance_inherited": false,
+  "preflight_notes": [
+    "Initial raw decoder incorrectly treated literal integers as references and raised IndexError before any generation; corrected decoder separates dereference from primitive hydration."
+  ]
+}

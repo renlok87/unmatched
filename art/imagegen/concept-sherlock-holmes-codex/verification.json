@@ -1,41 +1,39 @@
 {
-  "checks": [
-    {
-      "view": "design-front",
-      "generation": 1,
-      "exit_code": 0,
-      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json",
-      "stdout": "WARN view.frame_top         front    value=2.141 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json\n",
-      "stderr": ""
-    },
-    {
-      "view": "design-front",
-      "generation": 2,
-      "exit_code": 0,
-      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json",
-      "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json\n",
-      "stderr": ""
-    },
-    {
-      "view": "design-front",
-      "generation": 2,
-      "final": true,
-      "exit_code": 0,
-      "report": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
-      "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json\n",
-      "stderr": ""
-    }
-  ],
-  "date": "2026-10-13",
+  "date": "2026-10-15",
   "card_id": "ASSET-SHERLOCK-HOLMES-001",
-  "stage": "1a",
+  "stage": "1c",
+  "run_id": "2026-10-15-1c-concept-views",
   "status": "предложено",
   "source_unchanged": true,
   "sources": [
     {
-      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
-      "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
-      "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/orthos/ortho_front.png",
+      "sha256_before": "ed6053edbd78ec3d0032cee459f0045749c9a907aeb74d3ce32baa11aaa07b4a",
+      "sha256_after": "ed6053edbd78ec3d0032cee459f0045749c9a907aeb74d3ce32baa11aaa07b4a",
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/orthos/ortho_left.png",
+      "sha256_before": "7d5cc0b4da94a7ae08ab246f83b0b82725e2ea2fb284e85f04607b92226c1773",
+      "sha256_after": "7d5cc0b4da94a7ae08ab246f83b0b82725e2ea2fb284e85f04607b92226c1773",
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/orthos/ortho_back.png",
+      "sha256_before": "fd3e8d3f29f6fdd02595c07f659a434e52e125e1bbd1e3270b255d3e7231feaf",
+      "sha256_after": "fd3e8d3f29f6fdd02595c07f659a434e52e125e1bbd1e3270b255d3e7231feaf",
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/orthos/ortho-framing.json",
+      "sha256_before": "8e5c98b1699824c29228384f2ac7f5945f76e0bdeaf44b87c6f61160bca2cf6e",
+      "sha256_after": "8e5c98b1699824c29228384f2ac7f5945f76e0bdeaf44b87c6f61160bca2cf6e",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+      "sha256_before": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "sha256_after": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
       "unchanged": true
     },
     {
@@ -46,116 +44,309 @@
     }
   ],
   "outside_folder": [],
-  "outside_folder_scope": "Executor command writes; image_gen original copies are the explicitly required exception and are logged in generation-records.json.",
+  "outside_folder_scope": "Executor file writes only. Tool-owned original images under C:/Users/ren/.codex/generated_images/ are the task-required exception; all are logged and preserved. PYTHONDONTWRITEBYTECODE=1 used for concept checks.",
+  "checks": [
+    {
+      "view": "front",
+      "generation": 1,
+      "final": false,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/front-g1/checks-report.json",
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/front-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "side",
+      "generation": 1,
+      "final": false,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/side-g1/checks-report.json",
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/side-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "final": false,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks/back-g1/checks-report.json",
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/back-g1/checks-report.json\n",
+      "stderr": ""
+    },
+    {
+      "view": "front,side,back",
+      "generation": {
+        "front": 1,
+        "side": 1,
+        "back": 1
+      },
+      "final": true,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-sherlock-holmes-codex/checks-report.json",
+      "stdout": "PASS: PASS 33 WARN 0 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks-report.json, art/imagegen/concept-sherlock-holmes-codex/sheet-sherlock-holmes.png\n",
+      "stderr": ""
+    }
+  ],
   "checklist": [
     {
-      "view": "design-front",
-      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "view": "front",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
       "passed": true,
-      "note": "Одна фигура и одна двухъярусная подставка; текста, знаков, коллажа и дополнительных видов нет."
+      "note": "Strict frontal level view; one figure and pedestal; no text, collage or watermark."
     },
     {
-      "view": "design-front",
-      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "view": "front",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
       "passed": true,
-      "note": "Лицо и корпус направлены прямо на зрителя. Подставка показана с ребра: края горизонтальны, верхняя плоскость не видна; тонкие светлые полосы относятся к фаскам. Оценка визуальная, параметры камеры из изображения восстановить нельзя."
+      "note": "Draft stance, raised right hand, lowered left hand, cape outline and pedestal proportions follow the ortho. Surface and small cloth contours vary; no extra anatomy or weapon."
     },
     {
-      "view": "design-front",
-      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "view": "front",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
       "passed": true,
-      "note": "Фигура и подставка целиком в кадре. Фон нейтральный тёмно-серый без сцены, пола и различимого градиента; контрольные пиксели свободного фона около RGB 48–51. Незначительный пиксельный шум сохранён как часть исходной генерации."
+      "note": "Approved face, deerstalker, gray Inverness cape, brown tweed, dark curved pipe and brass magnifier are visible."
     },
     {
-      "view": "design-front",
-      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
-      "passed": false,
-      "note": "Лупа находится в собственной правой руке, слева для зрителя; левая кисть вынесена из кармана, локти согнуты, T/A-позы нет. Однако ткань плаща перекрывает пространство между руками и корпусом: требуемых открытых просветов фона у обеих рук нет."
+      "view": "front",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT;",
+      "passed": true,
+      "note": "Magnifying glass held by figure's right hand, on viewer's left."
     },
     {
-      "view": "design-front",
-      "item": "every identity anchor is visible: magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+      "view": "front",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
       "passed": true,
-      "note": "Все четыре якоря видны: лупа справа у фигуры, deerstalker, накидка Inverness и изогнутая трубка во рту."
+      "note": "Entire figure and pedestal visible; checker PASS: top 4.006%, bottom 94.130%, base center 50.0%, base width 58.103%."
     },
     {
-      "view": "design-front",
-      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "view": "front",
+      "item": "the same plain flat dark gray background in every view.",
       "passed": true,
-      "note": "Коричневый твид, серый плащ, тёмно-коричневая трубка и латунная оправа лупы представлены; командных цветов, кольца и металлической полосы на каменной подставке нет. Оттенки изменяются освещением и росписью; точное совпадение каждого пикселя с HEX не предполагается."
+      "note": "Neutral dark background, border RGB 43/43/43; checker PASS and no visible floor or gross gradient."
+    },
+    {
+      "view": "side",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
+      "passed": true,
+      "note": "Level left-side profile, nose directed toward image left, one figure; no collage/text/watermark."
+    },
+    {
+      "view": "side",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+      "passed": true,
+      "note": "Draft profile, raised magnifier hand, lower free hand, stance and two-tier pedestal retained. Cloth folds and surface rendering vary."
+    },
+    {
+      "view": "side",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+      "passed": true,
+      "note": "Deerstalker, gray cape and brown tweed match design; curved pipe and brass magnifier remain readable from this side."
+    },
+    {
+      "view": "side",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT;",
+      "passed": true,
+      "note": "Raised magnifier hand follows ortho_left: figure's right hand; lower left hand is separate and visible."
+    },
+    {
+      "view": "side",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+      "passed": true,
+      "note": "Whole subject and pedestal remain in frame; all framing checks PASS."
+    },
+    {
+      "view": "side",
+      "item": "the same plain flat dark gray background in every view.",
+      "passed": true,
+      "note": "Flat neutral dark gray background; checker PASS, no floor or gross gradient."
+    },
+    {
+      "view": "back",
+      "item": "the view is exactly the one asked for: front, a strict profile of the left side, or a strict back view; camera exactly level; no three-quarter, no perspective, no collage, no text or watermark;",
+      "passed": true,
+      "note": "Strict centered back view; no face visible; level camera; no text/collage/watermark."
+    },
+    {
+      "view": "back",
+      "item": "silhouette, pose, arm and weapon positions follow image 1 (the draft render); no added anatomy, no new weapon;",
+      "passed": true,
+      "note": "Back ortho cape outline, shoulder stance, raised right arm and feet follow draft. Fabric folds and sculpted surface detail interpreted from design."
+    },
+    {
+      "view": "back",
+      "item": "identity, costume, colours and materials follow the approved design; every anchor visible from this side is there;",
+      "passed": true,
+      "note": "Deerstalker, gray Inverness cape, brown tweed trousers and brass lens match approved design and finished side; pipe naturally occluded from back."
+    },
+    {
+      "view": "back",
+      "item": "weapon side: front and side - The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view; back - The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT;",
+      "passed": true,
+      "note": "Magnifier held in figure's right hand appears at viewer's right."
+    },
+    {
+      "view": "back",
+      "item": "framing as in image 1: the same pedestal position and size; the same highest point; the whole subject visible;",
+      "passed": true,
+      "note": "Entire figure and base visible, all framing checks PASS."
+    },
+    {
+      "view": "back",
+      "item": "the same plain flat dark gray background in every view.",
+      "passed": true,
+      "note": "Neutral dark gray background; all background checks PASS, no visible floor or gross gradient."
     }
   ],
   "generations_per_view": {
-    "design-front": 2
+    "front": 1,
+    "side": 1,
+    "back": 1
   },
-  "generations_allowed_this_run": 2,
+  "generations_allowed_this_run": {
+    "front": 2,
+    "side": 2,
+    "back": 2
+  },
+  "generations_allowed_total_per_view": 4,
   "selected": {
-    "design-front": "sherlock-holmes-design-front-g2"
+    "front": "sherlock-holmes-front-g1",
+    "side": "sherlock-holmes-side-g1",
+    "back": "sherlock-holmes-back-g1"
   },
-  "limit_reached": [
-    {
-      "view": "design-front",
-      "failed_items": [
-        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
-      ]
-    }
-  ],
+  "limit_reached": [],
   "errors": [],
   "limitations": [
     {
-      "id": "view.frame_top",
-      "kind": "WARN",
-      "actual_pct": 1.934,
-      "required_min_pct": 4,
-      "note": "WARN is allowed and does not trigger retry."
+      "id": "raster_geometry",
+      "note": "Visual concept review does not prove pixel-identical silhouettes, calibrated camera parameters, hidden anatomy or geometric correspondence to the draft."
     },
     {
-      "id": "CORE.FRAMING.base_bottom",
-      "kind": "deviation",
-      "actual_pct": 96.478,
-      "requested_pct": 93,
-      "note": "Pedestal remains fully visible."
+      "id": "surface_variation",
+      "note": "Small cloth contours, folds, herringbone patterns, hair detail and lens highlights vary between generated views."
+    },
+    {
+      "id": "image_dimensions",
+      "note": "Tool output 1086x1448; ortho sources 1152x1536. Both are 3:4. Generated image files were never resized or re-encoded."
+    },
+    {
+      "id": "framing_numeric_deviation",
+      "note": "Requested top 4.0%, bottom 94.0%, base x21-79%, top 85.5%. Measured values are retained below; all relevant checks PASS. Small differences do not trigger a retry under the task contract."
     }
   ],
   "candidate_visual_review": [
     {
-      "view": "design-front",
+      "view": "front",
       "generation": 1,
-      "failed_items": [
-        "front orthographic / edge-on pedestal",
-        "both arms clearly apart from the torso"
+      "failed_items": [],
+      "checklist_notes": [
+        "Strict frontal level view; one figure and pedestal; no text, collage or watermark.",
+        "Draft stance, raised right hand, lowered left hand, cape outline and pedestal proportions follow the ortho. Surface and small cloth contours vary; no extra anatomy or weapon.",
+        "Approved face, deerstalker, gray Inverness cape, brown tweed, dark curved pipe and brass magnifier are visible.",
+        "Magnifying glass held by figure's right hand, on viewer's left.",
+        "Entire figure and pedestal visible; checker PASS: top 4.006%, bottom 94.130%, base center 50.0%, base width 58.103%.",
+        "Neutral dark background, border RGB 43/43/43; checker PASS and no visible floor or gross gradient."
       ],
-      "note": "Left hand in pocket; head slightly turned; pedestal top visible. Background was included in correction based on initial visual assessment."
+      "note": "Selected g1; all six checklist items pass by visual assessment with measured framing/background. Exact geometric silhouette identity cannot be proven by a painted image."
     },
     {
-      "view": "design-front",
-      "generation": 2,
-      "failed_items": [
-        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+      "view": "side",
+      "generation": 1,
+      "failed_items": [],
+      "checklist_notes": [
+        "Level left-side profile, nose directed toward image left, one figure; no collage/text/watermark.",
+        "Draft profile, raised magnifier hand, lower free hand, stance and two-tier pedestal retained. Cloth folds and surface rendering vary.",
+        "Deerstalker, gray cape and brown tweed match design; curved pipe and brass magnifier remain readable from this side.",
+        "Raised magnifier hand follows ortho_left: figure's right hand; lower left hand is separate and visible.",
+        "Whole subject and pedestal remain in frame; all framing checks PASS.",
+        "Flat neutral dark gray background; checker PASS, no floor or gross gradient."
       ],
-      "note": "Selected. Background pixel inspection resolved perceived unevenness; cape still obscures both arm gaps."
+      "note": "Selected g1; all six checklist items pass. Left-facing profile follows the specifically authorized ortho_left rather than inferring side from other views."
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "failed_items": [],
+      "checklist_notes": [
+        "Strict centered back view; no face visible; level camera; no text/collage/watermark.",
+        "Back ortho cape outline, shoulder stance, raised right arm and feet follow draft. Fabric folds and sculpted surface detail interpreted from design.",
+        "Deerstalker, gray Inverness cape, brown tweed trousers and brass lens match approved design and finished side; pipe naturally occluded from back.",
+        "Magnifier held in figure's right hand appears at viewer's right.",
+        "Entire figure and base visible, all framing checks PASS.",
+        "Neutral dark gray background; all background checks PASS, no visible floor or gross gradient."
+      ],
+      "note": "Selected g1; all six checklist items pass. Back uses the exact selected side g1 as third input; hidden pipe is not invented behind the head."
     }
   ],
   "original_copies": [
     {
+      "view": "front",
       "generation": 1,
-      "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-c0b2810e-a34d-434a-9a8f-abee46494c9c.png",
-      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g1.png",
-      "sha256_original": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
-      "sha256_saved": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13e30-681d-7e10-81c2-cb055a861cd2/exec-6bbaf4fd-32c5-4763-9b11-961fe07eae74.png",
+      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-front-g1.png",
+      "sha256_original": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05",
+      "sha256_saved": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05",
+      "sha256_selected": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05",
       "byte_identical": true
     },
     {
-      "generation": 2,
-      "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-9d74e1b9-ed76-40d9-8bbe-eea75c08d29e.png",
-      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g2.png",
-      "sha256_original": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
-      "sha256_saved": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "view": "side",
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13e30-681d-7e10-81c2-cb055a861cd2/exec-49f3e6e9-0d40-4686-b7ca-e8d87f8916a2.png",
+      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-side-g1.png",
+      "sha256_original": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6",
+      "sha256_saved": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6",
+      "sha256_selected": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6",
+      "byte_identical": true
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13e30-681d-7e10-81c2-cb055a861cd2/exec-07bd9e4b-8a0b-4333-a410-206f63072ee3.png",
+      "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-back-g1.png",
+      "sha256_original": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f",
+      "sha256_saved": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f",
+      "sha256_selected": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f",
       "byte_identical": true
     }
   ],
-  "selected_design_byte_identical": true,
+  "selected_files_byte_identical": true,
   "preexisting_files_preserved": [
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json",
+      "sha256_before": "82f1db0b7472beb07559a1fbe6cea679664fa4c4af62f3524ef782ba562fb83f",
+      "sha256_after": "82f1db0b7472beb07559a1fbe6cea679664fa4c4af62f3524ef782ba562fb83f",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json",
+      "sha256_before": "3533f043ef59d32af99664db2018e52efddac5aea921c1026ae4e2487e71ac1e",
+      "sha256_after": "3533f043ef59d32af99664db2018e52efddac5aea921c1026ae4e2487e71ac1e",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g1.png",
+      "sha256_before": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+      "sha256_after": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g2.png",
+      "sha256_before": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "sha256_after": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
+      "sha256_before": "9a2305c376c9c62fdad3ac33f5780cec44b499f413dec679e5db8252275aea0b",
+      "sha256_after": "9a2305c376c9c62fdad3ac33f5780cec44b499f413dec679e5db8252275aea0b",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+      "sha256_before": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "sha256_after": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+      "unchanged": true
+    },
     {
       "path": "art/imagegen/concept-sherlock-holmes-codex/palette.json",
       "sha256_before": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
@@ -163,12 +354,328 @@
       "unchanged": true
     }
   ],
-  "execution_notes": [
-    "A long documentation-write command exceeded Windows command-line length before launch (206). Split into shorter commands; no file was written by the rejected command."
-  ],
+  "history_preservation": {
+    "old_generation_records_unchanged": true,
+    "old_prompt_entries_unchanged": true,
+    "old_source_hash_runs_unchanged": true,
+    "old_readme_bytes_are_suffix": true,
+    "old_prompts_md_bytes_are_suffix": true,
+    "preexisting_metadata_backups_byte_identical": true
+  },
+  "final_summary": {
+    "PASS": 33,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "measurements": {
+    "front": {
+      "mask": {
+        "area_pct": 33.7,
+        "filled_area_pct": 33.7,
+        "components_kept": 1,
+        "main_component_pct": 33.7,
+        "other_components_pct": [
+          0.007,
+          0.004,
+          0.002
+        ],
+        "bbox_px": [
+          227,
+          58,
+          858,
+          1363
+        ],
+        "top_pct": 4.006,
+        "bottom_pct": 94.13,
+        "left_pct": 20.902,
+        "right_pct": 79.006,
+        "height_pct": 90.124,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 58.103,
+        "base_top_pct_est": 85.773
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          43.0,
+          43.0,
+          43.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 0.0,
+        "luma": 43.0
+      }
+    },
+    "side": {
+      "mask": {
+        "area_pct": 20.68,
+        "filled_area_pct": 20.68,
+        "components_kept": 1,
+        "main_component_pct": 20.68,
+        "other_components_pct": [
+          0.007,
+          0.003,
+          0.002,
+          0.002
+        ],
+        "bbox_px": [
+          225,
+          57,
+          858,
+          1365
+        ],
+        "top_pct": 3.936,
+        "bottom_pct": 94.268,
+        "left_pct": 20.718,
+        "right_pct": 79.006,
+        "height_pct": 90.331,
+        "base_center_x_pct": 49.862,
+        "base_width_pct": 58.287,
+        "base_top_pct_est": 85.773
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          42.0,
+          42.0,
+          41.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 1.0,
+        "luma": 41.9
+      }
+    },
+    "back": {
+      "mask": {
+        "area_pct": 33.895,
+        "filled_area_pct": 33.895,
+        "components_kept": 1,
+        "main_component_pct": 33.895,
+        "other_components_pct": [
+          0.005,
+          0.002,
+          0.002
+        ],
+        "bbox_px": [
+          228,
+          50,
+          858,
+          1365
+        ],
+        "top_pct": 3.453,
+        "bottom_pct": 94.268,
+        "left_pct": 20.994,
+        "right_pct": 79.006,
+        "height_pct": 90.815,
+        "base_center_x_pct": 49.954,
+        "base_width_pct": 58.011,
+        "base_top_pct_est": 85.843
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          43.0,
+          43.0,
+          43.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 0.0,
+        "luma": 43.0
+      }
+    }
+  },
+  "sheet": "art/imagegen/concept-sherlock-holmes-codex/sheet-sherlock-holmes.png",
+  "sheet_inspected": true,
   "text_encoding": {
     "encoding": "utf-8",
     "bom": false,
     "validated": true
+  },
+  "process_lifecycle": "Only synchronous Python/PowerShell commands and built-in image generation. No persistent service, editor or client process was launched.",
+  "previous_runs": [
+    {
+      "checks": [
+        {
+          "view": "design-front",
+          "generation": 1,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json",
+          "stdout": "WARN view.frame_top         front    value=2.141 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g1/checks-report.json\n",
+          "stderr": ""
+        },
+        {
+          "view": "design-front",
+          "generation": 2,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json",
+          "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/checks/design-front-g2/checks-report.json\n",
+          "stderr": ""
+        },
+        {
+          "view": "design-front",
+          "generation": 2,
+          "final": true,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json",
+          "stdout": "WARN view.frame_top         front    value=1.934 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-sherlock-holmes-codex/design/checks-report.json\n",
+          "stderr": ""
+        }
+      ],
+      "date": "2026-10-13",
+      "card_id": "ASSET-SHERLOCK-HOLMES-001",
+      "stage": "1a",
+      "status": "предложено",
+      "source_unchanged": true,
+      "sources": [
+        {
+          "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+          "sha256_before": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "sha256_after": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-sherlock-holmes-codex/palette.json",
+          "sha256_before": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+          "sha256_after": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+          "unchanged": true
+        }
+      ],
+      "outside_folder": [],
+      "outside_folder_scope": "Executor command writes; image_gen original copies are the explicitly required exception and are logged in generation-records.json.",
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна двухъярусная подставка; текста, знаков, коллажа и дополнительных видов нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": true,
+          "note": "Лицо и корпус направлены прямо на зрителя. Подставка показана с ребра: края горизонтальны, верхняя плоскость не видна; тонкие светлые полосы относятся к фаскам. Оценка визуальная, параметры камеры из изображения восстановить нельзя."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и подставка целиком в кадре. Фон нейтральный тёмно-серый без сцены, пола и различимого градиента; контрольные пиксели свободного фона около RGB 48–51. Незначительный пиксельный шум сохранён как часть исходной генерации."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": false,
+          "note": "Лупа находится в собственной правой руке, слева для зрителя; левая кисть вынесена из кармана, локти согнуты, T/A-позы нет. Однако ткань плаща перекрывает пространство между руками и корпусом: требуемых открытых просветов фона у обеих рук нет."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+          "passed": true,
+          "note": "Все четыре якоря видны: лупа справа у фигуры, deerstalker, накидка Inverness и изогнутая трубка во рту."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Коричневый твид, серый плащ, тёмно-коричневая трубка и латунная оправа лупы представлены; командных цветов, кольца и металлической полосы на каменной подставке нет. Оттенки изменяются освещением и росписью; точное совпадение каждого пикселя с HEX не предполагается."
+        }
+      ],
+      "generations_per_view": {
+        "design-front": 2
+      },
+      "generations_allowed_this_run": 2,
+      "selected": {
+        "design-front": "sherlock-holmes-design-front-g2"
+      },
+      "limit_reached": [
+        {
+          "view": "design-front",
+          "failed_items": [
+            "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+          ]
+        }
+      ],
+      "errors": [],
+      "limitations": [
+        {
+          "id": "view.frame_top",
+          "kind": "WARN",
+          "actual_pct": 1.934,
+          "required_min_pct": 4,
+          "note": "WARN is allowed and does not trigger retry."
+        },
+        {
+          "id": "CORE.FRAMING.base_bottom",
+          "kind": "deviation",
+          "actual_pct": 96.478,
+          "requested_pct": 93,
+          "note": "Pedestal remains fully visible."
+        }
+      ],
+      "candidate_visual_review": [
+        {
+          "view": "design-front",
+          "generation": 1,
+          "failed_items": [
+            "front orthographic / edge-on pedestal",
+            "both arms clearly apart from the torso"
+          ],
+          "note": "Left hand in pocket; head slightly turned; pedestal top visible. Background was included in correction based on initial visual assessment."
+        },
+        {
+          "view": "design-front",
+          "generation": 2,
+          "failed_items": [
+            "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+          ],
+          "note": "Selected. Background pixel inspection resolved perceived unevenness; cape still obscures both arm gaps."
+        }
+      ],
+      "original_copies": [
+        {
+          "generation": 1,
+          "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-c0b2810e-a34d-434a-9a8f-abee46494c9c.png",
+          "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g1.png",
+          "sha256_original": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+          "sha256_saved": "e01be8f1d38dfdbfd1c953238c2dc5d730b931e567fa6a21a166b2e381eac6b4",
+          "byte_identical": true
+        },
+        {
+          "generation": 2,
+          "original_path": "C:/Users/ren/.codex/generated_images/01a13375-c35f-7903-9e0f-806077c08d6a/exec-9d74e1b9-ed76-40d9-8bbe-eea75c08d29e.png",
+          "saved_path": "art/imagegen/concept-sherlock-holmes-codex/concepts/sherlock-holmes-design-front-g2.png",
+          "sha256_original": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+          "sha256_saved": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a",
+          "byte_identical": true
+        }
+      ],
+      "selected_design_byte_identical": true,
+      "preexisting_files_preserved": [
+        {
+          "path": "art/imagegen/concept-sherlock-holmes-codex/palette.json",
+          "sha256_before": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+          "sha256_after": "ec132ae6e4521307568fb325f9a0ef58f38ed30b8a7533c2ea35c39f31e09078",
+          "unchanged": true
+        }
+      ],
+      "execution_notes": [
+        "A long documentation-write command exceeded Windows command-line length before launch (206). Split into shorter commands; no file was written by the rejected command."
+      ],
+      "text_encoding": {
+        "encoding": "utf-8",
+        "bom": false,
+        "validated": true
+      }
+    }
+  ],
+  "package_audit": {
+    "exit_code": 0,
+    "note": "Input/output hashes, exact prompts, reference order, all 18 visual checklist entries, history retention, byte-identical copies, report-to-image hashes and UTF-8/no-BOM validated."
   }
 }

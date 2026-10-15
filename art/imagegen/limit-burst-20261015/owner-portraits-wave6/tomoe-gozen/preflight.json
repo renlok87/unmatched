@@ -1,0 +1,99 @@
+{
+  "task": "CP-32",
+  "status": "source-candidate-only",
+  "checked_at_utc": "2026-10-15T06:30:01.378527+00:00",
+  "reference_opened_with_view_image": true,
+  "reference": {
+    "path": "art/imagegen/concept-tomoe-gozen-codex/design/tomoe-gozen-front.png",
+    "sha256": "dffd47153ec5f6f8196467b868b5f432d736a64ac9d69e20be02c50113eb1c16",
+    "width": 1086,
+    "height": 1448,
+    "format": "PNG",
+    "mode": "RGB"
+  },
+  "source_acceptance": {
+    "status": "accepted",
+    "card": "art/pipeline-candidates/ASSET-TOMOE-GOZEN-001/evidence/acceptance-concept/20261013-front-r1/card.json",
+    "card_sha256": "35dbf1c0e69e7d5e48786c4f9d822d16455813da3826665c6f44f10461247a20",
+    "verdict": "pass",
+    "score": 8.8,
+    "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)",
+    "decided_by": "delegated (ВР-реестр 2026-10-06)",
+    "accepted_object_sha256": "dffd47153ec5f6f8196467b868b5f432d736a64ac9d69e20be02c50113eb1c16",
+    "hash_matches": true,
+    "known_issues": [
+      {
+        "item": "S",
+        "frame": "tomoe-gozen-front.png",
+        "note": "На поясе есть дополнительный меч в ножнах: verification.json#core_limitations отмечает нарушение CORE «extra weapons». Он не скрывает нагинату и не меняет узнаваемость TomoeGozen; отдельного вето для меча в ножнах предоставленная рубрика 1a не задаёт."
+      },
+      {
+        "item": "S",
+        "frame": "tomoe-gozen-front.png",
+        "note": "Двухъярусная подставка шире ориентира: verification.json оценивает отношение диаметра к высоте фигуры без оружия примерно в 0,65 вместо 0,55. Фигура и подставка целиком видимы."
+      },
+      {
+        "item": "C",
+        "frame": "tomoe-gozen-front.png",
+        "note": "Видна узкая верхняя поверхность подставки, поэтому строгая ортографичность не достигнута; это также отмечено в verification.json. На 1a согласованность видов не оценивалась, фиксированное C сохранено."
+      },
+      {
+        "item": "P",
+        "frame": "tomoe-gozen-front.png",
+        "note": "Синие шнуры несколько серее и менее насыщенны, чем заданный cord blue #2F4F8F."
+      },
+      {
+        "item": "G-CHECKS",
+        "frame": "checks-report.json",
+        "note": "view.frame_top = WARN: верхняя точка на 1,519% высоты при ориентире не менее 4%. Лезвие не обрезано; WARN не является FAIL гейта."
+      }
+    ],
+    "scope": "Current front concept only; portrait remains a new unaccepted proposal. Older README says proposed; later exact-hash delegated acceptance card is recorded honestly without advancing model stages."
+  },
+  "roster": {
+    "path": "scraped-data/api/heroes/tomoe-gozen.json",
+    "sha256": "466ca6fc321d4cc9f7b1cf1f44d86e43ec817a88899b073a221ae989cf32215b",
+    "row": {
+      "id": 37,
+      "name": "Tomoe Gozen",
+      "key": "tomoe-gozen"
+    },
+    "decode": "Svelte devalue nodes[2].data fetchedHero object with referenced scalar id/name/key. No avatar image opened.",
+    "live_database_queried": false,
+    "hero_links_note": "tomoe-gozen is absent from docs/art-pipeline/hero-links.json; actual raw roster and asset-card CONTENT_KEY confirm tomoe-gozen; no roster edit performed."
+  },
+  "focused_absence_lookup": {
+    "roots": [
+      "art/imagegen",
+      "art/cards-v1",
+      "unreal/Unmatched/Content"
+    ],
+    "matching_portrait_or_avatar_files": [],
+    "errors": [
+      "[WinError 5] Отказано в доступе: 'art/imagegen\\\\concept-elektra-codex\\\\tmp-metadata-check-asb509mx'"
+    ],
+    "scope": "Focused named portrait/avatar filename lookup including earlier waves; not a visual audit of every image. Unrelated inaccessible concept-elektra temporary directory reported honestly.",
+    "runtime_registry": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+    "runtime_registry_sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+    "runtime_portrait_keys": [
+      "portrait:king-arthur",
+      "portrait:king-arthur:merlin",
+      "portrait:medusa",
+      "portrait:medusa:harpies",
+      "portrait:t-rex"
+    ],
+    "requested_key_absent": true
+  },
+  "cp32_registered_before_call": {
+    "path": "docs/game-design/visual/06-tasks/cards-portraits.csv",
+    "row_id": "CP-32",
+    "mapping": "art/imagegen/limit-burst-20261015/task-map-owner-wave6.json"
+  },
+  "crop": "full100; centered circle diameter 100 percent of square side, zero zoom",
+  "constraints": {
+    "generation_calls_allowed": 1,
+    "correction_only_for_actual_head_clipping_or_identity_failure": true,
+    "max_correction_calls": 1,
+    "no_runtime_import_or_acceptance": true
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-15",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+      "sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4"
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+      "sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7"
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+      "sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-dr-watson-codex",
+    "files": [
+      "sheet-dr-watson.png",
+      "dr-watson-front.png",
+      "dr-watson-side.png",
+      "dr-watson-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-dr-watson-codex/checks-report.json",
+    "art/imagegen/concept-dr-watson-codex/generation-records.json",
+    "art/imagegen/concept-dr-watson-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-dr-watson-codex/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.WARN = 0; summary.PASS = 33; verification.json#final_script_exit_code = 0.",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На dr-watson-front.png, dr-watson-side.png и dr-watson-back.png узнаваемы котелок, усы, поднятый револьвер и медицинская сумка; фигура целиком в кадре, поза не T и не A. Левая рука близка к пальто, особенно в профиле, поэтому полного отделения рук от корпуса нет. Ствол, спусковая скоба, ручка сумки и цепочка читаются; их толщину следует сохранить на этапах 3–4.",
+      "frames": [
+        "dr-watson-front.png",
+        "dr-watson-side.png",
+        "dr-watson-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "sheet-dr-watson.png показывает согласованные рост, пропорции, положение рук и длину пальто; разброс роста по checks-report.json составляет 0,53%. dr-watson-side.png соответствует SIDE_VIEW left; револьвер остаётся в собственной правой руке, сумка — в левой. Поза следует ортопроекциям 1b. Небольшие расхождения складок и фактуры допустимы, но видимая верхняя плоскость подставки на трёх видах не позволяет считать проекции полностью строгими.",
+      "frames": [
+        "sheet-dr-watson.png",
+        "dr-watson-front.png",
+        "dr-watson-side.png",
+        "dr-watson-back.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "dr-watson-front.png, dr-watson-side.png и dr-watson-back.png выдержаны на уровне расписанной коллекционной миниатюры эталона Medusa: проработаны лицо, волосы, усы, швы, жилет, цепочка, механизм револьвера и фурнитура сумки. Кожа, ткань, металл и каменная подставка различимы; детализация присутствует внутри силуэта на всех видах.",
+      "frames": [
+        "dr-watson-front.png",
+        "dr-watson-side.png",
+        "dr-watson-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Свотчи sheet-dr-watson.png соответствуют палитре фигуры: коричневое пальто, чёрный котелок, светло-коричневый жилет и золотая цепочка. На dr-watson-front.png присутствуют все четыре якоря; dr-watson-side.png и dr-watson-back.png сохраняют их там, где они видимы. Оружие и сумка не зеркальны.",
+      "frames": [
+        "sheet-dr-watson.png",
+        "dr-watson-front.png",
+        "dr-watson-side.png",
+        "dr-watson-back.png"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "dr-watson-side.png",
+      "note": "Левая рука с сумкой близка к пальто; отдельного просвета вдоль рукава нет. Особенность присутствует в исходной геометрии 1b, якоря остаются читаемыми."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-dr-watson.png",
+      "note": "Видна узкая верхняя плоскость подставки на всех трёх видах; есть небольшие различия складок и фактуры. Стороны рук, основные пропорции и масштаб согласованы."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13e42-fa9b-74e0-a05a-a2d4a4696e8c"
+  },
+  "executor_session_id": "codex-app:01a13e0b-a911-7190-9a60-c87273f3db77",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

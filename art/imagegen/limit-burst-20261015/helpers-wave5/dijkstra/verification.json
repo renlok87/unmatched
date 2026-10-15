@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "task_id": "AN-153",
+  "subject": "dijkstra",
+  "owner": "Philippa",
+  "status": "proposed/source-only",
+  "self_review_only": true,
+  "formal_acceptance": false,
+  "game_ready": false,
+  "stage0_registered_by_worker": false,
+  "independent_review": "pending root coordination",
+  "reviewed_utc": "2026-10-15T06:26:02.749740+00:00",
+  "review_method": "Required input references, initial output, and selected design opened with view_image; manual visual inspection plus PNG byte/dimension/hash checks. Numeric layout estimates are approximate manual raster boundary observations corroborated by centerline pixel-change sampling, not a segmentation certificate.",
+  "attempt_reviews": [
+    {
+      "attempt": 1,
+      "file": "attempts/attempt-01.png",
+      "opened_with_view_image": true,
+      "actual_failures": [
+        "Crown near y=49-50 (~3.2% height), below required 6% top margin.",
+        "Base bottom near y=1400 (~91.1%), slightly below requested 90% line."
+      ],
+      "other_observations": [
+        "Original broad male identity, teal doublet, brown trousers, folio, empty hand and two-disc edge-on pedestal are present.",
+        "Elbow gaps exist; the folio touches the hip. Background has a mild gradient."
+      ],
+      "action": "One targeted built-in edit requested only overall framing."
+    },
+    {
+      "attempt": 2,
+      "file": "design-front.png",
+      "opened_with_view_image": true,
+      "selected": true,
+      "actual_failures": [
+        "Exact requested composition still missed: crown ~6.84%, base bottom ~87.89% rather than 6% and 90%.",
+        "Strict feet-forward pose is imperfect: boots toe outward slightly."
+      ],
+      "other_observations": [
+        "Face/material microdetails were re-synthesized by the correction; byte/pixel identity to attempt 01 is not claimed.",
+        "Broad adult male design, teal/brown palette, folio side and both hand silhouettes remain consistent.",
+        "Subtle background gradient and folio-to-hip contact remain."
+      ],
+      "action": "Stop at authorized one-correction cap. Select for proposed source review, explicitly retain failures."
+    }
+  ],
+  "checks": [
+    {
+      "criterion": "Owner, count and gameplay stats",
+      "result": "pass",
+      "evidence": "Philippa; Dijkstra count 1, health 6, movement 2, melee. Supplied live-evidence row matches directly decoded local raw data; owner and raw SHA256 match evidence."
+    },
+    {
+      "criterion": "No existing same-helper source found before calls",
+      "result": "pass_with_search_limit",
+      "evidence": "Supplied absence evidence and local source filename/asset-card/hero-links searches returned no Dijkstra source. See preflight.json for temporary-directory exclusion and scope."
+    },
+    {
+      "criterion": "Both required references opened before generation",
+      "result": "pass",
+      "evidence": "Both opened with view_image and SHA256 recorded. Owner used for cohort/finish only; no owner identity or costume transfer requested."
+    },
+    {
+      "criterion": "One original adult heavy-built middle-aged human male",
+      "result": "pass_visual",
+      "evidence": "Broad adult male, bald crown, close-cropped side hair, weathered face, teal quilted doublet, brown trousers and plain boots. No actor likeness was requested; exhaustive similarity audit not performed."
+    },
+    {
+      "criterion": "Strict FRONT orthographic full figure",
+      "result": "partial",
+      "evidence": "Face, shoulders, torso and pedestal are frontal with no obvious three-quarter torso. Whole body and bare crown are visible. Boots toe slightly outward. Exact orthographic camera projection cannot be certified from a generated raster."
+    },
+    {
+      "criterion": "Relaxed bent arms and background limb gaps",
+      "result": "pass_visual_with_caveat",
+      "evidence": "Both elbows visibly bend; charcoal wedges separate arms from body near elbows and a leg gap is present. The folio touches the left hip, so background is not continuous along that entire side."
+    },
+    {
+      "criterion": "Visible hands, left folio, empty right hand",
+      "result": "pass_visual_with_limit",
+      "evidence": "Both hand silhouettes are visible; left hand (image right) grips a small closed leather folio; right hand is empty. No obvious duplicate/extra digit. Some left digits are naturally occluded by the grip; five independently visible digits cannot be proven."
+    },
+    {
+      "criterion": "Crown top at 6%; base bottom at 90%",
+      "result": "fail_exact_layout_remaining",
+      "evidence": "Selected attempt approximately crown y=105/1536 (6.84%), pedestal bottom y=1350/1536 (87.89%); requested y~92 and y~1382. Minimum 6% head clearance is achieved, exact placement is not. Estimates have about 3 px uncertainty."
+    },
+    {
+      "criterion": "One dark round two-disc pedestal exactly edge-on, top invisible",
+      "result": "pass_visual",
+      "evidence": "One two-band stacked dark-stone pedestal; straight horizontal sidewalls and one dividing seam; no broad top plane or oval visibly exposed. Roundness is intended by prompt, not reconstructable from the edge-on silhouette alone."
+    },
+    {
+      "criterion": "Plain charcoal, no VFX, scene, text or UI",
+      "result": "pass_visual_with_caveat",
+      "evidence": "Only figure, folio and pedestal; no VFX, ground scene, lettering or UI. Background has a subtle tonal gradient rather than mathematically uniform charcoal."
+    },
+    {
+      "criterion": "All original attempts and selected result preserved byte for byte",
+      "result": "pass_hash",
+      "evidence": "Both local attempts equal their tool-original PNG bytes; design-front.png equals attempt-02 and its original. No raster post-processing."
+    },
+    {
+      "criterion": "Bounded work and correction budget",
+      "result": "pass",
+      "evidence": "One initial built-in call and one framing correction; no further calls, agents, git operations, registry/ledger/code or service changes."
+    }
+  ],
+  "approximate_layout": {
+    "canvas": [
+      1024,
+      1536
+    ],
+    "uncertainty_px": 3,
+    "attempt_01": {
+      "crown_y": 50,
+      "crown_percent": 3.26,
+      "base_bottom_y": 1400,
+      "base_bottom_percent": 91.15
+    },
+    "attempt_02": {
+      "crown_y": 105,
+      "crown_percent": 6.84,
+      "base_bottom_y": 1350,
+      "base_bottom_percent": 87.89
+    },
+    "requested": {
+      "crown_percent": 6,
+      "base_bottom_percent": 90
+    }
+  },
+  "hard_guarantees_not_claimed": [
+    "Exact 6%/90% framing",
+    "Certified orthographic geometry",
+    "Exhaustive originality or actor-likeness clearance",
+    "Fully exposed and individually countable five digits on the gripping hand",
+    "3D reconstruction quality, mesh topology, rig, textures, engine render, acceptance or game readiness"
+  ],
+  "selected_sha256": "6aad3d805e386723d4adbbab95650a1ec09427cc0b90b3901acb103ab6d6aede",
+  "selected_dimensions": [
+    1024,
+    1536
+  ],
+  "hash_verification": {
+    "original_attempts_match_preserved_copies": true,
+    "selected_matches_attempt_02": true,
+    "prompt_files_match_exact_tool_argument_utf8": true,
+    "manifest_file": "manifest-sha256.json"
+  },
+  "process_lifecycle": "No persistent or background process or service was launched by this worker; only completed foreground file-read/copy/metadata commands and built-in tool calls."
+}

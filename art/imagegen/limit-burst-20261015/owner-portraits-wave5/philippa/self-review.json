@@ -1,0 +1,53 @@
+{
+  "task_id": "CP-31",
+  "status": "source-candidate-only",
+  "reviewer": "producing Codex agent self-review, not independent acceptance",
+  "reviewed_at_utc": "2026-10-15T06:34:57.121408+00:00",
+  "generated_image_inspected": true,
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "source_sha256": "be519d53e2f2cabbedb74bc285be354c12c3c12b283d815f3cddf6db9b268244",
+  "generation_calls": 1,
+  "correction_calls": 0,
+  "observations": {
+    "identity": "Short dark sculpted curls, high black-and-violet collar, dark gown and one pale-metal owl brooch preserve the broad project design. Hair/collar silhouette is clear, with generated differences in face and ornament.",
+    "style": "Sculpted coherent hair/costume masses and detailed matte painted surfaces. Facial skin rendering is highly realistic; physical resin provenance and a pixel-identical original face are not claimed.",
+    "source_framing": "About 8% above the hair instead of the requested 18%; full hair and high collar fit inside the full100 circle.",
+    "full100_circle": "Whole head/hair and high collar where present remain inside the circle of diameter100% of the square. Outer shoulders and lower chest corners are removed as expected. No tighter zoom/crop was tested.",
+    "native80": "Dark curls, pale face, high violet collar and a pale brooch accent are distinct. Owl silhouette is small; individual feathers do not resolve.",
+    "native40": "Dark hair and large violet collar framing the pale face remain readable. Brooch becomes a pale mark, not a reliable owl; fine eye and curl details are lost.",
+    "grayscale80_160": "Hair, face planes and collar remain visible in grayscale previews; colour-only costume distinctions and fine ornament are reduced.",
+    "background": "Plain charcoal studio backdrop with slight tonal variation; no UI, text, frame, watermark or scenery observed. Exact flatness is not claimed."
+  },
+  "checklist": [
+    {
+      "item": "one adult head-and-shoulders portrait; no hands, pedestal or text/UI",
+      "passed": true
+    },
+    {
+      "item": "whole head/hair/high collar safe in full100 circle",
+      "passed": true
+    },
+    {
+      "item": "requested about18% upper breathing room",
+      "passed": false,
+      "note": "About 8% above the hair instead of the requested 18%; full hair and high collar fit inside the full100 circle."
+    },
+    {
+      "item": "broad identity and costume cues readable at native80/40",
+      "passed": true,
+      "note": "Fine identity details are limited; source review is not runtime acceptance."
+    }
+  ],
+  "limitations": [
+    "About 8% above the hair instead of the requested 18%; full hair and high collar fit inside the full100 circle.",
+    "Formal paired result remains return_to_stage_1 at7.5 despite a recorded user override to proceed. Portrait source generation does not change either record or authorize runtime import.",
+    "Outer shoulder/chest corners are cut by the circular mask; keep full100 without tighter zoom.",
+    "No runtime widget, DPI, interaction state, UE import or independent acceptance tested by this producing agent."
+  ],
+  "actual_head_or_identity_failure_requiring_correction_observed": false,
+  "runtime_accepted": false,
+  "independent_review_pending": true
+}

@@ -1,0 +1,169 @@
+{
+  "task_id": "AN-152",
+  "content_key": "shuri",
+  "owner": "Black Panther",
+  "status": "proposed",
+  "scope": "source-only",
+  "formal_acceptance": false,
+  "stage0_registration_performed": false,
+  "game_ready_claim": false,
+  "independent_review_status": "pending coordinating root",
+  "created_utc": "2026-10-15T06:21:32.331822+00:00",
+  "selected_attempt": 1,
+  "selected_file": {
+    "path": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\limit-burst-20261015\\helpers-wave4\\shuri\\design-front.png",
+    "sha256": "4599026e6291206c89620a194ad34a288a3c60d3b5ce1ae962ccce0afc589a13",
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "bytes": 1921632,
+    "format": "PNG",
+    "mode": "RGB"
+  },
+  "generation_calls": 2,
+  "correction_calls": 1,
+  "no_further_correction": "One allowed framing correction used; original and correction kept without cropping, compositing, resampling or recoloring.",
+  "owner_statistics": {
+    "owner": "Black Panther",
+    "name": "Shuri",
+    "count": 1,
+    "health": 6,
+    "movement": 2,
+    "attack": "range",
+    "confirmed_from": "owner-evidence.json shortlist plus locally decoded nodes[2].data raw owner sidekicks",
+    "matching_raw_and_evidence": true
+  },
+  "input_hashes": [
+    {
+      "role": "owner_raw",
+      "path": "scraped-data/api/heroes/black-panther.json",
+      "sha256": "9d87b74c63036065c1e634c9f053533843ab7b65ad108512ac4c25dd8895bee4",
+      "expected_sha256": "9d87b74c63036065c1e634c9f053533843ab7b65ad108512ac4c25dd8895bee4",
+      "hash_matches_evidence": true,
+      "viewed_with_view_image_before_generation": false
+    },
+    {
+      "role": "owner_reference",
+      "path": "art/imagegen/concept-black-panther-codex/design/black-panther-front.png",
+      "sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+      "expected_sha256": "e01702c2a8013df634fcccc9c960d9a7b6958ecdd3a9f936548abb6a9f94f6d3",
+      "hash_matches_evidence": true,
+      "viewed_with_view_image_before_generation": true,
+      "dimensions": [
+        896,
+        1152
+      ]
+    },
+    {
+      "role": "owner_evidence",
+      "path": "art/imagegen/limit-burst-20261015/helpers-wave4/owner-evidence.json",
+      "sha256": "635828f112fbef0e8acfbe30849a6888c0492833bda6199d9e013eb012d1a2e5",
+      "expected_sha256": null,
+      "hash_matches_evidence": null,
+      "viewed_with_view_image_before_generation": false
+    },
+    {
+      "role": "quality_reference",
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "expected_sha256": null,
+      "hash_matches_evidence": null,
+      "viewed_with_view_image_before_generation": true,
+      "dimensions": [
+        1021,
+        1540
+      ]
+    }
+  ],
+  "source_absence_check": {
+    "evidence_matching_production_png_or_card_paths": [],
+    "current_rg_inventory_scopes": [
+      "art/imagegen",
+      "public"
+    ],
+    "matching_existing_paths": [],
+    "rg_exit_code": 2,
+    "unreadable_inventory_caveat": "rg: art/imagegen\\concept-elektra-codex\\tmp-metadata-check-asb509mx: Отказано в доступе. (os error 5)",
+    "conclusion": "No matching path found in readable inventory; evidence shortlist reports no existing production PNG/card path."
+  },
+  "byte_preservation": {
+    "all_attempts_match_original_sha256": true,
+    "selected_matches_attempt_01_and_original_sha256": true
+  },
+  "self_review": {
+    "method": "Both reference PNGs and both generated PNGs opened with view_image by worker. Geometric landmarks are approximate manual observations, not an automated mask or projection certification.",
+    "criteria": [
+      {
+        "criterion": "Original adult African researcher with compact athletic build and distinct woven costume",
+        "result": "visual pass",
+        "notes": "Adult appearance, short natural hair, woven cobalt/violet tunic, practical trousers and boots; no owner catsuit, cat helmet or claws."
+      },
+      {
+        "criterion": "No actor/franchise copying",
+        "result": "visual pass with limitation",
+        "notes": "No actor likeness requested or deliberately reproduced; no specific likeness identified by worker. No exhaustive likeness or rights clearance performed."
+      },
+      {
+        "criterion": "Strict front orthographic",
+        "result": "visual pass with limitation",
+        "notes": "Face, torso and boots appear frontal; no obvious camera yaw or pitch. True projection cannot be proven from one generated image."
+      },
+      {
+        "criterion": "Full figure and equipment uncut",
+        "result": "visual pass",
+        "notes": "Hair, hands, pulse-tool, boots and both pedestal discs are inside frame."
+      },
+      {
+        "criterion": "Relaxed bent arms with visible hands and background gaps",
+        "result": "visual pass",
+        "notes": "Right forearm and empty left hand have clear outside silhouettes. Tool body extends beyond right-hand grip into background. Fingers appear plausible; no mesh/manufacture verification."
+      },
+      {
+        "criterion": "One dark round two-disc pedestal exactly edge-on without visible top",
+        "result": "visual pass with limitation",
+        "notes": "Exactly two stacked sidewalls and a horizontal seam; no broad visible top plane or elliptical top. Circular footprint is implied by sidewall design, not proven from this elevation."
+      },
+      {
+        "criterion": "6% top margin",
+        "result": "FAIL",
+        "notes": "Selected original hair top approximately y=44/1536 = 2.9%, about 48px short of requested y=92. Correction reached approximately 9.7% and was not selected."
+      },
+      {
+        "criterion": "Pedestal bottom at 90%",
+        "result": "approximate visual pass",
+        "notes": "Selected original bottom approximately y=1382/1536 = 90.0%; correction bottom approximately 86.7% failed."
+      },
+      {
+        "criterion": "Plain charcoal background; no VFX, text, UI or ground scene",
+        "result": "visual pass with limitation",
+        "notes": "Plain charcoal studio background has soft tonal gradients; no scenery, ground, text, UI or glow."
+      }
+    ],
+    "actual_selected_failures": [
+      "Requested 6% top margin is not met (approximately 2.9%)."
+    ],
+    "actual_correction_failures": [
+      "Top margin is approximately 9.7%, rather than requested 6%.",
+      "Pedestal lowest edge is approximately 86.7%, rather than requested 90%."
+    ],
+    "selection_reason": "Attempt 01 best retains original quality, satisfies pedestal bottom near 90%, and has only one measured margin failure; correction 02 misses both specified vertical landmarks.",
+    "limitations": [
+      "Unresolved framing failure; source remains proposed for independent review.",
+      "Single front raster only; no back/side views, mesh, rig, material files or runtime validation.",
+      "Fine details and silhouette have not been tested at game-camera scale.",
+      "No stage advancement, formal acceptance or game-ready claim.",
+      "Inventory had one unrelated unreadable directory; source-absence conclusion is limited to readable paths plus supplied evidence."
+    ]
+  },
+  "scope_log": {
+    "writes": "Only assigned NEW shuri folder; built-in tool itself wrote originals to its default generated_images folder.",
+    "git_ledger_registries_code_services": "Untouched by worker.",
+    "agents_spawned": 0,
+    "external_generation_fallback": false,
+    "purchases": false,
+    "commercial_scans": false,
+    "background_services_started": 0
+  },
+  "integrity": "manifest-sha256.json enumerates every delivery file except itself; verified by recomputing SHA256."
+}

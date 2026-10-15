@@ -1,16 +1,46 @@
 {
   "card_id": "ASSET-DR-WATSON-001",
-  "stage": "1a",
-  "date": "2026-10-13",
+  "stage": "1c",
+  "side_view": "left",
+  "date": "2026-10-15T06:27:35.840799+00:00",
+  "run_id": "20261015T062340Z-1c",
   "status": "предложено",
-  "run_status": "metadata_repair_completed",
+  "run_status": "concept_package_completed",
   "source_unchanged": true,
   "sources": [
     {
-      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
-      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
-      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
-      "bytes": 2034907,
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho_front.png",
+      "before_sha256": "71b3ad574cf715815ddc66e51da4a4ca2f1f91f74a72445dc1ed810d332876d3",
+      "after_sha256": "71b3ad574cf715815ddc66e51da4a4ca2f1f91f74a72445dc1ed810d332876d3",
+      "bytes": 457303,
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho_left.png",
+      "before_sha256": "2e4816806d4db6e2c481acdebe56b8dab83559ff17c9a7a5b4b89023bc7d2493",
+      "after_sha256": "2e4816806d4db6e2c481acdebe56b8dab83559ff17c9a7a5b4b89023bc7d2493",
+      "bytes": 223491,
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho_back.png",
+      "before_sha256": "a1640b555e295d118c15c3232a3703431792d9563afc8a6a701334d541b60069",
+      "after_sha256": "a1640b555e295d118c15c3232a3703431792d9563afc8a6a701334d541b60069",
+      "bytes": 282519,
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho-framing.json",
+      "before_sha256": "14ddcf1788b6452594de50437a5da1a15391a373d3c964fc6a401d31bda72543",
+      "after_sha256": "14ddcf1788b6452594de50437a5da1a15391a373d3c964fc6a401d31bda72543",
+      "bytes": 3808,
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+      "before_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "after_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "bytes": 1733270,
       "unchanged": true
     },
     {
@@ -22,299 +52,679 @@
     }
   ],
   "outside_folder": [],
-  "outside_folder_scope": "Current corrective run: all file writes are inside this package; no new image tool call or tool-managed outside copy.",
+  "outside_folder_scope": "All agent-directed writes are inside the package. The three explicitly required image_gen-managed originals remain in the tool destination and are logged under original_path.",
   "checks": [
     {
-      "view": "design-front",
-      "generation": 1,
-      "exit_code": 2,
-      "report": null,
-      "expected_report": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
-      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4 --out art/imagegen/concept-dr-watson-codex/checks/design-front-g1",
-      "error": "ERROR: нет файла вида art\\imagegen\\concept-dr-watson-codex\\design\\dr-watson-front.png",
-      "cause": "The preceding Python copy command failed with SyntaxError: unterminated string literal due to shell quoting. The checker was then invoked with its required input still missing."
-    },
-    {
-      "view": "design-front",
+      "view": "front",
       "generation": 1,
       "exit_code": 0,
-      "report": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
-      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4 --out art/imagegen/concept-dr-watson-codex/checks/design-front-g1",
+      "report": "art/imagegen/concept-dr-watson-codex/checks/front-g1/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-dr-watson-codex",
+        "--key",
+        "dr-watson",
+        "--views",
+        "front",
+        "--role",
+        "hero",
+        "--out",
+        "art/imagegen/concept-dr-watson-codex/checks/front-g1"
+      ],
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks/front-g1/checks-report.json\n",
+      "stderr": "",
       "phase": "candidate",
-      "run_id": "20261013T045602740661Z-metadata-1a",
-      "date": "2026-10-13T04:56:22.100917+00:00",
-      "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-      "input_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "stdout": "WARN view.frame_top         front    value=3.246 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json\n",
-      "stderr": "",
-      "summary": {
-        "PASS": 12,
-        "WARN": 1,
-        "FAIL": 0
-      },
-      "warnings": [
-        "view.frame_top"
-      ]
+      "run_id": "20261015T062340Z-1c",
+      "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-front-g1.png",
+      "input_sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4"
     },
     {
-      "view": "design-front",
+      "view": "side",
       "generation": 1,
       "exit_code": 0,
-      "report": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
-      "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4",
-      "phase": "final_selected",
-      "run_id": "20261013T045602740661Z-metadata-1a",
-      "date": "2026-10-13T04:56:22.859262+00:00",
-      "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-      "input_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "stdout": "WARN view.frame_top         front    value=3.246 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-dr-watson-codex/design/checks-report.json\n",
+      "report": "art/imagegen/concept-dr-watson-codex/checks/side-g1/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-dr-watson-codex",
+        "--key",
+        "dr-watson",
+        "--views",
+        "side",
+        "--role",
+        "hero",
+        "--out",
+        "art/imagegen/concept-dr-watson-codex/checks/side-g1"
+      ],
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks/side-g1/checks-report.json\n",
       "stderr": "",
-      "summary": {
-        "PASS": 12,
-        "WARN": 1,
-        "FAIL": 0
+      "phase": "candidate",
+      "run_id": "20261015T062340Z-1c",
+      "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-side-g1.png",
+      "input_sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7"
+    },
+    {
+      "view": "back",
+      "generation": 1,
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-watson-codex/checks/back-g1/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-dr-watson-codex",
+        "--key",
+        "dr-watson",
+        "--views",
+        "back",
+        "--role",
+        "hero",
+        "--out",
+        "art/imagegen/concept-dr-watson-codex/checks/back-g1"
+      ],
+      "stdout": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks/back-g1/checks-report.json\n",
+      "stderr": "",
+      "phase": "candidate",
+      "run_id": "20261015T062340Z-1c",
+      "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-back-g1.png",
+      "input_sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2"
+    },
+    {
+      "view": "front,side,back",
+      "generation": {
+        "front": 1,
+        "side": 1,
+        "back": 1
       },
-      "warnings": [
-        "view.frame_top"
-      ]
+      "phase": "final_selected",
+      "run_id": "20261015T062340Z-1c",
+      "exit_code": 0,
+      "report": "art/imagegen/concept-dr-watson-codex/checks-report.json",
+      "command": [
+        "python",
+        "tools/art/concept/check_concept_views.py",
+        "--set",
+        "art/imagegen/concept-dr-watson-codex",
+        "--key",
+        "dr-watson",
+        "--views",
+        "front,side,back",
+        "--role",
+        "hero",
+        "--palette",
+        "art/imagegen/concept-dr-watson-codex/palette.json",
+        "--sheet"
+      ],
+      "stdout": "PASS: PASS 33 WARN 0 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks-report.json, art/imagegen/concept-dr-watson-codex/sheet-dr-watson.png\n",
+      "stderr": ""
     }
   ],
   "checklist": [
     {
-      "view": "design-front",
-      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "view": "front",
+      "item": "view exactly as requested; level orthographic camera; no perspective, three-quarter, collage, text or watermark",
       "passed": true,
-      "note": "Одна фигура и одна подставка; дополнительных видов и надписей нет."
+      "note": "Strict front; face and torso face the camera; one isolated view, no text or watermark."
     },
     {
-      "view": "design-front",
-      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
-      "passed": false,
-      "note": "Фигура фронтальна, но видна верхняя поверхность подставки и верх обуви. Строгий вид подставки ребром не получен."
-    },
-    {
-      "view": "design-front",
-      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "view": "front",
+      "item": "silhouette, pose, arm and weapon positions follow draft; no added anatomy or new weapon",
       "passed": true,
-      "note": "Фигура и вся подставка в кадре; фон тёмно-серый, без пола и падающей тени. Проверки кадрирования и фона выполнены; WARN view.frame_top сохранён отдельно."
+      "note": "Draft outline and raised right arm retained; lowered left hand holds the bag; no extra anatomy or weapon."
     },
     {
-      "view": "design-front",
-      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
-      "passed": false,
-      "note": "Револьвер справа у персонажа, слева для зрителя; правая рука отделена от корпуса. У левой руки с сумкой нет ясно читаемого просвета между рукавом и пальто. Не T- и не A-поза."
-    },
-    {
-      "view": "design-front",
-      "item": "every identity anchor is visible: revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+      "view": "front",
+      "item": "identity, costume, colours, materials and visible anchors follow approved design",
       "passed": true,
-      "note": "Все четыре якоря видны; стороны рук соблюдены."
+      "note": "Bowler, thick moustache, brown coat, tan waistcoat, gold chain and leather bag follow the approved design."
     },
     {
-      "view": "design-front",
-      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "view": "front",
+      "item": "weapon side correct",
       "passed": true,
-      "note": "Коричневое пальто, чёрный котелок, светло-коричневый жилет и золотая цепочка присутствуют. Командного цвета и цветного/металлического кольца нет."
+      "note": "Revolver in own RIGHT hand on viewer LEFT; bag in own LEFT hand on viewer RIGHT."
+    },
+    {
+      "view": "front",
+      "item": "framing follows draft; pedestal and whole subject visible",
+      "passed": true,
+      "note": "Framing checks PASS: top 3.798%, base bottom 94.475%, base center 50.0%; no cropped parts or visible floor."
+    },
+    {
+      "view": "front",
+      "item": "same plain flat dark gray background",
+      "passed": true,
+      "note": "Background checks PASS: border RGB [42.0, 42.0, 42.0]; no gross gradient, vignette or cast background shadow observed."
+    },
+    {
+      "view": "side",
+      "item": "view exactly as requested; level orthographic camera; no perspective, three-quarter, collage, text or watermark",
+      "passed": true,
+      "note": "Strict left profile facing image LEFT; one visible eye and profile nose; no three-quarter turn, text or watermark."
+    },
+    {
+      "view": "side",
+      "item": "silhouette, pose, arm and weapon positions follow draft; no added anatomy or new weapon",
+      "passed": true,
+      "note": "Profile follows the draft; near left arm lowers to the bag, far right arm bends upward with revolver."
+    },
+    {
+      "view": "side",
+      "item": "identity, costume, colours, materials and visible anchors follow approved design",
+      "passed": true,
+      "note": "Bowler, moustache, coat, cuff, leather bag and hardware follow the approved design; both handle and gun hand readable."
+    },
+    {
+      "view": "side",
+      "item": "weapon side correct",
+      "passed": true,
+      "note": "Near own LEFT hand holds bag; far own RIGHT hand holds the revolver, matching the draft."
+    },
+    {
+      "view": "side",
+      "item": "framing follows draft; pedestal and whole subject visible",
+      "passed": true,
+      "note": "Framing checks PASS: top 3.798%, base bottom 94.751%, base center 49.816%; no cropped parts or visible floor."
+    },
+    {
+      "view": "side",
+      "item": "same plain flat dark gray background",
+      "passed": true,
+      "note": "Background checks PASS: border RGB [43.0, 43.0, 42.0]; no gross gradient, vignette or cast background shadow observed."
+    },
+    {
+      "view": "back",
+      "item": "view exactly as requested; level orthographic camera; no perspective, three-quarter, collage, text or watermark",
+      "passed": true,
+      "note": "Strict back; no face visible; one isolated view, no text or watermark."
+    },
+    {
+      "view": "back",
+      "item": "silhouette, pose, arm and weapon positions follow draft; no added anatomy or new weapon",
+      "passed": true,
+      "note": "Draft rear silhouette, coat vent, back tab and asymmetric arms retained; no extra anatomy or weapon."
+    },
+    {
+      "view": "back",
+      "item": "identity, costume, colours, materials and visible anchors follow approved design",
+      "passed": true,
+      "note": "Black bowler, brown coat, hair and leather bag follow approved front and selected side; hidden face/chain not invented."
+    },
+    {
+      "view": "back",
+      "item": "weapon side correct",
+      "passed": true,
+      "note": "Revolver in own RIGHT hand on viewer RIGHT; bag in own LEFT hand on viewer LEFT."
+    },
+    {
+      "view": "back",
+      "item": "framing follows draft; pedestal and whole subject visible",
+      "passed": true,
+      "note": "Framing checks PASS: top 3.591%, base bottom 94.751%, base center 49.724%; no cropped parts or visible floor."
+    },
+    {
+      "view": "back",
+      "item": "same plain flat dark gray background",
+      "passed": true,
+      "note": "Background checks PASS: border RGB [42.0, 42.0, 42.0]; no gross gradient, vignette or cast background shadow observed."
     }
   ],
   "generations_per_view": {
-    "design-front": 1
+    "front": 1,
+    "side": 1,
+    "back": 1
   },
-  "generation_limit_this_run": 0,
-  "generations_used_this_run": 0,
-  "limit_reached": [
-    {
-      "view": "design-front",
-      "failed_items": [
-        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
-        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
-      ],
-      "run_id": "20261013T045602740661Z-metadata-1a",
-      "generations_allowed_this_run": 0
-    }
-  ],
-  "final_script_exit_code": 0,
-  "last_script_exit_code": 0,
-  "final_report": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
-  "limits_not_met": [
-    {
-      "item": "immediate_byte_copy",
-      "note": "The first copy command failed; the original was later copied byte for byte."
-    },
-    {
-      "item": "strict_front_orthographic",
-      "note": "The pedestal top surface is visible."
-    },
-    {
-      "item": "both_arms_clear_gap",
-      "note": "The left sleeve is not visibly separated from the overcoat."
-    },
-    {
-      "item": "frame_top_4pct",
-      "note": "Верхняя точка маски y=3,246% при требовании y≥4%; WARN view.frame_top допускается контрактом.",
-      "severity": "WARN"
-    }
-  ],
-  "processes_started_by_this_run_remaining": [],
-  "notes": [
-    "Корректирующий запуск: восстановление отчётов этапа 1a, GENERATIONS_ALLOWED = 0, новых изображений 0.",
-    "PNG, палитра, записи генерации и точные промпты не изменены; выбранный дизайн уже совпадал с кандидатом побайтово.",
-    "Исходная ошибка проверки с кодом 2 сохранена в checks и архиве; добавлены две успешные проверки.",
-    "Художественная приёмка не проводилась. Открытые пункты CHECKLIST сохранены при нулевом разрешении на генерации.",
-    "Git, Unreal, Tripo, SYNTX и image_gen не использовались; все записи находятся внутри пакета."
-  ],
+  "generation_limit_per_view_this_run": 2,
+  "generation_limit_per_view_all_records": 4,
+  "generations_used_this_run": 3,
+  "limit_reached": [],
+  "limits_not_met": [],
   "selected": {
-    "design-front": {
+    "front": {
       "generation": 1,
-      "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
-      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84"
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+      "sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4"
+    },
+    "side": {
+      "generation": 1,
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+      "sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7"
+    },
+    "back": {
+      "generation": 1,
+      "path": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+      "sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2"
     }
   },
   "byte_copies": [
     {
-      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13365-cb17-7d02-a4e5-38b011565fb5\\exec-e186b809-d34a-449b-8e22-484c84c805b1.png",
-      "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "unchanged": true
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e3a-640b-7221-bd64-dcfc5ecbe194\\exec-80489bee-94ee-4c52-aa67-e5a22a770502.png",
+      "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-front-g1.png",
+      "selected_path": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+      "sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4",
+      "byte_identical": true
     },
     {
-      "source": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-      "saved_path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
-      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "unchanged": true
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e3a-640b-7221-bd64-dcfc5ecbe194\\exec-6c54e03e-9917-468c-883e-228d5d8e9062.png",
+      "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-side-g1.png",
+      "selected_path": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+      "sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7",
+      "byte_identical": true
+    },
+    {
+      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e3a-640b-7221-bd64-dcfc5ecbe194\\exec-cfb29ad0-87e4-4d27-a3ad-bacf68dff20d.png",
+      "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-back-g1.png",
+      "selected_path": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+      "sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2",
+      "byte_identical": true
     }
   ],
-  "existing_package_files_preserved": [
-    "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/error.json",
-    "art/imagegen/concept-dr-watson-codex/generation-records.json",
-    "art/imagegen/concept-dr-watson-codex/palette.json",
-    "art/imagegen/concept-dr-watson-codex/prompts/concept-prompts.json",
-    "art/imagegen/concept-dr-watson-codex/prompts.md",
-    "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-    "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png"
-  ],
-  "original_run": {
-    "date": "2026-10-13",
-    "run_status": "stopped_on_check_exit_2",
-    "generation_limit_this_run": 2,
-    "generations_used_this_run": 1,
-    "final_script_exit_code": null,
-    "last_script_exit_code": 2,
-    "final_report": null,
-    "final_check_not_run_reason": "The task explicitly requires stopping on checker exit 2. Copying was repaired only to preserve the generated deliverable; no subsequent checker or image_gen calls were made.",
-    "limits_not_met": [
-      {
-        "item": "immediate_byte_copy",
-        "note": "The first copy command failed; the original was later copied byte for byte."
-      },
-      {
-        "item": "candidate_automatic_check",
-        "note": "Exit 2, missing input after failed copy command; no report was created."
-      },
-      {
-        "item": "final_selected_report",
-        "note": "Not run due to the explicit stop-on-exit-2 rule; design/checks-report.json is absent."
-      },
-      {
-        "item": "strict_front_orthographic",
-        "note": "The pedestal top surface is visible."
-      },
-      {
-        "item": "both_arms_clear_gap",
-        "note": "The left sleeve is not visibly separated from the overcoat."
-      }
-    ],
-    "notes": [
-      "No git commands, Unreal access, Tripo, SYNTX or downloads.",
-      "npx openskills failed with ENOTCACHED; instructions were read from local files.",
-      "A subsequent metadata write invocation exceeded the Windows command-line length limit and did not start. Metadata was written using shorter commands."
-    ],
-    "outside_folder_scope": "Files written by the agent are confined to the package. The image_gen-managed original outside the package is the explicit contract exception; it remains unchanged."
+  "final_script_exit_code": 0,
+  "final_report": "art/imagegen/concept-dr-watson-codex/checks-report.json",
+  "final_summary": {
+    "PASS": 33,
+    "WARN": 0,
+    "FAIL": 0
   },
-  "run_id": "20261013T045602740661Z-metadata-1a",
-  "run_scope": "metadata_only_report_repair",
-  "repaired_at": "2026-10-13T04:57:54.236906+00:00",
-  "images_generated_this_run": 0,
-  "generation_counts_scope": "generations_per_view includes preserved original generation records; this corrective run generated zero images.",
-  "resolved_limits_not_met": [
+  "sheet": "art/imagegen/concept-dr-watson-codex/sheet-dr-watson.png",
+  "sheet_visually_inspected": true,
+  "all_selected_outputs_visually_inspected": true,
+  "all_preexisting_nonmetadata_files_unchanged": true,
+  "preexisting_files": [
     {
-      "item": "candidate_automatic_check",
-      "note": "Exit 2, missing input after failed copy command; no report was created.",
-      "resolved_in": "20261013T045602740661Z-metadata-1a"
+      "path": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
+      "sha256": "b5997989626e20259c4ce84f4c6dc4c438537b130cff52252e96bf7da95f41c2",
+      "unchanged": true
     },
     {
-      "item": "final_selected_report",
-      "note": "Not run due to the explicit stop-on-exit-2 rule; design/checks-report.json is absent.",
-      "resolved_in": "20261013T045602740661Z-metadata-1a"
-    }
-  ],
-  "warnings": [
-    {
-      "view": "design-front",
-      "generation": 1,
-      "id": "view.frame_top",
-      "value_pct": 3.246,
-      "minimum_pct": 4,
-      "note": "Верхняя точка маски y=3,246% при требовании y≥4%; WARN view.frame_top допускается контрактом."
-    }
-  ],
-  "repair_history": [
-    {
-      "source": "art/imagegen/concept-dr-watson-codex/verification.json",
-      "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/verification.json",
-      "sha256": "516c7fc98996462ebf96214e05cbd968cfac9d581b8d6d418c8ec907b95061c3",
-      "bytes": 7132,
-      "byte_identical": true
+      "path": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/error.json",
+      "sha256": "25486462476580b752564debedd0bbe73518738e2016fbfd34a41a0e89b323cb",
+      "unchanged": true
     },
-    {
-      "source": "art/imagegen/concept-dr-watson-codex/manifest-sha256.json",
-      "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/manifest-sha256.json",
-      "sha256": "339715c9e88640a0608eb6683f55604435d7f91ef88c4d99b60233c82a49847f",
-      "bytes": 1768,
-      "byte_identical": true
-    }
-  ],
-  "repair_runs": [
-    {
-      "run_id": "20261013T045602740661Z-metadata-1a",
-      "audit": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/repair-run.json",
-      "started_at": "2026-10-13T04:56:02.740661+00:00",
-      "checks_completed_at": "2026-10-13T04:57:02.980877+00:00",
-      "generation_limit_this_run": 0,
-      "generations_used_this_run": 0,
-      "reports_completed": [
-        "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
-        "art/imagegen/concept-dr-watson-codex/design/checks-report.json"
-      ],
-      "final_script_exit_code": 0,
-      "source_unchanged": true,
-      "all_existing_pngs_unchanged": true,
-      "blockers": []
-    }
-  ],
-  "all_existing_pngs_unchanged": true,
-  "png_files": [
     {
       "path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
-      "before_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "after_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "bytes": 1733270,
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
+      "sha256": "b5997989626e20259c4ce84f4c6dc4c438537b130cff52252e96bf7da95f41c2",
       "unchanged": true
     },
     {
       "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
-      "before_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "after_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
-      "bytes": 1733270,
+      "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/palette.json",
+      "sha256": "485da8b13cb0238854c681a5600a9f0544cbcca0cf7871ddbc7a25c3e818c5c4",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/manifest-sha256.json",
+      "sha256": "339715c9e88640a0608eb6683f55604435d7f91ef88c4d99b60233c82a49847f",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/repair-run.json",
+      "sha256": "1be9a1880ec89ff17b8216569a3641ac27c8d6bc8050a460a2ae4b1869e1dbbb",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/verification.json",
+      "sha256": "516c7fc98996462ebf96214e05cbd968cfac9d581b8d6d418c8ec907b95061c3",
       "unchanged": true
     }
   ],
-  "generation_records_unchanged": true,
-  "exact_prompts_unchanged": true,
-  "selected_design_byte_identical": true,
+  "prior_generation_records_preserved": true,
+  "prior_exact_prompts_preserved": true,
+  "previous_runs": [
+    {
+      "card_id": "ASSET-DR-WATSON-001",
+      "stage": "1a",
+      "date": "2026-10-13",
+      "status": "предложено",
+      "run_status": "metadata_repair_completed",
+      "source_unchanged": true,
+      "sources": [
+        {
+          "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+          "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+          "bytes": 2034907,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-dr-watson-codex/palette.json",
+          "before_sha256": "485da8b13cb0238854c681a5600a9f0544cbcca0cf7871ddbc7a25c3e818c5c4",
+          "after_sha256": "485da8b13cb0238854c681a5600a9f0544cbcca0cf7871ddbc7a25c3e818c5c4",
+          "bytes": 308,
+          "unchanged": true
+        }
+      ],
+      "outside_folder": [],
+      "outside_folder_scope": "Current corrective run: all file writes are inside this package; no new image tool call or tool-managed outside copy.",
+      "checks": [
+        {
+          "view": "design-front",
+          "generation": 1,
+          "exit_code": 2,
+          "report": null,
+          "expected_report": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
+          "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4 --out art/imagegen/concept-dr-watson-codex/checks/design-front-g1",
+          "error": "ERROR: нет файла вида art\\imagegen\\concept-dr-watson-codex\\design\\dr-watson-front.png",
+          "cause": "The preceding Python copy command failed with SyntaxError: unterminated string literal due to shell quoting. The checker was then invoked with its required input still missing."
+        },
+        {
+          "view": "design-front",
+          "generation": 1,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
+          "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4 --out art/imagegen/concept-dr-watson-codex/checks/design-front-g1",
+          "phase": "candidate",
+          "run_id": "20261013T045602740661Z-metadata-1a",
+          "date": "2026-10-13T04:56:22.100917+00:00",
+          "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+          "input_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "stdout": "WARN view.frame_top         front    value=3.246 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json\n",
+          "stderr": "",
+          "summary": {
+            "PASS": 12,
+            "WARN": 1,
+            "FAIL": 0
+          },
+          "warnings": [
+            "view.frame_top"
+          ]
+        },
+        {
+          "view": "design-front",
+          "generation": 1,
+          "exit_code": 0,
+          "report": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
+          "command": "python tools/art/concept/check_concept_views.py --set art/imagegen/concept-dr-watson-codex/design --key dr-watson --views front --role hero --min-top-pct 4",
+          "phase": "final_selected",
+          "run_id": "20261013T045602740661Z-metadata-1a",
+          "date": "2026-10-13T04:56:22.859262+00:00",
+          "candidate": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+          "input_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "stdout": "WARN view.frame_top         front    value=3.246 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-dr-watson-codex/design/checks-report.json\n",
+          "stderr": "",
+          "summary": {
+            "PASS": 12,
+            "WARN": 1,
+            "FAIL": 0
+          },
+          "warnings": [
+            "view.frame_top"
+          ]
+        }
+      ],
+      "checklist": [
+        {
+          "view": "design-front",
+          "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+          "passed": true,
+          "note": "Одна фигура и одна подставка; дополнительных видов и надписей нет."
+        },
+        {
+          "view": "design-front",
+          "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+          "passed": false,
+          "note": "Фигура фронтальна, но видна верхняя поверхность подставки и верх обуви. Строгий вид подставки ребром не получен."
+        },
+        {
+          "view": "design-front",
+          "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+          "passed": true,
+          "note": "Фигура и вся подставка в кадре; фон тёмно-серый, без пола и падающей тени. Проверки кадрирования и фона выполнены; WARN view.frame_top сохранён отдельно."
+        },
+        {
+          "view": "design-front",
+          "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+          "passed": false,
+          "note": "Револьвер справа у персонажа, слева для зрителя; правая рука отделена от корпуса. У левой руки с сумкой нет ясно читаемого просвета между рукавом и пальто. Не T- и не A-поза."
+        },
+        {
+          "view": "design-front",
+          "item": "every identity anchor is visible: revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+          "passed": true,
+          "note": "Все четыре якоря видны; стороны рук соблюдены."
+        },
+        {
+          "view": "design-front",
+          "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+          "passed": true,
+          "note": "Коричневое пальто, чёрный котелок, светло-коричневый жилет и золотая цепочка присутствуют. Командного цвета и цветного/металлического кольца нет."
+        }
+      ],
+      "generations_per_view": {
+        "design-front": 1
+      },
+      "generation_limit_this_run": 0,
+      "generations_used_this_run": 0,
+      "limit_reached": [
+        {
+          "view": "design-front",
+          "failed_items": [
+            "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+            "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+          ],
+          "run_id": "20261013T045602740661Z-metadata-1a",
+          "generations_allowed_this_run": 0
+        }
+      ],
+      "final_script_exit_code": 0,
+      "last_script_exit_code": 0,
+      "final_report": "art/imagegen/concept-dr-watson-codex/design/checks-report.json",
+      "limits_not_met": [
+        {
+          "item": "immediate_byte_copy",
+          "note": "The first copy command failed; the original was later copied byte for byte."
+        },
+        {
+          "item": "strict_front_orthographic",
+          "note": "The pedestal top surface is visible."
+        },
+        {
+          "item": "both_arms_clear_gap",
+          "note": "The left sleeve is not visibly separated from the overcoat."
+        },
+        {
+          "item": "frame_top_4pct",
+          "note": "Верхняя точка маски y=3,246% при требовании y≥4%; WARN view.frame_top допускается контрактом.",
+          "severity": "WARN"
+        }
+      ],
+      "processes_started_by_this_run_remaining": [],
+      "notes": [
+        "Корректирующий запуск: восстановление отчётов этапа 1a, GENERATIONS_ALLOWED = 0, новых изображений 0.",
+        "PNG, палитра, записи генерации и точные промпты не изменены; выбранный дизайн уже совпадал с кандидатом побайтово.",
+        "Исходная ошибка проверки с кодом 2 сохранена в checks и архиве; добавлены две успешные проверки.",
+        "Художественная приёмка не проводилась. Открытые пункты CHECKLIST сохранены при нулевом разрешении на генерации.",
+        "Git, Unreal, Tripo, SYNTX и image_gen не использовались; все записи находятся внутри пакета."
+      ],
+      "selected": {
+        "design-front": {
+          "generation": 1,
+          "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+          "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84"
+        }
+      },
+      "byte_copies": [
+        {
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13365-cb17-7d02-a4e5-38b011565fb5\\exec-e186b809-d34a-449b-8e22-484c84c805b1.png",
+          "saved_path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+          "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "unchanged": true
+        },
+        {
+          "source": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+          "saved_path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+          "sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "unchanged": true
+        }
+      ],
+      "existing_package_files_preserved": [
+        "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/error.json",
+        "art/imagegen/concept-dr-watson-codex/generation-records.json",
+        "art/imagegen/concept-dr-watson-codex/palette.json",
+        "art/imagegen/concept-dr-watson-codex/prompts/concept-prompts.json",
+        "art/imagegen/concept-dr-watson-codex/prompts.md",
+        "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+        "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png"
+      ],
+      "original_run": {
+        "date": "2026-10-13",
+        "run_status": "stopped_on_check_exit_2",
+        "generation_limit_this_run": 2,
+        "generations_used_this_run": 1,
+        "final_script_exit_code": null,
+        "last_script_exit_code": 2,
+        "final_report": null,
+        "final_check_not_run_reason": "The task explicitly requires stopping on checker exit 2. Copying was repaired only to preserve the generated deliverable; no subsequent checker or image_gen calls were made.",
+        "limits_not_met": [
+          {
+            "item": "immediate_byte_copy",
+            "note": "The first copy command failed; the original was later copied byte for byte."
+          },
+          {
+            "item": "candidate_automatic_check",
+            "note": "Exit 2, missing input after failed copy command; no report was created."
+          },
+          {
+            "item": "final_selected_report",
+            "note": "Not run due to the explicit stop-on-exit-2 rule; design/checks-report.json is absent."
+          },
+          {
+            "item": "strict_front_orthographic",
+            "note": "The pedestal top surface is visible."
+          },
+          {
+            "item": "both_arms_clear_gap",
+            "note": "The left sleeve is not visibly separated from the overcoat."
+          }
+        ],
+        "notes": [
+          "No git commands, Unreal access, Tripo, SYNTX or downloads.",
+          "npx openskills failed with ENOTCACHED; instructions were read from local files.",
+          "A subsequent metadata write invocation exceeded the Windows command-line length limit and did not start. Metadata was written using shorter commands."
+        ],
+        "outside_folder_scope": "Files written by the agent are confined to the package. The image_gen-managed original outside the package is the explicit contract exception; it remains unchanged."
+      },
+      "run_id": "20261013T045602740661Z-metadata-1a",
+      "run_scope": "metadata_only_report_repair",
+      "repaired_at": "2026-10-13T04:57:54.236906+00:00",
+      "images_generated_this_run": 0,
+      "generation_counts_scope": "generations_per_view includes preserved original generation records; this corrective run generated zero images.",
+      "resolved_limits_not_met": [
+        {
+          "item": "candidate_automatic_check",
+          "note": "Exit 2, missing input after failed copy command; no report was created.",
+          "resolved_in": "20261013T045602740661Z-metadata-1a"
+        },
+        {
+          "item": "final_selected_report",
+          "note": "Not run due to the explicit stop-on-exit-2 rule; design/checks-report.json is absent.",
+          "resolved_in": "20261013T045602740661Z-metadata-1a"
+        }
+      ],
+      "warnings": [
+        {
+          "view": "design-front",
+          "generation": 1,
+          "id": "view.frame_top",
+          "value_pct": 3.246,
+          "minimum_pct": 4,
+          "note": "Верхняя точка маски y=3,246% при требовании y≥4%; WARN view.frame_top допускается контрактом."
+        }
+      ],
+      "repair_history": [
+        {
+          "source": "art/imagegen/concept-dr-watson-codex/verification.json",
+          "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/verification.json",
+          "sha256": "516c7fc98996462ebf96214e05cbd968cfac9d581b8d6d418c8ec907b95061c3",
+          "bytes": 7132,
+          "byte_identical": true
+        },
+        {
+          "source": "art/imagegen/concept-dr-watson-codex/manifest-sha256.json",
+          "path": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/manifest-sha256.json",
+          "sha256": "339715c9e88640a0608eb6683f55604435d7f91ef88c4d99b60233c82a49847f",
+          "bytes": 1768,
+          "byte_identical": true
+        }
+      ],
+      "repair_runs": [
+        {
+          "run_id": "20261013T045602740661Z-metadata-1a",
+          "audit": "art/imagegen/concept-dr-watson-codex/repair-history/20261013T045602740661Z-metadata-1a/repair-run.json",
+          "started_at": "2026-10-13T04:56:02.740661+00:00",
+          "checks_completed_at": "2026-10-13T04:57:02.980877+00:00",
+          "generation_limit_this_run": 0,
+          "generations_used_this_run": 0,
+          "reports_completed": [
+            "art/imagegen/concept-dr-watson-codex/checks/design-front-g1/checks-report.json",
+            "art/imagegen/concept-dr-watson-codex/design/checks-report.json"
+          ],
+          "final_script_exit_code": 0,
+          "source_unchanged": true,
+          "all_existing_pngs_unchanged": true,
+          "blockers": []
+        }
+      ],
+      "all_existing_pngs_unchanged": true,
+      "png_files": [
+        {
+          "path": "art/imagegen/concept-dr-watson-codex/concepts/dr-watson-design-front-g1.png",
+          "before_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "after_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "bytes": 1733270,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-dr-watson-codex/design/dr-watson-front.png",
+          "before_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "after_sha256": "58ff9e7e632c9c2810b293db25efa38779eb019612b14113c921f058f437ae84",
+          "bytes": 1733270,
+          "unchanged": true
+        }
+      ],
+      "generation_records_unchanged": true,
+      "exact_prompts_unchanged": true,
+      "selected_design_byte_identical": true,
+      "blockers": [],
+      "claims": {
+        "report_repair_completed": true,
+        "art_accepted": false
+      }
+    }
+  ],
+  "processes_started_by_this_run_remaining": [],
   "blockers": [],
-  "claims": {
-    "report_repair_completed": true,
-    "art_accepted": false
+  "limitations": [
+    "Concept images only; artistic acceptance remains with the acceptor.",
+    "Automated checks cover framing, background and set consistency; pose/identity assessed visually, without pixel-exact geometric registration.",
+    "Fine seams, leather grain and hardware are generated interpretations per view; no mesh, topology, rig, animation, or game-readiness validation was performed."
+  ],
+  "notes": [
+    "One built-in image_gen edit call per view, in order front, side, back; no retries, resizing, cropping, recolouring, retouching or re-encoding.",
+    "All four input images were opened with view_image before their edit calls. Back also used the inspected selected side as reference 3.",
+    "CORE sections extracted only at line-anchored CORE-FRONT / CORE-SIDE / CORE-BACK headings; original CORE text retained.",
+    "No git commands, ledger/registry edits, Unreal, Tripo, SYNTX, services, downloads or subagents."
+  ],
+  "integrity_audit": {
+    "exit_code": 0,
+    "source_hashes_match": true,
+    "previous_runs_preserved": true,
+    "prior_records_and_prompts_preserved": true,
+    "prior_markdown_suffixes_byte_identical": true,
+    "all_original_and_selected_pngs_byte_identical": true,
+    "all_text_utf8_without_bom": true,
+    "exact_core_prompts_match_specification": true
   }
 }

@@ -1,0 +1,59 @@
+{
+  "task": "CP-32",
+  "status": "source-candidate-only",
+  "reviewed_at_utc": "2026-10-15T06:32:01.408480+00:00",
+  "reviewer": "generating bounded worker; self-review only",
+  "not_independent_acceptance": true,
+  "files_opened_with_view_image": [
+    "review/full100-review-sheet.png"
+  ],
+  "original_review": "Built-in tool output visibly inspected at generation; originals copied without resave.",
+  "method": {
+    "circle": "full100",
+    "disc": [
+      0.5,
+      0.5,
+      1.0
+    ],
+    "source_region": "entire square",
+    "zoom": 1.0,
+    "pan": [
+      0.0,
+      0.0
+    ],
+    "native_sizes_px": [
+      40,
+      80
+    ],
+    "sheet_display": "40px and 80px icons are pasted at exactly native pixel dimensions, not enlarged.",
+    "other_previews_px": [
+      160,
+      320,
+      1254
+    ],
+    "review_only_derivatives": true
+  },
+  "observations": {
+    "whole_square": "One centered frontal grey face with heavy ridged brows, amber-brown eyes, broad nose and downturned mouth. Swept brown crown, pointed beard, layered fur and sparse moss accents follow the supplied concept. Complete crown and beard are visible; outer shoulders and chest continue beyond the bottom/side frame as expected for a bust.",
+    "full100_circle": "Whole crown, ears/upper mane and pointed beard stay within the full-square centered circle. The circle trims outer lower shoulder fur and chest; no claim that every shoulder strand survives. No pan or zoom used.",
+    "native_80": "Grey facial mass, heavy brow, nose, downturned mouth and beard remain readable. Small amber eyes are visible as tiny dark/light points; fine iris, grey-skin wrinkles and fur-strand details are not reliable at this size. Moss is subtle.",
+    "native_40": "The brow/grey face, brown mane and beard remain identifiable. Individual eyes/irises are weak and should not be relied on for expression or direction at 40px; identity mainly comes from silhouette and face-to-fur contrast. Fine moss and strand detail merge.",
+    "grayscale_320": "Grey skin separates from the dark eye sockets and brown-fur luminance sufficiently to retain the face. Brown-versus-moss hue distinction is reduced.",
+    "limitations": [
+      "Generated crown starts about 10% down, closer to the top than the requested 18%; it remains complete with visible charcoal margin and fits full100.",
+      "Outer shoulder silhouette reaches square edges and is clipped by the circle at the lower perimeter; head identity is retained.",
+      "The background is plain charcoal with a slight studio luminance variation, not verified perfectly uniform.",
+      "Native40 individual eye readability is limited; future runtime needs separate review. No zoom crop is prescribed or accepted here."
+    ],
+    "identity_failure": false,
+    "clipped_head_failure": false,
+    "recommendation": "Keep g1 as source candidate for independent review, with native40 eye-detail limitation."
+  },
+  "generation_budget": {
+    "calls_used": 1,
+    "corrections_used": 0,
+    "correction_reason": null,
+    "note": "No actual clipped-head or identity defect found; no correction call permitted for other refinements."
+  },
+  "acceptance": "No portrait runtime acceptance, asset import or model-stage advancement is made."
+}
