@@ -73,3 +73,5 @@ Dev-клиент `UnrealEditor -game -LiveCoding -DevExec` (`tools/dev/devexec.p
 | GD-052 UX-стопперы | `gd052-2026-10-15.md` |
 | GD-053 деградация | `gd053-2026-10-15/` |
 | GD-054 RC | `../../RELEASE-CANDIDATE.md` |
+| GD-045 / GD-051 предварительный замер (ПК разработки, не приёмка) | `gd045-prelim-2026-10-16/` |
+| ART-003 силуэты без цвета | `art003-2026-10-16/` |

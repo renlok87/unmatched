@@ -1,0 +1,2400 @@
+{
+  "schema": "unmatched.w4a-render-bench-summary/1",
+  "status": "измерено (RTX 4090, не D-07)",
+  "rule": "3 повтора на вариант; шум = max - min по повторам; разница значима, если |Δ| > 2 × шум",
+  "variants": {
+    "marmoreal": {
+      "variant": "marmoreal",
+      "runs": 3,
+      "views": {
+        "K1": {
+          "fps": {
+            "n": 3,
+            "mean": 287.3833,
+            "min": 280.38,
+            "max": 291.7,
+            "noise": 11.32
+          },
+          "frameMsAvg": {
+            "n": 3,
+            "mean": 3.4833,
+            "min": 3.43,
+            "max": 3.57,
+            "noise": 0.14
+          },
+          "frameMsP95": {
+            "n": 3,
+            "mean": 4.23,
+            "min": 4.15,
+            "max": 4.37,
+            "noise": 0.22
+          },
+          "gpuMsAvg": {
+            "n": 3,
+            "mean": 2.0167,
+            "min": 2.01,
+            "max": 2.02,
+            "noise": 0.01
+          },
+          "gpuMsP95": {
+            "n": 3,
+            "mean": 2.1433,
+            "min": 2.14,
+            "max": 2.15,
+            "noise": 0.01
+          },
+          "renderMsAvg": {
+            "n": 3,
+            "mean": 3.4833,
+            "min": 3.43,
+            "max": 3.57,
+            "noise": 0.14
+          },
+          "csvGpuMeanMs": {
+            "FrameTime": {
+              "n": 3,
+              "mean": 3.4807,
+              "min": 3.4281,
+              "max": 3.5666,
+              "noise": 0.1385
+            },
+            "GPU/AllocateRendertargets": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/Basepass": {
+              "n": 3,
+              "mean": 0.1023,
+              "min": 0.1023,
+              "max": 0.1024,
+              "noise": 0.0001
+            },
+            "GPU/BeginOcclusionTests": {
+              "n": 3,
+              "mean": 0.0135,
+              "min": 0.0133,
+              "max": 0.0136,
+              "noise": 0.0003
+            },
+            "GPU/BuildRenderingCommands": {
+              "n": 3,
+              "mean": 0.0032,
+              "min": 0.0032,
+              "max": 0.0032,
+              "noise": 0.0
+            },
+            "GPU/BuildRenderingCommandsDeferred": {
+              "n": 3,
+              "mean": 0.0478,
+              "min": 0.0477,
+              "max": 0.0479,
+              "noise": 0.0002
+            },
+            "GPU/DistanceFieldShadows": {
+              "n": 3,
+              "mean": 0.0472,
+              "min": 0.047,
+              "max": 0.0475,
+              "noise": 0.0005
+            },
+            "GPU/DistanceFields": {
+              "n": 3,
+              "mean": 0.0176,
+              "min": 0.0175,
+              "max": 0.0177,
+              "noise": 0.0002
+            },
+            "GPU/FXSystemPostRenderOpaque": {
+              "n": 3,
+              "mean": 0.0026,
+              "min": 0.0026,
+              "max": 0.0027,
+              "noise": 0.0001
+            },
+            "GPU/FXSystemPreRender": {
+              "n": 3,
+              "mean": 0.0011,
+              "min": 0.0011,
+              "max": 0.0011,
+              "noise": 0.0
+            },
+            "GPU/GPUSceneUpdate": {
+              "n": 3,
+              "mean": 0.0091,
+              "min": 0.009,
+              "max": 0.0091,
+              "noise": 0.0001
+            },
+            "GPU/GlobalDistanceFieldUpdate": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/HZB": {
+              "n": 3,
+              "mean": 0.0222,
+              "min": 0.0221,
+              "max": 0.0223,
+              "noise": 0.0002
+            },
+            "GPU/LightFunctionAtlasGeneration": {
+              "n": 3,
+              "mean": 0.0001,
+              "min": 0.0001,
+              "max": 0.0001,
+              "noise": 0.0
+            },
+            "GPU/LightGrid": {
+              "n": 3,
+              "mean": 0.0209,
+              "min": 0.0209,
+              "max": 0.0209,
+              "noise": 0.0
+            },
+            "GPU/Lights": {
+              "n": 3,
+              "mean": 0.1027,
+              "min": 0.1026,
+              "max": 0.1029,
+              "noise": 0.0003
+            },
+            "GPU/LumenReflections": {
+              "n": 3,
+              "mean": 0.1248,
+              "min": 0.1246,
+              "max": 0.125,
+              "noise": 0.0004
+            },
+            "GPU/LumenSceneUpdate": {
+              "n": 3,
+              "mean": 0.0454,
+              "min": 0.0453,
+              "max": 0.0455,
+              "noise": 0.0002
+            },
+            "GPU/LumenScreenProbeGather": {
+              "n": 3,
+              "mean": 0.0058,
+              "min": 0.0057,
+              "max": 0.0058,
+              "noise": 0.0001
+            },
+            "GPU/PostRenderOpsFX": {
+              "n": 3,
+              "mean": 0.0021,
+              "min": 0.0021,
+              "max": 0.0021,
+              "noise": 0.0
+            },
+            "GPU/Postprocessing": {
+              "n": 3,
+              "mean": 0.1191,
+              "min": 0.119,
+              "max": 0.1194,
+              "noise": 0.0004
+            },
+            "GPU/Prepass": {
+              "n": 3,
+              "mean": 0.048,
+              "min": 0.0479,
+              "max": 0.048,
+              "noise": 0.0001
+            },
+            "GPU/RayTracingGeometry": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/RenderDeferredLighting": {
+              "n": 3,
+              "mean": 0.2085,
+              "min": 0.2067,
+              "max": 0.2098,
+              "noise": 0.0031
+            },
+            "GPU/RenderVelocities": {
+              "n": 3,
+              "mean": 0.0524,
+              "min": 0.0523,
+              "max": 0.0526,
+              "noise": 0.0003
+            },
+            "GPU/ShadowDepths": {
+              "n": 3,
+              "mean": 0.0424,
+              "min": 0.0423,
+              "max": 0.0426,
+              "noise": 0.0003
+            },
+            "GPU/ShadowProjection": {
+              "n": 3,
+              "mean": 0.0197,
+              "min": 0.0197,
+              "max": 0.0198,
+              "noise": 0.0001
+            },
+            "GPU/TemporalSuperResolution": {
+              "n": 3,
+              "mean": 0.3374,
+              "min": 0.3367,
+              "max": 0.3385,
+              "noise": 0.0018
+            },
+            "GPU/Translucency": {
+              "n": 3,
+              "mean": 0.1096,
+              "min": 0.109,
+              "max": 0.1102,
+              "noise": 0.0012
+            },
+            "GPU/TranslucentLighting": {
+              "n": 3,
+              "mean": 0.015,
+              "min": 0.0149,
+              "max": 0.0151,
+              "noise": 0.0002
+            },
+            "GPU/Unaccounted": {
+              "n": 3,
+              "mean": 0.3241,
+              "min": 0.3237,
+              "max": 0.3243,
+              "noise": 0.0006
+            },
+            "GPU/UpdateLumenSceneBuffers": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VirtualTextureUpdate": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VisibilityCommands": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPUTime": {
+              "n": 3,
+              "mean": 2.0124,
+              "min": 2.0086,
+              "max": 2.0156,
+              "noise": 0.007
+            },
+            "GameThreadTime": {
+              "n": 3,
+              "mean": 1.2522,
+              "min": 1.2325,
+              "max": 1.2828,
+              "noise": 0.0503
+            },
+            "RenderThreadTime": {
+              "n": 3,
+              "mean": 3.4796,
+              "min": 3.4271,
+              "max": 3.5655,
+              "noise": 0.1384
+            }
+          },
+          "profileGpuInclusiveMs": {
+            "Compute pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 0.9327,
+                "min": 0.925,
+                "max": 0.94,
+                "noise": 0.015
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.522,
+                "min": 0.517,
+                "max": 0.525,
+                "noise": 0.008
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.008,
+                "min": 0.007,
+                "max": 0.009,
+                "noise": 0.002
+              },
+              "LumenSceneLighting": {
+                "n": 3,
+                "mean": 0.2347,
+                "min": 0.229,
+                "max": 0.24,
+                "noise": 0.011
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.484,
+                "min": 0.479,
+                "max": 0.487,
+                "noise": 0.008
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.143,
+                "min": 0.138,
+                "max": 0.146,
+                "noise": 0.008
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 0.9253,
+                "min": 0.92,
+                "max": 0.931,
+                "noise": 0.011
+              }
+            },
+            "Graphics pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.8003,
+                "min": 1.786,
+                "max": 1.811,
+                "noise": 0.025
+              },
+              "BasePass": {
+                "n": 3,
+                "mean": 0.1073,
+                "min": 0.107,
+                "max": 0.108,
+                "noise": 0.001
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.131,
+                "min": 0.129,
+                "max": 0.134,
+                "noise": 0.005
+              },
+              "DistanceFieldShadows": {
+                "n": 3,
+                "mean": 0.0453,
+                "min": 0.043,
+                "max": 0.047,
+                "noise": 0.004
+              },
+              "HZB": {
+                "n": 3,
+                "mean": 0.014,
+                "min": 0.013,
+                "max": 0.016,
+                "noise": 0.003
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.1697,
+                "min": 0.168,
+                "max": 0.171,
+                "noise": 0.003
+              },
+              "LumenReflections": {
+                "n": 3,
+                "mean": 0.131,
+                "min": 0.129,
+                "max": 0.134,
+                "noise": 0.005
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.0063,
+                "min": 0.006,
+                "max": 0.007,
+                "noise": 0.001
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.4577,
+                "min": 0.454,
+                "max": 0.461,
+                "noise": 0.007
+              },
+              "RenderDeferredLighting": {
+                "n": 3,
+                "mean": 0.339,
+                "min": 0.339,
+                "max": 0.339,
+                "noise": 0.0
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.6237,
+                "min": 1.608,
+                "max": 1.632,
+                "noise": 0.024
+              },
+              "ShadowDepths": {
+                "n": 3,
+                "mean": 0.075,
+                "min": 0.069,
+                "max": 0.086,
+                "noise": 0.017
+              },
+              "TemporalSuperResolution": {
+                "n": 3,
+                "mean": 0.0137,
+                "min": 0.009,
+                "max": 0.016,
+                "noise": 0.007
+              },
+              "Translucency": {
+                "n": 3,
+                "mean": 0.0943,
+                "min": 0.086,
+                "max": 0.11,
+                "noise": 0.024
+              }
+            }
+          },
+          "luma": {
+            "frameP50": {
+              "n": 3,
+              "mean": 73.2533,
+              "min": 73.25,
+              "max": 73.26,
+              "noise": 0.01
+            },
+            "center": {
+              "n": 3,
+              "mean": 104.7567,
+              "min": 104.75,
+              "max": 104.77,
+              "noise": 0.02
+            },
+            "faceRoiMean": {
+              "n": 0
+            },
+            "faceRoiP5": {
+              "n": 0
+            },
+            "faceRoiP95": {
+              "n": 0
+            },
+            "faceNeckRoiMean": {
+              "n": 0
+            }
+          },
+          "derived": {
+            "csvPassSum": {
+              "n": 3,
+              "mean": 1.5236,
+              "min": 1.5209,
+              "max": 1.5273,
+              "noise": 0.0064
+            },
+            "pgGraphicsRoot": {
+              "n": 3,
+              "mean": 1.8003,
+              "min": 1.786,
+              "max": 1.811,
+              "noise": 0.025
+            },
+            "pgComputeRoot": {
+              "n": 3,
+              "mean": 0.9327,
+              "min": 0.925,
+              "max": 0.94,
+              "noise": 0.015
+            },
+            "pgLumen": {
+              "n": 3,
+              "mean": 0.971,
+              "min": 0.965,
+              "max": 0.98,
+              "noise": 0.015
+            },
+            "tsrInputPct": {
+              "n": 3,
+              "mean": 100.0,
+              "min": 100.0,
+              "max": 100.0,
+              "noise": 0.0
+            }
+          }
+        },
+        "K2x5": {
+          "fps": {
+            "n": 3,
+            "mean": 260.62,
+            "min": 257.77,
+            "max": 262.2,
+            "noise": 4.43
+          },
+          "frameMsAvg": {
+            "n": 3,
+            "mean": 3.8367,
+            "min": 3.81,
+            "max": 3.88,
+            "noise": 0.07
+          },
+          "frameMsP95": {
+            "n": 3,
+            "mean": 4.6333,
+            "min": 4.55,
+            "max": 4.73,
+            "noise": 0.18
+          },
+          "gpuMsAvg": {
+            "n": 3,
+            "mean": 2.1833,
+            "min": 2.18,
+            "max": 2.19,
+            "noise": 0.01
+          },
+          "gpuMsP95": {
+            "n": 3,
+            "mean": 2.3033,
+            "min": 2.3,
+            "max": 2.31,
+            "noise": 0.01
+          },
+          "renderMsAvg": {
+            "n": 3,
+            "mean": 3.8367,
+            "min": 3.81,
+            "max": 3.88,
+            "noise": 0.07
+          },
+          "csvGpuMeanMs": {
+            "FrameTime": {
+              "n": 3,
+              "mean": 3.8372,
+              "min": 3.8139,
+              "max": 3.8794,
+              "noise": 0.0655
+            },
+            "GPU/AllocateRendertargets": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/Basepass": {
+              "n": 3,
+              "mean": 0.0882,
+              "min": 0.0879,
+              "max": 0.0886,
+              "noise": 0.0007
+            },
+            "GPU/BeginOcclusionTests": {
+              "n": 3,
+              "mean": 0.0098,
+              "min": 0.0097,
+              "max": 0.0098,
+              "noise": 0.0001
+            },
+            "GPU/BuildRenderingCommands": {
+              "n": 3,
+              "mean": 0.0032,
+              "min": 0.0032,
+              "max": 0.0033,
+              "noise": 0.0001
+            },
+            "GPU/BuildRenderingCommandsDeferred": {
+              "n": 3,
+              "mean": 0.0516,
+              "min": 0.0514,
+              "max": 0.0518,
+              "noise": 0.0004
+            },
+            "GPU/DistanceFieldShadows": {
+              "n": 3,
+              "mean": 0.0416,
+              "min": 0.0415,
+              "max": 0.0417,
+              "noise": 0.0002
+            },
+            "GPU/DistanceFields": {
+              "n": 3,
+              "mean": 0.0172,
+              "min": 0.0171,
+              "max": 0.0172,
+              "noise": 0.0001
+            },
+            "GPU/FXSystemPostRenderOpaque": {
+              "n": 3,
+              "mean": 0.0027,
+              "min": 0.0026,
+              "max": 0.0027,
+              "noise": 0.0001
+            },
+            "GPU/FXSystemPreRender": {
+              "n": 3,
+              "mean": 0.0011,
+              "min": 0.0011,
+              "max": 0.0011,
+              "noise": 0.0
+            },
+            "GPU/GPUSceneUpdate": {
+              "n": 3,
+              "mean": 0.0085,
+              "min": 0.0085,
+              "max": 0.0085,
+              "noise": 0.0
+            },
+            "GPU/GlobalDistanceFieldUpdate": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/HZB": {
+              "n": 3,
+              "mean": 0.0219,
+              "min": 0.0218,
+              "max": 0.022,
+              "noise": 0.0002
+            },
+            "GPU/LightFunctionAtlasGeneration": {
+              "n": 3,
+              "mean": 0.0001,
+              "min": 0.0001,
+              "max": 0.0001,
+              "noise": 0.0
+            },
+            "GPU/LightGrid": {
+              "n": 3,
+              "mean": 0.0188,
+              "min": 0.0188,
+              "max": 0.0188,
+              "noise": 0.0
+            },
+            "GPU/Lights": {
+              "n": 3,
+              "mean": 0.1425,
+              "min": 0.1423,
+              "max": 0.1428,
+              "noise": 0.0005
+            },
+            "GPU/LumenReflections": {
+              "n": 3,
+              "mean": 0.1304,
+              "min": 0.1303,
+              "max": 0.1306,
+              "noise": 0.0003
+            },
+            "GPU/LumenSceneUpdate": {
+              "n": 3,
+              "mean": 0.0668,
+              "min": 0.0666,
+              "max": 0.0671,
+              "noise": 0.0005
+            },
+            "GPU/LumenScreenProbeGather": {
+              "n": 3,
+              "mean": 0.0054,
+              "min": 0.0053,
+              "max": 0.0054,
+              "noise": 0.0001
+            },
+            "GPU/PostRenderOpsFX": {
+              "n": 3,
+              "mean": 0.002,
+              "min": 0.002,
+              "max": 0.002,
+              "noise": 0.0
+            },
+            "GPU/Postprocessing": {
+              "n": 3,
+              "mean": 0.1184,
+              "min": 0.1179,
+              "max": 0.1187,
+              "noise": 0.0008
+            },
+            "GPU/Prepass": {
+              "n": 3,
+              "mean": 0.0324,
+              "min": 0.0323,
+              "max": 0.0325,
+              "noise": 0.0002
+            },
+            "GPU/RayTracingGeometry": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/RenderDeferredLighting": {
+              "n": 3,
+              "mean": 0.2593,
+              "min": 0.2577,
+              "max": 0.2613,
+              "noise": 0.0036
+            },
+            "GPU/RenderVelocities": {
+              "n": 3,
+              "mean": 0.0403,
+              "min": 0.04,
+              "max": 0.0405,
+              "noise": 0.0005
+            },
+            "GPU/ShadowDepths": {
+              "n": 3,
+              "mean": 0.0773,
+              "min": 0.0772,
+              "max": 0.0775,
+              "noise": 0.0003
+            },
+            "GPU/ShadowProjection": {
+              "n": 3,
+              "mean": 0.0443,
+              "min": 0.0443,
+              "max": 0.0444,
+              "noise": 0.0001
+            },
+            "GPU/TemporalSuperResolution": {
+              "n": 3,
+              "mean": 0.3395,
+              "min": 0.3384,
+              "max": 0.3409,
+              "noise": 0.0025
+            },
+            "GPU/Translucency": {
+              "n": 3,
+              "mean": 0.1029,
+              "min": 0.1026,
+              "max": 0.1034,
+              "noise": 0.0008
+            },
+            "GPU/TranslucentLighting": {
+              "n": 3,
+              "mean": 0.0157,
+              "min": 0.0155,
+              "max": 0.0158,
+              "noise": 0.0003
+            },
+            "GPU/Unaccounted": {
+              "n": 3,
+              "mean": 0.312,
+              "min": 0.3112,
+              "max": 0.3127,
+              "noise": 0.0015
+            },
+            "GPU/UpdateLumenSceneBuffers": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VirtualTextureUpdate": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VisibilityCommands": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPUTime": {
+              "n": 3,
+              "mean": 2.1793,
+              "min": 2.1787,
+              "max": 2.1799,
+              "noise": 0.0012
+            },
+            "GameThreadTime": {
+              "n": 3,
+              "mean": 1.2897,
+              "min": 1.2843,
+              "max": 1.2966,
+              "noise": 0.0123
+            },
+            "RenderThreadTime": {
+              "n": 3,
+              "mean": 3.8362,
+              "min": 3.8131,
+              "max": 3.8783,
+              "noise": 0.0652
+            }
+          },
+          "profileGpuInclusiveMs": {
+            "Compute pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.059,
+                "min": 1.013,
+                "max": 1.099,
+                "noise": 0.086
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.6673,
+                "min": 0.643,
+                "max": 0.694,
+                "noise": 0.051
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.0087,
+                "min": 0.007,
+                "max": 0.011,
+                "noise": 0.004
+              },
+              "LumenSceneLighting": {
+                "n": 3,
+                "mean": 0.1967,
+                "min": 0.173,
+                "max": 0.234,
+                "noise": 0.061
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.6277,
+                "min": 0.606,
+                "max": 0.654,
+                "noise": 0.048
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.162,
+                "min": 0.156,
+                "max": 0.165,
+                "noise": 0.009
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.0513,
+                "min": 1.005,
+                "max": 1.091,
+                "noise": 0.086
+              }
+            },
+            "Graphics pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.9137,
+                "min": 1.878,
+                "max": 1.94,
+                "noise": 0.062
+              },
+              "BasePass": {
+                "n": 3,
+                "mean": 0.095,
+                "min": 0.088,
+                "max": 0.101,
+                "noise": 0.013
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.1343,
+                "min": 0.13,
+                "max": 0.141,
+                "noise": 0.011
+              },
+              "DistanceFieldShadows": {
+                "n": 3,
+                "mean": 0.0427,
+                "min": 0.038,
+                "max": 0.05,
+                "noise": 0.012
+              },
+              "HZB": {
+                "n": 3,
+                "mean": 0.0127,
+                "min": 0.011,
+                "max": 0.015,
+                "noise": 0.004
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.2167,
+                "min": 0.213,
+                "max": 0.221,
+                "noise": 0.008
+              },
+              "LumenReflections": {
+                "n": 3,
+                "mean": 0.1343,
+                "min": 0.13,
+                "max": 0.141,
+                "noise": 0.011
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.0063,
+                "min": 0.005,
+                "max": 0.007,
+                "noise": 0.002
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.461,
+                "min": 0.453,
+                "max": 0.474,
+                "noise": 0.021
+              },
+              "RenderDeferredLighting": {
+                "n": 3,
+                "mean": 0.3967,
+                "min": 0.387,
+                "max": 0.415,
+                "noise": 0.028
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.738,
+                "min": 1.702,
+                "max": 1.77,
+                "noise": 0.068
+              },
+              "ShadowDepths": {
+                "n": 3,
+                "mean": 0.1187,
+                "min": 0.117,
+                "max": 0.121,
+                "noise": 0.004
+              },
+              "TemporalSuperResolution": {
+                "n": 3,
+                "mean": 0.0157,
+                "min": 0.014,
+                "max": 0.018,
+                "noise": 0.004
+              },
+              "Translucency": {
+                "n": 3,
+                "mean": 0.091,
+                "min": 0.09,
+                "max": 0.092,
+                "noise": 0.002
+              }
+            }
+          },
+          "luma": {
+            "frameP50": {
+              "n": 3,
+              "mean": 85.6067,
+              "min": 85.6,
+              "max": 85.61,
+              "noise": 0.01
+            },
+            "center": {
+              "n": 3,
+              "mean": 100.49,
+              "min": 100.47,
+              "max": 100.5,
+              "noise": 0.03
+            },
+            "faceRoiMean": {
+              "n": 0
+            },
+            "faceRoiP5": {
+              "n": 0
+            },
+            "faceRoiP95": {
+              "n": 0
+            },
+            "faceNeckRoiMean": {
+              "n": 3,
+              "mean": 151.85,
+              "min": 151.82,
+              "max": 151.91,
+              "noise": 0.09
+            }
+          },
+          "derived": {
+            "csvPassSum": {
+              "n": 3,
+              "mean": 1.6449,
+              "min": 1.6415,
+              "max": 1.6493,
+              "noise": 0.0078
+            },
+            "pgGraphicsRoot": {
+              "n": 3,
+              "mean": 1.9137,
+              "min": 1.878,
+              "max": 1.94,
+              "noise": 0.062
+            },
+            "pgComputeRoot": {
+              "n": 3,
+              "mean": 1.059,
+              "min": 1.013,
+              "max": 1.099,
+              "noise": 0.086
+            },
+            "pgLumen": {
+              "n": 3,
+              "mean": 1.121,
+              "min": 1.072,
+              "max": 1.158,
+              "noise": 0.086
+            },
+            "tsrInputPct": {
+              "n": 3,
+              "mean": 100.0,
+              "min": 100.0,
+              "max": 100.0,
+              "noise": 0.0
+            }
+          }
+        }
+      },
+      "fingerprint": {
+        "K1": {
+          "tag": "BENCH",
+          "rhi": "D3D12",
+          "featureLevel": "SM6",
+          "shaderPlatform": "PCD3D_SM6",
+          "lumenPlatform": "1",
+          "gi": "lumen",
+          "giMethod": "1",
+          "refl": "lumen",
+          "reflMethod": "1",
+          "shadows": "csm",
+          "vsmEnable": "0",
+          "sg.res": "100",
+          "sg.view": "2",
+          "sg.aa": "2",
+          "sg.shadow": "2",
+          "sg.gi": "2",
+          "sg.refl": "2",
+          "sg.pp": "2",
+          "sg.tex": "2",
+          "sg.fx": "2",
+          "sg.foliage": "2",
+          "sg.shading": "2",
+          "sg.landscape": "2",
+          "preset": "High",
+          "screenPct": "100.0",
+          "screenPctMode": "0",
+          "aa": "TSR",
+          "aaMethod": "4",
+          "exposure": "fixed-histogram",
+          "expMin": "4.14106",
+          "expMax": "4.14106",
+          "expBias": "0.000",
+          "ev100": "2.05",
+          "lightUnits": "candelas",
+          "sky": "1",
+          "skyIntensity": "3.000",
+          "keyShadow": "csm-3600uu-2c-contact0.000",
+          "shadowCasters": "1",
+          "profile": "marmoreal-night",
+          "profilesSha256": "178d24540306aa0016eeea128630b1166010f4f4f78d7f3805299b324174e8d7",
+          "profilesSource": "pak",
+          "legacyRender": "0",
+          "gameLayer": "unlit-eyeadaptinv",
+          "tMaxFPS": "0.0",
+          "vsync": "0",
+          "frameRateLimit": "60.0",
+          "substrate": "0",
+          "nanite": "1",
+          "meshDF": "1",
+          "viewport": "1920x1080",
+          "reference": "1"
+        },
+        "K2x5": {
+          "tag": "BENCH",
+          "rhi": "D3D12",
+          "featureLevel": "SM6",
+          "shaderPlatform": "PCD3D_SM6",
+          "lumenPlatform": "1",
+          "gi": "lumen",
+          "giMethod": "1",
+          "refl": "lumen",
+          "reflMethod": "1",
+          "shadows": "csm",
+          "vsmEnable": "0",
+          "sg.res": "100",
+          "sg.view": "2",
+          "sg.aa": "2",
+          "sg.shadow": "2",
+          "sg.gi": "2",
+          "sg.refl": "2",
+          "sg.pp": "2",
+          "sg.tex": "2",
+          "sg.fx": "2",
+          "sg.foliage": "2",
+          "sg.shading": "2",
+          "sg.landscape": "2",
+          "preset": "High",
+          "screenPct": "100.0",
+          "screenPctMode": "0",
+          "aa": "TSR",
+          "aaMethod": "4",
+          "exposure": "fixed-histogram",
+          "expMin": "4.14106",
+          "expMax": "4.14106",
+          "expBias": "0.000",
+          "ev100": "2.05",
+          "lightUnits": "candelas",
+          "sky": "1",
+          "skyIntensity": "3.000",
+          "keyShadow": "csm-3600uu-2c-contact0.000",
+          "shadowCasters": "1",
+          "profile": "marmoreal-night",
+          "profilesSha256": "178d24540306aa0016eeea128630b1166010f4f4f78d7f3805299b324174e8d7",
+          "profilesSource": "pak",
+          "legacyRender": "0",
+          "gameLayer": "unlit-eyeadaptinv",
+          "tMaxFPS": "0.0",
+          "vsync": "0",
+          "frameRateLimit": "60.0",
+          "substrate": "0",
+          "nanite": "1",
+          "meshDF": "1",
+          "viewport": "1920x1080",
+          "reference": "1"
+        }
+      },
+      "referenceChecks": [
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        },
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        },
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        }
+      ]
+    },
+    "sarpedon": {
+      "variant": "sarpedon",
+      "runs": 3,
+      "views": {
+        "K1": {
+          "fps": {
+            "n": 3,
+            "mean": 249.89,
+            "min": 242.72,
+            "max": 254.41,
+            "noise": 11.69
+          },
+          "frameMsAvg": {
+            "n": 3,
+            "mean": 4.0033,
+            "min": 3.93,
+            "max": 4.12,
+            "noise": 0.19
+          },
+          "frameMsP95": {
+            "n": 3,
+            "mean": 4.8833,
+            "min": 4.75,
+            "max": 5.14,
+            "noise": 0.39
+          },
+          "gpuMsAvg": {
+            "n": 3,
+            "mean": 2.4833,
+            "min": 2.48,
+            "max": 2.49,
+            "noise": 0.01
+          },
+          "gpuMsP95": {
+            "n": 3,
+            "mean": 2.6533,
+            "min": 2.64,
+            "max": 2.67,
+            "noise": 0.03
+          },
+          "renderMsAvg": {
+            "n": 3,
+            "mean": 4.0033,
+            "min": 3.93,
+            "max": 4.12,
+            "noise": 0.19
+          },
+          "csvGpuMeanMs": {
+            "FrameTime": {
+              "n": 3,
+              "mean": 4.0035,
+              "min": 3.9307,
+              "max": 4.12,
+              "noise": 0.1893
+            },
+            "GPU/AllocateRendertargets": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/Basepass": {
+              "n": 3,
+              "mean": 0.1801,
+              "min": 0.1794,
+              "max": 0.1806,
+              "noise": 0.0012
+            },
+            "GPU/BeginOcclusionTests": {
+              "n": 3,
+              "mean": 0.026,
+              "min": 0.0258,
+              "max": 0.0262,
+              "noise": 0.0004
+            },
+            "GPU/BuildRenderingCommands": {
+              "n": 3,
+              "mean": 0.0032,
+              "min": 0.0032,
+              "max": 0.0032,
+              "noise": 0.0
+            },
+            "GPU/BuildRenderingCommandsDeferred": {
+              "n": 3,
+              "mean": 0.05,
+              "min": 0.0499,
+              "max": 0.0501,
+              "noise": 0.0002
+            },
+            "GPU/DistanceFieldShadows": {
+              "n": 3,
+              "mean": 0.0625,
+              "min": 0.0624,
+              "max": 0.0626,
+              "noise": 0.0002
+            },
+            "GPU/DistanceFields": {
+              "n": 3,
+              "mean": 0.0175,
+              "min": 0.0174,
+              "max": 0.0176,
+              "noise": 0.0002
+            },
+            "GPU/FXSystemPostRenderOpaque": {
+              "n": 3,
+              "mean": 0.003,
+              "min": 0.003,
+              "max": 0.003,
+              "noise": 0.0
+            },
+            "GPU/FXSystemPreRender": {
+              "n": 3,
+              "mean": 0.0011,
+              "min": 0.0011,
+              "max": 0.0011,
+              "noise": 0.0
+            },
+            "GPU/GPUSceneUpdate": {
+              "n": 3,
+              "mean": 0.0089,
+              "min": 0.0088,
+              "max": 0.009,
+              "noise": 0.0002
+            },
+            "GPU/GlobalDistanceFieldUpdate": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/HZB": {
+              "n": 3,
+              "mean": 0.0233,
+              "min": 0.0231,
+              "max": 0.0234,
+              "noise": 0.0003
+            },
+            "GPU/LightFunctionAtlasGeneration": {
+              "n": 3,
+              "mean": 0.0001,
+              "min": 0.0001,
+              "max": 0.0001,
+              "noise": 0.0
+            },
+            "GPU/LightGrid": {
+              "n": 3,
+              "mean": 0.0212,
+              "min": 0.0211,
+              "max": 0.0213,
+              "noise": 0.0002
+            },
+            "GPU/Lights": {
+              "n": 3,
+              "mean": 0.1246,
+              "min": 0.1244,
+              "max": 0.1249,
+              "noise": 0.0005
+            },
+            "GPU/LumenReflections": {
+              "n": 3,
+              "mean": 0.168,
+              "min": 0.1678,
+              "max": 0.1682,
+              "noise": 0.0004
+            },
+            "GPU/LumenSceneUpdate": {
+              "n": 3,
+              "mean": 0.0734,
+              "min": 0.0733,
+              "max": 0.0735,
+              "noise": 0.0002
+            },
+            "GPU/LumenScreenProbeGather": {
+              "n": 3,
+              "mean": 0.0157,
+              "min": 0.0157,
+              "max": 0.0158,
+              "noise": 0.0001
+            },
+            "GPU/PostRenderOpsFX": {
+              "n": 3,
+              "mean": 0.0023,
+              "min": 0.0023,
+              "max": 0.0023,
+              "noise": 0.0
+            },
+            "GPU/Postprocessing": {
+              "n": 3,
+              "mean": 0.1231,
+              "min": 0.123,
+              "max": 0.1232,
+              "noise": 0.0002
+            },
+            "GPU/Prepass": {
+              "n": 3,
+              "mean": 0.0268,
+              "min": 0.0267,
+              "max": 0.0269,
+              "noise": 0.0002
+            },
+            "GPU/RayTracingGeometry": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/RenderDeferredLighting": {
+              "n": 3,
+              "mean": 0.3904,
+              "min": 0.3898,
+              "max": 0.3913,
+              "noise": 0.0015
+            },
+            "GPU/RenderVelocities": {
+              "n": 3,
+              "mean": 0.0936,
+              "min": 0.0934,
+              "max": 0.0939,
+              "noise": 0.0005
+            },
+            "GPU/ShadowDepths": {
+              "n": 3,
+              "mean": 0.0657,
+              "min": 0.0656,
+              "max": 0.0659,
+              "noise": 0.0003
+            },
+            "GPU/ShadowProjection": {
+              "n": 3,
+              "mean": 0.0199,
+              "min": 0.0199,
+              "max": 0.02,
+              "noise": 0.0001
+            },
+            "GPU/TemporalSuperResolution": {
+              "n": 3,
+              "mean": 0.3326,
+              "min": 0.3316,
+              "max": 0.334,
+              "noise": 0.0024
+            },
+            "GPU/Translucency": {
+              "n": 3,
+              "mean": 0.1354,
+              "min": 0.1344,
+              "max": 0.1362,
+              "noise": 0.0018
+            },
+            "GPU/TranslucentLighting": {
+              "n": 3,
+              "mean": 0.0151,
+              "min": 0.015,
+              "max": 0.0153,
+              "noise": 0.0003
+            },
+            "GPU/Unaccounted": {
+              "n": 3,
+              "mean": 0.3323,
+              "min": 0.3303,
+              "max": 0.3333,
+              "noise": 0.003
+            },
+            "GPU/UpdateLumenSceneBuffers": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VirtualTextureUpdate": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VisibilityCommands": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPUTime": {
+              "n": 3,
+              "mean": 2.4825,
+              "min": 2.4763,
+              "max": 2.4932,
+              "noise": 0.0169
+            },
+            "GameThreadTime": {
+              "n": 3,
+              "mean": 1.427,
+              "min": 1.3979,
+              "max": 1.45,
+              "noise": 0.0521
+            },
+            "RenderThreadTime": {
+              "n": 3,
+              "mean": 4.0026,
+              "min": 3.9295,
+              "max": 4.1193,
+              "noise": 0.1898
+            }
+          },
+          "profileGpuInclusiveMs": {
+            "Compute pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.268,
+                "min": 1.231,
+                "max": 1.289,
+                "noise": 0.058
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.735,
+                "min": 0.707,
+                "max": 0.767,
+                "noise": 0.06
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.0113,
+                "min": 0.008,
+                "max": 0.017,
+                "noise": 0.009
+              },
+              "LumenSceneLighting": {
+                "n": 3,
+                "mean": 0.3343,
+                "min": 0.327,
+                "max": 0.343,
+                "noise": 0.016
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.6973,
+                "min": 0.67,
+                "max": 0.728,
+                "noise": 0.058
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.161,
+                "min": 0.152,
+                "max": 0.176,
+                "noise": 0.024
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.26,
+                "min": 1.221,
+                "max": 1.282,
+                "noise": 0.061
+              }
+            },
+            "Graphics pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 2.1207,
+                "min": 2.092,
+                "max": 2.15,
+                "noise": 0.058
+              },
+              "BasePass": {
+                "n": 3,
+                "mean": 0.1903,
+                "min": 0.186,
+                "max": 0.195,
+                "noise": 0.009
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.17,
+                "min": 0.167,
+                "max": 0.175,
+                "noise": 0.008
+              },
+              "DistanceFieldShadows": {
+                "n": 3,
+                "mean": 0.0693,
+                "min": 0.062,
+                "max": 0.082,
+                "noise": 0.02
+              },
+              "HZB": {
+                "n": 3,
+                "mean": 0.0287,
+                "min": 0.027,
+                "max": 0.03,
+                "noise": 0.003
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.2183,
+                "min": 0.205,
+                "max": 0.241,
+                "noise": 0.036
+              },
+              "LumenReflections": {
+                "n": 3,
+                "mean": 0.17,
+                "min": 0.167,
+                "max": 0.175,
+                "noise": 0.008
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.0183,
+                "min": 0.016,
+                "max": 0.021,
+                "noise": 0.005
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.4563,
+                "min": 0.455,
+                "max": 0.458,
+                "noise": 0.003
+              },
+              "RenderDeferredLighting": {
+                "n": 3,
+                "mean": 0.4267,
+                "min": 0.41,
+                "max": 0.443,
+                "noise": 0.033
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.9433,
+                "min": 1.915,
+                "max": 1.973,
+                "noise": 0.058
+              },
+              "ShadowDepths": {
+                "n": 3,
+                "mean": 0.107,
+                "min": 0.101,
+                "max": 0.116,
+                "noise": 0.015
+              },
+              "TemporalSuperResolution": {
+                "n": 3,
+                "mean": 0.0107,
+                "min": 0.007,
+                "max": 0.018,
+                "noise": 0.011
+              },
+              "Translucency": {
+                "n": 3,
+                "mean": 0.1237,
+                "min": 0.108,
+                "max": 0.132,
+                "noise": 0.024
+              }
+            }
+          },
+          "luma": {
+            "frameP50": {
+              "n": 3,
+              "mean": 41.4733,
+              "min": 41.46,
+              "max": 41.48,
+              "noise": 0.02
+            },
+            "center": {
+              "n": 3,
+              "mean": 109.88,
+              "min": 109.88,
+              "max": 109.88,
+              "noise": 0.0
+            },
+            "faceRoiMean": {
+              "n": 0
+            },
+            "faceRoiP5": {
+              "n": 0
+            },
+            "faceRoiP95": {
+              "n": 0
+            },
+            "faceNeckRoiMean": {
+              "n": 0
+            }
+          },
+          "derived": {
+            "csvPassSum": {
+              "n": 3,
+              "mean": 1.9866,
+              "min": 1.9854,
+              "max": 1.9881,
+              "noise": 0.0027
+            },
+            "pgGraphicsRoot": {
+              "n": 3,
+              "mean": 2.1207,
+              "min": 2.092,
+              "max": 2.15,
+              "noise": 0.058
+            },
+            "pgComputeRoot": {
+              "n": 3,
+              "mean": 1.268,
+              "min": 1.231,
+              "max": 1.289,
+              "noise": 0.058
+            },
+            "pgLumen": {
+              "n": 3,
+              "mean": 1.3543,
+              "min": 1.336,
+              "max": 1.373,
+              "noise": 0.037
+            },
+            "tsrInputPct": {
+              "n": 3,
+              "mean": 100.0,
+              "min": 100.0,
+              "max": 100.0,
+              "noise": 0.0
+            }
+          }
+        },
+        "K2x5": {
+          "fps": {
+            "n": 3,
+            "mean": 271.64,
+            "min": 268.86,
+            "max": 273.49,
+            "noise": 4.63
+          },
+          "frameMsAvg": {
+            "n": 3,
+            "mean": 3.6833,
+            "min": 3.66,
+            "max": 3.72,
+            "noise": 0.06
+          },
+          "frameMsP95": {
+            "n": 3,
+            "mean": 4.48,
+            "min": 4.43,
+            "max": 4.55,
+            "noise": 0.12
+          },
+          "gpuMsAvg": {
+            "n": 3,
+            "mean": 2.26,
+            "min": 2.26,
+            "max": 2.26,
+            "noise": 0.0
+          },
+          "gpuMsP95": {
+            "n": 3,
+            "mean": 2.4,
+            "min": 2.39,
+            "max": 2.41,
+            "noise": 0.02
+          },
+          "renderMsAvg": {
+            "n": 3,
+            "mean": 3.6833,
+            "min": 3.66,
+            "max": 3.72,
+            "noise": 0.06
+          },
+          "csvGpuMeanMs": {
+            "FrameTime": {
+              "n": 3,
+              "mean": 3.6815,
+              "min": 3.6564,
+              "max": 3.7195,
+              "noise": 0.0631
+            },
+            "GPU/AllocateRendertargets": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/Basepass": {
+              "n": 3,
+              "mean": 0.0926,
+              "min": 0.0925,
+              "max": 0.0928,
+              "noise": 0.0003
+            },
+            "GPU/BeginOcclusionTests": {
+              "n": 3,
+              "mean": 0.0144,
+              "min": 0.0143,
+              "max": 0.0144,
+              "noise": 0.0001
+            },
+            "GPU/BuildRenderingCommands": {
+              "n": 3,
+              "mean": 0.0032,
+              "min": 0.0032,
+              "max": 0.0032,
+              "noise": 0.0
+            },
+            "GPU/BuildRenderingCommandsDeferred": {
+              "n": 3,
+              "mean": 0.0533,
+              "min": 0.0531,
+              "max": 0.0536,
+              "noise": 0.0005
+            },
+            "GPU/DistanceFieldShadows": {
+              "n": 3,
+              "mean": 0.0495,
+              "min": 0.0492,
+              "max": 0.0496,
+              "noise": 0.0004
+            },
+            "GPU/DistanceFields": {
+              "n": 3,
+              "mean": 0.0175,
+              "min": 0.0174,
+              "max": 0.0175,
+              "noise": 0.0001
+            },
+            "GPU/FXSystemPostRenderOpaque": {
+              "n": 3,
+              "mean": 0.0027,
+              "min": 0.0026,
+              "max": 0.0027,
+              "noise": 0.0001
+            },
+            "GPU/FXSystemPreRender": {
+              "n": 3,
+              "mean": 0.0011,
+              "min": 0.0011,
+              "max": 0.0011,
+              "noise": 0.0
+            },
+            "GPU/GPUSceneUpdate": {
+              "n": 3,
+              "mean": 0.0087,
+              "min": 0.0087,
+              "max": 0.0087,
+              "noise": 0.0
+            },
+            "GPU/GlobalDistanceFieldUpdate": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/HZB": {
+              "n": 3,
+              "mean": 0.0221,
+              "min": 0.0219,
+              "max": 0.0222,
+              "noise": 0.0003
+            },
+            "GPU/LightFunctionAtlasGeneration": {
+              "n": 3,
+              "mean": 0.0001,
+              "min": 0.0001,
+              "max": 0.0001,
+              "noise": 0.0
+            },
+            "GPU/LightGrid": {
+              "n": 3,
+              "mean": 0.0189,
+              "min": 0.0189,
+              "max": 0.019,
+              "noise": 0.0001
+            },
+            "GPU/Lights": {
+              "n": 3,
+              "mean": 0.1446,
+              "min": 0.1446,
+              "max": 0.1446,
+              "noise": 0.0
+            },
+            "GPU/LumenReflections": {
+              "n": 3,
+              "mean": 0.1402,
+              "min": 0.14,
+              "max": 0.1404,
+              "noise": 0.0004
+            },
+            "GPU/LumenSceneUpdate": {
+              "n": 3,
+              "mean": 0.067,
+              "min": 0.0657,
+              "max": 0.0679,
+              "noise": 0.0022
+            },
+            "GPU/LumenScreenProbeGather": {
+              "n": 3,
+              "mean": 0.0056,
+              "min": 0.0056,
+              "max": 0.0056,
+              "noise": 0.0
+            },
+            "GPU/PostRenderOpsFX": {
+              "n": 3,
+              "mean": 0.002,
+              "min": 0.002,
+              "max": 0.002,
+              "noise": 0.0
+            },
+            "GPU/Postprocessing": {
+              "n": 3,
+              "mean": 0.1184,
+              "min": 0.1183,
+              "max": 0.1186,
+              "noise": 0.0003
+            },
+            "GPU/Prepass": {
+              "n": 3,
+              "mean": 0.0275,
+              "min": 0.0274,
+              "max": 0.0276,
+              "noise": 0.0002
+            },
+            "GPU/RayTracingGeometry": {
+              "n": 3,
+              "mean": 0.0003,
+              "min": 0.0003,
+              "max": 0.0003,
+              "noise": 0.0
+            },
+            "GPU/RenderDeferredLighting": {
+              "n": 3,
+              "mean": 0.3222,
+              "min": 0.3202,
+              "max": 0.326,
+              "noise": 0.0058
+            },
+            "GPU/RenderVelocities": {
+              "n": 3,
+              "mean": 0.0439,
+              "min": 0.0437,
+              "max": 0.0442,
+              "noise": 0.0005
+            },
+            "GPU/ShadowDepths": {
+              "n": 3,
+              "mean": 0.0918,
+              "min": 0.0916,
+              "max": 0.0919,
+              "noise": 0.0003
+            },
+            "GPU/ShadowProjection": {
+              "n": 3,
+              "mean": 0.0428,
+              "min": 0.0427,
+              "max": 0.0429,
+              "noise": 0.0002
+            },
+            "GPU/TemporalSuperResolution": {
+              "n": 3,
+              "mean": 0.3354,
+              "min": 0.335,
+              "max": 0.3362,
+              "noise": 0.0012
+            },
+            "GPU/Translucency": {
+              "n": 3,
+              "mean": 0.0998,
+              "min": 0.0997,
+              "max": 0.1001,
+              "noise": 0.0004
+            },
+            "GPU/TranslucentLighting": {
+              "n": 3,
+              "mean": 0.0149,
+              "min": 0.0148,
+              "max": 0.015,
+              "noise": 0.0002
+            },
+            "GPU/Unaccounted": {
+              "n": 3,
+              "mean": 0.3198,
+              "min": 0.3184,
+              "max": 0.3207,
+              "noise": 0.0023
+            },
+            "GPU/UpdateLumenSceneBuffers": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VirtualTextureUpdate": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPU/VisibilityCommands": {
+              "n": 3,
+              "mean": 0.0006,
+              "min": 0.0006,
+              "max": 0.0006,
+              "noise": 0.0
+            },
+            "GPUTime": {
+              "n": 3,
+              "mean": 2.266,
+              "min": 2.2656,
+              "max": 2.2666,
+              "noise": 0.001
+            },
+            "GameThreadTime": {
+              "n": 3,
+              "mean": 1.3968,
+              "min": 1.3682,
+              "max": 1.4246,
+              "noise": 0.0564
+            },
+            "RenderThreadTime": {
+              "n": 3,
+              "mean": 3.6805,
+              "min": 3.6555,
+              "max": 3.7186,
+              "noise": 0.0631
+            }
+          },
+          "profileGpuInclusiveMs": {
+            "Compute pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.1777,
+                "min": 1.157,
+                "max": 1.192,
+                "noise": 0.035
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.669,
+                "min": 0.657,
+                "max": 0.687,
+                "noise": 0.03
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.014,
+                "min": 0.01,
+                "max": 0.019,
+                "noise": 0.009
+              },
+              "LumenSceneLighting": {
+                "n": 3,
+                "mean": 0.2977,
+                "min": 0.261,
+                "max": 0.324,
+                "noise": 0.063
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.6283,
+                "min": 0.615,
+                "max": 0.647,
+                "noise": 0.032
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.1773,
+                "min": 0.156,
+                "max": 0.209,
+                "noise": 0.053
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.169,
+                "min": 1.15,
+                "max": 1.184,
+                "noise": 0.034
+              }
+            },
+            "Graphics pipeline 0": {
+              "<root>": {
+                "n": 3,
+                "mean": 1.9877,
+                "min": 1.957,
+                "max": 2.02,
+                "noise": 0.063
+              },
+              "BasePass": {
+                "n": 3,
+                "mean": 0.1003,
+                "min": 0.098,
+                "max": 0.102,
+                "noise": 0.004
+              },
+              "DiffuseIndirectAndAO": {
+                "n": 3,
+                "mean": 0.1487,
+                "min": 0.141,
+                "max": 0.163,
+                "noise": 0.022
+              },
+              "DistanceFieldShadows": {
+                "n": 3,
+                "mean": 0.0513,
+                "min": 0.048,
+                "max": 0.055,
+                "noise": 0.007
+              },
+              "HZB": {
+                "n": 3,
+                "mean": 0.0163,
+                "min": 0.014,
+                "max": 0.02,
+                "noise": 0.006
+              },
+              "Lights": {
+                "n": 3,
+                "mean": 0.2303,
+                "min": 0.228,
+                "max": 0.232,
+                "noise": 0.004
+              },
+              "LumenReflections": {
+                "n": 3,
+                "mean": 0.1487,
+                "min": 0.141,
+                "max": 0.163,
+                "noise": 0.022
+              },
+              "LumenScreenProbeGather": {
+                "n": 3,
+                "mean": 0.0063,
+                "min": 0.005,
+                "max": 0.007,
+                "noise": 0.002
+              },
+              "PostProcessing": {
+                "n": 3,
+                "mean": 0.4593,
+                "min": 0.458,
+                "max": 0.461,
+                "noise": 0.003
+              },
+              "RenderDeferredLighting": {
+                "n": 3,
+                "mean": 0.4303,
+                "min": 0.411,
+                "max": 0.464,
+                "noise": 0.053
+              },
+              "Scene": {
+                "n": 3,
+                "mean": 1.806,
+                "min": 1.768,
+                "max": 1.847,
+                "noise": 0.079
+              },
+              "ShadowDepths": {
+                "n": 3,
+                "mean": 0.131,
+                "min": 0.126,
+                "max": 0.139,
+                "noise": 0.013
+              },
+              "TemporalSuperResolution": {
+                "n": 3,
+                "mean": 0.0177,
+                "min": 0.013,
+                "max": 0.022,
+                "noise": 0.009
+              },
+              "Translucency": {
+                "n": 3,
+                "mean": 0.087,
+                "min": 0.08,
+                "max": 0.092,
+                "noise": 0.012
+              }
+            }
+          },
+          "luma": {
+            "frameP50": {
+              "n": 3,
+              "mean": 114.8467,
+              "min": 114.81,
+              "max": 114.87,
+              "noise": 0.06
+            },
+            "center": {
+              "n": 3,
+              "mean": 91.47,
+              "min": 91.45,
+              "max": 91.49,
+              "noise": 0.04
+            },
+            "faceRoiMean": {
+              "n": 0
+            },
+            "faceRoiP5": {
+              "n": 0
+            },
+            "faceRoiP95": {
+              "n": 0
+            },
+            "faceNeckRoiMean": {
+              "n": 3,
+              "mean": 134.0033,
+              "min": 133.86,
+              "max": 134.19,
+              "noise": 0.33
+            }
+          },
+          "derived": {
+            "csvPassSum": {
+              "n": 3,
+              "mean": 1.7433,
+              "min": 1.7398,
+              "max": 1.7465,
+              "noise": 0.0067
+            },
+            "pgGraphicsRoot": {
+              "n": 3,
+              "mean": 1.9877,
+              "min": 1.957,
+              "max": 2.02,
+              "noise": 0.063
+            },
+            "pgComputeRoot": {
+              "n": 3,
+              "mean": 1.1777,
+              "min": 1.157,
+              "max": 1.192,
+              "noise": 0.035
+            },
+            "pgLumen": {
+              "n": 3,
+              "mean": 1.251,
+              "min": 1.227,
+              "max": 1.269,
+              "noise": 0.042
+            },
+            "tsrInputPct": {
+              "n": 3,
+              "mean": 100.0,
+              "min": 100.0,
+              "max": 100.0,
+              "noise": 0.0
+            }
+          }
+        }
+      },
+      "fingerprint": {
+        "K1": {
+          "tag": "BENCH",
+          "rhi": "D3D12",
+          "featureLevel": "SM6",
+          "shaderPlatform": "PCD3D_SM6",
+          "lumenPlatform": "1",
+          "gi": "lumen",
+          "giMethod": "1",
+          "refl": "lumen",
+          "reflMethod": "1",
+          "shadows": "csm",
+          "vsmEnable": "0",
+          "sg.res": "100",
+          "sg.view": "2",
+          "sg.aa": "2",
+          "sg.shadow": "2",
+          "sg.gi": "2",
+          "sg.refl": "2",
+          "sg.pp": "2",
+          "sg.tex": "2",
+          "sg.fx": "2",
+          "sg.foliage": "2",
+          "sg.shading": "2",
+          "sg.landscape": "2",
+          "preset": "High",
+          "screenPct": "100.0",
+          "screenPctMode": "0",
+          "aa": "TSR",
+          "aaMethod": "4",
+          "exposure": "fixed-histogram",
+          "expMin": "4.14106",
+          "expMax": "4.14106",
+          "expBias": "0.000",
+          "ev100": "2.05",
+          "lightUnits": "candelas",
+          "sky": "1",
+          "skyIntensity": "3.000",
+          "keyShadow": "csm-3600uu-2c-contact0.000",
+          "shadowCasters": "1",
+          "profile": "sarpedon-night",
+          "profilesSha256": "178d24540306aa0016eeea128630b1166010f4f4f78d7f3805299b324174e8d7",
+          "profilesSource": "pak",
+          "legacyRender": "0",
+          "gameLayer": "unlit-eyeadaptinv",
+          "tMaxFPS": "0.0",
+          "vsync": "0",
+          "frameRateLimit": "60.0",
+          "substrate": "0",
+          "nanite": "1",
+          "meshDF": "1",
+          "viewport": "1920x1080",
+          "reference": "1"
+        },
+        "K2x5": {
+          "tag": "BENCH",
+          "rhi": "D3D12",
+          "featureLevel": "SM6",
+          "shaderPlatform": "PCD3D_SM6",
+          "lumenPlatform": "1",
+          "gi": "lumen",
+          "giMethod": "1",
+          "refl": "lumen",
+          "reflMethod": "1",
+          "shadows": "csm",
+          "vsmEnable": "0",
+          "sg.res": "100",
+          "sg.view": "2",
+          "sg.aa": "2",
+          "sg.shadow": "2",
+          "sg.gi": "2",
+          "sg.refl": "2",
+          "sg.pp": "2",
+          "sg.tex": "2",
+          "sg.fx": "2",
+          "sg.foliage": "2",
+          "sg.shading": "2",
+          "sg.landscape": "2",
+          "preset": "High",
+          "screenPct": "100.0",
+          "screenPctMode": "0",
+          "aa": "TSR",
+          "aaMethod": "4",
+          "exposure": "fixed-histogram",
+          "expMin": "4.14106",
+          "expMax": "4.14106",
+          "expBias": "0.000",
+          "ev100": "2.05",
+          "lightUnits": "candelas",
+          "sky": "1",
+          "skyIntensity": "3.000",
+          "keyShadow": "csm-3600uu-2c-contact0.000",
+          "shadowCasters": "1",
+          "profile": "sarpedon-night",
+          "profilesSha256": "178d24540306aa0016eeea128630b1166010f4f4f78d7f3805299b324174e8d7",
+          "profilesSource": "pak",
+          "legacyRender": "0",
+          "gameLayer": "unlit-eyeadaptinv",
+          "tMaxFPS": "0.0",
+          "vsync": "0",
+          "frameRateLimit": "60.0",
+          "substrate": "0",
+          "nanite": "1",
+          "meshDF": "1",
+          "viewport": "1920x1080",
+          "reference": "1"
+        }
+      },
+      "referenceChecks": [
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        },
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        },
+        {
+          "bench-K1-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          },
+          "bench-K2x5-1920x1080.png": {
+            "reference": true,
+            "reasons": []
+          }
+        }
+      ]
+    }
+  },
+  "comparisons": {}
+}
