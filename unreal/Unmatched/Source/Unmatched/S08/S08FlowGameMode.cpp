@@ -1,5 +1,6 @@
 #include "S08FlowGameMode.h"
 #include "S08DevExec.h"
+#include "S08DisplaySettings.h"
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"

@@ -31,6 +31,13 @@ bool FS08DisplaySettingsTest::RunTest(const FString&) {
   TestEqual(TEXT("invalid choice leaves output unchanged"), Next.Resolution, Before);
   TestFalse(TEXT("malformed mode refused"), S08Display::Resolve(Current, TEXT("windowMode"), TEXT("2junk"), Next, Error));
   TestFalse(TEXT("unrelated setting refused"), S08Display::Resolve(Current, TEXT("graphics"), TEXT("0"), Next, Error));
+  // 2026-10-15: a 1920x1080 window with a 40 px title bar on a 2048x1104 work area shrinks, keeping 16:9 and even sizes
+  TestEqual(TEXT("fit: shrinks under the taskbar"), S08Display::FitWindowed({1920, 1080}, {2048, 1104}, {16, 40}),
+            FIntPoint(1890, 1064));
+  TestEqual(TEXT("fit: a window that fits stays"), S08Display::FitWindowed({1920, 1080}, {5120, 1392}, {16, 40}),
+            FIntPoint(1920, 1080));
+  TestEqual(TEXT("fit: no work area - unchanged"), S08Display::FitWindowed({1920, 1080}, {0, 0}, {16, 40}),
+            FIntPoint(1920, 1080));
   return true;
 }
 #endif
