@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.portrait-source-candidate/1",
+  "hero_slug": "angel",
+  "created_utc": "2026-10-15T05:45:29.131576+00:00",
+  "generator": "built-in image_gen.imagegen only",
+  "generation_calls": 1,
+  "necessary_correction_calls": 1,
+  "external_api_cli_tripo_syntx_calls": 0,
+  "status": "CANDIDATE_SOURCE_ONLY_NOT_IMPORTED_NOT_RUNTIME_VALIDATED",
+  "approved_project_reference": {
+    "path": "art/imagegen/concept-angel-codex/design/angel-front.png",
+    "sha256": "8a62d7c2ddcf88b5958829f1c17f2f0b566f541b4289f2a2f8ab7f3711c05752",
+    "bytes": 1660307,
+    "dimensions": [
+      1086,
+      1448
+    ],
+    "mode": "RGB",
+    "format": "PNG"
+  },
+  "reference_checks_report": {
+    "path": "art/imagegen/concept-angel-codex/design/checks-report.json",
+    "sha256": "3704728418e3cfd2ae3dd6a5d457fe74343c250a7faa57d588897002fe18c206",
+    "bytes": 6808
+  },
+  "reference_opened_before_generation": true,
+  "commercial_scans_or_avatars_used": false,
+  "absence_evidence": {
+    "checked_before_generation": true,
+    "repository_filename_inventory": {
+      "scanned_files": 67683,
+      "matches": [],
+      "scan_errors": [],
+      "match_rule": "Path contains portrait or avatar AND angel, ancient-leshen or ancient_leshen (case insensitive).",
+      "excluded_directories": [
+        ".git",
+        "node_modules",
+        ".venv",
+        ".pytest_cache",
+        "Intermediate",
+        "Binaries",
+        "Saved",
+        "DerivedDataCache",
+        "tmp-metadata-check-*"
+      ]
+    },
+    "metadata_content_search": {
+      "roots": [
+        "art/imagegen",
+        "docs/game-design",
+        "tools/art"
+      ],
+      "file_types": [
+        "json",
+        "md",
+        "csv",
+        "py"
+      ],
+      "pattern": "portrait within 80 characters of angel or ancient.leshen, or reverse, case insensitive",
+      "matches": [],
+      "note": "Initial rg encountered an unrelated access-denied concept-elektra temporary folder. Successful filename inventory explicitly excluded temporary/cache/build directories and had no traversal errors."
+    },
+    "registry": {
+      "path": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+      "sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+      "bytes": 26189,
+      "portrait_keys": [
+        "portrait:king-arthur",
+        "portrait:king-arthur:merlin",
+        "portrait:medusa",
+        "portrait:medusa:harpies",
+        "portrait:t-rex"
+      ],
+      "target_key_absent": true
+    },
+    "generic_consumer_evidence": [
+      "unreal/Unmatched/Source/Unmatched/S08/UI/UmPortrait.cpp:38-39 forwards hero key to FindPortrait",
+      "unreal/Unmatched/Source/Unmatched/S08/UI/UmCardMedia.cpp:148-151 builds portrait:<hero-slug> key"
+    ],
+    "conclusion": "No existing original portrait source found for this hero in the searched source inventory, metadata references or active card media registry. Full-body miniature reference exists and is not a standalone portrait source."
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "role": "initial generation retained for audit",
+      "request": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/request-01.json",
+        "sha256": "a8762a3513ee2e7b2796dc77a8720ce937a7c1b93802dea64665a791b0b0ee28",
+        "bytes": 2266
+      },
+      "prompt": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/prompt-01.txt",
+        "sha256": "c1dd95dbb3b01ea825076364349d1e85b41a82141d7ce1c8f418b13f10216a5b",
+        "bytes": 2059
+      },
+      "reference": {
+        "path": "art/imagegen/concept-angel-codex/design/angel-front.png",
+        "sha256": "8a62d7c2ddcf88b5958829f1c17f2f0b566f541b4289f2a2f8ab7f3711c05752",
+        "bytes": 1660307,
+        "dimensions": [
+          1086,
+          1448
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "output": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/generated-01.png",
+        "sha256": "65047ac214a13d91fb8b448d85c6db2523c779ca26681febb23b2a39375cd048",
+        "bytes": 2160628,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "tool_output_path": "C:/Users/ren/.codex/generated_images/01a13e12-19b4-7811-96d7-200a96d85909/exec-e29b421e-53dd-4a23-a76e-639835bc9aae.png",
+      "copied_bytes_verified": true
+    },
+    {
+      "number": 2,
+      "role": "single necessary crop-margin correction; selected candidate",
+      "request": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/request-02-crop-correction.json",
+        "sha256": "52a735966ac2928c7175cb7605bb9e935e6734ff794d0bc330497242b3cd3ec3",
+        "bytes": 1343
+      },
+      "prompt": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/prompt-02-crop-correction.txt",
+        "sha256": "36424a4e9450c6d6c0611c4b9c39b25c5b6b34b2181ae2e229124d2a59f9b1e0",
+        "bytes": 1126
+      },
+      "edit_target": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/generated-01.png",
+        "sha256": "65047ac214a13d91fb8b448d85c6db2523c779ca26681febb23b2a39375cd048",
+        "bytes": 2160628,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "output": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/angel/portrait-source-candidate.png",
+        "sha256": "13d9a3e4fe2a646224a28e0e892e99f88406ba4db1a6ff66bd12f348ca8a2fa6",
+        "bytes": 1987134,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "tool_output_path": "C:/Users/ren/.codex/generated_images/01a13e12-19b4-7811-96d7-200a96d85909/exec-f92d5709-52b1-49b0-b8be-146f54ee4a86.png",
+      "copied_bytes_verified": true
+    }
+  ],
+  "write_scope": "art/imagegen/limit-burst-20261015/cli-portraits/angel",
+  "git_mutations": false,
+  "shared_registry_ledger_code_edits": false,
+  "services_or_background_processes_started": false,
+  "self_review": "self-review.json"
+}

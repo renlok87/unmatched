@@ -1,0 +1,87 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-84effa04-draft",
+  "asset_id": "ASSET-WIGLAF-001",
+  "service": "tripo-studio",
+  "task_id": "84effa04-450f-4185-a2d1-ff0ddaa3fd42",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/84effa04-450f-4185-a2d1-ff0ddaa3fd42",
+  "date": "2026-10-15",
+  "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "single-image",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+        "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42"
+      },
+      "left": null,
+      "right": null,
+      "back": null
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-wiglaf-codex/prompts.md",
+    "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+    "settings": {
+      "output": "Геометрия и текстура (по умолчанию формы)",
+      "generate_parts": false,
+      "parts_mode": null,
+      "ultra_mesh_quality": null,
+      "polygon_count": null,
+      "texture_8k": false,
+      "remove_lighting": null,
+      "pbr": false,
+      "privacy": true,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30.0,
+        "observed_debit": 30.0,
+        "balance_before": 20595.0,
+        "balance_after": 20565.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "draft-glb",
+      "path": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/source/wiglaf-draft-tripo-84effa04.glb",
+      "expected_sha256": "b1a3df2af761314e5a598d26947a65d00a15e21e0216707f835d92da544f280d",
+      "expected_bytes": 48254020,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+  "expectations": {
+    "draft-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1936523,
+      "glb_materials": 0,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

@@ -1,0 +1,36 @@
+**Next independent image work: Dr Watson portrait, Outlaws portrait, Charlie concept, then Daisy concept.** Assigned portraits, Wolf/Faith concepts and Patroclus/Wiglaf 1b work are excluded.
+
+Read-only audit completed. Runtime mappings and local fixtures were verified; live database access failed. Numeric IDs below are **scrape IDs**, not database CUIDs.
+
+For compact paths: `P = art/pipeline-candidates`, `C = art/imagegen`, `M = scraped-data/derived/ue-media-v1`.
+
+| # | Priority / verified identity | Missing stage and files | Runtime impact / evidence |
+|---|---|---|---|
+| 1 | **P1 — Dr Watson portrait**, owner Sherlock #10; `portrait:sherlock-holmes:dr-watson` | New portrait source: `C/limit-burst-20261015/ui-cards/dr-watson/portrait-source.png`; later crop/import evidence | Monogram. Reuse identity from `C/concept-dr-watson-codex/design/dr-watson-front.png`; approved hash `58ff9e7e632c…`. |
+| 2 | **P1 — Outlaws portrait**, owner Robin Hood #13; `portrait:robin-hood:outlaws` | New portrait source: `C/limit-burst-20261015/ui-cards/outlaws/portrait-source.png`; later crop/import evidence | Monograms for four Outlaws. Approved Little John identity: `C/concept-little-john-codex/design/little-john-front.png`, hash `54d0129ddc8b…`. Runtime key is **outlaws**, not little-john. |
+| 3 | **P1 — Charlie**, Annie Christmas #35, ranged, 8 HP | **Stage 0 → 1a:** no intake ID, asset card, concept package or acceptance card. Proposed intake location: `P/ASSET-CHARLIE-001/asset-card.yaml` | Generic fighter body and monogram. Identity evidence: `scraped-data/api/heroes/annie-christmas.json`, `nodes[2].data` → sidekicks. |
+| 4 | **P1 — Daisy**, Dr. Jill Trent #33, melee, 6 HP | **Stage 0 → 1a:** no intake ID, asset card, concept package or acceptance card. Proposed location: `P/ASSET-DAISY-001/asset-card.yaml` | Generic body and monogram. Evidence: `scraped-data/api/heroes/dr-jill-trent.json`. Confirm ownership against live roster before registration; see fixture contradiction below. |
+| 5 | **P1 — Achilles deck**, #14; `achilles:*`, `back:achilles` | Media export/import: **12 EN + 12 RU faces**, `M/cards/achilles/`; `M/backs/achilles.png`; provenance/import records | Text fallback faces and generic back. Sources already cached; fixture `scraped-data/api/heroes/achilles.json`. Back source: `scraped-data/images/heroes/card-covers/INWx-zVx8tsyrlQD4gFE2.gif`—still-frame selection needs recording. |
+| 6 | **P1 — Beowulf deck**, #18; `beowulf:*`, `back:beowulf` | **12 EN + 12 RU faces**, `M/cards/beowulf/`; `M/backs/beowulf.png`; provenance/import records | Same fallback. Fixture `scraped-data/api/heroes/beowulf.json`; cached back `scraped-data/images/heroes/card-covers/UQLFTSR_LuIMa60bOFMPl.webp`. |
+| 7 | **P1 — Angel deck**, #23; `angel:*`, `back:angel` | **12 EN + 12 RU faces**, `M/cards/angel/`; `M/backs/angel.png`; provenance/import records | Same fallback. Fixture `scraped-data/api/heroes/angel.json`; cached back `scraped-data/images/heroes/card-covers/zOn8WP6ucoOiZ4aFxZ5Rb.webp`. |
+| 8 | **P1 — Ancient Leshen deck**, #58; `ancient-leshen:*`, `back:ancient-leshen` | **11 EN + 11 RU faces**, `M/cards/ancient-leshen/`; `M/backs/ancient-leshen.png`; provenance/import records | Same fallback. Fixture `scraped-data/api/heroes/ancient-leshen.json`; cached back `scraped-data/images/heroes/card-covers/A-XrmwVNY2Gf9TvYj6FES.webp`. |
+| 9 | **P2 — `ASSET-SHERLOCK-HOLMES-001`**, AN-98, #10 | **1b → 1c:** actual draft model/export, rendered views and sheet acceptance; then stages 2–7 | Generic body. Accepted 1a remains valid: front hash `face103a3f69…`; card `P/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance-concept/20261013-front-r1/card.json`. |
+| 10 | **P2 — `ASSET-DR-WATSON-001`**, AN-64, Sherlock sidekick | Same missing 1b/1c deliverables | Generic body. Hash `58ff9e7e632c…`; card `P/ASSET-DR-WATSON-001/evidence/acceptance-concept/20261013-front-r1/card.json`. |
+| 11 | **P2 — `ASSET-ROBIN-HOOD-001`**, AN-95, #13 | Same missing 1b/1c deliverables | Generic body. Hash `ec2b8b305233…`; card `P/ASSET-ROBIN-HOOD-001/evidence/acceptance-concept/20261013-front-r1/card.json`. |
+| 12 | **P2 — `ASSET-LITTLE-JOHN-001`**, AN-77, Outlaws visual | Same missing 1b/1c deliverables; preserve the four-instance Outlaws identity | Generic bodies. Hash `54d0129ddc8b…`; card `P/ASSET-LITTLE-JOHN-001/evidence/acceptance-concept/20261013-front-r1/card.json`. |
+| 13 | **P2 — `ASSET-NIKOLA-TESLA-001`**, AN-86, #32 | Same missing 1b/1c deliverables | Generic body. Hash `6e89b012941b…`; card `P/ASSET-NIKOLA-TESLA-001/evidence/acceptance-concept/20261013-front-r1/card.json`. |
+| 14 | **Blocked — `ASSET-ALICE-001`**, #4 | **1a:** `C/concept-alice-codex/design/alice-front.png` absent; no acceptance card | Generic body. Recorded generation failure: `P/ASSET-ALICE-001/evidence/acceptance-concept/20261013-front-r1/generation-blocked.md`. Resolve the generation blocker before 1b. |
+| 15 | **Blocked — `ASSET-MR-HYDE-001`**, Jekyll & Hyde #9 | **1a:** `C/concept-mr-hyde-codex/design/mr-hyde-front.png` absent; no acceptance card | Generic body. Evidence: `P/ASSET-MR-HYDE-001/evidence/acceptance-concept/20261013-front-r1/generation-blocked.md` and `C/concept-mr-hyde-codex/verification.json`. |
+
+All five accepted-front hashes above were recalculated against their cards. Their `20261013-draft-tripo/generation-request/manifest.json` files report **`dry_run: true`, `submitted: false`, empty exports**. No FBX, GLB or OBJ exists in those candidate directories. Reuse the accepted fronts.
+
+**Pipeline contradictions and exclusions:**
+
+- [S08HeroesV2.cpp](C:/Users/ren/WebstormProjects/unmached/unmached/unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp:112) maps eight figure types. [hero-links.json](C:/Users/ren/WebstormProjects/unmached/unmached/docs/art-pipeline/hero-links.json) omits **Angel and Ancient Leshen**. Its Ophelia and Maid Marian links also outlive their move into `_off-roster`.
+- [S08CardMedia.json](C:/Users/ren/WebstormProjects/unmached/unmached/unreal/Unmatched/Config/Cards/S08CardMedia.json) contains only **27 bilingual card faces, two backs and five portraits**. All **94 face scans and four back sources** in rows 5–8 already exist locally; preserve them.
+- **Wiglaf is already accepted.** Canonical front hash is `189ddfea5962…`, pinned by `P/ASSET-WIGLAF-001/evidence/acceptance-concept/20261013-front-r1/card.json`. Burst alternative hash `bf84b3bf5900…` is explicitly **unselected** in `C/limit-burst-20261015/heroes/wiglaf/review.json`.
+- Wolf remains exploratory: `docs/art-pipeline/rig/rig-contract.json` is **schema `/2`**, while its provenance requires `/3`. Faith has a proposal and candidate images, without canonical intake/acceptance. Leave both with their current owners.
+- Fixture sidekick contamination needs live confirmation: **Bloody Mary → Patroclus**, **The Genie → Bess**, **Golden Bat → Daisy**. Do not create duplicate assets from these rows.
+- `docs/art-pipeline/art-hub-snapshot.json` dates from **2026-10-06**. Current model cards and hash-matching animation cards protect Achilles, Angel, Ancient Leshen and Beowulf from regeneration; Achilles, Leshen and Beowulf also have passing paired `final.json` records.
+
+No files, Git state, services or agents were changed.

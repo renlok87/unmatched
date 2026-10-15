@@ -1,0 +1,336 @@
+{
+  "asset_id": "ASSET-GILES-001",
+  "status": "proposed-reference-only",
+  "source_unchanged": true,
+  "source_checks": [
+    {
+      "path": "scraped-data/api/heroes/buffy.json",
+      "sha256": "a46b4a2c789dd562b0f9cb0e72e0eedbe3c4e71fc97d591fad74058884ec9d59",
+      "bytes": 23591,
+      "after_sha256": "a46b4a2c789dd562b0f9cb0e72e0eedbe3c4e71fc97d591fad74058884ec9d59",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BUFFY-001/asset-card.yaml",
+      "sha256": "cd20193940227a57ce063a10154195381b66e7fdecf0da8914bb00ad6c97ebf1",
+      "bytes": 1703,
+      "after_sha256": "cd20193940227a57ce063a10154195381b66e7fdecf0da8914bb00ad6c97ebf1",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-buffy-codex/design/buffy-front.png",
+      "sha256": "06041e7bc10895173f035992ce1e3aee7ef80057a08fdfa8d5c4f8dc8e14f8c8",
+      "bytes": 1629986,
+      "after_sha256": "06041e7bc10895173f035992ce1e3aee7ef80057a08fdfa8d5c4f8dc8e14f8c8",
+      "unchanged": true
+    }
+  ],
+  "package_writes_only": true,
+  "outside_folder": [],
+  "generated_image_byte_preserved": true,
+  "image_inspected": true,
+  "image_inspected_by": "producing Codex agent (self-review, not independent pipeline acceptance)",
+  "checklist": [
+    {
+      "item": "one mature man, one base, no text",
+      "passed": true
+    },
+    {
+      "item": "spectacles, tweed blazer, olive vest, cream shirt and burgundy tie",
+      "passed": true
+    },
+    {
+      "item": "empty hands with both arm gaps visible",
+      "passed": true
+    },
+    {
+      "item": "strict frontal body and full uncropped figure",
+      "passed": true
+    },
+    {
+      "item": "pedestal edge-on with no visible top",
+      "passed": false,
+      "note": "Narrow top ellipse remains visible behind shoes."
+    },
+    {
+      "item": "top at least 4 percent",
+      "passed": false,
+      "note": "3.522 percent, automated WARN."
+    }
+  ],
+  "limitations": [
+    "Скрипт: 12 PASS / 1 WARN / 0 FAIL; верх волос 3.522% при требовании не менее 4%.",
+    "Верхняя поверхность подставки узкой полосой видна: точная ортопроекция не заявляется пройденной.",
+    "Источник подтверждает имя/роль/механику, но не внешность. Очки, одежда и добавленная генератором короткая седая борода — оригинальная интерпретация; сходство с конкретным актёром не запрашивалось.",
+    "Референс требует регистрации intake, независимой приёмки и отдельного согласованного набора видов перед любым 3D."
+  ],
+  "pipeline_acceptance": false,
+  "three_d_game_or_rig_ready": false,
+  "shared_registry_ledger_or_source_files_modified": false,
+  "background_processes_started": [],
+  "automated_checks": [
+    {
+      "report": "art/imagegen/limit-burst-20261015/heroes/giles/checks/design-front-g1/checks-report.json",
+      "result": {
+        "schema": "unmatched.concept-checks/1",
+        "tool": "tools/art/concept/check_concept_views.py",
+        "generated_at": "2026-10-15T05:45:16+00:00",
+        "set": "art/imagegen/limit-burst-20261015/heroes/giles/design",
+        "key": "giles",
+        "role": "hero",
+        "views": [
+          "front"
+        ],
+        "inputs": [
+          {
+            "view": "front",
+            "path": "art/imagegen/limit-burst-20261015/heroes/giles/design/giles-front.png",
+            "sha256": "0d15aea4be21b6d5dcb603f5c1eb64edd4b0c48915ece214d43bc61c4dfa3e79",
+            "format": "PNG",
+            "mode": "RGB",
+            "size": [
+              1086,
+              1448
+            ]
+          }
+        ],
+        "raw_files_modified": false,
+        "tolerances": {
+          "size_rel_pct": 0.5,
+          "border_band_pct": 2.0,
+          "border_share_min": 0.99,
+          "border_tone_warn": 12,
+          "border_tone_fail": 20,
+          "bg_neutral_max": 6,
+          "bg_between_views_max": 12,
+          "bg_dark_luma_warn": 96,
+          "top_min_pct": 1.0,
+          "bottom_max_pct": 99.0,
+          "side_min_pct": 1.0,
+          "base_bottom_spread_warn_pct": 1.5,
+          "base_bottom_spread_fail_pct": 3.5,
+          "base_center_spread_warn_pct": 2.0,
+          "base_center_spread_fail_pct": 6.5,
+          "height_spread_warn_pct": 3.0,
+          "height_spread_fail_pct": 5.0,
+          "extra_component_warn_pct": 0.5,
+          "mask_area_min_pct": 2.0,
+          "mask_area_max_pct": 90.0,
+          "segment_tone": 14,
+          "segment_min_component_pct": 0.02,
+          "facing_margin": 0.05,
+          "facing_iou_warn": 0.5
+        },
+        "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+        "frame": {
+          "min_top_pct": 4.0
+        },
+        "measurements": {
+          "front": {
+            "size": [
+              1086,
+              1448
+            ],
+            "mode": "RGB",
+            "alpha": {
+              "present": false,
+              "min": 255
+            },
+            "border": {
+              "band_px": 22,
+              "median_rgb": [
+                37.0,
+                38.0,
+                39.0
+              ],
+              "share_within_tone_warn": 1.0,
+              "share_within_tone_fail": 1.0,
+              "p99_deviation": 2.0,
+              "neutral_delta": 1.0,
+              "luma": 37.9
+            },
+            "background_model": {
+              "fit": "quadratic per channel",
+              "residual_std": [
+                1.0,
+                0.85,
+                0.85
+              ],
+              "segment_tone": 14
+            },
+            "mask": {
+              "area_pct": 30.604,
+              "filled_area_pct": 30.604,
+              "components_kept": 1,
+              "main_component_pct": 30.604,
+              "other_components_pct": [],
+              "bbox_px": [
+                171,
+                51,
+                894,
+                1385
+              ],
+              "top_pct": 3.522,
+              "bottom_pct": 95.649,
+              "left_pct": 15.746,
+              "right_pct": 82.32,
+              "height_pct": 92.127,
+              "base_center_x_pct": 49.033,
+              "base_width_pct": 66.483,
+              "base_top_pct_est": 84.807
+            }
+          }
+        },
+        "checks": [
+          {
+            "id": "set.size",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "sizes": {
+                "front": [
+                  1086,
+                  1448
+                ]
+              },
+              "max_delta_pct": 0.0
+            },
+            "limit": "<= 0.5 %",
+            "message": "все виды одного размера и аспекта"
+          },
+          {
+            "id": "set.size_exact",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "front": [
+                1086,
+                1448
+              ]
+            },
+            "limit": "равны до пикселя",
+            "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+          },
+          {
+            "id": "view.alpha",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "present": false,
+              "min": 255
+            },
+            "limit": "без прозрачности",
+            "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+          },
+          {
+            "id": "view.border_uniform",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "share_warn_tone": 1.0,
+              "share_fail_tone": 1.0,
+              "p99_deviation": 2.0
+            },
+            "limit": ">= 0.99 при ±20 (WARN при ±12)",
+            "message": "рамка 2 % кадра — ровный фон без объектов"
+          },
+          {
+            "id": "view.bg_neutral",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              37.0,
+              38.0,
+              39.0
+            ],
+            "limit": "|R-G|,|G-B| <= 6",
+            "message": "фон нейтрально-серый"
+          },
+          {
+            "id": "view.bg_dark",
+            "scope": "front",
+            "result": "PASS",
+            "value": 37.9,
+            "limit": "<= 96",
+            "message": "фон тёмно-серый (норма hero-quality-v1)"
+          },
+          {
+            "id": "view.mask",
+            "scope": "front",
+            "result": "PASS",
+            "value": 30.604,
+            "limit": "2.0..90.0 %",
+            "message": "маска фигуры правдоподобна"
+          },
+          {
+            "id": "view.top_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 3.522,
+            "limit": ">= 1.0 %",
+            "message": "верх фигуры не касается края"
+          },
+          {
+            "id": "view.frame_top",
+            "scope": "front",
+            "result": "WARN",
+            "value": 3.522,
+            "limit": ">= 4.0 %",
+            "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "id": "view.bottom_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 95.649,
+            "limit": "<= 99.0 %",
+            "message": "низ подставки в кадре"
+          },
+          {
+            "id": "view.side_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 15.746,
+            "limit": ">= 1.0 %",
+            "message": "фигура не обрезана по бокам"
+          },
+          {
+            "id": "view.single_component",
+            "scope": "front",
+            "result": "PASS",
+            "value": [],
+            "limit": "прочие < 0.5 %",
+            "message": "одна крупная связная фигура"
+          },
+          {
+            "id": "set.bg_same",
+            "scope": "set",
+            "result": "PASS",
+            "value": 0.0,
+            "limit": "<= 12",
+            "message": "один фон на набор"
+          }
+        ],
+        "summary": {
+          "PASS": 12,
+          "WARN": 1,
+          "FAIL": 0
+        },
+        "verdict": "PASS",
+        "palette": {
+          "path": null,
+          "asset_id": null,
+          "swatches": []
+        },
+        "sheet": null
+      }
+    }
+  ]
+}

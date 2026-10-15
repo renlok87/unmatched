@@ -1,0 +1,164 @@
+{
+  "status": "CANDIDATE_SOURCE_ONLY_NOT_IMPORTED_NOT_RUNTIME_VALIDATED",
+  "actual_final_png_opened_with": "view_image after copying into assigned folder; initial design and both generated versions also opened",
+  "identity": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "Preserves the opened reference: elongated ivory deer skull with hollow sockets and long muzzle, large paired many-tined stag antlers, intertwined brown bark, desaturated moss and one secondary raven on image-right shoulder. Full antler crown and every visible tine are intact; no glowing eyes or human face. Fine branch shapes are a painted interpretation rather than a topology match."
+  },
+  "palette_and_craft": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "Weathered ivory bone, warm brown antlers/bark, muted moss green and charcoal-black raven/backdrop. Matte brushwork, readable dry bark and bone; no saturated magical glow.",
+    "corner_rgb_samples": {
+      "50,50": [
+        30,
+        29,
+        29
+      ],
+      "1204,50": [
+        31,
+        31,
+        31
+      ],
+      "50,1204": [
+        31,
+        31,
+        31
+      ],
+      "1204,1204": [
+        29,
+        29,
+        29
+      ]
+    }
+  },
+  "crop": {
+    "result": "PASS_SELF_REVIEW_FOR_SOURCE_FRAMING",
+    "square": "Full head/hair/antler silhouette visible with charcoal margin. Shoulders included; lower chest fades into background.",
+    "centered_circle": {
+      "center_normalized": [
+        0.5,
+        0.5
+      ],
+      "radius_fraction_of_width": 0.43,
+      "diameter_fraction_of_width": 0.86,
+      "maximum_marked_landmark_radius": 0.3679,
+      "remaining_radial_margin_at_marked_landmarks_px": 77.9,
+      "landmarks": {
+        "left_highest_antler_tip": {
+          "xy_px": [
+            434,
+            208
+          ],
+          "radial_distance_fraction_of_width": 0.3679,
+          "inside_review_circle": true
+        },
+        "right_highest_antler_tip": {
+          "xy_px": [
+            821,
+            209
+          ],
+          "radial_distance_fraction_of_width": 0.3675,
+          "inside_review_circle": true
+        },
+        "left_outer_upper_tine": {
+          "xy_px": [
+            363,
+            300
+          ],
+          "radial_distance_fraction_of_width": 0.3351,
+          "inside_review_circle": true
+        },
+        "right_outer_upper_tine": {
+          "xy_px": [
+            888,
+            303
+          ],
+          "radial_distance_fraction_of_width": 0.3318,
+          "inside_review_circle": true
+        },
+        "left_outer_lower_tine": {
+          "xy_px": [
+            360,
+            435
+          ],
+          "radial_distance_fraction_of_width": 0.2623,
+          "inside_review_circle": true
+        },
+        "right_outer_lower_tine": {
+          "xy_px": [
+            889,
+            434
+          ],
+          "radial_distance_fraction_of_width": 0.2595,
+          "inside_review_circle": true
+        },
+        "left_inner_tip": {
+          "xy_px": [
+            555,
+            415
+          ],
+          "radial_distance_fraction_of_width": 0.1785,
+          "inside_review_circle": true
+        },
+        "right_inner_tip": {
+          "xy_px": [
+            696,
+            415
+          ],
+          "radial_distance_fraction_of_width": 0.1778,
+          "inside_review_circle": true
+        },
+        "skull_top": {
+          "xy_px": [
+            622,
+            534
+          ],
+          "radial_distance_fraction_of_width": 0.0743,
+          "inside_review_circle": true
+        },
+        "skull_muzzle_bottom": {
+          "xy_px": [
+            623,
+            733
+          ],
+          "radial_distance_fraction_of_width": 0.0846,
+          "inside_review_circle": true
+        },
+        "raven_tail": {
+          "xy_px": [
+            861,
+            810
+          ],
+          "radial_distance_fraction_of_width": 0.2369,
+          "inside_review_circle": true
+        },
+        "left_shoulder": {
+          "xy_px": [
+            402,
+            788
+          ],
+          "radial_distance_fraction_of_width": 0.2206,
+          "inside_review_circle": true
+        }
+      }
+    },
+    "method_and_limits": "Visual inspection of the actual final PNG and approximate manually located identity landmarks, followed by circle-distance arithmetic. This is not automated silhouette segmentation or a runtime UI test. The lower bust is softly faded and is not included in the head/antler landmark guarantee.",
+    "top_identity_margin_approx_percent": 16.6,
+    "future_integration": "Choose square/disc crop using the actual consumer; existing hero-specific discs from the MVP must not be reused blindly. Test at 32/40/64/128 px in the UI. Antler-heavy Leshen needs the wider composition to retain identity."
+  },
+  "text_frame_watermark": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "No visible lettering, frame, logo, watermark, base or scene props."
+  },
+  "correction": {
+    "count": 1,
+    "reason": "Initial highest antler tips fall outside a full centered circular crop; required more charcoal safety margin.",
+    "change": "One built-in correction for wider framing, with original attempt retained."
+  },
+  "limitations": [
+    "No human acceptance or runtime-ready claim.",
+    "No registry/code edits, Unreal import, UI crop configuration, package or live run.",
+    "Prompt requested 1024x1024; built-in tool returned 1254x1254. Original output dimensions retained, without resampling.",
+    "Safe framing reduces face size; small UI readability remains to be checked by the integrating owner."
+  ]
+}

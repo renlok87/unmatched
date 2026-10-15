@@ -1,0 +1,148 @@
+{
+  "status": "CANDIDATE_SOURCE_ONLY_NOT_IMPORTED_NOT_RUNTIME_VALIDATED",
+  "actual_final_png_opened_with": "view_image after copying into assigned folder; initial design and both generated versions also opened",
+  "identity": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "Preserves the opened reference: swept-up dark spiky hair, pale angular clean-shaven face, pronounced brow, stern expression, raised black leather collar and charcoal shirt. No wings or halo: the approved Angel miniature is unwinged. This is a painted reinterpretation, not a claim of pixel-identical face geometry."
+  },
+  "palette_and_craft": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "Warm ivory skin, brown-black hair, charcoal-black leather/shirt and textured charcoal backdrop. Matte brushwork and restrained leather highlights match the miniature craft direction.",
+    "corner_rgb_samples": {
+      "50,50": [
+        30,
+        28,
+        28
+      ],
+      "1204,50": [
+        32,
+        30,
+        30
+      ],
+      "50,1204": [
+        31,
+        28,
+        29
+      ],
+      "1204,1204": [
+        30,
+        28,
+        28
+      ]
+    }
+  },
+  "crop": {
+    "result": "PASS_SELF_REVIEW_FOR_SOURCE_FRAMING",
+    "square": "Full head/hair/antler silhouette visible with charcoal margin. Shoulders included; lower chest fades into background.",
+    "centered_circle": {
+      "center_normalized": [
+        0.5,
+        0.5
+      ],
+      "radius_fraction_of_width": 0.42,
+      "diameter_fraction_of_width": 0.84,
+      "maximum_marked_landmark_radius": 0.3469,
+      "remaining_radial_margin_at_marked_landmarks_px": 91.7,
+      "landmarks": {
+        "hair_top": {
+          "xy_px": [
+            628,
+            192
+          ],
+          "radial_distance_fraction_of_width": 0.3469,
+          "inside_review_circle": true
+        },
+        "upper_left_hair": {
+          "xy_px": [
+            488,
+            245
+          ],
+          "radial_distance_fraction_of_width": 0.3242,
+          "inside_review_circle": true
+        },
+        "left_hair": {
+          "xy_px": [
+            452,
+            333
+          ],
+          "radial_distance_fraction_of_width": 0.2728,
+          "inside_review_circle": true
+        },
+        "right_hair": {
+          "xy_px": [
+            795,
+            331
+          ],
+          "radial_distance_fraction_of_width": 0.2714,
+          "inside_review_circle": true
+        },
+        "left_ear": {
+          "xy_px": [
+            468,
+            473
+          ],
+          "radial_distance_fraction_of_width": 0.1765,
+          "inside_review_circle": true
+        },
+        "right_ear": {
+          "xy_px": [
+            754,
+            472
+          ],
+          "radial_distance_fraction_of_width": 0.1598,
+          "inside_review_circle": true
+        },
+        "left_collar": {
+          "xy_px": [
+            341,
+            695
+          ],
+          "radial_distance_fraction_of_width": 0.2344,
+          "inside_review_circle": true
+        },
+        "right_collar": {
+          "xy_px": [
+            868,
+            690
+          ],
+          "radial_distance_fraction_of_width": 0.1986,
+          "inside_review_circle": true
+        },
+        "left_shoulder": {
+          "xy_px": [
+            233,
+            756
+          ],
+          "radial_distance_fraction_of_width": 0.3306,
+          "inside_review_circle": true
+        },
+        "right_shoulder": {
+          "xy_px": [
+            1000,
+            760
+          ],
+          "radial_distance_fraction_of_width": 0.3158,
+          "inside_review_circle": true
+        }
+      }
+    },
+    "method_and_limits": "Visual inspection of the actual final PNG and approximate manually located identity landmarks, followed by circle-distance arithmetic. This is not automated silhouette segmentation or a runtime UI test. The lower bust is softly faded and is not included in the head/antler landmark guarantee.",
+    "top_identity_margin_approx_percent": 15.3,
+    "future_integration": "Choose square/disc crop using the actual consumer; existing hero-specific discs from the MVP must not be reused blindly. Test at 32/40/64/128 px in the UI. Antler-heavy Leshen needs the wider composition to retain identity."
+  },
+  "text_frame_watermark": {
+    "result": "PASS_SELF_REVIEW",
+    "notes": "No visible lettering, frame, logo, watermark, base or scene props."
+  },
+  "correction": {
+    "count": 1,
+    "reason": "Initial image had less top safety margin than requested.",
+    "change": "One built-in correction for wider framing, with original attempt retained."
+  },
+  "limitations": [
+    "No human acceptance or runtime-ready claim.",
+    "No registry/code edits, Unreal import, UI crop configuration, package or live run.",
+    "Prompt requested 1024x1024; built-in tool returned 1254x1254. Original output dimensions retained, without resampling.",
+    "Safe framing reduces face size; small UI readability remains to be checked by the integrating owner."
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.portrait-source-candidate/1",
+  "hero_slug": "ancient-leshen",
+  "created_utc": "2026-10-15T05:45:29.169520+00:00",
+  "generator": "built-in image_gen.imagegen only",
+  "generation_calls": 1,
+  "necessary_correction_calls": 1,
+  "external_api_cli_tripo_syntx_calls": 0,
+  "status": "CANDIDATE_SOURCE_ONLY_NOT_IMPORTED_NOT_RUNTIME_VALIDATED",
+  "approved_project_reference": {
+    "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+    "sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+    "bytes": 505298,
+    "dimensions": [
+      896,
+      1152
+    ],
+    "mode": "RGB",
+    "format": "PNG"
+  },
+  "reference_checks_report": {
+    "path": "art/imagegen/concept-ancient-leshen-codex/design/checks-report.json",
+    "sha256": "1c17bed26bbacf8b0afadc3622586cb15bb03ac6d9a20c63c05f8de02cba792c",
+    "bytes": 7409
+  },
+  "reference_opened_before_generation": true,
+  "commercial_scans_or_avatars_used": false,
+  "absence_evidence": {
+    "checked_before_generation": true,
+    "repository_filename_inventory": {
+      "scanned_files": 67683,
+      "matches": [],
+      "scan_errors": [],
+      "match_rule": "Path contains portrait or avatar AND angel, ancient-leshen or ancient_leshen (case insensitive).",
+      "excluded_directories": [
+        ".git",
+        "node_modules",
+        ".venv",
+        ".pytest_cache",
+        "Intermediate",
+        "Binaries",
+        "Saved",
+        "DerivedDataCache",
+        "tmp-metadata-check-*"
+      ]
+    },
+    "metadata_content_search": {
+      "roots": [
+        "art/imagegen",
+        "docs/game-design",
+        "tools/art"
+      ],
+      "file_types": [
+        "json",
+        "md",
+        "csv",
+        "py"
+      ],
+      "pattern": "portrait within 80 characters of angel or ancient.leshen, or reverse, case insensitive",
+      "matches": [],
+      "note": "Initial rg encountered an unrelated access-denied concept-elektra temporary folder. Successful filename inventory explicitly excluded temporary/cache/build directories and had no traversal errors."
+    },
+    "registry": {
+      "path": "unreal/Unmatched/Config/Cards/S08CardMedia.json",
+      "sha256": "a48db201bc8360a82b9473c4f3f42a43c32a106bb0ac1322c05a677aa3204b5e",
+      "bytes": 26189,
+      "portrait_keys": [
+        "portrait:king-arthur",
+        "portrait:king-arthur:merlin",
+        "portrait:medusa",
+        "portrait:medusa:harpies",
+        "portrait:t-rex"
+      ],
+      "target_key_absent": true
+    },
+    "generic_consumer_evidence": [
+      "unreal/Unmatched/Source/Unmatched/S08/UI/UmPortrait.cpp:38-39 forwards hero key to FindPortrait",
+      "unreal/Unmatched/Source/Unmatched/S08/UI/UmCardMedia.cpp:148-151 builds portrait:<hero-slug> key"
+    ],
+    "conclusion": "No existing original portrait source found for this hero in the searched source inventory, metadata references or active card media registry. Full-body miniature reference exists and is not a standalone portrait source."
+  },
+  "attempts": [
+    {
+      "number": 1,
+      "role": "initial generation retained for audit",
+      "request": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/request-01.json",
+        "sha256": "c746b2884c27e5890c2933996563c2d101182f383999a4f92ef1b8b9baeeb51a",
+        "bytes": 2718
+      },
+      "prompt": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/prompt-01.txt",
+        "sha256": "7cb28da306b130a3e5fd0bce4ac82f424dc6adbfa33bff641000015d32256984",
+        "bytes": 2493
+      },
+      "reference": {
+        "path": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+        "sha256": "f9c5e751b61b17abc5a90de1bdf3974419b845565ac60899d0737bbf0123b1e4",
+        "bytes": 505298,
+        "dimensions": [
+          896,
+          1152
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "output": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/generated-01.png",
+        "sha256": "9a664ae82f118f30d3011c14d88f456ffdb785f59687910619509286149422a6",
+        "bytes": 2331337,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "tool_output_path": "C:/Users/ren/.codex/generated_images/01a13e12-19b4-7811-96d7-200a96d85909/exec-47d47c87-630b-4dad-bc9a-55d19cfdc7cf.png",
+      "copied_bytes_verified": true
+    },
+    {
+      "number": 2,
+      "role": "single necessary crop-margin correction; selected candidate",
+      "request": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/request-02-crop-correction.json",
+        "sha256": "44a26b394318967abcd5b8f98aef34ea814aa783fb0e0dc4125a7cdbc7311a72",
+        "bytes": 1474
+      },
+      "prompt": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/prompt-02-crop-correction.txt",
+        "sha256": "63ade89210d4cf5795246df2c21a9c8a2b7af7f0a222a99b41a0bb90c34e87e1",
+        "bytes": 1248
+      },
+      "edit_target": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/generated-01.png",
+        "sha256": "9a664ae82f118f30d3011c14d88f456ffdb785f59687910619509286149422a6",
+        "bytes": 2331337,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "output": {
+        "path": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/portrait-source-candidate.png",
+        "sha256": "4f2878b143d9dbff5cb2e914c0d1364a58c2ec10215589adf8fae4597a55a500",
+        "bytes": 2019590,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGB",
+        "format": "PNG"
+      },
+      "tool_output_path": "C:/Users/ren/.codex/generated_images/01a13e12-19b4-7811-96d7-200a96d85909/exec-ea13300e-683f-4b1e-a76a-31ae8eb094bb.png",
+      "copied_bytes_verified": true
+    }
+  ],
+  "write_scope": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen",
+  "git_mutations": false,
+  "shared_registry_ledger_code_edits": false,
+  "services_or_background_processes_started": false,
+  "self_review": "self-review.json"
+}

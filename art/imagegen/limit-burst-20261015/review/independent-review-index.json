@@ -1,0 +1,255 @@
+{
+  "schema": "unmatched.burst-independent-review-index/1",
+  "date": "2026-10-15",
+  "reviewer": "art_hub_audit",
+  "status": "proposed sources only",
+  "scope": "Independent visual inspection and provenance/hash checks; no runtime, registry, 3D, rig or stage acceptance. Review-owned diagnostics do not modify any source.",
+  "reviewed_outputs": [
+    {
+      "asset": "portrait:achilles",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/achilles/portrait-source.png",
+      "reference": "art/imagegen/concept-achilles-codex/design/achilles-front.png",
+      "identity": "Young blond warrior, raised bronze Corinthian helmet, red crest and cloak, bronze brooch and cuirass match the existing project concept. Both eyes visible; no text, frame, watermark, hands or weapons.",
+      "limits": [
+        "Central circular crop diameter 0.76 clips the crest; the head including helmet is not wholly inside the requested safe circle.",
+        "Full-source centered circle diameter 1.00 retains the crest and face. At 80 px the tall crest makes the face small; review diagnostic includes both crops at native size.",
+        "Square edges retain the silhouette. Navy background has subtle texture/value variation rather than an exact solid token."
+      ],
+      "recommendation": "Keep as original source candidate. For future runtime use choose an explicit crop preserving crest, or request a separate crop-safe correction. This is not runtime acceptance.",
+      "diagnostic": "art/imagegen/limit-burst-20261015/review/achilles-circular-crop-review.png",
+      "sha256": "ed96f378d99cf6e4e942120657e782175fd192166c3b00c7bb37135d5b0a3c6f",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "disposition": "usable_source_with_crop_limit",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "proposed:ASSET-WOLF-001",
+      "file": "art/imagegen/limit-burst-20261015/heroes/wolf/concepts/wolf-profile-g1.png",
+      "reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png (craftsmanship only); text-only roster provenance in heroes/wolf/provenance.json",
+      "identity": "One natural grey quadruped wolf, one head, two ears, one low tail, four clearly distinguishable legs/paws. Nose points left; adult canine proportions and closed mouth read clearly. Neutral alert posture with all paws planted on one low dark stone base. No antlers, gear, magic, team band or text.",
+      "limits": [
+        "This is a single exploratory side view, not a consistent multi-view package. No front/back or rig compatibility has been established.",
+        "Fur silhouette has many sharp tufts; a future game mesh needs fewer broader clumps and thickness checks.",
+        "Head and paws have slight perspective, and a narrow base top/rim is visible. Do not use as a strict orthographic tracing plate without review."
+      ],
+      "recommendation": "Keep as the missing Leshen sidekick design reference. Do not submit through humanoid 3D/rig pipeline or claim 1a/1b/1c/game acceptance.",
+      "sha256": "8f5f2b30af33d55695c8e63f8a407cb0537187f8327abf6953ee27df8214722b",
+      "size": [
+        1448,
+        1086
+      ],
+      "mode": "RGB",
+      "disposition": "usable_exploratory_reference",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "ASSET-WIGLAF-001 alternative only",
+      "file": "art/imagegen/limit-burst-20261015/heroes/wiglaf/design/wiglaf-front.png",
+      "reference": "art/pipeline-candidates/ASSET-WIGLAF-001/asset-card.yaml; canonical accepted 1a in art/imagegen/concept-wiglaf-codex/",
+      "identity": "Leather jerkin, green cloak, conical helmet, axe in own right hand and boar-painted shield on own left match the card. Face and full body visible; no text or team band. Base reads edge-on.",
+      "limits": [
+        "Shield still hides the left forearm/elbow; no clear charcoal-background gap for both arms.",
+        "Cloak still fills space beside torso and legs; geometry inference remains ambiguous.",
+        "The alternative was created independently of the already accepted canonical 1a. It must not overwrite the canonical source or inherit its acceptance hash."
+      ],
+      "recommendation": "Archive as optional unselected alternative. Proceed with canonical accepted Wiglaf for downstream work unless a fresh explicit selection is recorded.",
+      "sha256": "bf84b3bf5900b5672f25743ad95df575c9a959f7578079636bfc2eef39873975",
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "disposition": "optional_alternative_not_replacement",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:robin-hood",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/robin-hood/portrait-source.png",
+      "sha256": "517b3fb0f970616c706e7641e7fd178f933ccc835841e6ac49a19a0f602b3c32",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-robin-hood-codex/design/robin-hood-front.png",
+      "visual_review": "Green pointed hood and cloak, leaf clasp, trimmed beard and red fletching match the accepted project concept. Face is clearly distinct from the other portraits.",
+      "crop_review": "Full100 circle preserves the hood/head; outer quiver/fletching can meet the mask edge. Central76 clips hood/arrow detail.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ],
+      "disposition": "usable_original_source_candidate",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:sherlock-holmes",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/sherlock-holmes/portrait-source.png",
+      "sha256": "d31589b520c8177f588c2384c447798d3d2442636950ff042c1941d8a9829fec",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+      "visual_review": "Long clean-shaven face, deerstalker, grey cape, herringbone suit and pipe match the project concept. Both eyes and pipe read clearly at 80 px.",
+      "crop_review": "Full100 circle preserves hat bow and pipe. Central76 cuts the top of the hat.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ],
+      "disposition": "usable_original_source_candidate",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:nikola-tesla",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/nikola-tesla/portrait-source.png",
+      "sha256": "d739d6249c1436b9f4abc1fddf3436816299fd5df8e489a72c0d4e5f073f4ac7",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-nikola-tesla-codex/design/nikola-tesla-front.png",
+      "visual_review": "Center-parted wavy hair, moustache and dark three-piece suit match the project concept; no unwanted coil, hands or UI in the portrait. The moustache remains a clear landmark at 80 px.",
+      "crop_review": "Full100 circle preserves the hair/head. Central76 crops the upper hair.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ],
+      "disposition": "usable_original_source_candidate",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "proposed:ASSET-FAITH-001",
+      "file": "art/imagegen/limit-burst-20261015/heroes/faith/design/faith-front.png",
+      "sha256": "2f750901f83549453797e615d21aae049b6125c10209194388ef250566381dfb",
+      "size": [
+        1086,
+        1448
+      ],
+      "reference": "heroes/faith/asset-card.proposal.json, text-only roster provenance; Medusa quality reference only",
+      "visual_review": "One adult human vampire hunter. Dark wavy hair, open black leather jacket, burgundy top, black trousers/boots and one wooden stake in her own right hand. Left hand empty; no thigh holster or second weapon in g2. Arms are separate from torso and both feet planted. g2 corrects the visible base top from g1. No text, logo, team band or extra anatomy.",
+      "limits": [
+        "Top of hair is around 2% of image height, below the requested minimum 4% margin; base bottom is around 98%, not requested 93%. These are visual estimates, not pixel segmentation measurements.",
+        "This has no canonical asset-card registration or independent formal 1a acceptance. No 3D/rig/UE readiness claim.",
+        "The exact sent g1/g2 prompts contain leftover Wiglaf instruction/checklist text before the valid Faith CORE due to a template split defect. Executor confirmed it; preserve immutable prompts and record the defect.",
+        "G2 changes the burgundy top seam/button detail relative to g1, but there was no accepted canonical design and it remains within the proposed SUBJECT."
+      ],
+      "recommendation": "Keep g2 as proposed original design source, preserve g1/history and the explicit prompt/framing limits. No further generation needed solely for metadata cleanup.",
+      "disposition": "usable_proposed_intake_candidate_with_framing_limit",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:beowulf",
+      "file": "art/imagegen/limit-burst-20261015/cli-portraits/beowulf/portrait-source-candidate.png",
+      "sha256": "71352b225f5017f45d0e8547fbc778e6fc1a16f517f3e03760e39e5a6feac5cd",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-beowulf-codex/design/beowulf-front.png",
+      "disposition": "keep_proposed_original_source",
+      "visual_review": "Rounded iron/gold helmet, noseguard, weathered face, long tawny braids/beard, brown fur mantle, torc and chainmail preserve the project concept. Both eyes readable, no text/UI/extra weapons. Full square shows the complete head/helmet and beard. Charcoal background is specified by this brief.",
+      "crop_review": "Full100 retains helmet and beard. Centered86% cuts the helmet tip; use an explicit95-100% crop for future review, not the tighter setting used by Angel/Leshen.",
+      "limits": [
+        "Painted facial planes/fur are broader than the miniature concept; fine engraving is reinterpreted."
+      ],
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false,
+      "native_review": "Full100, gray160 and native80-enlarged2x personally inspected in cli-portrait-native-crop-review.png; helmet/beard/torc silhouette and face remain identifiable.",
+      "diagnostic": "art/imagegen/limit-burst-20261015/review/cli-portrait-native-crop-review.png"
+    },
+    {
+      "asset": "proposed:ASSET-GILES-001",
+      "file": "art/imagegen/limit-burst-20261015/heroes/giles/design/giles-front.png",
+      "sha256": "0d15aea4be21b6d5dcb603f5c1eb64edd4b0c48915ece214d43bc61c4dfa3e79",
+      "size": [
+        1086,
+        1448
+      ],
+      "reference": "heroes/giles/asset-card.proposal.json and provenance.json; text-only live/scraped roster, Medusa craftsmanship reference",
+      "disposition": "keep_proposed_reference_only",
+      "visual_review": "One mature academic-mentor interpretation with round glasses, tweed coat, olive waistcoat, tie and empty hands. Human anatomy is coherent, both arms separated, stable planted feet. Whole figure and plain base visible; no text or unwanted weapon.",
+      "limits": [
+        "Original delegated costume and short grey beard; source roster proves role/mechanics, not this exact appearance.",
+        "A narrow top plane of the base is visible; strict orthographic framing not achieved. Hair top at3.522% per producer script misses4% target.",
+        "Reference-only; future canonical intake/selection and formal independent pipeline acceptance required."
+      ],
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "proposed:ASSET-DAISY-001",
+      "file": "art/imagegen/limit-burst-20261015/heroes/daisy/design/daisy-front.png",
+      "sha256": "56c4cadf49fd0ac57ffa337d5f3ad1810917fb4fc6fdfc5216a073c537ae1236",
+      "size": [
+        1086,
+        1448
+      ],
+      "reference": "heroes/daisy/asset-card.proposal.json and provenance.json; text-only live/scraped roster, Medusa craftsmanship reference",
+      "disposition": "keep_proposed_reference_only",
+      "visual_review": "One adult mechanic interpretation with chestnut bob/headband, ivory blouse, navy overalls and work boots. One steel open-ended wrench in own right hand and empty left hand. The wrench has a visible background gap from the thigh; No extra limbs or extra tools are visible.",
+      "limits": [
+        "Original delegated costume/tool, not verified card/avatar likeness.",
+        "Narrow top rim of the base remains visible. Top margin3.315% per producer script misses4%; single_component WARN retained honestly.",
+        "Two alternative fronts only; reference-only, with no formal intake, multiview/3D/rig/UE acceptance."
+      ],
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:angel",
+      "file": "art/imagegen/limit-burst-20261015/cli-portraits/angel/portrait-source-candidate.png",
+      "sha256": "13d9a3e4fe2a646224a28e0e892e99f88406ba4db1a6ff66bd12f348ca8a2fa6",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-angel-codex/design/angel-front.png",
+      "disposition": "keep_proposed_original_source",
+      "visual_review": "Pale angular face, swept-up dark spiky hair, black leather coat and open dark collar preserve the existing project design. Both eyes visible; no wings, hands, weapons, pedestal, text or UI. Framing correction adds clear head margins.",
+      "limits": [
+        "Full100 and86% circular review retains the complete hair/head; at80px the face is smaller than the four navy portraits but remains identifiable.",
+        "Broad painted facial planes and textured charcoal backdrop differ stylistically from the more sculpted navy portrait group; this is a separate source, not an approved unified runtime set."
+      ],
+      "diagnostic": "art/imagegen/limit-burst-20261015/review/cli-portrait-native-crop-review.png",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    },
+    {
+      "asset": "portrait:ancient-leshen",
+      "file": "art/imagegen/limit-burst-20261015/cli-portraits/ancient-leshen/portrait-source-candidate.png",
+      "sha256": "4f2878b143d9dbff5cb2e914c0d1364a58c2ec10215589adf8fae4597a55a500",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-ancient-leshen-codex/design/ancient-leshen-front.png",
+      "disposition": "keep_proposed_original_source",
+      "visual_review": "Antlered animal skull, twisted woody body, lichen and one image-right raven preserve the core project design. Full antlers are visible; no text/UI or invented glow. Both square and circular86% diagnostics retain the antler tips.",
+      "limits": [
+        "At80px the antler silhouette and skull read, while individual bark/lichen/raven details are small. Future crop should be hero-specific; central86% is visually useful, not a runtime-approved numeric crop.",
+        "Fine antler branch positions, bark and lichen are interpreted for the portrait and are not a pixel-exact copy of the full miniature.",
+        "Textured charcoal background and broad painted treatment differ from the four navy sources; keep source-only status."
+      ],
+      "diagnostic": "art/imagegen/limit-burst-20261015/review/cli-portrait-native-crop-review.png",
+      "runtime_accepted": false,
+      "pipeline_stage_accepted": false
+    }
+  ],
+  "pending": [],
+  "frozen": true,
+  "frozen_at_utc": "2026-10-15T05:51:01.002443+00:00",
+  "reviewed_count": 12
+}

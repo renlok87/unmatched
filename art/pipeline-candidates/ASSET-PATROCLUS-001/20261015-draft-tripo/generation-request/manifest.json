@@ -1,0 +1,190 @@
+{
+  "asset_id": "ASSET-PATROCLUS-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "export_basename": "ASSET-PATROCLUS-001_draft-glb",
+    "primary_role": "draft-glb",
+    "primary_source": "tripo-pending",
+    "triangle_loss_tolerance": 0.001
+  },
+  "created_at": "2026-10-15T05:37:41+00:00",
+  "exports": [],
+  "generation_requests": [
+    {
+      "dry_run": true,
+      "path": "generation-requests/7f571cf56e293a18.json",
+      "request_key": "7f571cf56e293a1810c57a81ccc2da68d83ed3d0fa721310355ffef3572215ee",
+      "sha256": "12f98d5d0f38f370eec8c271b7140824f6296e50fc10283c9b027c21bd583ad8",
+      "submitted": false
+    }
+  ],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "generation-request",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-0a5f3ae5-draft": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-draft-tripo/reports/tripo-run.json",
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "2579146e75d7496c45a03ea93c2f58fc441cc39c20de9dd634f053270f4bcff1"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 48418288,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, unmodified",
+          "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-draft-tripo/source/patroclus-draft-tripo-0a5f3ae5.glb",
+          "produced_by": "generate",
+          "role": "draft-glb",
+          "sha256": "2363ad98ff41806aa30c48cd127ac628d6d3d7a33803269b75aacab35e09a65a",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 0,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "tripo_mesh_78f19bc4-eb37-4f80-8d8c-34c6aec37696",
+                "triangles": 1922590
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1922590
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-patroclus-codex/design/patroclus-front.png",
+          "present": true,
+          "sha256": "d92f10fa66fc9d0726b79e2981b9db5fd42a66ff2aa6aca8ad1125e538fce8ee",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 30.0
+      },
+      "registered_at": "2026-10-15T05:41:24+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-PATROCLUS-001",
+        "date": "2026-10-15",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-draft-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "draft-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 0,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1922590
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 48418288,
+            "expected_sha256": "2363ad98ff41806aa30c48cd127ac628d6d3d7a33803269b75aacab35e09a65a",
+            "in_git": false,
+            "origin": "Studio GLB export, unmodified",
+            "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-draft-tripo/source/patroclus-draft-tripo-0a5f3ae5.glb",
+            "produced_by": "generate",
+            "role": "draft-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-patroclus-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "single-image",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": false,
+            "output": "Геометрия и текстура (по умолчанию формы)",
+            "parts_mode": null,
+            "pbr": false,
+            "polygon_count": null,
+            "privacy": true,
+            "remove_lighting": null,
+            "seed": null,
+            "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный",
+            "texture_8k": false,
+            "topology": null,
+            "ultra_mesh_quality": null
+          },
+          "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+          "views": {
+            "back": null,
+            "front": {
+              "path": "art/imagegen/concept-patroclus-codex/design/patroclus-front.png",
+              "sha256": "d92f10fa66fc9d0726b79e2981b9db5fd42a66ff2aa6aca8ad1125e538fce8ee"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+        "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 20595.0,
+              "balance_before": 20625.0,
+              "observed_debit": 30.0,
+              "quoted": 30.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-draft-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+            "op": "generate"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-0a5f3ae5-draft",
+        "task_id": "0a5f3ae5-4ec9-4074-bfee-284ba12b23fb",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/0a5f3ae5-4ec9-4074-bfee-284ba12b23fb"
+      },
+      "spec_sha256": "f2aeb0d0310e730b16406685eb636bf04dfb51ca750ccd8ab0f27289228ed6f5"
+    }
+  },
+  "stages": {},
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

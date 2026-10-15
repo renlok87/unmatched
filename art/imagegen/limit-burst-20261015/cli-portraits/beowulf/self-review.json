@@ -1,0 +1,110 @@
+{
+  "status": "candidate_only_unaccepted_unintegrated",
+  "image_opened_after_generation": true,
+  "inspection_method": "Generated output and byte-identical workspace PNG opened using view_image; visual comparison to opened design reference. Manual landmark circle geometry supplements visual review; not a segmentation or runtime UI test.",
+  "checks": {
+    "identity": {
+      "result": "pass_for_source_candidate",
+      "observed": "Same frontal mature brown-bearded warrior; segmented round iron helmet with gold ridge/brow/nose guard, paired side braids and central beard plait, brown fur mantle, gold ring torc, iron mail and diagonal leather strap. No invented horns/crown. Fine engraving varies and is not a pixel-exact copy."
+    },
+    "square_crop": {
+      "result": "pass",
+      "observed": "1254 square, centered face, complete helmet/head/beard visible. Shoulders intentionally leave the lower side edges; no head or headgear clipping."
+    },
+    "circular_crop": {
+      "result": "pass_for_source_candidate",
+      "assumed_disc_normalized": [
+        0.5,
+        0.5,
+        0.95
+      ],
+      "observed": "Whole helmet/head/beard fits a centered circle, including a 95%-diameter disc. Lower shoulder corners would be trimmed as expected. Do not reuse existing MVP hero crop settings blindly.",
+      "manual_landmarks_px": {
+        "helmet_crest": [
+          631,
+          60
+        ],
+        "left_helmet": [
+          455,
+          220
+        ],
+        "right_helmet": [
+          806,
+          300
+        ],
+        "left_cheek_guard": [
+          427,
+          448
+        ],
+        "right_cheek_guard": [
+          828,
+          448
+        ],
+        "left_beard_braid": [
+          510,
+          805
+        ],
+        "right_beard_braid": [
+          752,
+          805
+        ],
+        "central_beard_tip": [
+          632,
+          900
+        ]
+      },
+      "center_px": [
+        627.0,
+        627.0
+      ],
+      "radius_px": 595.65,
+      "landmark_distances_px": {
+        "helmet_crest": 567.01,
+        "left_helmet": 441.85,
+        "right_helmet": 372.79,
+        "left_cheek_guard": 268.4,
+        "right_cheek_guard": 269.15,
+        "left_beard_braid": 213.01,
+        "right_beard_braid": 217.51,
+        "central_beard_tip": 273.05
+      },
+      "minimum_landmark_margin_px": 28.64,
+      "precision": "landmarks are approximate visual estimates, not a full pixel mask"
+    },
+    "palette": {
+      "result": "pass_visual",
+      "observed": "Muted iron grey on helmet/mail, warm brown fur/beard/leather, controlled antique gold on helmet and torc, warm skin, charcoal backdrop. Values are shaded paint interpretations, not exact flat hex swatches.",
+      "reference_palette": {
+        "path": "art/imagegen/concept-beowulf-codex/palette.json",
+        "sha256": "e7d64b412d64c430115e1c6dc313fd12f8046a6a36b9c5156e8afcb73a57cfde",
+        "bytes": 298
+      }
+    },
+    "craft": {
+      "result": "pass_for_source_candidate",
+      "observed": "Visible broad painted facial planes, tactile sculpted fur/beard, matte leather and restrained metallic highlights. Mail is fairly detailed; needs thumbnail-scale assessment in eventual UI."
+    },
+    "constraints": {
+      "result": "pass_visual",
+      "observed": "One character, no text/frame/watermark/UI, charcoal opaque background, no weapons/hands/pedestal."
+    }
+  },
+  "prompt_deviations": [
+    {
+      "item": "framing margins",
+      "observed": "Helmet crest is approximately 4.8% below the top, rather than requested 14%; head/helmet therefore reads larger than the suggested layout. Whole identity remains visible with circle margin. Preserve full canvas; do not zoom tighter without crop review."
+    },
+    {
+      "item": "helmet detail",
+      "observed": "Painted engraving/panel details are reinterpreted at bust resolution; the design anchors and material families remain recognizable."
+    }
+  ],
+  "correction_calls": 0,
+  "correction_decision": "No visibly broken anatomy, clipped headgear, wrong identity, text or palette defect requiring the one allowed correction. Framing variation documented; no second generation.",
+  "not_verified": [
+    "32/40 px icon readability in actual ROOM/LOBBY/PANEL/GAMEOVER screens",
+    "UE texture import, mip settings or portrait crop registration",
+    "Artistic acceptance by an independent acceptor or user"
+  ],
+  "next_step": "Owner may review this source candidate, establish a hero-specific crop and perform integration separately; this task edits no shared media registry or runtime assets."
+}

@@ -1,0 +1,82 @@
+{
+  "schema": "unmatched.burst-independent-visual-review/1",
+  "date": "2026-10-15",
+  "reviewer": "art_hub_audit",
+  "scope": "Actual PNGs and source design refs opened. Full100 portrait/native80/grayscale diagnostics inspected. Source candidates only, no runtime/3D acceptance.",
+  "diagnostic": "art/imagegen/limit-burst-20261015/ui-cards/review-sheet.png",
+  "reviews": [
+    {
+      "asset": "portrait:robin-hood",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/robin-hood/portrait-source.png",
+      "sha256": "517b3fb0f970616c706e7641e7fd178f933ccc835841e6ac49a19a0f602b3c32",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-robin-hood-codex/design/robin-hood-front.png",
+      "verdict": "usable_original_source_candidate",
+      "visual_review": "Green pointed hood and cloak, leaf clasp, trimmed beard and red fletching match the accepted project concept. Face is clearly distinct from the other portraits.",
+      "crop_review": "Full100 circle preserves the hood/head; outer quiver/fletching can meet the mask edge. Central76 clips hood/arrow detail.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ]
+    },
+    {
+      "asset": "portrait:sherlock-holmes",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/sherlock-holmes/portrait-source.png",
+      "sha256": "d31589b520c8177f588c2384c447798d3d2442636950ff042c1941d8a9829fec",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+      "verdict": "usable_original_source_candidate",
+      "visual_review": "Long clean-shaven face, deerstalker, grey cape, herringbone suit and pipe match the project concept. Both eyes and pipe read clearly at 80 px.",
+      "crop_review": "Full100 circle preserves hat bow and pipe. Central76 cuts the top of the hat.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ]
+    },
+    {
+      "asset": "portrait:nikola-tesla",
+      "file": "art/imagegen/limit-burst-20261015/ui-cards/nikola-tesla/portrait-source.png",
+      "sha256": "d739d6249c1436b9f4abc1fddf3436816299fd5df8e489a72c0d4e5f073f4ac7",
+      "size": [
+        1254,
+        1254
+      ],
+      "reference": "art/imagegen/concept-nikola-tesla-codex/design/nikola-tesla-front.png",
+      "verdict": "usable_original_source_candidate",
+      "visual_review": "Center-parted wavy hair, moustache and dark three-piece suit match the project concept; no unwanted coil, hands or UI in the portrait. The moustache remains a clear landmark at 80 px.",
+      "crop_review": "Full100 circle preserves the hair/head. Central76 crops the upper hair.",
+      "native_review": "Observed full100 160px, grayscale160 and native80 enlarged2x-nearest on ui-cards/review-sheet.png. Identity and face remain legible; no text, UI, frame or duplicate face.",
+      "limits": [
+        "Source only; no runtime import/mapping or accepted-art replacement.",
+        "Navy background contains subtle variation, not an exact flat #061623 token."
+      ]
+    },
+    {
+      "asset": "proposed:ASSET-FAITH-001",
+      "file": "art/imagegen/limit-burst-20261015/heroes/faith/concepts/faith-design-front-g2.png",
+      "sha256": "2f750901f83549453797e615d21aae049b6125c10209194388ef250566381dfb",
+      "size": [
+        1086,
+        1448
+      ],
+      "reference": "heroes/faith/asset-card.proposal.json, text-only roster provenance; Medusa quality reference only",
+      "verdict": "usable_proposed_intake_candidate_with_framing_limit",
+      "visual_review": "One adult human vampire hunter. Dark wavy hair, open black leather jacket, burgundy top, black trousers/boots and one wooden stake in her own right hand. Left hand empty; no thigh holster or second weapon in g2. Arms are separate from torso and both feet planted. g2 corrects the visible base top from g1. No text, logo, team band or extra anatomy.",
+      "limits": [
+        "Top of hair is around 2% of image height, below the requested minimum 4% margin; base bottom is around 98%, not requested 93%. These are visual estimates, not pixel segmentation measurements.",
+        "This has no canonical asset-card registration or independent formal 1a acceptance. No 3D/rig/UE readiness claim.",
+        "The exact sent g1/g2 prompts contain leftover Wiglaf instruction/checklist text before the valid Faith CORE due to a template split defect. Executor confirmed it; preserve immutable prompts and record the defect.",
+        "G2 changes the burgundy top seam/button detail relative to g1, but there was no accepted canonical design and it remains within the proposed SUBJECT."
+      ],
+      "recommendation": "Keep g2 as proposed original design source, preserve g1/history and the explicit prompt/framing limits. No further generation needed solely for metadata cleanup."
+    }
+  ]
+}

@@ -1,0 +1,637 @@
+{
+  "asset_id": "ASSET-DAISY-001",
+  "status": "proposed-reference-only",
+  "source_unchanged": true,
+  "source_checks": [
+    {
+      "path": "scraped-data/api/heroes/dr-jill-trent.json",
+      "sha256": "699e1c780429b956ea734b0160e4fc5718d97cbf5be3498ab911c7a7211ab2de",
+      "bytes": 23721,
+      "after_sha256": "699e1c780429b956ea734b0160e4fc5718d97cbf5be3498ab911c7a7211ab2de",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
+      "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-JILL-TRENT-001/asset-card.yaml",
+      "sha256": "66ba83122098e7a82beb302ab8f46ccd904277b192a6e9a75c36bff0c8d2e3d5",
+      "bytes": 1766,
+      "after_sha256": "66ba83122098e7a82beb302ab8f46ccd904277b192a6e9a75c36bff0c8d2e3d5",
+      "unchanged": true
+    },
+    {
+      "path": "art/imagegen/concept-dr-jill-trent-codex/design/dr-jill-trent-front.png",
+      "sha256": "0ef8501737ef3d7c33938bf8905f05f20101cb481213e78b0002cf396eb47883",
+      "bytes": 1617951,
+      "after_sha256": "0ef8501737ef3d7c33938bf8905f05f20101cb481213e78b0002cf396eb47883",
+      "unchanged": true
+    }
+  ],
+  "package_writes_only": true,
+  "outside_folder": [],
+  "generated_image_byte_preserved": true,
+  "image_inspected": true,
+  "image_inspected_by": "producing Codex agent (self-review, not independent pipeline acceptance)",
+  "checklist": [
+    {
+      "item": "one adult woman, one base, no text",
+      "passed": true
+    },
+    {
+      "item": "navy overalls, ivory blouse, chestnut bob, headband and work boots",
+      "passed": true
+    },
+    {
+      "item": "single wrench in own right hand and empty left hand",
+      "passed": true
+    },
+    {
+      "item": "held wrench separated from trouser leg in selected g2",
+      "passed": true,
+      "note": "A visible charcoal gap now separates the wrench from the thigh."
+    },
+    {
+      "item": "pedestal top wholly invisible",
+      "passed": false,
+      "note": "Major ellipse removed, but thin upper lip behind soles remains."
+    },
+    {
+      "item": "top at least 4 percent",
+      "passed": false,
+      "note": "3.315 percent in g2, automated WARN."
+    }
+  ],
+  "limitations": [
+    "g1: 12 PASS / 1 WARN / 0 FAIL; верх 2.693%. g2: 11 PASS / 2 WARN / 0 FAIL; верх 3.315% и view.single_component WARN. Визуально это одна фигура; автоматическое разбиение компонент не выдано за PASS.",
+    "Тонкая верхняя кромка подставки остаётся видимой; строгая ортопроекция ещё требует решения независимого приёмщика.",
+    "Костюм, прическа и инструмент — оригинальная интерпретация роли по делегированию. Данные подтверждают Daisy и её механику, но не такой точный вид или ключ; скан/аватар не копировался.",
+    "Есть только два альтернативных front-кандидата, не набор 1c. Формальный pipeline, модель, риг, Tripo и UE не запускались."
+  ],
+  "pipeline_acceptance": false,
+  "three_d_game_or_rig_ready": false,
+  "shared_registry_ledger_or_source_files_modified": false,
+  "background_processes_started": [],
+  "automated_checks": [
+    {
+      "report": "art/imagegen/limit-burst-20261015/heroes/daisy/checks/design-front-g1/checks-report.json",
+      "result": {
+        "schema": "unmatched.concept-checks/1",
+        "tool": "tools/art/concept/check_concept_views.py",
+        "generated_at": "2026-10-15T05:45:16+00:00",
+        "set": "art/imagegen/limit-burst-20261015/heroes/daisy/design",
+        "key": "daisy",
+        "role": "hero",
+        "views": [
+          "front"
+        ],
+        "inputs": [
+          {
+            "view": "front",
+            "path": "art/imagegen/limit-burst-20261015/heroes/daisy/design/daisy-front.png",
+            "sha256": "58d283a93756be703cc3c104716cf7a289e1ece29a9700612487a0beac8a4413",
+            "format": "PNG",
+            "mode": "RGB",
+            "size": [
+              1086,
+              1448
+            ]
+          }
+        ],
+        "raw_files_modified": false,
+        "tolerances": {
+          "size_rel_pct": 0.5,
+          "border_band_pct": 2.0,
+          "border_share_min": 0.99,
+          "border_tone_warn": 12,
+          "border_tone_fail": 20,
+          "bg_neutral_max": 6,
+          "bg_between_views_max": 12,
+          "bg_dark_luma_warn": 96,
+          "top_min_pct": 1.0,
+          "bottom_max_pct": 99.0,
+          "side_min_pct": 1.0,
+          "base_bottom_spread_warn_pct": 1.5,
+          "base_bottom_spread_fail_pct": 3.5,
+          "base_center_spread_warn_pct": 2.0,
+          "base_center_spread_fail_pct": 6.5,
+          "height_spread_warn_pct": 3.0,
+          "height_spread_fail_pct": 5.0,
+          "extra_component_warn_pct": 0.5,
+          "mask_area_min_pct": 2.0,
+          "mask_area_max_pct": 90.0,
+          "segment_tone": 14,
+          "segment_min_component_pct": 0.02,
+          "facing_margin": 0.05,
+          "facing_iou_warn": 0.5
+        },
+        "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+        "frame": {
+          "min_top_pct": 4.0
+        },
+        "measurements": {
+          "front": {
+            "size": [
+              1086,
+              1448
+            ],
+            "mode": "RGB",
+            "alpha": {
+              "present": false,
+              "min": 255
+            },
+            "border": {
+              "band_px": 22,
+              "median_rgb": [
+                41.0,
+                41.0,
+                41.0
+              ],
+              "share_within_tone_warn": 1.0,
+              "share_within_tone_fail": 1.0,
+              "p99_deviation": 2.0,
+              "neutral_delta": 0.0,
+              "luma": 41.0
+            },
+            "background_model": {
+              "fit": "quadratic per channel",
+              "residual_std": [
+                1.48,
+                1.21,
+                1.29
+              ],
+              "segment_tone": 14
+            },
+            "mask": {
+              "area_pct": 25.529,
+              "filled_area_pct": 25.529,
+              "components_kept": 6,
+              "main_component_pct": 25.219,
+              "other_components_pct": [
+                0.169,
+                0.045,
+                0.044,
+                0.029,
+                0.024,
+                0.016,
+                0.013,
+                0.011,
+                0.01,
+                0.009
+              ],
+              "bbox_px": [
+                186,
+                39,
+                898,
+                1396
+              ],
+              "top_pct": 2.693,
+              "bottom_pct": 96.409,
+              "left_pct": 17.127,
+              "right_pct": 82.689,
+              "height_pct": 93.715,
+              "base_center_x_pct": 49.862,
+              "base_width_pct": 65.562,
+              "base_top_pct_est": 85.843
+            }
+          }
+        },
+        "checks": [
+          {
+            "id": "set.size",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "sizes": {
+                "front": [
+                  1086,
+                  1448
+                ]
+              },
+              "max_delta_pct": 0.0
+            },
+            "limit": "<= 0.5 %",
+            "message": "все виды одного размера и аспекта"
+          },
+          {
+            "id": "set.size_exact",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "front": [
+                1086,
+                1448
+              ]
+            },
+            "limit": "равны до пикселя",
+            "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+          },
+          {
+            "id": "view.alpha",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "present": false,
+              "min": 255
+            },
+            "limit": "без прозрачности",
+            "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+          },
+          {
+            "id": "view.border_uniform",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "share_warn_tone": 1.0,
+              "share_fail_tone": 1.0,
+              "p99_deviation": 2.0
+            },
+            "limit": ">= 0.99 при ±20 (WARN при ±12)",
+            "message": "рамка 2 % кадра — ровный фон без объектов"
+          },
+          {
+            "id": "view.bg_neutral",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              41.0,
+              41.0,
+              41.0
+            ],
+            "limit": "|R-G|,|G-B| <= 6",
+            "message": "фон нейтрально-серый"
+          },
+          {
+            "id": "view.bg_dark",
+            "scope": "front",
+            "result": "PASS",
+            "value": 41.0,
+            "limit": "<= 96",
+            "message": "фон тёмно-серый (норма hero-quality-v1)"
+          },
+          {
+            "id": "view.mask",
+            "scope": "front",
+            "result": "PASS",
+            "value": 25.529,
+            "limit": "2.0..90.0 %",
+            "message": "маска фигуры правдоподобна"
+          },
+          {
+            "id": "view.top_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 2.693,
+            "limit": ">= 1.0 %",
+            "message": "верх фигуры не касается края"
+          },
+          {
+            "id": "view.frame_top",
+            "scope": "front",
+            "result": "WARN",
+            "value": 2.693,
+            "limit": ">= 4.0 %",
+            "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "id": "view.bottom_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 96.409,
+            "limit": "<= 99.0 %",
+            "message": "низ подставки в кадре"
+          },
+          {
+            "id": "view.side_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 17.127,
+            "limit": ">= 1.0 %",
+            "message": "фигура не обрезана по бокам"
+          },
+          {
+            "id": "view.single_component",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              0.169,
+              0.045,
+              0.044,
+              0.029,
+              0.024,
+              0.016,
+              0.013,
+              0.011,
+              0.01,
+              0.009
+            ],
+            "limit": "прочие < 0.5 %",
+            "message": "одна крупная связная фигура"
+          },
+          {
+            "id": "set.bg_same",
+            "scope": "set",
+            "result": "PASS",
+            "value": 0.0,
+            "limit": "<= 12",
+            "message": "один фон на набор"
+          }
+        ],
+        "summary": {
+          "PASS": 12,
+          "WARN": 1,
+          "FAIL": 0
+        },
+        "verdict": "PASS",
+        "palette": {
+          "path": null,
+          "asset_id": null,
+          "swatches": []
+        },
+        "sheet": null
+      }
+    },
+    {
+      "report": "art/imagegen/limit-burst-20261015/heroes/daisy/checks/design-front-g2/checks-report.json",
+      "result": {
+        "schema": "unmatched.concept-checks/1",
+        "tool": "tools/art/concept/check_concept_views.py",
+        "generated_at": "2026-10-15T05:46:13+00:00",
+        "set": "art/imagegen/limit-burst-20261015/heroes/daisy/design",
+        "key": "daisy",
+        "role": "hero",
+        "views": [
+          "front"
+        ],
+        "inputs": [
+          {
+            "view": "front",
+            "path": "art/imagegen/limit-burst-20261015/heroes/daisy/design/daisy-front.png",
+            "sha256": "56c4cadf49fd0ac57ffa337d5f3ad1810917fb4fc6fdfc5216a073c537ae1236",
+            "format": "PNG",
+            "mode": "RGB",
+            "size": [
+              1086,
+              1448
+            ]
+          }
+        ],
+        "raw_files_modified": false,
+        "tolerances": {
+          "size_rel_pct": 0.5,
+          "border_band_pct": 2.0,
+          "border_share_min": 0.99,
+          "border_tone_warn": 12,
+          "border_tone_fail": 20,
+          "bg_neutral_max": 6,
+          "bg_between_views_max": 12,
+          "bg_dark_luma_warn": 96,
+          "top_min_pct": 1.0,
+          "bottom_max_pct": 99.0,
+          "side_min_pct": 1.0,
+          "base_bottom_spread_warn_pct": 1.5,
+          "base_bottom_spread_fail_pct": 3.5,
+          "base_center_spread_warn_pct": 2.0,
+          "base_center_spread_fail_pct": 6.5,
+          "height_spread_warn_pct": 3.0,
+          "height_spread_fail_pct": 5.0,
+          "extra_component_warn_pct": 0.5,
+          "mask_area_min_pct": 2.0,
+          "mask_area_max_pct": 90.0,
+          "segment_tone": 14,
+          "segment_min_component_pct": 0.02,
+          "facing_margin": 0.05,
+          "facing_iou_warn": 0.5
+        },
+        "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+        "frame": {
+          "min_top_pct": 4.0
+        },
+        "measurements": {
+          "front": {
+            "size": [
+              1086,
+              1448
+            ],
+            "mode": "RGB",
+            "alpha": {
+              "present": false,
+              "min": 255
+            },
+            "border": {
+              "band_px": 22,
+              "median_rgb": [
+                37.0,
+                37.0,
+                38.0
+              ],
+              "share_within_tone_warn": 1.0,
+              "share_within_tone_fail": 1.0,
+              "p99_deviation": 2.0,
+              "neutral_delta": 1.0,
+              "luma": 37.1
+            },
+            "background_model": {
+              "fit": "quadratic per channel",
+              "residual_std": [
+                1.41,
+                1.2,
+                1.29
+              ],
+              "segment_tone": 14
+            },
+            "mask": {
+              "area_pct": 22.748,
+              "filled_area_pct": 22.748,
+              "components_kept": 4,
+              "main_component_pct": 16.009,
+              "other_components_pct": [
+                3.714,
+                2.962,
+                0.062,
+                0.017,
+                0.008,
+                0.008,
+                0.006,
+                0.006,
+                0.005,
+                0.004
+              ],
+              "bbox_px": [
+                215,
+                48,
+                871,
+                1375
+              ],
+              "top_pct": 3.315,
+              "bottom_pct": 94.959,
+              "left_pct": 19.797,
+              "right_pct": 80.203,
+              "height_pct": 91.644,
+              "base_center_x_pct": 50.0,
+              "base_width_pct": 60.405,
+              "base_top_pct_est": 85.635
+            }
+          }
+        },
+        "checks": [
+          {
+            "id": "set.size",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "sizes": {
+                "front": [
+                  1086,
+                  1448
+                ]
+              },
+              "max_delta_pct": 0.0
+            },
+            "limit": "<= 0.5 %",
+            "message": "все виды одного размера и аспекта"
+          },
+          {
+            "id": "set.size_exact",
+            "scope": "set",
+            "result": "PASS",
+            "value": {
+              "front": [
+                1086,
+                1448
+              ]
+            },
+            "limit": "равны до пикселя",
+            "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+          },
+          {
+            "id": "view.alpha",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "present": false,
+              "min": 255
+            },
+            "limit": "без прозрачности",
+            "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+          },
+          {
+            "id": "view.border_uniform",
+            "scope": "front",
+            "result": "PASS",
+            "value": {
+              "share_warn_tone": 1.0,
+              "share_fail_tone": 1.0,
+              "p99_deviation": 2.0
+            },
+            "limit": ">= 0.99 при ±20 (WARN при ±12)",
+            "message": "рамка 2 % кадра — ровный фон без объектов"
+          },
+          {
+            "id": "view.bg_neutral",
+            "scope": "front",
+            "result": "PASS",
+            "value": [
+              37.0,
+              37.0,
+              38.0
+            ],
+            "limit": "|R-G|,|G-B| <= 6",
+            "message": "фон нейтрально-серый"
+          },
+          {
+            "id": "view.bg_dark",
+            "scope": "front",
+            "result": "PASS",
+            "value": 37.1,
+            "limit": "<= 96",
+            "message": "фон тёмно-серый (норма hero-quality-v1)"
+          },
+          {
+            "id": "view.mask",
+            "scope": "front",
+            "result": "PASS",
+            "value": 22.748,
+            "limit": "2.0..90.0 %",
+            "message": "маска фигуры правдоподобна"
+          },
+          {
+            "id": "view.top_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 3.315,
+            "limit": ">= 1.0 %",
+            "message": "верх фигуры не касается края"
+          },
+          {
+            "id": "view.frame_top",
+            "scope": "front",
+            "result": "WARN",
+            "value": 3.315,
+            "limit": ">= 4.0 %",
+            "message": "верхняя точка не выше рамки ядра (1a: y >= 4 %)"
+          },
+          {
+            "id": "view.bottom_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 94.959,
+            "limit": "<= 99.0 %",
+            "message": "низ подставки в кадре"
+          },
+          {
+            "id": "view.side_margin",
+            "scope": "front",
+            "result": "PASS",
+            "value": 19.797,
+            "limit": ">= 1.0 %",
+            "message": "фигура не обрезана по бокам"
+          },
+          {
+            "id": "view.single_component",
+            "scope": "front",
+            "result": "WARN",
+            "value": [
+              3.714,
+              2.962,
+              0.062,
+              0.017,
+              0.008,
+              0.008,
+              0.006,
+              0.006,
+              0.005,
+              0.004
+            ],
+            "limit": "прочие < 0.5 %",
+            "message": "одна крупная связная фигура"
+          },
+          {
+            "id": "set.bg_same",
+            "scope": "set",
+            "result": "PASS",
+            "value": 0.0,
+            "limit": "<= 12",
+            "message": "один фон на набор"
+          }
+        ],
+        "summary": {
+          "PASS": 11,
+          "WARN": 2,
+          "FAIL": 0
+        },
+        "verdict": "PASS",
+        "palette": {
+          "path": null,
+          "asset_id": null,
+          "swatches": []
+        },
+        "sheet": null
+      }
+    }
+  ]
+}
