@@ -1,4 +1,5 @@
 #include "S08FlowGameMode.h"
+#include "S08DevExec.h"
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
@@ -2129,6 +2130,8 @@ bool AS08FlowGameMode::ViewportHasFocus() const {
   if (!ViewportClient || !ViewportClient->Viewport) return false;
   // A packaged window that is not the OS foreground window has no keyboard
   // focus: a press made before Alt+Tab must not act on the release after it.
+  // -DevExec (tools/dev/DEV-LOOP.md): the driver clicks a background window through synthetic Slate events.
+  if (S08DevExec::Active()) return true;
   return FApp::HasFocus() && ViewportClient->Viewport->HasFocus();
 }
 
