@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-10-06T10:30:00Z",
-  "head": "ada584c9087065481f9850d2627ab51b6055b59a",
+  "generated": "2026-10-15T07:33:38.802419+00:00",
+  "head": "5f986d06d9c9566a48c6db0a9a1d66ddbb2591b5",
   "sources": [
     {
       "id": "handover",
@@ -117,6 +117,11 @@
       "id": "visual-vs5",
       "path": "docs/game-design/evidence/VISUAL/VS-5/README.md",
       "title": "Визуальный чат, спринт VS-5 (ветка feat/visual-vs5): ENV-U16 — нарисованный Marmoreal, остатки HUD VS-4"
+    },
+    {
+      "id": "asset-burst-20261015",
+      "path": "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+      "title": "Текущая пачка ассетов2026-10-15: исходники, ревью, failed retopo и остановка по запросу пользователя"
     }
   ],
   "tasks": [
@@ -2500,6 +2505,108 @@
       "assets": [],
       "updated": "2026-10-06T10:30:00Z",
       "note": "Токены автопилота abilityboost / feint / slowdefense / storms, -HostPlanOverride / -JoinPlanOverride; исправлены выбор клетки для Command the Storms, гейт приватности ability=card, окно гейта после поздних снимков."
+    },
+    {
+      "id": "BURST-2D-1015",
+      "title": "64 новых исходника: 42 портрета и 22 референса помощников",
+      "track": "art",
+      "source": "asset-burst-20261015",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+        "art/imagegen/limit-burst-20261015/gallery/index.html",
+        "art/imagegen/limit-burst-20261015/wave9.json",
+        "art/imagegen/limit-burst-20261015/review-wave9/README.md",
+        "art/imagegen/limit-burst-20261015/validation-wave9.json"
+      ],
+      "next": "При возобновлении: импорт источников и фактическая UMG/DPI приёмка; source-only не даёт runtime pass.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-15T07:33:38.802419+00:00",
+      "note": "Девять волн;65 сохранённых результатов вместе с альтернативой независимо просмотрены. В галерее 74 записи / 77 PNG. CP-35: 4 портрета / 5 вызовов. Работа остановлена после текущей пачки по запросу пользователя; новая итерация не запущена."
+    },
+    {
+      "id": "BURST-BLOCKED-1015",
+      "title": "Пять отказов портретного сервиса: Geralt и CP-34",
+      "track": "art",
+      "source": "asset-burst-20261015",
+      "status": "blocked",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+        "art/imagegen/limit-burst-20261015/review-wave5/independent-review-index.json",
+        "art/imagegen/limit-burst-20261015/review-wave8/independent-review-index.json",
+        "art/imagegen/limit-burst-20261015/wave8.json"
+      ],
+      "next": "Сохранить точные ошибки и отсутствие PNG; обходные повторы не запускать.",
+      "blocker": "Сервис moderation_blocked; новых портретов этих пяти персонажей нет.",
+      "assets": [],
+      "updated": "2026-10-15T07:33:38.802419+00:00",
+      "note": " Работа остановлена после текущей пачки по запросу пользователя; новая итерация не запущена."
+    },
+    {
+      "id": "BURST-CONCEPT-1015",
+      "title": "Формальные концепты: Patroclus, Sherlock и Watson pass; Wiglaf return",
+      "track": "art",
+      "source": "asset-burst-20261015",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+        "art/imagegen/limit-burst-20261015/checkpoint.md"
+      ],
+      "next": "Wiglaf остаётся return 7.5 при четырёх исчерпанных попытках. Приёмка концептов не принимает последующие модели.",
+      "blocker": null,
+      "assets": [
+        "ASSET-PATROCLUS-001",
+        "ASSET-SHERLOCK-HOLMES-001",
+        "ASSET-DR-WATSON-001",
+        "ASSET-WIGLAF-001"
+      ],
+      "updated": "2026-10-15T07:33:38.802419+00:00",
+      "note": " Работа остановлена после текущей пачки по запросу пользователя; новая итерация не запущена."
+    },
+    {
+      "id": "BURST-PAT-H2-1015",
+      "title": "Patroclus: H2 и prepare PASS; retopo FAIL до closure",
+      "track": "art",
+      "source": "asset-burst-20261015",
+      "status": "blocked",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+        "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/HANDOFF.md",
+        "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/art-hub-handoff.json",
+        "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/HANDOFF.md"
+      ],
+      "next": "При возобновлении: отдельно исследовать связность HP до decimation, без слепого weld/изменения порогов; затем новая ограниченная проба.",
+      "blocker": "Фигура 52 360 и подставка 18 633 tris; outward part17=0.4573 / part19=0.1742; массовые разрывы поверхности.",
+      "assets": [
+        "ASSET-PATROCLUS-001"
+      ],
+      "updated": "2026-10-15T07:33:38.802419+00:00",
+      "note": "Целостность failed-пакета 22/22 не является принятием модели. Closure/UV/bake/rig/UE не запускались. Работа остановлена после текущей пачки по запросу пользователя; новая итерация не запущена."
+    },
+    {
+      "id": "BURST-SHER-H2-1015",
+      "title": "Sherlock: H2 геометрия создана; выгрузка не завершена",
+      "track": "art",
+      "source": "asset-burst-20261015",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/ASSET-BATCH-2026-10-15.md",
+        "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/README.md",
+        "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/reports/pause-checkpoint.json"
+      ],
+      "next": "При возобновлении проверить существующий экспорт 734b9954; только затем оставшиеся 8K / Remove Lighting / PBR на том же UUID.",
+      "blocker": "На точке остановки локально только crdownload 6 291 456 байт; завершённая GLB не зарегистрирована.",
+      "assets": [
+        "ASSET-SHERLOCK-HOLMES-001"
+      ],
+      "updated": "2026-10-15T07:33:38.802419+00:00",
+      "note": "Studio: 14 частей / 1 966 070 tris; 60 кредитов, 20410→20350. Новые платные операции не запущены. Работа остановлена после текущей пачки по запросу пользователя; новая итерация не запущена."
     }
   ],
   "waves": [
@@ -2791,6 +2898,18 @@
       "status": "done",
       "tasks": [
         "ENV-U16"
+      ]
+    },
+    {
+      "id": "ASSET-BURST-20261015",
+      "title": "Пачка ассетов2026-10-15: источники и ревью завершены; незавершённые3D стадии сохранены; остановка пользователя",
+      "status": "in_progress",
+      "tasks": [
+        "BURST-2D-1015",
+        "BURST-BLOCKED-1015",
+        "BURST-CONCEPT-1015",
+        "BURST-PAT-H2-1015",
+        "BURST-SHER-H2-1015"
       ]
     }
   ],

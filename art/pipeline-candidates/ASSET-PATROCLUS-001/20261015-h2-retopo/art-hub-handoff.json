@@ -1,0 +1,135 @@
+{
+  "schema": "unmatched.art-hub-stage-handoff/1",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "character": "Patroclus",
+  "game_role": "sidekick",
+  "frozen": true,
+  "queue_action": "stop_after_current_batch",
+  "prepare": {
+    "status": "PASS",
+    "checks_passed": 5,
+    "checks_total": 5,
+    "report": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-bake/reports/prepare-report.json",
+    "report_sha256": "1926ad6ba458906a0fbf03b9a3fe8c4e92bb147fb664d30397469b96c2775bea"
+  },
+  "retopo": {
+    "status": "FAIL",
+    "report": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/reports/retopo-report.json",
+    "report_sha256": "d5ca310426f6b73b194c9fdc2c9ca340efc507b02f30ee65918613c4797b77ce",
+    "checks_passed": 2,
+    "checks_total": 3,
+    "figure_triangles": 52360,
+    "body_triangles": 51164,
+    "weapon_triangles": 1196,
+    "base_triangles": 18633,
+    "total_triangles": 70993,
+    "starting_target_figure": 32550,
+    "starting_target_base": 1600,
+    "budget_figure": 45000,
+    "budget_base": 2500,
+    "orientation_threshold": 0.5,
+    "orientation_failures": {
+      "tripo_part_17": {
+        "in_area_m2": 0.000165249,
+        "out_area_m2": 0.000443767,
+        "sampled_polygons": 946,
+        "score": 0.4573,
+        "classified_area_inward_fraction": 0.27133769884535053
+      },
+      "tripo_part_19": {
+        "in_area_m2": 5.5369e-05,
+        "out_area_m2": 7.8723e-05,
+        "sampled_polygons": 200,
+        "score": 0.1742,
+        "classified_area_inward_fraction": 0.4129179965993497
+      }
+    },
+    "flipped_parts": [],
+    "success_stage_marker_written": false
+  },
+  "profile": {
+    "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/build-profiles/patroclus-h2-bake-h2.json",
+    "sha256": "23f3fd46f8110d2e02bae705803cd542bb64ce12377c9e3192f9b58fa2d0e00d",
+    "modified_in_this_task": false
+  },
+  "inventory": {
+    "path": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/reports/lp-boundary-contact-inventory.json",
+    "sha256": "069cabb5f42ff37ef774a61637756fa5a7f38a06158768251779a11e04b5809c",
+    "native_loops": {
+      "all": 17469,
+      "ge_0_5cm": 13860,
+      "ge_1cm": 8172,
+      "retained_with_coordinates": 15342
+    },
+    "caps_or_closure_authored": false
+  },
+  "causal_analysis": {
+    "measured": {
+      "HP_boundary": {
+        "tripo_part_0": {
+          "HP_boundary_edges": 72084,
+          "HP_unique_positions_round7": 299248,
+          "HP_vertices": 320080,
+          "coincident_boundary_edges_endpoint_round7": 69865,
+          "coincident_fraction": 0.9692164696742689,
+          "note": "Read-only coordinate comparison at 0.1 micrometre rounding; no weld/decimation experiment was run. Coincidence does not prove all cracks safely weldable."
+        },
+        "tripo_part_1": {
+          "HP_boundary_edges": 70316,
+          "HP_unique_positions_round7": 93784,
+          "HP_vertices": 116015,
+          "coincident_boundary_edges_endpoint_round7": 69608,
+          "coincident_fraction": 0.9899311678707549,
+          "note": "Read-only coordinate comparison at 0.1 micrometre rounding; no weld/decimation experiment was run. Coincidence does not prove all cracks safely weldable."
+        },
+        "tripo_part_17": {
+          "HP_boundary_edges": 2440,
+          "HP_unique_positions_round7": 7778,
+          "HP_vertices": 8402,
+          "coincident_boundary_edges_endpoint_round7": 2054,
+          "coincident_fraction": 0.8418032786885246,
+          "note": "Read-only coordinate comparison at 0.1 micrometre rounding; no weld/decimation experiment was run. Coincidence does not prove all cracks safely weldable."
+        },
+        "tripo_part_19": {
+          "HP_boundary_edges": 458,
+          "HP_unique_positions_round7": 5220,
+          "HP_vertices": 5267,
+          "coincident_boundary_edges_endpoint_round7": 154,
+          "coincident_fraction": 0.33624454148471616,
+          "note": "Read-only coordinate comparison at 0.1 micrometre rounding; no weld/decimation experiment was run. Coincidence does not prove all cracks safely weldable."
+        }
+      },
+      "retopo_order": "copy HPG mesh -> Decimate COLLAPSE -> cleanup(remove_doubles/degenerate/loose/tiny islands) -> orientation",
+      "caps": [],
+      "cloth_shell_executed": false,
+      "base_rim_smooth_configured": false,
+      "dense_region_part": "tripo_part_5 only, not cape/base"
+    },
+    "inference": "Highly fragmented/coincident-edge HP connectivity is presented to QEM before welding, plausibly limiting safe collapses and opening surface cracks. Exact internal Blender collapse rejection reason is not exposed by this unchanged stage; no weld/retopo counterfactual was run.",
+    "not_supported": "Do not attribute overrun to added caps/shells, claim all normals reversed, weaken orientation threshold, or infer grip safety from unsigned contact minima."
+  },
+  "visual_review": {
+    "personally_opened_png_count": 14,
+    "verdict": "failed candidate: widespread visible tears/faceting on cape, base, limbs, shield and sword; large-scale pose silhouette remains recognizable but surface continuity is unacceptable",
+    "preview_record": "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/diagnostic-preview/preview-record.json"
+  },
+  "next_action": {
+    "status": "not_started",
+    "owner": "root/user after stop",
+    "suggestion": "Investigate preserving/welding coincident HP connectivity before decimation in a separate bounded proposal, with exact topology/geometry-identity checks and no blind threshold change. Only after a valid budgeted LP should loop/contact caps be selected.",
+    "forbidden_advance": "No close, UV, bake, rig, runtime, new imagegen or paid task was run or queued."
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "model_accepted": false,
+    "retopo_passed": false,
+    "rig_authored": false,
+    "closure_run": false,
+    "baked": false
+  },
+  "process_records": [
+    "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/retopo-process-record.json",
+    "art/pipeline-candidates/ASSET-PATROCLUS-001/20261015-h2-retopo/inventory-process-record.json"
+  ]
+}
