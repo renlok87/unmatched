@@ -566,7 +566,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.badge.attack.from` | Отсюда можно атаковать: {n} | Can attack from here: {n} |
 | `ms.pending.move` | Выбор эффекта: {fighterName} — переместите до {n} | Effect choice: move {fighterName} up to {n} |
 | `ms.pending.move.enemy` | Вы двигаете бойца соперника: {fighterName} | You are moving an opponent's fighter: {fighterName} |
-| `ms.pending.place` | Выбор эффекта: поместите {fighterName} | Effect choice: place {fighterName} |
+| `ms.pending.place` | Выбор эффекта: {fighterName} — поставьте на клетку | Effect choice: place {fighterName} |
 | `ms.btn.stay` | Оставить на месте | Stay in place |
 | `ms.btn.decline` | Отказаться (X) | Decline (X) |
 | `ms.place.no.space` | Нет свободного пространства. Ожидание сервера | No free space. Waiting for the server |

@@ -38,6 +38,8 @@ struct UNMATCHED_API FSideMemory {
   int32 HeroMaxHp = 0;
   TMap<FString, FUmSidekickView> Sidekicks;
   TArray<FString> Order;
+  /** Sidekicks back from the dead (Winged Frenzy): their old death cross no longer marks them fallen (2026-10-15). */
+  TSet<FString> Revived;
 };
 /** "Harpies 2" -> 2, "Merlin" -> 0. */
 UNMATCHED_API int32 SidekickNumber(const FString& Label);

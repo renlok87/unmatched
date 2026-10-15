@@ -67,13 +67,20 @@ FUmPlayerPanelModel Gather(EUmPanelSide Side, const FString& PlayerId, const FSt
       S = &Memory.Sidekicks.Add(F.Id);
       Memory.Order.Add(F.Id);
     }
+    // 2026-10-15 playtest («Крылатое буйство» returned Harpy 2): a sidekick seen dead (0 HP) and now alive again keeps no
+    // fallen plate although its earlier death cross stays down
+    const bool bWasDead = S->bFallen && S->Hp <= 0;
+    if (bWasDead && F.Health > 0) Memory.Revived.Add(F.Id);
+    if (F.Health <= 0) Memory.Revived.Remove(F.Id);
     S->Id = F.Id;
     S->Name = F.Label.IsEmpty() ? F.Name : F.Label;
     S->Number = SidekickNumber(S->Name);
     S->Key = SidekickKey(F.HeroSlug, S->Name);
     S->Hp = F.Health;
     S->MaxHp = FMath::Max(S->MaxHp, F.MaxHealth);
-    S->bFallen = IsFallen(F.Id);
+    // 2026-10-15 playtest («Крылатое буйство» returned Harpy 2): a revived sidekick kept the grey «fallen» plate - the
+    // death cross of its earlier fall stays set, its health now says alive
+    S->bFallen = IsFallen(F.Id) && !Memory.Revived.Contains(F.Id);
   }
   for (const FString& Id : Memory.Order) {
     FUmSidekickView& S = Memory.Sidekicks[Id];

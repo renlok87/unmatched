@@ -479,6 +479,16 @@ bool FUmHudPlayerPanelOppMirrorTest::RunTest(const FString&) {
     const FUmPlayerPanelModel M2 = UmHudPanel::Gather(EUmPanelSide::Own, TEXT("p1"), FString(), G2, true, false, false, Never, Two);
     TestTrue(TEXT("second game, same hero id: only Merlin, no Harpy of the first game"),
              M2.Sidekicks.Num() == 1 && M2.Sidekicks[0].Name == TEXT("Merlin") && M2.Sidekicks[0].MaxHp == 7);
+    // 2026-10-15: a revived Harpy (Winged Frenzy) - its death cross is still down, its health says alive
+    UmHudPanel::FSideMemory Rev;
+    TArray<FS08BoardFighter> G3 = {Fighter(TEXT("h"), TEXT("p1"), TEXT("Medusa"), true, 16, 16, TEXT("medusa")),
+                                   Fighter(TEXT("s2"), TEXT("p1"), TEXT("Harpies 2"), false, 0, 1, TEXT("medusa"))};
+    UmHudPanel::Gather(EUmPanelSide::Own, TEXT("p1"), FString(), G3, true, false, false,
+                       [](const FString& Id) { return Id == TEXT("s2"); }, Rev);  // dead: 0 HP, the cross down
+    G3[1].Health = 1;  // returned to the board
+    const FUmPlayerPanelModel M3 = UmHudPanel::Gather(EUmPanelSide::Own, TEXT("p1"), FString(), G3, true, false, false,
+                                                      [](const FString& Id) { return Id == TEXT("s2"); }, Rev);
+    TestTrue(TEXT("revived sidekick: not fallen"), M3.Sidekicks.Num() == 1 && !M3.Sidekicks[0].bFallen);
   }
   TArray<FString> Lines;
   P->SetVisibility(ESlateVisibility::Visible);
