@@ -148,6 +148,10 @@ const FSlateBrush* UUmHudTheme::SkinFor(FName Key, float PxPerSu) const {
   return Skin(Key);
 }
 
+const FSlateBrush* UUmHudTheme::SkinV2(FName V2Key, FName Fallback, float PxPerSu) const {
+  return SkinFor(HasTextureSkin(V2Key) ? V2Key : Fallback, PxPerSu);
+}
+
 const FSlateBrush* UUmHudTheme::CardFrameFor(FName Key, float PxPerSu) const {
   // no Warning: before the CP-14 import the card widget draws its rounded fallback frame
   if (PxPerSu >= CardFrameX2MinPxPerSu) {

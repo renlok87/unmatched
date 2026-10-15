@@ -268,7 +268,10 @@ FBox2D UUmHudCombatCenter::PanelRectSu() const {
   if (!bHasModel || PlanNow.HeightSu <= 0.0f) return FBox2D(ForceInit);
   const float W = Frame.bClassS ? WidthSSu : WidthLSu;
   float Top = Frame.bClassS ? TopSSu : TopLSu;
-  if (Frame.StatusBottomSu > 0.0f) Top = FMath::Max(Top, Frame.StatusBottomSu + 8.0f);
+  // HUD v2: 16 su - the two marble frames do not touch
+  if (Frame.StatusBottomSu > 0.0f) {
+    Top = FMath::Max(Top, Frame.StatusBottomSu + (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 8.0f));
+  }
   const float X = 0.5f * (static_cast<float>(Frame.CanvasSu.X) - W);
   return FBox2D(FVector2D(X, Top), FVector2D(X + W, Top + PlanNow.HeightSu));
 }
@@ -313,7 +316,8 @@ void UUmHudCombatCenter::Relayout() {
   const FBox2D PanelSu = PanelRectSu();
   const FVector2D P = FVector2D(PanelSu.Min) - Frame.OriginSu;
   if (Panel) {
-    if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("panel"), Frame.PxPerSu)) Panel->SetBrush(*Skin);
+    // HUD v2: the centre result in the versus cartouche, the panel skin without the kit
+    if (const FSlateBrush* Skin = Theme.SkinV2(TEXT("hud.versus.badge"), TEXT("panel"), Frame.PxPerSu)) Panel->SetBrush(*Skin);
     UmCenterPlace(Panel, P, FVector2D(W, PlanNow.HeightSu), 0);
   }
   // wait

@@ -167,8 +167,9 @@ bool FUmHudLogFeedTest::RunTest(const FString&) {
   auto Cell = [](const FIntPoint& C) { return C == FIntPoint(1, 2) ? FString(TEXT("M13")) : FString(TEXT("M25")); };
   FText Text, Full;
   UmHudLog::DescribeTrail(T, FString(), {}, Player, Fighter, Cell, Text, Full);
-  TestEqual(TEXT("maneuver RU through ms.log.maneuver / ms.log.move (the arrow kept)"), Text.ToString(),
-            FString(TEXT("Medusa: манёвр: Medusa M13→M25")));
+  // 2026-10-15 HUD v2: the spaces moved (ms.log.move.steps, RU plural), never the raw space ids
+  TestEqual(TEXT("maneuver RU through ms.log.maneuver / ms.log.move.steps"), Text.ToString(),
+            FString(TEXT("Medusa: манёвр: Medusa → 1 клетка")));
   // run I Marmoreal seq 22: «Medusa: эффект Рывок: без движения»
   FS09LastMovement E = T;
   E.Source = TEXT("EFFECT");
@@ -896,8 +897,8 @@ bool FUmHudLogShortRowTest::RunTest(const FString&) {
   UmHudLog::DescribeTrail(T, FString(), {}, Player, Fighter, Cell, Text, Full, &Shorter);
   AddInfo(TEXT("text: ") + Text.ToString());
   if (!TestEqual(TEXT("two shorter forms"), Shorter.Num(), 2)) return false;
-  TestEqual(TEXT("the moves alone"), Shorter[0].ToString(), FString(TEXT("Harpies 1 M04→M05, Harpies 2 M06→M07")));
-  TestEqual(TEXT("the first move + «и ещё 1»"), Shorter[1].ToString(), FString(TEXT("Harpies 1 M04→M05, и ещё 1")));
+  TestEqual(TEXT("the moves alone"), Shorter[0].ToString(), FString(TEXT("Harpies 1 → 1 клетка, Harpies 2 → 1 клетка")));
+  TestEqual(TEXT("the first move + «и ещё 1»"), Shorter[1].ToString(), FString(TEXT("Harpies 1 → 1 клетка, и ещё 1")));
   FUmLogEntry E;
   E.Seq = 9;
   E.Text = Text;
@@ -905,7 +906,7 @@ bool FUmHudLogShortRowTest::RunTest(const FString&) {
   E.Shorter = Shorter;
   auto Fake = [](const FText& X) { return 8.0f * X.ToString().Len(); };
   TestTrue(TEXT("a wide row keeps the full line"), UmHudLog::PickRowText(E, 1000.0f, Fake).EqualTo(Text));
-  TestTrue(TEXT("320 su: the moves alone"), UmHudLog::PickRowText(E, 320.0f, Fake).EqualTo(Shorter[0]));
+  TestTrue(TEXT("340 su: the moves alone"), UmHudLog::PickRowText(E, 340.0f, Fake).EqualTo(Shorter[0]));  // 2026-10-15: «→ 1 клетка»
   TestTrue(TEXT("240 su: the first move"), UmHudLog::PickRowText(E, 240.0f, Fake).EqualTo(Shorter[1]));
   TestTrue(TEXT("nothing fits: the shortest, with its arrow"), UmHudLog::PickRowText(E, 40.0f, Fake).ToString().Contains(TEXT("→")));
   // a stay has no arrow and no shorter form
@@ -926,7 +927,7 @@ bool FUmHudLogShortRowTest::RunTest(const FString&) {
   AddInfo(FString::Printf(TEXT("row: «%s» %.1f su of %.1f"), *Shown.ToString(), Width, Log->RowTextWidthSu()));
   TestTrue(TEXT("the row shows the arrow"), Shown.ToString().Contains(TEXT("→")));
   TestTrue(TEXT("the shown text fits the row (Slate font measure)"), Width >= 0.0f && Width <= Log->RowTextWidthSu());
-  TestTrue(TEXT("the tooltip keeps every move"), Log->GetRowTooltip(0).ToString().Contains(TEXT("Harpies 2 M06→M07")));
+  TestTrue(TEXT("the tooltip keeps every move"), Log->GetRowTooltip(0).ToString().Contains(TEXT("Harpies 2 → 1 клетка")));
   return true;
 }
 

@@ -330,6 +330,16 @@ void UUmWorldTag::ApplyModel(const FUmWorldTagModel& InModel) {
 
 void UUmWorldTag::Restyle() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
+  // HUD v2 (art/imagegen/hud-v2-codex): the marble-and-gold plate of the kit (gold for the own team, enamel blue for the
+  // opponent's), the rounded navy capsule without it
+  if (Capsule) {
+    const FName PlateKey(Model.TeamSlot ? TEXT("hud.fighter.plate.enemy") : TEXT("hud.fighter.plate"));
+    if (Theme.HasTextureSkin(PlateKey)) {
+      if (const FSlateBrush* Brush = Theme.SkinFor(PlateKey, UmHudScale::Current().PxPerSu())) Capsule->SetBrush(*Brush);
+      // the team disc sits on the plate's own chip socket (x 7..24 su of the kit plate): 4 su in, not TagPadSu
+      Capsule->SetPadding(FMargin(4.0f, 0.0f, UmWorldLayer::TagPadSu, 0.0f));
+    }
+  }
   if (Chip) {
     if (bChips) Chip->SetBrush(ChipBrushes[Model.TeamSlot ? 1 : 0]);
     Chip->SetColorAndOpacity(Theme.Color(Model.TeamSlot ? TEXT("team.p2.screen") : TEXT("team.p1.screen")));

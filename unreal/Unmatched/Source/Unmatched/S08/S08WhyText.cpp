@@ -51,6 +51,7 @@ const FRow GRows[] = {
     {TEXT("why.choice.required"), TEXT("This choice is mandatory")},
     {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
     {TEXT("why.defense.pick"), TEXT("Pick a defense card in your hand")},  // VS-3 HB-30 (ВР-VS3-51)
+    {TEXT("why.boost.pick"), TEXT("Pick a card with BOOST in your hand")},  // 2026-10-15 playtest: BOOST_CHOICE
     {TEXT("why.pick.count"), TEXT("Make your choice: {need} needed, {have} chosen")},  // VS-4 HB-35 (ВР-VS4-08)
     // VS-1 HB-05: the screen reasons of visual/04-hud-spec.md §6.1
     {TEXT("why.login.fields"), TEXT("Enter your email and password")},

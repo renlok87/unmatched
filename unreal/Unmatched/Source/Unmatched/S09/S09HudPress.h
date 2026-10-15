@@ -144,7 +144,8 @@ public:
   static TSharedRef<SS09HudPress> MakeButton(FName Id, const TSharedPtr<FS09HudPressArbiter>& Arbiter,
                                              const FS09OnHudPressOutcome& OnOutcome, const FMargin& Padding,
                                              const FLinearColor& Tint, bool bDimmed,
-                                             const TSharedRef<SWidget>& Label);
+                                             const TSharedRef<SWidget>& Label,
+                                             const struct FButtonStyle* Style = nullptr);
 
   virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
   virtual FReply OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;

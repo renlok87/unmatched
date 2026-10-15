@@ -609,6 +609,8 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.log.maneuver` | {player}: манёвр{boostPart}: {moves} | {player}: maneuver{boostPart}: {moves} |
 | `ms.log.boost.part` | , буст +{n} ({cardName}) | , boost +{n} ({cardName}) |
 | `ms.log.move` | {fighterName} {from}→{to} | {fighterName} {from}→{to} |
+| `ms.log.move.steps` | {fighterName} → {n} клетк(а/и/ок) | {fighterName} → {n} space(s) |
+| `ms.log.move.place` | {fighterName} → новая клетка | {fighterName} → placed |
 | `ms.log.more` | и ещё {n} | and {n} more |
 | `ms.log.stay` | без движения | no movement |
 | `ms.settings.anim.speed` | Скорость анимации | Animation speed |

@@ -498,7 +498,10 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
     UmEdgePlace(SlotGlyph, CardPos + FVector2D(0.5f * (CardWH.X - SlotGlyphSu), FMath::RoundToFloat(0.27f * CardWH.Y)),
                 FVector2D(SlotGlyphSu), 2);
     if (SlotText) {
-      SlotText->SetText(UmText::Get(EUmTable::Hud, TEXT("hud.combat.slot.empty")));
+      // 2026-10-15: nothing to defend with - the slot says so instead of «Карта не выбрана» (why.defense.none)
+      const bool bNothing = Model.bButtons && Model.DefendWhy.Key == FName(TEXT("why.defense.none"));
+      SlotText->SetText(bNothing ? UmText::Get(EUmTable::Why, TEXT("why.defense.none"))
+                                 : UmText::Get(EUmTable::Hud, TEXT("hud.combat.slot.empty")));
       SlotText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.secondary"))));
       UmEdgePlace(SlotText, CardPos + FVector2D(12.0f, FMath::RoundToFloat(0.65f * CardWH.Y)), FVector2D(CardWH.X - 24.0f, 44.0f), 2);
     }
@@ -577,7 +580,11 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   const float BaseH = RibbonHeightSu(bS, TagRows, false);
   UmEdgeShow(Ribbon, true);
   if (Ribbon) {
-    if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("panel"), Px)) Ribbon->SetBrush(*Skin);
+    // HUD v2: the red / blue enamel ribbon of the attacker / defender, the panel skin without the kit
+    // (a ribbon with the timer row is two rows tall: the kit ribbon only stretches sideways - the 9-slice panel then)
+    const FName RibbonKey(Model.bTimer ? TEXT("panel")
+                          : Model.Role == EUmEdgeRole::Attack ? TEXT("hud.combat.ribbon.attack") : TEXT("hud.combat.ribbon.defense"));
+    if (const FSlateBrush* Skin = Theme.SkinV2(RibbonKey, TEXT("panel"), Px)) Ribbon->SetBrush(*Skin);
     UmEdgePlace(Ribbon, RibbonPos, RibbonWH, 2);
   }
   UmEdgeShow(RoleIcon, true);
@@ -606,10 +613,12 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
   UmEdgeShow(TimerTrack, Model.bTimer);
   UmEdgeShow(TimerBar, Model.bTimer);
   if (Model.bTimer) {
-    UmEdgePlace(TimerText, RibbonPos + FVector2D(6.0f, BaseH + 1.0f), FVector2D(RibbonWH.X - 44.0f, TimerRowSu - 6.0f), 3);
+    // HUD v2: the text and the bar keep inside the panel skin's marble rim (8 su)
+    const float Rim = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? 8.0f : 0.0f;
+    UmEdgePlace(TimerText, RibbonPos + FVector2D(6.0f + Rim, BaseH + 1.0f - 0.5f * Rim), FVector2D(RibbonWH.X - 44.0f - Rim, TimerRowSu - 6.0f), 3);
     if (TimerTrack) {
       TimerTrack->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("panel.bg.inset")), 0.0f));
-      UmEdgePlace(TimerTrack, RibbonPos + FVector2D(0.0f, RibbonWH.Y - TimerBarSu), FVector2D(RibbonWH.X, TimerBarSu), 3);
+      UmEdgePlace(TimerTrack, RibbonPos + FVector2D(Rim, RibbonWH.Y - TimerBarSu - Rim), FVector2D(RibbonWH.X - 2.0f * Rim, TimerBarSu), 3);
     }
     if (TimerBar) TimerBar->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("card.cream")), 0.0f));
     if (WarnIcon) UmEdgeIcon(WarnIcon, TEXT("state-warning"), WarnSu);
@@ -658,7 +667,11 @@ void UUmHudCombatEdge::ApplyButtons() {
   // HB-31: after the deadline both refuse with why.deadline.passed
   const bool bExpired = TimerNow == EUmTimerState::Expired;
   const FS09Reason Deadline = FS09Reason::Make(TEXT("why.deadline.passed"));
-  if (DefendButton) {
+  // 2026-10-15 (playtest): with no legal defense card «Защититься» can never work - it leaves, «Без защиты» becomes the
+  // primary button in its place (the slot says «Защититься нечем»)
+  const bool bNothing = Model.DefendWhy.Key == FName(TEXT("why.defense.none"));
+  if (DefendButton) DefendButton->SetVisibility(bNothing ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+  if (DefendButton && !bNothing) {
     FUmButtonModel B;
     B.Variant = EUmButtonVariant::Primary;
     B.Label = UmText::Get(EUmTable::Hud, TEXT("hud.combat.defend"));
@@ -671,14 +684,15 @@ void UUmHudCombatEdge::ApplyButtons() {
   }
   if (NoDefenseButton) {
     FUmButtonModel B;
-    B.Variant = EUmButtonVariant::Normal;
+    B.Variant = bNothing ? EUmButtonVariant::Primary : EUmButtonVariant::Normal;
     B.Label = UmText::Get(EUmTable::Hud, TEXT("hud.combat.no.defense"));
     B.Reason = bExpired ? Deadline : Model.NoDefenseWhy;
     B.bEnabled = !B.Reason.IsSet();
     B.HeightSu = H;
-    B.MinWidthSu = static_cast<float>(Frame.NoDefenseSu.Max.X - Frame.NoDefenseSu.Min.X);
+    const FBox2D& Rect = bNothing ? Frame.DefendSu : Frame.NoDefenseSu;
+    B.MinWidthSu = static_cast<float>(Rect.Max.X - Rect.Min.X);
     NoDefenseButton->ApplyModel(B);
-    UmEdgePlace(NoDefenseButton, FVector2D(Frame.NoDefenseSu.Min) - Frame.OriginSu, FVector2D(B.MinWidthSu, H), 6);
+    UmEdgePlace(NoDefenseButton, FVector2D(Rect.Min) - Frame.OriginSu, FVector2D(B.MinWidthSu, H), 6);
   }
 }
 
@@ -699,8 +713,9 @@ void UUmHudCombatEdge::ApplyTimer(bool bForce) {
   if (TimerBar && Frame.CardSu.bIsValid) {
     const FBox2D R = RibbonRectSu();
     const float Frac = Model.WindowSec > 0.0f ? FMath::Clamp(static_cast<float>(Left) / Model.WindowSec, 0.0f, 1.0f) : 0.0f;
-    UmEdgePlace(TimerBar, FVector2D(R.Min.X, R.Max.Y - TimerBarSu) - Frame.OriginSu,
-                FVector2D(Frac * static_cast<float>(R.Max.X - R.Min.X), TimerBarSu), 4);
+    const float Rim = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 8.0f : 0.0f;  // HUD v2 rim
+    UmEdgePlace(TimerBar, FVector2D(R.Min.X + Rim, R.Max.Y - TimerBarSu - Rim) - Frame.OriginSu,
+                FVector2D(Frac * static_cast<float>(R.Max.X - R.Min.X - 2.0f * Rim), TimerBarSu), 4);
   }
   const bool bWarn = State == EUmTimerState::Warning || State == EUmTimerState::Expired;
   UmEdgeShow(WarnEdge, bWarn);

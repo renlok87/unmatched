@@ -50,9 +50,12 @@ void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterN
            FString& Inline, FString& Full, FString* First = nullptr) {
   TArray<FString> Parts;
   for (const FS09LastMovement::FMove& Move : Trail.Moves) {
-    Parts.Add(Ms(TEXT("ms.log.move"), {{TEXT("fighterName"), FighterName(Move.FighterId)},
-                                       {TEXT("from"), CellName(Move.From)},
-                                       {TEXT("to"), CellName(Move.Dest())}})
+    // 2026-10-15 HUD v2: «Медуза → 3 клетки» - the spaces moved, not the raw space ids (M13→M25) a player never sees
+    (void)CellName;
+    FFormatNamedArguments Args;
+    Args.Add(TEXT("fighterName"), FText::FromString(FighterName(Move.FighterId)));
+    Args.Add(TEXT("n"), Move.Path.Num());  // a number: the RU plural клетка / клетки / клеток
+    Parts.Add(UmText::Format(EUmTable::Ms, Move.bPlace ? TEXT("ms.log.move.place") : TEXT("ms.log.move.steps"), Args)
                   .ToString());
   }
   if (Parts.Num() == 0) {
@@ -239,6 +242,9 @@ void UUmHudLog::SetFrame(const FUmLogFrame& InFrame) {
   bHasFrame = true;
   if (Panel && bSkin) {
     if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Frame.PxPerSu)) Panel->SetBrush(*Skin);
+    // HUD v2: the marble rim and gold corners of the kit's panel - the title and the row stripes keep inside them
+    const bool bV2 = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner"));
+    Panel->SetPadding(bV2 ? FMargin(8.0f, 6.0f, 8.0f, 6.0f) : FMargin(0.0f));
   }
   Relayout();
   RestyleRows();
@@ -246,7 +252,8 @@ void UUmHudLog::SetFrame(const FUmLogFrame& InFrame) {
 }
 
 void UUmHudLog::Relayout() {
-  const float W = static_cast<float>(Frame.SizeSu.X);
+  // HUD v2: the content box inside the rim inset of SetFrame (8 su each side)
+  const float W = static_cast<float>(Frame.SizeSu.X) - (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 0.0f);
   const float First = UmHudLog::FirstRowSu(Frame);
   const float ListH = UmHudLog::RowSu * static_cast<float>(UmHudLog::VisibleRows(Frame));
   auto Place = [](UWidget* Wd, float X, float Y, float SW, float SH) {
@@ -345,7 +352,8 @@ FLinearColor UUmHudLog::GetStripeColor(int32 I) const {
 FText UUmHudLog::GetRowText(int32 I) const { return Rows.IsValidIndex(I) ? Rows[I].Entry.Text : FText::GetEmpty(); }
 
 float UUmHudLog::RowTextWidthSu() const {
-  const float W = static_cast<float>(Frame.SizeSu.X);
+  // HUD v2: the content box inside the rim inset of SetFrame (8 su each side)
+  const float W = static_cast<float>(Frame.SizeSu.X) - (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 0.0f);
   return FMath::Max(40.0f, W - (UmHudLog::TextXSu + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
 }
 
@@ -389,6 +397,13 @@ void UUmHudLog::Push(const FUmLogEntry& Entry, double NowMs) {
   // the new line fades in (icon.appear.ms)
   const int32 Last = Rows.Num() - 1;
   if (RowBoxes.IsValidIndex(Last) && RowBoxes[Last]) RowBoxes[Last]->SetRenderOpacity(Frame.bReduced ? 1.0f : 0.0f);
+}
+
+void UUmHudLog::Clear() {
+  if (Rows.Num() == 0) return;
+  Rows.Reset();
+  RestyleRows();
+  if (Scroll) Scroll->ScrollToStart();
 }
 
 void UUmHudLog::ApplyModel(const TArray<FUmLogEntry>& Entries, double NowMs) {

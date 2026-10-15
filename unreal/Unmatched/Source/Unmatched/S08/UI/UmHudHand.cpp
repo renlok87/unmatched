@@ -14,6 +14,7 @@
 #include "Components/Border.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/Image.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/SizeBox.h"
@@ -734,6 +735,35 @@ void UUmHudHand::Relayout(bool bAnimate) {
     }
   }
   PlacedNow = MoveTemp(Placed);
+  ApplyTray();
+}
+
+void UUmHudHand::ApplyTray() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const bool bShow = Row && WidgetTree && RowNow.CardPos.Num() > 0 && !Model.bLowered && Theme.HasTextureSkin(TEXT("hud.hand.tray"));
+  if (!bShow) {
+    if (TrayV2) TrayV2->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
+  if (!TrayV2) {
+    TrayV2 = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("HandTrayV2")));
+    Row->AddChild(TrayV2);
+  }
+  if (const FSlateBrush* Brush = Theme.SkinFor(TEXT("hud.hand.tray"), Frame.PxPerSu)) TrayV2->SetBrush(*Brush);
+  TrayV2->SetVisibility(ESlateVisibility::HitTestInvisible);
+  // under the row: 16 su past the outer cards, from 18 su under the cards' top to the canvas bottom
+  float MinX = TNumericLimits<float>::Max(), MaxX = -TNumericLimits<float>::Max(), Top = TNumericLimits<float>::Max();
+  for (const FVector2D& P : RowNow.CardPos) {
+    MinX = FMath::Min(MinX, static_cast<float>(P.X));
+    MaxX = FMath::Max(MaxX, static_cast<float>(P.X + RowNow.CardSize.X));
+    Top = FMath::Min(Top, static_cast<float>(P.Y));
+  }
+  const FVector2D PosSu(MinX - 16.0f, Top + 18.0f);
+  if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(TrayV2->Slot)) {
+    S->SetPosition(LocalOf(PosSu));
+    S->SetSize(FVector2D(MaxX - MinX + 32.0f, RowNow.CardSize.Y));
+    S->SetZOrder(1);
+  }
 }
 
 void UUmHudHand::ApplyCardStates() {

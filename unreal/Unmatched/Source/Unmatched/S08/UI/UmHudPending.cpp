@@ -249,7 +249,9 @@ FUmPendingPlan Plan(const FUmPendingModel& M, const FUmPendingFrame& F, const TM
     const float W = F.ToastSu.bIsValid ? static_cast<float>(F.ToastSu.GetSize().X) : ToastWidthSu(F.bClassS, true);
     const float Bottom = F.ToastSu.bIsValid ? static_cast<float>(F.ToastSu.Max.Y) : static_cast<float>(F.CanvasSu.Y) - 160.0f;
     const float X = F.ToastSu.bIsValid ? static_cast<float>(F.ToastSu.Min.X) : 0.5f * (CW - W);
-    TArray<FString> Keys = {Label(FName(TEXT("KeyEnter"))), Label(FName(TEXT("KeyX"))), Label(FName(TEXT("KeyC")))};
+    TArray<FString> Keys = {Label(FName(TEXT("KeyEnter")))};
+    if (M.bDecline) Keys.Add(Label(FName(TEXT("KeyX"))));  // a mandatory choice offers no «отказаться»
+    Keys.Add(Label(FName(TEXT("KeyC"))));
     float KW = 0.0f;
     TArray<float> KWs;
     for (const FString& K : Keys) {
@@ -555,6 +557,7 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       A.Add(TEXT("choice"), FText::FromString(In.RememberedChoice));
       M.Text = In.RememberedChoice.IsEmpty() ? FString() : UmPdString(TEXT("ms.pending.remembered"), &A);
       M.QueueMore = 0;
+      M.bDecline = H.bOptional;  // 2026-10-15 playtest: the X chip only when the choice may be declined
       return M;
     }
     M.bDecline = H.bOptional;
@@ -620,9 +623,12 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
     } else if (T == TEXT("BOOST_CHOICE")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::HandPick;
-      M.Text = Printed;
+      // 2026-10-15 playtest: until a card is picked the panel says where to pick it (the hand), not only «нужно 1»
+      const bool bPicked = Ui.PendingCardIds.Num() == 1;
+      const FString Hint = UmPdString(TEXT("why.boost.pick"));
+      M.Text = bPicked || Hint.IsEmpty() ? Printed : (Printed.IsEmpty() ? Hint : Printed + TEXT(" ") + Hint);
       M.bConfirm = true;
-      M.ConfirmWhy = Busy(Ui.PendingCardIds.Num() == 1 ? FS09Reason() : Count(1, Ui.PendingCardIds.Num()));
+      M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(TEXT("why.boost.pick")));
     } else {
       // a type this client does not know a form for: the modal with its text (the server's own prompt)
       M.View = EUmPendingView::Modal;
@@ -1088,12 +1094,17 @@ void UUmHudPending::Relayout() {
   const bool bGrey = Model.View == EUmPendingView::Opp || Model.View == EUmPendingView::AfterCombat;
   const FName TextColor = bGrey ? FName(TEXT("text.secondary")) : FName(TEXT("text.primary"));
   // ---- the plate and its edge: own - state.pending 2 su; grey - the panel skin's own panel.edge 1 su ----
+  // HUD v2 (art/imagegen/hud-v2-codex): the panel skin's marble rim is ~8 su; the plate grows outward by it so the planned
+  // text and buttons (laid out for the 1 su rim of v1) never sit under the rim
+  const float RimSu = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? 8.0f : 0.0f;
+  const FBox2D PanelDrawn = RimSu > 0.0f && P.Panel.bIsValid ? P.Panel.ExpandBy(FVector2D(RimSu, RimSu)) : P.Panel;
   if (Panel) {
     if (const FSlateBrush* Skin = Theme.SkinFor(PanelSkin(), Px)) Panel->SetBrush(*Skin);
     UmPdShow(Panel, true);
-    UmPdPlace(Panel, P.Panel, 0);
+    UmPdPlace(Panel, PanelDrawn, 0);
   }
   if (Edge) {
+    // v1: the teal 2 su edge marks my own choice; the v2 rim carries the frame, the teal edge sits just inside it
     const bool bOwnEdge = !bGrey && Model.View != EUmPendingView::Toast;
     UmPdShow(Edge, bOwnEdge);
     if (bOwnEdge) {

@@ -120,6 +120,8 @@ class UNMATCHED_API UUmHudLog : public UUserWidget {
   void ApplyModel(const TArray<FUmLogEntry>& Entries, double NowMs);
   /** One new entry. */
   void Push(const FUmLogEntry& Entry, double NowMs);
+  /** A new match (2026-10-15 playtest: «Сыграть ещё» kept the old game's lines): every row goes. */
+  void Clear();
   /** The combat hides the block (150 ms). */
   void SetHidden(bool bHidden, double NowMs);
   bool IsHiddenByCombat() const { return bHiddenWanted; }

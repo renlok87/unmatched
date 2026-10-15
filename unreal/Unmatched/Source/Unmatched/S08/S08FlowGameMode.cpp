@@ -14,6 +14,7 @@
 #include "S08Team.h"
 #include "UI/S08HudDebug.h"
 #include "UI/UmHudScale.h"
+#include "UI/UmHudTheme.h"
 #include "UI/UmTeamChip.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/CoreDelegates.h"
@@ -2490,11 +2491,26 @@ TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reaso
   // decision itself is taken again on the click (the state may change first).
   const bool bDimmed = Blocked && Blocked().IsSet();
   // One builder with the HUD tests (Unmatched.S09.HudPress.Interactable checks this very construction).
+  // HUD v2 (art/imagegen/hud-v2-codex): the command panel buttons take the theme's 9-slice btn skins
+  static FButtonStyle ThemedStyle;
+  const FButtonStyle* Style = nullptr;
+  {
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    if (Theme.HasTextureSkin(TEXT("hud.status.banner")) && Theme.HasTextureSkin(TEXT("btn.normal"))) {
+      const float Px = UmHudScale::Current().PxPerSu();
+      if (const FSlateBrush* B = Theme.SkinFor(TEXT("btn.normal"), Px)) ThemedStyle.SetNormal(*B);
+      if (const FSlateBrush* B = Theme.SkinFor(TEXT("btn.hover"), Px)) ThemedStyle.SetHovered(*B);
+      if (const FSlateBrush* B = Theme.SkinFor(TEXT("btn.pressed"), Px)) ThemedStyle.SetPressed(*B);
+      if (const FSlateBrush* B = Theme.SkinFor(TEXT("btn.disabled"), Px)) ThemedStyle.SetDisabled(*B);
+      ThemedStyle.SetNormalPadding(FMargin(0.0f)).SetPressedPadding(FMargin(0.0f, 1.0f, 0.0f, 0.0f));
+      Style = &ThemedStyle;
+    }
+  }
   TSharedRef<SS09HudPress> Element = SS09HudPress::MakeButton(
       Id, HudPress, FS09OnHudPressOutcome::CreateLambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
         HandleHudPressOutcome(Outcome, Blocked, Action);
       }),
-      Padding, Tint, bDimmed, Label);
+      Padding, Tint, bDimmed, Label, Style);
   // VS-2 HB-12: the pointer over a pressable element, "denied" over a blocked one (04 §3.2; -S08SlateHud=cursor: none)
   if (!UmHudBlockOnSlate(TEXT("cursor"))) Element->SetCursor(TOptional<EMouseCursor::Type>(bDimmed ? EMouseCursor::SlashedCircle : EMouseCursor::Hand));
   HudPressWidgets.Add(Id, Element); // the newest instance of the id (flag step 'hudendturn')
@@ -5851,7 +5867,11 @@ void AS08FlowGameMode::BuildHudWidgets() {
       .AutoSize(true)
       [SAssignNew(CommandPanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
-           .BorderBackgroundColor(FSlateColor(FLinearColor(0.012f, 0.016f, 0.035f, 0.88f)))
+           // HUD v2: the themed buttons stand on the scene - no flat dark band behind them (the gate layer keeps it)
+           .BorderBackgroundColor(TAttribute<FSlateColor>::CreateLambda([this]() {
+             const bool bV2 = !S08ArtLook::S08Markers() && UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner"));
+             return FSlateColor(bV2 ? FLinearColor::Transparent : FLinearColor(0.012f, 0.016f, 0.035f, 0.88f));
+           }))
            .Padding(10.0f)
            [SNew(SVerticalBox) +
            SVerticalBox::Slot().AutoHeight()[SAssignNew(CommandBox, SVerticalBox)]]];

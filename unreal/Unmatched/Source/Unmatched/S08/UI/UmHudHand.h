@@ -54,6 +54,7 @@
 
 class UBorder;
 class UCanvasPanel;
+class UImage;
 class UTextBlock;
 class US08AnimatedIconWidget;
 class FS09CommandUi;
@@ -327,6 +328,9 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   bool bHasModel = false;
   bool bCodeDefaultTree = false;
   UmHudHand::FRow RowNow;
+  /** HUD v2 (art/imagegen/hud-v2-codex hud.hand.tray): the marble tray under the resting row; none without the kit. */
+  UPROPERTY(Transient) TObjectPtr<UImage> TrayV2;
+  void ApplyTray();
   /** Model index -> row position (-1: placed in the boost slot). */
   TArray<int32> RowIndex;
   int32 HoverIndex = INDEX_NONE;

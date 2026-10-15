@@ -347,10 +347,11 @@ void AS08FlowGameMode::AddYoursCalloutLine() {
 FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
   FS09TurnStatusInput In;
   const FString ViewerId = ViewerIdNow();
+  // the STATUS line names fighters in the UI language («против Король Артур», not the server's "King Arthur")
   auto Label = [this](const FString& Id) -> FString {
     if (Id.IsEmpty()) return FString();
     const FS08BoardFighter* F = FindFighter(Id);
-    return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : Id;
+    return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
   };
   In.bGameOver = Hud.bGameOver;
   In.bSyncing = HudBusyReason().IsSet() ||

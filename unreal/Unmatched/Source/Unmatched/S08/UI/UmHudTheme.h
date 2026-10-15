@@ -93,6 +93,9 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   const FSlateBrush* SkinFor(FName Key, float PxPerSu) const;
   /** True when Key is a 9-slice PNG skin (HB-10 imported), not the ВР-HB06 fallback. */
   bool HasTextureSkin(FName Key) const;
+  /** HUD v2 (art/imagegen/hud-v2-codex): the ornament skin V2Key when imported, else Fallback (the v1 skin key) - one
+   *  call per widget keeps the old look wherever the kit has no such piece. */
+  const FSlateBrush* SkinV2(FName V2Key, FName Fallback, float PxPerSu) const;
   static constexpr float SkinX2MinPxPerSu = 1.5f;
   /** VS-3 CP-14 (ВР-VS3-16, refines CP-14 p. 3 "x2 from 1.333"): the card frame skins card.frame.* take their x2 texture
    *  from DPI x UI scale >= 2.0, where it maps 1 : 1 or larger. Below, the x2 PNG would be minified (1.5 px per su =

@@ -338,7 +338,8 @@ TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& InRaw) {
     F.PxPerSu = L.PxPerSu;
     F.CanvasSu = L.CanvasSu;
     F.OriginSu = UmGameHudSlots::SlotRect(L, EUmGameSlot::CombatCenter).Min;
-    F.StatusBottomSu = Ctr.State == EUmCenterState::Wait ? In.StatusBottomSu : -1.0f;
+    // 2026-10-15 playtest: the result card sat on the (taller v2) status cartouche - every state keeps under it
+    F.StatusBottomSu = In.StatusBottomSu;
     F.SpeedMul = FMath::Max(0.0f, In.SpeedMul);
     C->SetFrame(F);
     C->ApplyModel(Ctr);

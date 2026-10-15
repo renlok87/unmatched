@@ -155,7 +155,8 @@ void UUmHudTop::ApplyModel(const FUmTopModel& InModel) {
   if (bClassChanged) {
     // HB-10: the x2 plate from 150 % (DPI x UI scale)
     if (Plate) {
-      if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Model.PxPerSu)) {
+      // HUD v2: the «Ход N» plate of the kit, the panel skin without it
+      if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Model.PxPerSu)) {
         Plate->SetBrush(*Skin);
       }
     }

@@ -62,8 +62,11 @@ EN_PLURAL = {"one", "other"}
 KEY_HINT_RE = re.compile(r"\s*\((?:[MAGENRBCXKV]|Enter|Esc|Backspace|Delete|1–9)\)")
 ENTER_TAIL_RE = re.compile(r";\s*Enter\b.*$")
 MS_PLURAL = {  # 03 §9: "Плюрализация «бойц(а/ов)» — через форматирование StringTable с числом"
-    "ru": ("{n} бойц(а/ов)", "{n} {n}|plural(one=боец,few=бойца,many=бойцов,other=бойца)"),
-    "en": ("{n} fighter(s)", "{n} {n}|plural(one=fighter,other=fighters)"),
+    "ru": [("{n} бойц(а/ов)", "{n} {n}|plural(one=боец,few=бойца,many=бойцов,other=бойца)"),
+           # 2026-10-15 HUD v2: the journal counts the spaces moved (ms.log.move.steps)
+           ("{n} клетк(а/и/ок)", "{n} {n}|plural(one=клетка,few=клетки,many=клеток,other=клетки)")],
+    "en": [("{n} fighter(s)", "{n} {n}|plural(one=fighter,other=fighters)"),
+           ("{n} space(s)", "{n} {n}|plural(one=space,other=spaces)")],
 }
 
 
@@ -149,8 +152,9 @@ def ms_delta(key: str, text: str, lang: str) -> str:
     shorthand of 03 §9 becomes a real plural."""
     if key.startswith("ms.status."):
         text = ENTER_TAIL_RE.sub("", KEY_HINT_RE.sub("", text)).strip()
-    old, new = MS_PLURAL[lang]
-    return text.replace(old, new)
+    for old, new in MS_PLURAL[lang]:
+        text = text.replace(old, new)
+    return text
 
 
 def expected_ms_rows(spec_text: str | None = None) -> list[dict]:
@@ -159,7 +163,7 @@ def expected_ms_rows(spec_text: str | None = None) -> list[dict]:
     for k, ru, en in ms_rows_from_03(spec_text):
         ru2, en2 = ms_delta(k, ru, "ru"), ms_delta(k, en, "en")
         ref = "03 §9"
-        if MS_PLURAL["ru"][0] in ru:
+        if any(short in ru for short, _ in MS_PLURAL["ru"]):
             ref += " · plural RU one/few/many/other"
         elif (ru2, en2) != (ru, en):
             ref += " · ВР-H09: клавиша — чип hud.key.*"

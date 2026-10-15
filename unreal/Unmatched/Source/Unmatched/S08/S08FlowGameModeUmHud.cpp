@@ -183,6 +183,7 @@ struct FUmHudRuntime {
     FString Player;
   };
   TArray<FSeqTurn> SeqTurns;
+  FString FeedGameId;  // the match the log and SeqTurns belong to (a new game id clears both)
   bool bStreamSeenReady = false;
   bool bReconnecting = false;
   int32 ReconnectSeq = 0;
@@ -1699,9 +1700,21 @@ void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, con
     AS08FlowGameMode* Self = WeakThis.Get();
     const FS09PlayerPanel* Own = Self ? Self->Hud.ViewerPanel() : nullptr;
     if (!Own) return;
-    const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+    int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+    if (Index == INDEX_NONE) {
+      // 2026-10-15 playtest (defense window): the pressed widget's copy id was not in the hand any more while the same
+      // card was - fall back to the catalog id (the part before "::") and trace both lists for the diagnosis
+      FString CatalogId = InstanceId;
+      CatalogId.Split(TEXT("::"), &CatalogId, nullptr);
+      Index = Own->Cards.IndexOfByPredicate([&CatalogId](const FS09CardView& C) { return !C.bHidden && C.CardId == CatalogId; });
+      TArray<FString> Ids;
+      for (const FS09CardView& C : Own->Cards) Ids.Add(C.InstanceId);
+      FS08Trace::Write(FString::Printf(TEXT("HUD-HAND press-miss id=%s fallback=%d hand=%s"), *InstanceId,
+                                       Index, *FString::Join(Ids, TEXT(","))));
+    }
     if (Index == INDEX_NONE) {
       Self->ShowReason(FS09Reason::Make(TEXT("why.state.changed")), 3.0f);
+      Self->RefreshHud();  // the hand widget redraws from the current hand
       return;
     }
     Self->HandleHandCardClick(Index, ES09InputSource::Click);
@@ -2303,7 +2316,7 @@ void AS08FlowGameMode::RefreshUmPending() {
     // the toast's «В прошлый раз: {choice}»: the fighter, else the space, else the option - as the UI names them
     if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
       if (!Last->FighterId.IsEmpty()) {
-        if (const FS08BoardFighter* F = FindFighter(Last->FighterId)) In.RememberedChoice = F->Label.IsEmpty() ? F->Name : F->Label;
+        if (const FS08BoardFighter* F = FindFighter(Last->FighterId)) In.RememberedChoice = UmWorldLayer::DisplayName(*F).ToString();
       }
       if (In.RememberedChoice.IsEmpty() && Last->bHasCell) In.RememberedChoice = BoardModel.CellLabel(Last->CellX, Last->CellY);
       if (In.RememberedChoice.IsEmpty() && Last->OptionIndex >= 0) {
@@ -2324,7 +2337,9 @@ void AS08FlowGameMode::RefreshUmPending() {
   const FBox2D Center = R.Layout.Rect(EUmHudBlock::Center);
   float Top = Center.bIsValid ? static_cast<float>(Center.Min.Y) : (F.bClassS ? 64.0f : 80.0f);
   if (Status && Status->IsShown()) {
-    Top = FMath::Max(Top, static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y) + 8.0f);
+    // HUD v2: + the 8 su the choice plate's marble rim grows outward (UUmHudPending), so the two frames never touch
+    const float RimGap = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 8.0f;
+    Top = FMath::Max(Top, static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y) + RimGap);
   }
   if (const UUmHudCombatCenter* Centre = R.Combat.GetCenter()) {
     if (UmGameHudSlots::ShownByProperty(Centre) && M.View != EUmPendingView::Modal) {
@@ -2386,7 +2401,7 @@ void AS08FlowGameMode::TickUmSourceSlot() {
   M.HeroSlug = UmDeckHeroSlug(Fighters, C.OwnerId);
   M.Ribbon = C.Ribbon;
   M.bOpponent = C.bOpponent;
-  M.OwnerName = PlayerHeroName(C.OwnerId);
+  M.OwnerName = UmWorldLayer::DisplayNameOf(PlayerHeroName(C.OwnerId));
   M.Boost = C.Ribbon == ES09SlotRibbon::Boosted && C.Card.bHasBoostValue ? C.Card.BoostValue : UmCardWidget::NoBoostChip;
   M.FlyT = CardSlot.FlyT(Now);
   if (CardSlot.HoldsEffect() && CardSlot.GetState() == ES09SlotState::Hold) {
@@ -2459,6 +2474,15 @@ void AS08FlowGameMode::TickUmFeed() {
   const double Now = static_cast<double>(NowMs());
   const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
   const float PxPerSu = R.Layout.PxPerSu > 0.0f ? R.Layout.PxPerSu : 1.0f;
+  // a new match (the rematch «Сыграть ещё», a new room): the old game's log lines and turn table go
+  if (Flow.IsValid() && !Flow->GetRoom().GameId.IsEmpty() && Flow->GetRoom().GameId != R.FeedGameId) {
+    if (!R.FeedGameId.IsEmpty()) {
+      if (UUmHudLog* L = R.Feed.GetLog()) L->Clear();
+      R.SeqTurns.Reset();
+      FS08Trace::Write(FString::Printf(TEXT("HUD-LOG clear game=%s"), *Flow->GetRoom().GameId));
+    }
+    R.FeedGameId = Flow->GetRoom().GameId;
+  }
   // the turn of each applied seq (the log's «Х{n}»: the turn the event happened in)
   if (Hud.bValid && (R.SeqTurns.Num() == 0 || R.SeqTurns.Last().Seq != Hud.SequenceNumber)) {
     FUmHudRuntime::FSeqTurn T;

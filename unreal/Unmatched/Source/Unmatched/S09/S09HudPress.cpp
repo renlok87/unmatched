@@ -131,11 +131,11 @@ void SS09HudPress::Construct(const FArguments& InArgs) {
 TSharedRef<SS09HudPress> SS09HudPress::MakeButton(FName InId, const TSharedPtr<FS09HudPressArbiter>& InArbiter,
                                                  const FS09OnHudPressOutcome& InOnOutcome, const FMargin& Padding,
                                                  const FLinearColor& Tint, bool bDimmed,
-                                                 const TSharedRef<SWidget>& Label) {
-  return SNew(SS09HudPress)
-      .Id(InId)
-      .Arbiter(InArbiter)
-      .OnOutcome(InOnOutcome)[SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+                                                 const TSharedRef<SWidget>& Label, const FButtonStyle* Style) {
+  // HUD v2: a themed style (the 9-slice btn skins) replaces the engine's grey SButton look when given
+  TSharedRef<SButton> Button = Style ? SNew(SButton).ButtonStyle(Style).ContentPadding(Padding).IsEnabled(!bDimmed)[Label]
+                                     : SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label];
+  return SNew(SS09HudPress).Id(InId).Arbiter(InArbiter).OnOutcome(InOnOutcome)[Button];
 }
 
 FSlateColor SS09HudPress::HighlightColor() const {

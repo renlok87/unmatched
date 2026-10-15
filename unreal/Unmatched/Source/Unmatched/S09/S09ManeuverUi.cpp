@@ -1,4 +1,5 @@
 #include "S09ManeuverUi.h"
+#include "../S08/UI/UmWorldLayer.h"
 #include "Dom/JsonObject.h"
 #include "S09HudModel.h"
 #include "../S08/S08TraceLog.h"
@@ -285,7 +286,9 @@ const FS08BoardFighter* FindWorkFighter(const TArray<FS08BoardFighter>& Work, co
 }
 
 FString FighterDisplayName(const FS08BoardFighter& Fighter) {
-  return Fighter.Label.IsEmpty() ? (Fighter.Name.IsEmpty() ? Fighter.Id : Fighter.Name) : Fighter.Label;
+  // 2026-10-15: the UI language's name (S08FighterNames.json: «Медуза», «Гарпия 2»), the server label without an entry
+  if (Fighter.Label.IsEmpty() && Fighter.Name.IsEmpty()) return Fighter.Id;
+  return UmWorldLayer::DisplayName(Fighter).ToString();
 }
 
 const TCHAR* S09DraftSourceName(ES09InputSource Source) {
@@ -2193,7 +2196,7 @@ FS09PendingMovePrompt FS09CommandUi::DescribePendingMovePlace(const FS08BoardMod
   PendingLegalFighters(Fighters, Legal);
   Out.LegalFighters = Legal.Num();
   Out.FighterId = !PendingFighterId.IsEmpty() ? PendingFighterId : (Legal.Num() == 1 ? Legal[0] : FString());
-  auto LabelOf = [](const FS08BoardFighter& F) { return F.Label.IsEmpty() ? F.Name : F.Label; };
+  auto LabelOf = [](const FS08BoardFighter& F) { return FighterDisplayName(F); };
   // MS-E-61: no legal fighter, or (PLACE) no legal fighter has a free space.
   bool bAnySpace = false;
   for (const FString& Id : Legal) {
