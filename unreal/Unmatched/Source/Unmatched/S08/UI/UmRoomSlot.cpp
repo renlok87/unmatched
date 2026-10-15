@@ -159,7 +159,9 @@ void UUmRoomSlot::Apply(const FUmRoomSlotModel& InModel, const FVector2D& InSize
   const float Tx = Pad + AvSu + (bClassS ? 12.0f : 16.0f);
   const float Tw = W - Tx - Pad;
   const FText ChipLabel = HostText ? HostText->GetText() : FText();
-  const float ChipW = bChip ? MeasureW(ChipLabel, TEXT("type.caption")) + 16.0f : 0.0f;
+  // 2026-10-15 PvP playtest: «Хост» read «Хо…» - the HUD v2 chip skin has 9-slice rims wider than the 8 su padding
+  const float ChipRim = UUmHudTheme::Get().HasTextureSkin(TEXT("chip")) ? 16.0f : 0.0f;
+  const float ChipW = bChip ? MeasureW(ChipLabel, TEXT("type.caption")) + 16.0f + ChipRim : 0.0f;
   const float RowStep = bClassS ? 30.0f : 36.0f;
   float Y = bClassS ? 10.0f : 18.0f;
   if (bAi) {

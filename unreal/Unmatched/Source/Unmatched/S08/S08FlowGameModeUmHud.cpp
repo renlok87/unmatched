@@ -2277,6 +2277,11 @@ void AS08FlowGameMode::RefreshUmPending() {
   In.bStatusSaysOpp = Status && Status->IsShown() && !UmHudBlockOnSlate(TEXT("status"));
   In.BusyWhy = HudBusyReason();
   In.bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  if (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.Combat.bPresent && CommandUi.Combat.bHasTimeoutAt) {
+    // past the deadline the server applies the default any moment - no «осталось 0 с» standing on the panel
+    const int32 Left = FMath::CeilToInt(CommandUi.Combat.SecondsUntilDeadline());
+    In.DeadlineSec = Left > 0 ? Left : -1;
+  }
   // the source card: the catalog cards of both deck lists (gameDeckLists, public), the own hand and both piles
   for (const FS09DeckList& List : DeckLists) {
     for (const FS09DeckListCard& Card : List.Cards) {

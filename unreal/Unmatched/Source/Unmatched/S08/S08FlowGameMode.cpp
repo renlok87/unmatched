@@ -5365,7 +5365,8 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   SyncMovePlates();
   // GD-034: the server deadline countdown must tick without a new snapshot.
   if (CommandUi.Mode == ES09CommandMode::CombatDefense ||
-      CommandUi.Mode == ES09CommandMode::CombatResolve) {
+      CommandUi.Mode == ES09CommandMode::CombatResolve ||
+      (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.Combat.bPresent)) {  // + the choice's countdown
     HudTickAccumulator += DeltaSeconds;
     if (HudTickAccumulator >= 0.25f) {
       HudTickAccumulator = 0.0f;

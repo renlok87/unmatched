@@ -405,7 +405,8 @@ FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
   In.bCombatAttacking = CommandUi.Combat.bPresent && Hud.Phase == TEXT("COMBAT") && !ViewerId.IsEmpty() &&
                         CommandUi.Combat.DefenderId != ViewerId;
   In.OpponentVerb = OpponentVerbNow;
-  if (const FS09PlayerPanel* Opponent = Hud.OpponentPanel()) In.OpponentName = PlayerHeroName(Opponent->PlayerId);
+  // 2026-10-15 PvP playtest: «King Arthur — Соперник выбирает действие» - the hero name on the UI language
+  if (const FS09PlayerPanel* Opponent = Hud.OpponentPanel()) In.OpponentName = UmWorldLayer::DisplayNameOf(PlayerHeroName(Opponent->PlayerId));
   return In;
 }
 

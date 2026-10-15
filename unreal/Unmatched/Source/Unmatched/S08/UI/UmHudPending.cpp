@@ -595,6 +595,14 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
     }
     M.bDecline = H.bOptional;
     M.bCollapse = true;
+    // 2026-10-15 PvP playtest: an after-combat choice («Стычка») closed by itself 7 s later - the server's resolve
+    // deadline (10 s) applied the default; the panel now counts it down in its title row
+    if (In.DeadlineSec >= 0) {
+      FFormatNamedArguments DA;
+      DA.Add(TEXT("s"), FText::AsNumber(In.DeadlineSec));
+      const FString Left = UmPdString(TEXT("hud.pending.deadline"), &DA);
+      if (!Left.IsEmpty()) M.Title = M.Title.IsEmpty() ? Left : M.Title + TEXT(" · ") + Left;
+    }
     M.ConfirmKey = TEXT("hud.number.confirm");
     const FString& T = H.Type;
     if (T == TEXT("CHOOSE_ONE")) {

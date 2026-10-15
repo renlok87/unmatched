@@ -26,6 +26,9 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
       In.bPending = true;
       In.bPendingPlace = bPlace;
       In.PendingCells = Ui.PendingCells;
+      // 2026-10-15 playtest («Стычка»: «Выберите, кого переместить»): before the fighter is picked the legal fighters
+      // wear the V-17 candidate rings (nothing on the board said who may be moved)
+      if (Ui.PendingFighterId.IsEmpty()) Ui.PendingLegalFighters(Fighters, In.CandidateFighterIds);
       const FIntPoint Start = PositionOf(Ui.PendingFighterId);
       if (!bPlace && Start.X >= 0) In.PendingCells.Remove(FS08BoardModel::CellKey(Start.X, Start.Y));
       const FIntPoint Dest(Ui.PendingCellX, Ui.PendingCellY);

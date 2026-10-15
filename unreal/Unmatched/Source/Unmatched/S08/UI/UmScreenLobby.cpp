@@ -354,6 +354,9 @@ bool UUmScreenLobby::Initialize() {
     // the box takes the keys; the cells draw the code (ВР-VS4-SC11-04) - its own glyphs and skin stay invisible
     CodeBox->SetRenderOpacity(0.0f);
     CodeBox->SetRevertTextOnEscape(false);
+    // 2026-10-15 PvP playtest: a click put the caret mid-code and typing inserted («P3ASSW») - the six cells are one
+    // field, a click selects it so a pasted / typed code replaces the old one
+    CodeBox->SetSelectAllTextWhenFocused(true);
     CodeBox->SetClearKeyboardFocusOnCommit(false);
     CodeBox->OnTextChanged.AddUniqueDynamic(this, &UUmScreenLobby::HandleCodeChanged);
     CodeBox->OnTextCommitted.AddUniqueDynamic(this, &UUmScreenLobby::HandleCodeCommitted);

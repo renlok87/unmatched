@@ -246,6 +246,9 @@ struct UNMATCHED_API FUmPendingInput {
   FString RememberedChoice;    // the toast's {choice}: a fighter, a space, an option
   int32 PickNeed = 0;          // PendingCardPickPlan
   TArray<FS09CardView> Revealed;  // DECK_TOP_PICK (the owner's projection)
+  /** Seconds left of the server's combat-stage deadline while my choice holds the combat open (COMBAT_RESOLVE: 10 s,
+   *  then the server applies the default); -1 = no deadline (2026-10-15 PvP playtest). */
+  int32 DeadlineSec = -1;
 };
 UNMATCHED_API FUmPendingModel Gather(const FUmPendingInput& In);
 }  // namespace UmHudPending
