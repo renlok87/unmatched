@@ -27,6 +27,7 @@ struct UNMATCHED_API FS09DeckListCard {
   FString CardType;
   FString BannerName;
   FString Text;
+  FString TextRu;  // gameDeckLists textRu (empty -> Text)
   int32 AttackValue = -1;
   int32 DefenseValue = -1;
   int32 BoostValue = -1;

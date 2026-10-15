@@ -39,6 +39,7 @@
 #include "UI/UmScreenLobby.h"
 #include "UI/UmScreenRoom.h"
 #include "UI/UmText.h"
+#include "UI/UmWorldLayer.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/WidgetSwitcher.h"
@@ -478,7 +479,7 @@ void AS08FlowGameMode::TickUmRoom(bool bShowing) {
     S.bHost = bHostSeat;
     S.bReady = P->bIsReady;
     if (const FS08HeroEntry* H = UmRmHero(Heroes, P->HeroId)) {
-      S.HeroName = H->Name;
+      S.HeroName = UmWorldLayer::DisplayNameOf(H->Name);
       S.HeroKey = FName(*UmPortrait::SlugOf(H->Name));
     }
     if (const FS08FlowController::FHeroDetails* D = Flow->FindHeroDetails(P->HeroId)) {
@@ -520,17 +521,18 @@ void AS08FlowGameMode::TickUmRoom(bool bShowing) {
     if (!H) continue;
     FUmHeroCardModel C;
     C.HeroId = Id;
-    C.Name = H->Name;
+    C.Name = UmWorldLayer::DisplayNameOf(H->Name);  // display; the keys below are the server names
     C.Key = FName(*UmPortrait::SlugOf(H->Name));
     if (const FS08FlowController::FHeroDetails* D = Flow->FindHeroDetails(Id)) {
       C.bDetails = true;
       C.Hp = D->Health;
       C.Move = D->Movement;
       C.AttackType = D->AttackType;
-      C.Ability = D->Ability;
+      const FString AbilityRu = UmWorldLayer::AbilityTextOf(H->Name);
+      C.Ability = AbilityRu.IsEmpty() ? D->Ability : AbilityRu;
       if (D->Sidekicks.Num()) {
         const FS08FlowController::FHeroSidekick& K = D->Sidekicks[0];
-        C.SidekickName = K.Name;
+        C.SidekickName = UmWorldLayer::DisplayNameOf(K.Name);
         C.SidekickKey = FName(*(C.Key.ToString() + TEXT("/") + UmPortrait::SlugOf(K.Name)));
         C.SidekickCount = K.Count;
         C.SidekickHp = K.Health;
@@ -646,7 +648,7 @@ void AS08FlowGameMode::TickUmLoading(bool bShowing) {
       FUmLoadingSide& S = Sides[P.UserId == Me ? 0 : 1];
       S.Nick = P.Username;
       if (const FS08HeroEntry* H = UmRmHero(Flow->GetHeroes(), P.HeroId)) {
-        S.HeroName = H->Name;
+        S.HeroName = UmWorldLayer::DisplayNameOf(H->Name);
         S.HeroKey = FName(*UmPortrait::SlugOf(H->Name));
       }
     }

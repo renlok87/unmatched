@@ -37,6 +37,7 @@
 #include "UI/UmScreenAborted.h"
 #include "UI/UmScreenGameOver.h"
 #include "UI/UmText.h"
+#include "UI/UmWorldLayer.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/NamedSlot.h"
 #include "Components/Overlay.h"
@@ -467,14 +468,17 @@ void AS08FlowGameMode::TickUmEndScreens() {
                   : Hud.bViewerWon ? EUmGameOverOutcome::Victory
                                    : EUmGameOverOutcome::Defeat;
       const bool bDecided = M.Outcome == EUmGameOverOutcome::Victory || M.Outcome == EUmGameOverOutcome::Defeat;
-      M.WinnerHero = bDecided ? ResultSummary.Left.HeroName : FString();
-      M.LoserHero = bDecided && ResultSummary.Reason == ES09ResultReason::HeroHpZero ? ResultSummary.Right.HeroName : FString();
+      // the names of the UI language (S08FighterNames.json); the portrait keys below stay the server names
+      M.WinnerHero = bDecided ? UmWorldLayer::DisplayNameOf(ResultSummary.Left.HeroName) : FString();
+      M.LoserHero = bDecided && ResultSummary.Reason == ES09ResultReason::HeroHpZero
+                        ? UmWorldLayer::DisplayNameOf(ResultSummary.Right.HeroName)
+                        : FString();
       M.Turn = ResultSummary.TurnCount;
       M.DurationSec = ResultSummary.DurationSec;
       M.bVsAi = Room && Room->Mode == TEXT("VS_AI");
       auto Side = [&](const FS09ResultSide& S) {
         FUmGameOverSide O;
-        O.HeroName = S.HeroName;
+        O.HeroName = UmWorldLayer::DisplayNameOf(S.HeroName);
         O.HeroKey = S.HeroName.IsEmpty() ? NAME_None : FName(*UmPortrait::SlugOf(S.HeroName));
         if (S.PlayerId == Viewer) {
           O.Role = UmText::Get(EUmTable::Screens, TEXT("screens.result.you")).ToString();

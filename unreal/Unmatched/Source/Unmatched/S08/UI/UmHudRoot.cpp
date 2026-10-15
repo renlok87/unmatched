@@ -101,6 +101,15 @@ UUmHudRoot* UUmHudRoot::Create(UWorld* World, FString* OutSource) {
   return Root;
 }
 
+void UUmHudRoot::SetGameInset(const FMargin& InsetSu) {
+  UWidget* ScreenChild = GameCache ? static_cast<UWidget*>(GameCache) : static_cast<UWidget*>(GameHud);
+  if (UWidgetSwitcherSlot* SwitcherSlot = ScreenChild ? Cast<UWidgetSwitcherSlot>(ScreenChild->Slot) : nullptr) {
+    if (!(SwitcherSlot->GetPadding() == InsetSu)) SwitcherSlot->SetPadding(InsetSu);
+    // the blocks that run past the canvas edge by design (the resting hand) end at the scene's edge, as in 16:9
+    if (ScreenChild->GetClipping() != EWidgetClipping::ClipToBounds) ScreenChild->SetClipping(EWidgetClipping::ClipToBounds);
+  }
+}
+
 UUmGameHud* UUmHudRoot::EnsureGameHud() {
   if (GameHud || !Screens) return GameHud;
   UClass* Class = UUmGameHud::StaticClass();

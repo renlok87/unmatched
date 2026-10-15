@@ -12,6 +12,7 @@
 #include "S08Team.h"
 #include "S08TraceLog.h"
 #include "S08WhyText.h"
+#include "UI/UmWorldLayer.h"
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -111,10 +112,10 @@ void AS08FlowGameMode::FeedOpponentView(const FS08Snapshot& Snapshot) {
     if (EffectTrailYours.Num() > 0) {
       auto FighterName = [&Decoded](const FString& Id) -> FString {
         const FS08BoardFighter* F = Decoded.FindByPredicate([&Id](const FS08BoardFighter& E) { return E.Id == Id; });
-        return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : Id;
+        return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
       };
       const FS09FeedEntry Entry = FS09EventFeed::DescribeEffect(
-          Trail, EffectTrailCard, EffectTrailYours, [this](const FString& Id) { return PlayerHeroName(Id); }, FighterName,
+          Trail, EffectTrailCard, EffectTrailYours, [this](const FString& Id) { return UmWorldLayer::DisplayNameOf(PlayerHeroName(Id)); }, FighterName,
           [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); });
       bYoursCallout = true;
       YoursCalloutText = Entry.Text;
@@ -151,10 +152,10 @@ void AS08FlowGameMode::TickOpponentView() {
   // trail writes its effect line (or "Your fighter X: Y effect") the same way
   FS09LastMovement Revealed;
   if (LastMoveTracker.ConsumeRevealed(Revealed)) {
-    auto PlayerName = [this](const FString& PlayerId) { return PlayerHeroName(PlayerId); };
+    auto PlayerName = [this](const FString& PlayerId) { return UmWorldLayer::DisplayNameOf(PlayerHeroName(PlayerId)); };
     auto FighterName = [this](const FString& FighterId) -> FString {
       const FS08BoardFighter* F = FindFighter(FighterId);
-      return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : FighterId;
+      return F ? UmWorldLayer::DisplayName(*F).ToString() : FighterId;
     };
     auto CellName = [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); };
     const bool bEffect = Revealed.Source == TEXT("EFFECT");

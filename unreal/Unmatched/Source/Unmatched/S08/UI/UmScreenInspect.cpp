@@ -132,6 +132,7 @@ FS09CardView DeckCardView(const FS09DeckListCard& C) {
   V.CardType = C.CardType;
   V.BannerName = C.BannerName;
   V.Text = C.Text;
+  V.TextRu = C.TextRu;
   V.AttackValue = FMath::Max(0, C.AttackValue);
   V.DefenseValue = FMath::Max(0, C.DefenseValue);
   V.BoostValue = FMath::Max(0, C.BoostValue);
@@ -727,7 +728,9 @@ void UUmScreenInspect::LayoutContent() {
     CopiesChipText->SetText(UmText::Format(EUmTable::Hud, TEXT("hud.inspect.copies.short"), A));
   }
   // the effect text (scrolls), the copies line, the missing scan
-  const FString BodyStr = bHidden || bDeck ? FString() : (Shown.Text.IsEmpty() ? Shown.EffectText : Shown.Text);
+  // the printed Russian text when the UI is Russian and the data has it (Card.textRu)
+  const FString& PrintedText = UmCardMedia::PreferredLang() != TEXT("en") && !Shown.TextRu.IsEmpty() ? Shown.TextRu : Shown.Text;
+  const FString BodyStr = bHidden || bDeck ? FString() : (PrintedText.IsEmpty() ? Shown.EffectText : PrintedText);
   if (BodyText) {
     UmInShow(BodyText, !bHidden && !bDeck, ESlateVisibility::Visible);
     if (UVerticalBoxSlot* S = Cast<UVerticalBoxSlot>(BodyText->Slot)) {

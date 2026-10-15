@@ -124,7 +124,7 @@ void FS08FlowController::FetchHeroes() {
 static const TCHAR* DeckListsQuery =
     TEXT("query DL($gameId: String!) { gameDeckLists(gameId: $gameId) {")
     TEXT(" playerId total cards { cardId name nameRu cardType attackValue defenseValue boostValue")
-    TEXT(" bannerName text count } } }");
+    TEXT(" bannerName text textRu count } } }");
 
 void FS08FlowController::EnsureDeckLists(bool bRetryFailed) {
   if (Room.GameId.IsEmpty() || Stage != ES08Stage::Started) return;

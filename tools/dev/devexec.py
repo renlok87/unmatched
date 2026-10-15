@@ -161,6 +161,12 @@ def cmd_lc(a) -> int:
                 for line in text.splitlines():
                     if "LiveCoding" in line or "error" in line.lower():
                         print(line)
+                if rc:
+                    ubt = Path(os.environ.get("LOCALAPPDATA", "")) / "UnrealBuildTool" / "Log.txt"
+                    if ubt.exists():
+                        errs = [l for l in ubt.read_text(encoding="utf-8", errors="replace").splitlines()
+                                if re.search(r"error C\d+|error LNK|: error", l)]
+                        print("\n".join(errs[-15:]))
                 return rc
         time.sleep(0.5)
     print("no Live Coding result in the log yet")
@@ -182,9 +188,16 @@ def cmd_stop(a) -> int:
             send(["quit"], 15)
         except SystemExit:
             pass
-        time.sleep(3)
+        for _ in range(30):  # the exe and its DLLs stay locked until the process is really gone (LNK1104)
+            if not alive(s["pid"]):
+                break
+            time.sleep(0.5)
         if alive(s["pid"]):
             subprocess.run(["taskkill", "/PID", str(s["pid"]), "/T", "/F"])
+            for _ in range(20):
+                if not alive(s["pid"]):
+                    break
+                time.sleep(0.5)
     SESSION.unlink(missing_ok=True)
     print("stopped")
     return 0

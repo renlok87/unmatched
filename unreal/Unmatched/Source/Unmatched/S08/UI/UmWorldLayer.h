@@ -78,6 +78,13 @@ UNMATCHED_API bool PlateV2();
 /** The plate name of a fighter on the UI language (Config/Cards/S08FighterNames.json; harpies hud.plate.harpy_name with
  *  their sidekicks[] number); the server label when the file has no entry. */
 UNMATCHED_API FText DisplayName(const FS08BoardFighter& Fighter);
+/** The same for a server name alone (a hero / sidekick label such as "King Arthur", "Merlin", "Harpies 2"): the entry
+ *  whose "en" is that name, a numbered sidekick by its base name; the name itself without one. Display only - the
+ *  server name stays the key of portraits, slugs and audio. */
+UNMATCHED_API FString DisplayNameOf(const FString& ServerName);
+/** The hero ability text on the UI language ("ability"."ru" of the hero whose "hero"."en" is HeroServerName); '' when the
+ *  UI is English or the file has none (the server's English text stays). */
+UNMATCHED_API FString AbilityTextOf(const FString& HeroServerName);
 /** hud.plate.role.hero_ranged | hero_melee | sidekick_ranged | sidekick_melee. */
 UNMATCHED_API FText RoleText(bool bHero, bool bRanged);
 /** hud.plate.side.own | .opponent. */

@@ -115,6 +115,63 @@ FText DisplayName(const FS08BoardFighter& Fighter) {
   return FText::FromString(Fallback);
 }
 
+FString DisplayNameOf(const FString& ServerName) {
+  const TSharedPtr<FJsonObject>& Root = UmWlNames();
+  const TSharedPtr<FJsonObject>* Heroes = nullptr;
+  if (ServerName.IsEmpty() || !Root.IsValid() || !Root->TryGetObjectField(TEXT("heroes"), Heroes)) return ServerName;
+  const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  FString Base = ServerName.TrimStartAndEnd();
+  FString Digits;
+  while (Base.Len() > 0 && FChar::IsDigit(Base[Base.Len() - 1])) {
+    Digits.InsertAt(0, Base[Base.Len() - 1]);
+    Base.LeftChopInline(1);
+  }
+  Base.TrimEndInline();
+  for (const auto& Pair : (*Heroes)->Values) {
+    const TSharedPtr<FJsonObject>* Hero = nullptr;
+    if (!Pair.Value.IsValid() || !Pair.Value->TryGetObject(Hero)) continue;
+    for (const TCHAR* Role : {TEXT("hero"), TEXT("sidekick")}) {
+      const TSharedPtr<FJsonObject>* Entry = nullptr;
+      if (!(*Hero)->TryGetObjectField(Role, Entry)) continue;
+      FString En;
+      if ((*Entry)->TryGetStringField(TEXT("en"), En) && En.Equals(ServerName, ESearchCase::IgnoreCase)) {
+        FString Name;
+        return (*Entry)->TryGetStringField(bRu ? TEXT("ru") : TEXT("en"), Name) && !Name.IsEmpty() ? Name : ServerName;
+      }
+      bool bNumbered = false;
+      // the numbered sidekicks of the data are the Harpies (server labels "Harpies 1..3", the fighter name "Harpy")
+      if (!Digits.IsEmpty() && (*Entry)->TryGetBoolField(TEXT("numbered"), bNumbered) && bNumbered &&
+          (Base.Equals(TEXT("Harpies"), ESearchCase::IgnoreCase) || Base.Equals(TEXT("Harpy"), ESearchCase::IgnoreCase))) {
+        FFormatNamedArguments Args;
+        Args.Add(TEXT("number"), FText::AsNumber(FCString::Atoi(*Digits)));
+        return UmText::Format(EUmTable::Hud, TEXT("hud.plate.harpy_name"), Args).ToString();
+      }
+    }
+  }
+  return ServerName;
+}
+
+FString AbilityTextOf(const FString& HeroServerName) {
+  const TSharedPtr<FJsonObject>& Root = UmWlNames();
+  const TSharedPtr<FJsonObject>* Heroes = nullptr;
+  if (UmCardMedia::PreferredLang() == TEXT("en") || HeroServerName.IsEmpty() || !Root.IsValid() ||
+      !Root->TryGetObjectField(TEXT("heroes"), Heroes)) {
+    return FString();
+  }
+  for (const auto& Pair : (*Heroes)->Values) {
+    const TSharedPtr<FJsonObject>* Hero = nullptr;
+    const TSharedPtr<FJsonObject>* Entry = nullptr;
+    const TSharedPtr<FJsonObject>* Ability = nullptr;
+    FString En, Ru;
+    if (Pair.Value.IsValid() && Pair.Value->TryGetObject(Hero) && (*Hero)->TryGetObjectField(TEXT("hero"), Entry) &&
+        (*Entry)->TryGetStringField(TEXT("en"), En) && En.Equals(HeroServerName, ESearchCase::IgnoreCase) &&
+        (*Hero)->TryGetObjectField(TEXT("ability"), Ability) && (*Ability)->TryGetStringField(TEXT("ru"), Ru)) {
+      return Ru;
+    }
+  }
+  return FString();
+}
+
 FText RoleText(bool bHero, bool bRanged) {
   const TCHAR* Key = bHero ? (bRanged ? TEXT("hud.plate.role.hero_ranged") : TEXT("hud.plate.role.hero_melee"))
                            : (bRanged ? TEXT("hud.plate.role.sidekick_ranged") : TEXT("hud.plate.role.sidekick_melee"));

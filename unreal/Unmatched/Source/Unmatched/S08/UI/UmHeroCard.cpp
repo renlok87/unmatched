@@ -337,7 +337,10 @@ void UUmHeroCard::Restyle() {
   const FSlateColor Secondary(Theme.Color(TEXT("text.secondary")));
   if (NameText) NameText->SetColorAndOpacity(bTaken ? Secondary : Primary);
   if (StatsText) StatsText->SetColorAndOpacity(bTaken ? Secondary : Primary);
-  Vis(LangChip, Model.bDetails && !Model.Ability.IsEmpty());
+  // the «EN» chip marks the server's English ability text; a Russian text (S08FighterNames.json "ability") has none
+  bool bAbilityRu = false;
+  for (const TCHAR Ch : Model.Ability) bAbilityRu |= Ch >= 0x0400 && Ch <= 0x04FF;  // Cyrillic
+  Vis(LangChip, Model.bDetails && !Model.Ability.IsEmpty() && !bAbilityRu);
   Vis(SidekickBox, !Model.SidekickKey.IsNone() && Model.bDetails);
   Vis(TakenText, bTaken);
   Vis(PickButton, !bTaken, true);

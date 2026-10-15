@@ -694,7 +694,9 @@ bool FUmPendingSourceTest::RunTest(const FString&) {
   TestEqual(TEXT("discard-choice: EN name"), UmHudPending::SourceName(H, Known, Heroes, {}, false), FString(TEXT("Hiss and Slither")));
   H.Id = TEXT("ability-medusa-target-p0");
   H.PlayerId = TEXT("p0");
-  TestEqual(TEXT("a hero ability: the hero"), UmHudPending::SourceName(H, Known, Heroes, {}, true), FString(TEXT("Medusa")));
+  // 2026-10-15: the UI language's hero name (S08FighterNames.json) - RU «Медуза», EN the server name
+  TestEqual(TEXT("a hero ability: the hero (RU)"), UmHudPending::SourceName(H, Known, Heroes, {}, true), FString(TEXT("Медуза")));
+  TestEqual(TEXT("a hero ability: the hero (EN)"), UmHudPending::SourceName(H, Known, Heroes, {}, false), FString(TEXT("Medusa")));
   H.Id = TEXT("unknown-effect-p0");
   H.Text = TEXT("discards 1 card");
   TestEqual(TEXT("the text fallback in the owner's discard"), UmHudPending::SourceName(H, {}, Heroes, Known, false), FString(TEXT("Hiss and Slither")));

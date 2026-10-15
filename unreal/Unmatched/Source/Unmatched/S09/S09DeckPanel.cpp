@@ -149,6 +149,7 @@ bool ParseDeckLists(const TSharedPtr<FJsonObject>& Data, TArray<FS09DeckList>& O
       Card.CardType = StringOrEmpty(C, TEXT("cardType"));
       Card.BannerName = StringOrEmpty(C, TEXT("bannerName"));
       Card.Text = StringOrEmpty(C, TEXT("text"));
+      Card.TextRu = StringOrEmpty(C, TEXT("textRu"));
       Card.AttackValue = IntOrMinus(C, TEXT("attackValue"));
       Card.DefenseValue = IntOrMinus(C, TEXT("defenseValue"));
       Card.BoostValue = IntOrMinus(C, TEXT("boostValue"));

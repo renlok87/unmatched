@@ -172,7 +172,8 @@ bool FUmHudPlayerPanelTreeTest::RunTest(const FString&) {
   TestTrue(TEXT("own: turn.flash.yellow"),
            P->StatusText->GetColorAndOpacity().GetSpecifiedColor().Equals(Theme.Color(TEXT("turn.flash.yellow")), 1e-3f));
   TestEqual(TEXT("HP «14/16»"), P->HpText->GetText().ToString(), FString(TEXT("14/16")));
-  TestEqual(TEXT("name"), P->NameText->GetText().ToString(), FString(TEXT("Medusa")));
+  // 2026-10-15: the server name "Medusa" reads in the UI language (S08FighterNames.json); the portrait keeps the server name
+  TestEqual(TEXT("name"), P->NameText->GetText().ToString(), FString(TEXT("Медуза")));
   P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Wait));
   TestEqual(TEXT("wait: «ЖДЁТ»"), P->StatusText->GetText().ToString(), FString(TEXT("ЖДЁТ")));
   TestTrue(TEXT("wait: text.secondary"),

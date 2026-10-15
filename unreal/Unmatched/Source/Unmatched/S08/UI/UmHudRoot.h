@@ -53,6 +53,10 @@ class UNMATCHED_API UUmHudRoot : public UUserWidget {
   /** False with -S08HudNoCache (the GAME screen straight in Screens, as before VS-5). */
   static bool CacheWanted();
   UUmGameHud* GetGameHud() const { return GameHud; }
+  /** The GAME screen inside the constrained camera rectangle (su): the pillarbox / letterbox bars of a non-16:9 window
+   *  stay empty and every block keeps its 16:9 place over the scene (user 2026-10-15: «Плывет интерфейс на разных
+   *  разрешениях»). Zero margin = the whole viewport. */
+  void SetGameInset(const FMargin& InsetSu);
   /** Every BindWidget part bound (false = broken tree; OutMissing lists them). */
   bool HasAllParts(FString* OutMissing = nullptr) const;
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }

@@ -33,6 +33,8 @@ struct UNMATCHED_API FS09CardView {
   bool bHasBoostValue = false;
   FString BannerName;
   FString Text;
+  /** The printed Russian text (card.textRu); empty when the data has none - Text then. */
+  FString TextRu;
   // DE-018 (01 F-01): number of entries of the card's `effects` array - with Text the "has effect text" test of the
   // combat read hold (combat.readHoldMs 1000 only when a revealed card carries an effect).
   int32 EffectCount = 0;

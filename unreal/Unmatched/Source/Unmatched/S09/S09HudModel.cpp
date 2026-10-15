@@ -25,6 +25,7 @@ bool FS09HudFactory::CardFromJson(const TSharedPtr<FJsonValue>& Value,
   OutCard.CardType = Card->GetStringField(TEXT("cardType"));
   OutCard.BannerName = Card->GetStringField(TEXT("bannerName"));
   OutCard.Text = Card->GetStringField(TEXT("text"));
+  Card->TryGetStringField(TEXT("textRu"), OutCard.TextRu);
   bool bVisible = false;
   Card->TryGetBoolField(TEXT("isVisible"), bVisible);
   OutCard.bVisible = bVisible;

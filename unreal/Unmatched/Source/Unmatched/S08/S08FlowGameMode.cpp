@@ -37,6 +37,7 @@
 #include "Serialization/JsonWriter.h"
 #include "S08TraceLog.h"
 #include "S08WhyText.h"
+#include "UI/UmText.h"
 #include "S08ArtTuner.h"
 #include "S08ArtView.h"
 #include "S08LiveTune.h"
@@ -5840,6 +5841,12 @@ void AS08FlowGameMode::BuildHudWidgets() {
   Canvas->AddSlot()
       .Anchors(FAnchors(0.0f, 0.0f))
       .Alignment(FVector2D(0.0f, 0.0f))
+      // the command buttons keep inside the scene's rectangle like the UMG HUD (pillarbox / letterbox bars stay empty);
+      // the world-anchored plates of this canvas stay in full-viewport coordinates
+      .Offset(TAttribute<FMargin>::CreateLambda([this]() {
+        const FMargin Inset = UmHudInsetSu();
+        return FMargin(Inset.Left, Inset.Top, 0.0f, 0.0f);
+      }))
       .AutoSize(true)
       [SAssignNew(CommandPanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -6451,11 +6458,33 @@ void AS08FlowGameMode::RefreshHud() {
 
   if (bDraft) {
     AddMarker(GS09ManeuverMarker);
-    AddHeader(TEXT("MANEUVER DRAFT - MOVE FIGHTERS"),
-              FLinearColor(1.0f, 0.6f, 1.0f, 1.0f));
-    AddLine(FString::Printf(TEXT("moves drafted: %d   boost: %s"), CommandUi.Moves.Num(),
-                            CommandUi.BoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
-    AddLine(TEXT("click an own fighter, then a highlighted space; 1-9 boost card; Enter confirm; Esc cancel"));
+    // The UMG status line already says what to do (ms.status.*); the English developer lines stay for the -S09Markers
+    // gates only. The two buttons stay - the mouse path to confirm / reset - with the ms.btn.* texts of ST_Ms.
+    const bool bDraftLines = S08ArtLook::S08Markers() || UmHudBlockOnSlate(TEXT("status"));
+    if (bDraftLines) {
+      AddHeader(TEXT("MANEUVER DRAFT - MOVE FIGHTERS"), FLinearColor(1.0f, 0.6f, 1.0f, 1.0f));
+      AddLine(FString::Printf(TEXT("moves drafted: %d   boost: %s"), CommandUi.Moves.Num(),
+                              CommandUi.BoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
+      AddLine(TEXT("click an own fighter, then a highlighted space; 1-9 boost card; Enter confirm; Esc cancel"));
+    }
+    FText ConfirmText;
+    {
+      const FS09CardView* Boost = nullptr;
+      if (const FS09PlayerPanel* Viewer = Hud.ViewerPanel(); Viewer && !CommandUi.BoostCardId.IsEmpty()) {
+        Boost = Viewer->Cards.FindByPredicate(
+            [this](const FS09CardView& C) { return C.InstanceId == CommandUi.BoostCardId; });
+      }
+      FFormatNamedArguments Args;
+      Args.Add(TEXT("n"), CommandUi.Moves.Num());
+      if (Boost) {
+        Args.Add(TEXT("b"), Boost->BoostValue);
+        Args.Add(TEXT("cardName"), FText::FromString(Boost->Name));
+      }
+      const TCHAR* Key = CommandUi.Moves.Num() == 0
+                             ? (Boost ? TEXT("ms.btn.confirm.zero.boost") : TEXT("ms.btn.confirm.zero"))
+                             : (Boost ? TEXT("ms.btn.confirm") : TEXT("ms.btn.confirm.noboost"));
+      ConfirmText = UmText::Format(EUmTable::Ms, Key, Args);
+    }
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -6466,7 +6495,7 @@ void AS08FlowGameMode::RefreshHud() {
                     ConfirmDraft();
                   },
                   FMargin(14, 8), FLinearColor::White,
-                  SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM MANEUVER (Enter)")))
+                  SNew(STextBlock).Text(bDraftLines ? FText::FromString(TEXT("CONFIRM MANEUVER (Enter)")) : ConfirmText)
                        .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
              [MakeHudPress(
@@ -6476,7 +6505,8 @@ void AS08FlowGameMode::RefreshHud() {
                     CancelDraft();
                   },
                   FMargin(14, 8), FLinearColor::White,
-                  SNew(STextBlock).Text(FText::FromString(TEXT("CLEAR DRAFT (Esc)")))
+                  SNew(STextBlock).Text(bDraftLines ? FText::FromString(TEXT("CLEAR DRAFT (Esc)"))
+                                                    : UmText::Get(EUmTable::Ms, TEXT("ms.btn.reset")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (bUmPending && (bDiscard || CommandUi.Mode == ES09CommandMode::PendingChoice ||
                             (CommandUi.Mode == ES09CommandMode::AttackDraft && CommandUi.IsAttackAbilityPromptOpen()) ||

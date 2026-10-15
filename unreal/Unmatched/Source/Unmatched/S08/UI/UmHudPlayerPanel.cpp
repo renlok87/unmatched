@@ -8,6 +8,7 @@
 #include "UmCardMedia.h"
 #include "UmGameHud.h"
 #include "UmHudTheme.h"
+#include "UmWorldLayer.h"
 #include "UmPortrait.h"
 #include "UmText.h"
 #include "Blueprint/WidgetTree.h"
@@ -435,7 +436,7 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
           T->SetFont(Theme.Font(TEXT("type.tag")));
           T->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
           T->SetJustification(bOpp ? ETextJustify::Right : ETextJustify::Left);
-          T->SetText(Line == 0 ? FText::FromString(S.Name) : UmHudPanel::HpText(S.Hp, S.MaxHp));
+          T->SetText(Line == 0 ? FText::FromString(UmWorldLayer::DisplayNameOf(S.Name)) : UmHudPanel::HpText(S.Hp, S.MaxHp));
           if (UVerticalBoxSlot* TS = Text->AddChildToVerticalBox(T)) {
             TS->SetHorizontalAlignment(bOpp ? HAlign_Right : HAlign_Left);
             TS->SetPadding(FMargin(0.0f, Line == 0 ? 2.0f : 4.0f, 0.0f, 0.0f));
@@ -508,7 +509,8 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
   ApplyGeometry();
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (NameText && (bFirst || Old.HeroName != Model.HeroName)) {
-    NameText->SetText(FText::FromString(Model.HeroName));  // hero name: server data
+    // hero name: server data, shown in the UI language (S08FighterNames.json); the server name stays the portrait key
+    NameText->SetText(FText::FromString(UmWorldLayer::DisplayNameOf(Model.HeroName)));
     NameText->SetFont(Theme.Font(UmHudPanel::NameFontToken(Model.HeroName)));
   }
   // the monogram of the fallback circle is the hero's (CP-08); the name's slug picks the avatar until a key is set

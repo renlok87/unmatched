@@ -94,6 +94,7 @@
 #include "UI/UmCardMedia.h"
 #include "UI/UmCombatGallery.h"
 #include "UI/UmCursor.h"
+#include "UI/UmWorldLayer.h"
 #include "UI/UmDecksGallery.h"
 #include "UI/UmFeedGallery.h"
 #include "UI/UmGameHud.h"
@@ -163,6 +164,12 @@ struct FUmHudRuntime {
   FRotator CamRot = FRotator::ZeroRotator;
   float CamFov = 35.0f;
   FBox2D FieldPx = FBox2D(ForceInit);
+  /** The GAME screen's origin in the viewport (su): the constrained camera rectangle's corner (pillarbox / letterbox);
+   *  every viewport px -> HUD su conversion subtracts it (UmHudPxToSu). */
+  FVector2D OriginSu = FVector2D::ZeroVector;
+  /** The bars around the constrained camera rectangle (su; left = OriginSu.X, top = OriginSu.Y): the inset of the GAME
+   *  screen and of the legacy Slate HUD canvas. */
+  FMargin InsetSu;
   FString LastLayoutLine;
   // VS-4 HB-39...HB-41: the log, the toast stack, the subtitle (UI/UmHudFeedBlocks.h); the K1 rects of the board spaces
   // (the toasts' obstacles, recomputed with the layout); the turn of each applied seq (the log's «Х{n}»: seq -> turn
@@ -430,7 +437,33 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
       if (B.bIsValid) R.SpaceRectsSu.Add(FBox2D(B.Min / PxPerSu, B.Max / PxPerSu));
     }
   }
-  R.Layout = FUmHudLayout::Compute(Viewport / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr);
+  // The HUD canvas is the constrained camera rectangle (the scene's 16:9 area), not the whole window: on 21:9 / 32:9 the
+  // blocks stay over the scene instead of drifting onto the pillarbox bars.
+  FVector2D CanvasPx = Viewport;
+  FVector2D OriginPx = FVector2D::ZeroVector;
+  if (const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr) {
+    if (const ULocalPlayer* Player = PC->GetLocalPlayer()) {
+      FSceneViewProjectionData Projection;
+      if (Player->GetProjectionData(GEngine->GameViewport->Viewport, Projection)) {
+        const FIntRect Rect = Projection.GetConstrainedViewRect();
+        if (Rect.Width() > 0 && Rect.Height() > 0) {
+          CanvasPx = FVector2D(Rect.Width(), Rect.Height());
+          OriginPx = FVector2D(Rect.Min);
+        }
+      }
+    }
+  }
+  R.OriginSu = OriginPx / PxPerSu;
+  {
+    const FVector2D FarSu = (Viewport - OriginPx - CanvasPx) / PxPerSu;
+    R.InsetSu = FMargin(R.OriginSu.X, R.OriginSu.Y, FMath::Max(0.0, FarSu.X), FMath::Max(0.0, FarSu.Y));
+  }
+  if (FieldSu.bIsValid) FieldSu = FBox2D(FieldSu.Min - R.OriginSu, FieldSu.Max - R.OriginSu);
+  for (FBox2D& B : R.SpaceRectsSu) B = FBox2D(B.Min - R.OriginSu, B.Max - R.OriginSu);
+  if (UmHudRoot) {
+    UmHudRoot->SetGameInset(R.InsetSu);
+  }
+  R.Layout = FUmHudLayout::Compute(CanvasPx / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr);
   R.Layout.bEnglishChips = UmCardMedia::PreferredLang() == TEXT("en");  // VS-3 HB-27: the chip widths of the language
   R.bLayout = true;
   if (UmHudRoot) {
@@ -1870,10 +1903,12 @@ void AS08FlowGameMode::HandleUmDeckRowInspect(const FString& CardId) {
   RefreshHud();
 }
 
+FMargin AS08FlowGameMode::UmHudInsetSu() const { return UmHud.IsValid() ? UmHud->InsetSu : FMargin(); }
+
 bool AS08FlowGameMode::UmHudCursorOverDeckPanel(float X, float Y) const {
   const UUmHudDeckPanel* Panel = UmHud.IsValid() && UmHud->bLayout ? UmHud->DeckBlocks.GetPanel() : nullptr;
   const float Px = Panel && UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
-  return Panel && Panel->ContainsSu(FVector2D(X / Px, Y / Px));
+  return Panel && Panel->ContainsSu(FVector2D(X / Px, Y / Px) - UmHud->OriginSu);
 }
 
 // ------------------------------------------------------------------------------------------------ VS-3 HB-30...HB-33
@@ -1963,7 +1998,7 @@ void AS08FlowGameMode::RefreshUmCombat() {
     Out.Name = Fallback;
     const FS08BoardFighter* F = Fighters.FindByPredicate([&Id](const FS08BoardFighter& X) { return X.Id == Id; });
     if (!F) return Out;
-    Out.Name = F->Label;
+    Out.Name = UmWorldLayer::DisplayName(*F).ToString();
     Out.OwnerId = F->OwnerId;
     Out.TeamSlot = BoardActor && BoardActor->TeamOfFighter(*F) == ES08TeamSlot::P2 ? 1 : 0;
     Out.DeckSlug = UmDeckHeroSlug(Fighters, F->OwnerId);
@@ -2234,6 +2269,7 @@ void AS08FlowGameMode::RefreshUmPending() {
       V.NameRu = Card.NameRu;
       V.CardType = Card.CardType;
       V.Text = Card.Text;
+      V.TextRu = Card.TextRu;
       V.BannerName = Card.BannerName;
       In.Known.Add(V);
     }
@@ -2464,7 +2500,7 @@ void AS08FlowGameMode::TickUmFeed() {
     APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
     float MX = -1.0f, MY = -1.0f;
     const bool bMouse = PC && PC->GetMousePosition(MX, MY);
-    const FVector2D P(MX / PxPerSu, MY / PxPerSu);
+    const FVector2D P = FVector2D(MX / PxPerSu, MY / PxPerSu) - R.OriginSu;
     const bool bClick = PC && (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) || PC->WasInputKeyJustPressed(EKeys::RightMouseButton));
     const bool bInside = bMouse && (R.Feed.LogListRectSu().IsInside(P) || R.Layout.Rect(EUmHudBlock::Top).IsInside(P));
     if ((bClick && !bInside) || (PC && PC->WasInputKeyJustPressed(EKeys::Escape))) {
@@ -2610,10 +2646,10 @@ void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FStrin
   const FString ShownCard = bEffect ? Title(Card, CardName) : CardName;
   if (Card) E.CardId = Card->CardId;
   UmHudLog::DescribeTrail(
-      Shown, ShownCard, YourFighters, [this](const FString& Id) { return PlayerHeroName(Id); },
+      Shown, ShownCard, YourFighters, [this](const FString& Id) { return UmWorldLayer::DisplayNameOf(PlayerHeroName(Id)); },
       [this](const FString& Id) -> FString {
         const FS08BoardFighter* F = FindFighter(Id);
-        return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : Id;
+        return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
       },
       [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full, &E.Shorter);
   R.Feed.PushLog(E, static_cast<double>(NowMs()));
@@ -2686,7 +2722,7 @@ void AS08FlowGameMode::UmHudRefuseCell(int32 CellX, int32 CellY) {
   FVector2D Edge(0.0, 0.0);
   const bool bEdge = ProjectToViewport(BoardModel.CellToWorld(CellX, CellY) + FVector(41.0f, 0.0f, 0.0f), Edge);
   const float BadgePx = S08FieldFx::RefuseBadgePx(bEdge ? 2.0f * static_cast<float>((Edge - Screen).Size()) : 100.0f);
-  const bool bShown = UmHud->Feed.ShowBadge(Screen / Px, static_cast<double>(NowMs()), BadgePx / Px);
+  const bool bShown = UmHud->Feed.ShowBadge(Screen / Px - UmHud->OriginSu, static_cast<double>(NowMs()), BadgePx / Px);
   FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=cell cell=%s px=%.0f restart=%d"), *BoardModel.CellLabel(CellX, CellY),
                                    BadgePx, bShown ? 1 : 0));
 }
@@ -2701,12 +2737,12 @@ void AS08FlowGameMode::UmHudRefusePress(FName PressedId) {
   const TWeakPtr<SS09HudPress>* Weak = PressedId.IsNone() ? nullptr : HudPressWidgets.Find(PressedId);
   const TSharedPtr<SS09HudPress> Press = Weak ? Weak->Pin() : nullptr;
   if (Press.IsValid() && WidgetViewportRect(StaticCastSharedPtr<SWidget>(Press), Rect) && !Rect.IsEmpty()) {
-    Centre = FVector2D(Rect.X1, Rect.Y0) / Px;
+    Centre = FVector2D(Rect.X1, Rect.Y0) / Px - UmHud->OriginSu;
   } else {
     APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
     float MX = 0.0f, MY = 0.0f;
     if (!PC || !PC->GetMousePosition(MX, MY)) return;
-    Centre = FVector2D(MX, MY) / Px + FVector2D(16.0, -16.0);
+    Centre = FVector2D(MX, MY) / Px - UmHud->OriginSu + FVector2D(16.0, -16.0);
   }
   UmHud->Feed.ShowBadge(Centre, static_cast<double>(NowMs()));
   FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=press id=%s"), PressedId.IsNone() ? TEXT("-") : *PressedId.ToString()));
@@ -2715,7 +2751,7 @@ void AS08FlowGameMode::UmHudRefusePress(FName PressedId) {
 bool AS08FlowGameMode::UmHudCursorOverFeed(float X, float Y) const {
   if (!UmHud.IsValid() || !UmHud->bLayout) return false;
   const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
-  return UmHud->Feed.CoversPoint(FVector2D(X / Px, Y / Px));
+  return UmHud->Feed.CoversPoint(FVector2D(X / Px, Y / Px) - UmHud->OriginSu);
 }
 
 // ------------------------------------------------------------------------------------------------ VS-4 HB-43 ACTIONS
@@ -3081,7 +3117,7 @@ bool AS08FlowGameMode::UmInspectOwnsInput() {
   if (Slot && PC->WasInputKeyJustPressed(EKeys::RightMouseButton) && PC->GetMousePosition(MX, MY)) {
     const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
     const FBox2D Rect = Slot->CardRectSu();
-    if (Rect.bIsValid && Rect.IsInside(FVector2D(MX / Px, MY / Px))) {
+    if (Rect.bIsValid && Rect.IsInside(FVector2D(MX / Px, MY / Px) - UmHud->OriginSu)) {
       const FUmSlotModel& M = Slot->GetModel();
       FS09CardView Card = M.Card;
       if (!M.bFace) {

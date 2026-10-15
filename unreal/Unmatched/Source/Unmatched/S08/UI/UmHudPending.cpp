@@ -12,6 +12,7 @@
 #include "UmHudStatusLine.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
+#include "UmWorldLayer.h"
 #include "Blueprint/WidgetTree.h"
 #include "Brushes/SlateNoResource.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
@@ -444,7 +445,10 @@ FString SourceName(const FS08PendingEffect& Head, const TArray<FS09CardView>& Kn
   if (Id.StartsWith(TEXT("ability-"))) {
     // a hero ability (generic-hero-ability.handler: ability-<hero>-<kind>-p<n>): the owner's hero, as the data names it
     const FString* Hero = HeroNames.Find(Head.PlayerId);
-    return Hero ? *Hero : FString();
+    if (!Hero) return FString();
+    // the UI language's hero name and ability text (S08FighterNames.json), the server's English text without them
+    if (OutText && bRu) *OutText = UmWorldLayer::AbilityTextOf(*Hero);
+    return bRu ? UmWorldLayer::DisplayNameOf(*Hero) : *Hero;
   }
   auto Name = [bRu](const FS09CardView& C) { return bRu && !C.NameRu.IsEmpty() ? C.NameRu : C.Name; };
   // the effect id is "<catalog card id>-<field>-<i>..." (game-initialization.service: effects of card.id); the deck
@@ -461,7 +465,7 @@ FString SourceName(const FS08PendingEffect& Head, const TArray<FS09CardView>& Kn
     }
   }
   if (Best) {
-    if (OutText) *OutText = Best->Text;
+    if (OutText) *OutText = bRu && !Best->TextRu.IsEmpty() ? Best->TextRu : Best->Text;
     return Name(*Best);
   }
   // the text fallback (S09OpponentView::EffectCardName's rule): the owner's newest discard card holding the head's text
@@ -470,7 +474,7 @@ FString SourceName(const FS08PendingEffect& Head, const TArray<FS09CardView>& Kn
     for (int32 I = OwnerDiscard.Num() - 1; I >= 0; --I) {
       const FS09CardView& C = OwnerDiscard[I];
       if (!C.bHidden && !C.Name.IsEmpty() && C.Text.Contains(Needle, ESearchCase::IgnoreCase)) {
-        if (OutText) *OutText = C.Text;
+        if (OutText) *OutText = bRu && !C.TextRu.IsEmpty() ? C.TextRu : C.Text;
         return Name(C);
       }
     }

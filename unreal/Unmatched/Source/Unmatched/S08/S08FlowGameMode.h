@@ -1308,6 +1308,8 @@ private:
   void TickUmHud();
   void UmHudDeckPanelLayering(float DeckAlpha);
   bool UmHudBlockOnSlate(const TCHAR* Key) const;
+  /** The bars around the constrained camera rectangle (su): the legacy Slate HUD canvas keeps inside them too. */
+  FMargin UmHudInsetSu() const;
   TSharedRef<SWidget> UmHudWrapEdge(const TSharedRef<SWidget>& Edge, bool bLeft);
   float UmHudHandLowerCap(float OffsetSu) const;
   FMargin UmHudToastOffset() const;

@@ -72,6 +72,16 @@ TArray<FUmCenterLine> FUmCombatBlocks::CenterLines(const FS09CombatStage& Stage,
     }
     return Name;
   };
+  // the printed Russian text of a revealed card (Card.textRu) - the whole printed text of the card stands for its line
+  auto RuTextOf = [&R, bRu](const FString& Name) -> FString {
+    if (!bRu) return FString();
+    TArray<const FS09CardView*> Cards = {&R.Attack, &R.Defense};
+    for (const FS09CardView& B : R.Boosts) Cards.Add(&B);
+    for (const FS09CardView* C : Cards) {
+      if (C->Name == Name && !C->TextRu.IsEmpty()) return C->TextRu;
+    }
+    return FString();
+  };
   const int32 Shown = FMath::Clamp(Stage.EffectLinesShown(NowMs), 0, SI.Effects.Num());
   const int32 Lit = Stage.HighlightedEffectLine(NowMs);
   // ВР-VS3-52: the attack card's effects were cancelled - its line right after the first defender line (the canceller),
@@ -90,7 +100,8 @@ TArray<FUmCenterLine> FUmCombatBlocks::CenterLines(const FS09CombatStage& Stage,
   auto Cancelled = [&](bool bStamp) {
     FUmCenterLine L;
     L.Title = TitleOf(R.Attack.Name);
-    L.Text = !R.Attack.Text.IsEmpty() ? R.Attack.Text : R.Attack.EffectText;
+    const FString Ru = RuTextOf(R.Attack.Name);
+    L.Text = !Ru.IsEmpty() ? Ru : !R.Attack.Text.IsEmpty() ? R.Attack.Text : R.Attack.EffectText;
     L.bCancelled = true;
     L.bStamp = bStamp;
     return L;
@@ -99,7 +110,8 @@ TArray<FUmCenterLine> FUmCombatBlocks::CenterLines(const FS09CombatStage& Stage,
     const FS09CombatEffectLine& E = SI.Effects[K];
     FUmCenterLine L;
     L.Title = TitleOf(E.CardName);
-    L.Text = E.bPrintedText ? E.Text : FString();  // never the parser's kind / value prose
+    const FString Ru = E.bPrintedText ? RuTextOf(E.CardName) : FString();
+    L.Text = !Ru.IsEmpty() ? Ru : E.bPrintedText ? E.Text : FString();  // never the parser's kind / value prose
     if (K == Lit) OutCurrent = Out.Num();
     Out.Add(MoveTemp(L));
     if (K == CancelAfter) Out.Add(Cancelled(true));
