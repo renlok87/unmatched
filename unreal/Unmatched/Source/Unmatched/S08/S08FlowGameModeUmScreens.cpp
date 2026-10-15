@@ -26,6 +26,7 @@
 #include "UI/UmHudScale.h"
 #include "UI/UmMenuBackdrop.h"
 #include "UI/UmScreenBoot.h"
+#include "UI/UmWorldLayer.h"
 #include "UI/UmScreenLobby.h"
 #include "UI/UmScreenLogin.h"
 #include "UI/UmScreenLoading.h"
@@ -105,7 +106,8 @@ bool UmFsHas(const FString& Plan, const TCHAR* Token) {
 
 FString UmFsHeroName(const TArray<FS08HeroEntry>& Heroes, const FString& HeroId) {
   const FS08HeroEntry* H = Heroes.FindByPredicate([&HeroId](const FS08HeroEntry& E) { return E.Id == HeroId; });
-  return H ? H->Name : FString();
+  // 2026-10-16: the UI language («Медуза · соперник: Король Артур»), as the HUD plates; the server name without an entry
+  return H ? UmWorldLayer::DisplayNameOf(H->Name) : FString();
 }
 }  // namespace
 
@@ -421,7 +423,7 @@ void AS08FlowGameMode::TickUmFlowScreens() {
         } else {
           M.bError = M.bRetrying = false;
           M.bResume = true;
-          // database names as they are (nominative, ВР-SC10); the board name of its Board row
+          // hero names on the UI language, nominative (ВР-SC10); the board name of its Board row
           for (const FS08RoomPlayer& P : G.Players) {
             const FString Name = UmFsHeroName(Flow->GetHeroes(), P.HeroId);
             (P.UserId == Flow->GetUserId() ? M.ResumeHero : M.ResumeOpponent) = Name;

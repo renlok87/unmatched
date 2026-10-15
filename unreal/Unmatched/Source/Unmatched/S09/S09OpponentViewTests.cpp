@@ -501,6 +501,8 @@ bool FS09MoveSelOpponentStatusTest::RunTest(const FString&) {
     Defend.Mode = ES09CommandMode::CombatDefense;
     Defend.OpponentVerb = ES09OpponentVerb::Attack;
     TestEqual(TEXT("I defend"), Line(Defend), FString(TEXT("You are attacked: choose a defense card or No defense (N)")));
+    Defend.bDefenseDeferred = true;  // B2: the previous combat's staging holds the window back
+    TestEqual(TEXT("defense window deferred"), Line(Defend), FString(TEXT("Opponent is attacking")));
     FS09TurnStatusInput Resolve = Mine;
     Resolve.Mode = ES09CommandMode::CombatResolve;
     TestEqual(TEXT("resolve window"), Line(Resolve), FString(TEXT("Resolve the combat (R)")));

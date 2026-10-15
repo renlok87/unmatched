@@ -32,6 +32,7 @@ python tools/dev/devexec.py stop
 | `shot путь.png` | кадр с UI (`FScreenshotRequest`, bShowUI), ответ после записи файла |
 | `res 1280x720w` | `r.SetRes` (w — окно, f — полный экран, wf — окно без рамки) |
 | `info` | размер вьюпорта, DPI, позиция окна, мир, game mode |
+| `pick X Y` | цепочка Slate под точкой от листа к окну: тип, имя UObject, `[cN]` — курсор, который отдаёт виджет (`EMouseCursor`: 1 Default, 9 Hand, 12 SlashedCircle); `platform=` — тип курсора ОС, `captor=` — виджет с захватом мыши |
 | всё остальное | консольная команда (`stat fps`, `LiveCoding.Compile`, `quit`, CVars) |
 
 Тестовые аккаунты — из сидов (`backend/prisma/seed.ts`). Аккаунт, которым пользователь играет сам, не занимать.

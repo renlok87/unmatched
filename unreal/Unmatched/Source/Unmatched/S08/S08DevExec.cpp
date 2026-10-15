@@ -20,6 +20,7 @@
 //   shot <png path>              viewport + Slate UI (FScreenshotRequest bShowUI), waits until the file is written
 //   res <W>x<H>[w|f|wf]          r.SetRes, then waits 0.5 s for the swap chain
 //   cursor os|faux               real mouse back / the driver's faux cursor (input lines switch to faux)
+//   pick <x> <y>                 the Slate path under the point, leaf first: widget (UObject name) and [cursor] if set
 //   info                         viewport size, DPI scale, window position, world, game mode
 #include "S08DevExec.h"
 
@@ -38,6 +39,7 @@
 #include "Misc/Paths.h"
 #include "Misc/Parse.h"
 #include "Serialization/JsonSerializer.h"
+#include "Types/ReflectionMetadata.h"
 #include "Serialization/JsonWriter.h"
 #include "UnrealClient.h"
 #include "Widgets/SViewport.h"
@@ -257,6 +259,25 @@ class FS08DevExec {
       const FKey Btn = (T.Num() > 3 && T[3] == TEXT("right")) ? EKeys::RightMouseButton : EKeys::LeftMouseButton;
       if (Op == TEXT("down")) Move(P);
       Button(P, Btn, Op == TEXT("down"));
+    } else if (Op == TEXT("pick") && T.Num() >= 3) {
+      if (!ToScreen(FCString::Atod(*T[1]), FCString::Atod(*T[2]), P, Err)) { R.bOk = false; R.Out = Err; return; }
+      FSlateApplication& App = FSlateApplication::Get();
+      const FWidgetPath Path = App.LocateWindowUnderMouse(P, App.GetInteractiveTopLevelWindows(), false);  // as FSlateUser::QueryCursor
+      TArray<FString> Parts;
+      for (int32 I = Path.Widgets.Num() - 1; I >= 0 && Parts.Num() < 32; --I) {
+        const FArrangedWidget& A = Path.Widgets[I];
+        SWidget& W = A.Widget.Get();
+        const FCursorReply C = W.OnCursorQuery(A.Geometry, FPointerEvent(App.CursorPointerIndex, P, P, TSet<FKey>(),
+                                                                          EKeys::Invalid, 0.0f, FModifierKeysState()));
+        Parts.Add(FString::Printf(TEXT("%s:%s%s"), *W.GetTypeAsString(), *FReflectionMetaData::GetWidgetDebugInfo(&W),
+                                  C.IsEventHandled() ? *FString::Printf(TEXT("[c%d]"), static_cast<int32>(C.GetCursorType())) : TEXT("")));
+      }
+      const TSharedPtr<ICursor> Os = App.GetPlatformCursor();
+      const TSharedPtr<FSlateUser> User = App.GetCursorUser();
+      const TSharedPtr<SWidget> Captor = User.IsValid() ? User->GetCursorCaptor() : nullptr;
+      R.Out = FString::Printf(TEXT("platform=%d captor=%s | "), Os.IsValid() ? static_cast<int32>(Os->GetType()) : -1,
+                              Captor.IsValid() ? *FReflectionMetaData::GetWidgetDebugInfo(Captor.Get()) : TEXT("-")) +
+              FString::Join(Parts, TEXT(" < "));
     } else if (Op == TEXT("move") && T.Num() >= 3) {
       if (!ToScreen(FCString::Atod(*T[1]), FCString::Atod(*T[2]), P, Err)) { R.bOk = false; R.Out = Err; return; }
       Move(P);

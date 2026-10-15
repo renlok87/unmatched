@@ -44,6 +44,10 @@ struct UNMATCHED_API FS09TurnStatusInput {
   bool bCombatAttacking = false;
   /** CombatDefense with no legal defense card in my hand (2026-10-15: the line then names the only way out). */
   bool bNoLegalDefense = false;
+  /** CombatDefense while the staging of the previous combat still runs: the defense window waits for its end
+   *  (UmHudCombatBlocks: no window while staged), so the line names the attack instead of asking for a defense
+   *  (2026-10-15 playtest B2). */
+  bool bDefenseDeferred = false;
   // the opponent
   ES09OpponentVerb OpponentVerb = ES09OpponentVerb::None;
   FString OpponentName;

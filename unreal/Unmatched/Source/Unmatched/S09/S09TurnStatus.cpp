@@ -18,6 +18,7 @@ FS09Reason Line(const FS09TurnStatusInput& In) {
                     : FS09Reason::Make(TEXT("ms.status.confirm"));
   }
   if (In.Mode == ES09CommandMode::CombatDefense) {
+    if (In.bDefenseDeferred) return FS09Reason::Make(TEXT("ms.opp.phase.attack"));
     // 2026-10-15 playtest: with nothing to defend with «выберите карту защиты» asked for the impossible
     return FS09Reason::Make(In.bNoLegalDefense ? TEXT("ms.status.defend.none") : TEXT("ms.status.defend"));
   }

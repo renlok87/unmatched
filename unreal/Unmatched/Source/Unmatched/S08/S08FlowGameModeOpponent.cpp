@@ -372,6 +372,7 @@ FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
       break;
     case ES09CommandMode::CombatDefense:
       In.bNoLegalDefense = Flow.IsValid() && !CommandUi.HasLegalDefenseCard(Flow->GetAppliedSnapshot(), Fighters);
+      In.bDefenseDeferred = CombatStage.IsActive();  // the previous combat still plays; the window opens after it
       break;
     case ES09CommandMode::DiscardDraft:
       In.DiscardNeed = CommandUi.PendingDiscard.Count;
