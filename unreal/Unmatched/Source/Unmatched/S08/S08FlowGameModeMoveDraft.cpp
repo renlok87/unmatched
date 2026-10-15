@@ -18,7 +18,8 @@ bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSe
                          CommandUi.PreDraft.bSet);
   // MS-S-12: a pending MOVE / PLACE head of this viewer (V-11 / V-12)
   const bool bPending = CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice &&
-                        (CommandUi.PendingChoice.Type == TEXT("MOVE") || CommandUi.PendingChoice.Type == TEXT("PLACE"));
+                        (CommandUi.PendingChoice.Type == TEXT("MOVE") || CommandUi.PendingChoice.Type == TEXT("PLACE") ||
+                         CommandUi.PendingChoice.Type == TEXT("TARGET_FIGHTER"));  // 2026-10-15: the target rings
   // MS-T-17: the last move V-14 / V-15 joins every view while MS-P-03 holds it
   const FS08MoveDraftInput::FLastMove Last = LastMovePlateInput();
   if (!bDraft && !bInspect && !bPending) {
@@ -43,6 +44,10 @@ bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSe
     return true;
   }
   FS08MoveDraftInput Input = S09MoveDraftView::BuildInput(CommandUi, BoardModel, Fighters);
+  if (bPending && CommandUi.PendingChoice.Type == TEXT("TARGET_FIGHTER")) {
+    FS08Trace::Write(FString::Printf(TEXT("MS-HL target view candidates=%d cells=%d picked=%s"), Input.CandidateFighterIds.Num(),
+                                     Input.PendingCells.Num(), CommandUi.PendingFighterId.IsEmpty() ? TEXT("-") : *CommandUi.PendingFighterId));
+  }
   Input.LastMove = Last;
   Input.Hover = MoveHoverCell;
   Input.bLeaderPips = BoardActor && BoardActor->DrawsLeaderPips();
@@ -52,7 +57,23 @@ bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSe
 }
 
 void AS08FlowGameMode::SyncMovePlates() {
-  if (!BoardActor || !BoardActor->UsesMovePlates()) return;
+  // 2026-10-15 playtest: the targets of an open TARGET_FIGHTER choice (all legal ones, then the picked one) wear the
+  // combat target ring - the choice ring under a figure did not read next to the team ring
+  if (BoardActor) {
+    TArray<FString> Targets;
+    if (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice &&
+        CommandUi.PendingChoice.Type == TEXT("TARGET_FIGHTER")) {
+      if (!CommandUi.PendingFighterId.IsEmpty()) {
+        Targets.Add(CommandUi.PendingFighterId);
+      } else {
+        CommandUi.PendingLegalFighters(Fighters, Targets);
+      }
+    }
+    BoardActor->SetPendingTargets(Targets);
+  }
+  // 2026-10-15 playtest: the default look is the choice layer (no -S08MovePlates) - a pending target head refreshed
+  // nothing there, its rings never showed
+  if (!BoardActor || !(BoardActor->UsesMovePlates() || BoardActor->UsesChoiceLayer())) return;
   // what the view depends on besides the selection (whose change already calls SetSelectedFighter)
   uint32 Key = HashCombineFast(GetTypeHash(CommandUi.DraftRevision), static_cast<uint32>(CommandUi.Mode));
   Key = HashCombineFast(Key, (CommandUi.bCommandInFlight ? 1u : 0u) | (CommandUi.PreDraft.bSet ? 2u : 0u) |

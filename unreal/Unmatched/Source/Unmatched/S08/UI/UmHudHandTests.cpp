@@ -41,6 +41,7 @@
 #include "UmCardGallery.h"
 #include "UmGameHud.h"
 #include "UmHudHand.h"
+#include "UmWorldLayer.h"
 #include "UmHudLayout.h"
 #include "UmText.h"
 
@@ -414,12 +415,13 @@ bool FUmHandInputTest::RunTest(const FString&) {
   const FUmHandModel A = UmHudHand::Gather(In);
   TestTrue(TEXT("the attack card selected"), A.Cards.Num() == 3 && A.Cards[0].bSelected && A.Cards[0].bPlayable);
   TestTrue(TEXT("Clutching Claws: why.banner.mismatch {Harpy}"), !A.Cards[1].bPlayable && A.Cards[1].Reason.Key == FName(TEXT("why.banner.mismatch")) &&
-                                                                   A.Cards[1].Reason.Args.FindRef(TEXT("bannerName")) == TEXT("Harpy"));
+                                                                   A.Cards[1].Reason.Args.FindRef(TEXT("bannerName")) == UmWorldLayer::DisplayNameOf(TEXT("Harpy")));  // 2026-10-15: «Гарпии»
   TestTrue(TEXT("Hiss and Slither (defense): dimmed, no exact why (ВР-VS3-19)"), !A.Cards[2].bPlayable && !A.Cards[2].Reason.IsSet());
   H->ApplyModel(A);
   H->SetHoverIndex(1);
   At(H, 4000.0);
-  TestTrue(TEXT("tooltip «Только для Harpy» over the hovered card"), H->IsTooltipShown() && H->GetTooltipText().ToString().Contains(TEXT("Harpy")));
+  TestTrue(TEXT("tooltip «Только для Гарпии» over the hovered card"),
+           H->IsTooltipShown() && H->GetTooltipText().ToString().Contains(UmWorldLayer::DisplayNameOf(TEXT("Harpy"))));
   H->SetHoverIndex(2);
   TestFalse(TEXT("no tooltip without an exact key"), H->IsTooltipShown());
   // the unplayable card without a why goes on to the owner (the game logic answers)

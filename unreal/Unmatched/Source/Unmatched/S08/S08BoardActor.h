@@ -262,6 +262,9 @@ public:
   TArray<FString> GetActiveDamageNumberIds() const;
   /** Apply local attack-draft or authoritative combat focus by fighter ID. */
   void SetCombatFocus(const FString& AttackerId, const FString& TargetId);
+  /** 2026-10-15 playtest: the legal targets of an open TARGET_FIGHTER choice wear the combat target ring (FX-15) -
+   *  the V-17 ring under the figure read like the team ring. Empty = none. */
+  void SetPendingTargets(const TArray<FString>& FighterIds);
   /** CUE-011 fallback: one 900ms damage number at the affected cell,
    *  exactly once per (fighter, authoritative seq) - a repeated cue for the
    *  same seq (reapply, reconnect replay) is traced and ignored (T2.2). */
@@ -678,6 +681,7 @@ private:
   FString SelectedFighterId;
   FString CombatAttackerId;
   FString CombatTargetId;
+  TSet<FString> PendingTargetIds;
   TSet<uint64> ReachableCells;
   TArray<TObjectPtr<AActor>> HighlightTiles;
 };

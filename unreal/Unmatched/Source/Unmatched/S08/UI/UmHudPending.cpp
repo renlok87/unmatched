@@ -634,7 +634,8 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       // never said that only Enter sends the pick (A Momentary Glance stood still for a mouse player)
       const bool bPicked = !Ui.PendingFighterId.IsEmpty();
       const FString Hint = UmPdString(TEXT("why.target.pick"));
-      M.Text = bPicked || Hint.IsEmpty() ? Printed : (Printed.IsEmpty() ? Hint : Printed + TEXT(" ") + Hint);
+      // the hint stays after the pick: the panel keeps its height, the buttons do not jump under the cursor
+      M.Text = Hint.IsEmpty() ? Printed : (Printed.IsEmpty() ? Hint : Printed + TEXT(" ") + Hint);
       M.bConfirm = true;
       M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(TEXT("why.target.pick")));
     } else if (T == TEXT("CHOOSE_SPACE")) {

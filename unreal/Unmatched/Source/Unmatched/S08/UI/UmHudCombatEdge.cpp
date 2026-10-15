@@ -697,7 +697,8 @@ void UUmHudCombatEdge::ApplyButtons() {
     B.Reason = bExpired ? Deadline : Model.NoDefenseWhy;
     B.bEnabled = !B.Reason.IsSet();
     B.HeightSu = H;
-    const FBox2D& Rect = bNothing ? Frame.DefendSu : Frame.NoDefenseSu;
+    // 2026-10-15 playtest (720p, 4:3): the Defend rect's top sits under the TOP strip in class S - the button keeps its own
+    const FBox2D& Rect = Frame.NoDefenseSu;
     B.MinWidthSu = static_cast<float>(Rect.Max.X - Rect.Min.X);
     NoDefenseButton->ApplyModel(B);
     UmEdgePlace(NoDefenseButton, FVector2D(Rect.Min) - Frame.OriginSu, FVector2D(B.MinWidthSu, H), 6);

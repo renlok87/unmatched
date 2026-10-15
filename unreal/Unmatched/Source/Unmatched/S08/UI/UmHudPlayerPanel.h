@@ -197,6 +197,8 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
  private:
   void BindParts();
   void ApplyFonts();
+  /** The name's type: the largest of heading / button / tag that fits beside the portrait (2026-10-15). */
+  FName FitNameToken() const;
   void ApplyGeometry();
   void RebuildSidekicks();
   void ApplyStatus(EUmPanelState State);

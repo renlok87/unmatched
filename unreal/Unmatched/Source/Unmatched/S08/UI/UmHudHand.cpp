@@ -1,6 +1,8 @@
 // VS-3 HB-24 / HB-25: HAND - see UmHudHand.h.
 #include "UmHudHand.h"
 
+#include "UmWorldLayer.h"
+
 #include "../../S09/S09HandLimit.h"
 #include "../../S09/S09ManeuverUi.h"
 #include "../S08AnimatedIconWidget.h"
@@ -183,7 +185,10 @@ bool BannerAllows(const FString& Banner, const FString& FighterName) {
   const FString B = Banner.TrimStartAndEnd().ToLower();
   if (B.IsEmpty() || B == TEXT("any")) return true;
   const FString N = FighterName.ToLower();
-  return N.Contains(B) || B.Contains(N);
+  if (N.Contains(B) || B.Contains(N)) return true;
+  // 2026-10-15 playtest: the banner «Harpy» against the fighter «Harpies 1» refused every Harpy card for a Harpy
+  // attacker - the server's rule (number suffix, singular), as the attack draft checks it
+  return FS09CommandUi::BannerAllowsFighter(Banner, FighterName);
 }
 
 FUmHandModel Gather(const FGatherIn& In) {
@@ -234,7 +239,7 @@ FUmHandModel Gather(const FGatherIn& In) {
     return false;
   };
   auto Banner = [](const FS09CardView& Card) {
-    return FS09Reason::Make(TEXT("why.banner.mismatch")).Arg(TEXT("bannerName"), Card.BannerName);
+    return FS09Reason::Make(TEXT("why.banner.mismatch")).Arg(TEXT("bannerName"), UmWorldLayer::DisplayNameOf(Card.BannerName));
   };
   int32 Index = -1;
   for (const FS09CardView& Card : In.Own->Cards) {

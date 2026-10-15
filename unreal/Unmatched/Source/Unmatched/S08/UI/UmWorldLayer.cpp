@@ -139,6 +139,12 @@ FString DisplayNameOf(const FString& ServerName) {
         return (*Entry)->TryGetStringField(bRu ? TEXT("ru") : TEXT("en"), Name) && !Name.IsEmpty() ? Name : ServerName;
       }
       bool bNumbered = false;
+      // 2026-10-15 playtest: the card banner «Harpy» (no number) - the sidekick group's name («Гарпии»)
+      if (Digits.IsEmpty() && (*Entry)->TryGetBoolField(TEXT("numbered"), bNumbered) && bNumbered &&
+          (Base.Equals(TEXT("Harpies"), ESearchCase::IgnoreCase) || Base.Equals(TEXT("Harpy"), ESearchCase::IgnoreCase))) {
+        FString Name;
+        return (*Entry)->TryGetStringField(bRu ? TEXT("ru") : TEXT("en"), Name) && !Name.IsEmpty() ? Name : ServerName;
+      }
       // the numbered sidekicks of the data are the Harpies (server labels "Harpies 1..3", the fighter name "Harpy")
       if (!Digits.IsEmpty() && (*Entry)->TryGetBoolField(TEXT("numbered"), bNumbered) && bNumbered &&
           (Base.Equals(TEXT("Harpies"), ESearchCase::IgnoreCase) || Base.Equals(TEXT("Harpy"), ESearchCase::IgnoreCase))) {

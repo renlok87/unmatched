@@ -435,9 +435,16 @@ void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
   for (AS08FighterActor* Actor : FighterActors) {
     if (Actor) {
       Actor->SetCombatMarkers(Actor->GetFighterId() == CombatAttackerId,
-                              Actor->GetFighterId() == CombatTargetId);
+                              Actor->GetFighterId() == CombatTargetId || PendingTargetIds.Contains(Actor->GetFighterId()));
     }
   }
+}
+
+void AS08BoardActor::SetPendingTargets(const TArray<FString>& FighterIds) {
+  const TSet<FString> Next(FighterIds);
+  if (Next.Num() == PendingTargetIds.Num() && Next.Includes(PendingTargetIds)) return;
+  PendingTargetIds = Next;
+  SetCombatFocus(CombatAttackerId, CombatTargetId);
 }
 
 void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
@@ -1863,7 +1870,7 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
                           Board.bHasTopology);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
       Actor->SetCombatMarkers(Fighter.Id == CombatAttackerId,
-                              Fighter.Id == CombatTargetId);
+                              Fighter.Id == CombatTargetId || PendingTargetIds.Contains(Fighter.Id));
       Actor->SetLabelMode(LabelPlateFighterId.IsEmpty() ? ES08FighterLabelMode::Full
                           : Fighter.Id == LabelPlateFighterId ? ES08FighterLabelMode::Hidden
                                                               : ES08FighterLabelMode::Compact);

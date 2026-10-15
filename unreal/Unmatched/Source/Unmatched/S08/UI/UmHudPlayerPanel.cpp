@@ -294,9 +294,24 @@ FString UUmHudPlayerPanel::SourceName() const {
   return bCodeDefaultTree ? FString(TEXT("code-default")) : GetClass()->GetPathName();
 }
 
+FName UUmHudPlayerPanel::FitNameToken() const {
+  // 2026-10-15 playtest (1440x1080, class S): «Король Артур» (12 chars) took type.heading in Lora and ran out of the 240 su
+  // plate on the portrait side - the name takes the largest type that fits the room between TextX and the plate's edge
+  const FName ByChars = UmHudPanel::NameFontToken(Model.HeroName);
+  if (!NameText) return ByChars;
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side);
+  const float Room = (Side == EUmPanelSide::Opp ? G.TextX : static_cast<float>(G.Size.X) - G.TextX) - 10.0f;
+  const FText Shown = FText::FromString(UmWorldLayer::DisplayNameOf(Model.HeroName));
+  TArray<FName> Tokens;
+  if (ByChars == FName(TEXT("type.heading"))) Tokens.Add(ByChars);
+  Tokens.Add(FName(TEXT("type.button")));
+  Tokens.Add(FName(TEXT("type.tag")));
+  return UmTextFit::PickToken(Shown, Room, Tokens);
+}
+
 void UUmHudPlayerPanel::ApplyFonts() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  if (NameText) NameText->SetFont(Theme.Font(UmHudPanel::NameFontToken(Model.HeroName)));
+  if (NameText) NameText->SetFont(Theme.Font(FitNameToken()));
   if (StatusText) StatusText->SetFont(Theme.Font(TEXT("type.tag")));
   if (HpText) HpText->SetFont(Theme.Font(HpToken));  // VS-5 E4: the fitted HP type (type.button by default)
 }
@@ -341,6 +356,7 @@ void UUmHudPlayerPanel::ApplyGeometry() {
     Portrait->SetRingSmoulder(UmHudPanel::RingSmoulder(bClassS));  // ВР-43: L 0.35, S 0.55
   }
   if (SidekickRow) SidekickRow->SetVisibility(G.bSidekickRow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  if (NameText && bHasModel) NameText->SetFont(UUmHudTheme::Get().Font(FitNameToken()));  // the class changed the room
 }
 
 // ------------------------------------------------------------------------------------------------- model
@@ -550,7 +566,7 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
   if (NameText && (bFirst || Old.HeroName != Model.HeroName)) {
     // hero name: server data, shown in the UI language (S08FighterNames.json); the server name stays the portrait key
     NameText->SetText(FText::FromString(UmWorldLayer::DisplayNameOf(Model.HeroName)));
-    NameText->SetFont(Theme.Font(UmHudPanel::NameFontToken(Model.HeroName)));
+    NameText->SetFont(Theme.Font(FitNameToken()));
   }
   // the monogram of the fallback circle is the hero's (CP-08); the name's slug picks the avatar until a key is set
   if (Portrait && !Model.HeroName.IsEmpty()) Portrait->SetHeroName(Model.HeroName);
