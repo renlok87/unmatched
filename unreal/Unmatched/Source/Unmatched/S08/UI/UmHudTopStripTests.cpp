@@ -301,7 +301,8 @@ bool FUmHudStatusTreeTest::RunTest(const FString&) {
   TestFalse(TEXT("game over: no line, hidden"), Line->IsShown());
   Line->ApplyModel(OwnTurn());
   TestTrue(TEXT("own turn: shown"), Line->IsShown());
-  TestEqual(TEXT("one line: the capsule is 48 su"), static_cast<float>(Line->GetBodySizeSu().Y), 48.0f);
+  // HUD v2: + the cartouche's marble rims (0 with the plain capsule)
+  TestEqual(TEXT("one line: the capsule is 48 su"), static_cast<float>(Line->GetBodySizeSu().Y), 48.0f + 2.0f * UmHudStatus::BannerRimSu());
   TestTrue(TEXT("the capsule never takes the mouse (no «…»)"), Line->Body->GetVisibility() == ESlateVisibility::HitTestInvisible);
   TestFalse(TEXT("no pulse dot in the own turn"), Visible(Line->PulseDot));
   TestFalse(TEXT("no key chip by default (UI-ACC-017 off until HB-43)"), Visible(Line->KeyChip));
@@ -471,7 +472,7 @@ bool FUmHudStatusKeysTest::RunTest(const FString&) {
     bool bWhole = false;
     for (const FString& R : Rows) bWhole |= R.Contains(TEXT("«Без\x00A0защиты»"));
     TestTrue(FString::Printf(TEXT("defend %s: «Без защиты» on one line"), Wd.Name), bWhole);
-    if (Wd.Lines == 2) TestEqual(TEXT("two lines: the capsule 78 su (CX-08)"), static_cast<float>(Line->GetBodySizeSu().Y), 78.0f);
+    if (Wd.Lines == 2) TestEqual(TEXT("two lines: the capsule 78 su (CX-08)"), static_cast<float>(Line->GetBodySizeSu().Y), 78.0f + 2.0f * UmHudStatus::BannerRimSu());
   }
   // still longer: 20, 16, then «…» with the full text in the tooltip
   {

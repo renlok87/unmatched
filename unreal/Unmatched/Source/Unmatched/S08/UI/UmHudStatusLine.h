@@ -63,6 +63,10 @@ struct UNMATCHED_API FUmStatusFit {
 };
 
 namespace UmHudStatus {
+/** HUD v2: the cartouche skin hud.status.banner when the theme has it - its meander ends (su) keep the text off them and
+ *  its marble rims above / below the navy field (su) add to the body height; 0 / 0 with the plain capsule. */
+UNMATCHED_API float BannerEndsSu();
+UNMATCHED_API float BannerRimSu();
 /** 04 §2.5: the capsule height of one line; ВР-VS2-HB13-05: line pitch = 1.25 x the size; two lines at most. */
 inline constexpr float MinHeightSu = 48.0f;
 inline constexpr float PitchFactor = 1.25f;

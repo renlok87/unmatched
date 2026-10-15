@@ -133,7 +133,8 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::PanelLoc, PanelLoc);
     Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - 340.0f, M, 340.0f, 136.0f));
     // backs 48x67 + caption; 92 su high (HB-07 delta: the caption keeps 14 su from the edge at fractional DPI)
-    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 300.0f, M + 136.0f + GapSu, 300.0f, 92.0f));
+    // HUD v2 (2026-10-15): +14 su for the marble rims of the panel skin - the caption kept off the bottom rim
+    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 300.0f, M + 136.0f + GapSu, 300.0f, 106.0f));
     const FBox2D Actions = UmLayoutBox(W - M - 344.0f, H - M - 72.0f, 344.0f, 72.0f);
     Set(EUmHudBlock::Actions, Actions);
     const FBox2D Decks = UmLayoutBox(W - M - 288.0f, Actions.Min.Y - GapSu - 56.0f, 288.0f, 56.0f);

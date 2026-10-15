@@ -56,7 +56,10 @@ void CheckHeaderValues(FAutomationTestBase& Test, const UUmHudTheme& Theme, cons
   Scalars(Theme.Space, S08HudTokens::kSpace, UE_ARRAY_COUNT(S08HudTokens::kSpace), TEXT("space"));
   Scalars(Theme.Radius, S08HudTokens::kRadius, UE_ARRAY_COUNT(S08HudTokens::kRadius), TEXT("radius"));
   Scalars(Theme.MotionMs, S08HudTokens::kMotionMs, UE_ARRAY_COUNT(S08HudTokens::kMotionMs), TEXT("motion"));
-  Test.TestEqual(FString::Printf(TEXT("%s: 29 skins"), What), Theme.Skins.Num(), S08HudTokens::kNumSkins);
+  // HUD v2 (2026-10-15): the 29 token skins plus the hud.* ornament pieces of art/imagegen/hud-v2-codex
+  int32 TokenSkins = 0;
+  for (const TPair<FName, FSlateBrush>& P : Theme.Skins) TokenSkins += P.Key.ToString().StartsWith(TEXT("hud.")) ? 0 : 1;
+  Test.TestEqual(FString::Printf(TEXT("%s: 29 skins"), What), TokenSkins, S08HudTokens::kNumSkins);
   for (int32 I = 0; I < S08HudTokens::kNumSkins; ++I) {
     const S08HudTokens::FSkinToken& S = S08HudTokens::kSkins[I];
     const FSlateBrush* Brush = Theme.Skins.Find(S.Name);

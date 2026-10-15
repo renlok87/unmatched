@@ -107,6 +107,8 @@ bool UUmHudOppHand::Initialize() {
       if (!bCodeDefaultTree) UE_LOG(LogTemp, Error, TEXT("UMHUD opp hand default tree: %s"), *Error);
     }
     Panel = UmOppFind<UBorder>(WidgetTree, TEXT("Panel"));
+    // HUD v2: the backs start under the panel skin's top rim (the WBP keeps the older 4 su)
+    if (Panel) Panel->SetPadding(FMargin(UmHudOppHand::PadSu, UmHudOppHand::TopSu + 6.0f, UmHudOppHand::PadSu, 0.0f));
     Backs = UmOppFind<UHorizontalBox>(WidgetTree, TEXT("Backs"));
     Caption = UmOppFind<UTextBlock>(WidgetTree, TEXT("Caption"));
     // the theme font is the default composite font: a WBP does not keep it

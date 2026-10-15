@@ -21,6 +21,18 @@
 const TCHAR* const UUmHudStatusLine::WidgetBlueprintPath = TEXT("/Game/S08/UI/Hud/WBP_UI_HUD_STATUS");
 
 namespace UmHudStatus {
+float BannerEndsSu() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const FSlateBrush* Banner = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? Theme.Skin(TEXT("hud.status.banner")) : nullptr;
+  return Banner ? FMath::Max(Banner->Margin.Left, Banner->Margin.Right) * Banner->ImageSize.X : 0.0f;
+}
+
+float BannerRimSu() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const FSlateBrush* Banner = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? Theme.Skin(TEXT("hud.status.banner")) : nullptr;
+  return Banner ? FMath::Max(0.0f, FMath::Max(Banner->Margin.Top, Banner->Margin.Bottom) * Banner->ImageSize.Y - 6.0f) : 0.0f;
+}
+
 const TCHAR* StateName(EUmStatusState State) {
   switch (State) {
     case EUmStatusState::Opp: return TEXT("opp");
@@ -395,14 +407,8 @@ void UUmHudStatusLine::Render() {
   }
   // ВР-VS2-46: the text room, the fit (24 -> 20 -> 16 su, two lines, then «…»), the capsule from the drawn text
   // HUD v2: the cartouche's meander ends keep the text off them - the brush's own left margin (fraction x image su)
-  float EndsSu = 0.0f;
-  float RimSu = 0.0f;  // the marble rims above and below the navy field: the field keeps the text's height
-  if (Theme.HasTextureSkin(TEXT("hud.status.banner"))) {
-    if (const FSlateBrush* Banner = Theme.Skin(TEXT("hud.status.banner"))) {
-      EndsSu = FMath::Max(Banner->Margin.Left, Banner->Margin.Right) * Banner->ImageSize.X;
-      RimSu = FMath::Max(0.0f, FMath::Max(Banner->Margin.Top, Banner->Margin.Bottom) * Banner->ImageSize.Y - 6.0f);
-    }
-  }
+  const float EndsSu = UmHudStatus::BannerEndsSu();
+  const float RimSu = UmHudStatus::BannerRimSu();  // the marble rims above and below: the field keeps the text's height
   const float PadX = FMath::Max(Theme.SpaceSu(TEXT("space.m")), EndsSu + 6.0f);
   const float Room = FMath::Max(0.0f, StatusFrame.MaxWidthSu - 2.0f * PadX - Extras);
   const float Base = UmTypeSu(Theme, TEXT("type.heading"));

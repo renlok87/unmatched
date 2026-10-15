@@ -333,8 +333,9 @@ bool FUmDeckPanelLayoutTest::RunTest(const FString&) {
   FWorld W(TEXT("UmDeckPanelLayout"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;
   const FMoment Marm = Marmoreal();
-  const FBox2D Want[] = {FBox2D(FVector2D(1516.0, 268.0), FVector2D(1896.0, 912.0)),
-                         FBox2D(FVector2D(1346.667, 268.0), FVector2D(1682.667, 792.0)),
+  // HUD v2 (2026-10-15): class L starts 14 su lower, under the taller opp hand
+  const FBox2D Want[] = {FBox2D(FVector2D(1516.0, 282.0), FVector2D(1896.0, 912.0)),
+                         FBox2D(FVector2D(1346.667, 282.0), FVector2D(1682.667, 792.0)),
                          FBox2D(FVector2D(964.0, 120.0), FVector2D(1264.0, 592.0)),
                          FBox2D(FVector2D(821.778, 120.0), FVector2D(1121.778, 512.0))};
   for (int32 C = 0; C < UE_ARRAY_COUNT(Canvases); ++C) {

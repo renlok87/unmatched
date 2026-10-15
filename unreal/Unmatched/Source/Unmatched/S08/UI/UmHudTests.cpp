@@ -270,10 +270,10 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::Log, 24, 712, 300, 200, W);
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 920, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1556, 24, 340, 136, W);
-    RectIs(*this, L, EUmHudBlock::OppHand, 1596, 168, 300, 92, W);
+    RectIs(*this, L, EUmHudBlock::OppHand, 1596, 168, 300, 106, W);  // HUD v2: +14 su for the marble rims
     RectIs(*this, L, EUmHudBlock::Decks, 1608, 920, 288, 56, W);
     // VS-3 HB-28 (HB-26 delta 04): the top under OPP-HAND + 8, the bottom over DECKS - 8
-    RectIs(*this, L, EUmHudBlock::DeckPanel, 1516, 268, 380, 644, W);
+    RectIs(*this, L, EUmHudBlock::DeckPanel, 1516, 282, 380, 630, W);  // HUD v2: under the taller opp hand
     RectIs(*this, L, EUmHudBlock::Actions, 1552, 984, 344, 72, W);
     // VS-3 HB-27 (ВР-VS2-HB26-09): the RU chips 156 / 124 su, the EN chips 144 / 136 su
     const FVector2D Deck = L.DeckChipCentreSu();
@@ -296,7 +296,7 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 800, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1342.67f, 24, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::Decks, 1394.67f, 800, 288, 56, W);
-    RectIs(*this, L, EUmHudBlock::DeckPanel, 1346.67f, 268, 336, 524, W);  // ВР-VS2-HB26-08: 336 su
+    RectIs(*this, L, EUmHudBlock::DeckPanel, 1346.67f, 282, 336, 510, W);  // ВР-VS2-HB26-08: 336 su; HUD v2 +14
     TestEqual(TEXT("720p: the deck panel covers no block shown with it"), L.DeckPanelBlocksPx2, 0.0);
     RectIs(*this, L, EUmHudBlock::Actions, 1338.67f, 864, 344, 72, W);
   }
@@ -749,7 +749,9 @@ bool FUmHudThemeSkinsTest::RunTest(const FString&) {
   bool bFallback = true;
   const UUmHudTheme* Theme = UUmHudTheme::LoadOrFallback(UUmHudTheme::AssetPath, bFallback);
   if (!TestFalse(TEXT("DA_UmHudTheme exists"), bFallback) || !Theme) return false;
-  TestEqual(TEXT("29 x2 skins"), Theme->SkinsX2.Num(), S08HudTokens::kNumSkins);
+  int32 TokenX2 = 0;  // HUD v2: the hud.* ornaments come on top of the 29 token skins
+  for (const TPair<FName, FSlateBrush>& P : Theme->SkinsX2) TokenX2 += P.Key.ToString().StartsWith(TEXT("hud.")) ? 0 : 1;
+  TestEqual(TEXT("29 x2 skins"), TokenX2, S08HudTokens::kNumSkins);
   int32 Textures = 0;
   for (int32 I = 0; I < S08HudTokens::kNumSkins; ++I) {
     const FName Key(S08HudTokens::kSkins[I].Name);
