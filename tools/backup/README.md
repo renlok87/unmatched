@@ -30,7 +30,8 @@ Restic шифрует снимки проекта на компьютере, rcl
 Удаляются только старые снимки сверх этого срока. После удаления ассета на компьютере
 он доступен в тех снимках, которые ещё хранятся.
 
-Установленная копия и состояние: `%LOCALAPPDATA%\UnmatchedBackup`.
+Установленная копия и состояние: `%USERPROFILE%\.unmatched-backup`.
+Папка находится вне AppData, чтобы её видел планировщик Windows даже при запуске установки из приложения Microsoft Store.
 `status.json` — текущая операция и последний успешный снимок; `logs` — журналы.
 Пароль защищён DPAPI этой учётной записи Windows. Папка доступна пользователю и SYSTEM.
 Пароль, OAuth-токены и локальная конфигурация не попадают в Git и в бэкап.
@@ -43,7 +44,7 @@ Restic шифрует снимки проекта на компьютере, rcl
 ## Запуск и восстановление
 
 ```powershell
-$runner = "$env:LOCALAPPDATA\UnmatchedBackup\backup.ps1"
+$runner = "$env:USERPROFILE\.unmatched-backup\backup.ps1"
 & $runner -Action Status
 & $runner -Action Backup
 & $runner -Action Snapshots
@@ -59,7 +60,7 @@ $runner = "$env:LOCALAPPDATA\UnmatchedBackup\backup.ps1"
 
 1. `powershell -NoProfile -ExecutionPolicy Bypass -File tools\backup\setup.ps1`.
 2. Настроить rclone remote `unmatched-gdrive` с отдельным OAuth client ID и областью доступа `drive.file`.
-   Конфигурация: `%LOCALAPPDATA%\UnmatchedBackup\rclone.conf`.
+   Конфигурация: `%USERPROFILE%\.unmatched-backup\rclone.conf`.
 3. Для **нового** хранилища: `backup.ps1 -Action Initialize`, затем `-Action Backup`, `-Action Check`.
 4. `setup.ps1 -RegisterTasks` включает расписание и обновляет установленные скрипты.
 
@@ -73,7 +74,7 @@ restic -r rclone:unmatched-gdrive:Unmatched-Backups/Assets snapshots
 restic -r rclone:unmatched-gdrive:Unmatched-Backups/Assets restore latest --target C:\Restored-Unmatched --verify
 ```
 
-Если rclone не в PATH, добавь к restic `-o rclone.program=C:\Path\To\rclone.exe`.
+Если rclone не в PATH, добавь к restic `-o "rclone.program='C:/Path/To/rclone.exe'"`.
 Перед сменой OAuth-приложения проверь доступ к старым файлам репозитория.
 
 Локальная проверка без облака: `python -m unittest discover -s tools/backup -p test_backup.py -v`.

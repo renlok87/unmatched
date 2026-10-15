@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 HERE = Path(__file__).resolve().parent
-STATE = Path(os.environ.get("LOCALAPPDATA", ".")) / "UnmatchedBackup"
+STATE = Path(os.environ.get("USERPROFILE", ".")) / ".unmatched-backup"
 POWERSHELL = Path(os.environ.get("WINDIR", "C:/Windows")) / "System32/WindowsPowerShell/v1.0/powershell.exe"
 
 

@@ -1,10 +1,12 @@
 [CmdletBinding()]
 param(
     [string]$ProjectRoot,
-    [string]$StateDir = (Join-Path $env:LOCALAPPDATA 'UnmatchedBackup'),
+    [string]$StateDir = (Join-Path $env:USERPROFILE '.unmatched-backup'),
     [switch]$RegisterTasks
 )
 $ErrorActionPreference = 'Stop'
+# Packaged desktop apps can virtualize AppData for their child processes.
+# A profile directory is also visible to the Windows Task Scheduler.
 Import-Module (Join-Path $PSHOME 'Modules\Microsoft.PowerShell.Security\Microsoft.PowerShell.Security.psd1') -ErrorAction Stop
 if (-not $ProjectRoot) { $ProjectRoot = (Join-Path $PSScriptRoot '..\..') }
 $StateDir = [IO.Path]::GetFullPath($StateDir)

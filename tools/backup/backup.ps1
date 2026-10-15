@@ -2,7 +2,7 @@
 param(
     [ValidateSet('Initialize', 'Backup', 'Check', 'Maintain', 'Snapshots', 'Restore', 'Status')]
     [string]$Action = 'Backup',
-    [string]$StateDir = (Join-Path $env:LOCALAPPDATA 'UnmatchedBackup'),
+    [string]$StateDir = (Join-Path $env:USERPROFILE '.unmatched-backup'),
     [string]$Snapshot = 'latest',
     [string]$Target,
     [string[]]$Include,
