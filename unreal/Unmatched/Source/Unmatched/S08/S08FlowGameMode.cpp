@@ -8293,7 +8293,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
     // W5b-R r3 (t53 revision 1, tags.binding): bound to the owner's figure, inset fallback, first two rings
     const S08ArtHud::FLabelPlacementInput In = S08ArtHud::MakeTagPlacementInput(
         ViewportPx, FVector2D(FMath::CeilToFloat(Desired.X * Ppu), FMath::CeilToFloat(Desired.Y * Ppu)), T.Figure,
-        OthersOf(T.FighterId), Hard, TagHardPadPx);
+        OthersOf(T.FighterId), Hard, TagHardPadPx, T.Widget && T.Widget->GetHarpyDigit() > 0);
     const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
     T.Planned = R.Rect;
     T.Candidate = R.Candidate;

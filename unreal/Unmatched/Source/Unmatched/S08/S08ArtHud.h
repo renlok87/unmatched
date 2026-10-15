@@ -253,6 +253,13 @@ struct FLabelPlacementInput {
   // A fighter boxed in by neighbours (Cobble: Medusa at (2,2), harpies left/right/behind, King Arthur in front)
   // has no bound spot outside its own box: every outside candidate is nearer a neighbour.
   bool bInset = false;
+  // 2026-10-16 (1440x1080, the harpy column): a tag 135 px wide touching its owner had its centre nearer a neighbour,
+  // so every outside candidate was unbound and the inset covered the figure. With bRectBind a candidate is bound also
+  // when its rect gap to every rect of BindOthers exceeds its gap to BindTarget by RectBindMarginOf(height).
+  bool bRectBind = false;
+  /** The rect-bind margin in px; < 0 = RectBindMarginOf(height). 0 for a numbered tag (harpy 1-3): its digit is the
+   *  same as on the figure's base, so a tag flush with its harpy reads as its own even with a neighbour close by. */
+  double RectBindMarginPx = -1.0;
   // W5b-R r3: when > 0, once ring NearRings-1 is done the bound hard-clean candidate with the least soft overlap
   // (other figures) wins over searching further rings for a fully clean spot (T5.2/W5b-R G3: the Medusa tag went
   // out to ring 16, 98 px from Medusa and next to the Harpies 2 tag).
@@ -281,7 +288,11 @@ bool IsBoundTo(const FVector2D& P, const FS08ScreenRect& Target, const TArray<FS
 /** Gap between two rects (0 when they touch or overlap). */
 double RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B);
 /** True when the gap of R to Target is strictly smaller than its gap to every rect of Others (or Target is empty). */
-bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others);
+bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others,
+                   double Margin = 0.0);
+/** bRectBind (tags): the gap to every other figure must exceed the gap to the owner by 0.4 x the tag height (a 40 px
+ *  tag: 16 px) - flush with the owner AND clear of the neighbours; t53_readability.py applies the same margin. */
+inline double RectBindMarginOf(double TagHeightPx) { return 0.4 * TagHeightPx; }
 
 /** Tag / damage placement: ring by ring around the anchor, candidates in the order above (centred, then sliding
  *  left/right), right (top-aligned, sliding down), left, below; the first candidate that overlaps neither a hard nor
@@ -299,7 +310,7 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In);
  *  every hard rect. */
 FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
                                            const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard,
-                                           float HardPadPx = 0.0f);
+                                           float HardPadPx = 0.0f, bool bNumbered = false);
 
 struct FIconAnchorInput {
   FVector2D Viewport = FVector2D::ZeroVector;

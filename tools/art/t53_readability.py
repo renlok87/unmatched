@@ -1088,7 +1088,9 @@ def plate_state(widgets, figs: dict, text: str | None, frame_name: str) -> dict:
 
 def block_tag_binding(block, text: str | None = None) -> dict:
     """t53 revision 1 on one SHOT block (late section): every painted tag's centre is strictly nearer its owner's
-    FigureScreenRect than any other figure's; the plate owner's tag is hidden only when the plate is bound."""
+    FigureScreenRect than any other figure's, or its rect gap to every other figure exceeds the gap to the owner by 0.4 x the tag height
+    (0 for a harpy: its digit names it; 2026-10-16, S08ArtHud bRectBind); the
+    plate owner's tag is hidden only when the plate is bound."""
     figs = {fid: tuple(v["bbox"]) for fid, v in block.figures.items()}
     ps = plate_state(block.widgets, figs, text, block.name)
     plate_owner, p_bound = ps["owner"], ps["bound"]
@@ -1116,7 +1118,12 @@ def block_tag_binding(block, text: str | None = None) -> dict:
                        nearestOther=nearest, centreToNearestOther=round(others[nearest], 1) if nearest else None,
                        gapToOwner=round(rect_gap(box, figs[fid]), 1),
                        overlapOtherFiguresPx2=round(sum(inter_area(box, r) for k, r in figs.items() if k != fid), 1),
-                       bindingPass=all(d > own for d in others.values()))
+                       # 2026-10-16: S08ArtHud tags also bind by rect gap (bRectBind) - a wide tag flush with its
+                       # owner reads as the owner's even when its centre is nearer a neighbour
+                       bindingPass=all(d > own for d in others.values()) or
+                       all(rect_gap(box, r) > rect_gap(box, figs[fid]) +
+                           (0.0 if "Harpies" in FIGHTER_NAMES.get(fid, "") else 0.4 * (box[3] - box[1]))
+                           for k, r in figs.items() if k != fid))
         rows.append(rec)
     return {"plate": ps, "tags": rows}
 

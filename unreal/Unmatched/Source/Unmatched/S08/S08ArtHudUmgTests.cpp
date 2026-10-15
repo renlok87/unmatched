@@ -609,6 +609,43 @@ bool FS08ArtHudUmgTagBindingTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudUmgTagColumnTest,
+    "Unmatched.S08.ArtHudUmg.TagColumn 2026-10-16: a tag in the Marmoreal harpy column at 1440x1080 sits beside its harpy, not over it",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtHudUmgTagColumnTest::RunTest(const FString&) {
+  using namespace S08ArtHud;
+  // live trace 2026-10-16 (dev client, Marmoreal, class S 1440x1080): Harpy 1 between Harpy 3 above and Medusa below;
+  // a 135 x 40 px tag had its centre nearer a neighbour on every outside candidate, and the inset covered the harpy
+  const FS08ScreenRect Owner(370.0f, 396.0f, 421.0f, 454.0f);
+  const TArray<FS08ScreenRect> Others = {FS08ScreenRect(399.0f, 326.0f, 447.0f, 383.0f),   // Harpy 3
+                                         FS08ScreenRect(353.0f, 459.0f, 420.0f, 536.0f),   // Medusa
+                                         FS08ScreenRect(366.0f, 549.0f, 419.0f, 610.0f),   // Harpy 2
+                                         FS08ScreenRect(892.0f, 645.0f, 959.0f, 728.0f)};  // King Arthur
+  const TArray<FS08ScreenRect> Hard = {FS08ScreenRect(356.0f, 284.0f, 491.0f, 324.0f)};  // the Harpy 3 tag
+  const FLabelPlacementResult R =
+      ChooseLabelRect(MakeTagPlacementInput(FVector2D(1440.0, 1080.0), FVector2D(135.0, 40.0), Owner, Others, Hard));
+  AddInfo(FString::Printf(TEXT("harpy 1 tag: %s %s ring=%d soft=%.0f"), *FormatRect(R.Rect), *R.Candidate, R.Ring, R.SoftArea));
+  TestNotEqual(TEXT("not the inset over the figure"), R.Candidate, FString(TEXT("inset")));
+  TestTrue(TEXT("bound + hard-clean"), R.bBound && R.bHardClean);
+  TestTrue(TEXT("flush with its harpy (gap <= 8 px)"), RectGap(R.Rect, Owner) <= 8.0);
+  TestTrue(TEXT("covers at most a sliver of its harpy"), R.Rect.IntersectionArea(Owner) <= 0.5);
+  TestTrue(TEXT("rect-bound with the margin"), IsRectBoundTo(R.Rect, Owner, Others, RectBindMarginOf(40.0)));
+  // UI 150 % (1920x1080, the same column): 203 x 60 px, Medusa 12 px under the harpy - the numbered tag sits beside it
+  const FS08ScreenRect Owner150(437.0f, 348.0f, 510.0f, 410.0f);
+  const TArray<FS08ScreenRect> Others150 = {FS08ScreenRect(472.0f, 252.0f, 540.0f, 333.0f),   // Harpy 3
+                                            FS08ScreenRect(430.0f, 422.0f, 525.0f, 520.0f)};  // Medusa
+  const TArray<FS08ScreenRect> Hard150 = {FS08ScreenRect(463.0f, 193.0f, 666.0f, 253.0f)};
+  const FLabelPlacementResult N = ChooseLabelRect(MakeTagPlacementInput(FVector2D(1920.0, 1080.0), FVector2D(203.0, 60.0),
+                                                                        Owner150, Others150, Hard150, 0.0f, true));
+  const FLabelPlacementResult U = ChooseLabelRect(MakeTagPlacementInput(FVector2D(1920.0, 1080.0), FVector2D(203.0, 60.0),
+                                                                        Owner150, Others150, Hard150, 0.0f, false));
+  AddInfo(FString::Printf(TEXT("150 %%: numbered %s %s, plain %s %s"), *FormatRect(N.Rect), *N.Candidate, *FormatRect(U.Rect),
+                          *U.Candidate));
+  TestNotEqual(TEXT("150 %: the numbered tag is not the inset"), N.Candidate, FString(TEXT("inset")));
+  TestTrue(TEXT("150 %: the numbered tag leaves its harpy uncovered"), N.Rect.IntersectionArea(Owner150) <= 0.5);
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudUmgWbpTest,
     "Unmatched.S08.ArtHudUmg.Wbp WBP_S08ArtPlate/WBP_S08ArtIcon are children of the classes, bind every part, = Slate within 1 px",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)

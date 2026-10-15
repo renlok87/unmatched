@@ -419,11 +419,12 @@ double RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B) {
   return FMath::Sqrt(Dx * Dx + Dy * Dy);
 }
 
-bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others) {
+bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others,
+                   double Margin) {
   if (Target.IsEmpty()) return true;
   const double D = RectGap(R, Target);
   for (const FS08ScreenRect& O : Others) {
-    if (!O.IsEmpty() && RectGap(R, O) <= D) return false;
+    if (!O.IsEmpty() && RectGap(R, O) <= D + Margin) return false;
   }
   return true;
 }
@@ -453,7 +454,13 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In) {
     // ENV-MAPS P4: board plates keep HardPadPx to the hard rects (the padded rect is only the test, not the result)
     R.HardArea = OverlapArea(In.HardPadPx > 0.0f ? Rect.Expand(In.HardPadPx) : Rect, In.Hard);
     R.SoftArea = OverlapArea(Rect, In.Soft);
-    R.bBound = IsBoundTo(Rect.Center(), In.BindTarget, In.BindOthers);
+    // 2026-10-16 (1440x1080, class S): the inset sits inside the owner's own box, so the other figures alone called it
+    // clean and it won ring 0 - a tag wider than the empty band above the figure covered the harpy. The owner's box is
+    // its soft obstacle: the inset stays the fallback of a boxed-in fighter, never ahead of a free spot nearby.
+    if (FCString::Strcmp(Name, TEXT("inset")) == 0) R.SoftArea += OverlapArea(Rect, TArray<FS08ScreenRect>{In.Anchor});
+    R.bBound = IsBoundTo(Rect.Center(), In.BindTarget, In.BindOthers) ||
+               (In.bRectBind && IsRectBoundTo(Rect, In.BindTarget, In.BindOthers,
+                                              In.RectBindMarginPx >= 0.0 ? In.RectBindMarginPx : RectBindMarginOf(H)));
     R.bHardClean = R.HardArea <= 0.5 && R.bBound;
     R.bClean = R.bHardClean && R.SoftArea <= 0.5;
     if (R.bClean) {
@@ -536,7 +543,7 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In) {
 
 FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
                                            const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard,
-                                           float HardPadPx) {
+                                           float HardPadPx, bool bNumbered) {
   FLabelPlacementInput In;
   In.Viewport = Viewport;
   In.Size = Size;
@@ -548,6 +555,8 @@ FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVec
   In.BindTarget = Owner;
   In.BindOthers = Others;
   In.bInset = true;
+  In.bRectBind = true;
+  In.RectBindMarginPx = bNumbered ? 0.0 : -1.0;
   In.NearRings = 2;
   In.HardPadPx = FMath::Max(0.0f, HardPadPx);
   return In;
