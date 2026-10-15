@@ -1,139 +1,925 @@
 {
   "card_id": "ASSET-WIGLAF-001",
-  "stage": "1a",
-  "status": "предложено",
-  "date": "2026-10-13T03:18:26.163714+00:00",
+  "stage": "1a corrective attempts",
+  "status": "correction exhausted; canonical accepted g2 retained; sheet-r1 rejected; asset requires coordinator escalation",
+  "date": "2026-10-15T06:23:54.718415+00:00",
   "source_unchanged": true,
   "source_checks": [
     {
+      "path": "docs/game-design/visual/06-tasks/prompts/ASSET-WIGLAF-001-concept.codex.md",
+      "sha256": "6fdb177aad325bbab55868de4e7bb54f329fb29f346397c6add435b91d4e6b15",
+      "bytes": 10889,
+      "after_sha256": "6fdb177aad325bbab55868de4e7bb54f329fb29f346397c6add435b91d4e6b15",
+      "unchanged": true
+    },
+    {
+      "path": "docs/game-design/visual/06-tasks/prompts/ASSET-WIGLAF-001-concept.fix1.codex.md",
+      "sha256": "9249387843700a34d94db9ad814e7eb60f718e141c7d3dd19f145c9f77a14c10",
+      "bytes": 1366,
+      "after_sha256": "9249387843700a34d94db9ad814e7eb60f718e141c7d3dd19f145c9f77a14c10",
+      "unchanged": true
+    },
+    {
       "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
-      "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+      "bytes": 2034907,
       "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
-      "unchanged": true,
-      "bytes": 2034907
+      "unchanged": true
     },
     {
       "path": "art/imagegen/concept-wiglaf-codex/palette.json",
-      "before_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+      "sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+      "bytes": 286,
       "after_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
-      "unchanged": true,
-      "bytes": 286
+      "unchanged": true
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-WIGLAF-001/evidence/acceptance-concept/20261015-sheet-r1/card.json",
+      "sha256": "446292a153a5ed59b31760cb1415b096031a5f6f14038d8a82752f78073af15a",
+      "bytes": 6475,
+      "after_sha256": "446292a153a5ed59b31760cb1415b096031a5f6f14038d8a82752f78073af15a",
+      "unchanged": true
     }
   ],
   "outside_folder": [],
+  "outside_folder_note": "Built-in image_gen automatic originals in CODEX_HOME are preserved at their original absolute paths.",
   "checks": [
     {
       "view": "design-front",
-      "generation": 1,
-      "run": "candidate",
+      "generation": "g3",
       "exit_code": 0,
-      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json",
-      "output": "WARN view.frame_top         front    value=3.177 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json"
+      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g3/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
     },
     {
       "view": "design-front",
-      "generation": 2,
-      "run": "candidate",
+      "generation": "g4",
       "exit_code": 0,
-      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json",
-      "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json"
+      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g4/checks-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      }
     },
     {
       "view": "design-front",
-      "generation": 2,
-      "run": "selected-final",
+      "generation": "best failed g3",
       "exit_code": 0,
-      "report": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
-      "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/design/checks-report.json"
+      "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g3/final-attempt-report.json",
+      "summary": {
+        "PASS": 12,
+        "WARN": 1,
+        "FAIL": 0
+      },
+      "note": "This temporary candidate check was saved before restoring canonical g2 and its original design/checks-report.json byte-for-byte."
     }
   ],
   "checklist": [
     {
-      "view": "design-front",
-      "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+      "view": "design-front candidates g3/g4",
+      "item": "one subject, one pedestal, no collage, second view, text or watermark",
       "passed": true,
-      "note": "Одна фигура, одна двухдисковая подставка; дополнительных видов, фигур и надписей нет."
+      "note": "Both saved candidates visually contain one complete figure and one stone base."
     },
     {
-      "view": "design-front",
-      "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+      "view": "design-front candidate g3",
+      "item": "strict front orthographic view and exactly edge-on base",
       "passed": false,
-      "note": "Лицо и корпус фронтальны; щит и подставка фронтальнее g1. Но узкая верхняя полоска подставки ещё различима, щит слегка овальный; требование точно ребром считаю невыполненным."
+      "note": "Body is frontal, but a narrow top strip of the pedestal remains and the shield is strongly angled. Exact camera orthography cannot be inferred from the raster."
     },
     {
-      "view": "design-front",
-      "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+      "view": "design-front candidates g3/g4",
+      "item": "whole subject/pedestal visible; charcoal background",
       "passed": true,
-      "note": "Вся фигура, топор, щит и подставка в кадре; фон визуально ровный тёмно-серый. Медиана рамки RGB 40/40/40. Низ 93,094%; верх 3,660% даёт допустимый WARN view.frame_top."
+      "note": "No cropping; numeric mask/border checks PASS. Pixel-perfect flatness is not claimed."
     },
     {
-      "view": "design-front",
-      "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+      "view": "design-front candidates g3/g4",
+      "item": "weapon in own RIGHT hand at viewer LEFT",
+      "passed": true,
+      "note": "Axe and shield hands remain correct; neutral planted bent-arm stance is retained broadly."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "S fix1: visible narrow background gaps beneath right forearm and between left elbow and torso",
       "passed": false,
-      "note": "Топор в собственной правой руке, слева для зрителя; поза не T и не A. Плащ заполняет зазор под правой рукой, щит закрывает левое предплечье. Чистые фоновые зазоры между обеими руками и корпусом не видны."
+      "note": "Cloak still fills the required spaces; shield still obscures much of the left arm. Requested S correction was not achieved."
     },
     {
-      "view": "design-front",
-      "item": "every identity anchor is visible: hand axe in the figure's own RIGHT hand; round shield with a boar on the LEFT arm; conical helmet",
+      "view": "design-front candidates g3/g4",
+      "item": "every identity anchor: hand axe RIGHT, boar shield LEFT, conical helmet",
       "passed": true,
-      "note": "Топор слева для зрителя, щит с читаемым кабаном справа и конический железный шлем присутствуют. Хват левой руки скрыт щитом."
+      "note": "The semantic anchors and handedness remain visible."
     },
     {
-      "view": "design-front",
-      "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+      "view": "design-front candidates g3/g4",
+      "item": "preserve the approved design details, face and shield decoration",
+      "passed": false,
+      "note": "Both change the pale boar/red field into a red boar/bare-wood field and change face, fittings and drape. G4 also shortens sleeves, adds a bright helmet band and changes the axe angle more strongly."
+    },
+    {
+      "view": "design-front candidate g3",
+      "item": "main palette and red accent present; no team-colour base ring",
       "passed": true,
-      "note": "Коричневая кожа, зелёный плащ, серое железо и приглушённое красное поле щита присутствуют. Кабан светлого нейтрального тона. Командных цветов и цветных либо металлических поясов на подставке нет."
+      "note": "Brown leather, green cloak, iron, red boar remain. The red placement differs from the approved design and is recorded as a continuity failure above."
     }
   ],
   "generations_per_view": {
-    "design-front": 2
+    "design-front": 4
   },
   "generation_limit_this_run": 2,
-  "selected_per_view": {
-    "design-front": 2
+  "generation_limit_package_per_view": {
+    "design-front": 4
   },
+  "generations_this_run": 2,
+  "counter_reset": false,
+  "selected_per_view": {
+    "design-front": "g2, previous accepted canonical design retained"
+  },
+  "selected_sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+  "best_failed_candidate": {
+    "attempt": 3,
+    "path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g3.png",
+    "sha256": "581cc22298bd63299059104448bc7ccedb85a1bb91f1d25f54debf3f95d8ebb2",
+    "selected": false
+  },
+  "historical_selection_note": "Previous 1a and 1c generation records retain their original historical selected flags. Both new attempts are unselected and cannot be used as a new draft source.",
   "limit_reached": [
     {
       "view": "design-front",
+      "generations_total": 4,
+      "generations_this_run": 2,
       "failed_items": [
-        "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
-        "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
-      ]
+        "S / requested forearm and elbow background gaps",
+        "preserve approved design details/face/shield decoration",
+        "strict level orthographic base with no visible top strip"
+      ],
+      "action": "Only this asset requires coordinator handoff/stop; canonical accepted g2 retained; no new 1b or 1c from g3/g4."
     }
   ],
   "raw_copy_checks": [
     {
-      "generation": 1,
-      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-4fae5a22-4546-4e10-801f-99781b0ae90b.png",
-      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g1.png",
-      "sha256": "b17ad226ee094d196ea56edb7bbf62e00b68d7ff09c5459bfdaa34473f58cae3",
-      "byte_identical": true,
-      "hash_matches_record": true
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13e0e-695c-71e2-9124-c660b061b646/exec-10478047-f643-4461-ab1f-331b4f73f6cd.png",
+      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g3.png",
+      "sha256": "581cc22298bd63299059104448bc7ccedb85a1bb91f1d25f54debf3f95d8ebb2",
+      "byte_identical": true
     },
     {
-      "generation": 2,
-      "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-a346a70c-7aea-4ea0-a554-563befe86ec1.png",
-      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g2.png",
-      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
-      "byte_identical": true,
-      "hash_matches_record": true
+      "original_path": "C:/Users/ren/.codex/generated_images/01a13e0e-695c-71e2-9124-c660b061b646/exec-f870bc74-6f14-4489-9983-59bd6c1e6188.png",
+      "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g4.png",
+      "sha256": "22854f19e9a251631c088e07e397e0bf0e82ab5f495ca054764d1b99ff7980da",
+      "byte_identical": true
     }
   ],
   "selected_copy_byte_identical": true,
-  "warnings": [
+  "limitations": [
+    "Запрошенный S не исправлен. Ни g3, ни g4 не принят и не заменяет canonical g2; лимит 2 новых вызова / 4 design-front total исчерпан без сброса.",
+    "Оба кандидата получили 12 PASS / 1 WARN / 0 FAIL; верх g3/g4 2.970% вместо >=4%. Низ g3 95.373%, g4 94.475% вместо целевых 93%. WARN не был причиной повтора: g4 запускался из-за фактического провала S в g3.",
+    "Роспись щита в обоих новых кандидатах меняет прежний pale-boar/red-field на red-boar/bare-wood, лицо и детали также варьируются. Точное сохранение принятого дизайна не достигнуто при заданном Medusa-only image input и неизменяемом CORE.",
+    "G3 и g4 — два оригинальных 1a corrective attempts, а не новые согласованные виды 1c. Они сохранены побайтно без ретуши, ресайза, обрезки и перекодирования.",
+    "Canonical accepted g2 (189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42) и его прежний design/checks-report.json восстановлены побайтно из pre-mutation snapshot. Исторические 1a/1c записи и prompts сохранены.",
+    "Sheet-r1 остаётся rejected с 7.5, C=0.5, S=1.5; противоречие внутренней росписи щита в side не исправлялось. Старые 1c PNG, sheet и root checks-report не менялись и не доказывают исправление S.",
+    "Только этот ассет требует handoff/стопа координатором по исчерпанию лимита. Новый 1b/1c по g3/g4 не разрешён; Tripo, риг, UE, ledger, реестры, git и службы не использовались."
+  ],
+  "candidate_visual_failures": [
     {
-      "view": "design-front",
-      "generation": 1,
-      "id": "view.frame_top",
-      "top_pct": 3.177
+      "generation": "g3",
+      "items": [
+        "S gaps still filled by cloak/shield",
+        "approved red shield field/pale boar changed to bare wood/red boar",
+        "face, fittings and axe angle vary",
+        "narrow base top strip and tilted shield"
+      ]
     },
     {
-      "view": "design-front",
-      "generation": 2,
-      "id": "view.frame_top",
-      "top_pct": 3.66
+      "generation": "g4",
+      "items": [
+        "S gaps still filled by cloak/shield",
+        "approved red shield field/pale boar changed to bare wood/red boar",
+        "shorter sleeves and bright helmet band, stronger axe-angle change",
+        "base top visible"
+      ]
     }
   ],
-  "errors": [],
-  "outside_folder_note": "Автоматические оригиналы image_gen вне пакета разрешены договором и не входят в outside_folder; команды задачи писали только внутри пакета."
+  "history_archive": "art/imagegen/concept-wiglaf-codex/history/1a-fix1-20261015-061726",
+  "prior_metadata_preserved": true,
+  "preexisting_immutable_files": [
+    {
+      "path": "checks-report.json",
+      "sha256": "7665a974a1ec410ac92e2cbb7d890b5ec1ea08d0bf92ca1d00913bb43a7d3696",
+      "bytes": 15624,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks-report.json"
+    },
+    {
+      "path": "palette.json",
+      "sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+      "bytes": 286,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/palette.json"
+    },
+    {
+      "path": "sheet-wiglaf.png",
+      "sha256": "8427a142c1f2a2f6afd1794519007dd966a49bd2b9b3b4bafeeaced9be2014cb",
+      "bytes": 2247101,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/sheet-wiglaf.png"
+    },
+    {
+      "path": "wiglaf-back.png",
+      "sha256": "8d8cad77da69b922a464720a92d45ab1c45f6f94e182f8a63ed0f9406bdc12a7",
+      "bytes": 2068310,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/wiglaf-back.png"
+    },
+    {
+      "path": "wiglaf-front.png",
+      "sha256": "b1d1b50becff40bf400cdd0814a76a267bd3fdd8cd86c4ea1c7185dcc34d4ab0",
+      "bytes": 2035390,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/wiglaf-front.png"
+    },
+    {
+      "path": "wiglaf-side.png",
+      "sha256": "4b6f5b59b504d36051e4d269ef0feba18bbaea27c7a1abd40f35139ae40ee2c5",
+      "bytes": 1686585,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/wiglaf-side.png"
+    },
+    {
+      "path": "concepts/wiglaf-back-g1.png",
+      "sha256": "d416125936f7533d8cc2c187208c5d2d13b67804529126ebb17efca60244c505",
+      "bytes": 2057854,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-back-g1.png"
+    },
+    {
+      "path": "concepts/wiglaf-back-g2.png",
+      "sha256": "8d8cad77da69b922a464720a92d45ab1c45f6f94e182f8a63ed0f9406bdc12a7",
+      "bytes": 2068310,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-back-g2.png"
+    },
+    {
+      "path": "concepts/wiglaf-design-front-g1.png",
+      "sha256": "b17ad226ee094d196ea56edb7bbf62e00b68d7ff09c5459bfdaa34473f58cae3",
+      "bytes": 1944273,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-design-front-g1.png"
+    },
+    {
+      "path": "concepts/wiglaf-design-front-g2.png",
+      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+      "bytes": 2009882,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-design-front-g2.png"
+    },
+    {
+      "path": "concepts/wiglaf-front-g1.png",
+      "sha256": "b1d1b50becff40bf400cdd0814a76a267bd3fdd8cd86c4ea1c7185dcc34d4ab0",
+      "bytes": 2035390,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-front-g1.png"
+    },
+    {
+      "path": "concepts/wiglaf-side-g1.png",
+      "sha256": "4b6f5b59b504d36051e4d269ef0feba18bbaea27c7a1abd40f35139ae40ee2c5",
+      "bytes": 1686585,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/concepts/wiglaf-side-g1.png"
+    },
+    {
+      "path": "design/checks-report.json",
+      "sha256": "3c9aae998ecd9c7a9c0c48a98f0b2740adb0e6c0dbd183e2c00d5ce035462cc5",
+      "bytes": 6803,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/design/checks-report.json"
+    },
+    {
+      "path": "design/wiglaf-front.png",
+      "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+      "bytes": 2009882,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/design/wiglaf-front.png"
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/generation-records.json",
+      "sha256": "e576fae81a8fd3bed96f82f73070e650626a8b73c6f194f20f7681009ee25b98",
+      "bytes": 2479
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/manifest-sha256.json",
+      "sha256": "20265be49f91942bf67c06fff87c3551f9daa2358457d63f9c95fae30e341484",
+      "bytes": 2617
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/prompts.md",
+      "sha256": "895ef983bf90bd7aa34adf3f306f4a7a49bebe0cbf33fe24680ef234c5e12025",
+      "bytes": 9480
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/README.md",
+      "sha256": "2831bbfc811a18e0773780360eb8dfdb787ff383374a4c12b783536f270b2b24",
+      "bytes": 3253
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/source-hashes-before.json",
+      "sha256": "fc93082059d6809ba89c1deffc70a0a4f09aa7e155614c34b8324f3cda9daac9",
+      "bytes": 523
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/verification.json",
+      "sha256": "6544060d47278c17bf34a00a01629bdaa0c481ab36ae2a50b0658056369c8964",
+      "bytes": 7533
+    },
+    {
+      "path": "history/1c-20261015-054952/preexisting-metadata/prompts/concept-prompts.json",
+      "sha256": "e04788d6138e1b6e43814a24de6d9f46cf4b848d9e38c328e946d8b610c82795",
+      "bytes": 6380
+    },
+    {
+      "path": "checks/back-g1/checks-report.json",
+      "sha256": "df9e90cf004a0106a0d5acedbaa2d32ed213f97ee3fd605dcd9c1892f0be6a6d",
+      "bytes": 6886,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/back-g1/checks-report.json"
+    },
+    {
+      "path": "checks/back-g2/checks-report.json",
+      "sha256": "ad4223e5376d29c2fb5597661e3750192291fb7acb0fa324f99c723155a351be",
+      "bytes": 6889,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/back-g2/checks-report.json"
+    },
+    {
+      "path": "checks/design-front-g1/checks-report.json",
+      "sha256": "fdfc87da373386c30842233fae010c2531223fc92b7c39bdde1312a0054a4436",
+      "bytes": 6604,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/design-front-g1/checks-report.json"
+    },
+    {
+      "path": "checks/design-front-g2/checks-report.json",
+      "sha256": "0a2c31711c12daccceb12085ad35b4bc29dd89d625d5e1cf4e702a1037e855d8",
+      "bytes": 6803,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/design-front-g2/checks-report.json"
+    },
+    {
+      "path": "checks/front-g1/checks-report.json",
+      "sha256": "9202bb71565668e60fb4cc29b3aa6aa06579e5448a0084b9e704567ef3e5352e",
+      "bytes": 6903,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/front-g1/checks-report.json"
+    },
+    {
+      "path": "checks/side-g1/checks-report.json",
+      "sha256": "001b45289eaa95abe209637ed5b10bac3e5b00391370a9be147f3d10a04cedf6",
+      "bytes": 6889,
+      "snapshot_path": "history/1a-fix1-20261015-061726/preexisting-package/checks/side-g1/checks-report.json"
+    }
+  ],
+  "base_core_unchanged": true,
+  "exact_root_correction": true,
+  "prior_1c_status": "rejected sheet-r1; root views, sheet, reports and all originals remain unchanged historical artifacts of g2",
+  "corrective_goal_achieved": false,
+  "canonical_accepted_design_retained": true,
+  "asset_only_escalation": true,
+  "new_draft_authorized": false,
+  "next_required_gates": [
+    "coordinator handoff/stop for this asset: 1a attempt limit reached without requested S fix",
+    "no new 1b or 1c using these unaccepted correction attempts"
+  ],
+  "previous_runs": [
+    {
+      "card_id": "ASSET-WIGLAF-001",
+      "stage": "1c",
+      "status": "предложено",
+      "date": "2026-10-15T05:57:05.355306+00:00",
+      "side_view": "right",
+      "source_unchanged": true,
+      "source_checks": [
+        {
+          "path": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/orthos/ortho_front.png",
+          "sha256": "4671a2742bbcd7821739e0d105d707ef4fecdec1ea21b764bca151d5f223ab9c",
+          "bytes": 573644,
+          "sha256_after": "4671a2742bbcd7821739e0d105d707ef4fecdec1ea21b764bca151d5f223ab9c",
+          "unchanged": true
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/orthos/ortho_right.png",
+          "sha256": "d4305efee66481fe149cb72c8ca3e90a9bb9b4262c6b3a1318b7f880d652868f",
+          "bytes": 304489,
+          "sha256_after": "d4305efee66481fe149cb72c8ca3e90a9bb9b4262c6b3a1318b7f880d652868f",
+          "unchanged": true
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/orthos/ortho_back.png",
+          "sha256": "74718a7f915ff889393e4a8b46196f9166a5fd82af796a589711ba03a664cc96",
+          "bytes": 357857,
+          "sha256_after": "74718a7f915ff889393e4a8b46196f9166a5fd82af796a589711ba03a664cc96",
+          "unchanged": true
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-WIGLAF-001/20261015-draft-tripo/orthos/ortho-framing.json",
+          "sha256": "b5e42fbe43e4440769cbecaebc47666b4d052627cf404cc7367c804ddcef9a14",
+          "bytes": 3792,
+          "sha256_after": "b5e42fbe43e4440769cbecaebc47666b4d052627cf404cc7367c804ddcef9a14",
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+          "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+          "bytes": 2009882,
+          "sha256_after": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/palette.json",
+          "sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+          "bytes": 286,
+          "sha256_after": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+          "unchanged": true
+        }
+      ],
+      "outside_folder": [],
+      "outside_folder_note": "All explicit task file writes were confined to art/imagegen/concept-wiglaf-codex/. Built-in image_gen original copies under CODEX_HOME are the authorized tool-managed exception and were preserved. Concurrent work elsewhere was not attributed to this run; no git commands were used.",
+      "checks": [
+        {
+          "view": "front",
+          "generation": "g1",
+          "exit_code": 0,
+          "report": "art/imagegen/concept-wiglaf-codex/checks/front-g1/checks-report.json",
+          "output": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/front-g1/checks-report.json\r\n",
+          "summary": {
+            "PASS": 12,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "side",
+          "generation": "g1",
+          "exit_code": 0,
+          "report": "art/imagegen/concept-wiglaf-codex/checks/side-g1/checks-report.json",
+          "output": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/side-g1/checks-report.json\r\n",
+          "summary": {
+            "PASS": 12,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "back",
+          "generation": "g1",
+          "exit_code": 0,
+          "report": "art/imagegen/concept-wiglaf-codex/checks/back-g1/checks-report.json",
+          "output": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/back-g1/checks-report.json\r\n",
+          "summary": {
+            "PASS": 12,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "back",
+          "generation": "g2",
+          "exit_code": 0,
+          "report": "art/imagegen/concept-wiglaf-codex/checks/back-g2/checks-report.json",
+          "output": "PASS: PASS 12 WARN 0 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/back-g2/checks-report.json\r\n",
+          "summary": {
+            "PASS": 12,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        },
+        {
+          "view": "front,side,back",
+          "generation": "front-g1,side-g1,back-g2",
+          "exit_code": 0,
+          "report": "art/imagegen/concept-wiglaf-codex/checks-report.json",
+          "output": "PASS: PASS 33 WARN 0 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks-report.json, art/imagegen/concept-wiglaf-codex/sheet-wiglaf.png\r\n",
+          "summary": {
+            "PASS": 33,
+            "WARN": 0,
+            "FAIL": 0
+          }
+        }
+      ],
+      "checklist": [
+        {
+          "view": "front",
+          "item": "view",
+          "passed": true,
+          "note": "Strict frontal figure and level camera; no three-quarter turn, collage, text or watermark."
+        },
+        {
+          "view": "front",
+          "item": "silhouette_pose",
+          "passed": true,
+          "note": "Draft stance, helmet, arm positions, axe grip and shield position retained; no added anatomy or weapon."
+        },
+        {
+          "view": "front",
+          "item": "identity_palette",
+          "passed": true,
+          "note": "Young warrior, conical iron helmet, leather jerkin, moss cloak and red shield with pale boar retained from approved design."
+        },
+        {
+          "view": "front",
+          "item": "weapon_side",
+          "passed": true,
+          "note": "Axe in own RIGHT hand at viewer LEFT; shield on own LEFT arm at viewer RIGHT."
+        },
+        {
+          "view": "front",
+          "item": "framing",
+          "passed": true,
+          "note": "Whole figure and two-disc base visible; framing checks PASS. No gross crop, floor or camera defect."
+        },
+        {
+          "view": "front",
+          "item": "background",
+          "passed": true,
+          "note": "Dark neutral charcoal background; border_uniform, bg_neutral and bg_dark PASS. No gross visible floor or vignette."
+        },
+        {
+          "view": "side",
+          "item": "view",
+          "passed": true,
+          "note": "Strict own RIGHT profile with face toward image right; level orthographic presentation without text or collage."
+        },
+        {
+          "view": "side",
+          "item": "silhouette_pose",
+          "passed": true,
+          "note": "Draft right-side stance, cloak outline, near axe arm, exposed grip and far shield position retained."
+        },
+        {
+          "view": "side",
+          "item": "identity_palette",
+          "passed": true,
+          "note": "Conical iron helmet, hair, green cloak, brown leather and visible red boar shield continue the approved design."
+        },
+        {
+          "view": "side",
+          "item": "weapon_side",
+          "passed": true,
+          "note": "Near RIGHT hand holds the axe with clear fingers around the haft; shield remains on far LEFT arm."
+        },
+        {
+          "view": "side",
+          "item": "framing",
+          "passed": true,
+          "note": "Whole subject and two-disc base visible; all framing checks PASS; no floor or crop."
+        },
+        {
+          "view": "side",
+          "item": "background",
+          "passed": true,
+          "note": "Dark neutral charcoal background; border_uniform, bg_neutral and bg_dark PASS; no gross gradient or vignette."
+        },
+        {
+          "view": "back",
+          "item": "view",
+          "passed": true,
+          "note": "Strict rear view, no face visible, level camera; no three-quarter turn, text, collage or watermark."
+        },
+        {
+          "view": "back",
+          "item": "silhouette_pose",
+          "passed": true,
+          "note": "Draft back stance, cloak silhouette, left shield arm, right axe arm and grip retained; no added anatomy or weapon."
+        },
+        {
+          "view": "back",
+          "item": "identity_palette",
+          "passed": true,
+          "note": "Green cloak, conical iron helmet, leather wraps and axe continue front/side. g2 correctly shows the unpainted wood shield interior and inner grip; g1 had the exterior boar on this surface."
+        },
+        {
+          "view": "back",
+          "item": "weapon_side",
+          "passed": true,
+          "note": "Own RIGHT axe hand appears at viewer RIGHT; shield and own LEFT hand appear at viewer LEFT."
+        },
+        {
+          "view": "back",
+          "item": "framing",
+          "passed": true,
+          "note": "Whole figure and two-disc stone pedestal visible; framing checks PASS; no gross crop, floor or camera defect."
+        },
+        {
+          "view": "back",
+          "item": "background",
+          "passed": true,
+          "note": "Dark neutral charcoal background; view and set background checks PASS; no gross visible gradient or vignette."
+        }
+      ],
+      "generations_per_view": {
+        "front": 1,
+        "side": 1,
+        "back": 2
+      },
+      "generation_limit_this_run": {
+        "front": 2,
+        "side": 2,
+        "back": 2
+      },
+      "generation_limit_package_per_view": 4,
+      "selected_per_view": {
+        "front": {
+          "generation": "g1",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-front-g1.png",
+          "selected_path": "art/imagegen/concept-wiglaf-codex/wiglaf-front.png",
+          "sha256": "b1d1b50becff40bf400cdd0814a76a267bd3fdd8cd86c4ea1c7185dcc34d4ab0",
+          "width": 1086,
+          "height": 1448
+        },
+        "side": {
+          "generation": "g1",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-side-g1.png",
+          "selected_path": "art/imagegen/concept-wiglaf-codex/wiglaf-side.png",
+          "sha256": "4b6f5b59b504d36051e4d269ef0feba18bbaea27c7a1abd40f35139ae40ee2c5",
+          "width": 1086,
+          "height": 1448
+        },
+        "back": {
+          "generation": "g2",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-back-g2.png",
+          "selected_path": "art/imagegen/concept-wiglaf-codex/wiglaf-back.png",
+          "sha256": "8d8cad77da69b922a464720a92d45ab1c45f6f94e182f8a63ed0f9406bdc12a7",
+          "width": 1086,
+          "height": 1448
+        }
+      },
+      "limit_reached": [],
+      "raw_copy_checks": [
+        {
+          "generation": "ASSET-WIGLAF-001-1c-front-g1",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-front-g1.png",
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e1b-68a3-7b60-8f05-6c8cac13c133\\exec-96d15625-080d-446b-94a6-f04a3dd6c1fd.png",
+          "sha256": "b1d1b50becff40bf400cdd0814a76a267bd3fdd8cd86c4ea1c7185dcc34d4ab0",
+          "bytes": 2035390,
+          "byte_identical": true
+        },
+        {
+          "generation": "ASSET-WIGLAF-001-1c-side-g1",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-side-g1.png",
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e1b-68a3-7b60-8f05-6c8cac13c133\\exec-7c937c8c-d60b-4ac5-a18c-4e9433f626b0.png",
+          "sha256": "4b6f5b59b504d36051e4d269ef0feba18bbaea27c7a1abd40f35139ae40ee2c5",
+          "bytes": 1686585,
+          "byte_identical": true
+        },
+        {
+          "generation": "ASSET-WIGLAF-001-1c-back-g1",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-back-g1.png",
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e1b-68a3-7b60-8f05-6c8cac13c133\\exec-67995954-f8a6-44eb-9079-a62bb7f1dc94.png",
+          "sha256": "d416125936f7533d8cc2c187208c5d2d13b67804529126ebb17efca60244c505",
+          "bytes": 2057854,
+          "byte_identical": true
+        },
+        {
+          "generation": "ASSET-WIGLAF-001-1c-back-g2",
+          "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-back-g2.png",
+          "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a13e1b-68a3-7b60-8f05-6c8cac13c133\\exec-153eba8d-4297-4e2f-8c8d-b419466d996d.png",
+          "sha256": "8d8cad77da69b922a464720a92d45ab1c45f6f94e182f8a63ed0f9406bdc12a7",
+          "bytes": 2068310,
+          "byte_identical": true
+        }
+      ],
+      "selected_copy_checks": [
+        {
+          "view": "front",
+          "path": "art/imagegen/concept-wiglaf-codex/wiglaf-front.png",
+          "candidate": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-front-g1.png",
+          "byte_identical": true
+        },
+        {
+          "view": "side",
+          "path": "art/imagegen/concept-wiglaf-codex/wiglaf-side.png",
+          "candidate": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-side-g1.png",
+          "byte_identical": true
+        },
+        {
+          "view": "back",
+          "path": "art/imagegen/concept-wiglaf-codex/wiglaf-back.png",
+          "candidate": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-back-g2.png",
+          "byte_identical": true
+        }
+      ],
+      "selected_copy_byte_identical": true,
+      "warnings": [],
+      "errors": [],
+      "limitations": [
+        "Only 2D concept views were generated and visually checked; no 3D geometry, topology, rigging, dimensions or game readiness was evaluated.",
+        "Surface grain, cloak weave, small ornaments, hair and folds are image-generated interpretations; exact pixel-level or sculptural correspondence between views is not proven.",
+        "Framing follows the stated checker tolerances: the side highest point is 4.8% versus the 5.8% draft target; all framing and set checks PASS. No resize, crop or retouch was applied.",
+        "The final sheet is an inspection derivative produced by check_concept_views.py; the four raw candidates and three selected PNGs remain unchanged.",
+        "Back g1 passed automated checks but failed visual shield-interior continuity; back g2 corrects that surface. Acceptance remains with the acceptor."
+      ],
+      "candidate_visual_failures": [
+        {
+          "view": "back",
+          "generation": "g1",
+          "item": "identity, costume, colours and materials",
+          "note": "The exterior red boar and boss were incorrectly repeated on the inner shield face. g2 replaces this with plain wooden interior and inner grip.",
+          "corrected_by": "g2"
+        }
+      ],
+      "preexisting_immutable_files": [
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/palette.json",
+          "sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+          "bytes": 286,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g1.png",
+          "sha256": "b17ad226ee094d196ea56edb7bbf62e00b68d7ff09c5459bfdaa34473f58cae3",
+          "bytes": 1944273,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g2.png",
+          "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+          "bytes": 2009882,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+          "sha256": "3c9aae998ecd9c7a9c0c48a98f0b2740adb0e6c0dbd183e2c00d5ce035462cc5",
+          "bytes": 6803,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+          "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+          "bytes": 2009882,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json",
+          "sha256": "fdfc87da373386c30842233fae010c2531223fc92b7c39bdde1312a0054a4436",
+          "bytes": 6604,
+          "unchanged": true
+        },
+        {
+          "path": "art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json",
+          "sha256": "0a2c31711c12daccceb12085ad35b4bc29dd89d625d5e1cf4e702a1037e855d8",
+          "bytes": 6803,
+          "unchanged": true
+        }
+      ],
+      "history_archive": "art/imagegen/concept-wiglaf-codex/history/1c-20261015-054952/preexisting-metadata",
+      "prior_metadata_preserved": true,
+      "previous_runs": [
+        {
+          "card_id": "ASSET-WIGLAF-001",
+          "stage": "1a",
+          "status": "предложено",
+          "date": "2026-10-13T03:18:26.163714+00:00",
+          "source_unchanged": true,
+          "source_checks": [
+            {
+              "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+              "before_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+              "after_sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9",
+              "unchanged": true,
+              "bytes": 2034907
+            },
+            {
+              "path": "art/imagegen/concept-wiglaf-codex/palette.json",
+              "before_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+              "after_sha256": "3dabb702c6da0a8fa2666e1954c28eaba716b3b8b72545fdbe0ad34e514b3f7f",
+              "unchanged": true,
+              "bytes": 286
+            }
+          ],
+          "outside_folder": [],
+          "checks": [
+            {
+              "view": "design-front",
+              "generation": 1,
+              "run": "candidate",
+              "exit_code": 0,
+              "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json",
+              "output": "WARN view.frame_top         front    value=3.177 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g1/checks-report.json"
+            },
+            {
+              "view": "design-front",
+              "generation": 2,
+              "run": "candidate",
+              "exit_code": 0,
+              "report": "art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json",
+              "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/checks/design-front-g2/checks-report.json"
+            },
+            {
+              "view": "design-front",
+              "generation": 2,
+              "run": "selected-final",
+              "exit_code": 0,
+              "report": "art/imagegen/concept-wiglaf-codex/design/checks-report.json",
+              "output": "WARN view.frame_top         front    value=3.66 limit=>= 4.0 %  # верхняя точка не выше рамки ядра (1a: y >= 4 %)\r\nPASS: PASS 12 WARN 1 FAIL 0 → art/imagegen/concept-wiglaf-codex/design/checks-report.json"
+            }
+          ],
+          "checklist": [
+            {
+              "view": "design-front",
+              "item": "one subject, one pedestal, no collage, no second view, no text, letters, logo or watermark",
+              "passed": true,
+              "note": "Одна фигура, одна двухдисковая подставка; дополнительных видов, фигур и надписей нет."
+            },
+            {
+              "view": "design-front",
+              "item": "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+              "passed": false,
+              "note": "Лицо и корпус фронтальны; щит и подставка фронтальнее g1. Но узкая верхняя полоска подставки ещё различима, щит слегка овальный; требование точно ребром считаю невыполненным."
+            },
+            {
+              "view": "design-front",
+              "item": "the whole subject and pedestal visible, nothing cropped; plain flat dark gray background",
+              "passed": true,
+              "note": "Вся фигура, топор, щит и подставка в кадре; фон визуально ровный тёмно-серый. Медиана рамки RGB 40/40/40. Низ 93,094%; верх 3,660% даёт допустимый WARN view.frame_top."
+            },
+            {
+              "view": "design-front",
+              "item": "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)",
+              "passed": false,
+              "note": "Топор в собственной правой руке, слева для зрителя; поза не T и не A. Плащ заполняет зазор под правой рукой, щит закрывает левое предплечье. Чистые фоновые зазоры между обеими руками и корпусом не видны."
+            },
+            {
+              "view": "design-front",
+              "item": "every identity anchor is visible: hand axe in the figure's own RIGHT hand; round shield with a boar on the LEFT arm; conical helmet",
+              "passed": true,
+              "note": "Топор слева для зрителя, щит с читаемым кабаном справа и конический железный шлем присутствуют. Хват левой руки скрыт щитом."
+            },
+            {
+              "view": "design-front",
+              "item": "main colours and the accent of the palette are present; no team colour, no coloured ring or band on the base",
+              "passed": true,
+              "note": "Коричневая кожа, зелёный плащ, серое железо и приглушённое красное поле щита присутствуют. Кабан светлого нейтрального тона. Командных цветов и цветных либо металлических поясов на подставке нет."
+            }
+          ],
+          "generations_per_view": {
+            "design-front": 2
+          },
+          "generation_limit_this_run": 2,
+          "selected_per_view": {
+            "design-front": 2
+          },
+          "limit_reached": [
+            {
+              "view": "design-front",
+              "failed_items": [
+                "strict front orthographic view, camera exactly level, no perspective, no three-quarter turn; the pedestal is seen exactly edge-on, its top surface is not visible",
+                "The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view. (both arms clearly apart from the torso, not a T-pose, not an A-pose)"
+              ]
+            }
+          ],
+          "raw_copy_checks": [
+            {
+              "generation": 1,
+              "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-4fae5a22-4546-4e10-801f-99781b0ae90b.png",
+              "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g1.png",
+              "sha256": "b17ad226ee094d196ea56edb7bbf62e00b68d7ff09c5459bfdaa34473f58cae3",
+              "byte_identical": true,
+              "hash_matches_record": true
+            },
+            {
+              "generation": 2,
+              "original_path": "C:\\Users\\ren\\.codex\\generated_images\\01a1333f-a46b-7c12-99a7-1b9a2445b577\\exec-a346a70c-7aea-4ea0-a554-563befe86ec1.png",
+              "saved_path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g2.png",
+              "sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+              "byte_identical": true,
+              "hash_matches_record": true
+            }
+          ],
+          "selected_copy_byte_identical": true,
+          "warnings": [
+            {
+              "view": "design-front",
+              "generation": 1,
+              "id": "view.frame_top",
+              "top_pct": 3.177
+            },
+            {
+              "view": "design-front",
+              "generation": 2,
+              "id": "view.frame_top",
+              "top_pct": 3.66
+            }
+          ],
+          "errors": [],
+          "outside_folder_note": "Автоматические оригиналы image_gen вне пакета разрешены договором и не входят в outside_folder; команды задачи писали только внутри пакета."
+        }
+      ],
+      "execution": {
+        "tool": "image_gen.imagegen",
+        "mode": "edit",
+        "one_view_per_call": true,
+        "transparent_background": false,
+        "size_argument_supplied": false,
+        "raw_images_edited": false,
+        "side_used_for_back": true,
+        "core_extraction": "Line-anchored ^CORE-FRONT:, ^CORE-SIDE:, ^CORE-BACK: only",
+        "no_git_commands": true,
+        "no_external_services_or_unreal": true,
+        "process_lifecycle": "Only synchronous completed Python commands; no task-owned background service or process was left running.",
+        "metadata_write_note": "One oversized metadata command was rejected by Windows before execution; metadata was written in smaller commands."
+      }
+    }
+  ],
+  "execution": {
+    "mode": "built-in image_gen",
+    "retouch_resize_crop_reencode": false,
+    "git_ledger_registry_tripo_unreal_services_used": false,
+    "background_processes_started": []
+  }
 }

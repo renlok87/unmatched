@@ -1,0 +1,104 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-PATROCLUS-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-15",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-patroclus-codex/patroclus-front.png",
+      "sha256": "9006ed813844b46a08f6ef2a58ff6a889eb1dca5700a3b70b272ce78359401cd"
+    },
+    {
+      "path": "art/imagegen/concept-patroclus-codex/patroclus-side.png",
+      "sha256": "cf6c70fbee00280e888d4ea0a075b34705d9a40835b9390052babdc042154c18"
+    },
+    {
+      "path": "art/imagegen/concept-patroclus-codex/patroclus-back.png",
+      "sha256": "fae2471de96e4efe90040806405dd39ef84627be097c651b43e164af784b2b6b"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-patroclus-codex",
+    "files": [
+      "sheet-patroclus.png",
+      "patroclus-front.png",
+      "patroclus-side.png",
+      "patroclus-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-patroclus-codex/checks-report.json",
+    "art/imagegen/concept-patroclus-codex/generation-records.json",
+    "art/imagegen/concept-patroclus-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-patroclus-codex/checks-report.json",
+      "note": "checks-report.json#summary.PASS = 33; checks-report.json#summary.WARN = 0; checks-report.json#summary.FAIL = 0; verification.json#final_script_exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "В patroclus-front.png, patroclus-side.png и patroclus-back.png ясно читаются шлем с гребнем, отдельный клинок, щит и плащ. Руки отделены от корпуса, хват правой кисти хорошо виден в выбранном профиле; поза не T и не A. Клинок, гарда и перья читаются; их толщину потребуется сохранить на этапах 3–4.",
+      "frames": [
+        "patroclus-front.png",
+        "patroclus-side.png",
+        "patroclus-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "В patroclus-front.png, patroclus-side.png и patroclus-back.png совпадают поза, пропорции, положение оружия и основные формы утверждённого дизайна и орто 1b. Меч остаётся в собственной правой руке, щит — на левой; профиль строгий правый, вид сзади без поворота лица. sheet-patroclus.png подтверждает общий масштаб и линию земли. Остаются мелкие расхождения рисунка ткани и отдельных складок плаща между боковым и задним видами.",
+      "frames": [
+        "patroclus-front.png",
+        "patroclus-side.png",
+        "patroclus-back.png",
+        "sheet-patroclus.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "patroclus-front.png, patroclus-side.png и patroclus-back.png соответствуют уровню расписанной коллекционной миниатюры эталона Medusa: различимы лён, кожа, бронза, сталь и ткань плаща. Рельефные медальоны, заклёпки, гравировка, бахрома, перья и фактура ткани проработаны внутри силуэта; обратная сторона щита и спина также закончены.",
+      "frames": [
+        "patroclus-front.png",
+        "patroclus-side.png",
+        "patroclus-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Свотчи sheet-patroclus.png соответствуют palette.json и цветам фигуры: льняной корсет, эгейский синий плащ, бронзовое снаряжение и белый плюмаж. В patroclus-front.png, patroclus-side.png и patroclus-back.png все якоря присутствуют там, где видимы; сторона меча и щита сохранена.",
+      "frames": [
+        "sheet-patroclus.png",
+        "patroclus-front.png",
+        "patroclus-side.png",
+        "patroclus-back.png"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "patroclus-back.png",
+      "note": "Рисунок синей ткани и отдельные мелкие складки не полностью продолжают боковой вид patroclus-side.png. Общие контур, длина и крепление плаща согласованы; расхождение допустимо по рубрике C = 1,5."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13e22-73bd-7202-87a1-9be46e19e1ba"
+  },
+  "executor_session_id": "codex-app:01a13e0b-a911-7190-9a60-c87273f3db77",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c: художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)."
+}

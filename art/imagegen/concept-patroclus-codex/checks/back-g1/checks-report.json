@@ -1,0 +1,270 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-15T05:46:34+00:00",
+  "set": "art/imagegen/concept-patroclus-codex",
+  "key": "patroclus",
+  "role": "hero",
+  "views": [
+    "back"
+  ],
+  "inputs": [
+    {
+      "view": "back",
+      "path": "art/imagegen/concept-patroclus-codex/patroclus-back.png",
+      "sha256": "fae2471de96e4efe90040806405dd39ef84627be097c651b43e164af784b2b6b",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "measurements": {
+    "back": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          43.0,
+          43.0,
+          43.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 0.0,
+        "luma": 43.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.82,
+          0.81,
+          0.82
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 31.32,
+        "filled_area_pct": 31.32,
+        "components_kept": 1,
+        "main_component_pct": 31.32,
+        "other_components_pct": [],
+        "bbox_px": [
+          217,
+          54,
+          952,
+          1364
+        ],
+        "top_pct": 3.729,
+        "bottom_pct": 94.199,
+        "left_pct": 19.982,
+        "right_pct": 87.661,
+        "height_pct": 90.47,
+        "base_center_x_pct": 49.908,
+        "base_width_pct": 59.853,
+        "base_top_pct_est": 85.843
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "back": [
+            1086,
+            1448
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "back": [
+          1086,
+          1448
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "back",
+      "result": "PASS",
+      "value": [
+        43.0,
+        43.0,
+        43.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "back",
+      "result": "PASS",
+      "value": 43.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "back",
+      "result": "PASS",
+      "value": 31.32,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 3.729,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 94.199,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 12.339,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "back",
+      "result": "PASS",
+      "value": [],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 12,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-patroclus-codex/palette.json",
+    "asset_id": null,
+    "swatches": [
+      {
+        "name": "linen",
+        "hex": "#D9CBA6",
+        "role": "main",
+        "figure_share_within_40_pct": 2.66
+      },
+      {
+        "name": "aegean blue",
+        "hex": "#2F5B85",
+        "role": "main",
+        "figure_share_within_40_pct": 28.08
+      },
+      {
+        "name": "bronze",
+        "hex": "#A9773A",
+        "role": "main",
+        "figure_share_within_40_pct": 2.3
+      },
+      {
+        "name": "white plume",
+        "hex": "#EDEBE4",
+        "role": "accent",
+        "figure_share_within_40_pct": 1.39
+      }
+    ]
+  },
+  "sheet": null
+}

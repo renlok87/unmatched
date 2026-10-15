@@ -1,0 +1,37 @@
+{
+  "asset_id": "ASSET-WIGLAF-001",
+  "stage": "1a",
+  "status": "correction exhausted; canonical accepted g2 retained; sheet-r1 rejected; asset requires coordinator escalation",
+  "fix_task": "docs/game-design/visual/06-tasks/prompts/ASSET-WIGLAF-001-concept.fix1.codex.md",
+  "source_rejection": "art/pipeline-candidates/ASSET-WIGLAF-001/evidence/acceptance-concept/20261015-sheet-r1/card.json",
+  "source_rejection_score": 7.5,
+  "source_rejection_S": 1.5,
+  "source_rejection_C": 0.5,
+  "history_archive": "art/imagegen/concept-wiglaf-codex/history/1a-fix1-20261015-061726",
+  "current_selected_design": "art/imagegen/concept-wiglaf-codex/design/wiglaf-front.png",
+  "current_selected_sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+  "current_generation": 2,
+  "best_failed_candidate": {
+    "attempt": 3,
+    "path": "art/imagegen/concept-wiglaf-codex/concepts/wiglaf-design-front-g3.png",
+    "sha256": "581cc22298bd63299059104448bc7ccedb85a1bb91f1d25f54debf3f95d8ebb2",
+    "selected": false
+  },
+  "prior_design_g2_sha256": "189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42",
+  "prior_records_retained_unchanged": true,
+  "prior_1c_views_retained_unchanged": true,
+  "new_attempts_not_source_of_old_or_new_1b_or_1c": true,
+  "image_inputs": [
+    "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+  ],
+  "approved_previous_design_read_only_context": true,
+  "limits": [
+    "Запрошенный S не исправлен. Ни g3, ни g4 не принят и не заменяет canonical g2; лимит 2 новых вызова / 4 design-front total исчерпан без сброса.",
+    "Оба кандидата получили 12 PASS / 1 WARN / 0 FAIL; верх g3/g4 2.970% вместо >=4%. Низ g3 95.373%, g4 94.475% вместо целевых 93%. WARN не был причиной повтора: g4 запускался из-за фактического провала S в g3.",
+    "Роспись щита в обоих новых кандидатах меняет прежний pale-boar/red-field на red-boar/bare-wood, лицо и детали также варьируются. Точное сохранение принятого дизайна не достигнуто при заданном Medusa-only image input и неизменяемом CORE.",
+    "G3 и g4 — два оригинальных 1a corrective attempts, а не новые согласованные виды 1c. Они сохранены побайтно без ретуши, ресайза, обрезки и перекодирования.",
+    "Canonical accepted g2 (189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42) и его прежний design/checks-report.json восстановлены побайтно из pre-mutation snapshot. Исторические 1a/1c записи и prompts сохранены.",
+    "Sheet-r1 остаётся rejected с 7.5, C=0.5, S=1.5; противоречие внутренней росписи щита в side не исправлялось. Старые 1c PNG, sheet и root checks-report не менялись и не доказывают исправление S.",
+    "Только этот ассет требует handoff/стопа координатором по исчерпанию лимита. Новый 1b/1c по g3/g4 не разрешён; Tripo, риг, UE, ledger, реестры, git и службы не использовались."
+  ]
+}

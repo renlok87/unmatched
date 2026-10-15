@@ -1,0 +1,87 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-d4bea6a3-draft",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "service": "tripo-studio",
+  "task_id": "d4bea6a3-d226-4607-a7bc-f154ebc969a0",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/d4bea6a3-d226-4607-a7bc-f154ebc969a0",
+  "date": "2026-10-15",
+  "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "single-image",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/design/sherlock-holmes-front.png",
+        "sha256": "face103a3f693a31f0121c1cf0c09dd053dc0ce50c7a7be9e0aa08e3ac2f8a0a"
+      },
+      "left": null,
+      "right": null,
+      "back": null
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-sherlock-holmes-codex/prompts.md",
+    "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+    "settings": {
+      "output": "Геометрия и текстура (по умолчанию формы)",
+      "generate_parts": false,
+      "parts_mode": null,
+      "ultra_mesh_quality": null,
+      "polygon_count": null,
+      "texture_8k": false,
+      "remove_lighting": null,
+      "pbr": false,
+      "privacy": true,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30.0,
+        "observed_debit": 30.0,
+        "balance_before": 20565.0,
+        "balance_after": 20535.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "draft-glb",
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/source/sherlock-holmes-draft-tripo-d4bea6a3.glb",
+      "expected_sha256": "10ab95a68b53683fa2035bbf501ce2f05b868e402f8508212a050a7d39f9ff83",
+      "expected_bytes": 49280384,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+  "expectations": {
+    "draft-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1939088,
+      "glb_materials": 0,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-draft-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

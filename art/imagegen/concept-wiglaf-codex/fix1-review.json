@@ -1,0 +1,97 @@
+{
+  "best_attempt": 3,
+  "final_checker_exit_code": 0,
+  "summary_ru": "Выполнены только design-front g3 и g4 с неизменённым базовым CORE и точным CORRECTION fix1. Требуемые фоновые зазоры под правым предплечьем и у левого локтя не получены: их по-прежнему заполняет плащ/перекрытие щита. Оба численных checker дали 12 PASS / 1 WARN / 0 FAIL, что не отменяет визуальный провал S. G3 меньше отклонился от прежней одежды, чем g4, и сохранён как лучший непринятый кандидат; selected=false у обоих. Прежний принятый canonical g2 и его checks-report восстановлены побайтно по указанию координатора. Коррекция завершена исчерпанием лимита, а не исправлением дефекта.",
+  "checklist": [
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "one subject, one pedestal, no collage, second view, text or watermark",
+      "passed": true,
+      "note": "Both saved candidates visually contain one complete figure and one stone base."
+    },
+    {
+      "view": "design-front candidate g3",
+      "item": "strict front orthographic view and exactly edge-on base",
+      "passed": false,
+      "note": "Body is frontal, but a narrow top strip of the pedestal remains and the shield is strongly angled. Exact camera orthography cannot be inferred from the raster."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "whole subject/pedestal visible; charcoal background",
+      "passed": true,
+      "note": "No cropping; numeric mask/border checks PASS. Pixel-perfect flatness is not claimed."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "weapon in own RIGHT hand at viewer LEFT",
+      "passed": true,
+      "note": "Axe and shield hands remain correct; neutral planted bent-arm stance is retained broadly."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "S fix1: visible narrow background gaps beneath right forearm and between left elbow and torso",
+      "passed": false,
+      "note": "Cloak still fills the required spaces; shield still obscures much of the left arm. Requested S correction was not achieved."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "every identity anchor: hand axe RIGHT, boar shield LEFT, conical helmet",
+      "passed": true,
+      "note": "The semantic anchors and handedness remain visible."
+    },
+    {
+      "view": "design-front candidates g3/g4",
+      "item": "preserve the approved design details, face and shield decoration",
+      "passed": false,
+      "note": "Both change the pale boar/red field into a red boar/bare-wood field and change face, fittings and drape. G4 also shortens sleeves, adds a bright helmet band and changes the axe angle more strongly."
+    },
+    {
+      "view": "design-front candidate g3",
+      "item": "main palette and red accent present; no team-colour base ring",
+      "passed": true,
+      "note": "Brown leather, green cloak, iron, red boar remain. The red placement differs from the approved design and is recorded as a continuity failure above."
+    }
+  ],
+  "limit_reached": [
+    {
+      "view": "design-front",
+      "generations_total": 4,
+      "generations_this_run": 2,
+      "failed_items": [
+        "S / requested forearm and elbow background gaps",
+        "preserve approved design details/face/shield decoration",
+        "strict level orthographic base with no visible top strip"
+      ],
+      "action": "Only this asset requires coordinator handoff/stop; canonical accepted g2 retained; no new 1b or 1c from g3/g4."
+    }
+  ],
+  "candidate_visual_failures": [
+    {
+      "generation": "g3",
+      "items": [
+        "S gaps still filled by cloak/shield",
+        "approved red shield field/pale boar changed to bare wood/red boar",
+        "face, fittings and axe angle vary",
+        "narrow base top strip and tilted shield"
+      ]
+    },
+    {
+      "generation": "g4",
+      "items": [
+        "S gaps still filled by cloak/shield",
+        "approved red shield field/pale boar changed to bare wood/red boar",
+        "shorter sleeves and bright helmet band, stronger axe-angle change",
+        "base top visible"
+      ]
+    }
+  ],
+  "limitations": [
+    "Запрошенный S не исправлен. Ни g3, ни g4 не принят и не заменяет canonical g2; лимит 2 новых вызова / 4 design-front total исчерпан без сброса.",
+    "Оба кандидата получили 12 PASS / 1 WARN / 0 FAIL; верх g3/g4 2.970% вместо >=4%. Низ g3 95.373%, g4 94.475% вместо целевых 93%. WARN не был причиной повтора: g4 запускался из-за фактического провала S в g3.",
+    "Роспись щита в обоих новых кандидатах меняет прежний pale-boar/red-field на red-boar/bare-wood, лицо и детали также варьируются. Точное сохранение принятого дизайна не достигнуто при заданном Medusa-only image input и неизменяемом CORE.",
+    "G3 и g4 — два оригинальных 1a corrective attempts, а не новые согласованные виды 1c. Они сохранены побайтно без ретуши, ресайза, обрезки и перекодирования.",
+    "Canonical accepted g2 (189ddfea5962e086cfa11dbc6545212cacfa5701d14d08445782969f1a74bc42) и его прежний design/checks-report.json восстановлены побайтно из pre-mutation snapshot. Исторические 1a/1c записи и prompts сохранены.",
+    "Sheet-r1 остаётся rejected с 7.5, C=0.5, S=1.5; противоречие внутренней росписи щита в side не исправлялось. Старые 1c PNG, sheet и root checks-report не менялись и не доказывают исправление S.",
+    "Только этот ассет требует handoff/стопа координатором по исчерпанию лимита. Новый 1b/1c по g3/g4 не разрешён; Tripo, риг, UE, ledger, реестры, git и службы не использовались."
+  ]
+}

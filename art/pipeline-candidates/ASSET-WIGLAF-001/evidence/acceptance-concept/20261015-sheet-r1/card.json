@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WIGLAF-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-15",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/wiglaf-front.png",
+      "sha256": "b1d1b50becff40bf400cdd0814a76a267bd3fdd8cd86c4ea1c7185dcc34d4ab0"
+    },
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/wiglaf-side.png",
+      "sha256": "4b6f5b59b504d36051e4d269ef0feba18bbaea27c7a1abd40f35139ae40ee2c5"
+    },
+    {
+      "path": "art/imagegen/concept-wiglaf-codex/wiglaf-back.png",
+      "sha256": "8d8cad77da69b922a464720a92d45ab1c45f6f94e182f8a63ed0f9406bdc12a7"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wiglaf-codex",
+    "files": [
+      "sheet-wiglaf.png",
+      "wiglaf-front.png",
+      "wiglaf-side.png",
+      "wiglaf-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wiglaf-codex/checks-report.json",
+    "art/imagegen/concept-wiglaf-codex/generation-records.json",
+    "art/imagegen/concept-wiglaf-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wiglaf-codex/checks-report.json",
+      "note": "checks-report.json#summary.FAIL = 0; summary.WARN = 0; summary.PASS = 33; verification.json#checks[4].exit_code = 0",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В wiglaf-front.png, wiglaf-side.png и wiglaf-back.png шлем, щит и топор читаются, правая кисть уверенно держит древко; поза не T и не A. До 2 не хватает отделения рук от корпуса: спереди плащ заполняет промежуток под правым предплечьем, левое предплечье скрыто щитом; в профиле кисть и древко проецируются на одежду. Ограничение отделения рук присутствует уже в утверждённом дизайне.",
+      "frames": [
+        "wiglaf-front.png",
+        "wiglaf-side.png",
+        "wiglaf-back.png"
+      ]
+    },
+    "C": {
+      "value": 0.5,
+      "rationale": "В wiglaf-side.png выдержан собственный правый профиль, оружие не зеркально; рост, стойка и основные массы согласованы с wiglaf-front.png и wiglaf-back.png. Однако видимая внутренняя поверхность дальнего щита ошибочно окрашена красным и получила кабана. В ortho_right она внутренняя, а wiglaf-back.png показывает её неокрашенной деревянной, с внутренним хватом. Это заметное расхождение отделки предмета на одном виде, а не мелкая вариация орнамента. На sheet-wiglaf.png противоречие сохраняется; числовые проверки его не выявляют.",
+      "frames": [
+        "wiglaf-side.png",
+        "wiglaf-back.png",
+        "wiglaf-front.png",
+        "sheet-wiglaf.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "wiglaf-front.png, wiglaf-side.png и wiglaf-back.png соответствуют уровню расписанной коллекционной миниатюры эталона Medusa: различимы ткань плаща, потёртая кожа, древесина, кованое железо, швы, пряжки и гравировка топора. Детали присутствуют внутри силуэта; более простой костюм соответствует персонажу.",
+      "frames": [
+        "wiglaf-front.png",
+        "wiglaf-side.png",
+        "wiglaf-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "В wiglaf-front.png и на sheet-wiglaf.png коричневая кожа, мшистый зелёный плащ, серое железо и красный акцент щита соответствуют PALETTE и свотчам. Все якоря присутствуют: топор в собственной правой руке, щит с кабаном на левой, конический шлем. wiglaf-back.png подтверждает стороны рук. Ошибка поверхности щита в профиле учтена в C.",
+      "frames": [
+        "wiglaf-front.png",
+        "wiglaf-back.png",
+        "sheet-wiglaf.png"
+      ]
+    }
+  },
+  "score": 7.5,
+  "verdict": "return_to_stage_1",
+  "verdict_reason": "Сработали вето C = 0.5 < 1.0 и порог score = 7.5 < 8.0 по concept-sheet.md §11. В wiglaf-side.png внутренняя поверхность щита получила наружную красную роспись с кабаном, противоречащую правой ортопроекции и принятому виду сзади; G-CHECKS при этом PASS.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "wiglaf-front.png",
+      "fix": "In the approved front design, open narrow background gaps beneath the right forearm and between the left elbow and torso by adjusting the cloak drape and shield offset, preserving the relaxed bent-arm stance and weapon hands.",
+      "tool": "Codex 1a"
+    },
+    {
+      "item": "C",
+      "frame": "wiglaf-side.png",
+      "fix": "Replace the red boar-painted far shield surface with the unpainted wooden interior shown in ortho_right.png and wiglaf-back.png, preserving its rim, silhouette, occlusions, the strict right profile and the axe grip.",
+      "tool": "Codex 1c CORRECTION"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a13e2b-d0b2-7883-9a7c-748cbd23f0d1"
+  },
+  "executor_session_id": "codex-app:01a13e0b-a911-7190-9a60-c87273f3db77",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Приёмка 1c r1 не пройдена; требуются указанные исправления и повторная оценка листа."
+}
