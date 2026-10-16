@@ -14,6 +14,8 @@
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
+#include "Components/TextBlock.h"
+#include "../S08ArtLook.h"
 
 namespace UmHudTurnStrip {
 float CompactWidthSu(bool bClassS) {
@@ -280,6 +282,7 @@ void UUmHudTurnStrip::ApplyModel(const FS09TurnStripModel& InModel, const FUmTur
   }
   SetVisibility(Model.bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
   if (!Model.bShow) return;
+  ApplyCaption();
   PulseBoxes.Reset();
   PulseStart = FPlatformTime::Seconds();
   const float Su = NodeSu(Frame.bClassS);
@@ -390,4 +393,46 @@ void UUmHudTurnStrip::CollectShotLines(TArray<FString>& Out, const FS08ScreenRec
   Out.Add(S08ArtHud::FormatWidgetLineEx(TEXT("UI-HUD-TURNSTRIP"), TEXT("umg"), Model.bOwnTurn ? TEXT("own") : TEXT("opp"),
                                         FString(), Rect, bVisible && !Rect.IsEmpty(), bVisible,
                                         bCodeDefaultTree ? FString(TEXT("code-default")) : GetClass()->GetPathName(), Extra));
+}
+
+void UUmHudTurnStrip::ApplyCaption() {
+  // HUD "Стол" slice 7 (third blind review: four glyphs without words): «Действие 1 из 2» / «Сброс до 7 карт» / «Конец
+  // хода» right of the strip, class L only; the tooltips of the nodes keep the rules
+  UTextBlock* Cap = WidgetTree ? Cast<UTextBlock>(WidgetTree->FindWidget(FName(TEXT("StageCaption")))) : nullptr;
+  const bool bOn = S08ArtLook::HudTable() && !Frame.bClassS && !Frame.bCompact && Row && WidgetTree;
+  if (!bOn) {
+    if (Cap) Cap->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
+  if (!Cap) {
+    Cap = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("StageCaption")));
+    if (UHorizontalBoxSlot* S = Row->AddChildToHorizontalBox(Cap)) {
+      S->SetVerticalAlignment(VAlign_Center);
+      S->SetPadding(FMargin(12.0f, 0.0f, 4.0f, 0.0f));
+    }
+  }
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  Cap->SetFont(Theme.Font(TEXT("type.tag")));
+  const int32 Actions = FMath::Max(0, Model.Nodes.Num() - 2);
+  int32 Now = INDEX_NONE;
+  for (int32 I = 0; I < Model.Nodes.Num(); ++I) {
+    if (Model.Nodes[I].State == ES09StripState::Now) {
+      Now = I;
+      break;
+    }
+  }
+  FText Text;
+  if (Now != INDEX_NONE && Now < Actions) {
+    FFormatNamedArguments Args;
+    Args.Add(TEXT("n"), Now + 1);
+    Args.Add(TEXT("max"), Actions);
+    Text = UmText::Format(EUmTable::Hud, TEXT("hud.turnstrip.now.action"), Args);
+  } else if (Now == Actions) {
+    Text = UmText::Get(EUmTable::Hud, TEXT("hud.turnstrip.now.discard"));
+  } else if (Now != INDEX_NONE) {
+    Text = UmText::Get(EUmTable::Hud, TEXT("hud.turnstrip.now.end"));
+  }
+  Cap->SetText(Text);
+  Cap->SetColorAndOpacity(FSlateColor(Theme.Color(Model.bOwnTurn ? TEXT("text.primary") : TEXT("text.secondary"))));
+  Cap->SetVisibility(Text.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
 }

@@ -671,7 +671,8 @@ void US08TurnPortraitWidget::SetClockOverrideMs(float Ms) {
 
 void US08TurnPortraitWidget::SetTrackerOpacity(float Alpha) {
   if (!TrackerRow) return;
-  const float A = FMath::Clamp(Alpha, 0.0f, 1.0f);
+  // HUD "Стол" slice 7: in the hero card the turn strip's caption says the actions - the pips stay unseen
+  const float A = bPanelMode && S08ArtLook::HudTable() ? 0.0f : FMath::Clamp(Alpha, 0.0f, 1.0f);
   if (!FMath::IsNearlyEqual(TrackerRow->GetRenderOpacity(), A, 1.0e-3f)) TrackerRow->SetRenderOpacity(A);
   const ESlateVisibility Vis = A > 0.0f ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden;
   if (TrackerRow->GetVisibility() != Vis) TrackerRow->SetVisibility(Vis);

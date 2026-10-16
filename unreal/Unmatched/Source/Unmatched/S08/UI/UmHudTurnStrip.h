@@ -48,6 +48,8 @@ inline constexpr float TrayGapSu = 6.0f;
 /** The widths the layout reserves (su): the four nodes, and with a tray of MaxSubs sub-steps. */
 UNMATCHED_API float CompactWidthSu(bool bClassS);
 UNMATCHED_API float FullWidthSu(bool bClassS);
+/** HUD "Стол" (L): the room of the stage caption right of the strip, su. */
+inline constexpr float CaptionSu = 168.0f;
 inline constexpr double PulseMs = 1200.0;
 }  // namespace UmHudTurnStrip
 
@@ -80,6 +82,8 @@ class UNMATCHED_API UUmHudTurnStrip : public UUserWidget {
 
  private:
   /** One drawn node (main or sub): the size box (tooltip, hit test), the ring, the icon, the badge. */
+  /** HUD "Стол" slice 7: the caption of the stage now right of the strip (L). */
+  void ApplyCaption();
   void StyleNode(int32 Box, const FS09StripNode& N, float Su, FName Badge);
   void BindParts();
 

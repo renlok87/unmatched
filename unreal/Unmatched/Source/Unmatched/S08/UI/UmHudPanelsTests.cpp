@@ -672,8 +672,10 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   const FBox2D Log = L.Rect(EUmHudBlock::Log);
   TestTrue(TEXT("layout: table flag"), L.bTable);
   TestTrue(TEXT("layout: the hero card 380 su"), FMath::IsNearlyEqual(Loc.Max.X - Loc.Min.X, 380.0));
-  TestTrue(TEXT("layout: the prompt in the decision column (right edge, over DECKS)"),
-           FMath::IsNearlyEqual(Status.Max.X, 1896.0) && Status.Max.Y <= Decks.Min.Y);
+  const FBox2D Act = L.Rect(EUmHudBlock::Actions);
+  TestTrue(TEXT("layout: the prompt in the decision column (right edge, right over ACTIONS, under DECKS) - slice 7"),
+           FMath::IsNearlyEqual(Status.Max.X, 1896.0) && Status.Min.Y + UmHudLayout::StatusTwoLineSu <= Act.Min.Y + 0.5 &&
+               Decks.Max.Y <= Status.Min.Y);
   TestTrue(TEXT("layout: the turn strip right over the hero card"),
            Strip.bIsValid && Strip.Max.Y <= Loc.Min.Y && FMath::IsNearlyEqual(Strip.Min.X, Loc.Min.X));
   TestTrue(TEXT("layout: the journal above the strip"), Log.bIsValid && Log.Max.Y <= Strip.Min.Y);

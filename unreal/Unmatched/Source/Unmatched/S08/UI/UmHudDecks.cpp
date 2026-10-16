@@ -263,7 +263,7 @@ void UUmHudDecks::Relayout() {
     // centred on the slip; class S keeps the mini card in the chip
     const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > ChipH + 1.0f;
     const FVector2D CardSize = bPile ? FVector2D(66.0f, 92.0f) : FVector2D(MiniW, MiniH);
-    const FVector2D CardPos = bPile ? P + FVector2D(0.5f * (W - CardSize.X), 14.0f - CardSize.Y)
+    const FVector2D CardPos = bPile ? P + FVector2D(0.5f * (W - CardSize.X), -6.0f - CardSize.Y)  /* slice 7: clear of the chip */
                                     : P + FVector2D(MiniLeft, 0.5f * (ChipH - MiniH));
     USizeBox* MiniBox = I == 0 ? DeckMiniBox.Get() : DiscardMiniBox.Get();
     if (MiniBox) {

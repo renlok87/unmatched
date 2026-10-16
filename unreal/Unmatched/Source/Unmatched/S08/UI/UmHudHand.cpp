@@ -94,7 +94,8 @@ FRow Row(int32 N, const FUmHandFrame& F) {
   FRow R;
   R.CardSize = F.bClassS ? FVector2D(CardWS, CardHS) : FVector2D(CardWL, CardHL);
   const float W = static_cast<float>(R.CardSize.X);
-  const float Nominal = F.bClassS ? StepS : StepL;
+  // slice 7 (third blind review: the hand stood in a flat row like a list): the table look overlaps the cards a little
+  const float Nominal = F.bClassS ? StepS : (S08ArtLook::HudTable() ? StepL - 22.0f : StepL);
   const float CorrL = F.CorridorLeftSu;
   const float CorrR = FMath::Max(F.CorridorLeftSu, F.CorridorRightSu);
   const float Corridor = CorrR - CorrL;
@@ -905,6 +906,17 @@ void UUmHudHand::ApplyOffsets(float DurMs) {
     } else if (C.bSelected && !Model.bLowered) {
       Target = FVector2D(0.0, -Raise);
     }
+    // slice 7: a light fan under the table look - the cards tilt about their bottom centre and sink along an arc; the
+    // hovered, selected or lowered card stands straight
+    float Angle = 0.0f;
+    const int32 N = Model.Cards.Num();
+    if (S08ArtLook::HudTable() && !Frame.bClassS && N > 1 && I != HoverIndex && !C.bSelected && !Model.bLowered) {
+      const float Off = static_cast<float>(I) - 0.5f * static_cast<float>(N - 1);
+      Angle = 2.4f * Off;
+      Target.Y += 2.6f * Off * Off;
+    }
+    W->SetRenderTransformPivot(FVector2D(0.5, 1.0));
+    if (!FMath::IsNearlyEqual(W->GetRenderTransformAngle(), Angle)) W->SetRenderTransformAngle(Angle);
     W->SetOwnerOffset(Target, DurMs);
   }
 }

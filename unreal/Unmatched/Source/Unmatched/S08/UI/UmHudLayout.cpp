@@ -193,12 +193,32 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
   if (L.bTable) {
     const FBox2D Decks = L.Rect(EUmHudBlock::Decks);
     const float StatusW = L.bClassS ? 260.0f : 400.0f;
-    Set(EUmHudBlock::Status, UmLayoutBox(W - M - StatusW, static_cast<float>(Decks.Min.Y) - GapSu - StatusTwoLineSu,
-                                         StatusW, 48.0f));
+    if (L.bClassS) {
+      Set(EUmHudBlock::Status, UmLayoutBox(W - M - StatusW, static_cast<float>(Decks.Min.Y) - GapSu - StatusTwoLineSu,
+                                           StatusW, 48.0f));
+    } else {
+      // slice 7 (third blind review: the prompt hung apart from the actions tray): L reads bottom-up actions, the prompt
+      // right over them (its two-line room), the piles above the prompt; the deck panel ends over the piles
+      const FBox2D Act = L.Rect(EUmHudBlock::Actions);
+      const FBox2D StatusR = UmLayoutBox(W - M - StatusW, static_cast<float>(Act.Min.Y) - GapSu - StatusTwoLineSu, StatusW, 48.0f);
+      Set(EUmHudBlock::Status, StatusR);
+      const float DecksH = static_cast<float>(Decks.Max.Y - Decks.Min.Y);
+      const FBox2D DecksR = UmLayoutBox(static_cast<float>(Decks.Min.X), static_cast<float>(StatusR.Min.Y) - GapSu - DecksH,
+                                        static_cast<float>(Decks.Max.X - Decks.Min.X), DecksH);
+      Set(EUmHudBlock::Decks, DecksR);
+      if (L.HasRect(EUmHudBlock::DeckPanel)) {
+        const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
+        Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),
+                                                static_cast<float>(DP.Max.X - DP.Min.X),
+                                                static_cast<float>(DecksR.Min.Y - GapSu - DP.Min.Y)));
+      }
+    }
     const FBox2D PanelLocR = L.Rect(EUmHudBlock::PanelLoc);
     const FBox2D TopR = L.Rect(EUmHudBlock::Top);
     const float StripH = static_cast<float>(TopR.Max.Y - TopR.Min.Y);
-    const float StripW = L.bClassS ? UmHudTurnStrip::CompactWidthSu(true) : UmHudTurnStrip::FullWidthSu(false);
+    // L: the full strip and the caption of the stage now (slice 7: the glyphs alone did not read)
+    const float StripW = L.bClassS ? UmHudTurnStrip::CompactWidthSu(true)
+                                   : UmHudTurnStrip::FullWidthSu(false) + UmHudTurnStrip::CaptionSu;
     L.bTurnStripCompact = L.bClassS;
     const FBox2D Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, StripW, StripH);
     Set(EUmHudBlock::TurnStrip, Strip);

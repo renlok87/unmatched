@@ -49,14 +49,14 @@ FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
     G.DiscSu = 80.0f;
     G.RingPos = FVector2D(bOpp ? 272.0 : 4.0, 16.0);
     G.TextX = bOpp ? 252.0f : 128.0f;
-    G.NameTop = 8.0f;
-    G.StatusTop = 36.0f;
-    G.HpTop = 51.0f;
+    G.NameTop = 12.0f;
+    G.StatusTop = 40.0f;
+    G.HpTop = 54.0f;
     G.TrackerSu = 32.0f;
     G.TrackerX = bOpp ? 14.0f : 366.0f;
     G.TrackerTop = 12.0f;
     G.bSidekickRow = true;
-    G.SidekickTop = 82.0f;
+    G.SidekickTop = 84.0f;
     return G;
   }
   if (!bClassS) {
@@ -345,7 +345,11 @@ void UUmHudPlayerPanel::Setup(EUmPanelSide InSide, const FS08TurnHudLook& Look, 
     Portrait->Setup(Side == EUmPanelSide::Opp, Look, TeamColor);
     Portrait->SetVisibility(ESlateVisibility::HitTestInvisible);
   }
-  if (TrackerRow) TrackerRow->SetVisibility(ESlateVisibility::HitTestInvisible);
+  // slice 7: under the table look the turn strip's caption says the actions - the tracker pips stay for their cues, unseen
+  if (TrackerRow) {
+    TrackerRow->SetVisibility(ESlateVisibility::HitTestInvisible);
+    TrackerRow->SetRenderOpacity(S08ArtLook::HudTable() ? 0.0f : 1.0f);  // the portrait drives its visibility
+  }
   const bool bOpp = Side == EUmPanelSide::Opp;
   if (NameText) NameText->SetJustification(bOpp ? ETextJustify::Right : ETextJustify::Left);
   bGeometryApplied = false;
@@ -454,6 +458,17 @@ void UUmHudPlayerPanel::ApplyTableArt() {
   };
   Ensure(TurnGlow, TEXT("TurnGlowTable"));
   (void)Inset; (void)H; (void)ArtX; (void)BandX;
+  // slice 7 (third blind review: the two portraits framed differently): one gilt ring on every portrait, the turn
+  // smoulder of the portrait keeps its own glow inside it
+  UImage* Rim = Cast<UImage>(WidgetTree->FindWidget(FName(TEXT("PortraitRimTable"))));
+  if (!Rim) {
+    Rim = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("PortraitRimTable")));
+    Canvas->AddChild(Rim);
+  }
+  Rim->SetBrush(FSlateRoundedBoxBrush(FLinearColor::Transparent, 0.5f * G.RingSu, FLinearColor::FromSRGBColor(FColor(212, 170, 92)), 3.0f));
+  Rim->SetVisibility(ESlateVisibility::HitTestInvisible);
+  UmPanelPlace(Rim, G.RingPos, false, FVector2D(G.RingSu, G.RingSu));
+  if (UCanvasPanelSlot* RimSlot = Cast<UCanvasPanelSlot>(Rim->Slot)) RimSlot->SetZOrder(50);
   // the turn glow: the side that acts (own turn / their turn / the AI thinking) - the team colour round the card
   const bool bActs = Model.State == EUmPanelState::Own || Model.State == EUmPanelState::Opp || Model.State == EUmPanelState::Ai;
   const FLinearColor Team = UUmHudTheme::Get().Color(bOpp ? TEXT("team.p2") : TEXT("team.p1"));
@@ -573,7 +588,6 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         Hp->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
         Hp->SetText(UmHudPanel::HpText(S.Hp, S.MaxHp));
         // HUD "Стол" (03 §3.1): a one-hit sidekick (the harpies) carries no «1/1» - its number is the identity
-        if (bTable && S.MaxHp <= 1) Hp->SetVisibility(ESlateVisibility::Collapsed);
         if (UVerticalBoxSlot* H = Column->AddChildToVerticalBox(Hp)) H->SetPadding(FMargin(0.0f, -2.0f, 0.0f, 0.0f));
         Item->AddChildToOverlay(Column);
         if (S.bFallen) {

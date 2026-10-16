@@ -204,7 +204,10 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
   bHasModel = true;
   if (Panel && bTextureChanged) {
     if (S08ArtLook::HudTable()) {
-      Panel->SetBrush(FSlateNoResource());  // HUD "Стол": the backs lie on the table edge, no box (01-INSPECTION №4)
+      // slice 7 (third blind review: the backs and the caption lay on the busy scene): a tray of the hero cards' material
+      const UUmHudTheme& Theme = UUmHudTheme::Get();
+      const FSlateBrush* Tray = Theme.HasTextureSkin(TEXT("hud.table.card")) ? Theme.SkinFor(TEXT("hud.table.card"), Model.PxPerSu) : nullptr;
+      if (Tray) Panel->SetBrush(*Tray); else Panel->SetBrush(FSlateNoResource());
     } else if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Model.PxPerSu)) {
       Panel->SetBrush(*Skin);
     }

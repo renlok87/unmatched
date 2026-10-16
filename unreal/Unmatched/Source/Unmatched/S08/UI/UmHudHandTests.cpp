@@ -23,6 +23,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud.Hand+Unmatched.S09.HudPress.UmgHand" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "../../S09/S09ManeuverUi.h"
 #include "../S08BoardModel.h"
 #include "Blueprint/WidgetTree.h"
@@ -201,6 +202,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandLayoutTest,
     "Unmatched.S08.Hud.Hand.Layout row and fan 3 5 7 9 10 cards x L and S on both FIELDs, HB-22 numbers, lowered 48 su",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHandLayoutTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HB-22 row numbers of the HUD v2 look (slice 7 fans the table hand)
   using namespace UmHandTest;
   for (const FHandCanvas& C : Canvases) {
     for (const bool bSarpedon : {false, true}) {
@@ -322,6 +324,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandInputTest,
     "Unmatched.S08.Hud.Hand.Input instance ids, keys 1-9, reorder, hover strips, preview keeps the hover, wheel, double click, inspector",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHandInputTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HB-22 row numbers of the HUD v2 look (slice 7 fans the table hand)
   using namespace UmHandTest;
   FWorld W(TEXT("UmHandInput"));
   const FUmHandFrame F = Frame(Canvases[0], false);
@@ -566,6 +569,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandBoostTest,
     "Unmatched.S08.Hud.Hand.Boost maneuver boost into SLOT face down plus N, King Arthur attack boost beside COMBAT-L, why.boost.no.value",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHandBoostTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HB-22 row numbers of the HUD v2 look (slice 7 fans the table hand)
   using namespace UmHandTest;
   FWorld W(TEXT("UmHandBoost"));
   // ---- the maneuver: Medusa boosts with Dash (+1)

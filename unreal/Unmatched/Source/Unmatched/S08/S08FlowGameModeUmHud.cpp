@@ -1177,7 +1177,10 @@ void AS08FlowGameMode::TickUmHud() {
       const FVector2D Want = Cmd->GetDesiredSize();
       const FBox2D St = R.Layout.Rect(EUmHudBlock::Status);
       ShiftX = FMath::Max(0.0f, static_cast<float>(St.Max.X) - static_cast<float>(Want.X));
-      ShiftY = FMath::Max(0.0f, static_cast<float>(St.Min.Y) - static_cast<float>(Want.Y) - 4.0f);
+      // slice 7: in L the piles stand over the prompt - the buttons go over the top of the column (never over the piles)
+      float ColumnTop = static_cast<float>(St.Min.Y);
+      if (R.Layout.HasRect(EUmHudBlock::Decks)) ColumnTop = FMath::Min(ColumnTop, static_cast<float>(R.Layout.Rect(EUmHudBlock::Decks).Min.Y));
+      ShiftY = FMath::Max(0.0f, ColumnTop - static_cast<float>(Want.Y) - 4.0f);
     }
     if (!FMath::IsNearlyEqual(ShiftY, R.CommandShiftSu, 0.5f) || !FMath::IsNearlyEqual(ShiftX, R.CommandShiftXSu, 0.5f)) {
       R.CommandShiftSu = ShiftY;
