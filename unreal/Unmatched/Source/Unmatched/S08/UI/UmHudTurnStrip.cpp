@@ -1,5 +1,6 @@
 // HB-50 TURN-STRIP: the widget - see UmHudTurnStrip.h.
 #include "UmHudTurnStrip.h"
+#include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
@@ -271,7 +272,11 @@ void UUmHudTurnStrip::ApplyModel(const FS09TurnStripModel& InModel, const FUmTur
   bHasModel = true;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (bFrameChanged && Plate) {
-    if (const FSlateBrush* Skin = Theme.SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Frame.PxPerSu)) Plate->SetBrush(*Skin);
+    const bool bTable = S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.strip"));
+    if (const FSlateBrush* Skin = bTable ? Theme.SkinFor(TEXT("hud.table.strip"), Frame.PxPerSu)
+                                         : Theme.SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Frame.PxPerSu)) {
+      Plate->SetBrush(*Skin);
+    }
   }
   SetVisibility(Model.bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
   if (!Model.bShow) return;

@@ -1,5 +1,6 @@
 // VS-2 HB-11: the HUD button of the UMG HUD - see UmButton.h.
 #include "UmButton.h"
+#include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
@@ -411,7 +412,7 @@ void UUmButton::ApplyDiscRing() {
                           : State == EUmButtonState::Selected ? TEXT("active")
                                                               : TEXT("normal");
   const FName Key(*FString::Printf(TEXT("hud.action.ring.%s"), StateKey));
-  const bool bShow = DiscRingSu > 0.0f && Content && WidgetTree && Theme.HasTextureSkin(Key);
+  const bool bShow = DiscRingSu > 0.0f && Content && WidgetTree && Theme.HasTextureSkin(Key) && !S08ArtLook::HudTable();
   if (!bShow) {
     if (DiscRing) DiscRing->SetVisibility(ESlateVisibility::Collapsed);
     return;
@@ -441,6 +442,25 @@ void UUmButton::Restyle() {
     if (Model.bFlat && Model.Variant == EUmButtonVariant::Normal &&
                (State == EUmButtonState::Normal || State == EUmButtonState::Focus)) {
       Body->SetBrush(FSlateNoResource());  // VS-2 HB-14: at rest the plate of the block shows through
+    } else if (Model.bTableSlip && S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.slip"))) {
+      if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("hud.table.slip"), PxPerSu)) {
+        FSlateBrush Slip = *Skin;
+        const bool bLit = State == EUmButtonState::Hover || State == EUmButtonState::Pressed || State == EUmButtonState::Selected;
+        Slip.TintColor = FSlateColor(bLit ? FLinearColor(1.0f, 1.0f, 1.0f, 1.0f) : FLinearColor(0.88f, 0.86f, 0.82f, 1.0f));
+        Body->SetBrush(Slip);
+      }
+    } else if (bDisc && S08ArtLook::HudTable()) {
+      // HUD "Стол" (03 §3.5): a bare action disc with its caption - no square plate; hover / selected light a soft
+      // round-cornered pad, the selected one with the P1 gold edge
+      const bool bLit = State == EUmButtonState::Hover || State == EUmButtonState::Pressed;
+      const bool bSel = State == EUmButtonState::Selected;
+      if (bSel) {
+        Body->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.93f, 0.89f, 0.81f, 0.10f), 10.0f, Theme.Color(TEXT("team.p1")), 2.0f));
+      } else if (bLit) {
+        Body->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.93f, 0.89f, 0.81f, 0.12f), 10.0f));
+      } else {
+        Body->SetBrush(FSlateNoResource());
+      }
     } else if (const FSlateBrush* Skin = Theme.SkinFor(UmButton::SkinKeyFor(Model, State), PxPerSu)) {
       Body->SetBrush(*Skin);  // VS-4 HB-43: a disc cell too (its HB-08 skin, ВР-VS2-HB42-03)
     }

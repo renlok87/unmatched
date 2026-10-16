@@ -1,6 +1,8 @@
 // VS-4 HB-39: the event log - see UmHudLog.h.
 #include "UmHudLog.h"
 
+#include "../S08ArtLook.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
 #include "UmGameHud.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
@@ -257,7 +259,11 @@ void UUmHudLog::SetFrame(const FUmLogFrame& InFrame) {
   const bool bSkin = !bHasFrame || Frame.PxPerSu != InFrame.PxPerSu;
   Frame = InFrame;
   bHasFrame = true;
-  if (Panel && bSkin) {
+  if (Panel && bSkin && S08ArtLook::HudTable()) {
+    // HUD "Стол" (hud-redesign 03 §3.8): the journal is text on a soft dark veil, no frame (it is not a box component)
+    Panel->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.031f, 0.035f, 0.047f, 0.72f), 10.0f));
+    Panel->SetPadding(FMargin(8.0f, 6.0f, 8.0f, 6.0f));
+  } else if (Panel && bSkin) {
     if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Frame.PxPerSu)) Panel->SetBrush(*Skin);
     // HUD v2: the marble rim and gold corners of the kit's panel - the title and the row stripes keep inside them
     const bool bV2 = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner"));
@@ -361,6 +367,8 @@ void UUmHudLog::RestyleRows() {
     }
   }
   if (Empty) Empty->SetVisibility(Rows.Num() == 0 ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  // HUD "Стол": an empty journal is not drawn at all (01-INSPECTION: «Событий пока нет» reads as unfinished)
+  if (S08ArtLook::HudTable()) ApplyVisibility();
 }
 
 FName UUmHudLog::GetRowColorToken(int32 I) const {
@@ -456,7 +464,8 @@ void UUmHudLog::SetOpen(bool bInOpen) {
 }
 
 void UUmHudLog::ApplyVisibility() {
-  const bool bWanted = (!Frame.bClassS || bOpen) && (!bHiddenWanted || BlockAlpha > 0.0f);
+  const bool bEmptyTable = S08ArtLook::HudTable() && Rows.Num() == 0 && !(Frame.bClassS && bOpen);
+  const bool bWanted = (!Frame.bClassS || bOpen) && (!bHiddenWanted || BlockAlpha > 0.0f) && !bEmptyTable;
   const ESlateVisibility V = bWanted ? ESlateVisibility::Visible : ESlateVisibility::Collapsed;
   if (GetVisibility() != V) SetVisibility(V);
   if (Frame.bClassS && bOpen && !bHiddenWanted) {

@@ -1,6 +1,7 @@
 // VS-2 HB-15: STATUS - see UmHudStatusLine.h.
 #include "UmHudStatusLine.h"
 
+#include "../S08ArtLook.h"
 #include "../S08IconMotion.h"
 #include "UmGameHud.h"
 #include "UmHudTheme.h"
@@ -21,15 +22,23 @@
 const TCHAR* const UUmHudStatusLine::WidgetBlueprintPath = TEXT("/Game/S08/UI/Hud/WBP_UI_HUD_STATUS");
 
 namespace UmHudStatus {
+/** HUD "Стол" (hud-redesign 03 §3.5): the prompt plate of the box canon (hud.table.strip) in the decision column; HUD
+ *  v2: the marble cartouche with meander ends; else the capsule. */
+FName BannerKey() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  if (S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.strip"))) return FName(TEXT("hud.table.strip"));
+  return Theme.HasTextureSkin(TEXT("hud.status.banner")) ? FName(TEXT("hud.status.banner")) : NAME_None;
+}
+
 float BannerEndsSu() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  const FSlateBrush* Banner = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? Theme.Skin(TEXT("hud.status.banner")) : nullptr;
+  const FSlateBrush* Banner = BannerKey().IsNone() ? nullptr : Theme.Skin(BannerKey());
   return Banner ? FMath::Max(Banner->Margin.Left, Banner->Margin.Right) * Banner->ImageSize.X : 0.0f;
 }
 
 float BannerRimSu() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  const FSlateBrush* Banner = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? Theme.Skin(TEXT("hud.status.banner")) : nullptr;
+  const FSlateBrush* Banner = BannerKey().IsNone() ? nullptr : Theme.Skin(BannerKey());
   return Banner ? FMath::Max(0.0f, FMath::Max(Banner->Margin.Top, Banner->Margin.Bottom) * Banner->ImageSize.Y - 6.0f) : 0.0f;
 }
 
@@ -441,7 +450,7 @@ void UUmHudStatusLine::Render() {
   }
   if (Body) {
     // HUD v2 (art/imagegen/hud-v2-codex): the marble cartouche with meander ends when the theme has it, else the capsule
-    const FName BannerKey = Theme.HasTextureSkin(TEXT("hud.status.banner")) ? FName(TEXT("hud.status.banner")) : FName(TEXT("capsule"));
+    const FName BannerKey = UmHudStatus::BannerKey().IsNone() ? FName(TEXT("capsule")) : UmHudStatus::BannerKey();
     if (const FSlateBrush* Skin = Theme.SkinFor(BannerKey, StatusFrame.PxPerSu)) Body->SetBrush(*Skin);
     Body->SetPadding(FMargin(PadX, RimSu));
     // «…»: the full text in the tooltip - the capsule then takes the hover

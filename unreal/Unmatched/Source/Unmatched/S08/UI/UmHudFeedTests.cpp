@@ -22,6 +22,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud.Log+Unmatched.S08.Hud.Toast+Unmatched.S08.Hud.Subtitle+Unmatched.S08.Hud.Pending" <log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "../../S09/S09ManeuverUi.h"
 #include "../../S09/S09OpponentView.h"
 #include "../../S09/S09PendingPresent.h"
@@ -147,6 +148,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudLogFeedTest,
     "Unmatched.S08.Hud.Log.Feed row, 50 lines, autoscroll, 6 / 3 / 12 rows, hidden in the combat",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudLogFeedTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 look this test pins
   using namespace UmFeedTest;
   FWorld W(TEXT("UmHudLogFeed"));
   if (!TestNotNull(TEXT("world"), W.World)) return false;

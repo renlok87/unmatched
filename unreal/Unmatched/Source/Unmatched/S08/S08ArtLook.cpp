@@ -51,6 +51,16 @@ bool PortraitAvatars() { return DecideCardMedia(FParse::Param(FCommandLine::Get(
 
 bool CardArt() { return DecideCardMedia(FParse::Param(FCommandLine::Get(), CardArtLegacyFlagName)); }
 
+namespace {
+int32 GHudTableForTest = -1;
+}
+
+bool HudTable() {
+  return GHudTableForTest >= 0 ? GHudTableForTest == 1 : !FParse::Param(FCommandLine::Get(), HudTableLegacyFlagName);
+}
+
+void SetHudTableForTest(int32 Value) { GHudTableForTest = Value; }
+
 FString CardMediaField(const TCHAR* CommandLine) {
   const bool bPortraitLegacy = CommandLine && FParse::Param(CommandLine, PortraitLegacyFlagName);
   const bool bCardLegacy = CommandLine && FParse::Param(CommandLine, CardArtLegacyFlagName);

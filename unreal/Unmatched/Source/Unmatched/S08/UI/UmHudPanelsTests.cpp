@@ -17,6 +17,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "UmGameHud.h"
 #include "UmHudLayout.h"
 #include "UmHudOppHand.h"
@@ -126,6 +127,7 @@ FS08BoardFighter Fighter(const TCHAR* Id, const TCHAR* Owner, const TCHAR* Label
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPlayerPanelTreeTest, "Unmatched.S08.Hud.PlayerPanel.Tree",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudPlayerPanelTreeTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 look this test pins
   using namespace UmPanelsTest;
   FWorld W(TEXT("UmHudPanelTree"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;
@@ -399,6 +401,7 @@ bool FUmHudPlayerPanelTurnLookTest::RunTest(const FString&) {
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPlayerPanelOppMirrorTest, "Unmatched.S08.Hud.PlayerPanel.OppMirror",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudPlayerPanelOppMirrorTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 look this test pins
   using namespace UmPanelsTest;
   FWorld W(TEXT("UmHudPanelOpp"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;
@@ -645,6 +648,56 @@ bool FUmHudPanelsLeetFitTest::RunTest(const FString&) {
   TestTrue(TEXT("the caption keeps its line in the row: ellipsis, clipped"),
            H->Caption->GetClipping() == EWidgetClipping::ClipToBounds);
   TestEqual(TEXT("the tooltip is the whole caption"), H->Caption->GetToolTipText().ToString(), H->Caption->GetText().ToString());
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------------------------- Table
+
+// HUD "Стол" (docs/game-design/hud-redesign/03-CONCEPT.md §2, §3.1): the hero card of class L (380 x 136, the HP number
+// on the dial, no heart row, no «ВАШ ХОД» / «ЖДЁТ» word, «ИИ ДУМАЕТ» kept) and the table layout (the prompt in the
+// decision column over DECKS, the turn strip over PANEL-LOC, LOG above it, nothing of them over FIELD).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPlayerPanelTableTest, "Unmatched.S08.Hud.PlayerPanel.Table",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope Table(true);
+  using namespace UmPanelsTest;
+  // ---- the layout (world-free)
+  const FBox2D Field(FVector2D(410.0, 255.0), FVector2D(1440.0, 850.0));  // Marmoreal FIELD at 1080p (04 §1.6)
+  const FUmHudLayout L = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, &Field, true);
+  const FBox2D Loc = L.Rect(EUmHudBlock::PanelLoc);
+  const FBox2D Status = L.Rect(EUmHudBlock::Status);
+  const FBox2D Decks = L.Rect(EUmHudBlock::Decks);
+  const FBox2D Strip = L.Rect(EUmHudBlock::TurnStrip);
+  const FBox2D Log = L.Rect(EUmHudBlock::Log);
+  TestTrue(TEXT("layout: table flag"), L.bTable);
+  TestTrue(TEXT("layout: the hero card 380 su"), FMath::IsNearlyEqual(Loc.Max.X - Loc.Min.X, 380.0));
+  TestTrue(TEXT("layout: the prompt in the decision column (right edge, over DECKS)"),
+           FMath::IsNearlyEqual(Status.Max.X, 1896.0) && Status.Max.Y <= Decks.Min.Y);
+  TestTrue(TEXT("layout: the turn strip right over the hero card"),
+           Strip.bIsValid && Strip.Max.Y <= Loc.Min.Y && FMath::IsNearlyEqual(Strip.Min.X, Loc.Min.X));
+  TestTrue(TEXT("layout: the journal above the strip"), Log.bIsValid && Log.Max.Y <= Strip.Min.Y);
+  TestEqual(TEXT("layout: no persistent block over FIELD"), L.OverlapFieldPx2, 0.0);
+  const FUmHudLayout Old = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, &Field, false);
+  TestTrue(TEXT("layout: the HUD v2 layout keeps the prompt at the top"), Old.Rect(EUmHudBlock::Status).Min.Y < 100.0);
+  // ---- the card
+  FWorld W(TEXT("UmHudPanelTable"));
+  if (!TestNotNull(TEXT("test world"), W.World)) return false;
+  FRu Ru;
+  UUmHudPlayerPanel* P = Make(W.World, EUmPanelSide::Own);
+  if (!TestNotNull(TEXT("panel"), P)) return false;
+  P->SetReducedForTest(1);
+  P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Own));
+  TestTrue(TEXT("card: ring at (4, 16)"), PosOf(P->Portrait).Equals(FVector2D(4.0, 16.0)));
+  TestEqual(TEXT("card: no «ВАШ ХОД» word (the card's glow says it)"), P->StatusText->GetText().ToString(), FString());
+  TestEqual(TEXT("card: the heart row transparent"), P->HpRow->GetRenderOpacity(), 0.0f);
+  if (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.table.dial"))) {
+    UTextBlock* Dial = Cast<UTextBlock>(P->WidgetTree->FindWidget(FName(TEXT("HpDialTextTable"))));
+    TestTrue(TEXT("card: the HP number on the dial"), Dial && Dial->GetText().ToString() == TEXT("14"));
+  } else {
+    AddWarning(TEXT("hud.table.dial not imported: the dial is not checked"));
+  }
+  P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Ai));
+  TestFalse(TEXT("card: «ИИ ДУМАЕТ» kept"), P->StatusText->GetText().IsEmpty());
   return true;
 }
 

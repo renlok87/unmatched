@@ -99,9 +99,12 @@ struct UNMATCHED_API FUmHudLayout {
   bool bEnglishChips = false;
   /** HB-50: the turn strip shows only its four nodes (no sub-step tray): the full one would squeeze STATUS. */
   bool bTurnStripCompact = false;
+  /** HUD "Стол" (hud-redesign 03 §2): the player panels 380 su wide (class L), the prompt (STATUS) in the decision
+   *  column over DECKS, the turn strip over PANEL-LOC with LOG above it. */
+  bool bTable = false;
 
   /** CanvasSu = window / PxPerSu (fractional: 1137.78 x 640 at 1280x720 150 %); Field in su or null. */
-  static FUmHudLayout Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu);
+  static FUmHudLayout Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu, bool bInTable = false);
   const FBox2D& Rect(EUmHudBlock Block) const { return Rects[static_cast<int32>(Block)]; }
   bool HasRect(EUmHudBlock Block) const { return Rect(Block).bIsValid != 0; }
   /** Where a drawn or discarded card flies (centre of the deck / discard chip, su; HB-27: the chips of DeckChipRect). */

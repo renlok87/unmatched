@@ -1,5 +1,6 @@
 // VS-2 HB-14: TOP - see UmHudTop.h.
 #include "UmHudTop.h"
+#include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08TraceLog.h"
@@ -156,7 +157,11 @@ void UUmHudTop::ApplyModel(const FUmTopModel& InModel) {
     // HB-10: the x2 plate from 150 % (DPI x UI scale)
     if (Plate) {
       // HUD v2: the «Ход N» plate of the kit, the panel skin without it
-      if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Model.PxPerSu)) {
+      const UUmHudTheme& Theme = UUmHudTheme::Get();
+      // HUD "Стол": the box-canon strip (hud.table.strip); HUD v2: the «Ход N» plate of the kit
+      const bool bTable = S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.strip"));
+      if (const FSlateBrush* Skin = bTable ? Theme.SkinFor(TEXT("hud.table.strip"), Model.PxPerSu)
+                                           : Theme.SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Model.PxPerSu)) {
         Plate->SetBrush(*Skin);
       }
     }
@@ -164,7 +169,13 @@ void UUmHudTop::ApplyModel(const FUmTopModel& InModel) {
     ApplyButton(LogButton, UmHudTop::LogIcon, TEXT("hud.top.log"), Square, bLogGlyph);
     if (LogButton) LogButton->SetVisibility(Model.bClassS ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
   }
-  if (Conn) Conn->ApplyState(Model.Conn, Square);
+  if (Conn) {
+    Conn->ApplyState(Model.Conn, Square);
+    // HUD "Стол" (03 §6): the connection chip only when something is wrong
+    if (S08ArtLook::HudTable()) {
+      Conn->SetVisibility(Model.Conn == EUmConnState::Online ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    }
+  }
   if (TurnText) {
     if (Model.TurnCount > 0) {
       TurnText->SetText(UmHudTop::TurnText(Model.TurnCount));

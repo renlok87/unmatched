@@ -67,7 +67,7 @@ UmHudFeed::FStackInput FUmFeedBlocks::StackInput(const FUmFeedInput& In, const T
   S.TopBandSu = L.bClassS ? TopBandSSu : TopBandLSu;
   const FBox2D& Top = L.Rect(EUmHudBlock::Top);
   const float StatusBottom = In.StatusBottomSu >= 0.0f ? In.StatusBottomSu
-                             : L.Rect(EUmHudBlock::Status).bIsValid ? static_cast<float>(L.Rect(EUmHudBlock::Status).Max.Y)
+                             : (L.Rect(EUmHudBlock::Status).bIsValid && !L.bTable) ? static_cast<float>(L.Rect(EUmHudBlock::Status).Max.Y)
                              : Top.bIsValid ? static_cast<float>(Top.Max.Y)
                                             : L.MarginSu;
   S.MinTopSu = StatusBottom + GapSu;

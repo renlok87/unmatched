@@ -8191,6 +8191,10 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
   FString SelectedId;
   TSet<uint64> Legal;
   CurrentSelection(SelectedId, Legal);
+  TSet<FString> AttackCandidates;
+  if (CommandUi.Mode == ES09CommandMode::AttackDraft && !CommandUi.AttackAttackerId.IsEmpty()) {
+    AttackCandidates.Append(FS09CommandUi::LegalAttackTargets(BoardModel, HudFighters(), CommandUi.AttackAttackerId));
+  }
 
   // ---- tag content (pushed on change only, HUD-RULES P2)
   TArray<const FS08BoardFighter*> Alive;
@@ -8228,6 +8232,15 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       Mode = ES08TagMode::Full;
     } else if (!Actor || !Actor->HasArtSculpt()) {
       Mode = ES08TagMode::Full;
+    }
+    // HUD "Стол" (hud-redesign 03 §3.6, U-7): nothing permanent over the field - a tag only over a hurt fighter, the
+    // hovered / selected one, the attack's target and the legal targets of the attack draft; the panels carry the
+    // rest (rollback -S08HudTableLegacy: a tag over every fighter)
+    if (S08ArtLook::HudTable() && Mode != ES08TagMode::Hidden && !ArtHud.bTagNamesAll) {
+      const bool bHurt = F->MaxHealth > 0 && F->Health < F->MaxHealth;
+      const bool bFocus = F->Id == ArtHud.HoveredFighterId || F->Id == SelectedId || F->Id == IconTarget ||
+                          F->Id == CommandUi.AttackTargetId || AttackCandidates.Contains(F->Id);
+      if (!bHurt && !bFocus) Mode = ES08TagMode::Hidden;
     }
     const ES08TeamSlot Team = BoardActor->TeamOfFighter(*F);
     const ES08TeamSlot Look =

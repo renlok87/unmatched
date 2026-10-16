@@ -1,5 +1,6 @@
 // VS-3 HB-27: DECKS - see UmHudDecks.h.
 #include "UmHudDecks.h"
+#include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08ArtHud.h"
@@ -253,6 +254,7 @@ void UUmHudDecks::Relayout() {
       B.Variant = EUmButtonVariant::Normal;
       B.HeightSu = ChipH;
       B.MinWidthSu = W;
+      B.bTableSlip = S08ArtLook::HudTable();  // HUD "Стол": the count printed on a paper slip of the box
       Button->ApplyModel(B);
       UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
     }
@@ -294,6 +296,12 @@ void UUmHudDecks::ApplyContent() {
   if (!Model.bShow) return;
   const bool bS = Frame.bClassS;
   if (DeckCount) DeckCount->SetText(UmHudDecks::DeckLabel(Model, bS));
+  if (S08ArtLook::HudTable()) {
+    // HUD "Стол": print ink on the paper slip
+    const FSlateColor Ink(UUmHudTheme::Get().Color(TEXT("card.navy")));
+    if (DeckCount) DeckCount->SetColorAndOpacity(Ink);
+    if (DiscardCount) DiscardCount->SetColorAndOpacity(Ink);
+  }
   if (DiscardCount) DiscardCount->SetText(UmHudDecks::DiscardLabel(Model, bS));
   // 2026-10-15 playtest: «Сброс 10» touched the chip's right rim under the HUD v2 skin (2560x1080 read «Сброс 1C») -
   // a count that does not fit between the text start and the rim steps down to type.tag

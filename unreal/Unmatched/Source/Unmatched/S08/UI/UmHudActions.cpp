@@ -1,5 +1,6 @@
 // VS-4 HB-43: ACTIONS - UUmHudActions, see UmHudActions.h.
 #include "UmHudActions.h"
+#include "../S08ArtLook.h"
 
 #include "../S08ArtHud.h"
 #include "UmGameHud.h"
@@ -442,6 +443,10 @@ void UUmHudActions::ApplyButtons() {
       M.MinWidthSu = UmHudActions::CellWidthSu(Key, false);
     }
     B->ApplyModel(M);
+    // HUD "Стол" (03 Р-5): what is illegal is not drawn - КОНЕЦ ХОДА only while the end of turn is open (SD-44)
+    if (Key == EUmActionKey::EndTurn && S08ArtLook::HudTable()) {
+      B->SetVisibility(M.bEnabled ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+    }
   }
 }
 

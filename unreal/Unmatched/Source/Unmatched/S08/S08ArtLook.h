@@ -100,6 +100,17 @@ constexpr bool DecideCardMedia(bool bLegacyFlag) { return !bLegacyFlag; }
 UNMATCHED_API bool PortraitAvatars();
 /** True unless -S08CardArtLegacy: card faces show the scan, backs the original card back. */
 UNMATCHED_API bool CardArt();
+/** HUD "Стол" (docs/game-design/hud-redesign/03-CONCEPT.md, 2026-10-16): the table look of the match HUD - box-canon
+ *  skins (hud.table.*), no laurel medallions, HP on a dial, no HP tags over unhurt fighters, the prompt in the decision
+ *  column, bare action discs. -S08HudTableLegacy rolls it back to the HUD v2 look of 9360ae41. */
+inline const TCHAR* const HudTableLegacyFlagName = TEXT("S08HudTableLegacy");
+UNMATCHED_API bool HudTable();
+/** Tests: pin the look (1 = table, 0 = HUD v2, -1 = the command line) - the HUD v2 tests keep their geometry. */
+UNMATCHED_API void SetHudTableForTest(int32 Value);
+struct FHudTableTestScope {
+  explicit FHudTableTestScope(bool bTable) { SetHudTableForTest(bTable ? 1 : 0); }
+  ~FHudTableTestScope() { SetHudTableForTest(-1); }
+};
 /** The ARTLOOK fields of CP-02: "portraits=avatar|legacy(-S08PortraitLegacy) cards=art|legacy(-S08CardArtLegacy)". */
 UNMATCHED_API FString CardMediaField(const TCHAR* CommandLine);
 

@@ -466,7 +466,8 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   if (UmHudRoot) {
     UmHudRoot->SetGameInset(R.InsetSu);
   }
-  R.Layout = FUmHudLayout::Compute(CanvasPx / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr);
+  R.Layout = FUmHudLayout::Compute(CanvasPx / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr,
+                                   S08ArtLook::HudTable());
   R.Layout.bEnglishChips = UmCardMedia::PreferredLang() == TEXT("en");  // VS-3 HB-27: the chip widths of the language
   R.bLayout = true;
   if (UmHudRoot) {
@@ -2121,7 +2122,8 @@ void AS08FlowGameMode::RefreshUmCombat() {
     }
   }
   if (const UUmHudStatusLine* Status = R.TopStrip.GetStatus()) {
-    if (Status->IsShown()) In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + Status->GetBodySizeSu().Y;
+    // HUD "Стол": STATUS lives in the decision column, not over the field - nothing hangs under it
+    if (Status->IsShown() && !R.Layout.bTable) In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + Status->GetBodySizeSu().Y;
   }
   // VS-5 E4 (VS-4 «Открыто» п. 2): the resolve window's button on the own edge (the Slate one gives way)
   In.bResolveButton = In.bOpen && In.bResolvePhase && CommandUi.Mode == ES09CommandMode::CombatResolve && UmHudOwnsSlateBlock(TEXT("resolve"));
@@ -2430,7 +2432,7 @@ void AS08FlowGameMode::RefreshUmPending() {
   F.CanvasSu = R.Layout.CanvasSu;
   const FBox2D Center = R.Layout.Rect(EUmHudBlock::Center);
   float Top = Center.bIsValid ? static_cast<float>(Center.Min.Y) : (F.bClassS ? 64.0f : 80.0f);
-  if (Status && Status->IsShown()) {
+  if (Status && Status->IsShown() && !R.Layout.bTable) {
     // HUD v2: + the 8 su the choice plate's marble rim grows outward (UUmHudPending), so the two frames never touch
     const float RimGap = UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 8.0f;
     Top = FMath::Max(Top, static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y) + RimGap);
@@ -2636,8 +2638,10 @@ void AS08FlowGameMode::TickUmFeed() {
   const UUmHudBanner* Banner = R.TopStrip.GetBanner();
   In.bBannerShown = Banner && Banner->GetAlpha() > 0.0f;
   const UUmHudStatusLine* Status = R.TopStrip.GetStatus();
-  if (Status && Status->IsShown() && R.Layout.HasRect(EUmHudBlock::Status)) {
+  if (Status && Status->IsShown() && R.Layout.HasRect(EUmHudBlock::Status) && !R.Layout.bTable) {
     In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y);
+  } else if (Status && Status->IsShown() && R.Layout.bTable) {
+    In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Status));  // HUD "Стол": the prompt in the decision column is a block
   }
   for (const TPair<FString, FS08ScreenRect>& F : FigureScreenRects()) In.Figures.Add(UmHudPxToSu(F.Value, PxPerSu));
   for (const FS08ArtHudRuntime::FTagSlot& Tag : ArtHud.Tags) {

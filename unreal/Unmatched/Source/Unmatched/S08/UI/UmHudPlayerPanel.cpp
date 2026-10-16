@@ -35,9 +35,27 @@ const TCHAR* const UUmHudPlayerPanel::OppBlueprintPath = TEXT("/Game/S08/UI/Hud/
 // ------------------------------------------------------------------------------------------------- rules
 
 namespace UmHudPanel {
-FGeom Geometry(bool bClassS, EUmPanelSide Side) {
+FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
   FGeom G;
   const bool bOpp = Side == EUmPanelSide::Opp;
+  if (bTable && !bClassS) {
+    // HUD "Стол" L 380 x 136: the portrait 104 as before; the name over the HP dial (64) at the text column, the
+    // sidekicks right of the dial, the tracker in the top corner away from the portrait
+    G.Size = FVector2D(380.0, 136.0);
+    G.RingSu = 104.0f;
+    G.DiscSu = 80.0f;
+    G.RingPos = FVector2D(bOpp ? 272.0 : 4.0, 16.0);
+    G.TextX = bOpp ? 252.0f : 128.0f;
+    G.NameTop = 9.0f;
+    G.StatusTop = 40.0f;
+    G.HpTop = 50.0f;
+    G.TrackerSu = 32.0f;
+    G.TrackerX = bOpp ? 14.0f : 366.0f;
+    G.TrackerTop = 12.0f;
+    G.bSidekickRow = true;
+    G.SidekickTop = 60.0f;
+    return G;
+  }
   if (!bClassS) {
     // CX-09 L (facts.json rendered_panels, su): 340 x 136
     G.Size = FVector2D(340.0, 136.0);
@@ -299,7 +317,7 @@ FName UUmHudPlayerPanel::FitNameToken() const {
   // plate on the portrait side - the name takes the largest type that fits the room between TextX and the plate's edge
   const FName ByChars = UmHudPanel::NameFontToken(Model.HeroName);
   if (!NameText) return ByChars;
-  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side);
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side, bTable);
   const float Room = (Side == EUmPanelSide::Opp ? G.TextX : static_cast<float>(G.Size.X) - G.TextX) - 10.0f;
   const FText Shown = FText::FromString(UmWorldLayer::DisplayNameOf(Model.HeroName));
   TArray<FName> Tokens;
@@ -318,6 +336,7 @@ void UUmHudPlayerPanel::ApplyFonts() {
 
 void UUmHudPlayerPanel::Setup(EUmPanelSide InSide, const FS08TurnHudLook& Look, const FLinearColor& TeamColor) {
   Side = InSide;
+  bTable = S08ArtLook::HudTable();
   if (Portrait) {
     Portrait->AttachToPanel(TrackerRow, HeartIcon);
     Portrait->Setup(Side == EUmPanelSide::Opp, Look, TeamColor);
@@ -338,19 +357,25 @@ void UUmHudPlayerPanel::ApplyGeometry() {
   bAppliedClassS = bClassS;
   AppliedPxPerSu = PxPerSu;
   const bool bOpp = Side == EUmPanelSide::Opp;
-  const UmHudPanel::FGeom G = UmHudPanel::Geometry(bClassS, Side);
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(bClassS, Side, bTable);
   // HB-10: the x2 plate from 150 % (DPI x UI scale)
   if (Panel) {
-    if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), PxPerSu)) Panel->SetBrush(*Skin);
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    const FName Key = bTable && Theme.HasTextureSkin(TEXT("hud.table.card")) ? FName(TEXT("hud.table.card")) : FName(TEXT("panel"));
+    if (const FSlateBrush* Skin = Theme.SkinFor(Key, PxPerSu)) Panel->SetBrush(*Skin);
   }
   UmPanelPlace(Portrait, G.RingPos, false, FVector2D(G.RingSu, G.RingSu));
   UmPanelPlace(NameText, FVector2D(G.TextX, G.NameTop - UmHudPanel::NameLiftSu()), bOpp);
   UmPanelPlace(StatusRow, FVector2D(G.TextX, G.StatusTop), bOpp);
   UmPanelPlace(HpRow, FVector2D(G.TextX, G.HpTop), bOpp);
   UmPanelPlace(TrackerRow, FVector2D(G.TrackerX, G.TrackerTop), !bOpp);
-  UmPanelPlace(SidekickRow, FVector2D(G.TextX, G.SidekickTop), bOpp);
+  const float SideX = bTable && !bClassS
+                          ? (bOpp ? G.TextX - UmHudPanel::DialSuL - 14.0f : G.TextX + UmHudPanel::DialSuL + 14.0f)
+                          : G.TextX;
+  UmPanelPlace(SidekickRow, FVector2D(SideX, G.SidekickTop), bOpp);
   AppliedRingSu = G.RingSu;
   ApplyPortraitFrame();
+  ApplyTableDial();
   if (Portrait) {
     Portrait->SetPanelGeometry(G.RingSu, G.DiscSu, G.TrackerSu);
     Portrait->SetRingSmoulder(UmHudPanel::RingSmoulder(bClassS));  // ВР-43: L 0.35, S 0.55
@@ -365,6 +390,10 @@ void UUmHudPlayerPanel::ApplyPortraitFrame() {
   UCanvasPanel* FrameCanvas = Portrait ? Cast<UCanvasPanel>(Portrait->GetParent()) : nullptr;
   if (!FrameCanvas || !WidgetTree || AppliedRingSu <= 0.0f) return;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
+  if (bTable) {  // HUD "Стол": no laurel medallion (an ornament without a function, 01-INSPECTION №3)
+    if (PortraitFrame) PortraitFrame->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
   // the own panel's 80 su ring takes the 88 su medallion, the opponent's 64 su one the 72 su medallion (x1.1)
   const bool bSmall = AppliedRingSu < 72.0f;
   const FString Key = FString::Printf(TEXT("hud.portrait.frame%s%s"), bFrameActive ? TEXT(".active") : TEXT(""),
@@ -390,6 +419,42 @@ void UUmHudPlayerPanel::ApplyPortraitFrame() {
       FrameSlot->SetZOrder(PortraitSlot->GetZOrder() + 1);
     }
   }
+}
+
+void UUmHudPlayerPanel::ApplyTableDial() {
+  // HUD "Стол" (03 §3.1): the health dial of the box - one number in the cream window, no heart, no «/max»; the heart
+  // widget keeps living for the portrait's AB-6 / AB-8 cues, the HP row is only transparent
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const bool bShow = bTable && Theme.HasTextureSkin(TEXT("hud.table.dial")) && Canvas && WidgetTree;
+  if (HpRow) HpRow->SetRenderOpacity(bShow ? 0.0f : 1.0f);
+  if (!bShow) {
+    if (HpDial) HpDial->SetVisibility(ESlateVisibility::Collapsed);
+    if (HpDialText) HpDialText->SetVisibility(ESlateVisibility::Collapsed);
+    return;
+  }
+  const bool bOpp = Side == EUmPanelSide::Opp;
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side, bTable);
+  const float Dial = Model.bClassS ? UmHudPanel::DialSuS : UmHudPanel::DialSuL;
+  if (!HpDial) {
+    HpDial = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("HpDialTable")));
+    Canvas->AddChild(HpDial);
+    HpDialText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("HpDialTextTable")));
+    Canvas->AddChild(HpDialText);
+    HpDialText->SetJustification(ETextJustify::Center);
+    HpDialText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("card.navy"))));
+  }
+  if (const FSlateBrush* Brush = Theme.SkinFor(TEXT("hud.table.dial"), AppliedPxPerSu > 0.0f ? AppliedPxPerSu : 1.0f)) {
+    HpDial->SetBrush(*Brush);
+  }
+  FSlateFontInfo Font = Theme.Font(TEXT("type.button"));
+  Font.Size = FMath::RoundToInt(Font.Size * (Model.bClassS ? 1.0f : 1.15f));
+  HpDialText->SetFont(Font);
+  HpDialText->SetText(Model.bHasHp ? FText::AsNumber(FMath::Max(Model.Hp, 0)) : FText::GetEmpty());
+  HpDial->SetVisibility(ESlateVisibility::HitTestInvisible);
+  HpDialText->SetVisibility(ESlateVisibility::HitTestInvisible);
+  const FVector2D Pos(bOpp ? G.TextX - Dial : G.TextX, Model.bClassS ? static_cast<float>(G.Size.Y) - Dial - 8.0f : G.HpTop);
+  UmPanelPlace(HpDial, Pos, false, FVector2D(Dial, Dial));
+  UmPanelPlace(HpDialText, Pos + FVector2D(0.0f, 0.5f * Dial - 15.0f), false, FVector2D(Dial, 30.0f));
 }
 
 UWidget* UUmHudPlayerPanel::MakeMiniPortrait(const FUmSidekickView& S) {
@@ -465,6 +530,8 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         Hp->SetFont(Theme.Font(TEXT("type.tag")));
         Hp->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
         Hp->SetText(UmHudPanel::HpText(S.Hp, S.MaxHp));
+        // HUD "Стол" (03 §3.1): a one-hit sidekick (the harpies) carries no «1/1» - its number is the identity
+        if (bTable && S.MaxHp <= 1) Hp->SetVisibility(ESlateVisibility::Collapsed);
         if (UVerticalBoxSlot* H = Column->AddChildToVerticalBox(Hp)) H->SetPadding(FMargin(0.0f, -2.0f, 0.0f, 0.0f));
         Item->AddChildToOverlay(Column);
         if (S.bFallen) {
@@ -593,6 +660,7 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
   if (HpText && (bFirst || Old.Hp != Model.Hp || Old.MaxHp != Model.MaxHp || Old.bHasHp != Model.bHasHp)) {
     HpText->SetText(Model.bHasHp ? UmHudPanel::HpText(Model.Hp, Model.MaxHp) : FText::GetEmpty());
     HpFitSlots = -1;  // VS-5 E4: fitted again below
+    if (HpDialText) HpDialText->SetText(Model.bHasHp ? FText::AsNumber(FMath::Max(Model.Hp, 0)) : FText::GetEmpty());
   }
   if (bFirst || Old.bClassS != Model.bClassS) HpFitSlots = -1;
   FitHpText();
@@ -620,7 +688,7 @@ void UUmHudPlayerPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 float UUmHudPlayerPanel::HpRoomSu() const {
   // CX-09: own - the heart from TextX, the number 4 su after it, the tracker right-aligned at TrackerX; the opponent's
   // mirrored (the row right-aligned at TextX, the tracker from TrackerX); the slots 4 su apart; 4 su between the two
-  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side);
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side, bTable);
   const int32 Slots = TrackerRow ? TrackerRow->GetChildrenCount() : 0;
   const float TrackerW = Slots > 0 ? Slots * G.TrackerSu + (Slots - 1) * 4.0f : 0.0f;
   const float Lead = UmHudPanel::HeartSu + 4.0f;
@@ -659,7 +727,9 @@ void UUmHudPlayerPanel::FitHpText() {
 void UUmHudPlayerPanel::ApplyStatus(EUmPanelState State) {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (StatusText) {
-    const FText Status = UmHudPanel::StatusText(State);
+    // HUD "Стол": the card's glow says whose turn it is - only «ИИ думает» / «вне игры» stay as words
+    const bool bWord = !bTable || State == EUmPanelState::Ai || State == EUmPanelState::Fallen;
+    const FText Status = bWord ? UmHudPanel::StatusText(State) : FText::GetEmpty();
     StatusText->SetText(Status);
     StatusText->SetColorAndOpacity(FSlateColor(Theme.Color(UmHudPanel::StatusColorToken(State))));
     StatusText->SetRenderOpacity(1.0f);

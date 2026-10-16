@@ -77,6 +77,9 @@ struct UNMATCHED_API FUmButtonModel {
   float DiscSu = 0.0f;
   /** VS-4 HB-43: the owner block draws the why tooltip (the HB-22 plate of HB-42 A7), the button sets none. */
   bool bOwnerTooltip = false;
+  /** HUD "Стол" (hud-redesign 03 §3.4): the paper slip of a pile (hud.table.slip) in every state, hover a brighter
+   *  tint - the deck / discard chips. Ignored under -S08HudTableLegacy or without the skin. */
+  bool bTableSlip = false;
 };
 
 namespace UmButton {

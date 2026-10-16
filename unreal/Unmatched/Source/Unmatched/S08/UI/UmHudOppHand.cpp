@@ -1,5 +1,6 @@
 // VS-2 HB-21: OPP-HAND - see UmHudOppHand.h.
 #include "UmHudOppHand.h"
+#include "../S08ArtLook.h"
 
 #include "UmTextFit.h"
 
@@ -202,7 +203,11 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
   Model = InModel;
   bHasModel = true;
   if (Panel && bTextureChanged) {
-    if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Model.PxPerSu)) Panel->SetBrush(*Skin);
+    if (S08ArtLook::HudTable()) {
+      Panel->SetBrush(FSlateNoResource());  // HUD "Стол": the backs lie on the table edge, no box (01-INSPECTION №4)
+    } else if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Model.PxPerSu)) {
+      Panel->SetBrush(*Skin);
+    }
   }
   if (bTextureChanged && BackSlugLoaded != Model.HeroSlug) {
     BackSlugLoaded = Model.HeroSlug;

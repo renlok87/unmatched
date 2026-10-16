@@ -98,7 +98,10 @@ struct UNMATCHED_API FGeom {
   bool bSidekickRow = true;
   float SidekickTop = 82.0f;
 };
-UNMATCHED_API FGeom Geometry(bool bClassS, EUmPanelSide Side);
+UNMATCHED_API FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable = false);
+/** HUD "Стол": the HP dial (hud.table.dial) of class L / S, su. */
+inline constexpr float DialSuL = 64.0f;
+inline constexpr float DialSuS = 52.0f;
 inline constexpr float SidekickSu = 32.0f;
 inline constexpr float SidekickStepSu = 64.0f;  // the harpies 128 / 192 / 256
 inline constexpr float IndexDiscSu = 14.0f;     // ВР-72: the number on a card.navy disc in the corner
@@ -232,6 +235,12 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
    *  over the portrait circle; absent while the theme has no such texture (the old ring stays alone). */
   UPROPERTY(Transient) TObjectPtr<UImage> PortraitFrame;
   void ApplyPortraitFrame();
+  /** HUD "Стол" (hud-redesign 03 §3.1): the box-canon card skin, no laurel medallion, no status word but «думает»,
+   *  the HP number on the dial instead of the heart and the fraction (rollback -S08HudTableLegacy). */
+  bool bTable = false;
+  UPROPERTY(Transient) TObjectPtr<UImage> HpDial;
+  UPROPERTY(Transient) TObjectPtr<UTextBlock> HpDialText;
+  void ApplyTableDial();
   float AppliedRingSu = 0.0f;
   bool bFrameActive = false;
   TArray<FUmPortraitShown> MiniShown;  // CP-10 / CP-12: what each mini portrait shows (the PORTRAIT lines)

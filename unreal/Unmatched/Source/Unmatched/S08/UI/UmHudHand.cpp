@@ -1,5 +1,6 @@
 // VS-3 HB-24 / HB-25: HAND - see UmHudHand.h.
 #include "UmHudHand.h"
+#include "../S08ArtLook.h"
 
 #include "../S08TraceLog.h"
 
@@ -823,7 +824,9 @@ void UUmHudHand::Relayout(bool bAnimate) {
 
 void UUmHudHand::ApplyTray() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  const bool bShow = Row && WidgetTree && RowNow.CardPos.Num() > 0 && !Model.bLowered && Theme.HasTextureSkin(TEXT("hud.hand.tray"));
+  // HUD "Стол": the cards lie on the table, no marble tray under them
+  const bool bShow = Row && WidgetTree && RowNow.CardPos.Num() > 0 && !Model.bLowered && Theme.HasTextureSkin(TEXT("hud.hand.tray")) &&
+                     !S08ArtLook::HudTable();
   if (!bShow) {
     if (TrayV2) TrayV2->SetVisibility(ESlateVisibility::Collapsed);
     return;
@@ -925,7 +928,9 @@ void UUmHudHand::ApplyCaption() {
   UWidget* PlateW = CountPlate ? static_cast<UWidget*>(CountPlate) : static_cast<UWidget*>(CountText);
   if (!PlateW) return;
   // ВР-VS2-HB22-10: one plate at the left edge of the first card in every state, hidden while the hand is lowered
-  const bool bShown = Model.bShow && !Model.bLowered;
+  // HUD "Стол" (03 §3.3): the count shows only when the hand is over its limit (the discard step says the rest)
+  const bool bOverLimit = Model.HandMaxSize > 0 && N > Model.HandMaxSize;
+  const bool bShown = Model.bShow && !Model.bLowered && (!S08ArtLook::HudTable() || bOverLimit);
   PlateW->SetVisibility(bShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(PlateW->Slot)) {
     const bool bEmpty = N == 0;

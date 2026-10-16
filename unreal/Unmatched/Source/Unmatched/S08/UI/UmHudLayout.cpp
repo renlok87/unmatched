@@ -98,9 +98,10 @@ bool UmLayoutCrosses(const FBox2D& A, const TArray<FBox2D>& Avoid) {
 }
 }  // namespace
 
-FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu) {
+FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu, bool bInTable) {
   using namespace UmHudLayout;
   FUmHudLayout L;
+  L.bTable = bInTable;
   L.CanvasSu = InCanvasSu;
   L.PxPerSu = InPxPerSu > 0.0f ? InPxPerSu : 1.0f;
   L.bClassS = InCanvasSu.X < ClassLMinWidthSu;
@@ -131,9 +132,10 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::CombatL, UmLayoutBox(M, 360.0f, 230.0f, 379.0f));
     Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 230.0f, 360.0f, 230.0f, 351.0f));
     Set(EUmHudBlock::Defend, UmLayoutBox(32.0f, L.bTall ? 747.0f : 112.0f, 230.0f, 104.0f));
-    const FBox2D PanelLoc = UmLayoutBox(M, H - M - 136.0f, 340.0f, 136.0f);
+    const float PanelW = L.bTable ? 380.0f : 340.0f;  // HUD "Стол": the hero card with the HP dial and the sidekicks
+    const FBox2D PanelLoc = UmLayoutBox(M, H - M - 136.0f, PanelW, 136.0f);
     Set(EUmHudBlock::PanelLoc, PanelLoc);
-    Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - 340.0f, M, 340.0f, 136.0f));
+    Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - PanelW, M, PanelW, 136.0f));
     // backs 48x67 + caption; 92 su high (HB-07 delta: the caption keeps 14 su from the edge at fractional DPI)
     // HUD v2 (2026-10-15): +14 su for the marble rims of the panel skin - the caption kept off the bottom rim
     Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 300.0f, M + 136.0f + GapSu, 300.0f, 106.0f));
@@ -183,6 +185,27 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     L.HandLeftSu = PanelLoc.Max.X + HandGapLeftSu;
     L.HandRightSu = Actions.Min.X - HandGapRight;
   }
+  // HUD "Стол" (hud-redesign 03 §2-§3): the prompt (STATUS) in the decision column right above DECKS (L 400 su, room
+  // for two lines; S 300 su), the turn strip over PANEL-LOC (full in L, compact in S), LOG above the strip.
+  if (L.bTable) {
+    const FBox2D Decks = L.Rect(EUmHudBlock::Decks);
+    const float StatusW = L.bClassS ? 260.0f : 400.0f;
+    Set(EUmHudBlock::Status, UmLayoutBox(W - M - StatusW, static_cast<float>(Decks.Min.Y) - GapSu - StatusTwoLineSu,
+                                         StatusW, 48.0f));
+    const FBox2D PanelLocR = L.Rect(EUmHudBlock::PanelLoc);
+    const FBox2D TopR = L.Rect(EUmHudBlock::Top);
+    const float StripH = static_cast<float>(TopR.Max.Y - TopR.Min.Y);
+    const float StripW = L.bClassS ? UmHudTurnStrip::CompactWidthSu(true) : UmHudTurnStrip::FullWidthSu(false);
+    L.bTurnStripCompact = L.bClassS;
+    const FBox2D Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, StripW, StripH);
+    Set(EUmHudBlock::TurnStrip, Strip);
+    if (L.HasRect(EUmHudBlock::Log)) {
+      const FBox2D Log = L.Rect(EUmHudBlock::Log);
+      const float LogH = static_cast<float>(Log.Max.Y - Log.Min.Y);
+      Set(EUmHudBlock::Log, UmLayoutBox(M, static_cast<float>(Strip.Min.Y) - GapSu - LogH,
+                                        static_cast<float>(Log.Max.X - Log.Min.X), LogH));
+    }
+  } else
   // HB-50 (2026-10-16, TURN-STRIP.md): the turn strip in the TOP row, right of «Ход N», as high as TOP. The full strip
   // (with the sub-step tray) when STATUS keeps >= 640 su (L) / 440 su (S) centred between it and its mirror; else the
   // compact one (four nodes); else none. STATUS stays centred and narrows to that room when it must.
