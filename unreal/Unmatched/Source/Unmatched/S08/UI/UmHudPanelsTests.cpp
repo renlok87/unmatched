@@ -655,7 +655,7 @@ bool FUmHudPanelsLeetFitTest::RunTest(const FString&) {
 // ------------------------------------------------------------------------------------------------------------- Table
 
 // HUD "Стол" (docs/game-design/hud-redesign/03-CONCEPT.md §2, §3.1): the hero card of class L (380 x 136, the HP number
-// on the dial, no heart row, no «ВАШ ХОД» / «ЖДЁТ» word, «ИИ ДУМАЕТ» kept) and the table layout (the prompt in the
+// «♥ N/M» row, the «ВАШ ХОД» / «ЖДЁТ» / «ИИ ДУМАЕТ» words) and the table layout (the prompt in the
 // decision column over DECKS, the turn strip over PANEL-LOC, LOG above it, nothing of them over FIELD).
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPlayerPanelTableTest, "Unmatched.S08.Hud.PlayerPanel.Table",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
@@ -689,7 +689,7 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   P->SetReducedForTest(1);
   P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Own));
   TestTrue(TEXT("card: ring at (4, 16)"), PosOf(P->Portrait).Equals(FVector2D(4.0, 16.0)));
-  TestEqual(TEXT("card: no «ВАШ ХОД» word (the card's glow says it)"), P->StatusText->GetText().ToString(), FString());
+  TestFalse(TEXT("card: the «ВАШ ХОД» word kept with the glow (blind review 2026-10-16)"), P->StatusText->GetText().IsEmpty());
   // blind review 2026-10-16: the bare dial number did not read as health - the card keeps «♥ 14/16», no dial
   TestEqual(TEXT("card: the heart row shown"), P->HpRow->GetRenderOpacity(), 1.0f);
   TestTrue(TEXT("card: «14/16» in the heart row"), P->HpText->GetText().ToString().Contains(TEXT("14/16")));

@@ -14,6 +14,7 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -398,6 +399,34 @@ void UUmHudActions::SetFrame(const FUmActionsFrame& InFrame) {
 }
 
 void UUmHudActions::Relayout() {
+  // HUD "Стол" (blind review 2026-10-16: bare discs on the busy scene): one tray in the hero cards' material under the
+  // four cells (class L)
+  if (Row && WidgetTree) {
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    UImage* Tray = Cast<UImage>(WidgetTree->FindWidget(FName(TEXT("TableTray"))));
+    const bool bTray = S08ArtLook::HudTable() && !Frame.bClassS && Theme.HasTextureSkin(TEXT("hud.table.card"));
+    if (bTray && !Tray) {
+      Tray = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("TableTray")));
+      Row->AddChild(Tray);
+    }
+    if (Tray) {
+      Tray->SetVisibility(bTray ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+      if (bTray) {
+        FBox2D All(ForceInit);
+        for (int32 I = 0; I < UmActionCount; ++I) All += UmHudActions::CellLocalSu(static_cast<EUmActionKey>(I), false);
+        if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("hud.table.card"), UmHudScale::Current().PxPerSu())) Tray->SetBrush(*Skin);
+        if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Tray->Slot)) {
+          const FVector2D Pad(8.0, 6.0);
+          S->SetAnchors(FAnchors(0.0f, 0.0f));
+          S->SetAlignment(FVector2D::ZeroVector);
+          S->SetAutoSize(false);
+          S->SetPosition(All.Min - Pad);
+          S->SetSize(All.GetSize() + 2.0 * Pad);
+          S->SetZOrder(1);
+        }
+      }
+    }
+  }
   for (int32 I = 0; I < UmActionCount; ++I) {
     const EUmActionKey Key = static_cast<EUmActionKey>(I);
     UUmButton* B = GetButton(Key);
@@ -443,10 +472,9 @@ void UUmHudActions::ApplyButtons() {
       M.MinWidthSu = UmHudActions::CellWidthSu(Key, false);
     }
     B->ApplyModel(M);
-    // HUD "Стол" (03 Р-5): what is illegal is not drawn - КОНЕЦ ХОДА only while the end of turn is open (SD-44)
-    if (Key == EUmActionKey::EndTurn && S08ArtLook::HudTable()) {
-      B->SetVisibility(M.bEnabled ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-    }
+    // HUD "Стол": КОНЕЦ ХОДА stays drawn (disabled with its why until the end of turn opens, SD-44) - the blind review of
+    // 2026-10-16 read the hidden button as missing
+    if (Key == EUmActionKey::EndTurn) B->SetVisibility(ESlateVisibility::Visible);
   }
 }
 

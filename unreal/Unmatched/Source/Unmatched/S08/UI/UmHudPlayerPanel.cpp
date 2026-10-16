@@ -49,14 +49,14 @@ FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
     G.DiscSu = 80.0f;
     G.RingPos = FVector2D(bOpp ? 272.0 : 4.0, 16.0);
     G.TextX = bOpp ? 252.0f : 128.0f;
-    G.NameTop = 9.0f;
+    G.NameTop = 8.0f;
     G.StatusTop = 36.0f;
-    G.HpTop = 50.0f;
+    G.HpTop = 51.0f;
     G.TrackerSu = 32.0f;
     G.TrackerX = bOpp ? 14.0f : 366.0f;
     G.TrackerTop = 12.0f;
     G.bSidekickRow = true;
-    G.SidekickTop = 86.0f;
+    G.SidekickTop = 82.0f;
     return G;
   }
   if (!bClassS) {
@@ -770,9 +770,8 @@ void UUmHudPlayerPanel::FitHpText() {
 void UUmHudPlayerPanel::ApplyStatus(EUmPanelState State) {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (StatusText) {
-    // HUD "Стол": the card's glow says whose turn it is - only «ИИ думает» / «вне игры» stay as words
-    const bool bWord = !bTable || State == EUmPanelState::Ai || State == EUmPanelState::Fallen;
-    const FText Status = bWord ? UmHudPanel::StatusText(State) : FText::GetEmpty();
+    // HUD "Стол": the glow alone did not say whose turn it is (blind review 2026-10-16) - the words stay with it
+    const FText Status = UmHudPanel::StatusText(State);
     StatusText->SetText(Status);
     StatusText->SetColorAndOpacity(FSlateColor(Theme.Color(UmHudPanel::StatusColorToken(State))));
     StatusText->SetRenderOpacity(1.0f);
