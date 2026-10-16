@@ -11,7 +11,7 @@ slice-margins.json in the contract of the HUD v2 kit (px per file, stretch nine_
 import json
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageFilter
+from PIL import Image, ImageChops, ImageFilter, ImageStat
 
 HERE = Path(__file__).resolve().parent
 SRC = HERE.parent / "hud-table-materials-codex"
@@ -37,7 +37,13 @@ def dim_body(im, rim):
     r, g, b, a = dark.split()
     r, g, b = (ch.point(lambda v: int(v * MARBLE_DIM)) for ch in (r, g, b))
     dark = Image.merge("RGBA", (r, g, b, a))
-    return Image.composite(dark, im, inner)
+    # slice 19 (blind review s18: «the veins compete with the small type»): the slab softened and pulled half-way to its
+    # own mean - the stone reads, the veins no longer cross the letters
+    mean = tuple(int(v) for v in ImageStat.Stat(dark.convert("RGB"), mask=inner).mean)
+    flat = Image.new("RGBA", dark.size, mean + (255,))
+    soft = Image.blend(dark.filter(ImageFilter.GaussianBlur(2)), flat, 0.5)
+    soft.putalpha(a)
+    return Image.composite(soft, im, inner)
 
 # the gilt bevel from the outside in (blind review 2026-10-16: the thick cream die-cut edge read as a mobile casual
 # frame): a dark bronze outline, the lit gold, the gold body, a dark inner line; the rest of the old cream band -> navy

@@ -417,7 +417,8 @@ void UUmHudTurnStrip::ApplyCaption() {
   // хода» right of the strip, class L only; the tooltips of the nodes keep the rules
   UTextBlock* Cap = WidgetTree ? Cast<UTextBlock>(WidgetTree->FindWidget(FName(TEXT("StageCaption")))) : nullptr;
   // slice 15: the stage reads in the prompt's header line now - the caption row stays empty
-  const bool bOn = false && S08ArtLook::HudTable() && !Frame.bClassS && Row && WidgetTree;
+  // slice 19: the small gold stage row is back above the prompt (the secondary indicator)
+  const bool bOn = S08ArtLook::HudTable() && !Frame.bClassS && Row && WidgetTree;
   if (!bOn) {
     if (Cap) Cap->SetVisibility(ESlateVisibility::Collapsed);
     return;
@@ -430,7 +431,7 @@ void UUmHudTurnStrip::ApplyCaption() {
     }
   }
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  Cap->SetFont(Theme.Font(TEXT("type.button")));
+  Cap->SetFont(Theme.Font(TEXT("type.tag")));
   const int32 Actions = FMath::Max(0, Model.Nodes.Num() - 2);
   int32 Now = INDEX_NONE;
   for (int32 I = 0; I < Model.Nodes.Num(); ++I) {

@@ -308,6 +308,7 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
     Plates.Add(Opp);
     FBox2D Panel = L.Rect(EUmHudBlock::Actions);
     if (L.HasRect(EUmHudBlock::Status)) Panel += L.Rect(EUmHudBlock::Status);
+    if (L.HasRect(EUmHudBlock::TurnStrip)) Panel += L.Rect(EUmHudBlock::TurnStrip);  // slice 19: the stage row
     Panel.Min.X = FMath::Min(Panel.Min.X, Panel.Max.X - 360.0 - 8.0);
     Panel = FBox2D(Panel.Min - FVector2D(0.0, UmHudLayout::TableTrayPadSu), Panel.Max + FVector2D(0.0, UmHudLayout::TableTrayPadSu));
     Plates.Add(Panel);
@@ -334,6 +335,32 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
       S->SetPosition(Plates[P].Min + FVector2D(4.0));
       S->SetSize(Plates[P].GetSize() - FVector2D(8.0));
       S->SetZOrder(5);
+    }
+  }
+  // slice 19 (blind review s18: «flat plates - a bevel and highlights»): a 2 su light line under the top edge and a
+  // shade line over the bottom edge of each plate
+  for (int32 B = 0; B < 8; ++B) {
+    const int32 P = B / 2;
+    const bool bTopLine = (B % 2) == 0;
+    const FName Name(*FString::Printf(TEXT("TableBevel%d"), B));
+    UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
+    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid;
+    if (!Img && bShow) {
+      Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
+      Canvas->AddChildToCanvas(Img);
+    }
+    if (!Img) continue;
+    Img->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    if (!bShow) continue;
+    Img->SetBrush(FSlateRoundedBoxBrush(bTopLine ? FLinearColor(1.0f, 0.88f, 0.66f, 0.16f) : FLinearColor(0.0f, 0.0f, 0.0f, 0.35f), 1.0f));
+    if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Img->Slot)) {
+      const FBox2D& R = Plates[P];
+      S->SetAnchors(FAnchors(0.0f, 0.0f));
+      S->SetAlignment(FVector2D::ZeroVector);
+      S->SetAutoSize(false);
+      S->SetPosition(FVector2D(R.Min.X + 14.0, bTopLine ? R.Min.Y + 2.0 : R.Max.Y - 4.0));
+      S->SetSize(FVector2D(R.GetSize().X - 28.0, 2.0));
+      S->SetZOrder(6);
     }
   }
   for (int32 I = 0; I < 8; ++I) {
