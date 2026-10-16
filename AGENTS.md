@@ -321,6 +321,35 @@ memory. A change that contradicts it needs the user's explicit word first.
 - **ENV-U16 fixed (`8ea9c6c9`, EN-13).** Marmoreal shows the painted backdrop by default; the 3D P5c surroundings with
   the T2b tray come back only with the rollback flag `-NoConceptPaste` (ВР-56).
 
+## Hero showcase high-poly (user decision 2026-10-16, binding)
+
+The user's words: «добавь в проект основное правило, что теперь у нас есть витрина, где должна быть проработанная
+хайполи модель без косяков для каждого нового героя». Context: `docs/game-design/select-screens/` (05-HIPOLY-COMPARE,
+06-HIPOLY-LOOKDEV, blind rounds `blind-s1`…`blind-s3`).
+
+- The select screens (room and VS splash) show each hero as a **high-poly showcase figure** in a 3D niche
+  (`AUmHeroShowcase`, S08/UI/UmHeroShowcase.*), not the in-game H2LD. The in-game figure stays on the board.
+- **Every new hero needs a finished showcase high-poly as a deliverable of `3d-model-pipeline`**, next to the game
+  figure. "Finished" means all of the following:
+  - **No generation defects.** No phantom parts, no second face profile, no extra weapon or limb, no holes, no
+    reversed feet. A source with such defects is regenerated in Tripo with the correct view slots
+    (`references/tripo3d-stages.md` §5.5). Do not patch a broken head or limb in Blender: King Arthur c24eeff0 could not
+    be fixed that way and was regenerated (4f059621).
+  - **Seated on the game pedestal.** The Tripo base is cut off (`tools/art/showcase/clean_hipoly.py`) and the figure
+    stands on the game pedestal with the team ring.
+  - **Game colours.** Use the game look-dev maps when the game low-poly shares the source's frame
+    (`hp_lookdev_bake.py` → `import_hipoly_lookdev.py`, `/Game/PipelineCandidates/<Key>/HPLD`). Otherwise use the
+    source's own clean Tripo 8K materials (`import_hipoly.py`, `/HP2`).
+  - **Faced so the face is visible.** The hero's own niche yaw keeps the face clear: the weapon must never cross the
+    face (example: King Arthur 85° / 95°).
+  - **Accepted blind.** A blind before/after review (Opus + GPT Astra, unlabeled X/Y with swapped sides) is done before
+    it becomes the default.
+  - **Registered and cooked.** The path is registered in `UmShowcase::HiPolyPath` and its folder is in
+    `DirectoriesToAlwaysCook`.
+- A hero without a finished showcase high-poly falls back to its H2LD figure in the niche. Treat that as an open item,
+  not as done.
+- Rollback: `-S08ShowcaseV2` shows the animated H2LD figures in every niche.
+
 ## Rollback flags (phase-3 closing, 2026-10-09)
 
 Accepted art is the default; each flag below only rolls one piece back (client command line; the trace line `ARTLOOK …`
