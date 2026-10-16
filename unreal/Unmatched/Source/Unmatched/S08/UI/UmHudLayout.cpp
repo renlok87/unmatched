@@ -133,13 +133,16 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::CombatL, UmLayoutBox(M, 360.0f, 230.0f, 379.0f));
     Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 230.0f, 360.0f, 230.0f, 351.0f));
     Set(EUmHudBlock::Defend, UmLayoutBox(32.0f, L.bTall ? 747.0f : 112.0f, 230.0f, 104.0f));
-    const float PanelW = L.bTable ? 380.0f : 340.0f;  // HUD "Стол": the hero card with the HP dial and the sidekicks
+    // HUD "Стол": 340 su like v2 (final blind review 08: the card's right third stood empty)
+    const float PanelW = 340.0f;
     const FBox2D PanelLoc = UmLayoutBox(M, H - M - 136.0f, PanelW, 136.0f);
     Set(EUmHudBlock::PanelLoc, PanelLoc);
     Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - PanelW, M, PanelW, 136.0f));
     // backs 48x67 + caption; 92 su high (HB-07 delta: the caption keeps 14 su from the edge at fractional DPI)
     // HUD v2 (2026-10-15): +14 su for the marble rims of the panel skin - the caption kept off the bottom rim
-    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 300.0f, M + 136.0f + GapSu, 300.0f, 106.0f));
+    // HUD "Стол" (final blind review 08: two plates of different widths): the opponent's hand as wide as his card
+    const float OppHandW = L.bTable ? PanelW : 300.0f;
+    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M + 136.0f + GapSu, OppHandW, 106.0f));
     const FBox2D Actions = UmLayoutBox(W - M - 344.0f, H - M - 72.0f, 344.0f, 72.0f);
     Set(EUmHudBlock::Actions, Actions);
     // HUD "Стол" (03 §3.4): the piles - a card of each stands on its paper slip, the rect grows up by the card
@@ -197,13 +200,17 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       Set(EUmHudBlock::Status, UmLayoutBox(W - M - StatusW, static_cast<float>(Decks.Min.Y) - GapSu - StatusTwoLineSu,
                                            StatusW, 48.0f));
     } else {
-      // slice 7 (third blind review: the prompt hung apart from the actions tray): L reads bottom-up actions, the prompt
-      // right over them (its two-line room), the piles above the prompt; the deck panel ends over the piles
+      // slice 12 (final blind review 08: four separate blocks): ONE control panel bottom-up - the actions, the prompt
+      // (one line, bottom-aligned in its two-line room), the stage strip; the piles stand over the panel
       const FBox2D Act = L.Rect(EUmHudBlock::Actions);
-      const FBox2D StatusR = UmLayoutBox(W - M - StatusW, static_cast<float>(Act.Min.Y) - GapSu - StatusTwoLineSu, StatusW, 48.0f);
+      // the prompt right on the actions (one line fits the 400 su at the body size; a rare second line grows over the
+      // panel's own tray)
+      const FBox2D StatusR = UmLayoutBox(W - M - StatusW, static_cast<float>(Act.Min.Y) - GapSu - 48.0f, StatusW, 48.0f);
       Set(EUmHudBlock::Status, StatusR);
+      const float StripHNow = static_cast<float>(L.Rect(EUmHudBlock::Top).Max.Y - L.Rect(EUmHudBlock::Top).Min.Y);
+      const float PanelTop = static_cast<float>(StatusR.Min.Y) - GapSu - StripHNow;
       const float DecksH = static_cast<float>(Decks.Max.Y - Decks.Min.Y);
-      const FBox2D DecksR = UmLayoutBox(static_cast<float>(Decks.Min.X), static_cast<float>(StatusR.Min.Y) - GapSu - DecksH,
+      const FBox2D DecksR = UmLayoutBox(static_cast<float>(Decks.Min.X), PanelTop - 2.0f * GapSu - DecksH,
                                         static_cast<float>(Decks.Max.X - Decks.Min.X), DecksH);
       Set(EUmHudBlock::Decks, DecksR);
       if (L.HasRect(EUmHudBlock::DeckPanel)) {
@@ -223,15 +230,10 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     if (L.bClassS) {
       Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, UmHudTurnStrip::CompactWidthSu(true), StripH);
     } else {
+      // slice 12: the strip is the top row of the control panel, right over the prompt (the piles above it)
       const float StripW = UmHudTurnStrip::CompactWidthSu(false) + UmHudTurnStrip::CaptionSu;
-      const FBox2D DecksNow = L.Rect(EUmHudBlock::Decks);
-      Strip = UmLayoutBox(W - M - StripW, static_cast<float>(DecksNow.Min.Y) - GapSu - StripH, StripW, StripH);
-      if (L.HasRect(EUmHudBlock::DeckPanel)) {
-        const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
-        Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),
-                                                static_cast<float>(DP.Max.X - DP.Min.X),
-                                                static_cast<float>(Strip.Min.Y - GapSu - DP.Min.Y)));
-      }
+      const FBox2D StatusNow = L.Rect(EUmHudBlock::Status);
+      Strip = UmLayoutBox(W - M - StripW, static_cast<float>(StatusNow.Min.Y) - GapSu - StripH, StripW, StripH);
     }
     Set(EUmHudBlock::TurnStrip, Strip);
     if (L.HasRect(EUmHudBlock::Log)) {

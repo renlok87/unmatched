@@ -942,7 +942,9 @@ void UUmHudHand::ApplyCaption() {
   // ВР-VS2-HB22-10: one plate at the left edge of the first card in every state, hidden while the hand is lowered
   // HUD "Стол" (03 §3.3): the count shows only when the hand is over its limit (the discard step says the rest)
   const bool bOverLimit = Model.HandMaxSize > 0 && N > Model.HandMaxSize;
-  const bool bShown = Model.bShow && !Model.bLowered && (!S08ArtLook::HudTable() || bOverLimit);
+  // slice 12 (final blind review 08: the hand limit was not visible): «Рука N/7» again, the table look too
+  (void)bOverLimit;
+  const bool bShown = Model.bShow && !Model.bLowered;
   PlateW->SetVisibility(bShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(PlateW->Slot)) {
     const bool bEmpty = N == 0;

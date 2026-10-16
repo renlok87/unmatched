@@ -671,13 +671,15 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   const FBox2D Strip = L.Rect(EUmHudBlock::TurnStrip);
   const FBox2D Log = L.Rect(EUmHudBlock::Log);
   TestTrue(TEXT("layout: table flag"), L.bTable);
-  TestTrue(TEXT("layout: the hero card 380 su"), FMath::IsNearlyEqual(Loc.Max.X - Loc.Min.X, 380.0));
+  TestTrue(TEXT("layout: the hero card 340 su (slice 12)"), FMath::IsNearlyEqual(Loc.Max.X - Loc.Min.X, 340.0));
   const FBox2D Act = L.Rect(EUmHudBlock::Actions);
-  TestTrue(TEXT("layout: the prompt in the decision column (right edge, right over ACTIONS, under DECKS) - slice 7"),
-           FMath::IsNearlyEqual(Status.Max.X, 1896.0) && Status.Min.Y + UmHudLayout::StatusTwoLineSu <= Act.Min.Y + 0.5 &&
-               Decks.Max.Y <= Status.Min.Y);
-  TestTrue(TEXT("layout: the turn strip at the top of the decision column, over DECKS (slice 8)"),
-           Strip.bIsValid && Strip.Max.Y <= Decks.Min.Y && FMath::IsNearlyEqual(Strip.Max.X, 1896.0));
+  // slice 12 (08-BLIND-FINAL): one control panel bottom-up - actions, the prompt right on them, the stage strip; the
+  // piles above the panel
+  TestTrue(TEXT("layout: the prompt right over ACTIONS at the right edge (slice 12)"),
+           FMath::IsNearlyEqual(Status.Max.X, 1896.0) && FMath::IsNearlyEqual(Status.Min.Y + 48.0 + 8.0, Act.Min.Y));
+  TestTrue(TEXT("layout: the stage strip over the prompt, the piles over the strip (slice 12)"),
+           Strip.bIsValid && FMath::IsNearlyEqual(Strip.Max.Y + 8.0, Status.Min.Y) && FMath::IsNearlyEqual(Strip.Max.X, 1896.0) &&
+               Decks.Max.Y <= Strip.Min.Y);
   TestTrue(TEXT("layout: the journal above the hero card"), Log.bIsValid && Log.Max.Y <= Loc.Min.Y);
   TestEqual(TEXT("layout: no persistent block over FIELD"), L.OverlapFieldPx2, 0.0);
   const FUmHudLayout Old = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, &Field, false);

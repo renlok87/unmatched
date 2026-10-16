@@ -275,8 +275,10 @@ void UUmHudTurnStrip::ApplyModel(const FS09TurnStripModel& InModel, const FUmTur
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (bFrameChanged && Plate) {
     const bool bTable = S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.strip"));
-    if (const FSlateBrush* Skin = bTable ? Theme.SkinFor(TEXT("hud.table.strip"), Frame.PxPerSu)
-                                         : Theme.SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Frame.PxPerSu)) {
+    if (S08ArtLook::HudTable() && !Frame.bClassS) {
+      Plate->SetBrush(FSlateNoResource());  // slice 12: the L strip is the top row of the control panel's tray
+    } else if (const FSlateBrush* Skin = bTable ? Theme.SkinFor(TEXT("hud.table.strip"), Frame.PxPerSu)
+                                                : Theme.SkinV2(TEXT("hud.turn.plate"), TEXT("panel"), Frame.PxPerSu)) {
       Plate->SetBrush(*Skin);
     }
   }

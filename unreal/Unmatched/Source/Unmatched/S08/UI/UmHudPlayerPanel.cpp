@@ -44,16 +44,16 @@ FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
     // HUD "Стол" L 380 x 136 (blind review 2026-10-16: the art strip and the bare HP number read as unfinished): the round
     // portrait 104, the name, «♥ 16/16» under it and the sidekicks under that in the text column; the tracker in the top
     // corner away from the portrait
-    G.Size = FVector2D(380.0, 136.0);
+    G.Size = FVector2D(340.0, 136.0);  // slice 12: as narrow as its content (final blind review 08)
     G.RingSu = 104.0f;
     G.DiscSu = 80.0f;
-    G.RingPos = FVector2D(bOpp ? 272.0 : 4.0, 16.0);
-    G.TextX = bOpp ? 252.0f : 128.0f;
+    G.RingPos = FVector2D(bOpp ? 232.0 : 4.0, 16.0);
+    G.TextX = bOpp ? 212.0f : 128.0f;
     G.NameTop = 12.0f;
     G.StatusTop = 40.0f;
     G.HpTop = 54.0f;
     G.TrackerSu = 32.0f;
-    G.TrackerX = bOpp ? 14.0f : 366.0f;
+    G.TrackerX = bOpp ? 14.0f : 326.0f;
     G.TrackerTop = 12.0f;
     G.bSidekickRow = true;
     G.SidekickTop = 84.0f;
@@ -333,7 +333,8 @@ FName UUmHudPlayerPanel::FitNameToken() const {
 void UUmHudPlayerPanel::ApplyFonts() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (NameText) NameText->SetFont(Theme.Font(FitNameToken()));
-  if (StatusText) StatusText->SetFont(Theme.Font(TEXT("type.tag")));
+  // slice 12 (final blind review 08: «ВАШ ХОД» too small): the table card's turn word at the button size
+  if (StatusText) StatusText->SetFont(Theme.Font(bTable && !Model.bClassS ? TEXT("type.button") : TEXT("type.tag")));
   if (HpText) HpText->SetFont(Theme.Font(HpToken));  // VS-5 E4: the fitted HP type (type.button by default)
 }
 

@@ -71,6 +71,11 @@ EUmStatusState StateOf(const FS09TurnStatusInput& In, const FS09Reason& Line) {
 
 FText LineText(const FS09Reason& Line, const FS09TurnStatusInput& In) {
   if (!Line.IsSet()) return FText::GetEmpty();
+  // slice 12 (final blind review 08): under the table look the prompt stands right over the captioned action buttons -
+  // «Выберите действие» without repeating their names
+  if (S08ArtLook::HudTable() && Line.Key == FName(TEXT("ms.status.action")) && UmText::Has(EUmTable::Hud, TEXT("hud.prompt.action"))) {
+    return UmText::Get(EUmTable::Hud, TEXT("hud.prompt.action"));
+  }
   const FString Key = Line.Key.ToString();
   FFormatNamedArguments Args;
   for (const TPair<FString, FString>& A : Line.Args) Args.Add(A.Key, FText::FromString(A.Value));
@@ -398,7 +403,11 @@ void UUmHudStatusLine::SetFrame(const FUmStatusFrame& InFrame) {
 
 void UUmHudStatusLine::Render() {
   bShown = !FullText.IsEmpty();
-  if (Frame) Frame->SetVisibility(bShown ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+  if (Frame) {
+    Frame->SetVisibility(bShown ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+    // slice 12: the L table prompt stands on the actions (bottom of its two-line room)
+    Frame->SetVerticalAlignment(S08ArtLook::HudTable() && StatusFrame.MaxWidthSu > 300.0f ? VAlign_Bottom : VAlign_Top);
+  }
   if (!bShown) return;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const bool bOpp = State == EUmStatusState::Opp;
@@ -437,7 +446,7 @@ void UUmHudStatusLine::Render() {
   const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
                             [this](const FString& T, float S) { return MeasureSu(T, S); },
-                            RimSu > 0.0f && !S08ArtLook::HudTable());  // slice 8: the table prompt keeps its size, wraps
+                            RimSu > 0.0f);  // slice 12 (final blind review 08): one line first, the table prompt too
   const float Height = UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
   const float Width = FMath::Min(StatusFrame.MaxWidthSu, FMath::CeilToFloat(FitNow.TextWidthSu) + 2.0f * PadX + Extras);
   BodySizeSu = FVector2D(Width, Height);
@@ -452,7 +461,13 @@ void UUmHudStatusLine::Render() {
   if (Body) {
     // HUD v2 (art/imagegen/hud-v2-codex): the marble cartouche with meander ends when the theme has it, else the capsule
     const FName BannerKey = UmHudStatus::BannerKey().IsNone() ? FName(TEXT("capsule")) : UmHudStatus::BannerKey();
-    if (const FSlateBrush* Skin = Theme.SkinFor(BannerKey, StatusFrame.PxPerSu)) Body->SetBrush(*Skin);
+    // slice 12: in the L table look the prompt sits on the control panel's tray - no plate of its own
+    const bool bOnPanel = S08ArtLook::HudTable() && StatusFrame.MaxWidthSu > 300.0f;
+    if (bOnPanel) {
+      Body->SetBrush(FSlateNoResource());
+    } else if (const FSlateBrush* Skin = Theme.SkinFor(BannerKey, StatusFrame.PxPerSu)) {
+      Body->SetBrush(*Skin);
+    }
     Body->SetPadding(FMargin(PadX, RimSu));
     // «…»: the full text in the tooltip - the capsule then takes the hover
     Body->SetToolTipText(FitNow.bEllipsis ? FText::FromString(FullText) : FText::GetEmpty());
