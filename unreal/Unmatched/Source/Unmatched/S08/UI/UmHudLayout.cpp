@@ -216,17 +216,29 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     const FBox2D PanelLocR = L.Rect(EUmHudBlock::PanelLoc);
     const FBox2D TopR = L.Rect(EUmHudBlock::Top);
     const float StripH = static_cast<float>(TopR.Max.Y - TopR.Min.Y);
-    // L: the full strip and the caption of the stage now (slice 7: the glyphs alone did not read)
-    const float StripW = L.bClassS ? UmHudTurnStrip::CompactWidthSu(true)
-                                   : UmHudTurnStrip::FullWidthSu(false) + UmHudTurnStrip::CaptionSu;
-    L.bTurnStripCompact = L.bClassS;
-    const FBox2D Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, StripW, StripH);
+    // S: the compact strip over the hero card. L (slice 8, fourth blind review: the stage sat a screen away from the
+    // actions): the compact strip and the caption of the stage now at the top of the decision column, over the piles
+    L.bTurnStripCompact = true;
+    FBox2D Strip;
+    if (L.bClassS) {
+      Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, UmHudTurnStrip::CompactWidthSu(true), StripH);
+    } else {
+      const float StripW = UmHudTurnStrip::CompactWidthSu(false) + UmHudTurnStrip::CaptionSu;
+      const FBox2D DecksNow = L.Rect(EUmHudBlock::Decks);
+      Strip = UmLayoutBox(W - M - StripW, static_cast<float>(DecksNow.Min.Y) - GapSu - StripH, StripW, StripH);
+      if (L.HasRect(EUmHudBlock::DeckPanel)) {
+        const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
+        Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),
+                                                static_cast<float>(DP.Max.X - DP.Min.X),
+                                                static_cast<float>(Strip.Min.Y - GapSu - DP.Min.Y)));
+      }
+    }
     Set(EUmHudBlock::TurnStrip, Strip);
     if (L.HasRect(EUmHudBlock::Log)) {
       const FBox2D Log = L.Rect(EUmHudBlock::Log);
       const float LogH = static_cast<float>(Log.Max.Y - Log.Min.Y);
-      Set(EUmHudBlock::Log, UmLayoutBox(M, static_cast<float>(Strip.Min.Y) - GapSu - LogH,
-                                        static_cast<float>(Log.Max.X - Log.Min.X), LogH));
+      const float Above = static_cast<float>(L.bClassS ? Strip.Min.Y : PanelLocR.Min.Y);
+      Set(EUmHudBlock::Log, UmLayoutBox(M, Above - GapSu - LogH, static_cast<float>(Log.Max.X - Log.Min.X), LogH));
     }
   } else
   // HB-50 (2026-10-16, TURN-STRIP.md): the turn strip in the TOP row, right of «Ход N», as high as TOP. The full strip

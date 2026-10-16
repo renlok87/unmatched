@@ -15,6 +15,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "UmButton.h"
 #include "UmConnectionBadge.h"
 #include "UmHudBanner.h"
@@ -321,6 +322,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudStatusKeysTest, "Unmatched.S08.Hud.Status
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudStatusKeysTest::RunTest(const FString&) {
   using namespace UmTopStripTest;
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the one-line-first fit of the HUD v2 cartouche (slice 8 wraps the table prompt)
   FWorld W(TEXT("UmHudStatusKeys"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;
   FRu Ru;

@@ -676,9 +676,9 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   TestTrue(TEXT("layout: the prompt in the decision column (right edge, right over ACTIONS, under DECKS) - slice 7"),
            FMath::IsNearlyEqual(Status.Max.X, 1896.0) && Status.Min.Y + UmHudLayout::StatusTwoLineSu <= Act.Min.Y + 0.5 &&
                Decks.Max.Y <= Status.Min.Y);
-  TestTrue(TEXT("layout: the turn strip right over the hero card"),
-           Strip.bIsValid && Strip.Max.Y <= Loc.Min.Y && FMath::IsNearlyEqual(Strip.Min.X, Loc.Min.X));
-  TestTrue(TEXT("layout: the journal above the strip"), Log.bIsValid && Log.Max.Y <= Strip.Min.Y);
+  TestTrue(TEXT("layout: the turn strip at the top of the decision column, over DECKS (slice 8)"),
+           Strip.bIsValid && Strip.Max.Y <= Decks.Min.Y && FMath::IsNearlyEqual(Strip.Max.X, 1896.0));
+  TestTrue(TEXT("layout: the journal above the hero card"), Log.bIsValid && Log.Max.Y <= Loc.Min.Y);
   TestEqual(TEXT("layout: no persistent block over FIELD"), L.OverlapFieldPx2, 0.0);
   const FUmHudLayout Old = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, &Field, false);
   TestTrue(TEXT("layout: the HUD v2 layout keeps the prompt at the top"), Old.Rect(EUmHudBlock::Status).Min.Y < 100.0);

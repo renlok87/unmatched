@@ -436,7 +436,8 @@ void UUmHudStatusLine::Render() {
   const float Base = UmTypeSu(Theme, TEXT("type.status"));
   const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
-                            [this](const FString& T, float S) { return MeasureSu(T, S); }, RimSu > 0.0f);
+                            [this](const FString& T, float S) { return MeasureSu(T, S); },
+                            RimSu > 0.0f && !S08ArtLook::HudTable());  // slice 8: the table prompt keeps its size, wraps
   const float Height = UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
   const float Width = FMath::Min(StatusFrame.MaxWidthSu, FMath::CeilToFloat(FitNow.TextWidthSu) + 2.0f * PadX + Extras);
   BodySizeSu = FVector2D(Width, Height);
