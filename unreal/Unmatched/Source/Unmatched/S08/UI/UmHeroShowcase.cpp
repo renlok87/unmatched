@@ -62,12 +62,18 @@ float PushFov(float BaseFov, double Seconds) {
 }
 bool HiPolyRequested() { return !FParse::Param(FCommandLine::Get(), V2FlagName); }
 FString HiPolyPath(const TCHAR* Key) {
-  // the H2 Tripo tasks the in-game H2LD figures were decimated from (docs/art-pipeline/<hero>-lookdev-v2.md)
+  // the H2 Tripo sources of the in-game H2LD figures, repaired and baked with the game look (06-HIPOLY-LOOKDEV.md,
+  // tools/art/showcase/hp_lookdev_bake.py + import_hipoly_lookdev.py)
+  // King Arthur keeps the game figure: his Tripo source was generated with the side view in the wrong slot (phantoms,
+  // a second face profile fused into the head; docs/art-pipeline/king-arthur-h2-report.md) and the head cannot be
+  // patched (06-HIPOLY-LOOKDEV.md) - a regenerated source replaces it
   const FString K(Key);
-  const TCHAR* Source = K == TEXT("KingArthur") ? TEXT("king-arthur-h2-tripo-c24eeff0-tex8k-pbr-clean")
-                        : K == TEXT("Medusa")   ? TEXT("medusa-h2-tripo-40c4d1cd-tex8k-pbr-clean")
-                                                : nullptr;
-  return Source ? FString::Printf(TEXT("/Game/PipelineCandidates/%s/HP/%s.%s"), Key, Source, Source) : FString();
+  if (K != TEXT("Medusa")) return FString();
+  return FString::Printf(TEXT("/Game/PipelineCandidates/%s/HPLD/SM_%s_HP_Showcase.SM_%s_HP_Showcase"), Key, Key, Key);
+}
+FString HiPolyMaterialPath(const TCHAR* Key, const FString& Part, ES08TeamSlot Look) {
+  return FString::Printf(TEXT("/Game/PipelineCandidates/%s/HPLD/Materials/MI_%s_HP_%s_%s.MI_%s_HP_%s_%s"), Key, Key, *Part,
+                         S08TeamSlotName(Look), Key, *Part, S08TeamSlotName(Look));
 }
 float FigureYawDeg(int32 Side) {
   // The camera looks along +X (its right is +Y). Rig v2 faces +X at yaw 0: 180 faces the camera; side 0 turns towards
@@ -272,6 +278,26 @@ void AUmHeroShowcase::SetHero(int32 Side, const FString& FighterName, ES08TeamSl
     FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hipoly=%s path=%s"), Side, Hi ? TEXT("1") : TEXT("missing"), *HiPath));
   }
   HiPoly[Side]->SetStaticMesh(Hi);
+  if (Hi) {
+    // the game material per Tripo part, in the side's team look (slot names MAT_tripo_part_N)
+    int32 Set = 0;
+    for (int32 I = 0; I < Hi->GetStaticMaterials().Num(); ++I) {
+      const FString Slot = Hi->GetStaticMaterials()[I].MaterialSlotName.ToString();
+      int32 At = Slot.Find(TEXT("tripo_part_"));
+      if (At == INDEX_NONE) continue;
+      FString Part = Slot.Mid(At);
+      int32 End = 11;
+      while (End < Part.Len() && FChar::IsDigit(Part[End])) ++End;
+      Part = Part.Left(End);
+      if (UMaterialInterface* Mi = LoadObject<UMaterialInterface>(nullptr, *UmShowcase::HiPolyMaterialPath(Spec[Side]->Key, Part, Look),
+                                                                  nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+        HiPoly[Side]->SetMaterial(I, Mi);
+        ++Set;
+      }
+    }
+    FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hipolyMaterials=%d/%d look=%s"), Side, Set,
+                                     Hi->GetStaticMaterials().Num(), S08TeamSlotName(Look)));
+  }
   HiPoly[Side]->SetVisibility(Hi != nullptr);
   Body[Side]->SetVisibility(Hi == nullptr);
   // the game pedestal with the team ring stays (blind round 1: the Tripo base had no team colour; it is cut off by

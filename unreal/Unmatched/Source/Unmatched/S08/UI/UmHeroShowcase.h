@@ -40,6 +40,8 @@ UNMATCHED_API bool HiPolyRequested();
 inline const TCHAR* const V2FlagName = TEXT("S08ShowcaseV2");
 /** /Game/PipelineCandidates/<Key>/HP/<source>.<source> of a v2 key, or "" when no high-poly source was imported. */
 UNMATCHED_API FString HiPolyPath(const TCHAR* Key);
+/** The game-look instance of one Tripo part of the high-poly (MI_<Key>_HP_<part>_<P1|P2>). */
+UNMATCHED_API FString HiPolyMaterialPath(const TCHAR* Key, const FString& Part, ES08TeamSlot Look);
 /** Automation tests only (Reset -> the command line again). */
 UNMATCHED_API void SetEnabledOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetEnabledOverrideForTest();
