@@ -71,6 +71,8 @@ UNMATCHED_API bool IsPersistent(EUmHudBlock Block);
 UNMATCHED_API FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Index);
 /** VS-2 HB-15: STATUS grows to two lines (78 su) - the height the deck panel gate keeps clear. */
 inline constexpr float StatusTwoLineSu = 78.0f;
+/** HUD "Стол": how far a pile card stands over its slip in DECKS (class L), su. */
+inline constexpr float TablePileCardSu = 84.0f;
 }  // namespace UmHudLayout
 
 struct UNMATCHED_API FUmHudLayout {

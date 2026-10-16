@@ -64,7 +64,8 @@ FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Inde
   const float W1 = bClassS ? 64.0f : (bEnglish ? 136.0f : 124.0f);
   const float H = bClassS ? 48.0f : 56.0f;
   const float X = static_cast<float>(Decks.Min.X) + (Index == 0 ? 0.0f : W0 + GapSu);
-  const float Y = static_cast<float>(Decks.Min.Y);
+  // bottom-aligned: the HUD "Стол" DECKS rect is taller (the pile cards stand over the slips); the v2 rect is H high
+  const float Y = static_cast<float>(Decks.Max.Y) - H;
   return FBox2D(FVector2D(X, Y), FVector2D(X + (Index == 0 ? W0 : W1), Y + H));
 }
 
@@ -141,7 +142,9 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 300.0f, M + 136.0f + GapSu, 300.0f, 106.0f));
     const FBox2D Actions = UmLayoutBox(W - M - 344.0f, H - M - 72.0f, 344.0f, 72.0f);
     Set(EUmHudBlock::Actions, Actions);
-    const FBox2D Decks = UmLayoutBox(W - M - 288.0f, Actions.Min.Y - GapSu - 56.0f, 288.0f, 56.0f);
+    // HUD "Стол" (03 §3.4): the piles - a card of each stands on its paper slip, the rect grows up by the card
+    const float DecksH = L.bTable ? 56.0f + UmHudLayout::TablePileCardSu : 56.0f;
+    const FBox2D Decks = UmLayoutBox(W - M - 288.0f, Actions.Min.Y - GapSu - DecksH, 288.0f, DecksH);
     Set(EUmHudBlock::Decks, Decks);
     const float LogH = L.bTall ? 200.0f : 104.0f;
     Set(EUmHudBlock::Log, UmLayoutBox(M, PanelLoc.Min.Y - GapSu - LogH, 300.0f, LogH));

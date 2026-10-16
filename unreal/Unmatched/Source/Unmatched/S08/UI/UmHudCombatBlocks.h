@@ -127,5 +127,6 @@ class UNMATCHED_API FUmCombatBlocks {
   /** HUD "Стол" (03 §3.7): the edge cards' current offset / scale toward the centre (the reveal), eased per refresh. */
   FVector2D CentreShift[2] = {FVector2D::ZeroVector, FVector2D::ZeroVector};
   float CentreScale[2] = {1.0f, 1.0f};
+  FVector2D ScoreShift = FVector2D::ZeroVector;
   FString LastCenterLine;
 };

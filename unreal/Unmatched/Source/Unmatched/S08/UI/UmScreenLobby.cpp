@@ -1,5 +1,6 @@
 // VS-7 SC-08...SC-13: LOBBY - see UmScreenLobby.h.
 #include "UmScreenLobby.h"
+#include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
@@ -421,7 +422,14 @@ void UUmScreenLobby::ApplyCanvas(const FVector2D& InCanvasSu, bool bInClassS, fl
 // ------------------------------------------------------------------------------------------------ layout
 
 void UUmScreenLobby::Layout() {
-  const FUmLobbyLayout L = UmLobby::Layout(CanvasSu, bClassS);
+  FUmLobbyLayout L = UmLobby::Layout(CanvasSu, bClassS);
+  if (S08ArtLook::HudTable() && !bClassS) {
+    // HUD "Стол" (01 §7: the empty list took 60 % of the screen): the list is as tall as its rows (at least the empty
+    // note), the scene of the board shows under it; Create and Code keep the right column
+    const int32 Shown = FMath::Max(RowModels.Num(), 2);
+    const float Want = UmLobby::RowsTopSu + Shown * (UmLobbyRow::HeightSu + UmLobbyRow::GapSu) + 48.0f;
+    L.List.H = FMath::Min(L.List.H, FMath::Max(Want, L.Create.H));
+  }
   const FVector2D O = FrameRectSu().Min;  // canvas su -> the frame's local su
   auto P = [&O](UWidget* W, float X, float Y, float Wd, float Ht) { UmLbPlace(W, FVector2D(X, Y) - O, FVector2D(Wd, Ht)); };
   P(Header, L.Header.X, L.Header.Y, L.Header.W, L.Header.H);
@@ -615,7 +623,11 @@ void UUmScreenLobby::SetList(EUmLobbyList InList, const TArray<FUmLobbyRowModel>
       Row->SetVisibility(ESlateVisibility::Collapsed);
     }
   }
-  LayoutRows();
+  if (S08ArtLook::HudTable()) {
+    Layout();  // HUD "Стол": the list grows with its rows (Layout ends with LayoutRows)
+  } else {
+    LayoutRows();
+  }
   Refresh();
 }
 

@@ -344,7 +344,7 @@ TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& InRaw) {
       FVector2D Want = FVector2D::ZeroVector;
       if (bCentre) {
         const FVector2D C(0.5 * L.CanvasSu.X, 0.5 * L.CanvasSu.Y - 40.0);
-        const float Gap = L.bClassS ? 60.0f : 110.0f;
+        const float Gap = L.bClassS ? 360.0f : 584.0f;  // the score (CENTER, <= 560 su) stands between the cards
         const float W = static_cast<float>(CardL.X) * Scale;
         const float H = static_cast<float>(CardL.Y) * Scale;
         const FVector2D Target(I == 0 ? C.X - 0.5f * Gap - W : C.X + 0.5f * Gap, C.Y - 0.5f * H);
@@ -372,6 +372,18 @@ TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& InRaw) {
     F.SpeedMul = FMath::Max(0.0f, In.SpeedMul);
     C->SetFrame(F);
     C->ApplyModel(Ctr);
+    if (L.bTable) {
+      // HUD "Стол": during the duel the score card «N : M» sits between the two cards, at their middle height
+      const ES09CombatStagePhase Ph = bStaged && In.Stage ? In.Stage->GetPhase() : ES09CombatStagePhase::Idle;
+      const bool bMid = bStaged && (Ph == ES09CombatStagePhase::Flip || Ph == ES09CombatStagePhase::Read ||
+                                    Ph == ES09CombatStagePhase::Effects || Ph == ES09CombatStagePhase::Slam ||
+                                    Ph == ES09CombatStagePhase::Pause);
+      const float TopNow = static_cast<float>(F.OriginSu.Y);
+      const FVector2D Want = bMid ? FVector2D(0.0, 0.5 * L.CanvasSu.Y - 40.0 - 80.0 - TopNow) : FVector2D::ZeroVector;
+      ScoreShift = FMath::Lerp(ScoreShift, Want, In.SpeedMul <= 0.0f ? 1.0f : 0.22f);
+      if (!bMid && ScoreShift.Size() < 0.5f) ScoreShift = FVector2D::ZeroVector;
+      C->SetRenderTranslation(ScoreShift);
+    }
     const FString Line = FString::Printf(TEXT("HUD-COMBAT center=%s seq=%d lines=%d current=%d"),
                                          Ctr.State == EUmCenterState::Hidden ? TEXT("hidden") : UmHudCombatCenter::StateName(Ctr.State),
                                          Ctr.Seq, Ctr.Lines.Num(), Ctr.Current);

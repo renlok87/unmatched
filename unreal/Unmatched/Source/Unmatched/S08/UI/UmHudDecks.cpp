@@ -259,26 +259,32 @@ void UUmHudDecks::Relayout() {
       Button->ApplyModel(B);
       UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
     }
+    // HUD "Стол" (03 §3.4): the pile card stands on its slip (class L) - a 66 x 92 card over the slip's middle, the count
+    // centred on the slip; class S keeps the mini card in the chip
+    const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > ChipH + 1.0f;
+    const FVector2D CardSize = bPile ? FVector2D(66.0f, 92.0f) : FVector2D(MiniW, MiniH);
+    const FVector2D CardPos = bPile ? P + FVector2D(0.5f * (W - CardSize.X), 14.0f - CardSize.Y)
+                                    : P + FVector2D(MiniLeft, 0.5f * (ChipH - MiniH));
     USizeBox* MiniBox = I == 0 ? DeckMiniBox.Get() : DiscardMiniBox.Get();
     if (MiniBox) {
-      MiniBox->SetWidthOverride(MiniW);
-      MiniBox->SetHeightOverride(MiniH);
-      UmDecksPlace(MiniBox, P + FVector2D(MiniLeft, 0.5f * (ChipH - MiniH)), FVector2D(MiniW, MiniH), 1);
+      MiniBox->SetWidthOverride(CardSize.X);
+      MiniBox->SetHeightOverride(CardSize.Y);
+      UmDecksPlace(MiniBox, CardPos, CardSize, bPile ? 3 : 1);
     }
     US08AnimatedIconWidget* IconW = I == 0 ? DeckIcon.Get() : DiscardIcon.Get();
     if (IconW && IconW->SetIcon(TEXT("resource-card"), IconSuNow, FMath::RoundToInt(IconSuNow))) {
       IconW->SetDisplaySizeSu(IconSuNow);
       IconW->ShowAtRest();
       // centred on the mini card's place (it stands in for the top card of an empty pile)
-      const FVector2D C = P + FVector2D(MiniLeft + 0.5f * MiniW, 0.5f * ChipH);
-      UmDecksPlace(IconW, C - FVector2D(0.5f * IconSuNow), FVector2D(IconSuNow), 1);
+      const FVector2D C = CardPos + 0.5f * CardSize;
+      UmDecksPlace(IconW, C - FVector2D(0.5f * IconSuNow), FVector2D(IconSuNow), bPile ? 3 : 1);
     }
     UTextBlock* Text = I == 0 ? DeckCount.Get() : DiscardCount.Get();
     if (UCanvasPanelSlot* S = UmDecksSlot(Text)) {
       S->SetAnchors(FAnchors(0.0f, 0.0f));
-      S->SetAlignment(FVector2D(0.0f, 0.5f));
+      S->SetAlignment(FVector2D(bPile ? 0.5f : 0.0f, 0.5f));
       S->SetAutoSize(true);
-      S->SetPosition(P + FVector2D(TextLeft, 0.5f * ChipH));
+      S->SetPosition(bPile ? P + FVector2D(0.5f * W, 0.5f * ChipH + 7.0f) : P + FVector2D(TextLeft, 0.5f * ChipH));
       S->SetZOrder(2);
     }
   }
