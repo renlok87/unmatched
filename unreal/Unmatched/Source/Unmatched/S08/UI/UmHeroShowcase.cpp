@@ -14,6 +14,7 @@
 #include "EngineUtils.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "HAL/IConsoleManager.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -34,6 +35,12 @@ constexpr float ExposureBias = 0.0f;     // manual exposure of the captures (EV)
 constexpr int32 StageChannel = 2;           // lighting channel 2: no board light reaches the figures
 constexpr float HiPolyYawSide0Deg = 45.0f;    // the imported Tripo source (glTF axes after Interchange), left niche
 constexpr float HiPolyYawSide1Deg = 135.0f;  // right niche
+// King Arthur's regenerated source holds the sword upright before his right shoulder: at the shared three-quarter turn
+// the blade crosses his face (blind round 3) - his own yaw per side (tuned live: um.Showcase.ArthurYaw0 / 1, -1 = table)
+constexpr float ArthurYawSide0Deg = 85.0f;   // live frames 2026-10-16: 25-65 the blade crosses the face, 85 clear
+constexpr float ArthurYawSide1Deg = 95.0f;   // the mirror of side 0 (45/135 -> 85/95)
+TAutoConsoleVariable<float> CVarArthurYaw0(TEXT("um.Showcase.ArthurYaw0"), -1.0f, TEXT("SEL: Arthur high-poly yaw, left niche (-1 = code)"));
+TAutoConsoleVariable<float> CVarArthurYaw1(TEXT("um.Showcase.ArthurYaw1"), -1.0f, TEXT("SEL: Arthur high-poly yaw, right niche (-1 = code)"));
 }  // namespace
 
 namespace UmShowcase {
@@ -333,7 +340,12 @@ void AUmHeroShowcase::Frame(int32 Side) {
     HiPoly[Side]->SetRelativeLocation(O + FVector(0.0, 0.0, PedTop - HiBox.Min.Z * S));
     // measured on the live frames 2026-10-16: the imported source faces the camera at yaw 90 (180 = left profile,
     // 315 = back), so three quarters to the image right is 45 (side 0) and to the image left 135 (side 1)
-    HiPoly[Side]->SetRelativeRotation(FRotator(0.0f, Side == 0 ? HiPolyYawSide0Deg : HiPolyYawSide1Deg, 0.0f));
+    float HiYaw = Side == 0 ? HiPolyYawSide0Deg : HiPolyYawSide1Deg;
+    if (Spec[Side] && FCString::Strcmp(Spec[Side]->Key, TEXT("KingArthur")) == 0) {
+      const float Live = (Side == 0 ? CVarArthurYaw0 : CVarArthurYaw1).GetValueOnGameThread();
+      HiYaw = Live >= 0.0f ? Live : (Side == 0 ? ArthurYawSide0Deg : ArthurYawSide1Deg);
+    }
+    HiPoly[Side]->SetRelativeRotation(FRotator(0.0f, HiYaw, 0.0f));
     HiPoly[Side]->SetRelativeScale3D(FVector(S));
   }
   // the wall: a plane (100 uu) stood up behind the figure, square to the camera axis, big enough to fill the frame
@@ -389,6 +401,13 @@ void AUmHeroShowcase::Tick(float DeltaSeconds) {
   const UWorld* W = GetWorld();
   if (!W) return;
   if (bActive && GFrameCounter > LastRequestFrame + 2) SetActive(false);  // no screen asked: the captures sleep
+  for (int32 S = 0; S < 2; ++S) {  // live yaw tuning (um.Showcase.ArthurYaw*): re-frame when the value changes
+    const float Live = (S == 0 ? CVarArthurYaw0 : CVarArthurYaw1).GetValueOnGameThread();
+    if (Live != LastArthurYaw[S]) {
+      LastArthurYaw[S] = Live;
+      if (HiPoly[S]->GetStaticMesh()) Frame(S);
+    }
+  }
   for (int32 S = 0; S < 2; ++S) {
     Capture[S]->FOVAngle = UmShowcase::PushFov(CaptureFovDeg, W->GetTimeSeconds() - PushStartedAt[S]);
     if (Clip[S] == S08HeroesV2::EClip::LungeAttack && W->GetTimeSeconds() >= ClipEndsAt[S]) {

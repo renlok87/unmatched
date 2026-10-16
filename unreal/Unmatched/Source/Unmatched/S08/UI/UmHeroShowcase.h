@@ -116,6 +116,7 @@ class UNMATCHED_API AUmHeroShowcase : public AActor {
   S08HeroesV2::EClip Clip[2] = {S08HeroesV2::EClip::None, S08HeroesV2::EClip::None};
   double ClipEndsAt[2] = {0.0, 0.0};
   double PushStartedAt[2] = {-100.0, -100.0};
+  float LastArthurYaw[2] = {-1.0f, -1.0f};
   bool bActive = false;
   uint64 LastRequestFrame = 0;
 };
