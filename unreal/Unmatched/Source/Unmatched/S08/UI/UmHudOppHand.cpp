@@ -261,8 +261,14 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
       Caption->SetShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.9f));
     }
     Caption->SetToolTipText(Text);
-    const FName Token = UmTextFit::PickToken(Text, Model.WidthSu - 2.0f * UmHudOppHand::PadSu,
-                                             {FName(TEXT("type.caption")), FName(TEXT("type.tag"))});
+    // slice 14 (blind review s13: the backs and the caption said the same): under the table look the counts line
+    // alone, at the button size
+    const bool bCountsLine = S08ArtLook::HudTable() && Model.WidthSu >= 300.0f;  // class L only (S keeps its backs)
+    if (Backs) Backs->SetVisibility(bCountsLine ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    const TArray<FName> Tokens = bCountsLine
+                                     ? TArray<FName>{FName(TEXT("type.button")), FName(TEXT("type.caption")), FName(TEXT("type.tag"))}
+                                     : TArray<FName>{FName(TEXT("type.caption")), FName(TEXT("type.tag"))};
+    const FName Token = UmTextFit::PickToken(Text, Model.WidthSu - 2.0f * UmHudOppHand::PadSu, Tokens);
     if (Token != CaptionToken) {
       CaptionToken = Token;
       Caption->SetFont(UUmHudTheme::Get().Font(CaptionToken));

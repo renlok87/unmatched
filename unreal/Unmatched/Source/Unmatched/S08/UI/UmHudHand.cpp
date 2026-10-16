@@ -912,8 +912,8 @@ void UUmHudHand::ApplyOffsets(float DurMs) {
     const int32 N = Model.Cards.Num();
     if (S08ArtLook::HudTable() && !Frame.bClassS && N > 1 && I != HoverIndex && !C.bSelected && !Model.bLowered) {
       const float Off = static_cast<float>(I) - 0.5f * static_cast<float>(N - 1);
-      Angle = FMath::Clamp(2.0f * Off, -4.0f, 4.0f);
-      Target.Y += 2.0f * Off * Off;
+      Angle = FMath::Clamp(1.5f * Off, -3.0f, 3.0f);  // slice 14 (blind review s13): at most 3 deg, the names level
+      Target.Y += 1.5f * Off * Off;
     }
     W->SetRenderTransformPivot(FVector2D(0.5, 1.0));
     if (!FMath::IsNearlyEqual(W->GetRenderTransformAngle(), Angle)) W->SetRenderTransformAngle(Angle);

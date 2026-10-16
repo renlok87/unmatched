@@ -589,7 +589,9 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
           if (UOverlaySlot* X = Stack->AddChildToOverlay(UmPortrait::MakeNumberBadge(*WidgetTree, S.Number))) {
             X->SetHorizontalAlignment(HAlign_Left);
             X->SetVerticalAlignment(VAlign_Top);
-            X->SetPadding(FMargin(Su - 11.0f, Su - 12.0f, 0.0f, 0.0f));  // CX-09: the lower right corner, over the circle's edge
+            // CX-09: the lower right corner; slice 14 (blind review s13: «1 1/1» read as «11/1»): the table token
+            // carries it top-left, away from the HP beside it
+            X->SetPadding(bSide ? FMargin(0.0f) : FMargin(Su - 11.0f, Su - 12.0f, 0.0f, 0.0f));
           }
         }
         Column->AddChild(StackBox);

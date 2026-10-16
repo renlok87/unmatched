@@ -596,6 +596,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPanelsLeetFitTest,
     "Unmatched.S08.Hud.PlayerPanel.LeetFit class S HP steps down to type.tag before the tracker, the opponent hand caption fits its row",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudPanelsLeetFitTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 caption tokens (slice 14: the table counts line)
   using namespace UmPanelsTest;
   FWorld W(TEXT("UmPanelsLeetFit"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;
@@ -680,10 +681,12 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   TestTrue(TEXT("layout: the prompt right on ACTIONS at the right edge (slice 13)"),
            FMath::IsNearlyEqual(Status.Max.X, 1896.0) && FMath::IsNearlyEqual(Status.Max.Y, Act.Min.Y) &&
                FMath::IsNearlyEqual(Status.Max.X - Status.Min.X, 360.0));
-  TestTrue(TEXT("layout: the stage row over the prompt, the piles tray over it (slice 13)"),
+  // slice 14: the stage row over the prompt; the piles leave the column - their tray beside the hand, left of the
+  // control panel, bottom-aligned with it; the hand corridor ends before the piles
+  const FBox2D Hand = L.Rect(EUmHudBlock::Hand);
+  TestTrue(TEXT("layout: the stage row over the prompt, the piles beside the hand (slice 14)"),
            Strip.bIsValid && FMath::IsNearlyEqual(Strip.Max.Y, Status.Min.Y) && FMath::IsNearlyEqual(Strip.Max.X, 1896.0) &&
-               FMath::IsNearlyEqual(Decks.Max.Y + 2.0 * UmHudLayout::TableTrayPadSu, Strip.Min.Y) &&
-               FMath::IsNearlyEqual(Decks.Max.X - Decks.Min.X, 300.0));
+               FMath::IsNearlyEqual(Decks.Max.Y, Act.Max.Y) && Decks.Max.X < Status.Min.X && Hand.Max.X < Decks.Min.X);
   TestTrue(TEXT("layout: the journal above the hero card"), Log.bIsValid && Log.Max.Y <= Loc.Min.Y);
   TestEqual(TEXT("layout: no persistent block over FIELD"), L.OverlapFieldPx2, 0.0);
   const FUmHudLayout Old = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, &Field, false);

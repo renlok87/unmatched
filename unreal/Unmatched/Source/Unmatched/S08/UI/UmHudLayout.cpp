@@ -63,11 +63,17 @@ FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Inde
   const float W0 = bClassS ? 64.0f : (bEnglish ? 144.0f : 156.0f);
   const float W1 = bClassS ? 64.0f : (bEnglish ? 136.0f : 124.0f);
   const float H = bClassS ? 48.0f : 56.0f;
-  const float Lead = FMath::Max(0.0f, 0.5f * (static_cast<float>(Decks.Max.X - Decks.Min.X) - (W0 + GapSu + W1)));
-  const float X = static_cast<float>(Decks.Min.X) + Lead + (Index == 0 ? 0.0f : W0 + GapSu);
+  const float RectW = static_cast<float>(Decks.Max.X - Decks.Min.X);
+  const float Nominal = W0 + GapSu + W1;
+  const float Lead = FMath::Max(0.0f, 0.5f * (RectW - Nominal));
+  // a rect narrower than the nominal pair (HUD "Стол" slice 14: the piles beside the hand) splits evenly
+  const float Even = 0.5f * (RectW - GapSu);
+  const bool bEven = RectW + 0.5f < Nominal;
+  const float X = static_cast<float>(Decks.Min.X) + Lead + (Index == 0 ? 0.0f : (bEven ? Even : W0) + GapSu);
+  const float CW = bEven ? Even : (Index == 0 ? W0 : W1);
   // bottom-aligned: the HUD "Стол" DECKS rect is taller (the pile cards stand over the slips); the v2 rect is H high
   const float Y = static_cast<float>(Decks.Max.Y) - H;
-  return FBox2D(FVector2D(X, Y), FVector2D(X + (Index == 0 ? W0 : W1), Y + H));
+  return FBox2D(FVector2D(X, Y), FVector2D(X + CW, Y + H));
 }
 
 bool IsPersistent(EUmHudBlock Block) {
@@ -146,7 +152,8 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     if (L.bTable) {
       // slice 13 (blind review s12: two equally heavy opponent blocks): one plate - the hand's tray starts under the
       // opponent's card (z under it, UmGameHud) and the backs sit at its bottom
-      Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M, OppHandW, 136.0f + GapSu + 106.0f));
+      // slice 14 (blind review s13: 340 x 250 for little data): the backs go, one counts line under the card
+      Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M, OppHandW, 136.0f + 40.0f));
     } else {
       Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M + 136.0f + GapSu, OppHandW, 106.0f));
     }
@@ -219,14 +226,20 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       // slice 13 (blind review s12: the piles hung loose): the piles on their own tray as wide as the control panel,
       // docked right over it (the two trays' pads touch)
       const float DecksH = static_cast<float>(Decks.Max.Y - Decks.Min.Y);
-      // the piles tray only as wide as the two piles (300 su) - wider it covered the board frame's right edge
-      const FBox2D DecksR = UmLayoutBox(W - M - 300.0f, PanelTop - 2.0f * UmHudLayout::TableTrayPadSu - DecksH, 300.0f, DecksH);
+      // slice 14 (blind review s13: «a 375 x 325 tower in the bottom right»): the piles leave the column - their tray
+      // stands at the right end of the hand, bottom-aligned with the control panel (the library beside the hand, as in
+      // MTG Arena); the column is the control panel alone
+      const float Pad = UmHudLayout::TableTrayPadSu;
+      const float PanelLeft = W - M - StatusW - 8.0f;  // the actions tray's own 8 su pad
+      const float PilesW = 176.0f;
+      const FBox2D DecksR = UmLayoutBox(PanelLeft - 12.0f - Pad - PilesW, H - M - DecksH, PilesW, DecksH);
       Set(EUmHudBlock::Decks, DecksR);
+      L.HandRightSu = static_cast<float>(DecksR.Min.X) - Pad - 12.0f;
       if (L.HasRect(EUmHudBlock::DeckPanel)) {
         const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
         Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),
                                                 static_cast<float>(DP.Max.X - DP.Min.X),
-                                                static_cast<float>(DecksR.Min.Y - GapSu - DP.Min.Y)));
+                                                PanelTop - Pad - GapSu - static_cast<float>(DP.Min.Y)));
       }
     }
     const FBox2D PanelLocR = L.Rect(EUmHudBlock::PanelLoc);
