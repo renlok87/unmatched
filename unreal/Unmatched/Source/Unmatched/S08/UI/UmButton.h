@@ -83,6 +83,10 @@ struct UNMATCHED_API FUmButtonModel {
 };
 
 namespace UmButton {
+/** HUD "Стол" (ВР-39, 06 §3.1): a caption without its trailing key hint - «Отказаться (X)» -> «Отказаться»,
+ *  «Подтвердить без движения (Enter)» -> «Подтвердить без движения». Only a short last parenthesis of letters (a key
+ *  name, <= 6 chars) goes; «Атака (3)» or a sentence keeps its text. */
+UNMATCHED_API FText StripKeyHint(const FText& Caption);
 /** The state drawn for a model and the pointer (busy > disabled > pressed > selected > hover > focus > normal;
  *  a primary is never selected). */
 UNMATCHED_API EUmButtonState ResolveState(const FUmButtonModel& Model, bool bHovered, bool bPressed);

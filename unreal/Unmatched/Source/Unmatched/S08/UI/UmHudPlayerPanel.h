@@ -239,6 +239,11 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
    *  the HP number on the dial instead of the heart and the fraction (rollback -S08HudTableLegacy). */
   bool bTable = false;
   UPROPERTY(Transient) TObjectPtr<UImage> HpDial;
+  /** HUD "Стол": the hero's art as a full-height panel of the card, the hero colour band beside it, the turn glow. */
+  UPROPERTY(Transient) TObjectPtr<UImage> HeroArt;
+  UPROPERTY(Transient) TObjectPtr<UImage> HeroBand;
+  UPROPERTY(Transient) TObjectPtr<UImage> TurnGlow;
+  void ApplyTableArt();
   UPROPERTY(Transient) TObjectPtr<UTextBlock> HpDialText;
   void ApplyTableDial();
   float AppliedRingSu = 0.0f;

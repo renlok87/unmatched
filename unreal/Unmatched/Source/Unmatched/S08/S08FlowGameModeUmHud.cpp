@@ -1167,14 +1167,23 @@ void AS08FlowGameMode::TickUmHud() {
     // panel's left is the Slate canvas's 16 su
     const UUmHudSourceSlot* SlotW = R.Slot.Get();
     const FBox2D SlotRect = R.Layout.Rect(EUmHudBlock::SourceSlot);
-    const float ShiftX = SlotW && SlotW->GetPhase() != EUmSlotPhase::Hidden && SlotRect.bIsValid
-                             ? FMath::Max(0.0f, static_cast<float>(SlotRect.Max.X) + 8.0f - 16.0f)
-                             : 0.0f;
-    if (!FMath::IsNearlyEqual(Shift, R.CommandShiftSu, 0.5f) || !FMath::IsNearlyEqual(ShiftX, R.CommandShiftXSu, 0.5f)) {
-      R.CommandShiftSu = Shift;
+    float ShiftX = SlotW && SlotW->GetPhase() != EUmSlotPhase::Hidden && SlotRect.bIsValid
+                       ? FMath::Max(0.0f, static_cast<float>(SlotRect.Max.X) + 8.0f - 16.0f)
+                       : 0.0f;
+    float ShiftY = Shift;
+    if (R.Layout.bTable && R.Layout.HasRect(EUmHudBlock::Status) && CommandBox.IsValid() && CommandBox->NumSlots() > 0) {
+      // HUD "Стол" (03 §3.5): the draft's confirm / reset buttons stand in the decision column, right over the prompt -
+      // the answer next to the question, never in the top-left corner
+      const FVector2D Want = Cmd->GetDesiredSize();
+      const FBox2D St = R.Layout.Rect(EUmHudBlock::Status);
+      ShiftX = FMath::Max(0.0f, static_cast<float>(St.Max.X) - static_cast<float>(Want.X));
+      ShiftY = FMath::Max(0.0f, static_cast<float>(St.Min.Y) - static_cast<float>(Want.Y) - 4.0f);
+    }
+    if (!FMath::IsNearlyEqual(ShiftY, R.CommandShiftSu, 0.5f) || !FMath::IsNearlyEqual(ShiftX, R.CommandShiftXSu, 0.5f)) {
+      R.CommandShiftSu = ShiftY;
       R.CommandShiftXSu = ShiftX;
-      Cmd->SetRenderTransform(Shift > 0.0f || ShiftX > 0.0f
-                                  ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(ShiftX, Shift)))
+      Cmd->SetRenderTransform(ShiftY > 0.0f || ShiftX > 0.0f
+                                  ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(ShiftX, ShiftY)))
                                   : TOptional<FSlateRenderTransform>());
       FS08Trace::Write(FString::Printf(TEXT("HUD-CMD shift=%.0f top=%d shiftX=%.0f slot=%d"), Shift, Shift > 0.0f ? 1 : 0, ShiftX,
                                        ShiftX > 0.0f ? 1 : 0));

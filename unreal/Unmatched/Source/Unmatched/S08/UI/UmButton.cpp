@@ -47,6 +47,18 @@ const TCHAR* UmButtonStateName(EUmButtonState State) {
 }
 
 namespace UmButton {
+FText StripKeyHint(const FText& Caption) {
+  const FString S = Caption.ToString();
+  int32 Open = INDEX_NONE;
+  if (!S.EndsWith(TEXT(")")) || !S.FindLastChar(TEXT('('), Open) || Open < 1) return Caption;
+  const FString Key = S.Mid(Open + 1, S.Len() - Open - 2);
+  if (Key.IsEmpty() || Key.Len() > 6) return Caption;
+  for (const TCHAR C : Key) {
+    if (!FChar::IsAlpha(C)) return Caption;
+  }
+  return FText::FromString(S.Left(Open).TrimEnd());
+}
+
 EUmButtonState ResolveState(const FUmButtonModel& Model, bool bHovered, bool bPressed) {
   if (Model.bBusy) return EUmButtonState::Busy;
   if (!Model.bEnabled) return EUmButtonState::Disabled;
@@ -329,7 +341,8 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   }
   // the text: type.button caps (disc: type.tag caps under the disc); busy reads "Отправлено…" (V-10)
   if (Label) {
-    const FText Text = Model.bBusy ? UmText::Get(EUmTable::Hud, TEXT("hud.btn.sent")) : Model.Label;
+    const FText Shown = S08ArtLook::HudTable() ? UmButton::StripKeyHint(Model.Label) : Model.Label;
+    const FText Text = Model.bBusy ? UmText::Get(EUmTable::Hud, TEXT("hud.btn.sent")) : Shown;
     Label->SetText(Model.bBusy ? Text : Text.ToUpper());
     Label->SetFont(Theme.Font(bDisc ? TEXT("type.tag") : TEXT("type.button")));
     Label->SetVisibility(Text.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);

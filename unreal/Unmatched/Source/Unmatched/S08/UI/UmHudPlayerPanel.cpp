@@ -7,11 +7,13 @@
 #include "../S08TurnPortraitWidget.h"
 #include "UmCardMedia.h"
 #include "UmGameHud.h"
+#include "UmHeroColors.generated.h"
 #include "UmHudTheme.h"
 #include "UmWorldLayer.h"
 #include "UmPortrait.h"
 #include "UmText.h"
 #include "Blueprint/WidgetTree.h"
+#include "Brushes/SlateColorBrush.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Components/Border.h"
 #include "Components/CanvasPanel.h"
@@ -376,6 +378,7 @@ void UUmHudPlayerPanel::ApplyGeometry() {
   AppliedRingSu = G.RingSu;
   ApplyPortraitFrame();
   ApplyTableDial();
+  ApplyTableArt();
   if (Portrait) {
     Portrait->SetPanelGeometry(G.RingSu, G.DiscSu, G.TrackerSu);
     Portrait->SetRingSmoulder(UmHudPanel::RingSmoulder(bClassS));  // ВР-43: L 0.35, S 0.55
@@ -419,6 +422,62 @@ void UUmHudPlayerPanel::ApplyPortraitFrame() {
       FrameSlot->SetZOrder(PortraitSlot->GetZOrder() + 1);
     }
   }
+}
+
+void UUmHudPlayerPanel::ApplyTableArt() {
+  // HUD "Стол" (03 §3.1, R3 P-2 / P-5): the card shows the hero's art on its whole height (the round portrait stays for
+  // its tracker / heart cues, transparent), a band in the hero's own colour (backend Hero.color) and, on the side that
+  // acts, a glow round the card in the team colour instead of the ring at the portrait
+  const bool bShow = bTable && Canvas && WidgetTree && Portrait;
+  if (Portrait) Portrait->SetRenderOpacity(bShow ? 0.0f : 1.0f);
+  if (!bShow) {
+    for (UImage* W : {HeroArt.Get(), HeroBand.Get(), TurnGlow.Get()}) {
+      if (W) W->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    return;
+  }
+  const bool bOpp = Side == EUmPanelSide::Opp;
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side, bTable);
+  const float Inset = 7.0f;
+  const float H = static_cast<float>(G.Size.Y) - 2.0f * Inset;
+  const float ArtW = Model.bClassS ? 76.0f : 112.0f;
+  const float BandW = 5.0f;
+  const float ArtX = bOpp ? static_cast<float>(G.Size.X) - Inset - ArtW : Inset;
+  const float BandX = bOpp ? ArtX - BandW : ArtX + ArtW;
+  auto Ensure = [this](TObjectPtr<UImage>& W, const TCHAR* Name) {
+    if (!W) {
+      W = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(Name));
+      Canvas->AddChild(W);
+    }
+    W->SetVisibility(ESlateVisibility::HitTestInvisible);
+  };
+  Ensure(HeroArt, TEXT("HeroArtTable"));
+  Ensure(HeroBand, TEXT("HeroBandTable"));
+  Ensure(TurnGlow, TEXT("TurnGlowTable"));
+  if (UTexture2D* Tex = const_cast<UTexture2D*>(Portrait->GetAvatarTexture())) {
+    FSlateBrush Art;
+    Art.SetResourceObject(Tex);
+    Art.ImageSize = FVector2D(ArtW, H);
+    Art.DrawAs = ESlateBrushDrawType::RoundedBox;
+    Art.OutlineSettings = FSlateBrushOutlineSettings(FVector4(bOpp ? 0.0f : 9.0f, bOpp ? 9.0f : 0.0f, bOpp ? 9.0f : 0.0f,
+                                                              bOpp ? 0.0f : 9.0f));
+    HeroArt->SetBrush(Art);
+  } else {
+    HeroArt->SetVisibility(ESlateVisibility::Collapsed);
+  }
+  FColor HeroColor;
+  const FString Key = Model.HeroName.ToLower().Replace(TEXT(" "), TEXT("-"));
+  const FLinearColor Band = UmHeroColors::Find(Key, HeroColor) ? FLinearColor::FromSRGBColor(HeroColor)
+                                                               : UUmHudTheme::Get().Color(bOpp ? TEXT("team.p2") : TEXT("team.p1"));
+  HeroBand->SetBrush(FSlateColorBrush(Band));
+  UmPanelPlace(HeroArt, FVector2D(ArtX, Inset), false, FVector2D(ArtW, H));
+  UmPanelPlace(HeroBand, FVector2D(BandX, Inset), false, FVector2D(BandW, H));
+  // the turn glow: the side that acts (own turn / their turn / the AI thinking) - the team colour round the card
+  const bool bActs = Model.State == EUmPanelState::Own || Model.State == EUmPanelState::Opp || Model.State == EUmPanelState::Ai;
+  const FLinearColor Team = UUmHudTheme::Get().Color(bOpp ? TEXT("team.p2") : TEXT("team.p1"));
+  TurnGlow->SetBrush(FSlateRoundedBoxBrush(FLinearColor::Transparent, 12.0f, Team, 3.0f));
+  TurnGlow->SetVisibility(bActs ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  UmPanelPlace(TurnGlow, FVector2D(-2.0f, -2.0f), false, FVector2D(G.Size.X + 4.0f, G.Size.Y + 4.0f));
 }
 
 void UUmHudPlayerPanel::ApplyTableDial() {
@@ -657,6 +716,7 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
       }
     }
   }
+  if (bFirst || Old.State != Model.State || Old.HeroName != Model.HeroName) ApplyTableArt();
   if (HpText && (bFirst || Old.Hp != Model.Hp || Old.MaxHp != Model.MaxHp || Old.bHasHp != Model.bHasHp)) {
     HpText->SetText(Model.bHasHp ? UmHudPanel::HpText(Model.Hp, Model.MaxHp) : FText::GetEmpty());
     HpFitSlots = -1;  // VS-5 E4: fitted again below

@@ -4,6 +4,7 @@
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
+#include "UI/UmButton.h"
 #include "UI/UmWorldLayer.h"
 #include "UI/UmWorldDamage.h"
 #include "S08Render.h"
@@ -6519,6 +6520,7 @@ void AS08FlowGameMode::RefreshHud() {
                              ? (Boost ? TEXT("ms.btn.confirm.zero.boost") : TEXT("ms.btn.confirm.zero"))
                              : (Boost ? TEXT("ms.btn.confirm") : TEXT("ms.btn.confirm.noboost"));
       ConfirmText = UmText::Format(EUmTable::Ms, Key, Args);
+      if (S08ArtLook::HudTable()) ConfirmText = UmButton::StripKeyHint(ConfirmText);  // ВР-39: the key in the tooltip
     }
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
@@ -6542,7 +6544,9 @@ void AS08FlowGameMode::RefreshHud() {
                   },
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(bDraftLines ? FText::FromString(TEXT("CLEAR DRAFT (Esc)"))
-                                                    : UmText::Get(EUmTable::Ms, TEXT("ms.btn.reset")))
+                                                    : S08ArtLook::HudTable()
+                                                        ? UmButton::StripKeyHint(UmText::Get(EUmTable::Ms, TEXT("ms.btn.reset")))
+                                                        : UmText::Get(EUmTable::Ms, TEXT("ms.btn.reset")))
                        .Font(UUmHudTheme::Get().Font(TEXT("type.button"))))]];
   } else if (bUmPending && (bDiscard || CommandUi.Mode == ES09CommandMode::PendingChoice ||
                             (CommandUi.Mode == ES09CommandMode::AttackDraft && CommandUi.IsAttackAbilityPromptOpen()) ||
