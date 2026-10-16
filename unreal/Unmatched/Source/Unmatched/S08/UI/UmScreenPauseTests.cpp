@@ -58,7 +58,10 @@ struct FPauseCulture {
 #if WITH_EDITOR
     FTextLocalizationManager::Get().DisableGameLocalizationPreview();
 #endif
+    // the preview switch reloads the text on a worker; restoring the culture under it raced (MTAccessDetector ensure)
+    FTextLocalizationManager::Get().WaitForAsyncTasks();
     FInternationalization::Get().RestoreCultureState(Snapshot);
+    FTextLocalizationManager::Get().WaitForAsyncTasks();
   }
 };
 
