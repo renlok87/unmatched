@@ -32,6 +32,8 @@ constexpr float FillCandela = 1.6f;
 constexpr float LightReachUU = 600.0f;
 constexpr float ExposureBias = 0.0f;     // manual exposure of the captures (EV)
 constexpr int32 StageChannel = 2;           // lighting channel 2: no board light reaches the figures
+constexpr float HiPolyYawSide0Deg = 45.0f;    // the imported Tripo source (glTF axes after Interchange), left niche
+constexpr float HiPolyYawSide1Deg = 135.0f;  // right niche
 }  // namespace
 
 namespace UmShowcase {
@@ -58,6 +60,15 @@ float PushFov(float BaseFov, double Seconds) {
   if (Seconds < In) return FMath::InterpEaseOut(BaseFov, Near, static_cast<float>(Seconds / In), 2.0f);
   return FMath::InterpEaseInOut(Near, BaseFov, static_cast<float>((Seconds - In) / Out), 2.0f);
 }
+bool HiPolyRequested() { return FParse::Param(FCommandLine::Get(), TEXT("S08ShowcaseHiPoly")); }
+FString HiPolyPath(const TCHAR* Key) {
+  // the H2 Tripo tasks the in-game H2LD figures were decimated from (docs/art-pipeline/<hero>-lookdev-v2.md)
+  const FString K(Key);
+  const TCHAR* Source = K == TEXT("KingArthur") ? TEXT("king-arthur-h2-tripo-c24eeff0-tex8k-pbr")
+                        : K == TEXT("Medusa")   ? TEXT("medusa-h2-tripo-40c4d1cd-tex8k-pbr")
+                                                : nullptr;
+  return Source ? FString::Printf(TEXT("/Game/PipelineCandidates/%s/HP/%s.%s"), Key, Source, Source) : FString();
+}
 float FigureYawDeg(int32 Side) {
   // The camera looks along +X (its right is +Y). Rig v2 faces +X at yaw 0: 180 faces the camera; side 0 turns towards
   // the image right (+Y, yaw 90) -> 135, side 1 towards the image left (-Y, yaw 270) -> 225 (checked on the live
@@ -81,6 +92,13 @@ AUmHeroShowcase::AUmHeroShowcase() {
     Backdrop[S]->SetCastShadow(false);
     Backdrop[S]->LightingChannels.bChannel0 = false;
     Backdrop[S]->LightingChannels.bChannel2 = true;
+    HiPoly[S] = CreateDefaultSubobject<UStaticMeshComponent>(*(TEXT("HiPoly") + Sfx));
+    HiPoly[S]->SetupAttachment(Root);
+    HiPoly[S]->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    HiPoly[S]->LightingChannels.bChannel0 = false;
+    HiPoly[S]->LightingChannels.bChannel2 = true;
+    HiPoly[S]->bForceMipStreaming = true;
+    HiPoly[S]->SetVisibility(false);
     Body[S] = CreateDefaultSubobject<USkeletalMeshComponent>(*(TEXT("Body") + Sfx));
     Body[S]->SetupAttachment(Root);
     // never rendered by the main view: the pose must tick anyway (the capture sees it)
@@ -123,6 +141,7 @@ AUmHeroShowcase::AUmHeroShowcase() {
     C->bAlwaysPersistRenderingState = true;
     C->ShowOnlyComponents.Add(Backdrop[S]);
     C->ShowOnlyComponents.Add(Base[S]);
+    C->ShowOnlyComponents.Add(HiPoly[S]);
     C->ShowOnlyComponents.Add(Body[S]);
     C->ShowFlags.SetAtmosphere(false);
     C->ShowFlags.SetFog(false);
@@ -245,6 +264,17 @@ void AUmHeroShowcase::SetHero(int32 Side, const FString& FighterName, ES08TeamSl
       FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hero=%s missing=%s"), Side, *FighterName, *MeshPath(*NewSpec)));
     }
   }
+  // -S08ShowcaseHiPoly: the static high-poly source in place of the skeletal figure and its pedestal
+  UStaticMesh* Hi = nullptr;
+  if (Spec[Side] && UmShowcase::HiPolyRequested()) {
+    const FString HiPath = UmShowcase::HiPolyPath(Spec[Side]->Key);
+    Hi = HiPath.IsEmpty() ? nullptr : LoadObject<UStaticMesh>(nullptr, *HiPath, nullptr, LOAD_NoWarn | LOAD_Quiet);
+    FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hipoly=%s path=%s"), Side, Hi ? TEXT("1") : TEXT("missing"), *HiPath));
+  }
+  HiPoly[Side]->SetStaticMesh(Hi);
+  HiPoly[Side]->SetVisibility(Hi != nullptr);
+  Body[Side]->SetVisibility(Hi == nullptr);
+  Base[Side]->SetVisibility(Hi == nullptr);
   RimLight[Side]->SetLightColor(S08TeamPalette::RingFill(Look));
   Frame(Side);
   TraceSide(Side);
@@ -259,6 +289,16 @@ void AUmHeroShowcase::Frame(int32 Side) {
     C->SetRelativeLocation(O);
     C->SetRelativeRotation(Yaw);
     C->SetRelativeScale3D(FVector(Scale));
+  }
+  // the high-poly source: the same top height as the v2 figure (its bounds top incl. the weapon), the same facing
+  // plus the glTF axis offset of the import (tuned on the live frame)
+  if (UStaticMesh* Hi = HiPoly[Side]->GetStaticMesh()) {
+    const float HiTop = FMath::Max(1.0f, static_cast<float>(Hi->GetBoundingBox().Max.Z));
+    HiPoly[Side]->SetRelativeLocation(O);
+    // measured on the live frames 2026-10-16: the imported source faces the camera at yaw 90 (180 = left profile,
+    // 315 = back), so three quarters to the image right is 45 (side 0) and to the image left 135 (side 1)
+    HiPoly[Side]->SetRelativeRotation(FRotator(0.0f, Side == 0 ? HiPolyYawSide0Deg : HiPolyYawSide1Deg, 0.0f));
+    HiPoly[Side]->SetRelativeScale3D(FVector(TopUU / HiTop));
   }
   // the wall: a plane (100 uu) stood up behind the figure, square to the camera axis, big enough to fill the frame
   Backdrop[Side]->SetRelativeLocation(O + FVector(TopUU * 2.2, 0.0, TopUU * 0.5));

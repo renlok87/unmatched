@@ -11,6 +11,9 @@
 //   trace    'SHOWCASE side=<0|1> hero=<key|none> look=<P1|P2> clip=<Idle|LungeAttack|None> rt=<w>x<h> active=<0|1>'
 //            on every change of the side.
 //   rollback -S08SelectLegacy: never spawned (the legacy room and loading screens).
+//   hipoly   -S08ShowcaseHiPoly (experiment, docs/game-design/select-screens/05-HIPOLY-COMPARE.md): a static Nanite mesh of
+//            the Tripo H2 high-poly source (/Game/PipelineCandidates/<Key>/HP, tools/art/showcase/import_hipoly.py)
+//            stands in the niche instead of the skeletal figure - no Idle / lunge, the source's own glTF materials.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -30,6 +33,10 @@ namespace UmShowcase {
 /** The select screens' look is the default; -S08SelectLegacy keeps the legacy room / loading screens. */
 inline const TCHAR* const LegacyFlagName = TEXT("S08SelectLegacy");
 UNMATCHED_API bool Enabled();
+/** -S08ShowcaseHiPoly: the static high-poly Tripo source instead of the v2 skeletal figure (comparison only). */
+UNMATCHED_API bool HiPolyRequested();
+/** /Game/PipelineCandidates/<Key>/HP/<source>.<source> of a v2 key, or "" when no high-poly source was imported. */
+UNMATCHED_API FString HiPolyPath(const TCHAR* Key);
 /** Automation tests only (Reset -> the command line again). */
 UNMATCHED_API void SetEnabledOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetEnabledOverrideForTest();
@@ -82,6 +89,8 @@ class UNMATCHED_API AUmHeroShowcase : public AActor {
   UPROPERTY() TObjectPtr<UStaticMeshComponent> Base[2];
   /** A dark matte wall behind the figure: the rim light paints a soft team-colour halo on it. */
   UPROPERTY() TObjectPtr<UStaticMeshComponent> Backdrop[2];
+  /** -S08ShowcaseHiPoly: the static high-poly source (its own pedestal) in place of Body + Base. */
+  UPROPERTY() TObjectPtr<UStaticMeshComponent> HiPoly[2];
   UPROPERTY() TObjectPtr<UPointLightComponent> Key[2];
   UPROPERTY() TObjectPtr<UPointLightComponent> RimLight[2];
   UPROPERTY() TObjectPtr<UPointLightComponent> Fill[2];
