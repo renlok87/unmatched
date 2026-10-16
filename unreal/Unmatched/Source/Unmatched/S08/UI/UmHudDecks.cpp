@@ -258,8 +258,17 @@ void UUmHudDecks::Relayout() {
       B.HeightSu = ChipH;
       B.MinWidthSu = W;
       B.bTableSlip = S08ArtLook::HudTable();  // slice 9: the marble plate of the table look (UmButton)
+      // slice 10 (sixth blind review: five stacked layers in the decision column): with the pile cards (L) the chip
+      // plate goes - the count reads under its card, the whole pile (card + count) is the press zone
+      const bool bPileChip = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > ChipH + 1.0f;
+      B.bFlat = bPileChip;
+      if (bPileChip) B.bTableSlip = false;
       Button->ApplyModel(B);
-      UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
+      if (bPileChip) {
+        UmDecksPlace(Button, P - FVector2D(0.0, 98.0), FVector2D(W, ChipH + 98.0f), 0);
+      } else {
+        UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
+      }
     }
     // HUD "Стол" (03 §3.4): the pile card stands on its slip (class L) - a 66 x 92 card over the slip's middle, the count
     // centred on the slip; class S keeps the mini card in the chip
@@ -330,6 +339,11 @@ void UUmHudDecks::ApplyContent() {
     const FLinearColor Faint(Navy.R, Navy.G, Navy.B, 0.5f);
     if (DeckCount) DeckCount->SetColorAndOpacity(FSlateColor(Model.bDeckStale ? Faint : Navy));
     if (DiscardCount) DiscardCount->SetColorAndOpacity(FSlateColor(Model.bDiscardStale ? Faint : Navy));
+    for (UTextBlock* T : {DeckCount.Get(), DiscardCount.Get()}) {  // slice 10: the count lies on the table, no plate
+      if (!T) continue;
+      T->SetShadowOffset(FVector2D(1.0, 1.5));
+      T->SetShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.9f));
+    }
   }
   if (DiscardCount) DiscardCount->SetText(UmHudDecks::DiscardLabel(Model, bS));
   // 2026-10-15 playtest: «Сброс 10» touched the chip's right rim under the HUD v2 skin (2560x1080 read «Сброс 1C») -
