@@ -609,15 +609,19 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         // a named sidekick: [mini portrait] 12 su [name / hp]
         UHorizontalBox* Row = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
         UVerticalBox* Text = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
-        for (int32 Line = 0; Line < 2; ++Line) {
+        // slice 10 (sixth blind review: no hierarchy in the opponent card): the table look reads «Мерлин  7/7» on one line
+        const bool bOneLine = bTable && !Model.bClassS;
+        for (int32 Line = 0; Line < (bOneLine ? 1 : 2); ++Line) {
           UTextBlock* T = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
           T->SetFont(Theme.Font(TEXT("type.tag")));
           T->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
           T->SetJustification(bOpp ? ETextJustify::Right : ETextJustify::Left);
-          T->SetText(Line == 0 ? FText::FromString(UmWorldLayer::DisplayNameOf(S.Name)) : UmHudPanel::HpText(S.Hp, S.MaxHp));
+          const FText Name = FText::FromString(UmWorldLayer::DisplayNameOf(S.Name));
+          T->SetText(bOneLine ? FText::Format(FText::FromString(TEXT("{0}  {1}")), Name, UmHudPanel::HpText(S.Hp, S.MaxHp))
+                              : (Line == 0 ? Name : UmHudPanel::HpText(S.Hp, S.MaxHp)));
           if (UVerticalBoxSlot* TS = Text->AddChildToVerticalBox(T)) {
             TS->SetHorizontalAlignment(bOpp ? HAlign_Right : HAlign_Left);
-            TS->SetPadding(FMargin(0.0f, Line == 0 ? 2.0f : 4.0f, 0.0f, 0.0f));
+            TS->SetPadding(FMargin(0.0f, bOneLine ? 8.0f : (Line == 0 ? 2.0f : 4.0f), 0.0f, 0.0f));
           }
         }
         UWidget* Mini = MakeMiniPortrait(S);
@@ -759,7 +763,10 @@ void UUmHudPlayerPanel::FitHpText() {
   if (Slots == HpFitSlots) return;
   HpFitSlots = Slots;
   const float Room = HpRoomSu();
-  const FName Token = UmTextFit::PickToken(HpText->GetText(), Room, {FName(TEXT("type.button")), FName(TEXT("type.tag"))});
+  // slice 10 (sixth blind review: «16/16 is small for the screen's main number»): the table card tries the heading size first
+  TArray<FName> Tokens = {FName(TEXT("type.button")), FName(TEXT("type.tag"))};
+  if (bTable && !Model.bClassS) Tokens.Insert(FName(TEXT("type.heading")), 0);
+  const FName Token = UmTextFit::PickToken(HpText->GetText(), Room, Tokens);
   if (Token != HpToken) {
     HpToken = Token;
     HpText->SetFont(UUmHudTheme::Get().Font(HpToken));
