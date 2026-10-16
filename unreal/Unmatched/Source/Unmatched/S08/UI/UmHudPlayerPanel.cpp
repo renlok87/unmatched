@@ -600,13 +600,17 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         UTextBlock* Hp = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
         Hp->SetFont(Theme.Font(TEXT("type.tag")));
         Hp->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
-        Hp->SetText(UmHudPanel::HpText(S.Hp, S.MaxHp));
-        // HUD "Стол" (03 §3.1): a one-hit sidekick (the harpies) carries no «1/1» - its number is the identity
+        // slice 16 (blind review s15: «7/7 without a name» - a regression of slice 15): a named sidekick reads
+        // «Мерлин 7/7» beside its token
+        const bool bNamed = S.Number <= 0;
+        Hp->SetText(bNamed ? FText::Format(FText::FromString(TEXT("{0}  {1}")), FText::FromString(UmWorldLayer::DisplayNameOf(S.Name)),
+                                           UmHudPanel::HpText(S.Hp, S.MaxHp))
+                           : UmHudPanel::HpText(S.Hp, S.MaxHp));
         UPanelSlot* HpSlot = Column->AddChild(Hp);
         if (UVerticalBoxSlot* H = Cast<UVerticalBoxSlot>(HpSlot)) H->SetPadding(FMargin(0.0f, -2.0f, 0.0f, 0.0f));
         if (UHorizontalBoxSlot* H = Cast<UHorizontalBoxSlot>(HpSlot)) {
-          H->SetVerticalAlignment(VAlign_Bottom);
-          H->SetPadding(FMargin(1.0f, 0.0f, 0.0f, 0.0f));
+          H->SetVerticalAlignment(bNamed ? VAlign_Center : VAlign_Bottom);
+          H->SetPadding(FMargin(bNamed ? 8.0f : 1.0f, 0.0f, 0.0f, 0.0f));
         }
         Item->AddChildToOverlay(Column);
         if (S.bFallen) {
@@ -621,7 +625,7 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         }
         // the items 64 su apart; the last one only as wide as its content (the row's edge, PANEL-OPP right 212)
         USizeBox* Cell = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-        Cell->SetWidthOverride(I + 1 < N ? UmHudPanel::SidekickStepSu : Su + (bSide ? 30.0f : 3.0f));
+        Cell->SetWidthOverride(I + 1 < N ? UmHudPanel::SidekickStepSu : Su + (bSide ? (bNamed ? 120.0f : 30.0f) : 3.0f));
         Cell->SetContent(Item);
         if (UHorizontalBoxSlot* C = SidekickRow->AddChildToHorizontalBox(Cell)) C->SetVerticalAlignment(VAlign_Top);
       } else {

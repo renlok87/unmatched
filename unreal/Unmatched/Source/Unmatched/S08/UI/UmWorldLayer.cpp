@@ -338,7 +338,13 @@ void UUmWorldTag::Restyle() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   // HUD v2 (art/imagegen/hud-v2-codex): the marble-and-gold plate of the kit (gold for the own team, enamel blue for the
   // opponent's), the rounded navy capsule without it
-  if (Capsule) {
+  if (Capsule && S08ArtLook::HudTable()) {
+    // slice 16 (blind review s15: «blue with a cream rim - a foreign material»): the chip in the panels' dark stone with
+    // the 1 px gold of their rim
+    Capsule->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.035f, 0.035f, 0.032f, 0.92f), UmWorldLayer::TagRadiusSu,
+                                            FLinearColor::FromSRGBColor(FColor(212, 170, 92)), 1.0f));
+    Capsule->SetPadding(FMargin(4.0f, 0.0f, UmWorldLayer::TagPadSu, 0.0f));
+  } else if (Capsule) {
     const FName PlateKey(Model.TeamSlot ? TEXT("hud.fighter.plate.enemy") : TEXT("hud.fighter.plate"));
     if (Theme.HasTextureSkin(PlateKey)) {
       if (const FSlateBrush* Brush = Theme.SkinFor(PlateKey, UmHudScale::Current().PxPerSu())) Capsule->SetBrush(*Brush);

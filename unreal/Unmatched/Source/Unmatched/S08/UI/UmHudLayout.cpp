@@ -231,10 +231,18 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       // MTG Arena); the column is the control panel alone
       const float Pad = UmHudLayout::TableTrayPadSu;
       const float PanelLeft = W - M - StatusW - 8.0f;  // the actions tray's own 8 su pad
-      const float PilesW = 176.0f;
+      const float PilesW = 200.0f;  // slice 16: room for the counts at the button size
       const FBox2D DecksR = UmLayoutBox(PanelLeft - 12.0f - Pad - PilesW, H - M - DecksH, PilesW, DecksH);
       Set(EUmHudBlock::Decks, DecksR);
       L.HandRightSu = static_cast<float>(DecksR.Min.X) - Pad - 12.0f;
+      // slice 16 (blind reviews s14 / s15: the hand sat ~115 px left of the screen's axis): the corridor symmetric
+      // about the axis - the row centres on the board
+      // (only while the symmetric corridor still holds a hand of five without a deep fan - at 1280x720 it would not)
+      const float Half = FMath::Max(0.0f, FMath::Min(0.5f * W - L.HandLeftSu, L.HandRightSu - 0.5f * W));
+      if (Half >= 300.0f) {
+        L.HandLeftSu = 0.5f * W - Half;
+        L.HandRightSu = 0.5f * W + Half;
+      }
       if (L.HasRect(EUmHudBlock::DeckPanel)) {
         const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
         Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),

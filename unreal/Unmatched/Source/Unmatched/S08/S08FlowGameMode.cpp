@@ -8312,7 +8312,22 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
     const S08ArtHud::FLabelPlacementInput In = S08ArtHud::MakeTagPlacementInput(
         ViewportPx, FVector2D(FMath::CeilToFloat(Desired.X * Ppu), FMath::CeilToFloat(Desired.Y * Ppu)), T.Figure,
         OthersOf(T.FighterId), Hard, TagHardPadPx, T.Widget && T.Widget->GetHarpyDigit() > 0);
-    const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
+    S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
+    // slice 16 (blind review s15: «16/16 reads as the harpy's HP»): the table look's compact hero chip sits centred
+    // right under its own figure's base when that place is free of the panels
+    if (S08ArtLook::HudTable() && static_cast<ES08TagMode>(T.Mode) == ES08TagMode::Compact && !T.Figure.IsEmpty() &&
+        Desired.X > 0.0) {
+      const float W = FMath::CeilToFloat(Desired.X * Ppu);
+      const float Hh = FMath::CeilToFloat(Desired.Y * Ppu);
+      const float Cx = static_cast<float>(T.Figure.Center().X);
+      const FS08ScreenRect Under(Cx - 0.5f * W, T.Figure.Y1 + 2.0f, Cx + 0.5f * W, T.Figure.Y1 + 2.0f + Hh);
+      bool bFree = Under.X0 >= 0.0f && Under.Y1 <= static_cast<float>(ViewportPx.Y);
+      for (const FS08ScreenRect& Hr : Hard) bFree = bFree && Under.IntersectionArea(Hr) <= 0.0;
+      if (bFree) {
+        R.Rect = Under;
+        R.bBound = true;
+      }
+    }
     T.Planned = R.Rect;
     T.Candidate = R.Candidate;
     T.Ring = R.Ring;
