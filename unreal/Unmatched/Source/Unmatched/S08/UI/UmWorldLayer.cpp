@@ -341,9 +341,11 @@ void UUmWorldTag::Restyle() {
   if (Capsule && S08ArtLook::HudTable()) {
     // slice 16 (blind review s15: «blue with a cream rim - a foreign material»): the chip in the panels' dark stone with
     // the 1 px gold of their rim
+    // slice 20 (blind review s19: «the chips cover the bases and the cells»): no team icon inside - the team colour is
+    // the rim (1.5 px), the chip ~a third narrower
     Capsule->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.035f, 0.035f, 0.032f, 0.92f), UmWorldLayer::TagRadiusSu,
-                                            FLinearColor::FromSRGBColor(FColor(212, 170, 92)), 1.0f));
-    Capsule->SetPadding(FMargin(4.0f, 0.0f, UmWorldLayer::TagPadSu, 0.0f));
+                                            Theme.Color(Model.TeamSlot ? TEXT("team.p2.screen") : TEXT("team.p1.screen")), 1.5f));
+    Capsule->SetPadding(FMargin(UmWorldLayer::TagPadSu, 0.0f, UmWorldLayer::TagPadSu, 0.0f));
   } else if (Capsule) {
     const FName PlateKey(Model.TeamSlot ? TEXT("hud.fighter.plate.enemy") : TEXT("hud.fighter.plate"));
     if (Theme.HasTextureSkin(PlateKey)) {
@@ -352,6 +354,7 @@ void UUmWorldTag::Restyle() {
       Capsule->SetPadding(FMargin(4.0f, 0.0f, UmWorldLayer::TagPadSu, 0.0f));
     }
   }
+  if (ChipBox) ChipBox->SetVisibility(S08ArtLook::HudTable() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
   if (Chip) {
     if (bChips) Chip->SetBrush(ChipBrushes[Model.TeamSlot ? 1 : 0]);
     Chip->SetColorAndOpacity(Theme.Color(Model.TeamSlot ? TEXT("team.p2.screen") : TEXT("team.p1.screen")));
@@ -452,6 +455,7 @@ void UUmWorldPlate::ApplyModel(const FUmWorldPlateModel& InModel) {
   if (TargetLabel) TargetLabel->SetText(UmWorldLayer::TargetText());
   if (TargetChip) TargetChip->SetVisibility(Model.bTarget ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   if (Box) Box->SetHeightOverride(UmWorldLayer::PlateHeightSu(Model.bTarget));  // VS-5 E4: no empty lower part
+  if (ChipBox) ChipBox->SetVisibility(S08ArtLook::HudTable() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
   if (Chip) {
     if (bChips) Chip->SetBrush(ChipBrushes[Model.TeamSlot ? 1 : 0]);
     Chip->SetColorAndOpacity(Theme.Color(Model.TeamSlot ? TEXT("team.p2.screen") : TEXT("team.p1.screen")));

@@ -423,7 +423,10 @@ void UUmHudDecks::ApplyContent() {
   const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.bIsValid &&
                      Frame.RectSu.GetSize().Y > UmHudDecks::ChipHeightLSu + 1.0f;
   if (DiscardIcon) {
-    DiscardIcon->SetVisibility(Model.bHasTop || bPile ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    // slice 20 (blind review s19: «the empty discard reads as a texture that did not load»): the pile look shows the
+    // card glyph faintly inside the empty recess - a ghost of the card that will lie there
+    DiscardIcon->SetVisibility(Model.bHasTop ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    DiscardIcon->SetRenderOpacity(bPile ? 0.3f : 1.0f);
   }
 }
 
