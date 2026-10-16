@@ -1,5 +1,6 @@
-# SEL experiment (docs/game-design/select-screens/05-HIPOLY-COMPARE.md): import the Tripo H2 high-poly sources of the
-# select-screen heroes as ONE combined Nanite static mesh each, with their own glTF materials, into
+# SEL (docs/game-design/select-screens/05-HIPOLY-COMPARE.md): import the Tripo H2 high-poly sources of the
+# select-screen heroes, cleaned by tools/art/showcase/clean_hipoly.py (no phantoms, no Tripo base), as ONE combined Nanite
+# static mesh each, with their own glTF materials, into
 # /Game/PipelineCandidates/<Key>/HP/. Run headless:
 #   UnrealEditor-Cmd.exe <uproject> -run=pythonscript -script="<this file>" -unattended -nosplash -nullrhi
 import os
@@ -7,8 +8,8 @@ import unreal
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 SOURCES = {
-    "KingArthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
-    "Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb",
+    "KingArthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr-clean.glb",
+    "Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr-clean.glb",
 }
 
 
@@ -53,8 +54,10 @@ def import_one(key, rel):
     src = os.path.join(REPO, rel)
     dest = "/Game/PipelineCandidates/%s/HP" % key
     if not os.path.isfile(src):
-        log("missing %s" % src)
+        log("missing %s (run tools/art/showcase/clean_hipoly.py first)" % src)
         return
+    if unreal.EditorAssetLibrary.does_directory_exist(dest):
+        unreal.EditorAssetLibrary.delete_directory(dest)  # the previous (uncleaned) import
     params = unreal.ImportAssetParameters()
     params.is_automated = True
     params.replace_existing = True

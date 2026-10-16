@@ -342,7 +342,9 @@ names the look in use). Sources: `docs/game-design/visual/03-asset-registry.csv`
   turn strip in the TOP row, square action bezels, the empty journal, «Рука N/7», the connection chip).
 - **Select screens "SEL" (2026-10-16, docs/game-design/select-screens):** `-S08SelectLegacy` brings back the room
   SC-14…SC-18 panels and the SC-19 loading panel instead of the fighting-game look (3D v2 figures in niches, roster strip,
-  board step with `selectBoard`, VS splash).
+  board step with `selectBoard`, VS splash). `-S08ShowcaseV2` puts the animated H2LD figures back into the niches instead
+  of the cleaned static Tripo high-poly sources (default since the blind rounds of 2026-10-16,
+  docs/game-design/select-screens/05-HIPOLY-COMPARE.md).
 - **HUD, icons, cards, screens:** `-S08SlateHud` (whole UMG HUD and screens back to Slate) or `-S08SlateHud=<block,…>`
   (top, panels, hand, combat, slot, actions, log, toast, pending, cursor, boot, login, lobby, room, loading, pause,
   reconnect, gameover, aborted, menubg, turnstrip (HB-50 полоса стадий хода, 2026-10-16), …); `-S08FontLegacy` (шрифт

@@ -60,12 +60,12 @@ float PushFov(float BaseFov, double Seconds) {
   if (Seconds < In) return FMath::InterpEaseOut(BaseFov, Near, static_cast<float>(Seconds / In), 2.0f);
   return FMath::InterpEaseInOut(Near, BaseFov, static_cast<float>((Seconds - In) / Out), 2.0f);
 }
-bool HiPolyRequested() { return FParse::Param(FCommandLine::Get(), TEXT("S08ShowcaseHiPoly")); }
+bool HiPolyRequested() { return !FParse::Param(FCommandLine::Get(), V2FlagName); }
 FString HiPolyPath(const TCHAR* Key) {
   // the H2 Tripo tasks the in-game H2LD figures were decimated from (docs/art-pipeline/<hero>-lookdev-v2.md)
   const FString K(Key);
-  const TCHAR* Source = K == TEXT("KingArthur") ? TEXT("king-arthur-h2-tripo-c24eeff0-tex8k-pbr")
-                        : K == TEXT("Medusa")   ? TEXT("medusa-h2-tripo-40c4d1cd-tex8k-pbr")
+  const TCHAR* Source = K == TEXT("KingArthur") ? TEXT("king-arthur-h2-tripo-c24eeff0-tex8k-pbr-clean")
+                        : K == TEXT("Medusa")   ? TEXT("medusa-h2-tripo-40c4d1cd-tex8k-pbr-clean")
                                                 : nullptr;
   return Source ? FString::Printf(TEXT("/Game/PipelineCandidates/%s/HP/%s.%s"), Key, Source, Source) : FString();
 }
@@ -264,7 +264,7 @@ void AUmHeroShowcase::SetHero(int32 Side, const FString& FighterName, ES08TeamSl
       FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hero=%s missing=%s"), Side, *FighterName, *MeshPath(*NewSpec)));
     }
   }
-  // -S08ShowcaseHiPoly: the static high-poly source in place of the skeletal figure and its pedestal
+  // default: the static high-poly source in place of the skeletal figure (rollback -S08ShowcaseV2; no source = v2)
   UStaticMesh* Hi = nullptr;
   if (Spec[Side] && UmShowcase::HiPolyRequested()) {
     const FString HiPath = UmShowcase::HiPolyPath(Spec[Side]->Key);
@@ -274,7 +274,9 @@ void AUmHeroShowcase::SetHero(int32 Side, const FString& FighterName, ES08TeamSl
   HiPoly[Side]->SetStaticMesh(Hi);
   HiPoly[Side]->SetVisibility(Hi != nullptr);
   Body[Side]->SetVisibility(Hi == nullptr);
-  Base[Side]->SetVisibility(Hi == nullptr);
+  // the game pedestal with the team ring stays (blind round 1: the Tripo base had no team colour; it is cut off by
+  // tools/art/showcase/clean_hipoly.py)
+  Base[Side]->SetVisibility(true);
   RimLight[Side]->SetLightColor(S08TeamPalette::RingFill(Look));
   Frame(Side);
   TraceSide(Side);
@@ -293,12 +295,16 @@ void AUmHeroShowcase::Frame(int32 Side) {
   // the high-poly source: the same top height as the v2 figure (its bounds top incl. the weapon), the same facing
   // plus the glTF axis offset of the import (tuned on the live frame)
   if (UStaticMesh* Hi = HiPoly[Side]->GetStaticMesh()) {
-    const float HiTop = FMath::Max(1.0f, static_cast<float>(Hi->GetBoundingBox().Max.Z));
-    HiPoly[Side]->SetRelativeLocation(O);
+    // seat the feet on the pedestal top; the figure keeps the v2 height from the pedestal top to the weapon tip
+    const FBox HiBox = Hi->GetBoundingBox();
+    const float PedTop = Base[Side]->GetStaticMesh() ? static_cast<float>(Base[Side]->GetStaticMesh()->GetBoundingBox().Max.Z) * Scale : 0.0f;
+    const float HiH = FMath::Max(1.0f, static_cast<float>(HiBox.Max.Z - HiBox.Min.Z));
+    const float S = FMath::Max(0.05f, (TopUU - PedTop) / HiH);
+    HiPoly[Side]->SetRelativeLocation(O + FVector(0.0, 0.0, PedTop - HiBox.Min.Z * S));
     // measured on the live frames 2026-10-16: the imported source faces the camera at yaw 90 (180 = left profile,
     // 315 = back), so three quarters to the image right is 45 (side 0) and to the image left 135 (side 1)
     HiPoly[Side]->SetRelativeRotation(FRotator(0.0f, Side == 0 ? HiPolyYawSide0Deg : HiPolyYawSide1Deg, 0.0f));
-    HiPoly[Side]->SetRelativeScale3D(FVector(TopUU / HiTop));
+    HiPoly[Side]->SetRelativeScale3D(FVector(S));
   }
   // the wall: a plane (100 uu) stood up behind the figure, square to the camera axis, big enough to fill the frame
   Backdrop[Side]->SetRelativeLocation(O + FVector(TopUU * 2.2, 0.0, TopUU * 0.5));

@@ -438,6 +438,11 @@ bool FUmScreensRoomSelectTest::RunTest(const FString& Parameters) {
   R->ApplyCanvas(FVector2D(1920.0, 1080.0), false, 1.0f);
   R->PlayShow();
   TestTrue(TEXT("the select look is the default"), R->IsSelLook());
+  // the showcase sources: the cleaned Tripo high-poly for the two heroes with one, the v2 figure otherwise
+  TestTrue(TEXT("Arthur high-poly path"), UmShowcase::HiPolyPath(TEXT("KingArthur")).EndsWith(TEXT("-clean")));
+  TestTrue(TEXT("Medusa high-poly path"), UmShowcase::HiPolyPath(TEXT("Medusa")).EndsWith(TEXT("-clean")));
+  TestTrue(TEXT("no high-poly for Merlin"), UmShowcase::HiPolyPath(TEXT("Merlin")).IsEmpty());
+  TestTrue(TEXT("high-poly is the default look"), UmShowcase::HiPolyRequested());
   // ---- waiting: both niches empty, the roster strip = 2 heroes + «Случайный», hero step
   FUmRoomModel M = Base(true);
   M.OwnSeat = 0;

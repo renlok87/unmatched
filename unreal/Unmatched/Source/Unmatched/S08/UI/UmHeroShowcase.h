@@ -11,9 +11,11 @@
 //   trace    'SHOWCASE side=<0|1> hero=<key|none> look=<P1|P2> clip=<Idle|LungeAttack|None> rt=<w>x<h> active=<0|1>'
 //            on every change of the side.
 //   rollback -S08SelectLegacy: never spawned (the legacy room and loading screens).
-//   hipoly   -S08ShowcaseHiPoly (experiment, docs/game-design/select-screens/05-HIPOLY-COMPARE.md): a static Nanite mesh of
-//            the Tripo H2 high-poly source (/Game/PipelineCandidates/<Key>/HP, tools/art/showcase/import_hipoly.py)
-//            stands in the niche instead of the skeletal figure - no Idle / lunge, the source's own glTF materials.
+//   hipoly   DEFAULT since the blind rounds of 2026-10-16 (docs/game-design/select-screens/05-HIPOLY-COMPARE.md: round 2,
+//            Opus and GPT Astra, 2:0): a static Nanite mesh of the Tripo H2 high-poly source without its phantom parts
+//            and Tripo base (tools/art/showcase/clean_hipoly.py + import_hipoly.py, /Game/PipelineCandidates/<Key>/HP)
+//            stands on the game pedestal with the team ring; a hero without an imported source keeps its v2 figure.
+//            Rollback -S08ShowcaseV2: the animated skeletal v2 figure (Idle / LungeAttack) in every niche.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -33,8 +35,9 @@ namespace UmShowcase {
 /** The select screens' look is the default; -S08SelectLegacy keeps the legacy room / loading screens. */
 inline const TCHAR* const LegacyFlagName = TEXT("S08SelectLegacy");
 UNMATCHED_API bool Enabled();
-/** -S08ShowcaseHiPoly: the static high-poly Tripo source instead of the v2 skeletal figure (comparison only). */
+/** The static high-poly source in the niches (default); false with the rollback -S08ShowcaseV2. */
 UNMATCHED_API bool HiPolyRequested();
+inline const TCHAR* const V2FlagName = TEXT("S08ShowcaseV2");
 /** /Game/PipelineCandidates/<Key>/HP/<source>.<source> of a v2 key, or "" when no high-poly source was imported. */
 UNMATCHED_API FString HiPolyPath(const TCHAR* Key);
 /** Automation tests only (Reset -> the command line again). */
@@ -89,7 +92,7 @@ class UNMATCHED_API AUmHeroShowcase : public AActor {
   UPROPERTY() TObjectPtr<UStaticMeshComponent> Base[2];
   /** A dark matte wall behind the figure: the rim light paints a soft team-colour halo on it. */
   UPROPERTY() TObjectPtr<UStaticMeshComponent> Backdrop[2];
-  /** -S08ShowcaseHiPoly: the static high-poly source (its own pedestal) in place of Body + Base. */
+  /** The static high-poly source in place of Body (on the game pedestal Base); hidden with -S08ShowcaseV2. */
   UPROPERTY() TObjectPtr<UStaticMeshComponent> HiPoly[2];
   UPROPERTY() TObjectPtr<UPointLightComponent> Key[2];
   UPROPERTY() TObjectPtr<UPointLightComponent> RimLight[2];
