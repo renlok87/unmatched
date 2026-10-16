@@ -314,6 +314,28 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
     const FBox2D PilesR = L.Rect(EUmHudBlock::Decks);
     Plates.Add(FBox2D(PilesR.Min - FVector2D(0.0, UmHudLayout::TableTrayPadSu), PilesR.Max + FVector2D(0.0, UmHudLayout::TableTrayPadSu)));
   }
+  // slice 17 (blind reviews s15 / s16: «a bevel and an inner light rim»): a faint warm line 4 su inside each plate
+  for (int32 P = 0; P < 4; ++P) {
+    const FName Name(*FString::Printf(TEXT("TableRim%d"), P));
+    UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
+    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid;
+    if (!Img && bShow) {
+      Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
+      Canvas->AddChildToCanvas(Img);
+    }
+    if (!Img) continue;
+    Img->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    if (!bShow) continue;
+    Img->SetBrush(FSlateRoundedBoxBrush(FLinearColor::Transparent, 8.0f, FLinearColor(1.0f, 0.86f, 0.62f, 0.13f), 1.0f));
+    if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Img->Slot)) {
+      S->SetAnchors(FAnchors(0.0f, 0.0f));
+      S->SetAlignment(FVector2D::ZeroVector);
+      S->SetAutoSize(false);
+      S->SetPosition(Plates[P].Min + FVector2D(4.0));
+      S->SetSize(Plates[P].GetSize() - FVector2D(8.0));
+      S->SetZOrder(5);
+    }
+  }
   for (int32 I = 0; I < 8; ++I) {
     const int32 Plate = I / 2;
     const bool bOuter = (I % 2) == 1;

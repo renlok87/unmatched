@@ -95,7 +95,9 @@ FRow Row(int32 N, const FUmHandFrame& F) {
   R.CardSize = F.bClassS ? FVector2D(CardWS, CardHS) : FVector2D(CardWL, CardHL);
   const float W = static_cast<float>(R.CardSize.X);
   // slice 7 (third blind review: the hand stood in a flat row like a list): the table look overlaps the cards a little
-  const float Nominal = F.bClassS ? StepS : (S08ArtLook::HudTable() ? StepL - 22.0f : StepL);
+  // slice 17 (blind review s16: «the overlap cuts the boost circles and the rules»): the full step again - a fan only
+  // when the corridor cannot hold the row
+  const float Nominal = F.bClassS ? StepS : StepL;
   const float CorrL = F.CorridorLeftSu;
   const float CorrR = FMath::Max(F.CorridorLeftSu, F.CorridorRightSu);
   const float Corridor = CorrR - CorrL;
@@ -108,8 +110,12 @@ FRow Row(int32 N, const FUmHandFrame& F) {
   const float Full = W + Nominal * static_cast<float>(N - 1);
   float Left = CorrL;
   if (Full <= Corridor + 1.0e-3f) {
-    // 04 §2.6 / HB-22 H3: centred in the corridor
+    // 04 §2.6 / HB-22 H3: centred in the corridor; slice 17: the table look centres the row on the screen's axis as far
+    // as the corridor allows (the piles and the control panel sit right of it)
     Left = CorrL + 0.5f * (Corridor - Full);
+    if (S08ArtLook::HudTable() && !F.bClassS) {
+      Left = FMath::Clamp(0.5f * static_cast<float>(F.CanvasSu.X) - 0.5f * Full, CorrL, CorrR - Full);
+    }
   } else {
     // a fan over the whole corridor; under 72 su only when the corridor cannot hold it (ВР-VS2-HB22-09)
     R.bFan = true;

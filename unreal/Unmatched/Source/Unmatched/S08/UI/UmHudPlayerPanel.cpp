@@ -603,6 +603,7 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         // slice 16 (blind review s15: «7/7 without a name» - a regression of slice 15): a named sidekick reads
         // «Мерлин 7/7» beside its token
         const bool bNamed = S.Number <= 0;
+        if (bNamed) Hp->SetFont(Theme.Font(TEXT("type.button")));  // slice 17: the sidekick line at the HP size
         Hp->SetText(bNamed ? FText::Format(FText::FromString(TEXT("{0}  {1}")), FText::FromString(UmWorldLayer::DisplayNameOf(S.Name)),
                                            UmHudPanel::HpText(S.Hp, S.MaxHp))
                            : UmHudPanel::HpText(S.Hp, S.MaxHp));

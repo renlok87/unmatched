@@ -8245,7 +8245,9 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       const bool bFocus = F->Id == ArtHud.HoveredFighterId || F->Id == SelectedId || F->Id == IconTarget ||
                           F->Id == CommandUi.AttackTargetId || AttackCandidates.Contains(F->Id);
       // slice 15 (blind review s14: «HP has to be looked up in the corners»): a compact HP chip stays over the heroes
-      if (!bHurt && !bFocus) Mode = F->bIsHero ? ES08TagMode::Compact : ES08TagMode::Hidden;
+      // slice 17 (blind review s16): every fighter with more than 1 HP keeps its chip (Merlin too); the one-hit
+      // harpies show theirs on focus only
+      if (!bHurt && !bFocus) Mode = (F->bIsHero || F->MaxHealth > 1) ? ES08TagMode::Compact : ES08TagMode::Hidden;
     }
     const ES08TeamSlot Team = BoardActor->TeamOfFighter(*F);
     const ES08TeamSlot Look =

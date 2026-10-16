@@ -237,12 +237,8 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       L.HandRightSu = static_cast<float>(DecksR.Min.X) - Pad - 12.0f;
       // slice 16 (blind reviews s14 / s15: the hand sat ~115 px left of the screen's axis): the corridor symmetric
       // about the axis - the row centres on the board
-      // (only while the symmetric corridor still holds a hand of five without a deep fan - at 1280x720 it would not)
-      const float Half = FMath::Max(0.0f, FMath::Min(0.5f * W - L.HandLeftSu, L.HandRightSu - 0.5f * W));
-      if (Half >= 300.0f) {
-        L.HandLeftSu = 0.5f * W - Half;
-        L.HandRightSu = 0.5f * W + Half;
-      }
+      // slice 17: the corridor stays the whole room between the card and the piles - the hand row itself centres on
+      // the axis as far as it can (UmHudHand::Row), so five cards lie without overlap
       if (L.HasRect(EUmHudBlock::DeckPanel)) {
         const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
         Set(EUmHudBlock::DeckPanel, UmLayoutBox(static_cast<float>(DP.Min.X), static_cast<float>(DP.Min.Y),
