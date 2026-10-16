@@ -1,5 +1,8 @@
 // VS-2 HB-06: the GAME screen of the UMG HUD - see UmGameHud.h.
 #include "UmGameHud.h"
+#include "UmHudLayout.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
+#include "Components/Image.h"
 #include "../S08ArtLook.h"
 
 #include "UmHudLog.h"
@@ -245,6 +248,7 @@ bool UUmGameHud::HasAllParts(FString* OutMissing) const {
 
 void UUmGameHud::ApplyLayout(const FUmHudLayout& InLayout, const TArray<FName>& SlateKeys, bool bAllSlate) {
   Layout = InLayout;
+  ApplyTableDepth(InLayout);
   for (int32 I = 0; I < UmGameSlotCount; ++I) {
     const EUmGameSlot Which = static_cast<EUmGameSlot>(I);
     USizeBox* Box = GetSlot(Which);
@@ -288,4 +292,51 @@ void UUmGameHud::CollectShotLines(TArray<FString>& Out, const FIntPoint& WindowP
       TEXT("SHOT widget id=UI-SCR-GAME impl=umg state=%s fighter=none bbox=0,0,%d,%d geom=painted visible=%d twin=0 "
            "source=%s slots=%d"),
       *ScreenState, WindowPx.X, WindowPx.Y, bVisible ? 1 : 0, *Source, UmGameSlotCount));
+}
+
+void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
+  // HUD "Стол" slice 15 (blind review s14: «the marble plates read as a flat UI texture»): a soft two-layer contact
+  // shadow under each plate lying on the table (class L) - the hero cards, the opponent's plate, the control panel and
+  // the piles tray
+  if (!WidgetTree || !Canvas) return;
+  const bool bOn = S08ArtLook::HudTable() && L.bTable && !L.bClassS;
+  TArray<FBox2D> Plates;
+  if (bOn) {
+    Plates.Add(L.Rect(EUmHudBlock::PanelLoc));
+    FBox2D Opp = L.Rect(EUmHudBlock::PanelOpp);
+    if (L.HasRect(EUmHudBlock::OppHand)) Opp += L.Rect(EUmHudBlock::OppHand);
+    Plates.Add(Opp);
+    FBox2D Panel = L.Rect(EUmHudBlock::Actions);
+    if (L.HasRect(EUmHudBlock::Status)) Panel += L.Rect(EUmHudBlock::Status);
+    Panel.Min.X = FMath::Min(Panel.Min.X, Panel.Max.X - 360.0 - 8.0);
+    Panel = FBox2D(Panel.Min - FVector2D(0.0, UmHudLayout::TableTrayPadSu), Panel.Max + FVector2D(0.0, UmHudLayout::TableTrayPadSu));
+    Plates.Add(Panel);
+    const FBox2D PilesR = L.Rect(EUmHudBlock::Decks);
+    Plates.Add(FBox2D(PilesR.Min - FVector2D(0.0, UmHudLayout::TableTrayPadSu), PilesR.Max + FVector2D(0.0, UmHudLayout::TableTrayPadSu)));
+  }
+  for (int32 I = 0; I < 8; ++I) {
+    const int32 Plate = I / 2;
+    const bool bOuter = (I % 2) == 1;
+    const FName Name(*FString::Printf(TEXT("TableDepth%d"), I));
+    UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
+    const bool bShow = bOn && Plates.IsValidIndex(Plate) && Plates[Plate].bIsValid;
+    if (!Img && bShow) {
+      Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
+      Canvas->AddChildToCanvas(Img);
+    }
+    if (!Img) continue;
+    Img->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    if (!bShow) continue;
+    const float Grow = bOuter ? 7.0f : 2.0f;
+    const FVector2D Drop(0.0, bOuter ? 9.0 : 4.0);
+    Img->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.0f, 0.0f, 0.0f, bOuter ? 0.22f : 0.45f), bOuter ? 18.0f : 12.0f));
+    if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Img->Slot)) {
+      S->SetAnchors(FAnchors(0.0f, 0.0f));
+      S->SetAlignment(FVector2D::ZeroVector);
+      S->SetAutoSize(false);
+      S->SetPosition(Plates[Plate].Min - FVector2D(Grow) + Drop);
+      S->SetSize(Plates[Plate].GetSize() + FVector2D(2.0f * Grow));
+      S->SetZOrder(-3);
+    }
+  }
 }

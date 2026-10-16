@@ -355,6 +355,8 @@ void UUmWorldTag::Restyle() {
   // the bar's slot sits 6 su after the chip, or after the digit (HB-44 row)
   const float Fraction = Model.MaxHp > 0 ? FMath::Clamp(static_cast<float>(Model.Hp) / Model.MaxHp, 0.0f, 1.0f) : 0.0f;
   if (BarFill) BarFill->SetWidthOverride(Fraction > 0.0f ? FMath::Max(1.0f, UmWorldLayer::BarWSu * Fraction) : 0.0f);
+  // HUD "Стол" slice 15 (blind reviews: «the green bars are an MMO device»): the chip and the number, no bar
+  if (BarBox) BarBox->SetVisibility(S08ArtLook::HudTable() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
   if (HpLabel) HpLabel->SetText(UmWorldLayer::HpText(Model.Hp, Model.MaxHp));
 }
 

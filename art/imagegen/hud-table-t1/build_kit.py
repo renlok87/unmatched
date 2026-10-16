@@ -26,7 +26,7 @@ KIT = [
     ("T_Hud_TableSlip", "pile-slip.png", (240, 64), (20, 20, 20, 20), "nine_slice", 0, "R3"),
     ("T_Hud_TableDial", "hp-dial.png", (192, 192), (0, 0, 0, 0), "none", 0, "R3"),
 ]
-MARBLE_DIM = 0.5   # the slab inside the rim, x this (the veins stay, the type reads over them)
+MARBLE_DIM = 0.4   # the slab inside the rim, x this (the veins stay, the type reads over them)
 RIM_PX = 8         # x2: the bronze rim kept as painted
 
 

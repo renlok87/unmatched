@@ -126,6 +126,8 @@ class UNMATCHED_API UUmGameHud : public UUserWidget {
   void BindSlotsFromTree();
   /** HB-50: a slot the WBP lacks (TurnStrip, added after WBP_UI_SCR_GAME) is made in its canvas. */
   void EnsureSlots();
+  /** HUD "Стол" slice 15: soft contact shadows under the table plates (class L). */
+  void ApplyTableDepth(const FUmHudLayout& L);
   FUmHudLayout Layout;
   FString ScreenState = TEXT("own");
   bool bCodeDefaultTree = false;

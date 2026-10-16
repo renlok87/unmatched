@@ -17,6 +17,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud.Actions+Unmatched.S09.HudPress.UmgActions" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "../../S09/S09HudPress.h"
 #include "../S08AnimatedIconWidget.h"
 #include "../S08UserSettings.h"
@@ -370,6 +371,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudActionsKeyHintsTest,
     "Unmatched.S08.Hud.Actions.KeyHints UI-ACC-017 auto on off, the flag, the chips in L and in the S tooltip",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudActionsKeyHintsTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // HUD v2 key chips (slice 15 hides them on a disabled table command)
   using namespace UmActionsTest;
   using K = EUmActionKey;
   TestTrue(TEXT("auto: shown in the first match"), US08UserSettings::KeyHintsShown(TEXT("auto"), 0));

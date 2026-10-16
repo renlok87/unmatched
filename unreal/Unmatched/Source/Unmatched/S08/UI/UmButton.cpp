@@ -483,6 +483,12 @@ void UUmButton::Restyle() {
   }
   if (Label) Label->SetColorAndOpacity(FSlateColor(Theme.Color(UmButton::TextColorTokenFor(Model, State))));
   if (KeyText) KeyText->SetColorAndOpacity(FSlateColor(Theme.Color(bOff ? TEXT("text.secondary") : TEXT("text.primary"))));
+  // slice 15 (blind review s14: «the gold M/A/G/E outshine the icons»): under the table look the key chip is quiet and
+  // goes on a disabled command
+  if (KeyChip && S08ArtLook::HudTable() && !Model.KeyHint.IsEmpty()) {
+    KeyChip->SetRenderOpacity(0.55f);
+    KeyChip->SetVisibility(bOff ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+  }
   if (Icon) Icon->SetRenderOpacity(bOff ? Theme.Alpha(TEXT("state.disabled.opacity")) : 1.0f);
   ApplyDiscRing();
   // VS-2 HB-12 (04 §3.2): the pointer over a pressable button, "denied" over a disabled one (with its why.*); while a

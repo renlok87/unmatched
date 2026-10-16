@@ -566,7 +566,9 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
     for (int32 I = 0; I < N; ++I) {
       const FUmSidekickView& S = Model.Sidekicks[I];
       UOverlay* Item = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
-      if (S.Number > 0) {
+      // slice 15 (blind reviews: one cell for every sidekick): the table card draws a named sidekick as a token with its
+      // HP beside it too, the name in the panel's tooltip
+      if (S.Number > 0 || (bTable && !Model.bClassS)) {
         // slice 13 (blind review s12: the harpy tokens ~30 px, «1/1» on the bottom rim): the table card draws them
         // 40 su with the HP beside the token
         const bool bSide = bTable && !Model.bClassS;
@@ -585,7 +587,7 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
         }
         // CP-12 / 02 §6.5: the number badge (card.navy 14 su + mark.keyline, the digit card.cream as runtime text) on
         // the avatar; the fallback circle is the digit itself (ВР-CP09) - no second digit (ВР-VS2-66)
-        if (MiniShown.Num() && MiniShown.Last().IsAvatar()) {
+        if (S.Number > 0 && MiniShown.Num() && MiniShown.Last().IsAvatar()) {
           if (UOverlaySlot* X = Stack->AddChildToOverlay(UmPortrait::MakeNumberBadge(*WidgetTree, S.Number))) {
             X->SetHorizontalAlignment(HAlign_Left);
             X->SetVerticalAlignment(VAlign_Top);

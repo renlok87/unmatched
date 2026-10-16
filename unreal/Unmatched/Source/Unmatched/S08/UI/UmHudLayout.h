@@ -75,7 +75,7 @@ inline constexpr float StatusTwoLineSu = 78.0f;
 inline constexpr float TablePileCardSu = 88.0f;
 /** HUD "Стол" slice 13 (L control panel): the prompt row and the stage caption row over the actions, su. */
 inline constexpr float TablePromptSu = 48.0f;
-inline constexpr float TableStageSu = 26.0f;
+inline constexpr float TableStageSu = 0.0f;  // slice 15: the stage is in the prompt line
 /** The trays' own pad round their content (the piles tray and the control panel tray), su. */
 inline constexpr float TableTrayPadSu = 6.0f;
 }  // namespace UmHudLayout

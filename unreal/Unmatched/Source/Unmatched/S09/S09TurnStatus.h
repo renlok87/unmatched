@@ -25,6 +25,9 @@ struct UNMATCHED_API FS09TurnStatusInput {
   bool bSyncing = false;
   bool bViewerTurn = false;
   int32 ActionsRemaining = -1;  // -1 unknown
+  /** HUD "Стол" slice 15: the action this step belongs to (1-based) and the turn's slots; 0 = unknown. */
+  int32 ActionNow = 0;
+  int32 ActionSlots = 0;
   ES09CommandMode Mode = ES09CommandMode::None;
   // ManeuverDraft
   FString SelectedFighterName;  // '' = no fighter picked yet (MS-S-06)

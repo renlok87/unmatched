@@ -360,6 +360,15 @@ FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
   In.bViewerTurn = Hud.bViewerTurn;
   In.ActionsRemaining = Hud.ActionsRemaining;
   In.Mode = CommandUi.Mode;
+  {
+    // slice 15: the server spends an action when it starts (a maneuver's draw, an attack's declare) - while its step
+    // still runs (the maneuver's move, a combat, a deferred choice) the header names that action, not the next one
+    const FS09ActionTracker::FSlots Own = ActionTracker.Own();
+    const bool bRunning = (Flow.IsValid() && !FS08Contracts::PendingManeuverId(Flow->GetAppliedSnapshot()).IsEmpty()) ||
+                          CommandUi.Mode == ES09CommandMode::PendingChoice || CommandUi.Combat.bPresent;
+    In.ActionSlots = FMath::Max(1, Own.Slots);
+    In.ActionNow = FMath::Clamp(Own.Spent + (bRunning && Own.Spent > 0 ? 0 : 1), 1, In.ActionSlots);
+  }
   switch (CommandUi.Mode) {
     case ES09CommandMode::ManeuverDraft:
       In.SelectedFighterName = Label(CommandUi.SelectedFighterId);

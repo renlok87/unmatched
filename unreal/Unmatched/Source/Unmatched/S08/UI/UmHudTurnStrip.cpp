@@ -416,7 +416,8 @@ void UUmHudTurnStrip::ApplyCaption() {
   // HUD "Стол" slice 7 (third blind review: four glyphs without words): «Действие 1 из 2» / «Сброс до 7 карт» / «Конец
   // хода» right of the strip, class L only; the tooltips of the nodes keep the rules
   UTextBlock* Cap = WidgetTree ? Cast<UTextBlock>(WidgetTree->FindWidget(FName(TEXT("StageCaption")))) : nullptr;
-  const bool bOn = S08ArtLook::HudTable() && !Frame.bClassS && Row && WidgetTree;
+  // slice 15: the stage reads in the prompt's header line now - the caption row stays empty
+  const bool bOn = false && S08ArtLook::HudTable() && !Frame.bClassS && Row && WidgetTree;
   if (!bOn) {
     if (Cap) Cap->SetVisibility(ESlateVisibility::Collapsed);
     return;

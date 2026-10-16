@@ -8244,7 +8244,8 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       const bool bHurt = F->MaxHealth > 0 && F->Health < F->MaxHealth;
       const bool bFocus = F->Id == ArtHud.HoveredFighterId || F->Id == SelectedId || F->Id == IconTarget ||
                           F->Id == CommandUi.AttackTargetId || AttackCandidates.Contains(F->Id);
-      if (!bHurt && !bFocus) Mode = ES08TagMode::Hidden;
+      // slice 15 (blind review s14: «HP has to be looked up in the corners»): a compact HP chip stays over the heroes
+      if (!bHurt && !bFocus) Mode = F->bIsHero ? ES08TagMode::Compact : ES08TagMode::Hidden;
     }
     const ES08TeamSlot Team = BoardActor->TeamOfFighter(*F);
     const ES08TeamSlot Look =

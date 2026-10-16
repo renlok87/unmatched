@@ -380,7 +380,15 @@ float UUmHudStatusLine::MeasureSu(const FString& Text, float SizeSu, const TCHAR
 
 void UUmHudStatusLine::ApplyModel(const FS09TurnStatusInput& In) {
   const FS09Reason NewLine = S09TurnStatus::Line(In);
-  const FString NewText = UmHudStatus::LineText(NewLine, In).ToString();
+  FString NewText = UmHudStatus::LineText(NewLine, In).ToString();
+  // slice 15 (blind review s14: «the two-line header outweighs the commands»): the L table panel's one header line
+  // «Действие 1 из 2 · Выберите действие» - the stage row above it goes
+  if (S08ArtLook::HudTable() && StatusFrame.MaxWidthSu > 300.0f && In.bViewerTurn && In.ActionNow > 0 && !NewText.IsEmpty()) {
+    FFormatNamedArguments Args;
+    Args.Add(TEXT("n"), In.ActionNow);
+    Args.Add(TEXT("max"), In.ActionSlots);
+    NewText = UmText::Format(EUmTable::Hud, TEXT("hud.turnstrip.now.action"), Args).ToString() + TEXT(" · ") + NewText;
+  }
   const EUmStatusState NewState = UmHudStatus::StateOf(In, NewLine);
   if (bHasModel && NewText == FullText && NewState == State && NewLine.Key == LineKey) return;
   const bool bTextChanged = !bHasModel || NewText != FullText;
@@ -443,7 +451,10 @@ void UUmHudStatusLine::Render() {
   const float PadX = FMath::Max(Theme.SpaceSu(TEXT("space.m")), EndsSu + 6.0f);
   const float Room = FMath::Max(0.0f, StatusFrame.MaxWidthSu - 2.0f * PadX - Extras);
   const float Base = UmTypeSu(Theme, TEXT("type.status"));
-  const TArray<float> Sizes = {Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
+  // slice 15: the L table prompt one size down (the commands lead)
+  const bool bTablePanel = S08ArtLook::HudTable() && StatusFrame.MaxWidthSu > 300.0f;
+  const TArray<float> Sizes = bTablePanel ? TArray<float>{UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))}
+                                          : TArray<float>{Base, UmTypeSu(Theme, TEXT("type.button")), UmTypeSu(Theme, TEXT("type.body"))};
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
                             [this](const FString& T, float S) { return MeasureSu(T, S); },
                             RimSu > 0.0f);  // slice 12 (final blind review 08): one line first, the table prompt too
