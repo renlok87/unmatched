@@ -364,6 +364,8 @@ void UUmWorldTag::Restyle() {
   // HUD "Стол" slice 15 (blind reviews: «the green bars are an MMO device»): the chip and the number, no bar
   if (BarBox) BarBox->SetVisibility(S08ArtLook::HudTable() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
   if (HpLabel) HpLabel->SetText(UmWorldLayer::HpText(Model.Hp, Model.MaxHp));
+  // slice 18 (blind review s17: «the chip numbers ~11 px»): the table look prints them at the button size
+  if (HpLabel && S08ArtLook::HudTable()) HpLabel->SetFont(Theme.Font(TEXT("type.button")));
 }
 
 int32 UUmWorldTag::HpFontSize() const {

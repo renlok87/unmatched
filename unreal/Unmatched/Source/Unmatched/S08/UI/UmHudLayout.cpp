@@ -231,10 +231,12 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       // MTG Arena); the column is the control panel alone
       const float Pad = UmHudLayout::TableTrayPadSu;
       const float PanelLeft = W - M - StatusW - 8.0f;  // the actions tray's own 8 su pad
-      const float PilesW = 200.0f;  // slice 16: room for the counts at the button size
-      const FBox2D DecksR = UmLayoutBox(PanelLeft - 12.0f - Pad - PilesW, H - M - DecksH, PilesW, DecksH);
+      // slice 18 (blind review s17: «the hand sits ~60 px left of the axis, the piles block takes much room»): the
+      // piles tray 184 su and 4 su gaps to its neighbours - the hand row can centre ~20 su from the axis
+      const float PilesW = 184.0f;
+      const FBox2D DecksR = UmLayoutBox(PanelLeft - 4.0f - Pad - PilesW, H - M - DecksH, PilesW, DecksH);
       Set(EUmHudBlock::Decks, DecksR);
-      L.HandRightSu = static_cast<float>(DecksR.Min.X) - Pad - 12.0f;
+      L.HandRightSu = static_cast<float>(DecksR.Min.X) - Pad - 4.0f;
       // slice 16 (blind reviews s14 / s15: the hand sat ~115 px left of the screen's axis): the corridor symmetric
       // about the axis - the row centres on the board
       // slice 17: the corridor stays the whole room between the card and the piles - the hand row itself centres on

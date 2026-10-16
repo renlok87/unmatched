@@ -72,7 +72,7 @@ UNMATCHED_API FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEngli
 /** VS-2 HB-15: STATUS grows to two lines (78 su) - the height the deck panel gate keeps clear. */
 inline constexpr float StatusTwoLineSu = 78.0f;
 /** HUD "Стол": how far a pile card stands over its slip in DECKS (class L), su. */
-inline constexpr float TablePileCardSu = 88.0f;
+inline constexpr float TablePileCardSu = 80.0f;  // slice 18: a lower piles tray
 /** HUD "Стол" slice 13 (L control panel): the prompt row and the stage caption row over the actions, su. */
 inline constexpr float TablePromptSu = 48.0f;
 inline constexpr float TableStageSu = 0.0f;  // slice 15: the stage is in the prompt line

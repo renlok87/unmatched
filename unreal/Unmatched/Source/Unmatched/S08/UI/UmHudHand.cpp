@@ -446,6 +446,12 @@ bool UUmHudHand::Initialize() {
   for (UBorder* P : {CountPlate.Get(), WhyPlate.Get(), BoostRibbon.Get()}) {
     if (P) P->SetBrush(UmHandPlate());
   }
+  // slice 18 (blind reviews s16 / s17: «Рука 5/7 - a blue pill of another set»): the table look's count plate in the
+  // panels' dark stone with the 1 px gold rim
+  if (CountPlate && S08ArtLook::HudTable()) {
+    CountPlate->SetBrush(FSlateRoundedBoxBrush(FLinearColor(0.035f, 0.035f, 0.032f, 0.92f), 6.0f,
+                                               FLinearColor::FromSRGBColor(FColor(212, 170, 92)), 1.0f));
+  }
   if (Row) Row->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
   // the cards take the pointer, the hand only hears it (moves and the wheel bubble up from them)
   SetVisibility(ESlateVisibility::SelfHitTestInvisible);
@@ -918,8 +924,8 @@ void UUmHudHand::ApplyOffsets(float DurMs) {
     const int32 N = Model.Cards.Num();
     if (S08ArtLook::HudTable() && !Frame.bClassS && N > 1 && I != HoverIndex && !C.bSelected && !Model.bLowered) {
       const float Off = static_cast<float>(I) - 0.5f * static_cast<float>(N - 1);
-      Angle = FMath::Clamp(1.5f * Off, -3.0f, 3.0f);  // slice 14 (blind review s13): at most 3 deg, the names level
-      Target.Y += 1.5f * Off * Off;
+      Angle = FMath::Clamp(0.75f * Off, -1.5f, 1.5f);  // slice 18 (blind review s17): at most 1.5 deg - the rules level
+      Target.Y += 1.0f * Off * Off;
     }
     W->SetRenderTransformPivot(FVector2D(0.5, 1.0));
     if (!FMath::IsNearlyEqual(W->GetRenderTransformAngle(), Angle)) W->SetRenderTransformAngle(Angle);

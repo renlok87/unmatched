@@ -87,6 +87,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmWorldTagTokensTest,
     "Unmatched.S08.ArtHudUmg.TagTokens H12 tag: no name, type.tag 14, card.navy capsule, chip 24, HP bar 40x4, harpy digits 1-3",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmWorldTagTokensTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the H12 tag tokens of the HUD v2 look (slice 18: the table chip type.button)
   using namespace UmWorldTest;
   S08ArtLook::SetSlateHudOverrideForTest(TEXT(""));
   FWorld W(TEXT("UmWorldTag"));

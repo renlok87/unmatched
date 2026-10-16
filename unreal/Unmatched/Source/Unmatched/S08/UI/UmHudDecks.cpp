@@ -293,7 +293,7 @@ void UUmHudDecks::Relayout() {
     // HUD "Стол" (03 §3.4): the pile card stands on its slip (class L) - a 66 x 92 card over the slip's middle, the count
     // centred on the slip; class S keeps the mini card in the chip
     const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > ChipH + 1.0f;
-    const FVector2D CardSize = bPile ? FVector2D(60.0f, 84.0f) : FVector2D(MiniW, MiniH);
+    const FVector2D CardSize = bPile ? FVector2D(54.0f, 76.0f) : FVector2D(MiniW, MiniH);
     const FVector2D CardPos = bPile ? P + FVector2D(0.5f * (W - CardSize.X), -4.0f - CardSize.Y)  /* slice 7: clear of the chip */
                                     : P + FVector2D(MiniLeft, 0.5f * (ChipH - MiniH));
     // slice 9 (fifth blind review: a lone back over the scene): the pile has a thickness - up to three card edges under
@@ -376,7 +376,7 @@ void UUmHudDecks::ApplyContent() {
       const FBox2D Chip = ChipRectSu(I);
       // the pile look centres the count under its card: the chip's whole width is its room (slice 14)
       const bool bPileText = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > UmHudDecks::ChipHeightLSu + 1.0f;
-      const float Room = static_cast<float>(Chip.Max.X - Chip.Min.X) - (bPileText ? 4.0f : TextLeft + 1.0f);
+      const float Room = static_cast<float>(Chip.Max.X - Chip.Min.X) + (bPileText ? 6.0f : -(TextLeft + 1.0f));  // slice 18: the pile counts may use the chips' gap
       T->SetFont(UUmHudTheme::Get().Font(UmTextFit::PickToken(T->GetText(), Room, {FName(TEXT("type.button")), FName(TEXT("type.tag"))})));
     }
     // slice 14: the two pile counts in one size (the smaller of the two fits)

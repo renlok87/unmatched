@@ -8322,7 +8322,8 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       const float W = FMath::CeilToFloat(Desired.X * Ppu);
       const float Hh = FMath::CeilToFloat(Desired.Y * Ppu);
       const float Cx = static_cast<float>(T.Figure.Center().X);
-      const FS08ScreenRect Under(Cx - 0.5f * W, T.Figure.Y1 + 2.0f, Cx + 0.5f * W, T.Figure.Y1 + 2.0f + Hh);
+      // slice 18 (blind review s17: «the chips spill onto the next cells»): the chip rides the base's front edge
+      const FS08ScreenRect Under(Cx - 0.5f * W, T.Figure.Y1 - 0.55f * Hh, Cx + 0.5f * W, T.Figure.Y1 + 0.45f * Hh);
       bool bFree = Under.X0 >= 0.0f && Under.Y1 <= static_cast<float>(ViewportPx.Y);
       for (const FS08ScreenRect& Hr : Hard) bFree = bFree && Under.IntersectionArea(Hr) <= 0.0;
       if (bFree) {
