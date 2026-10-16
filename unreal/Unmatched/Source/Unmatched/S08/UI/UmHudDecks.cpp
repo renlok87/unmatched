@@ -1,5 +1,7 @@
 // VS-3 HB-27: DECKS - see UmHudDecks.h.
 #include "UmHudDecks.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
+#include "Components/Image.h"
 #include "../S08ArtLook.h"
 
 #include "../S08AnimatedIconWidget.h"
@@ -255,7 +257,7 @@ void UUmHudDecks::Relayout() {
       B.Variant = EUmButtonVariant::Normal;
       B.HeightSu = ChipH;
       B.MinWidthSu = W;
-      B.bTableSlip = false;  // blind review 2026-10-16: the cream slips read as web buttons - the HUD's own dark chip
+      B.bTableSlip = S08ArtLook::HudTable();  // slice 9: the marble plate of the table look (UmButton)
       Button->ApplyModel(B);
       UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
     }
@@ -265,6 +267,25 @@ void UUmHudDecks::Relayout() {
     const FVector2D CardSize = bPile ? FVector2D(66.0f, 92.0f) : FVector2D(MiniW, MiniH);
     const FVector2D CardPos = bPile ? P + FVector2D(0.5f * (W - CardSize.X), -6.0f - CardSize.Y)  /* slice 7: clear of the chip */
                                     : P + FVector2D(MiniLeft, 0.5f * (ChipH - MiniH));
+    // slice 9 (fifth blind review: a lone back over the scene): the pile has a thickness - up to three card edges under
+    // the top card, down-right; an empty discard shows the outline of its place
+    if (UCanvasPanel* RowW = UmDecksFind<UCanvasPanel>(WidgetTree, TEXT("Row"))) {
+      for (int32 K = 1; K <= 4; ++K) {
+        const FString Name = FString::Printf(TEXT("PileEdge%d_%d"), I, K);
+        UImage* Edge = UmDecksFind<UImage>(WidgetTree, *Name);
+        if (!Edge && bPile) {
+          Edge = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(*Name));
+          RowW->AddChild(Edge);
+        }
+        if (!Edge) continue;
+        const bool bOutline = K == 4;  // the empty place
+        Edge->SetBrush(bOutline ? FSlateRoundedBoxBrush(FLinearColor(0.0f, 0.0f, 0.0f, 0.25f), 6.0f, FLinearColor(0.72f, 0.58f, 0.38f, 0.55f), 1.5f)
+                                : FSlateRoundedBoxBrush(FLinearColor(0.07f, 0.065f, 0.06f, 1.0f), 6.0f, FLinearColor(0.55f, 0.45f, 0.30f, 0.9f), 1.0f));
+        const FVector2D Off = bOutline ? FVector2D::ZeroVector : FVector2D(2.5 * K, 2.5 * K);
+        UmDecksPlace(Edge, CardPos + Off, CardSize, bOutline ? 2 : 3 - K);
+        Edge->SetVisibility(ESlateVisibility::Collapsed);  // ApplyContent shows what the counts call for
+      }
+    }
     USizeBox* MiniBox = I == 0 ? DeckMiniBox.Get() : DiscardMiniBox.Get();
     if (MiniBox) {
       MiniBox->SetWidthOverride(CardSize.X);
@@ -341,6 +362,22 @@ void UUmHudDecks::ApplyContent() {
     if (Model.bHasTop) DiscardMini->ApplyModel(Model.Top, Top);
   }
   if (DiscardMiniBox) DiscardMiniBox->SetVisibility(Model.bHasTop ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  // slice 9: the piles' thickness (one edge per ~8 cards, up to three) and the empty discard's outline (class L table)
+  {
+    const bool bPileLook = S08ArtLook::HudTable() && !bS && Frame.RectSu.bIsValid &&
+                           Frame.RectSu.GetSize().Y > UmHudDecks::ChipHeightLSu + 1.0f;
+    const int32 Counts[2] = {Model.DeckCount, Model.DiscardCount};
+    for (int32 I = 0; I < 2; ++I) {
+      const bool bTop = I == 0 ? Counts[0] > 0 : Model.bHasTop;
+      const int32 Edges = bPileLook && bTop && Counts[I] > 1 ? FMath::Clamp((Counts[I] + 7) / 8, 1, 3) : 0;
+      for (int32 K = 1; K <= 4; ++K) {
+        UImage* Edge = UmDecksFind<UImage>(WidgetTree, *FString::Printf(TEXT("PileEdge%d_%d"), I, K));
+        if (!Edge) continue;
+        const bool bOn = K == 4 ? bPileLook && !bTop : K <= Edges;
+        Edge->SetVisibility(bOn ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+      }
+    }
+  }
   // HUD "Стол" piles (class L): an empty discard is just its chip - no lone glyph floating over the table
   const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.bIsValid &&
                      Frame.RectSu.GetSize().Y > UmHudDecks::ChipHeightLSu + 1.0f;

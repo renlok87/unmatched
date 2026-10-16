@@ -455,8 +455,11 @@ void UUmButton::Restyle() {
     if (Model.bFlat && Model.Variant == EUmButtonVariant::Normal &&
                (State == EUmButtonState::Normal || State == EUmButtonState::Focus)) {
       Body->SetBrush(FSlateNoResource());  // VS-2 HB-14: at rest the plate of the block shows through
-    } else if (Model.bTableSlip && S08ArtLook::HudTable() && Theme.HasTextureSkin(TEXT("hud.table.slip"))) {
-      if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("hud.table.slip"), PxPerSu)) {
+    } else if (Model.bTableSlip && S08ArtLook::HudTable() &&
+               (Theme.HasTextureSkin(TEXT("hud.table.card")) || Theme.HasTextureSkin(TEXT("hud.table.slip")))) {
+      // slice 9: the pile chip is a small plate of the hero cards' marble (the paper slip only without it)
+      const FName SlipKey = Theme.HasTextureSkin(TEXT("hud.table.card")) ? FName(TEXT("hud.table.card")) : FName(TEXT("hud.table.slip"));
+      if (const FSlateBrush* Skin = Theme.SkinFor(SlipKey, PxPerSu)) {
         FSlateBrush Slip = *Skin;
         const bool bLit = State == EUmButtonState::Hover || State == EUmButtonState::Pressed || State == EUmButtonState::Selected;
         Slip.TintColor = FSlateColor(bLit ? FLinearColor(1.0f, 1.0f, 1.0f, 1.0f) : FLinearColor(0.88f, 0.86f, 0.82f, 1.0f));
