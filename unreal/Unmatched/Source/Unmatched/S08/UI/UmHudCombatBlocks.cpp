@@ -1,6 +1,7 @@
 // VS-3 HB-30...HB-33: the game mode's side of the combat blocks - see UmHudCombatBlocks.h.
 #include "UmHudCombatBlocks.h"
 
+#include "../S08ArtLook.h"
 #include "UmCardWidget.h"
 #include "UmGameHud.h"
 
@@ -331,6 +332,34 @@ TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& InRaw) {
     E->ApplyModel(I == 0 ? Own : Opp);
     E->Step();
     Trace.Append(E->TakeTrace());
+    // HUD "Стол" (03 §3.7, R6 §5): the reveal is a duel in the middle - from the flip to the end of the pause both cards
+    // stand side by side over the field's centre, 1.15x; for the blow (lunge / hit), the choices after the combat and
+    // the defense window they rest at the edges again ("parked"), the field and the hand free
+    if (L.bTable && Block.bIsValid) {
+      const ES09CombatStagePhase Ph = bStaged && In.Stage ? In.Stage->GetPhase() : ES09CombatStagePhase::Idle;
+      const bool bCentre = bStaged && (Ph == ES09CombatStagePhase::Flip || Ph == ES09CombatStagePhase::Read ||
+                                       Ph == ES09CombatStagePhase::Effects || Ph == ES09CombatStagePhase::Slam ||
+                                       Ph == ES09CombatStagePhase::Pause);
+      const float Scale = bCentre ? 1.15f : 1.0f;
+      FVector2D Want = FVector2D::ZeroVector;
+      if (bCentre) {
+        const FVector2D C(0.5 * L.CanvasSu.X, 0.5 * L.CanvasSu.Y - 40.0);
+        const float Gap = L.bClassS ? 60.0f : 110.0f;
+        const float W = static_cast<float>(CardL.X) * Scale;
+        const float H = static_cast<float>(CardL.Y) * Scale;
+        const FVector2D Target(I == 0 ? C.X - 0.5f * Gap - W : C.X + 0.5f * Gap, C.Y - 0.5f * H);
+        Want = Target - FVector2D(Block.Min);
+      }
+      const float A = In.SpeedMul <= 0.0f ? 1.0f : 0.22f;
+      CentreShift[I] = FMath::Lerp(CentreShift[I], Want, A);
+      CentreScale[I] = FMath::Lerp(CentreScale[I], Scale, A);
+      if (CentreShift[I].Size() < 0.5f && FMath::IsNearlyEqual(CentreScale[I], 1.0f, 0.002f) && !bCentre) {
+        CentreShift[I] = FVector2D::ZeroVector;
+        CentreScale[I] = 1.0f;
+      }
+      E->SetRenderTransformPivot(FVector2D(0.0, 0.0));
+      E->SetRenderTransform(FWidgetTransform(CentreShift[I], FVector2D(CentreScale[I]), FVector2D::ZeroVector, 0.0f));
+    }
   }
   if (UUmHudCombatCenter* C = Center.Get()) {
     FUmCombatCenterFrame F;

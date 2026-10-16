@@ -11,6 +11,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud.Decks" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "../../S09/S09HudPress.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/ScaleBox.h"
@@ -124,6 +125,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmDecksCountsTest,
     "Unmatched.S08.Hud.Decks.Counts the chips follow the snapshot - labels, stale, top card, empty pile, rects, SHOT, presses",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmDecksCountsTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 look this test pins («≈»)
   using namespace UmDecksTest;
   FRu Ru;
   FWorld W(TEXT("UmDecksCounts"));

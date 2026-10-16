@@ -1,4 +1,5 @@
 #include "UmHudTheme.h"
+#include "../S08ArtLook.h"
 
 #include "../S08HudTokens.generated.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
@@ -185,6 +186,12 @@ const FSlateBrush* UUmHudTheme::SkinFor(FName Key, float PxPerSu) const {
     if (const FSlateBrush* X2 = SkinsX2.Find(Key)) return X2;
   }
   return Skin(Key);
+}
+
+const FSlateBrush* UUmHudTheme::ScreenSkin(FName Key, float PxPerSu) const {
+  const bool bPlate = Key == FName(TEXT("modal")) || Key == FName(TEXT("panel"));
+  if (bPlate && S08ArtLook::HudTable() && HasTextureSkin(TEXT("hud.table.card"))) return SkinFor(TEXT("hud.table.card"), PxPerSu);
+  return SkinFor(Key, PxPerSu);
 }
 
 const FSlateBrush* UUmHudTheme::SkinV2(FName V2Key, FName Fallback, float PxPerSu) const {

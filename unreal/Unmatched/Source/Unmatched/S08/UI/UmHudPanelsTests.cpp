@@ -506,6 +506,7 @@ bool FUmHudPlayerPanelOppMirrorTest::RunTest(const FString&) {
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudOppHandFanTest, "Unmatched.S08.Hud.OppHand.Fan",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmHudOppHandFanTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the HUD v2 look this test pins («≈»)
   using namespace UmPanelsTest;
   FWorld W(TEXT("UmHudOppHandFan"));
   if (!TestNotNull(TEXT("test world"), W.World)) return false;

@@ -124,5 +124,8 @@ class UNMATCHED_API FUmCombatBlocks {
   int32 StagedSeq = -1;
   bool bDefenseWindowShown = false;
   bool bStageYield = false;  // VS-5 E4: an open combat over a running staging
+  /** HUD "Стол" (03 §3.7): the edge cards' current offset / scale toward the centre (the reveal), eased per refresh. */
+  FVector2D CentreShift[2] = {FVector2D::ZeroVector, FVector2D::ZeroVector};
+  float CentreScale[2] = {1.0f, 1.0f};
   FString LastCenterLine;
 };

@@ -216,15 +216,15 @@ bool UUmScreenRoom::Initialize() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const float ScalePx = UmHudScale::Current().PxPerSu();
   if (Header) {
-    if (const FSlateBrush* Panel = Theme.SkinFor(TEXT("panel"), ScalePx)) Header->SetBrush(*Panel);
+    if (const FSlateBrush* Panel = Theme.ScreenSkin(TEXT("panel"), ScalePx)) Header->SetBrush(*Panel);
   }
   for (UBorder* B : {BoardBlock.Get(), DeckRow.Get(), BottomStrip.Get()}) {
-    if (const FSlateBrush* Screen = Theme.SkinFor(TEXT("modal"), ScalePx)) {
+    if (const FSlateBrush* Screen = Theme.ScreenSkin(TEXT("modal"), ScalePx)) {
       if (B) B->SetBrush(*Screen);
     }
   }
   if (CountPanel) {
-    if (const FSlateBrush* Screen = Theme.SkinFor(TEXT("modal"), ScalePx)) CountPanel->SetBrush(*Screen);
+    if (const FSlateBrush* Screen = Theme.ScreenSkin(TEXT("modal"), ScalePx)) CountPanel->SetBrush(*Screen);
     CountPanel->SetHorizontalAlignment(HAlign_Center);
     CountPanel->SetVerticalAlignment(VAlign_Center);
   }

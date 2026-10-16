@@ -43,7 +43,7 @@ FText Caption(const FUmOppHandModel& M) {
     Args.Add(TEXT("n"), N);
     return UmText::Format(EUmTable::Hud, Key, Args);
   };
-  const FText Deck = M.bDeckStale ? Num(TEXT("hud.opp.stale"), FText::AsNumber(M.DeckCount)) : FText::AsNumber(M.DeckCount);
+  const FText Deck = M.bDeckStale && !S08ArtLook::HudTable() ? Num(TEXT("hud.opp.stale"), FText::AsNumber(M.DeckCount)) : FText::AsNumber(M.DeckCount);
   // the separator is punctuation of the caption, the words come from the table (04 §2.3)
   return FText::Format(INVTEXT("{0} · {1} · {2}"), Num(TEXT("hud.opp.hand"), FText::AsNumber(M.HandCount)),
                        Num(TEXT("hud.opp.deck"), Deck), Num(TEXT("hud.opp.discard"), FText::AsNumber(M.DiscardCount)));

@@ -41,6 +41,7 @@ FUmDecksModel Gather(const FS09PlayerPanel* Own, const FString& HeroSlug) {
 
 namespace {
 FText Count(int32 N, bool bStale) {
+  if (S08ArtLook::HudTable()) bStale = false;  // HUD "Стол": no «≈»; the stale count prints in a faint ink instead
   const FText Num = FText::FromString(FString::FromInt(N));  // tabular digits, no grouping
   if (!bStale) return Num;
   FFormatNamedArguments A;
@@ -298,9 +299,10 @@ void UUmHudDecks::ApplyContent() {
   if (DeckCount) DeckCount->SetText(UmHudDecks::DeckLabel(Model, bS));
   if (S08ArtLook::HudTable()) {
     // HUD "Стол": print ink on the paper slip
-    const FSlateColor Ink(UUmHudTheme::Get().Color(TEXT("card.navy")));
-    if (DeckCount) DeckCount->SetColorAndOpacity(Ink);
-    if (DiscardCount) DiscardCount->SetColorAndOpacity(Ink);
+    const FLinearColor Navy = UUmHudTheme::Get().Color(TEXT("card.navy"));
+    const FLinearColor Faint(Navy.R, Navy.G, Navy.B, 0.5f);
+    if (DeckCount) DeckCount->SetColorAndOpacity(FSlateColor(Model.bDeckStale ? Faint : Navy));
+    if (DiscardCount) DiscardCount->SetColorAndOpacity(FSlateColor(Model.bDiscardStale ? Faint : Navy));
   }
   if (DiscardCount) DiscardCount->SetText(UmHudDecks::DiscardLabel(Model, bS));
   // 2026-10-15 playtest: «Сброс 10» touched the chip's right rim under the HUD v2 skin (2560x1080 read «Сброс 1C») -

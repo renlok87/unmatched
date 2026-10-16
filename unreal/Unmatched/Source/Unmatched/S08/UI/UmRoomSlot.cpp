@@ -56,7 +56,7 @@ bool UUmRoomSlot::Initialize() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (Avatar) Avatar->SetBrush(FSlateNoResource());  // a UBorder's default brush is a white box
   if (Panel) {
-    if (const FSlateBrush* Skin = Theme.Skin(TEXT("modal"))) Panel->SetBrush(*Skin);
+    if (const FSlateBrush* Skin = Theme.ScreenSkin(TEXT("modal"), 1.0f)) Panel->SetBrush(*Skin);
   }
   if (HostChip) {
     if (const FSlateBrush* Chip = Theme.Skin(TEXT("chip"))) HostChip->SetBrush(*Chip);

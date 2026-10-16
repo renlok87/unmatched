@@ -321,11 +321,11 @@ bool UUmScreenLobby::Initialize() {
   BindParts();
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const float ScalePx = UmHudScale::Current().PxPerSu();
-  if (const FSlateBrush* Panel = Theme.SkinFor(TEXT("panel"), ScalePx)) {
+  if (const FSlateBrush* Panel = Theme.ScreenSkin(TEXT("panel"), ScalePx)) {
     if (Header) Header->SetBrush(*Panel);
   }
   for (UBorder* B : {GameList.Get(), CreateColumn.Get(), CodeColumn.Get()}) {
-    if (const FSlateBrush* Screen = Theme.SkinFor(TEXT("modal"), ScalePx)) {
+    if (const FSlateBrush* Screen = Theme.ScreenSkin(TEXT("modal"), ScalePx)) {
       if (B) B->SetBrush(*Screen);
     }
   }

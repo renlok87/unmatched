@@ -252,10 +252,10 @@ bool UUmScreenGameOver::Initialize() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const float ScalePx = UmHudScale::Current().PxPerSu();
   if (ResultModal) {
-    if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("modal"), ScalePx)) ResultModal->SetBrush(*Skin);
+    if (const FSlateBrush* Skin = Theme.ScreenSkin(TEXT("modal"), ScalePx)) ResultModal->SetBrush(*Skin);
   }
   if (BoardStrip) {
-    if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("panel"), ScalePx)) BoardStrip->SetBrush(*Skin);  // panel.bg 0.92
+    if (const FSlateBrush* Skin = Theme.ScreenSkin(TEXT("panel"), ScalePx)) BoardStrip->SetBrush(*Skin);  // panel.bg 0.92
   }
   for (UBorder* B : {LeftPortrait.Get(), RightPortrait.Get()}) {
     if (B) B->SetBrush(FSlateNoResource());

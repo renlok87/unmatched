@@ -96,6 +96,10 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** HUD v2 (art/imagegen/hud-v2-codex): the ornament skin V2Key when imported, else Fallback (the v1 skin key) - one
    *  call per widget keeps the old look wherever the kit has no such piece. */
   const FSlateBrush* SkinV2(FName V2Key, FName Fallback, float PxPerSu) const;
+  /** HUD "Стол" (hud-redesign 03 §9 E7): the big plates of the screens off the match (lobby, room, loading, result,
+   *  the modals) - "modal" / "panel" take the box-canon card hud.table.card under the table look; any other key, the
+   *  legacy look or no imported texture = SkinFor(Key). */
+  const FSlateBrush* ScreenSkin(FName Key, float PxPerSu) const;
   /** 2026-10-16: was 1.5. Slate draws a Box brush's 9-slice borders at the TEXTURE's native pixels (ElementBatcher
    *  AddBoxElements: ResourceProxy->ActualSize through the inverse layout transform), not at ImageSize - the x2 PNG at
    *  1.5 px per su drew the HUD v2 marble rims and meander ends 1.33x too large (the status cartouche's dark band

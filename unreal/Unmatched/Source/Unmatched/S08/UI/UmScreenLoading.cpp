@@ -132,7 +132,7 @@ bool UUmScreenLoading::Initialize() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const float ScalePx = UmHudScale::Current().PxPerSu();
   if (LoadingPanel) {
-    if (const FSlateBrush* Screen = Theme.SkinFor(TEXT("modal"), ScalePx)) LoadingPanel->SetBrush(*Screen);
+    if (const FSlateBrush* Screen = Theme.ScreenSkin(TEXT("modal"), ScalePx)) LoadingPanel->SetBrush(*Screen);
   }
   for (UBorder* B : {LeftPortrait.Get(), RightPortrait.Get()}) {
     if (B) B->SetBrush(FSlateNoResource());  // a UBorder's default brush is a white box

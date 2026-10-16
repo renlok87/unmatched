@@ -34,6 +34,15 @@ FBox2D ListRectSu(const FBox2D& TopRectSu) {
   return FBox2D(Min, Min + ListSizeSu());
 }
 
+/** HUD "Стол" (03 §3.8): the row text 18 su (minimum read size), no «Х1» turn column - the text starts by the stripe. */
+FSlateFontInfo RowFont() {
+  FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.body"));
+  if (S08ArtLook::HudTable()) Font.Size = UmHudTheme::PointsFromSu(18.0f);
+  return Font;
+}
+
+float RowTextX() { return S08ArtLook::HudTable() ? 14.0f : TextXSu; }
+
 FText TurnText(int32 Turn) {
   FFormatNamedArguments Args;
   Args.Add(TEXT("n"), FText::FromString(FString::FromInt(Turn)));
@@ -297,10 +306,10 @@ void UUmHudLog::Relayout() {
     // class L: the wheel scrolls the column, no track (the rows fill it); the S list shows the track on overflow
     Scroll->SetScrollBarVisibility(Frame.bClassS ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
   }
-  const float TextW = FMath::Max(40.0f, W - (UmHudLog::TextXSu + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
+  const float TextW = FMath::Max(40.0f, W - (UmHudLog::RowTextX() + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
   for (int32 I = 0; I < RowBoxes.Num(); ++I) {
     if (RowBoxes[I]) RowBoxes[I]->SetWidthOverride(W);
-    if (RowTexts.IsValidIndex(I)) Place(RowTexts[I], UmHudLog::TextXSu, 1.0f, TextW, UmHudLog::RowSu - 1.0f);
+    if (RowTexts.IsValidIndex(I)) Place(RowTexts[I], UmHudLog::RowTextX(), 0.0f, TextW, UmHudLog::RowSu);
   }
 }
 
@@ -334,7 +343,7 @@ void UUmHudLog::AddRowWidget() {
     S->SetPosition(FVector2D(UmHudLog::TurnXSu, 2.0));
   }
   UTextBlock* Txt = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-  Txt->SetFont(Theme.Font(TEXT("type.body")));
+  Txt->SetFont(UmHudLog::RowFont());
   Txt->SetShadowOffset(FVector2D::ZeroVector);
   Txt->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
   Txt->SetClipping(EWidgetClipping::ClipToBounds);
@@ -358,7 +367,7 @@ void UUmHudLog::RestyleRows() {
     const FUmLogEntry& E = Rows[I].Entry;
     if (RowStripes[I]) RowStripes[I]->SetColorAndOpacity(Theme.Color(E.TeamSlot == 1 ? TEXT("team.p2.screen") : TEXT("team.p1.screen")));
     if (RowTurns[I]) {
-      RowTurns[I]->SetText(E.Turn > 0 ? UmHudLog::TurnText(E.Turn) : FText::GetEmpty());
+      RowTurns[I]->SetText(E.Turn > 0 && !S08ArtLook::HudTable() ? UmHudLog::TurnText(E.Turn) : FText::GetEmpty());
     }
     if (RowTexts[I]) {
       RowTexts[I]->SetText(GetRowShownText(I));  // VS-5 E4: a shorter form when the line does not fit (HB-39)
@@ -384,7 +393,7 @@ FText UUmHudLog::GetRowText(int32 I) const { return Rows.IsValidIndex(I) ? Rows[
 float UUmHudLog::RowTextWidthSu() const {
   // HUD v2: the content box inside the rim inset of SetFrame (8 su each side)
   const float W = static_cast<float>(Frame.SizeSu.X) - (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.status.banner")) ? 16.0f : 0.0f);
-  return FMath::Max(40.0f, W - (UmHudLog::TextXSu + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
+  return FMath::Max(40.0f, W - (UmHudLog::RowTextX() + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
 }
 
 FText UUmHudLog::GetRowShownText(int32 I) const {
@@ -392,7 +401,7 @@ FText UUmHudLog::GetRowShownText(int32 I) const {
   const FUmLogEntry& E = Rows[I].Entry;
   if (E.Shorter.Num() == 0 || !FSlateApplication::IsInitialized() || !FSlateApplication::Get().GetRenderer()) return E.Text;
   // the width with the font the row draws (the theme's composite font with the «→» fallback, 04 §2.10)
-  const FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.body"));
+  const FSlateFontInfo Font = UmHudLog::RowFont();
   const TSharedRef<FSlateFontMeasure> Measure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
   return UmHudLog::PickRowText(E, RowTextWidthSu(), [&Measure, &Font](const FText& T) {
     return static_cast<float>(Measure->Measure(T, Font, 1.0f).X);

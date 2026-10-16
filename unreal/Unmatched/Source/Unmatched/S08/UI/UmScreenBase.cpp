@@ -82,7 +82,7 @@ bool UUmScreenBase::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach,
     S->SetOffsets(FMargin(0.0f));
   }
   UBorder* FrameW = Tree.ConstructWidget<UBorder>(UBorder::StaticClass(), FName(TEXT("Frame")));
-  if (const FSlateBrush* Skin = Theme.Skin(TEXT("modal"))) FrameW->SetBrush(*Skin);
+  if (const FSlateBrush* Skin = Theme.ScreenSkin(TEXT("modal"), 1.0f)) FrameW->SetBrush(*Skin);
   FrameW->SetPadding(FMargin(0.0f));
   FrameW->SetVisibility(ESlateVisibility::Visible);
   if (!Attach(FrameW, RootW)) return Fail(TEXT("Frame"));
@@ -170,7 +170,7 @@ FBox2D UUmScreenBase::FrameRectSu() const {
 void UUmScreenBase::Relayout() {
   if (!Frame) return;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("modal"), PxPerSu)) Frame->SetBrush(*Skin);
+  if (const FSlateBrush* Skin = Theme.ScreenSkin(TEXT("modal"), PxPerSu)) Frame->SetBrush(*Skin);
   if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Frame->Slot)) {
     const FBox2D R = FrameRectSu();
     S->SetAnchors(FAnchors(0.0f, 0.0f));
