@@ -246,6 +246,26 @@ void UUmHudDecks::Relayout() {
   const float MiniLeft = bS ? MiniLeftSSu : MiniLeftLSu;
   const float TextLeft = bS ? TextLeftSSu : TextLeftLSu;
   IconSuNow = IconSuFor(Frame.PxPerSu);
+  // slice 13 (blind review s12: «the piles hang over the path with no surface»): under the L table look the piles lie
+  // on a tray of the hero cards' marble as wide as the control panel, docked right over it (UmHudLayout)
+  if (UCanvasPanel* RowW = UmDecksFind<UCanvasPanel>(WidgetTree, TEXT("Row"))) {
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    const bool bTray = S08ArtLook::HudTable() && !bS && Frame.RectSu.GetSize().Y > ChipH + 1.0f &&
+                       Theme.HasTextureSkin(TEXT("hud.table.card"));
+    UImage* Tray = UmDecksFind<UImage>(WidgetTree, TEXT("PileTray"));
+    if (bTray && !Tray) {
+      Tray = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("PileTray")));
+      RowW->AddChild(Tray);
+    }
+    if (Tray) {
+      Tray->SetVisibility(bTray ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+      if (bTray) {
+        if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("hud.table.card"), Frame.PxPerSu)) Tray->SetBrush(*Skin);
+        const float Pad = UmHudLayout::TableTrayPadSu;
+        UmDecksPlace(Tray, FVector2D(0.0, -Pad), Frame.RectSu.GetSize() + FVector2D(0.0, 2.0 * Pad), -1);
+      }
+    }
+  }
   for (int32 I = 0; I < 2; ++I) {
     const FBox2D Chip = ChipRectSu(I);
     const FVector2D P = Chip.Min - Origin;

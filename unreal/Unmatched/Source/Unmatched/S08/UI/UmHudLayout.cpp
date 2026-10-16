@@ -63,7 +63,8 @@ FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Inde
   const float W0 = bClassS ? 64.0f : (bEnglish ? 144.0f : 156.0f);
   const float W1 = bClassS ? 64.0f : (bEnglish ? 136.0f : 124.0f);
   const float H = bClassS ? 48.0f : 56.0f;
-  const float X = static_cast<float>(Decks.Min.X) + (Index == 0 ? 0.0f : W0 + GapSu);
+  const float Lead = FMath::Max(0.0f, 0.5f * (static_cast<float>(Decks.Max.X - Decks.Min.X) - (W0 + GapSu + W1)));
+  const float X = static_cast<float>(Decks.Min.X) + Lead + (Index == 0 ? 0.0f : W0 + GapSu);
   // bottom-aligned: the HUD "Стол" DECKS rect is taller (the pile cards stand over the slips); the v2 rect is H high
   const float Y = static_cast<float>(Decks.Max.Y) - H;
   return FBox2D(FVector2D(X, Y), FVector2D(X + (Index == 0 ? W0 : W1), Y + H));
@@ -142,7 +143,13 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     // HUD v2 (2026-10-15): +14 su for the marble rims of the panel skin - the caption kept off the bottom rim
     // HUD "Стол" (final blind review 08: two plates of different widths): the opponent's hand as wide as his card
     const float OppHandW = L.bTable ? PanelW : 300.0f;
-    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M + 136.0f + GapSu, OppHandW, 106.0f));
+    if (L.bTable) {
+      // slice 13 (blind review s12: two equally heavy opponent blocks): one plate - the hand's tray starts under the
+      // opponent's card (z under it, UmGameHud) and the backs sit at its bottom
+      Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M, OppHandW, 136.0f + GapSu + 106.0f));
+    } else {
+      Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - OppHandW, M + 136.0f + GapSu, OppHandW, 106.0f));
+    }
     const FBox2D Actions = UmLayoutBox(W - M - 344.0f, H - M - 72.0f, 344.0f, 72.0f);
     Set(EUmHudBlock::Actions, Actions);
     // HUD "Стол" (03 §3.4): the piles - a card of each stands on its paper slip, the rect grows up by the card
@@ -195,7 +202,7 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
   // for two lines; S 300 su), the turn strip over PANEL-LOC (full in L, compact in S), LOG above the strip.
   if (L.bTable) {
     const FBox2D Decks = L.Rect(EUmHudBlock::Decks);
-    const float StatusW = L.bClassS ? 260.0f : 400.0f;
+    const float StatusW = L.bClassS ? 260.0f : 360.0f;  // slice 13: the L control panel 360 su (blind review s12: lighter)
     if (L.bClassS) {
       Set(EUmHudBlock::Status, UmLayoutBox(W - M - StatusW, static_cast<float>(Decks.Min.Y) - GapSu - StatusTwoLineSu,
                                            StatusW, 48.0f));
@@ -203,15 +210,17 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       // slice 12 (final blind review 08: four separate blocks): ONE control panel bottom-up - the actions, the prompt
       // (one line, bottom-aligned in its two-line room), the stage strip; the piles stand over the panel
       const FBox2D Act = L.Rect(EUmHudBlock::Actions);
-      // the prompt right on the actions (one line fits the 400 su at the body size; a rare second line grows over the
-      // panel's own tray)
-      const FBox2D StatusR = UmLayoutBox(W - M - StatusW, static_cast<float>(Act.Min.Y) - GapSu - 48.0f, StatusW, 48.0f);
+      // slice 13 (blind review s12: the panel was the heaviest block and covered the board frame's corner): the rows
+      // packed - the stage caption 26, the prompt 48 right on the actions; the panel top clears the frame at 1080p
+      const FBox2D StatusR = UmLayoutBox(W - M - StatusW, static_cast<float>(Act.Min.Y) - UmHudLayout::TablePromptSu, StatusW,
+                                         UmHudLayout::TablePromptSu);
       Set(EUmHudBlock::Status, StatusR);
-      const float StripHNow = static_cast<float>(L.Rect(EUmHudBlock::Top).Max.Y - L.Rect(EUmHudBlock::Top).Min.Y);
-      const float PanelTop = static_cast<float>(StatusR.Min.Y) - GapSu - StripHNow;
+      const float PanelTop = static_cast<float>(StatusR.Min.Y) - UmHudLayout::TableStageSu;
+      // slice 13 (blind review s12: the piles hung loose): the piles on their own tray as wide as the control panel,
+      // docked right over it (the two trays' pads touch)
       const float DecksH = static_cast<float>(Decks.Max.Y - Decks.Min.Y);
-      const FBox2D DecksR = UmLayoutBox(static_cast<float>(Decks.Min.X), PanelTop - 2.0f * GapSu - DecksH,
-                                        static_cast<float>(Decks.Max.X - Decks.Min.X), DecksH);
+      // the piles tray only as wide as the two piles (300 su) - wider it covered the board frame's right edge
+      const FBox2D DecksR = UmLayoutBox(W - M - 300.0f, PanelTop - 2.0f * UmHudLayout::TableTrayPadSu - DecksH, 300.0f, DecksH);
       Set(EUmHudBlock::Decks, DecksR);
       if (L.HasRect(EUmHudBlock::DeckPanel)) {
         const FBox2D DP = L.Rect(EUmHudBlock::DeckPanel);
@@ -231,9 +240,10 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
       Strip = UmLayoutBox(M, static_cast<float>(PanelLocR.Min.Y) - GapSu - StripH, UmHudTurnStrip::CompactWidthSu(true), StripH);
     } else {
       // slice 12: the strip is the top row of the control panel, right over the prompt (the piles above it)
-      const float StripW = UmHudTurnStrip::CompactWidthSu(false) + UmHudTurnStrip::CaptionSu;
+      // slice 13: the stage caption row only («Действие 1 из 2», no node glyphs), the panel's width
       const FBox2D StatusNow = L.Rect(EUmHudBlock::Status);
-      Strip = UmLayoutBox(W - M - StripW, static_cast<float>(StatusNow.Min.Y) - GapSu - StripH, StripW, StripH);
+      Strip = UmLayoutBox(W - M - 360.0f, static_cast<float>(StatusNow.Min.Y) - UmHudLayout::TableStageSu, 360.0f,
+                          UmHudLayout::TableStageSu);
     }
     Set(EUmHudBlock::TurnStrip, Strip);
     if (L.HasRect(EUmHudBlock::Log)) {

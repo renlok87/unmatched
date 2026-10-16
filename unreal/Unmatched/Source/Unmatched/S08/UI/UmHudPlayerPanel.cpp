@@ -56,7 +56,7 @@ FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
     G.TrackerX = bOpp ? 14.0f : 326.0f;
     G.TrackerTop = 12.0f;
     G.bSidekickRow = true;
-    G.SidekickTop = 84.0f;
+    G.SidekickTop = 82.0f;
     return G;
   }
   if (!bClassS) {
@@ -370,7 +370,11 @@ void UUmHudPlayerPanel::ApplyGeometry() {
   if (Panel) {
     const UUmHudTheme& Theme = UUmHudTheme::Get();
     const FName Key = bTable && Theme.HasTextureSkin(TEXT("hud.table.card")) ? FName(TEXT("hud.table.card")) : FName(TEXT("panel"));
-    if (const FSlateBrush* Skin = Theme.SkinFor(Key, PxPerSu)) Panel->SetBrush(*Skin);
+    if (bTable && bOpp && !bClassS) {
+      Panel->SetBrush(FSlateNoResource());  // slice 13: the opponent's card lies on his hand's tray (one plate)
+    } else if (const FSlateBrush* Skin = Theme.SkinFor(Key, PxPerSu)) {
+      Panel->SetBrush(*Skin);
+    }
   }
   UmPanelPlace(Portrait, G.RingPos, false, FVector2D(G.RingSu, G.RingSu));
   UmPanelPlace(NameText, FVector2D(G.TextX, G.NameTop - UmHudPanel::NameLiftSu()), bOpp);
@@ -523,7 +527,7 @@ UWidget* UUmHudPlayerPanel::MakeMiniPortrait(const FUmSidekickView& S) {
   Spec.Key = S.Key;
   Spec.Name = S.Name;
   Spec.Number = S.Number;
-  Spec.ShowSu = UmHudPanel::SidekickSu;
+  Spec.ShowSu = bTable && !Model.bClassS ? UmHudPanel::SidekickTableSu : UmHudPanel::SidekickSu;  // slice 13
   Spec.PxPerSu = Model.PxPerSu;
   Spec.State = S.bFallen ? EUmPortraitState::Fallen : EUmPortraitState::Avatar;
   Spec.bLegacy = Portrait ? Portrait->IsPortraitLegacy() : !S08ArtLook::PortraitAvatars();
@@ -563,11 +567,16 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
       const FUmSidekickView& S = Model.Sidekicks[I];
       UOverlay* Item = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
       if (S.Number > 0) {
-        UVerticalBox* Column = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+        // slice 13 (blind review s12: the harpy tokens ~30 px, «1/1» on the bottom rim): the table card draws them
+        // 40 su with the HP beside the token
+        const bool bSide = bTable && !Model.bClassS;
+        const float Su = bSide ? UmHudPanel::SidekickTableSu : UmHudPanel::SidekickSu;
+        UPanelWidget* Column = bSide ? static_cast<UPanelWidget*>(WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass()))
+                                     : static_cast<UPanelWidget*>(WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass()));
         // the mini portrait with the number disc in its lower right corner (+21, +20)
         USizeBox* StackBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-        StackBox->SetWidthOverride(UmHudPanel::SidekickSu + 3.0f);
-        StackBox->SetHeightOverride(UmHudPanel::SidekickSu + 2.0f);
+        StackBox->SetWidthOverride(Su + 3.0f);
+        StackBox->SetHeightOverride(Su + 2.0f);
         UOverlay* Stack = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
         StackBox->SetContent(Stack);
         if (UOverlaySlot* P = Stack->AddChildToOverlay(MakeMiniPortrait(S))) {
@@ -580,16 +589,21 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
           if (UOverlaySlot* X = Stack->AddChildToOverlay(UmPortrait::MakeNumberBadge(*WidgetTree, S.Number))) {
             X->SetHorizontalAlignment(HAlign_Left);
             X->SetVerticalAlignment(VAlign_Top);
-            X->SetPadding(FMargin(21.0f, 20.0f, 0.0f, 0.0f));  // CX-09: the lower right corner, over the circle's edge
+            X->SetPadding(FMargin(Su - 11.0f, Su - 12.0f, 0.0f, 0.0f));  // CX-09: the lower right corner, over the circle's edge
           }
         }
-        Column->AddChildToVerticalBox(StackBox);
+        Column->AddChild(StackBox);
         UTextBlock* Hp = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
         Hp->SetFont(Theme.Font(TEXT("type.tag")));
         Hp->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
         Hp->SetText(UmHudPanel::HpText(S.Hp, S.MaxHp));
         // HUD "Стол" (03 §3.1): a one-hit sidekick (the harpies) carries no «1/1» - its number is the identity
-        if (UVerticalBoxSlot* H = Column->AddChildToVerticalBox(Hp)) H->SetPadding(FMargin(0.0f, -2.0f, 0.0f, 0.0f));
+        UPanelSlot* HpSlot = Column->AddChild(Hp);
+        if (UVerticalBoxSlot* H = Cast<UVerticalBoxSlot>(HpSlot)) H->SetPadding(FMargin(0.0f, -2.0f, 0.0f, 0.0f));
+        if (UHorizontalBoxSlot* H = Cast<UHorizontalBoxSlot>(HpSlot)) {
+          H->SetVerticalAlignment(VAlign_Bottom);
+          H->SetPadding(FMargin(1.0f, 0.0f, 0.0f, 0.0f));
+        }
         Item->AddChildToOverlay(Column);
         if (S.bFallen) {
           // 04 §2.2: the fallen heart 24 su beside the grey mini portrait (CX-09: x +34, y +4)
@@ -597,13 +611,13 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
             if (UOverlaySlot* H = Item->AddChildToOverlay(Heart)) {
               H->SetHorizontalAlignment(HAlign_Left);
               H->SetVerticalAlignment(VAlign_Top);
-              H->SetPadding(FMargin(UmHudPanel::SidekickSu + 2.0f, 4.0f, 0.0f, 0.0f));
+              H->SetPadding(FMargin(Su + 2.0f, 4.0f, 0.0f, 0.0f));
             }
           }
         }
         // the items 64 su apart; the last one only as wide as its content (the row's edge, PANEL-OPP right 212)
         USizeBox* Cell = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-        Cell->SetWidthOverride(I + 1 < N ? UmHudPanel::SidekickStepSu : UmHudPanel::SidekickSu + 3.0f);
+        Cell->SetWidthOverride(I + 1 < N ? UmHudPanel::SidekickStepSu : Su + (bSide ? 30.0f : 3.0f));
         Cell->SetContent(Item);
         if (UHorizontalBoxSlot* C = SidekickRow->AddChildToHorizontalBox(Cell)) C->SetVerticalAlignment(VAlign_Top);
       } else {

@@ -103,6 +103,8 @@ UNMATCHED_API FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable = fals
 inline constexpr float DialSuL = 64.0f;
 inline constexpr float DialSuS = 52.0f;
 inline constexpr float SidekickSu = 32.0f;
+/** HUD "Стол" slice 13: the sidekick token on the L table card, su. */
+inline constexpr float SidekickTableSu = 40.0f;
 inline constexpr float SidekickStepSu = 64.0f;  // the harpies 128 / 192 / 256
 inline constexpr float IndexDiscSu = 14.0f;     // ВР-72: the number on a card.navy disc in the corner
 inline constexpr float HeartSu = 24.0f;

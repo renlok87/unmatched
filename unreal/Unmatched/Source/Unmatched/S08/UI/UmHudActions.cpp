@@ -418,11 +418,11 @@ void UUmHudActions::Relayout() {
         // slice 12 (final blind review 08): one control panel - the tray reaches up over the prompt (48 su) and
         // the stage strip (UmHudLayout: gap 8 + 48 + gap 8 + strip 44) and left to the prompt's 400 su width
         const FVector2D Right(All.Max.X, All.Max.Y);
-        All.Min.Y -= 8.0 + 48.0 + 8.0 + 44.0;
-        All.Min.X = FMath::Min(All.Min.X, Right.X - 400.0);
+        All.Min.Y -= UmHudLayout::TablePromptSu + UmHudLayout::TableStageSu;  // slice 13: the packed rows
+        All.Min.X = FMath::Min(All.Min.X, Right.X - 360.0);  // slice 13: the panel 360 su
         if (const FSlateBrush* Skin = Theme.SkinFor(TEXT("hud.table.card"), UmHudScale::Current().PxPerSu())) Tray->SetBrush(*Skin);
         if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Tray->Slot)) {
-          const FVector2D Pad(8.0, 6.0);
+          const FVector2D Pad(8.0, UmHudLayout::TableTrayPadSu);
           S->SetAnchors(FAnchors(0.0f, 0.0f));
           S->SetAlignment(FVector2D::ZeroVector);
           S->SetAutoSize(false);

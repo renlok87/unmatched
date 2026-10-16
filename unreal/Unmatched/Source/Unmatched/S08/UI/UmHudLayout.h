@@ -73,6 +73,11 @@ UNMATCHED_API FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEngli
 inline constexpr float StatusTwoLineSu = 78.0f;
 /** HUD "Стол": how far a pile card stands over its slip in DECKS (class L), su. */
 inline constexpr float TablePileCardSu = 100.0f;
+/** HUD "Стол" slice 13 (L control panel): the prompt row and the stage caption row over the actions, su. */
+inline constexpr float TablePromptSu = 48.0f;
+inline constexpr float TableStageSu = 26.0f;
+/** The trays' own pad round their content (the piles tray and the control panel tray), su. */
+inline constexpr float TableTrayPadSu = 6.0f;
 }  // namespace UmHudLayout
 
 struct UNMATCHED_API FUmHudLayout {

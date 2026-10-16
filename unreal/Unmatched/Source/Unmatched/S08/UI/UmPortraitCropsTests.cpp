@@ -13,6 +13,7 @@
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.Hud.Portrait" <abs log>
 #if WITH_AUTOMATION_TESTS
 
+#include "../S08ArtLook.h"
 #include "UmCardMedia.h"
 #include "UmHudPanels.h"
 #include "UmHudPlayerPanel.h"
@@ -152,6 +153,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmPortraitSidekicksTest, "Unmatched.S08.Hud.Po
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmPortraitSidekicksTest::RunTest(const FString&) {
   using namespace UmPortraitCropsTest;
+  const S08ArtLook::FHudTableTestScope HudV2(false);  // the 32 su tokens of the HUD v2 card (slice 13 draws 40 on the table)
   // ---- the number: the server's seat order (sidekicks[]), per owner; a defeated harpy stays in the array ----
   TArray<TSharedPtr<FJsonValue>> Arr = {
       FighterJson(TEXT("f-0-hero"), TEXT("p0"), TEXT("Medusa"), true, 16, TEXT("medusa")),

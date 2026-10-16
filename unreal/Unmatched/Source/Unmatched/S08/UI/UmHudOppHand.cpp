@@ -208,6 +208,9 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
       const UUmHudTheme& Theme = UUmHudTheme::Get();
       const FSlateBrush* Tray = Theme.HasTextureSkin(TEXT("hud.table.card")) ? Theme.SkinFor(TEXT("hud.table.card"), Model.PxPerSu) : nullptr;
       if (Tray) Panel->SetBrush(*Tray); else Panel->SetBrush(FSlateNoResource());
+      // slice 13: the tray runs under the opponent's card - the backs and the caption at its bottom
+      Panel->SetVerticalAlignment(VAlign_Bottom);
+      Panel->SetPadding(FMargin(UmHudOppHand::PadSu, UmHudOppHand::TopSu, UmHudOppHand::PadSu, 10.0f));
     } else if (const FSlateBrush* Skin = UUmHudTheme::Get().SkinFor(TEXT("panel"), Model.PxPerSu)) {
       Panel->SetBrush(*Skin);
     }

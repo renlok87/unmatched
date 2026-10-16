@@ -274,7 +274,9 @@ void UUmGameHud::ApplyLayout(const FUmHudLayout& InLayout, const TArray<FName>& 
       CanvasSlot->SetSize(Size);
       // slice 12: under the table look the actions' tray is the control panel's plate - it lies under the prompt and
       // the stage strip that stand on it
-      if (Which == EUmGameSlot::Actions) CanvasSlot->SetZOrder(S08ArtLook::HudTable() ? -1 : 0);
+      if (Which == EUmGameSlot::Actions || Which == EUmGameSlot::OppHand) {
+        CanvasSlot->SetZOrder(S08ArtLook::HudTable() ? -1 : 0);
+      }
     }
   }
 }

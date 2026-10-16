@@ -348,6 +348,21 @@ void UUmHudTurnStrip::ApplyModel(const FS09TurnStripModel& InModel, const FUmTur
   for (int32 I = 0; I < MainNodes; ++I) {
     if (Boxes.IsValidIndex(I) && Boxes[I]) RowSlot(Boxes[I], FMargin(0.0f));
   }
+  // slice 13 (blind review s12: «the glyph chain needs decoding, it repeats the counter»): the L table strip is the
+  // control panel's caption row only - the nodes keep their tooltips' model, unseen
+  if (S08ArtLook::HudTable() && !Frame.bClassS) {
+    for (USizeBox* B : Boxes) {
+      if (B) B->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    for (UBorder* L : Links) {
+      if (USizeBox* LB = L ? Cast<USizeBox>(L->GetParent()) : nullptr) LB->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    for (UBorder* T : TrayBoxes) {
+      if (T) T->SetVisibility(ESlateVisibility::Collapsed);
+    }
+    if (Plate) Plate->SetHorizontalAlignment(HAlign_Center);
+    if (UOverlaySlot* PS = Plate ? Cast<UOverlaySlot>(Plate->Slot) : nullptr) PS->SetHorizontalAlignment(HAlign_Fill);
+  }
 }
 
 void UUmHudTurnStrip::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
@@ -410,11 +425,11 @@ void UUmHudTurnStrip::ApplyCaption() {
     Cap = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("StageCaption")));
     if (UHorizontalBoxSlot* S = Row->AddChildToHorizontalBox(Cap)) {
       S->SetVerticalAlignment(VAlign_Center);
-      S->SetPadding(FMargin(12.0f, 0.0f, 4.0f, 0.0f));
+      S->SetPadding(FMargin(0.0f));
     }
   }
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  Cap->SetFont(Theme.Font(TEXT("type.tag")));
+  Cap->SetFont(Theme.Font(TEXT("type.button")));
   const int32 Actions = FMath::Max(0, Model.Nodes.Num() - 2);
   int32 Now = INDEX_NONE;
   for (int32 I = 0; I < Model.Nodes.Num(); ++I) {
@@ -435,6 +450,6 @@ void UUmHudTurnStrip::ApplyCaption() {
     Text = UmText::Get(EUmTable::Hud, TEXT("hud.turnstrip.now.end"));
   }
   Cap->SetText(Text);
-  Cap->SetColorAndOpacity(FSlateColor(Theme.Color(Model.bOwnTurn ? TEXT("text.primary") : TEXT("text.secondary"))));
+  Cap->SetColorAndOpacity(FSlateColor(Theme.Color(Model.bOwnTurn ? TEXT("turn.flash.yellow") : TEXT("text.secondary"))));
   Cap->SetVisibility(Text.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
 }
