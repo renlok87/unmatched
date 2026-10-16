@@ -241,6 +241,21 @@ export class GameResolver {
   }
 
   /**
+   * SEL (docs/game-design/select-screens/02-DESIGN.md §2): хост меняет поле в лобби комнаты
+   * Rate limited: 10 запросов в минуту
+   */
+  @Mutation(() => GameResponse, { name: 'selectBoard' })
+  @UseGuards(GqlAuthGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  async selectBoard(
+    @Args('gameId', { type: () => String }) gameId: string,
+    @Args('boardId', { type: () => String }) boardId: string,
+    @CurrentUser() user: any,
+  ): Promise<GameResponse> {
+    return await this.gameService.selectBoard(gameId, user.id, boardId);
+  }
+
+  /**
    * Получить sequence number для optimistic updates
    */
   @Query(() => Number, { name: 'gameSequence', nullable: true })

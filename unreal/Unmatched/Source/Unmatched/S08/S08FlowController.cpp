@@ -50,6 +50,12 @@ static const TCHAR* SelectHeroMutation =
     TEXT(" id code status mode hostId boardId")
     TEXT(" players { userId username heroId isReady seatOrder } } }");
 
+static const TCHAR* SelectBoardMutation =
+    TEXT("mutation B($gameId: String!, $boardId: String!) {")
+    TEXT(" selectBoard(gameId: $gameId, boardId: $boardId) {")
+    TEXT(" id code status mode hostId boardId")
+    TEXT(" players { userId username heroId isReady seatOrder } } }");
+
 static const TCHAR* ToggleReadyMutation =
     TEXT("mutation R($gameId: String!) { toggleReady(gameId: $gameId) {")
     TEXT(" id code status mode hostId boardId")
@@ -473,6 +479,30 @@ void FS08FlowController::SelectHero(const FString& HeroId) {
         HandleRoomResponse(Data, TEXT("selectHero"));
       };
 SendHttp(SelectHeroMutation, Variables, MoveTemp(OnDone));
+}
+
+void FS08FlowController::SelectBoard(const FString& BoardId) {
+  TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
+  Variables->SetStringField(TEXT("gameId"), Room.GameId);
+  Variables->SetStringField(TEXT("boardId"), BoardId);
+  const FString GameId = Room.GameId;
+  const int32 Gen = MatchGeneration;
+  FS08GraphqlClient::FResult OnDone =
+      [this, GameId, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
+                          TSharedPtr<FJsonObject> Data, const FString&) {
+        if (!IsSameMatchRequest(GameId, Gen)) {
+          Trace(FString::Printf(TEXT("BOARD stale answer room=%s ignored"), *GameId));
+          return;
+        }
+        if (!bOk) {
+          Trace(TEXT("BOARD failed: ") + (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          OnFlowError.Broadcast(Errors.Num() ? Errors[0]
+                                             : FS08GraphQLError{TEXT("TRANSPORT"), TEXT("board failed"), FString()});
+          return;
+        }
+        HandleRoomResponse(Data, TEXT("selectBoard"));
+      };
+  SendHttp(SelectBoardMutation, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::ToggleReady() {

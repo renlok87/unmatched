@@ -16,7 +16,7 @@ import { GameActionType } from './models/game-action.model';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
 import { GameAccessDeniedException, MaxActiveGamesException } from './exceptions/game.exceptions';
-import { DEFAULT_BOARD_ID, DEFAULT_BOARD_NAME } from './default-board';
+import { DEFAULT_BOARD_ID, DEFAULT_BOARD_NAME, REAL_BOARD_IDS } from './default-board';
 import * as crypto from 'node:crypto';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -966,6 +966,41 @@ export class GameService {
 
     await this.invalidateGameCache(gameId);
 
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * SEL: выбрать поле. Только хост, только в лобби; доска обязана существовать (как в createGame).
+   * Смена поля снимает готовность остальных игроков — соперник подтверждает новое поле заново.
+   */
+  async selectBoard(gameId: string, userId: string, boardId: string): Promise<GameResponse> {
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+    if (game.status !== GameStatus.LOBBY) {
+      throw new BadRequestException('Поле можно выбрать только в лобби');
+    }
+    if (game.hostId !== userId) {
+      throw new ForbiddenException('Поле выбирает хост');
+    }
+    if (!REAL_BOARD_IDS.includes(boardId)) {
+      throw new BadRequestException('Выбрать можно только оригинальные карты Marmoreal и Sarpedon');
+    }
+    const board = await this.prisma.board.findUnique({ where: { id: boardId }, select: { id: true } });
+    if (!board) {
+      throw new BadRequestException(`Доска ${boardId} не найдена`);
+    }
+    if (game.boardId !== boardId) {
+      await this.prisma.$transaction([
+        this.prisma.game.update({ where: { id: gameId }, data: { boardId } }),
+        this.prisma.gamePlayer.updateMany({
+          where: { gameId, userId: { not: userId } },
+          data: { isReady: false },
+        }),
+      ]);
+      await this.invalidateGameCache(gameId);
+    }
     return await this.getGame(gameId);
   }
 

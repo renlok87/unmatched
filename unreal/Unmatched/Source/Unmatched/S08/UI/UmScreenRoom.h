@@ -28,6 +28,14 @@
 //            hero=0|1 ready=0|1 opp=<none|joined|hero|ready> primary=<start|ready|none> busy=0|1' and two block lines
 //            'state=board board=<marmoreal|sarpedon>' and 'state=deck deck=<n> deckButton=0|1' - never a code or a name.
 //   rollback -S08SlateHud=room: the legacy Slate room panel, this is not built.
+//
+//   SEL      (docs/game-design/select-screens/02-DESIGN.md, 2026-10-16) the fighting-game look is the DEFAULT: two
+//            tall niches with the live 3D figures of AUmHeroShowcase (the viewer left, the opponent right), a VS mark,
+//            the hero card in the centre, the roster strip of UUmSelectTile (heroes + «Случайный»); step 2 «ПОЛЕ»
+//            (both heroes picked) - the board preview, the board strip (+ «Случайное»), the host picks it
+//            (selectBoard), «‹ Герой» back. The legacy panels (slots, grid, board block, deck row) are hidden then.
+//            Rollback -S08SelectLegacy: the SC-14...SC-18 room above, byte for byte. Gate extra: ' look=sel step=hero|board
+//            p1=<empty|hover|locked|ready> p2=<...> tiles=<n>'.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -37,6 +45,7 @@
 #include "UmRoomSlot.h"
 #include "UmScreenBase.h"
 #include "UmScreenLobby.h"
+#include "UmSelectTile.h"
 #include "UmScreenRoom.generated.h"
 
 class UBorder;
@@ -48,6 +57,8 @@ class UTextBlock;
 class UUniformGridPanel;
 class UUmBoardCard;
 class UUmButton;
+class AUmHeroShowcase;
+class UTexture2D;
 
 enum class EUmRoomPhase : uint8 { Room, Countdown, Starting };
 
@@ -81,6 +92,8 @@ struct UNMATCHED_API FUmRoomModel {
   int32 DeckCount = -1;
   /** A room mutation of this screen waits for its answer (why.syncing on the controls). */
   bool bBusy = false;
+  /** SEL: the viewer's seat (0 / 1) - its slot is drawn in the left niche; the other slot in the right one. */
+  int32 OwnSeat = 0;
 };
 
 namespace UmRoom {
@@ -122,6 +135,8 @@ class UNMATCHED_API UUmScreenRoom : public UUmScreenBase {
     TFunction<void()> OnCopy;
     TFunction<void()> OnMenu;
     TFunction<void(FName BankId)> OnSound;
+    /** SEL step 2: the host picks a board (selectBoard). */
+    TFunction<void(const FString& BoardId)> OnBoard;
   };
   void SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter, FInput InInput);
 
@@ -189,6 +204,58 @@ class UNMATCHED_API UUmScreenRoom : public UUmScreenBase {
   UPROPERTY(BlueprintReadOnly, Category = "Um Screen", meta = (BindWidget)) TObjectPtr<UTextBlock> CountText;
   UPROPERTY(BlueprintReadOnly, Category = "Um Screen", meta = (BindWidgetOptional)) TObjectPtr<UCanvasPanel> Content;
 
+  // ---- SEL (the fighting-game look; created in code, the WBP does not carry them)
+  UPROPERTY() TObjectPtr<UCanvasPanel> Sel;
+  UPROPERTY() TObjectPtr<UImage> SelVeil;
+  UPROPERTY() TObjectPtr<UBorder> Niche[2];
+  UPROPERTY() TObjectPtr<UImage> NicheView[2];
+  UPROPERTY() TObjectPtr<UTextBlock> NicheEmpty[2];
+  UPROPERTY() TObjectPtr<UTextBlock> NicheHint[2];
+  UPROPERTY() TObjectPtr<UBorder> NicheFlash[2];
+  UPROPERTY() TObjectPtr<UBorder> Plate[2];
+  UPROPERTY() TObjectPtr<UTextBlock> PlateName[2];
+  UPROPERTY() TObjectPtr<UTextBlock> PlateNick[2];
+  UPROPERTY() TObjectPtr<UBorder> PlateChip[2];
+  UPROPERTY() TObjectPtr<UTextBlock> PlateChipText[2];
+  UPROPERTY() TObjectPtr<UTextBlock> PlateSide[2];
+  UPROPERTY() TObjectPtr<UBorder> PlateSideDisc[2];
+  UPROPERTY() TObjectPtr<UBorder> NicheLine[2];
+  UPROPERTY() TArray<TObjectPtr<UObject>> SelKeepAlive;
+  UPROPERTY() TObjectPtr<UTextBlock> StepTitle;
+  UPROPERTY() TObjectPtr<UTextBlock> StepSub;
+  UPROPERTY() TObjectPtr<UBorder> VsMedal;
+  UPROPERTY() TObjectPtr<UTextBlock> VsText;
+  UPROPERTY() TObjectPtr<UBorder> InfoCard;
+  UPROPERTY() TObjectPtr<UTextBlock> InfoName;
+  UPROPERTY() TObjectPtr<UTextBlock> InfoStats;
+  UPROPERTY() TObjectPtr<UTextBlock> InfoSide;
+  UPROPERTY() TObjectPtr<UTextBlock> InfoAbility;
+  UPROPERTY() TObjectPtr<UCanvasPanel> TileRow;
+  UPROPERTY() TArray<TObjectPtr<UUmSelectTile>> Tiles;
+  UPROPERTY() TObjectPtr<UBorder> PreviewFrame;
+  UPROPERTY() TObjectPtr<UImage> Preview;
+  UPROPERTY() TObjectPtr<UTextBlock> PreviewName;
+  UPROPERTY() TObjectPtr<UTextBlock> PreviewHint;
+  UPROPERTY() TObjectPtr<UCanvasPanel> BoardRow;
+  UPROPERTY() TArray<TObjectPtr<UUmSelectTile>> BoardTiles;
+  UPROPERTY() TObjectPtr<UUmButton> BackButton;
+  UPROPERTY() TObjectPtr<UTexture2D> BoardThumbs[2];
+  UPROPERTY() TObjectPtr<UTexture2D> BoardPreviews[2];
+  UPROPERTY() TArray<TObjectPtr<UTexture2D>> TilePortraits;
+  TArray<FBox2f> TileRegions;
+  TWeakObjectPtr<AUmHeroShowcase> Showcase;
+
+  // ---- SEL state (what the screen shows; tests and the gate)
+  bool IsSelLook() const { return bSel; }
+  bool IsBoardStep() const;
+  /** The niche state of a side (0 = viewer): empty, hover, locked, ready. */
+  const TCHAR* NicheState(int32 Side) const;
+  int32 GetTileCount() const;
+  UUmSelectTile* GetTile(int32 Index) const;
+  UUmSelectTile* GetBoardTile(int32 Index) const;
+  /** The board shown in the preview (the hovered one, else the room board). */
+  FString GetPreviewBoardId() const;
+
   UPROPERTY() TArray<TObjectPtr<UUmHeroCard>> CardPool;
   UPROPERTY() TArray<TObjectPtr<USizeBox>> CardBoxes;
   UPROPERTY() TArray<TObjectPtr<UUmBoardCard>> Boards;
@@ -207,6 +274,33 @@ class UNMATCHED_API UUmScreenRoom : public UUmScreenBase {
   void BindCardPress(UUmHeroCard* Card, int32 Index);
   void Sound(const TCHAR* Bank) const;
   FBox2D BlockRectPx(const FUmRectSu& R) const;
+  // ---- SEL (UmScreenRoomSelect.cpp)
+  virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+  void SelBuild();
+  void SelSyncTiles();
+  void SelLayout();
+  void SelRefresh();
+  void SelShowcase();
+  void SelTileClick(int32 Index);
+  void SelTileHover(int32 Index, bool bOn);
+  void SelBoardClick(int32 Index);
+  void SelBoardHover(int32 Index, bool bOn);
+  int32 SelHeroIndexForSide(int32 Side) const;
+  FString SelFighterName(const FUmHeroCardModel& H) const;
+
+  bool bSel = false;
+  bool bForceHeroStep = false;
+  int32 HoverTile = INDEX_NONE;
+  int32 HoverBoard = INDEX_NONE;
+  FString PrevOwnHero;
+  FString PrevOppHero;
+  double FlashUntil[2] = {0.0, 0.0};
+  /** Review fix 1 (04-REVIEW-OPUS.md): the lock-in beat - both heroes stand facing each other with the VS for
+   *  1.2 s before step 2 opens. 0 = not both picked. */
+  double BothPickedSince = 0.0;
+  bool bPrevBoardStep = false;
+  FName SideDiscKey[2];
+  double PushUntil[2] = {0.0, 0.0};
 
   FUmRoomModel Model;
   EUmRoomPhase Phase = EUmRoomPhase::Room;

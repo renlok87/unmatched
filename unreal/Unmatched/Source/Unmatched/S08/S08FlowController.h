@@ -347,6 +347,8 @@ public:
   void JoinRoomByCode(const FString& Code);
   // ---- ROOM ----
   void SelectHero(const FString& HeroId);
+  /** SEL step 2 (docs/game-design/select-screens/02-DESIGN.md §2): the host changes the room board (selectBoard). */
+  void SelectBoard(const FString& BoardId);
   void ToggleReady();
   void StartGame();
   void LeaveRoom();

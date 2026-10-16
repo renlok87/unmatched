@@ -254,6 +254,7 @@ bool UUmScreenRoom::Initialize() {
   if (CountText) CountText->SetJustification(ETextJustify::Center);
   if (HeroGrid) HeroGrid->SetSlotPadding(FMargin(0.0f, 0.0f, 16.0f, 16.0f));
   BuildBoards();
+  SelBuild();  // SEL: the fighting-game look (default; -S08SelectLegacy keeps the panels above)
   if (Frame) Frame->SetBrush(FSlateNoResource());
   Refresh();
   return bFirst;
@@ -316,6 +317,7 @@ void UUmScreenRoom::ApplyModel(const FUmRoomModel& InModel) {
     }
   }
   SyncCards();
+  SelSyncTiles();
   Refresh();  // the texts first: the layout measures them
   Layout();
 }
@@ -475,6 +477,7 @@ void UUmScreenRoom::Layout() {
     CountPanel->SetVerticalAlignment(VAlign_Top);
     CountPanel->SetHorizontalAlignment(HAlign_Fill);
   }
+  SelLayout();
 }
 
 // ------------------------------------------------------------------------------------------------ refresh
@@ -557,6 +560,7 @@ void UUmScreenRoom::Refresh() {
   if (CountVeil) CountVeil->SetVisibility(bCount ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
   Vis(CountPanel, bCount);
   SetScreenState(FName(UmRoom::StateName(Phase, Model)));
+  SelRefresh();
 }
 
 // ------------------------------------------------------------------------------------------------ what it shows
@@ -608,7 +612,11 @@ FString UUmScreenRoom::ShotExtra() const {
                          Model.bVsAi ? TEXT("ai") : TEXT("1v1"), Model.OwnHeroId.IsEmpty() ? 0 : 1, Model.bOwnReady ? 1 : 0, Opp,
                          IsStartPrimary() ? TEXT("start") : IsReadyPrimary() ? TEXT("ready") : TEXT("none"), Model.bBusy ? 1 : 0,
                          Model.Heroes.Num(), Phase == EUmRoomPhase::Countdown ? TEXT("countdown") : Phase == EUmRoomPhase::Starting ? TEXT("starting") : TEXT("room"),
-                         Digit);
+                         Digit) +
+         (bSel ? FString::Printf(TEXT(" look=sel step=%s p1=%s p2=%s tiles=%d preview=%s showcase=%d"), IsBoardStep() ? TEXT("board") : TEXT("hero"),
+                                 NicheState(0), NicheState(1), GetTileCount(),
+                                 GetPreviewBoardId() == UmLobby::SarpedonId ? TEXT("sarpedon") : TEXT("marmoreal"), Showcase.IsValid() ? 1 : 0)
+               : FString(TEXT(" look=legacy")));
 }
 
 void UUmScreenRoom::CollectShotLines(TArray<FString>& Out) const {
@@ -653,6 +661,7 @@ void UUmScreenRoom::SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter, F
   Bind(LeaveButton, TEXT("screens.room.leave"));
   Bind(ReadyButton, TEXT("screens.room.ready"));
   Bind(StartButton, TEXT("screens.room.start"));
+  Bind(BackButton, TEXT("screens.sel.back.hero"));
   for (int32 I = 0; I < CardPool.Num(); ++I) BindCardPress(CardPool[I], I);
 }
 
@@ -683,6 +692,10 @@ void UUmScreenRoom::OnPressOutcome(FName Id, const FS09HudPressOutcome& Outcome)
     if (IsReadyEnabled() && Input.OnReady) Input.OnReady();
   } else if (S == TEXT("screens.room.start")) {
     if (IsStartEnabled() && Input.OnStart) Input.OnStart();
+  } else if (S == TEXT("screens.sel.back.hero")) {
+    Sound(TEXT("UI-BTN-CLICK"));
+    bForceHeroStep = true;
+    Layout();
   } else if (S.StartsWith(TEXT("screens.room.hero.pick."))) {
     const int32 I = FCString::Atoi(*S.RightChop(23));
     if (Model.Heroes.IsValidIndex(I)) {

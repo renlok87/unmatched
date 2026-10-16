@@ -16,12 +16,19 @@
 //   gate     'SHOT widget id=UI-SCR-LOADING impl=umg state=<connect|state|board|error> ... board=<marmoreal|sarpedon|other>
 //            heroes=<n> primary=<retry|none>' - never a name.
 //   rollback -S08SlateHud=loading: no loading screen (the match shows as before).
+//   SEL      (docs/game-design/select-screens/02-DESIGN.md §5, 2026-10-16) the VS look is the DEFAULT: two tall niches with
+//            the live 3D figures of AUmHeroShowcase (both play the lunge as the screen comes up), a bronze VS medallion,
+//            the names and nicks under the niches, the board name and the stage row (spinner) at the bottom; the error
+//            buttons under it. -S08SelectLegacy: the SC-19 panel above. Gate extra ' look=vs|legacy'.
 #pragma once
 
 #include "CoreMinimal.h"
 #include "../../S09/S09HudPress.h"
 #include "UmScreenBase.h"
 #include "UmScreenLoading.generated.h"
+
+class AUmHeroShowcase;
+class UImage;
 
 class UBorder;
 class UCanvasPanel;
@@ -36,6 +43,13 @@ struct UNMATCHED_API FUmLoadingSide {
   FString HeroName;  // '' = not known (the disc stays empty)
   FName HeroKey;
   FString Nick;
+  /** SEL: the host's seat is team P1 (gold), the other P2 (silver-blue). */
+  bool bHost = false;
+  /** SEL (review fix 2): the sidekick that comes with the hero - its round token and line on the VS. */
+  FString SidekickName;
+  FName SidekickKey;
+  int32 SidekickCount = 0;
+  int32 SidekickHp = 0;
 };
 
 namespace UmLoading {
@@ -110,6 +124,18 @@ class UNMATCHED_API UUmScreenLoading : public UUmScreenBase {
   UPROPERTY(BlueprintReadOnly, Category = "Um Screen", meta = (BindWidget)) TObjectPtr<UUmButton> RetryButton;
   UPROPERTY(BlueprintReadOnly, Category = "Um Screen", meta = (BindWidgetOptional)) TObjectPtr<UCanvasPanel> Content;
   UPROPERTY() TArray<TObjectPtr<UObject>> KeepAlive;
+  // ---- SEL VS look (created in code)
+  UPROPERTY() TObjectPtr<UBorder> VsNiche[2];
+  UPROPERTY() TObjectPtr<UImage> VsView[2];
+  UPROPERTY() TObjectPtr<UBorder> VsPlate[2];
+  UPROPERTY() TObjectPtr<UBorder> VsMedal;
+  UPROPERTY() TObjectPtr<UTextBlock> VsMark;
+  UPROPERTY() TObjectPtr<UBorder> VsStrip;
+  UPROPERTY() TObjectPtr<UBorder> VsSideDisc[2];
+  UPROPERTY() TObjectPtr<UTextBlock> VsSideText[2];
+  UPROPERTY() TArray<TObjectPtr<UObject>> VsKeepAlive;
+  TWeakObjectPtr<AUmHeroShowcase> Showcase;
+  bool IsVsLook() const { return bVs; }
 
  protected:
   virtual void BuildContent() override;
@@ -122,6 +148,13 @@ class UNMATCHED_API UUmScreenLoading : public UUmScreenBase {
   void Refresh();
   void RebuildDiscs();
   void OnPressOutcome(FName Id, const FS09HudPressOutcome& Outcome);
+  // ---- SEL (UmScreenLoadingSelect.cpp)
+  void VsBuild();
+  void VsLayout();
+  void VsTick();
+  bool bVs = false;
+  bool bVsPosed = false;
+  FName VsDiscKey[2];
 
   EUmLoadingStage Stage = EUmLoadingStage::Connect;
   bool bVeilOpaque = false;

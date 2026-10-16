@@ -113,7 +113,7 @@ const FS08HeroEntry* UmRmHero(const TArray<FS08HeroEntry>& Heroes, const FString
 }
 
 FString UmRmRoomKey(const FS08RoomState& R) {
-  FString K = R.Status + TEXT("|");
+  FString K = R.Status + TEXT("|") + R.BoardId + TEXT("|");  // SEL: a board change answers a board pick
   for (const FS08RoomPlayer& P : R.Players) K += FString::Printf(TEXT("%s:%s:%d;"), *P.UserId, *P.HeroId, P.bIsReady ? 1 : 0);
   return K;
 }
@@ -179,6 +179,12 @@ void AS08FlowGameMode::BuildUmRoom() {
       if (!Self || !Self->Flow.IsValid() || Self->Flow->GetRoom().Code.IsEmpty()) return;
       FPlatformApplicationMisc::ClipboardCopy(*Self->Flow->GetRoom().Code);
       FS08Trace::Write(TEXT("ROOM code copied"));  // never the code itself
+    };
+    In.OnBoard = [WeakThis, Busy](const FString& BoardId) {  // SEL step 2: the host changes the board
+      AS08FlowGameMode* Self = WeakThis.Get();
+      if (!Self || !Busy()) return;
+      FS08Trace::Write(FString::Printf(TEXT("ROOM board pick board=%s"), *BoardId));
+      Self->Flow->SelectBoard(BoardId);
     };
     In.OnMenu = [WeakThis]() {  // VS-7 S4 SC-24: PAUSE from the header
     if (AS08FlowGameMode* Self = WeakThis.Get(); !Self || !Self->OpenUmPause(TEXT("menu"))) FS08Trace::Write(TEXT("ROOM menu (no PAUSE)"));
@@ -504,6 +510,7 @@ void AS08FlowGameMode::TickUmRoom(bool bShowing) {
   M.BoardNames[1] = UmRmBoardName(Names, UmLobby::SarpedonId);
   M.Slots[0] = Slot(HostP, true);
   M.Slots[1] = Slot(OtherP, false);
+  M.OwnSeat = M.bHost ? 0 : 1;  // SEL: the viewer's slot is drawn in the left niche
   M.OwnHeroId = OwnHero;
   M.bOwnReady = MeP && MeP->bIsReady;
   M.bOppPresent = OppP != nullptr || bVsAi;
@@ -653,9 +660,16 @@ void AS08FlowGameMode::TickUmLoading(bool bShowing) {
     for (const FS08RoomPlayer& P : Room.Players) {
       FUmLoadingSide& S = Sides[P.UserId == Me ? 0 : 1];
       S.Nick = P.Username;
+      S.bHost = Room.IsHost(P.UserId);
       if (const FS08HeroEntry* H = UmRmHero(Flow->GetHeroes(), P.HeroId)) {
         S.HeroName = UmWorldLayer::DisplayNameOf(H->Name);
         S.HeroKey = FName(*UmPortrait::SlugOf(H->Name));
+        if (const FS08FlowController::FHeroDetails* D = Flow->FindHeroDetails(P.HeroId); D && D->Sidekicks.Num()) {
+          S.SidekickName = UmWorldLayer::DisplayNameOf(D->Sidekicks[0].Name);
+          S.SidekickKey = FName(*(S.HeroKey.ToString() + TEXT("/") + UmPortrait::SlugOf(D->Sidekicks[0].Name)));
+          S.SidekickCount = D->Sidekicks[0].Count;
+          S.SidekickHp = D->Sidekicks[0].Health;
+        }
       }
     }
     if (Room.Mode == TEXT("VS_AI") && Sides[1].Nick.IsEmpty()) Sides[1].Nick = UmLobby::AiBotName;
@@ -665,7 +679,8 @@ void AS08FlowGameMode::TickUmLoading(bool bShowing) {
     Flow->FetchGameSequence();
   }
   // ---- ВР-VS7-32: another map never shows through - opaque until the scene under is the room's board
-  L->SetVeilOpaque(!(BoardActor || Room.BoardId == UmLobby::MarmorealId));
+  // SEL: the VS look always stands on the opaque navy (the fighters own the screen, as the VS splash of a fighting game)
+  L->SetVeilOpaque(L->IsVsLook() || !(BoardActor || Room.BoardId == UmLobby::MarmorealId));
   // ---- the stages (each reads at least 600 ms, ВР-VS7-31)
   const bool bApplied = AppliedCount > R.AppliedBase;
   const bool bBoard = bApplied && BoardActor && BoardActor->GetFighters().Num() > 0;
@@ -677,7 +692,10 @@ void AS08FlowGameMode::TickUmLoading(bool bShowing) {
   } else if (R.LStage == EUmLoadingStage::State) {
     if (bHeld && bApplied) SetStage(EUmLoadingStage::Board);
   } else if (R.LStage == EUmLoadingStage::Board) {
-    if (bHeld && R.BoardReadyFrames >= 3) {
+    // SEL: the VS splash holds at least 2.6 s from its show (MK / Injustice hold the VS 2-3 s, 02-DESIGN.md §5)
+    constexpr double VsHoldMs = 2600.0;
+    const bool bVsHeld = !L->IsVsLook() || Now - R.LoadingShownMs >= VsHoldMs;
+    if (bHeld && bVsHeld && R.BoardReadyFrames >= 3) {
       R.bLoadingDone = true;
       FS08Trace::Write(FString::Printf(TEXT("LOADING done t=%.0f fighters=%d board=%s"), Now - R.LoadingShownMs,
                                        BoardActor ? BoardActor->GetFighters().Num() : 0, *Room.BoardId));

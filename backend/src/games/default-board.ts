@@ -8,3 +8,10 @@
  */
 export const DEFAULT_BOARD_ID = 'c121b47f8d6eb28daccb76d05';
 export const DEFAULT_BOARD_NAME = 'Marmoreal · original map';
+
+/**
+ * The real game maps a room may switch to (selectBoard, docs/game-design/select-screens/02-DESIGN.md §2): only the
+ * original maps of AGENTS.md «Board scenes and heroes» — Marmoreal and Sarpedon; synthetic boards never.
+ */
+export const SARPEDON_BOARD_ID = 'c7fa64a26c29a0835f2383e63';
+export const REAL_BOARD_IDS: readonly string[] = [DEFAULT_BOARD_ID, SARPEDON_BOARD_ID];

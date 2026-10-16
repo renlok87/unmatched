@@ -159,6 +159,7 @@ bool UUmScreenLoading::Initialize() {
   if (Spinner) Spinner->SetSizeSu(48.0f);
   Icon(ErrorIcon, TEXT("resource-connection-lost"), 48.0f);
   if (Frame) Frame->SetBrush(FSlateNoResource());
+  VsBuild();  // SEL: the VS look (default; -S08SelectLegacy keeps the SC-19 panel)
   Refresh();
   return bFirst;
 }
@@ -286,6 +287,7 @@ void UUmScreenLoading::Layout() {
   const float Bx = X0 + 0.5f * (UmLoading::PanelWSu - (2.0f * BtnW + 16.0f));
   P(LobbyButton, Bx, BtnY, BtnW, 48.0f);
   P(RetryButton, Bx + BtnW + 16.0f, BtnY, BtnW, 48.0f);
+  VsLayout();
 }
 
 void UUmScreenLoading::Refresh() {
@@ -343,7 +345,8 @@ FString UUmScreenLoading::ShotExtra() const {
   const TCHAR* Board = BoardId == UmLobby::SarpedonId ? TEXT("sarpedon") : BoardId == UmLobby::MarmorealId ? TEXT("marmoreal") : TEXT("other");
   const int32 Heroes = (Sides[0].HeroName.IsEmpty() ? 0 : 1) + (Sides[1].HeroName.IsEmpty() ? 0 : 1);
   return FString::Printf(TEXT(" board=%s heroes=%d primary=%s veil=%s"), Board, Heroes, IsRetryPrimary() ? TEXT("retry") : TEXT("none"),
-                         bVeilOpaque ? TEXT("opaque") : TEXT("0.60"));
+                         bVeilOpaque ? TEXT("opaque") : TEXT("0.60")) +
+         FString(bVs ? TEXT(" look=vs") : TEXT(" look=legacy"));
 }
 
 void UUmScreenLoading::SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter, FInput InInput) {
@@ -379,4 +382,5 @@ void UUmScreenLoading::SimulatePress(FName Id) {
 void UUmScreenLoading::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
   if (Spinner && IsShown()) Spinner->SetWaiting(Stage != EUmLoadingStage::Error, FPlatformTime::Seconds() * 1000.0, TEXT("loading"));
+  VsTick();
 }

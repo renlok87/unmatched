@@ -22,12 +22,15 @@
 #include "Internationalization/Internationalization.h"
 #include "Internationalization/TextLocalizationManager.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/ScopeExit.h"
 #include "UmBoardCard.h"
 #include "UmButton.h"
 #include "UmHeroCard.h"
 #include "UmRoomSlot.h"
 #include "UmScreenLoading.h"
 #include "UmScreenRoom.h"
+#include "UmHeroShowcase.h"
+#include "UmSelectTile.h"
 
 namespace UmRoomTest {
 struct FWorld {
@@ -180,6 +183,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmScreensRoomTreeTest, "Unmatched.S08.Hud.Scre
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FUmScreensRoomTreeTest::RunTest(const FString& Parameters) {
   FRu Ru;
+  // the SC-14...SC-18 panels: the rollback look (-S08SelectLegacy); the select look has its own test below
+  UmShowcase::SetEnabledOverrideForTest(false);
+  ON_SCOPE_EXIT { UmShowcase::ResetEnabledOverrideForTest(); };
   FWorld W(TEXT("UmRoomTree"));
   if (!TestNotNull(TEXT("world"), W.World)) return false;
   for (int32 Pass = 0; Pass < 2; ++Pass) {
@@ -410,3 +416,75 @@ bool FUmScreensLoadingTreeTest::RunTest(const FString& Parameters) {
 }
 
 #endif  // WITH_AUTOMATION_TESTS
+
+
+// ------------------------------------------------------------------------------------------------ SEL (select look)
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmScreensRoomSelectTest, "Unmatched.S08.Hud.Screens.Room.Select",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FUmScreensRoomSelectTest::RunTest(const FString& Parameters) {
+  FRu Ru;
+  UmShowcase::SetEnabledOverrideForTest(true);
+  ON_SCOPE_EXIT { UmShowcase::ResetEnabledOverrideForTest(); };
+  FWorld W(TEXT("UmRoomSelect"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  UUmScreenRoom* R = CreateWidget<UUmScreenRoom>(W.World, UUmScreenRoom::StaticClass());
+  if (!TestNotNull(TEXT("room"), R)) return false;
+  FString Picked, Board;
+  UUmScreenRoom::FInput In;
+  In.OnPick = [&](const FString& Id) { Picked = Id; };
+  In.OnBoard = [&](const FString& Id) { Board = Id; };
+  R->SetInput(MakeShared<FS09HudPressArbiter>(), MoveTemp(In));
+  R->ApplyCanvas(FVector2D(1920.0, 1080.0), false, 1.0f);
+  R->PlayShow();
+  TestTrue(TEXT("the select look is the default"), R->IsSelLook());
+  // ---- waiting: both niches empty, the roster strip = 2 heroes + «Случайный», hero step
+  FUmRoomModel M = Base(true);
+  M.OwnSeat = 0;
+  R->ApplyModel(M);
+  TestEqual(TEXT("tiles: heroes + random"), R->GetTileCount(), 3);
+  TestEqual(TEXT("own niche empty"), FString(R->NicheState(0)), FString(TEXT("empty")));
+  TestEqual(TEXT("opp niche empty"), FString(R->NicheState(1)), FString(TEXT("empty")));
+  TestFalse(TEXT("hero step"), R->IsBoardStep());
+  if (UUmSelectTile* T = R->GetTile(2)) TestTrue(TEXT("random tile has no image"), T->GetModel().Image == nullptr);
+  // ---- a tile click picks the hero (the server call)
+  if (UUmSelectTile* T = R->GetTile(1); TestNotNull(TEXT("Medusa tile"), T) && T->OnClick) T->OnClick();
+  TestEqual(TEXT("tile click sends Medusa"), Picked, FString(TEXT("h-medusa")));
+  // ---- own pick answered: locked, the badge 1 on the tile, still the hero step (no opponent)
+  M.OwnHeroId = TEXT("h-medusa");
+  M.Heroes[1].State = EUmHeroCardState::Picked;
+  M.Slots[0] = Seat(TEXT("ProGamer"), true, false, TEXT("Medusa"));
+  M.DeckCount = 30;
+  R->ApplyModel(M);
+  TestEqual(TEXT("own niche locked"), FString(R->NicheState(0)), FString(TEXT("locked")));
+  if (UUmSelectTile* T = R->GetTile(1)) {
+    TestTrue(TEXT("own badge"), T->GetModel().bBadge && T->GetModel().BadgeDigit == 1);
+    TestEqual(TEXT("own pick state"), (int32)T->GetModel().State, (int32)EUmTileState::Picked);
+  }
+  TestFalse(TEXT("no opponent hero: hero step"), R->IsBoardStep());
+  // ---- the opponent picks King Arthur: its tile is taken (GD-016), badge 2; the lock beat holds the hero step
+  M.bOppPresent = true;
+  M.bOppHero = true;
+  M.Slots[1] = Seat(TEXT("Veteran"), false, false, TEXT("King Arthur"));
+  R->ApplyModel(M);
+  TestEqual(TEXT("opp niche locked"), FString(R->NicheState(1)), FString(TEXT("locked")));
+  if (UUmSelectTile* T = R->GetTile(0)) {
+    TestEqual(TEXT("opp pick taken"), (int32)T->GetModel().State, (int32)EUmTileState::Taken);
+    TestTrue(TEXT("opp badge 2"), T->GetModel().bBadge && T->GetModel().BadgeDigit == 2);
+  }
+  TestFalse(TEXT("the lock-in beat: still the hero step right after both picked"), R->IsBoardStep());
+  // ---- step 2: the host's board tile asks selectBoard (Sarpedon); the room board is marked
+  if (UUmSelectTile* B = R->GetBoardTile(1); TestNotNull(TEXT("Sarpedon tile"), B) && B->OnClick) B->OnClick();
+  TestEqual(TEXT("board tile sends Sarpedon"), Board, FString(UmLobby::SarpedonId));
+  if (UUmSelectTile* B = R->GetBoardTile(0)) TestTrue(TEXT("room board selected"), B->GetModel().bSelected);
+  // ---- a guest never sends a board
+  Board.Reset();
+  M.bHost = false;
+  M.OwnSeat = 1;
+  R->ApplyModel(M);
+  if (UUmSelectTile* B = R->GetBoardTile(1); B && B->OnClick) B->OnClick();
+  TestTrue(TEXT("guest board click ignored"), Board.IsEmpty());
+  // ---- the gate line names the look
+  TestTrue(TEXT("gate look=sel"), R->ShotExtra().Contains(TEXT(" look=sel step=hero")));
+  return true;
+}
