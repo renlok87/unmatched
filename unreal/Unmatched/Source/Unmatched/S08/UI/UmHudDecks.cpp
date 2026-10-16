@@ -278,8 +278,8 @@ void UUmHudDecks::Relayout() {
           RowW->AddChild(Edge);
         }
         if (!Edge) continue;
-        const bool bOutline = K == 4;  // the empty place
-        Edge->SetBrush(bOutline ? FSlateRoundedBoxBrush(FLinearColor(0.0f, 0.0f, 0.0f, 0.25f), 6.0f, FLinearColor(0.72f, 0.58f, 0.38f, 0.55f), 1.5f)
+        const bool bOutline = K == 4;  // the empty place: a recess in the table, no light line (sixth blind review)
+        Edge->SetBrush(bOutline ? FSlateRoundedBoxBrush(FLinearColor(0.0f, 0.0f, 0.0f, 0.45f), 6.0f, FLinearColor(0.30f, 0.24f, 0.16f, 0.6f), 1.0f)
                                 : FSlateRoundedBoxBrush(FLinearColor(0.07f, 0.065f, 0.06f, 1.0f), 6.0f, FLinearColor(0.55f, 0.45f, 0.30f, 0.9f), 1.0f));
         const FVector2D Off = bOutline ? FVector2D::ZeroVector : FVector2D(2.5 * K, 2.5 * K);
         UmDecksPlace(Edge, CardPos + Off, CardSize, bOutline ? 2 : 3 - K);
