@@ -1,0 +1,77 @@
+{
+ "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+ "asset_id": "ASSET-KING-ARTHUR-001",
+ "date": "2026-10-16",
+ "performed_by": "Claude (Windows-MCP в Chrome пользователя; расширения Claude in Chrome подключены только на macOS)",
+ "task_id": "4f059621-5510-44e9-9ab9-42e8bd649060",
+ "generation": {
+  "slot_mapping": {
+   "front": "king-arthur-front.png",
+   "left": "king-arthur-side.png",
+   "right": null,
+   "back": "king-arthur-back.png"
+  },
+  "slot_consistency": "side — левый вид, слот LEFT: согласовано (tripo3d-stages.md §5.5)",
+  "attempt": "1 из 3 разрешённых"
+ },
+ "studio_settings_before": "HD Model, multi-view, Generate in Parts вкл. (Balanced), 8K Texture выкл., Private, H3.1, Ultra Mesh 2M, Texture выкл., Triangle — форма уже стояла на H2-настройках; не менялась",
+ "operations": [
+  {
+   "op": "generate",
+   "quoted": 60,
+   "balance_before": 20350,
+   "balance_after": 20290
+  },
+  {
+   "op": "texture",
+   "quoted": 30,
+   "balance_before": 20290,
+   "balance_after": 20260
+  },
+  {
+   "op": "pbr",
+   "quoted": 5,
+   "balance_before": 20260,
+   "balance_after": 20255
+  }
+ ],
+ "exports": [
+  {
+   "file": "king-arthur-h2-tripo-4f059621-parts17.glb",
+   "sha256": "c126b28bcc3d5994c6946b1f8bc23771d300eb2f3a1fbe13d2ee2488e515832e",
+   "bytes": 47697832,
+   "meshes": 17,
+   "triangles": 1980812,
+   "materials": 1,
+   "images": 0,
+   "skins": 0,
+   "container": "OK"
+  },
+  {
+   "file": "king-arthur-h2-tripo-4f059621-tex8k-pbr.glb",
+   "sha256": "b0c7ec40f3b5b590d69f0012b7c336e0dbf0d8bd391cf4c5b363373475862d3a",
+   "bytes": 77768412,
+   "meshes": 17,
+   "triangles": 1980812,
+   "materials": 17,
+   "images": 51,
+   "skins": 0,
+   "container": "OK"
+  }
+ ],
+ "credits": {
+  "this_hero_total_observed": 95,
+  "ledger": "docs/game-design/visual/credits-ledger.json",
+  "visual_card": "AN-155"
+ },
+ "findings": [
+  "Превью preview/ortho_{front,left,back,right}.png и preview-parts/: одна фигура, одна подставка, ОДИН меч в правой руке, одно лицо (профили слева и справа — один нос и борода), стопы вперёд, плащ сзади цельный. Фантомов c24eeff0 (второй меч, вторая опущенная рука, наколенник и медальон сзади, второй профиль) нет.",
+  "Части: 17 (tripo_part_0…16); роли подтверждает разведка этапа 3.",
+  "Понадобилась одна генерация из трёх разрешённых."
+ ],
+ "claims": {
+  "art_accepted": false,
+  "game_ready": false,
+  "budgets_declared": false
+ }
+}

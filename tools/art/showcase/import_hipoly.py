@@ -7,9 +7,10 @@ import os
 import unreal
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+# 2026-10-16: King Arthur from the regenerated H2 4f059621 (side slot LEFT, no phantoms), his own Tripo materials; Medusa
+# shows the game look (import_hipoly_lookdev.py) and is not imported here
 SOURCES = {
-    "KingArthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr-clean.glb",
-    "Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr-clean.glb",
+    "KingArthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/source/king-arthur-h2-tripo-4f059621-tex8k-pbr-clean.glb",
 }
 
 
@@ -52,7 +53,7 @@ def make_pipeline():
 
 def import_one(key, rel):
     src = os.path.join(REPO, rel)
-    dest = "/Game/PipelineCandidates/%s/HP" % key
+    dest = "/Game/PipelineCandidates/%s/HP2" % key
     if not os.path.isfile(src):
         log("missing %s (run tools/art/showcase/clean_hipoly.py first)" % src)
         return

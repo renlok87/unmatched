@@ -439,7 +439,7 @@ bool FUmScreensRoomSelectTest::RunTest(const FString& Parameters) {
   R->PlayShow();
   TestTrue(TEXT("the select look is the default"), R->IsSelLook());
   // the showcase sources: the cleaned Tripo high-poly for the two heroes with one, the v2 figure otherwise
-  TestTrue(TEXT("Arthur keeps the game figure"), UmShowcase::HiPolyPath(TEXT("KingArthur")).IsEmpty());
+  TestTrue(TEXT("Arthur regenerated high-poly"), UmShowcase::HiPolyPath(TEXT("KingArthur")).Contains(TEXT("/HP2/king-arthur-h2-tripo-4f059621")));
   TestTrue(TEXT("Medusa high-poly path"), UmShowcase::HiPolyPath(TEXT("Medusa")).Contains(TEXT("/HPLD/SM_Medusa_HP_Showcase")));
   TestTrue(TEXT("no high-poly for Merlin"), UmShowcase::HiPolyPath(TEXT("Merlin")).IsEmpty());
   TestTrue(TEXT("high-poly is the default look"), UmShowcase::HiPolyRequested());

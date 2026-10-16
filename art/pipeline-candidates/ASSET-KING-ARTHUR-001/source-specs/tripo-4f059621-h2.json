@@ -1,0 +1,115 @@
+{
+ "schema": "unmatched.tripo-pipeline.source-spec/1",
+ "source_id": "tripo-4f059621-h2",
+ "asset_id": "ASSET-KING-ARTHUR-001",
+ "service": "tripo-studio",
+ "task_id": "4f059621-5510-44e9-9ab9-42e8bd649060",
+ "parent_task_id": null,
+ "task_url": "https://studio.tripo3d.ai/workspace/generate/4f059621-5510-44e9-9ab9-42e8bd649060",
+ "date": "2026-10-16",
+ "iteration": "H2 regen (side slot LEFT)",
+ "model_version": "H3.1",
+ "generation": {
+  "mode": "multi-view",
+  "views": {
+   "front": {
+    "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+    "sha256": "26399f6fa7a52178b022902a871be689c91570c75b5d8e7e313b13c67227d2c5"
+   },
+   "left": {
+    "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+    "sha256": "3bb174aa58df24dea8ac9589562cc1cc376e58b6fed5fcb2c56494bd0a5bbe7b"
+   },
+   "right": null,
+   "back": {
+    "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+    "sha256": "6e00c1c20ae82ca771a5c1ca22d5afc7234a9955fee892d4dba7feac3c64de55"
+   }
+  },
+  "input_manifest": null,
+  "concept_prompts": "art/imagegen/hero-quality-v1/king-arthur/prompts.md",
+  "slot_note": "Боковой концепт — левый вид (лицо влево по кадру), подан в слот LEFT: согласовано. Прежний H2 c24eeff0 получил этот же вид в RIGHT и дал фантомы (второй меч, вторая рука, второй профиль лица) — те же входы, исправлен только слот (SHARED-INPUTS, tripo3d-stages.md §6 п.3).",
+  "settings": {
+   "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+   "generate_parts": true,
+   "parts_mode": "Баланс (Balanced)",
+   "ultra_mesh_quality": true,
+   "polygon_count": 2000000,
+   "topology": "triangle",
+   "texture_8k": true,
+   "remove_lighting": true,
+   "pbr": true,
+   "privacy": "private"
+  }
+ },
+ "operations": [
+  {
+   "op": "generate",
+   "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, треугольники, без текстуры",
+   "history_time": "2026-10-16",
+   "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/reports/tripo-run.json",
+   "credits": {
+    "unit": "studio-credits",
+    "quoted": 60,
+    "observed_debit": 60,
+    "balance_before": 20350,
+    "balance_after": 20290
+   }
+  },
+  {
+   "op": "texture",
+   "mode": "Генератор текстур 8K, удалить освещение, на high-poly по частям",
+   "history_time": "2026-10-16",
+   "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/reports/tripo-run.json",
+   "credits": {
+    "unit": "studio-credits",
+    "quoted": 30,
+    "observed_debit": 30,
+    "balance_before": 20290,
+    "balance_after": 20260
+   }
+  },
+  {
+   "op": "pbr",
+   "mode": "Генератор PBR после 8K",
+   "history_time": "2026-10-16",
+   "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/reports/tripo-run.json",
+   "credits": {
+    "unit": "studio-credits",
+    "quoted": 5,
+    "observed_debit": 5,
+    "balance_before": 20260,
+    "balance_after": 20255
+   }
+  }
+ ],
+ "files": [
+  {
+   "role": "h2-parts-glb",
+   "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/source/king-arthur-h2-tripo-4f059621-parts17.glb",
+   "expected_sha256": "c126b28bcc3d5994c6946b1f8bc23771d300eb2f3a1fbe13d2ee2488e515832e",
+   "expected_bytes": 47697832,
+   "produced_by": "generate",
+   "origin": "Studio GLB export, high-poly по частям без текстуры, Pack UV выкл., unmodified",
+   "in_git": false
+  },
+  {
+   "role": "h2-tex8k-pbr-glb",
+   "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/source/king-arthur-h2-tripo-4f059621-tex8k-pbr.glb",
+   "expected_sha256": "b0c7ec40f3b5b590d69f0012b7c336e0dbf0d8bd391cf4c5b363373475862d3a",
+   "expected_bytes": 77768412,
+   "produced_by": "pbr",
+   "origin": "Studio GLB export после 8K + PBR, текстура 8k, Pack UV выкл., unmodified",
+   "in_git": false
+  }
+ ],
+ "git_policy": "сырые GLB не в git (.gitignore ассета: *-tripo/source/*.glb), закреплены sha256 и bytes",
+ "expectations": {
+  "mesh_count": 17,
+  "triangles": 1980812,
+  "skins": 0
+ },
+ "evidence": [
+  "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/reports/tripo-run.json"
+ ]
+}

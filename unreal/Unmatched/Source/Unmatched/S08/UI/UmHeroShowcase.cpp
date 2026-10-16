@@ -64,10 +64,12 @@ bool HiPolyRequested() { return !FParse::Param(FCommandLine::Get(), V2FlagName);
 FString HiPolyPath(const TCHAR* Key) {
   // the H2 Tripo sources of the in-game H2LD figures, repaired and baked with the game look (06-HIPOLY-LOOKDEV.md,
   // tools/art/showcase/hp_lookdev_bake.py + import_hipoly_lookdev.py)
-  // King Arthur keeps the game figure: his Tripo source was generated with the side view in the wrong slot (phantoms,
-  // a second face profile fused into the head; docs/art-pipeline/king-arthur-h2-report.md) and the head cannot be
-  // patched (06-HIPOLY-LOOKDEV.md) - a regenerated source replaces it
+  // King Arthur: the regenerated H2 4f059621 (side in the LEFT slot, no phantoms; 2026-10-16) with its own Tripo 8K
+  // materials - no game low-poly shares its frame, so the game maps are not baked onto it (06-HIPOLY-LOOKDEV.md)
   const FString K(Key);
+  if (K == TEXT("KingArthur")) {
+    return TEXT("/Game/PipelineCandidates/KingArthur/HP2/king-arthur-h2-tripo-4f059621-tex8k-pbr-clean.king-arthur-h2-tripo-4f059621-tex8k-pbr-clean");
+  }
   if (K != TEXT("Medusa")) return FString();
   return FString::Printf(TEXT("/Game/PipelineCandidates/%s/HPLD/SM_%s_HP_Showcase.SM_%s_HP_Showcase"), Key, Key, Key);
 }
@@ -278,8 +280,10 @@ void AUmHeroShowcase::SetHero(int32 Side, const FString& FighterName, ES08TeamSl
     FS08Trace::Write(FString::Printf(TEXT("SHOWCASE side=%d hipoly=%s path=%s"), Side, Hi ? TEXT("1") : TEXT("missing"), *HiPath));
   }
   HiPoly[Side]->SetStaticMesh(Hi);
-  if (Hi) {
-    // the game material per Tripo part, in the side's team look (slot names MAT_tripo_part_N)
+  HiPoly[Side]->EmptyOverrideMaterials();  // overrides survive SetStaticMesh: a previous hero's instances would stay
+  if (Hi && Hi->GetPathName().Contains(TEXT("/HPLD/"))) {
+    // the game material per Tripo part, in the side's team look (slot names MAT_tripo_part_N) - only for the HPLD bake;
+    // a source with its own Tripo materials (Arthur HP2) keeps them (the old HPLD instances belong to another mesh)
     int32 Set = 0;
     for (int32 I = 0; I < Hi->GetStaticMaterials().Num(); ++I) {
       const FString Slot = Hi->GetStaticMaterials()[I].MaterialSlotName.ToString();

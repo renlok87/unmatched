@@ -16,8 +16,10 @@ import numpy as np
 
 REPO = Path(__file__).resolve().parents[3]
 JOBS = {
-    "KingArthur": ("art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
-                   {4, 11, 13, 14, 16, 18, 19, 20}),
+    # 2026-10-16: the regenerated H2 4f059621 (side in the LEFT slot) has no phantoms - only its Tripo base goes (the
+    # base part is found by its bounds: the widest part with its top under 12 % of the figure height)
+    "KingArthur": ("art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/source/king-arthur-h2-tripo-4f059621-tex8k-pbr.glb",
+                   "auto-base"),
     "Medusa": ("art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb", {2}),
 }
 
@@ -41,6 +43,14 @@ def clean(key, rel, drop):
     j = json.loads(blob[20:20 + jlen])
     bin_chunk = blob[20 + jlen:]
     bin0 = 20 + jlen + 8
+    if drop == "auto-base":
+        boxes = []
+        for i, m in enumerate(j["meshes"]):
+            pts = positions(blob, j, bin0, m)
+            boxes.append((i, float(pts[:, 1].max()), float(np.ptp(pts[:, 0]) * np.ptp(pts[:, 2]))))
+        top = max(b[1] for b in boxes)
+        low = [b for b in boxes if b[1] < 0.12 * top]
+        drop = {max(low, key=lambda b: b[2])[0]} if low else set()
     drop_nodes = {i for i, n in enumerate(j["nodes"]) if n.get("mesh") is not None and n["mesh"] in drop}
     for n in j["nodes"]:
         if "children" in n:
