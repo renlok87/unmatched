@@ -41,21 +41,22 @@ FGeom Geometry(bool bClassS, EUmPanelSide Side, bool bTable) {
   FGeom G;
   const bool bOpp = Side == EUmPanelSide::Opp;
   if (bTable && !bClassS) {
-    // HUD "Стол" L 380 x 136: the portrait 104 as before; the name over the HP dial (64) at the text column, the
-    // sidekicks right of the dial, the tracker in the top corner away from the portrait
+    // HUD "Стол" L 380 x 136 (blind review 2026-10-16: the art strip and the bare HP number read as unfinished): the round
+    // portrait 104, the name, «♥ 16/16» under it and the sidekicks under that in the text column; the tracker in the top
+    // corner away from the portrait
     G.Size = FVector2D(380.0, 136.0);
     G.RingSu = 104.0f;
     G.DiscSu = 80.0f;
     G.RingPos = FVector2D(bOpp ? 272.0 : 4.0, 16.0);
     G.TextX = bOpp ? 252.0f : 128.0f;
     G.NameTop = 9.0f;
-    G.StatusTop = 40.0f;
+    G.StatusTop = 36.0f;
     G.HpTop = 50.0f;
     G.TrackerSu = 32.0f;
     G.TrackerX = bOpp ? 14.0f : 366.0f;
     G.TrackerTop = 12.0f;
     G.bSidekickRow = true;
-    G.SidekickTop = 60.0f;
+    G.SidekickTop = 86.0f;
     return G;
   }
   if (!bClassS) {
@@ -371,10 +372,7 @@ void UUmHudPlayerPanel::ApplyGeometry() {
   UmPanelPlace(StatusRow, FVector2D(G.TextX, G.StatusTop), bOpp);
   UmPanelPlace(HpRow, FVector2D(G.TextX, G.HpTop), bOpp);
   UmPanelPlace(TrackerRow, FVector2D(G.TrackerX, G.TrackerTop), !bOpp);
-  const float SideX = bTable && !bClassS
-                          ? (bOpp ? G.TextX - UmHudPanel::DialSuL - 14.0f : G.TextX + UmHudPanel::DialSuL + 14.0f)
-                          : G.TextX;
-  UmPanelPlace(SidekickRow, FVector2D(SideX, G.SidekickTop), bOpp);
+  UmPanelPlace(SidekickRow, FVector2D(G.TextX, G.SidekickTop), bOpp);
   AppliedRingSu = G.RingSu;
   ApplyPortraitFrame();
   ApplyTableDial();
@@ -428,12 +426,15 @@ void UUmHudPlayerPanel::ApplyTableArt() {
   // HUD "Стол" (03 §3.1, R3 P-2 / P-5): the card shows the hero's art on its whole height (the round portrait stays for
   // its tracker / heart cues, transparent), a band in the hero's own colour (backend Hero.color) and, on the side that
   // acts, a glow round the card in the team colour instead of the ring at the portrait
+  // blind review 2026-10-16: the art strip read as a half-loaded picture - the round portrait is back, only the turn
+  // glow of the card stays
   const bool bShow = bTable && Canvas && WidgetTree && Portrait;
-  if (Portrait) Portrait->SetRenderOpacity(bShow ? 0.0f : 1.0f);
+  if (Portrait) Portrait->SetRenderOpacity(1.0f);
+  for (UImage* W : {HeroArt.Get(), HeroBand.Get()}) {
+    if (W) W->SetVisibility(ESlateVisibility::Collapsed);
+  }
   if (!bShow) {
-    for (UImage* W : {HeroArt.Get(), HeroBand.Get(), TurnGlow.Get()}) {
-      if (W) W->SetVisibility(ESlateVisibility::Collapsed);
-    }
+    if (TurnGlow) TurnGlow->SetVisibility(ESlateVisibility::Collapsed);
     return;
   }
   const bool bOpp = Side == EUmPanelSide::Opp;
@@ -451,27 +452,8 @@ void UUmHudPlayerPanel::ApplyTableArt() {
     }
     W->SetVisibility(ESlateVisibility::HitTestInvisible);
   };
-  Ensure(HeroArt, TEXT("HeroArtTable"));
-  Ensure(HeroBand, TEXT("HeroBandTable"));
   Ensure(TurnGlow, TEXT("TurnGlowTable"));
-  if (UTexture2D* Tex = const_cast<UTexture2D*>(Portrait->GetAvatarTexture())) {
-    FSlateBrush Art;
-    Art.SetResourceObject(Tex);
-    Art.ImageSize = FVector2D(ArtW, H);
-    Art.DrawAs = ESlateBrushDrawType::RoundedBox;
-    Art.OutlineSettings = FSlateBrushOutlineSettings(FVector4(bOpp ? 0.0f : 9.0f, bOpp ? 9.0f : 0.0f, bOpp ? 9.0f : 0.0f,
-                                                              bOpp ? 0.0f : 9.0f));
-    HeroArt->SetBrush(Art);
-  } else {
-    HeroArt->SetVisibility(ESlateVisibility::Collapsed);
-  }
-  FColor HeroColor;
-  const FString Key = Model.HeroName.ToLower().Replace(TEXT(" "), TEXT("-"));
-  const FLinearColor Band = UmHeroColors::Find(Key, HeroColor) ? FLinearColor::FromSRGBColor(HeroColor)
-                                                               : UUmHudTheme::Get().Color(bOpp ? TEXT("team.p2") : TEXT("team.p1"));
-  HeroBand->SetBrush(FSlateColorBrush(Band));
-  UmPanelPlace(HeroArt, FVector2D(ArtX, Inset), false, FVector2D(ArtW, H));
-  UmPanelPlace(HeroBand, FVector2D(BandX, Inset), false, FVector2D(BandW, H));
+  (void)Inset; (void)H; (void)ArtX; (void)BandX;
   // the turn glow: the side that acts (own turn / their turn / the AI thinking) - the team colour round the card
   const bool bActs = Model.State == EUmPanelState::Own || Model.State == EUmPanelState::Opp || Model.State == EUmPanelState::Ai;
   const FLinearColor Team = UUmHudTheme::Get().Color(bOpp ? TEXT("team.p2") : TEXT("team.p1"));
@@ -484,7 +466,8 @@ void UUmHudPlayerPanel::ApplyTableDial() {
   // HUD "Стол" (03 §3.1): the health dial of the box - one number in the cream window, no heart, no «/max»; the heart
   // widget keeps living for the portrait's AB-6 / AB-8 cues, the HP row is only transparent
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  const bool bShow = bTable && Theme.HasTextureSkin(TEXT("hud.table.dial")) && Canvas && WidgetTree;
+  // blind review 2026-10-16: a bare «16» in a disc did not read as health - the table keeps the «♥ 16/16» row
+  const bool bShow = false && bTable && Theme.HasTextureSkin(TEXT("hud.table.dial")) && Canvas && WidgetTree;
   if (HpRow) HpRow->SetRenderOpacity(bShow ? 0.0f : 1.0f);
   if (!bShow) {
     if (HpDial) HpDial->SetVisibility(ESlateVisibility::Collapsed);

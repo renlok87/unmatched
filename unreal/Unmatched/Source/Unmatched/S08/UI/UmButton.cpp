@@ -315,7 +315,7 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
                      Model.HeightSu == InModel.HeightSu && Model.MinWidthSu == InModel.MinWidthSu &&
                      Model.bFlat == InModel.bFlat && Model.PadXSu == InModel.PadXSu &&
                      Model.bDiscPrimary == InModel.bDiscPrimary && Model.DiscSu == InModel.DiscSu &&
-                     Model.bOwnerTooltip == InModel.bOwnerTooltip;
+                     Model.bOwnerTooltip == InModel.bOwnerTooltip && Model.bTableSlip == InModel.bTableSlip;
   if (bSame) return;
   const bool bWasSelected = bHasModel && Model.bSelected;
   Model = InModel;

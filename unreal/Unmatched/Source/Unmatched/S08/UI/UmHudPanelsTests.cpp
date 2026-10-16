@@ -690,13 +690,11 @@ bool FUmHudPlayerPanelTableTest::RunTest(const FString&) {
   P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Own));
   TestTrue(TEXT("card: ring at (4, 16)"), PosOf(P->Portrait).Equals(FVector2D(4.0, 16.0)));
   TestEqual(TEXT("card: no «ВАШ ХОД» word (the card's glow says it)"), P->StatusText->GetText().ToString(), FString());
-  TestEqual(TEXT("card: the heart row transparent"), P->HpRow->GetRenderOpacity(), 0.0f);
-  if (UUmHudTheme::Get().HasTextureSkin(TEXT("hud.table.dial"))) {
-    UTextBlock* Dial = Cast<UTextBlock>(P->WidgetTree->FindWidget(FName(TEXT("HpDialTextTable"))));
-    TestTrue(TEXT("card: the HP number on the dial"), Dial && Dial->GetText().ToString() == TEXT("14"));
-  } else {
-    AddWarning(TEXT("hud.table.dial not imported: the dial is not checked"));
-  }
+  // blind review 2026-10-16: the bare dial number did not read as health - the card keeps «♥ 14/16», no dial
+  TestEqual(TEXT("card: the heart row shown"), P->HpRow->GetRenderOpacity(), 1.0f);
+  TestTrue(TEXT("card: «14/16» in the heart row"), P->HpText->GetText().ToString().Contains(TEXT("14/16")));
+  UWidget* Dial = P->WidgetTree->FindWidget(FName(TEXT("HpDialTextTable")));
+  TestTrue(TEXT("card: no dial"), !Dial || !Dial->IsVisible());
   P->ApplyModel(Model(TEXT("Medusa"), 14, 16, EUmPanelState::Ai));
   TestFalse(TEXT("card: «ИИ ДУМАЕТ» kept"), P->StatusText->GetText().IsEmpty());
   return true;

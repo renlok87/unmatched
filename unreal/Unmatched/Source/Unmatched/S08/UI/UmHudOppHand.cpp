@@ -250,6 +250,10 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
   if (Caption) {
     const FText Text = UmHudOppHand::Caption(Model);
     Caption->SetText(Text);
+    if (S08ArtLook::HudTable()) {  // blind review 2026-10-16: the caption on the bare scene needs a shadow to read
+      Caption->SetShadowOffset(FVector2D(1.0, 1.5));
+      Caption->SetShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.9f));
+    }
     Caption->SetToolTipText(Text);
     const FName Token = UmTextFit::PickToken(Text, Model.WidthSu - 2.0f * UmHudOppHand::PadSu,
                                              {FName(TEXT("type.caption")), FName(TEXT("type.tag"))});

@@ -255,7 +255,7 @@ void UUmHudDecks::Relayout() {
       B.Variant = EUmButtonVariant::Normal;
       B.HeightSu = ChipH;
       B.MinWidthSu = W;
-      B.bTableSlip = S08ArtLook::HudTable();  // HUD "Стол": the count printed on a paper slip of the box
+      B.bTableSlip = false;  // blind review 2026-10-16: the cream slips read as web buttons - the HUD's own dark chip
       Button->ApplyModel(B);
       UmDecksPlace(Button, P, FVector2D(W, ChipH), 0);
     }
@@ -304,8 +304,8 @@ void UUmHudDecks::ApplyContent() {
   const bool bS = Frame.bClassS;
   if (DeckCount) DeckCount->SetText(UmHudDecks::DeckLabel(Model, bS));
   if (S08ArtLook::HudTable()) {
-    // HUD "Стол": print ink on the paper slip
-    const FLinearColor Navy = UUmHudTheme::Get().Color(TEXT("card.navy"));
+    // HUD "Стол": no «≈» - a stale count prints fainter
+    const FLinearColor Navy = UUmHudTheme::Get().Color(TEXT("text.primary"));
     const FLinearColor Faint(Navy.R, Navy.G, Navy.B, 0.5f);
     if (DeckCount) DeckCount->SetColorAndOpacity(FSlateColor(Model.bDeckStale ? Faint : Navy));
     if (DiscardCount) DiscardCount->SetColorAndOpacity(FSlateColor(Model.bDiscardStale ? Faint : Navy));
@@ -341,7 +341,12 @@ void UUmHudDecks::ApplyContent() {
     if (Model.bHasTop) DiscardMini->ApplyModel(Model.Top, Top);
   }
   if (DiscardMiniBox) DiscardMiniBox->SetVisibility(Model.bHasTop ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-  if (DiscardIcon) DiscardIcon->SetVisibility(Model.bHasTop ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+  // HUD "Стол" piles (class L): an empty discard is just its chip - no lone glyph floating over the table
+  const bool bPile = S08ArtLook::HudTable() && !bS && Frame.RectSu.bIsValid &&
+                     Frame.RectSu.GetSize().Y > UmHudDecks::ChipHeightLSu + 1.0f;
+  if (DiscardIcon) {
+    DiscardIcon->SetVisibility(Model.bHasTop || bPile ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+  }
 }
 
 void UUmHudDecks::CollectShotLines(TArray<FString>& Out) const {

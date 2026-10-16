@@ -481,7 +481,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   StripFrame.StatusMaxWidthSu = StatusRect.bIsValid ? static_cast<float>(StatusRect.Max.X - StatusRect.Min.X) : 600.0f;
   StripFrame.bTurnStripCompact = R.Layout.bTurnStripCompact;  // HB-50
   StripFrame.bReducedMotion = MoveMotion.bReducedMotion;
-  StripFrame.bKeyHints = UmKeyHintsNow();  // VS-4 HB-43: UI-ACC-017 (04 §2.11) - the STATUS chips with the ACTIONS ones
+  StripFrame.bKeyHints = UmKeyHintsNow() && !S08ArtLook::HudTable();  // HUD "Стол": the letters live on the discs only  // VS-4 HB-43: UI-ACC-017 (04 §2.11) - the STATUS chips with the ACTIONS ones
   R.TopStrip.SetFrame(StripFrame);
   const FBox2D OppHandRect = R.Layout.Rect(EUmHudBlock::OppHand);  // VS-2 HB-18...HB-21
   R.Panels.SetFrame(R.Layout.bClassS, R.Layout.PxPerSu,
