@@ -1,0 +1,292 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-20T21:56:07+00:00",
+  "set": "art/imagegen/concept-bruce-lee-codex",
+  "key": "bruce-lee",
+  "role": "hero",
+  "views": [
+    "side"
+  ],
+  "inputs": [
+    {
+      "view": "side",
+      "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png",
+      "sha256": "da72946b46715eaac8f930e89b794c72d0a2c1229c070904192179c23ad6d7b7",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1152,
+        1536
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "measurements": {
+    "side": {
+      "size": [
+        1152,
+        1536
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 23,
+        "median_rgb": [
+          46.0,
+          45.0,
+          45.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 1.0,
+        "luma": 45.2
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.37,
+          1.11,
+          1.25
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 16.818,
+        "filled_area_pct": 16.818,
+        "components_kept": 1,
+        "main_component_pct": 16.818,
+        "other_components_pct": [
+          0.017,
+          0.008,
+          0.004,
+          0.004,
+          0.004,
+          0.003,
+          0.003,
+          0.002,
+          0.002,
+          0.002
+        ],
+        "bbox_px": [
+          178,
+          65,
+          970,
+          1460
+        ],
+        "top_pct": 4.232,
+        "bottom_pct": 95.052,
+        "left_pct": 15.451,
+        "right_pct": 84.201,
+        "height_pct": 90.82,
+        "base_center_x_pct": 49.826,
+        "base_width_pct": 68.75,
+        "base_top_pct_est": 84.635
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "side": [
+            1152,
+            1536
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "side": [
+          1152,
+          1536
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        46.0,
+        45.0,
+        45.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 45.2,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 16.818,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 4.232,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 95.052,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 15.451,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        0.017,
+        0.008,
+        0.004,
+        0.004,
+        0.004,
+        0.003,
+        0.003,
+        0.002,
+        0.002,
+        0.002
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 12,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-bruce-lee-codex/palette.json",
+    "asset_id": null,
+    "swatches": [
+      {
+        "name": "suit yellow",
+        "hex": "#E0B830",
+        "role": "main",
+        "figure_share_within_40_pct": 17.32
+      },
+      {
+        "name": "stripe black",
+        "hex": "#141414",
+        "role": "main",
+        "figure_share_within_40_pct": 18.42
+      },
+      {
+        "name": "skin tan",
+        "hex": "#C49A74",
+        "role": "main",
+        "figure_share_within_40_pct": 5.4
+      },
+      {
+        "name": "shoe black",
+        "hex": "#1E1C1C",
+        "role": "accent",
+        "figure_share_within_40_pct": 28.63
+      }
+    ]
+  },
+  "sheet": null
+}

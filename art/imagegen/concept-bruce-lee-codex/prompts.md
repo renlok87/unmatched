@@ -87,3 +87,79 @@ CORRECTION (fix only this; everything above still applies):
 У g1 и g2 скрипт вернул 0: 12 PASS, 1 WARN, 0 FAIL. WARN view.frame_top: g1 3,177%, g2 3,453% при требовании 4%. Этот WARN допустим по заданию; изображения не кадрировались и не нормализовались.
 Все шесть пунктов визуального CHECKLIST у выбранного g2 пройдены. Тон фона содержит слабое зерно генерации (p99 отклонения рамки 2 уровня RGB), сохранённое без ретуши.
 Исходный эталон и palette.json не изменены. Все PNG скопированы побайтово; оригиналы image_gen сохранены.
+
+## 1c (2026-10-21, Tripo Studio Image, GPT Image 2)
+
+### bruce-lee-front-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/orthos/ortho_front.png, art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, FRONT
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Bruce Lee, the martial artist (Unmatched: Bruce Lee): lean muscular martial artist in a yellow jumpsuit with black side stripes, bare-handed fighting stance, intense expression.
+IDENTITY ANCHORS, where visible from this side: yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair.
+PALETTE: suit yellow #E0B830, stripe black #141414, skin tan #C49A74, accent shoe black #1E1C1C. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: FRONT: strict front orthographic view, the figure faces the camera, no three-quarter turn.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x15.0%-85.0%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### bruce-lee-side-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/orthos/ortho_left.png, art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, LEFT SIDE
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Bruce Lee, the martial artist (Unmatched: Bruce Lee): lean muscular martial artist in a yellow jumpsuit with black side stripes, bare-handed fighting stance, intense expression.
+IDENTITY ANCHORS, where visible from this side: yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair.
+PALETTE: suit yellow #E0B830, stripe black #141414, skin tan #C49A74, accent shoe black #1E1C1C. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: LEFT SIDE: strict profile, the figure's OWN left side faces the camera, its face toward the left edge of the image, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x15.3%-84.7%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### bruce-lee-back-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/orthos/ortho_back.png, art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png, art/imagegen/concept-bruce-lee-codex/concepts/bruce-lee-side-g1.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, BACK
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+Image 3 is the finished side view of the SAME miniature, for continuity of colours and details only.
+SUBJECT: Bruce Lee, the martial artist (Unmatched: Bruce Lee): lean muscular martial artist in a yellow jumpsuit with black side stripes, bare-handed fighting stance, intense expression.
+IDENTITY ANCHORS, where visible from this side: yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair.
+PALETTE: suit yellow #E0B830, stripe black #141414, skin tan #C49A74, accent shoe black #1E1C1C. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: BACK: camera directly behind, no face visible, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x15.0%-85.0%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### Проверка и ограничения
+
+Силуэт и рамка держатся за орто (верх 3,9–4,2 %, земля 93,4–95,4 %); идентичность и палитра — от дизайна 1a. На back видны кончики пальцев правой руки сбоку (как на орто). Низ подставки side/back на 1,5–2,0 % ниже front (WARN set.base_bottom).

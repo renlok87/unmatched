@@ -183,5 +183,60 @@
     "background_processes_started": [],
     "services_started": []
   },
-  "checked_at": "2026-10-13T08:44:19.011519+00:00"
+  "checked_at": "2026-10-13T08:44:19.011519+00:00",
+  "stage_1c": {
+    "date": "2026-10-21",
+    "generator": "Tripo Studio Image tool, model GPT Image 2, 3:4, 2 images per run (first image saved)",
+    "why_not_gemini": "Gemini app refuses Bruce Lee: «can't depict some public figures» (1a and 1c front, 2026-10-20); Seedream v5.0 Pro in unstability.ai dropped the job without output",
+    "inputs_unchanged": true,
+    "checks": [
+      {
+        "view": "front",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-bruce-lee-codex/checks/front-g1/checks-report.json"
+      },
+      {
+        "view": "side",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-bruce-lee-codex/checks/side-g1/checks-report.json"
+      },
+      {
+        "view": "back",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-bruce-lee-codex/checks/back-g1/checks-report.json"
+      },
+      {
+        "view": "set",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-bruce-lee-codex/checks-report.json",
+        "final": true
+      }
+    ],
+    "checklist": [
+      {
+        "view": "front",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark",
+        "passed": true,
+        "note": "осмотрено запускающим агентом; IoU силуэта с орто: front 0,735, side 0,635"
+      },
+      {
+        "view": "side",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark",
+        "passed": true,
+        "note": "осмотрено запускающим агентом; IoU силуэта с орто: front 0,735, side 0,635"
+      },
+      {
+        "view": "back",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark",
+        "passed": true,
+        "note": "осмотрено запускающим агентом; IoU силуэта с орто: front 0,735, side 0,635"
+      }
+    ],
+    "executor": "запускающий агент (Claude, оркестратор мини-пачки) через Windows-MCP в Chrome пользователя",
+    "limit_reached": []
+  }
 }
