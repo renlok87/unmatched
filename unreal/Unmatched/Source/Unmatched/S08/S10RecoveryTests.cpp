@@ -782,13 +782,13 @@ bool FS10PendingStepFaultTest::RunTest(const FString&) {
   const TCHAR* Stage2 =
       TEXT("{\"pendingEffects\":[{\"id\":\"rs-0-p0#2\",\"playerId\":\"p-host\",")
       TEXT("\"type\":\"CHOOSE_SPACE\",\"stage\":2,\"anchor\":{\"x\":1,\"y\":0}}]}");
-  Flow.ApplySnapshot(StartedSnapshot(4, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage1));
+  Flow.ApplySnapshot(StartedSnapshot(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage1));
   ProveOpLiveForTest(Flow, TEXT("ACTION_MANEUVER"), HostId);
 
-  // [stage-1 reply lost after commit] -> [recovery read: seq 5, stage 2 open]
+  // [stage-1 reply lost after commit] -> [recovery read: seq 11, stage 2 open]
   Flow.QueueHttpResultForTest(false, {TransportLost()}, /*bDeferDelivery=*/true);
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
-                              GameStateBody(5, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage2));
+                              GameStateBody(11, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage2));
   Flow.ResolvePendingEffect(TEXT("rs-0-p0"), FString(), true, 1, 0, false, 0, {});
   Flow.DeliverQueuedHttpForTest(); // loss -> armed, refetch 1 dispatched
   TestTrue("outcome unknown -> recovery armed", Flow.IsMutationRecoveryActiveForTest());
@@ -816,19 +816,19 @@ bool FS10PendingNotLandedTest::RunTest(const FString&) {
   const TCHAR* Open =
       TEXT("{\"pendingEffects\":[{\"id\":\"mv-1\",\"playerId\":\"p-host\",")
       TEXT("\"type\":\"MOVE\",\"optional\":false}]}");
-  Flow.ApplySnapshot(StartedSnapshot(7, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+  Flow.ApplySnapshot(StartedSnapshot(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
   ProveOpLiveForTest(Flow, TEXT("ACTION_MANEUVER"), HostId);
 
   Flow.QueueHttpResultForTest(false, {TransportLost()}, /*bDeferDelivery=*/true);
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
-                              GameStateBody(7, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+                              GameStateBody(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
-                              GameStateBody(7, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+                              GameStateBody(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
   Flow.ResolvePendingEffect(TEXT("mv-1"), TEXT("f1"), true, 1, 0, false, 0, {});
   Flow.DeliverQueuedHttpForTest(); // loss -> armed, refetch 1
   Flow.DeliverQueuedHttpForTest(); // read 1: same seq, mv-1 still open
   TestTrue("first read holds", Flow.IsMutationRecoveryActiveForTest());
-  TestTrue("hold traced", Cap.SawTrace(TEXT("RECOVERY held: pending choice mv-1 is still open at seq 7")));
+  TestTrue("hold traced", Cap.SawTrace(TEXT("RECOVERY held: pending choice mv-1 is still open at seq 10")));
   TestTrue("the ladder re-reads (no silent wait)",
            Cap.SawTrace(TEXT("RECOVERY re-read in 1s: the choice is still open")));
   Flow.TickConnectivity(1.1f);
@@ -836,7 +836,7 @@ bool FS10PendingNotLandedTest::RunTest(const FString&) {
   Flow.DeliverQueuedHttpForTest(); // read 2: still open at the guarded seq
   TestFalse("released: the answer did not land", Flow.IsMutationRecoveryActiveForTest());
   TestTrue("release traced",
-           Cap.SawTrace(TEXT("RECOVERY settled: pending choice mv-1 still open at the guarded seq 7 after 2 reads")));
+           Cap.SawTrace(TEXT("RECOVERY settled: pending choice mv-1 still open at the guarded seq 10 after 2 reads")));
   FString Reason;
   TestTrue("the choice can be answered again", Flow.CanIssueCombatCommand(Reason));
   return true;
