@@ -16,14 +16,25 @@
  *    seed-scraped.ts пропустил их по имени. Скрипт обновляет героев и заменяет
  *    колоды реальными данными из scraped-data/api/heroes/{ms-marvel,daredevil}.json.
  *
+ * 3. Разбор DE 2026-10-20 (docs/research/de-reverse-2026-10-20, DATA-01):
+ *    - What Big Eyes You Have 🐺 (Little Red, versatile) → 3 (в источнике 2);
+ *    - опечатки банеров BANNER_FIXES (prisma/card-banner-fixes.ts): Allice,
+ *      The Potter, Djkstra. После правки скрипт проверяет банеры всех карт
+ *      (findBannerMismatches) и печатает остаток.
+ *
  * Запуск: npx ts-node --transpile-only -e "require('./prisma/fix-card-gaps.ts')"
+ * Только отчёт, без записи: FIX_DRY_RUN=1 в окружении или
+ *   npx ts-node --transpile-only prisma/fix-card-gaps.ts --dry-run
  */
 
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
+import { applyBannerFix, BANNER_FIXES, findBannerMismatches } from './card-banner-fixes';
 
 const prisma = new PrismaClient();
+
+const DRY_RUN = process.argv.includes('--dry-run') || process.env.FIX_DRY_RUN === '1';
 
 const SCRAPED_DATA_PATH = path.join(__dirname, '../../scraped-data/api/heroes');
 
@@ -46,10 +57,12 @@ const VALUE_FIXES: ValueFix[] = [
   { name: 'Lady Justice', heroName: 'She Hulk', cardType: 'DEFENSE', value: 0 },
   { name: 'Life Model Decoy', heroName: 'Black Widow', cardType: 'DEFENSE', value: 0 },
   { name: 'Skin Like Titanium', heroName: 'Luke Cage', cardType: 'DEFENSE', value: 0 },
+  // DATA-01: в источнике 2, на карте и в DE — 3
+  { name: 'What Big Eyes You Have 🐺', heroName: 'Little Red', cardType: 'VERSATILE', value: 3 },
 ];
 
 async function fixMissingValues(): Promise<void> {
-  console.log('🔧 Фикс значений карт с value=null в источнике...');
+  console.log('🔧 Фикс значений карт (value=null в источнике и неверные значения)...');
 
   for (const fix of VALUE_FIXES) {
     const hero = await prisma.hero.findUnique({ where: { name: fix.heroName } });
@@ -68,17 +81,90 @@ async function fixMissingValues(): Promise<void> {
       data.attackValue = fix.value;
     }
 
-    const result = await prisma.card.updateMany({
+    const cards = await prisma.card.findMany({
       where: { name: fix.name, heroId: hero.id },
-      data,
+      select: { attackValue: true, defenseValue: true },
     });
-
-    if (result.count > 0) {
-      console.log(`   ✅ ${fix.name} (${fix.heroName}): value=${fix.value}`);
-    } else {
+    if (cards.length === 0) {
       console.log(`   ⚠️  Карта не найдена: ${fix.name} (${fix.heroName})`);
+      continue;
     }
+    const stale = cards.filter(
+      (c) =>
+        (data.attackValue !== undefined && c.attackValue !== data.attackValue) ||
+        (data.defenseValue !== undefined && c.defenseValue !== data.defenseValue),
+    );
+    if (stale.length === 0) {
+      console.log(`   ⏭️  ${fix.name} (${fix.heroName}): уже value=${fix.value}`);
+      continue;
+    }
+    if (DRY_RUN) {
+      console.log(`   📝 [dry-run] ${fix.name} (${fix.heroName}): value → ${fix.value} (${stale.length} стр.)`);
+      continue;
+    }
+
+    await prisma.card.updateMany({ where: { name: fix.name, heroId: hero.id }, data });
+    console.log(`   ✅ ${fix.name} (${fix.heroName}): value=${fix.value}`);
   }
+}
+
+// ============================================
+// 3. Банеры карт (DATA-01 / DATA-02)
+// ============================================
+
+async function fixBanners(): Promise<void> {
+  console.log('🔧 Опечатки банеров (BANNER_FIXES)...');
+
+  for (const fix of BANNER_FIXES) {
+    const hero = await prisma.hero.findUnique({ where: { name: fix.heroName } });
+    if (!hero) {
+      console.log(`   ⚠️  Герой не найден: ${fix.heroName}`);
+      continue;
+    }
+    const cards = await prisma.card.findMany({
+      where: { heroId: hero.id, bannerName: fix.from },
+      select: { name: true },
+    });
+    if (cards.length === 0) {
+      console.log(`   ⏭️  ${fix.heroName}: банера «${fix.from}» нет`);
+      continue;
+    }
+    const names = cards.map((c) => c.name).join(', ');
+    if (DRY_RUN) {
+      console.log(`   📝 [dry-run] ${fix.heroName}: «${fix.from}» → «${fix.to}» (${cards.length}): ${names}`);
+      continue;
+    }
+    const result = await prisma.card.updateMany({
+      where: { heroId: hero.id, bannerName: fix.from },
+      data: { bannerName: fix.to },
+    });
+    console.log(`   ✅ ${fix.heroName}: «${fix.from}» → «${fix.to}» (${result.count}): ${names}`);
+  }
+}
+
+/** Банеры всех карт против героя и его помощников (в dry-run — с учётом будущих правок). */
+async function reportBannerMismatches(): Promise<number> {
+  const heroes = await prisma.hero.findMany({
+    select: { name: true, sidekicks: true, cards: { select: { name: true, bannerName: true } } },
+  });
+  const mismatches = heroes.flatMap((hero) =>
+    findBannerMismatches(
+      {
+        name: hero.name,
+        sidekicks: Array.isArray(hero.sidekicks)
+          ? (hero.sidekicks as Array<{ name?: string | null } | null>).map((s) => ({ name: s?.name ?? '' }))
+          : [],
+      },
+      hero.cards.map((c) => ({
+        name: c.name,
+        bannerName: DRY_RUN ? applyBannerFix(hero.name, c.bannerName) : c.bannerName,
+      })),
+    ),
+  );
+  for (const m of mismatches) {
+    console.log(`   ❌ ${m.heroName} — ${m.cardName}: «${m.bannerName}»`);
+  }
+  return mismatches.length;
 }
 
 // ============================================
@@ -202,6 +288,10 @@ async function replaceFakeHero(slug: string): Promise<void> {
     console.log(`   ⏭️  ${heroName}: колода уже актуальна (${deck.length} карт)`);
     return;
   }
+  if (DRY_RUN) {
+    console.log(`   📝 [dry-run] ${heroName}: колода будет заменена (${existingNames.size} → ${deck.length} карт)`);
+    return;
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.hero.update({
@@ -269,7 +359,12 @@ async function replaceFakeHero(slug: string): Promise<void> {
 async function main() {
   console.log('🌱 Фикс дыр в данных карт...\n');
 
+  if (DRY_RUN) console.log('📝 DRY-RUN: БД не меняется\n');
+
   await fixMissingValues();
+
+  console.log('');
+  await fixBanners();
 
   console.log('\n🔧 Замена фейковых колод Ms. Marvel / Daredevil...');
   await replaceFakeHero('ms-marvel');
@@ -287,6 +382,11 @@ async function main() {
     },
   });
   console.log(`\n📊 Карт с пропущенными значениями: ${gaps}`);
+
+  console.log('\n🔎 Банеры карт против героя и помощников...');
+  const bannerMismatches = await reportBannerMismatches();
+  console.log(`📊 Карт с чужим банером: ${bannerMismatches}`);
+  if (bannerMismatches > 0) process.exitCode = 1;
 }
 
 main()

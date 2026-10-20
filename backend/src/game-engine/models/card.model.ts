@@ -61,8 +61,12 @@ export interface CardEffect {
   readonly when?: EffectCondition;
   /** Счётчик для VALUE_PER_COUNT / draw-per-damage */
   readonly count?: CountSpec;
-  /** «You may …» — игрок может отказаться (MVP: авто-применение выгодных) */
+  /** «You may …» — игрок может отказаться (MVP: авто-применение выгодных;
+   *  DRAW_CARD — выбор «не добирать / добрать») */
   readonly optional?: boolean;
+  /** RULE-01: «(This effect cannot be canceled.)» — эффект исполняется и на
+   *  отменённой карте */
+  readonly uncancellable?: boolean;
   /** Имя бойца для target NAMED_FIGHTER ('Dr. Watson') */
   readonly fighterName?: string;
   /** Откуда берётся BOOST-карта (для type BOOST) */
@@ -214,6 +218,9 @@ export enum EffectType {
   // S06 (GD-022, The Holy Grail): «If King Arthur has 4 or less health but is
   // not defeated, set his health to 8» — точная установка (НЕ heal)
   SET_HEALTH = 'SET_HEALTH',
+  // RULE-03 (Alice): «Change size.» — герой игрока переходит в другую стойку
+  // (BIG ↔ SMALL); у героя без стоек — no-op
+  CHANGE_SIZE = 'CHANGE_SIZE',
   // маркер нераспознанного текста: не исполняется, едет в manualEffects + warn
   UNSUPPORTED = 'UNSUPPORTED',
 }

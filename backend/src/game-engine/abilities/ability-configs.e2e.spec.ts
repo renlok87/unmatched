@@ -35,7 +35,7 @@ import { HeroAbilityRegistry } from './hero-ability-registry';
 import { GenericHeroAbilityHandler } from './generic-hero-ability.handler';
 import { ABILITY_CONFIGS } from './ability-config';
 import { daredevilHandler, msMarvelHandler, arthurAbilityHandler } from './heroes';
-import { FighterType, GamePhase } from '../models';
+import { CardType, FighterType, GamePhase } from '../models';
 import type { GameState } from '../models';
 import { ResolveCombatDto, EndTurnDto, AttackDto, ManeuverDto } from '../../games/dto/gameplay.dto';
 
@@ -178,6 +178,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
             validateEndTurn: jest.fn().mockReturnValue({ valid: true }),
             validatePass: jest.fn().mockReturnValue({ valid: true }),
             validateToggleDoor: jest.fn().mockReturnValue({ valid: true }),
+            validateBanner: jest.fn().mockReturnValue({ valid: true }),
           },
         },
         { provide: MovementService, useValue: { executeMovement: jest.fn() } },
@@ -245,6 +246,17 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
             executeAfterCombatEffects: jest.fn().mockImplementation((state: GameState) =>
               Promise.resolve({ state, appliedEffects: [], manualEffects: [] }),
             ),
+            // Опции CHOOSE_ONE способностей («you may draw»): исполняем только
+            // DRAW_CARD через тот же наблюдаемый добор
+            executeChosenEffects: jest.fn().mockImplementation(
+              async (state: GameState, effects: Array<{ type: string; value?: number }>, playerId: string) => {
+                let next = state;
+                for (const e of effects) {
+                  if (e.type === 'DRAW_CARD') next = await drawCards(next, playerId, e.value ?? 1);
+                }
+                return { state: next, appliedEffects: [], manualEffects: [] };
+              },
+            ),
           },
         },
       ],
@@ -268,8 +280,9 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
   afterEach(() => jest.clearAllMocks());
 
   // ====================================================================
-  // САНИТИ: все 26 конфигов реально зарегистрированы под своими слагами
-  // (24 базовых + 2 STANCE-героя: alice, muhammad-ali)
+  // САНИТИ: все 29 конфигов реально зарегистрированы под своими слагами
+  // (24 базовых + 2 STANCE-героя: alice, muhammad-ali + 3 героя с
+  // неотменяемыми картами: sherlock-holmes, ciri, winter-soldier)
   // ====================================================================
   describe('registration', () => {
     it('каждый ABILITY_CONFIGS.heroId зарегистрирован в реестре под своим слагом', () => {
@@ -277,7 +290,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         expect(registry.has(cfg.heroId)).toBe(true);
         expect(registry.getExtended(cfg.heroId)?.heroId).toBe(cfg.heroId);
       }
-      expect(ABILITY_CONFIGS).toHaveLength(26);
+      expect(ABILITY_CONFIGS).toHaveLength(29);
     });
   });
 
@@ -709,18 +722,38 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(move.fighterName).toBeUndefined(); // any-own → имя опущено
     });
 
-    it('dracula (turn-damage смежному врагу 1 + добор 1)', async () => {
+    it('dracula (RULE-02): optional выбор смежной цели; урон 1 + добор 1 только после выбора', async () => {
       // fighter2 (player2) HERO в (6,5); враг fighter1 в (5,5) → manhattan 1 (смежны).
       let state = endTurnState();
       state = withHeroSlug(state, 'fighter2', 'dracula');
 
-      const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
+      const turned = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
 
-      expect(result.success).toBe(true);
-      const victim = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
-      expect(victim.health).toBe(14 - 1); // укус 1
-      // Единственный добор — thenDraw способности; передача хода карт не добавляет.
-      expect(result.gameState!.handZones.player2.cards.length).toBe(1);
+      expect(turned.success).toBe(true);
+      // Сама способность не бьёт и не добирает: выбор за игроком
+      expect(turned.gameState!.fighters.find((f) => f.id === 'fighter1')!.health).toBe(14);
+      expect(turned.gameState!.handZones.player2.cards.length).toBe(0);
+      const pending = turned.gameState!.metadata.pendingEffects ?? [];
+      expect(pending[0]).toMatchObject({
+        type: 'TARGET_FIGHTER', playerId: 'player2', optional: true, damage: 1, drawAfterDamage: 1,
+        targetFighterIds: ['fighter1'],
+      });
+
+      const bitten = await service.executeResolvePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id, fighterId: 'fighter1' } as any,
+        ctxFor('player2', turned.gameState!),
+      );
+      expect(bitten.success).toBe(true);
+      expect(bitten.gameState!.fighters.find((f) => f.id === 'fighter1')!.health).toBe(14 - 1);
+      expect(bitten.gameState!.handZones.player2.cards.length).toBe(1); // «If you do, draw a card»
+
+      const declined = await service.executeDeclinePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id },
+        ctxFor('player2', turned.gameState!),
+      );
+      expect(declined.success).toBe(true);
+      expect(declined.gameState!.fighters.find((f) => f.id === 'fighter1')!.health).toBe(14);
+      expect(declined.gameState!.handZones.player2.cards.length).toBe(0); // отказ — без добора
     });
 
     it('medusa (GD-017: optional TARGET_FIGHTER pending врагу В ЗОНЕ — при isInSameZone=true)', async () => {
@@ -774,7 +807,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         ...overrides,
       });
 
-    it('philippa (drawToHandSize 4): рука player1 1→4', async () => {
+    it('philippa (RULE-02, optional drawToHandSize 4): ход ждёт выбора; «добрать» → 1→4, отказ → 1', async () => {
       let state = endTurnState({
         handZones: {
           player1: { cards: [{ id: 'h1' }], maxSize: 5 },
@@ -783,11 +816,30 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       });
       state = withHeroSlug(state, 'fighter1', 'philippa');
 
-      const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
+      const ended = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
 
-      expect(result.success).toBe(true);
-      // онTurnEnd завершающего player1 добирает до 4 (дефицит 3) ДО передачи хода.
-      expect(result.gameState!.handZones.player1.cards.length).toBe(4);
+      expect(ended.success).toBe(true);
+      // onTurnEnd открыл optional выбор — передача хода отложена (GD-018)
+      expect(ended.gameState!.handZones.player1.cards.length).toBe(1);
+      const pending = ended.gameState!.metadata.pendingEffects ?? [];
+      expect(pending[0]).toMatchObject({ type: 'CHOOSE_ONE', playerId: 'player1', optional: true });
+      expect(ended.gameState!.metadata.pendingTurnEnd).toMatchObject({ playerId: 'player1' });
+
+      const drew = await service.executeResolvePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id, optionIndex: 1 } as any,
+        ctxFor('player1', ended.gameState!),
+      );
+      expect(drew.success).toBe(true);
+      expect(drew.gameState!.handZones.player1.cards.length).toBe(4); // дефицит 3
+      expect(drew.gameState!.currentTurnPlayerId).toBe('player2');
+
+      const declined = await service.executeDeclinePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id },
+        ctxFor('player1', ended.gameState!),
+      );
+      expect(declined.success).toBe(true);
+      expect(declined.gameState!.handZones.player1.cards.length).toBe(1);
+      expect(declined.gameState!.currentTurnPlayerId).toBe('player2');
     });
 
     it('t-rex (draw 1 в конце хода): рука player1 +1', async () => {
@@ -805,7 +857,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(result.gameState!.handZones.player1.cards.length).toBe(2); // 1 + 1
     });
 
-    it('bigfoot (draw 1 если в зоне НЕТ врага — default isInSameZone=false)', async () => {
+    it('bigfoot (RULE-02: optional draw 1 если в зоне НЕТ врага — default isInSameZone=false)', async () => {
       let state = endTurnState({
         handZones: {
           player1: { cards: [{ id: 'h1' }], maxSize: 5 },
@@ -814,10 +866,17 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       });
       state = withHeroSlug(state, 'fighter1', 'bigfoot');
 
-      const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
+      const ended = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
 
-      expect(result.success).toBe(true);
-      expect(result.gameState!.handZones.player1.cards.length).toBe(2); // 1 + 1
+      expect(ended.success).toBe(true);
+      expect(ended.gameState!.handZones.player1.cards.length).toBe(1); // без выбора — без добора
+      const pending = ended.gameState!.metadata.pendingEffects ?? [];
+      const drew = await service.executeResolvePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id, optionIndex: 1 } as any,
+        ctxFor('player1', ended.gameState!),
+      );
+      expect(drew.success).toBe(true);
+      expect(drew.gameState!.handZones.player1.cards.length).toBe(2); // 1 + 1
     });
 
     it('bigfoot (negative): враг В ЗОНЕ (isInSameZone=true) → добора нет', async () => {
@@ -835,6 +894,79 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
 
       expect(result.success).toBe(true);
       expect(result.gameState!.handZones.player1.cards.length).toBe(1); // без добора
+    });
+
+    it('michelangelo (максимум руки 3): 4 карты в конце хода → сброс 1, а не до 7', async () => {
+      let state = endTurnState({
+        handZones: {
+          player1: { cards: [{ id: 'h1' }, { id: 'h2' }, { id: 'h3' }, { id: 'h4' }], maxSize: 3 },
+          player2: { cards: [], maxSize: 5 },
+        } as any,
+      });
+      state = withHeroSlug(state, 'fighter1', 'michelangelo');
+
+      const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.metadata.pendingHandDiscard).toMatchObject({ playerId: 'player1', count: 1 });
+    });
+
+    it('обычный герой: 4 карты в конце хода — лимит 7, сброса нет', async () => {
+      const state = endTurnState({
+        handZones: {
+          player1: { cards: [{ id: 'h1' }, { id: 'h2' }, { id: 'h3' }, { id: 'h4' }], maxSize: 7 },
+          player2: { cards: [], maxSize: 5 },
+        } as any,
+      });
+
+      const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.metadata.pendingHandDiscard).toBeUndefined();
+      expect(result.gameState!.currentTurnPlayerId).toBe('player2');
+    });
+  });
+
+  // ====================================================================
+  // AFTER-SCHEME (executePlayScheme → разыгравший игрок)
+  // ====================================================================
+  describe('after-scheme (onAfterScheme через executePlayScheme)', () => {
+    const schemeState = (slug: string): GameState =>
+      withHeroSlug(
+        createMockGameState({
+          phase: GamePhase.ACTION_MANEUVER,
+          currentTurnPlayerId: 'player1',
+          handZones: {
+            player1: {
+              cards: [{ id: 'sch-1', cardId: 'sch', name: 'Scheme', cardType: CardType.SCHEME, isVisible: true }],
+              maxSize: 3,
+            },
+            player2: { cards: [], maxSize: 5 },
+          } as any,
+          metadata: { lastActionAt: new Date(), lastActionBy: 'player1', version: 1, actionsRemaining: 2 } as any,
+        }),
+        'fighter1',
+        slug,
+      );
+
+    it('michelangelo: «After you attack or scheme, draw 1 card» — схема добирает 1', async () => {
+      const result = await service.executePlayScheme(
+        { gameId: 'test-game-1', cardId: 'sch-1' } as any,
+        ctxFor('player1', schemeState('michelangelo')),
+      );
+
+      expect(result.success).toBe(true);
+      expect(drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    });
+
+    it('без after-scheme правила — схема не добирает', async () => {
+      const result = await service.executePlayScheme(
+        { gameId: 'test-game-1', cardId: 'sch-1' } as any,
+        ctxFor('player1', schemeState('chupacabra')),
+      );
+
+      expect(result.success).toBe(true);
+      expect(drawCards).not.toHaveBeenCalled();
     });
   });
 
@@ -877,14 +1009,22 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       return s;
     };
 
-    it('chupacabra (draw 1 всегда после своей атаки)', async () => {
+    it('chupacabra (RULE-02: optional draw 1 после своей атаки)', async () => {
       let state = afterAttackState({ attackValue: 5, defenseValue: 1 });
       state = withHeroSlug(state, 'fighter1', 'chupacabra');
 
       const result = await service.executeResolveCombat({ gameId: 'test-game-1' } as ResolveCombatDto, ctxFor('player1', state));
 
       expect(result.success).toBe(true);
-      expect(result.gameState!.handZones.player1.cards.length).toBe(1); // +1 атакующему
+      expect(result.gameState!.handZones.player1.cards.length).toBe(0); // ждёт выбора
+      const pending = result.gameState!.metadata.pendingEffects ?? [];
+      expect(pending[0]).toMatchObject({ type: 'CHOOSE_ONE', playerId: 'player1', optional: true });
+      const drew = await service.executeResolvePendingEffect(
+        { gameId: 'test-game-1', effectId: pending[0].id, optionIndex: 1 } as any,
+        ctxFor('player1', result.gameState!),
+      );
+      expect(drew.success).toBe(true);
+      expect(drew.gameState!.handZones.player1.cards.length).toBe(1); // +1 атакующему
     });
 
     it('deadpool (heal 1 всегда; atk==def → урона нет, проверяем чистый heal)', async () => {

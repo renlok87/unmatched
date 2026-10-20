@@ -41,6 +41,8 @@ import {
   withSkippedEffect,
 } from './pending-targets';
 import { describeEffectSource, type EffectSource } from './combat-effect-log';
+import { optionalDrawPending } from './optional-draw';
+import { isCardUncancellable, toggleHeroStance } from '../abilities/ability-rules';
 
 /**
  * Результат выполнения одного эффекта
@@ -130,7 +132,7 @@ export class CardEffectExecutorService {
     combat: CombatContext,
   ): Promise<RevealResult> {
     return this.runCombatQueue(state, this.createCombatQueue(
-      'ON_REVEAL', attackerCard, defenderCard, combat,
+      state, 'ON_REVEAL', attackerCard, defenderCard, combat,
     ));
   }
 
@@ -143,7 +145,7 @@ export class CardEffectExecutorService {
   ): Promise<CombatCalculation> {
     return this.metrics.measureServiceDuration('executeCombatEffects', 'CardEffectExecutor', () =>
       this.runCombatQueue(state, this.createCombatQueue(
-        'DURING_COMBAT', attackerCard, defenderCard, combat, cancelled,
+        state, 'DURING_COMBAT', attackerCard, defenderCard, combat, cancelled,
       )),
     );
   }
@@ -157,7 +159,7 @@ export class CardEffectExecutorService {
     cancelled: { attacker: boolean; defender: boolean } = { attacker: false, defender: false },
   ): Promise<AfterCombatResult> {
     return this.runCombatQueue(state, this.createCombatQueue(
-      'AFTER_COMBAT', attackerCard, defenderCard, combat, cancelled, outcome,
+      state, 'AFTER_COMBAT', attackerCard, defenderCard, combat, cancelled, outcome,
     ));
   }
 
@@ -170,6 +172,7 @@ export class CardEffectExecutorService {
   }
 
   private createCombatQueue(
+    state: GameState,
     stage: CombatEffectContinuation['stage'],
     attackerCard: Card | null,
     defenderCard: Card | null,
@@ -184,8 +187,13 @@ export class CardEffectExecutorService {
       const card = role === 'attacker' ? attackerCard : defenderCard;
       if (!card) continue;
       const isAttacker = role === 'attacker';
+      // RULE-01: CANCEL_EFFECTS этой стороны не действует на неотменяемую карту соперника
+      const opposingCard = isAttacker ? defenderCard : attackerCard;
+      const opposingFighterId = isAttacker ? combat.targetFighterId : combat.attackerFighterId;
       const context: EffectContext = {
         ...this.combatSideContext(card, combat, role),
+        ...(isCardUncancellable(state, opposingCard, opposingFighterId)
+          ? { opposingCardUncancellable: true } : {}),
         ...(outcome ? {
           wonCombat: isAttacker ? outcome.attackerWon : !outcome.attackerWon,
           damageDealt: isAttacker ? outcome.defenderDamage : outcome.attackerDamage,
@@ -217,7 +225,9 @@ export class CardEffectExecutorService {
     for (let index = 0; index < queue.remaining.length; index++) {
       if (currentState.phase === GamePhase.GAME_OVER) break;
       const { effect, context, isAttacker } = queue.remaining[index];
-      if (isAttacker ? progress.attackerCardCancelled : progress.defenderCardCancelled) continue;
+      // «(This effect cannot be canceled.)» — эффект исполняется и на отменённой карте
+      if ((isAttacker ? progress.attackerCardCancelled : progress.defenderCardCancelled) &&
+          !effect.uncancellable) continue;
       if (!(await this.passesWhen(currentState, effect, context))) continue;
       const pendingBefore = currentState.metadata.pendingEffects?.length ?? 0;
       const outcome = await this.applyOneEffect(currentState, effect, context);
@@ -509,11 +519,29 @@ export class CardEffectExecutorService {
       }
 
       case EffectType.CANCEL_EFFECTS:
+        // RULE-01: печатная неотменяемость карты или способность героя
+        // соперника (Holmes, Ciri, Winter Soldier) — отмена не действует
+        if (context.opposingCardUncancellable) {
+          return { state, result: ok({ message: 'Эффекты карты противника нельзя отменить' }) };
+        }
         return {
           state,
           result: ok({ message: 'Эффекты карты противника отменены' }),
           cancelOpposingCard: true,
         };
+
+      // RULE-03 (Alice, «Change size.»): герой игрока — в другую стойку
+      case EffectType.CHANGE_SIZE: {
+        const next = toggleHeroStance(state, context.playerId);
+        const stance = next.metadata.heroStances?.[context.playerId];
+        return {
+          state: next,
+          result: ok({
+            targetIds: [context.playerId],
+            message: next === state ? 'У героя нет стоек — размер не меняется' : `Размер: ${stance}`,
+          }),
+        };
+      }
 
       case EffectType.PREVENT_DAMAGE:
         return { state, result: ok({ message: 'Урон предотвращён' }), preventDamage: true };
@@ -567,6 +595,25 @@ export class CardEffectExecutorService {
       }
 
       case EffectType.DRAW_CARD: {
+        // «You may draw N cards» (RULE-02): выбор «не добирать / добрать»
+        if (effect.optional) {
+          const pending = optionalDrawPending({
+            id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
+            playerId: context.playerId,
+            count: value || 1,
+            text: effect.text ?? `You may draw ${value || 1} card(s)`,
+            card: context.card,
+            effectContext: context.combat ? context : undefined,
+          });
+          const next: GameState = {
+            ...state,
+            metadata: {
+              ...state.metadata,
+              pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+            },
+          };
+          return { state: next, result: ok({ message: `Ожидает выбора: ${pending.text}` }) };
+        }
         const next = await this.deckManagement.drawCards(state, context.playerId, value || 1);
         return { state: next, result: ok({ targetIds: [context.playerId], valueApplied: value || 1 }) };
       }

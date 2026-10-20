@@ -13,6 +13,7 @@
 import type { GameState } from '../models/game-state.model';
 import { getActionsRemaining, GamePhase } from '../models/game-state.model';
 import { applyTerminalState } from '../engine/terminal-state';
+import { optionalDrawPending } from '../effects/optional-draw';
 import { hasTopology, isAdjacent as isAdjacentOnTopology } from '../engine/board-topology';
 import type { Fighter } from '../models/fighter.model';
 import { FighterType } from '../models/fighter.model';
@@ -50,6 +51,11 @@ export interface GenericHeroAbilityDeps {
   /** Для draw/drawToHandSize — реальный DeckManagementService */
   readonly deck: {
     drawCards(state: GameState, userId: string, count: number): Promise<GameState>;
+    /** Случайный сброс карты (Achilles). Нет в лёгких тестовых deps → первая карта руки. */
+    discardRandomCard?(
+      state: GameState,
+      userId: string,
+    ): Promise<{ gameState: GameState }>;
   };
   /**
    * Зоны/смежность (AdjacencyService). Модуль передаёт сюда весь
@@ -378,6 +384,12 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     return this.applyTurnRules(state, playerId, 'turn-end');
   }
 
+  /** После розыгрыша своей схемы (Michelangelo: «After you attack or scheme,
+   *  draw 1 card»). Те же turn-эффекты, цель — разыгравший игрок. */
+  async onAfterScheme(state: GameState, playerId: string): Promise<GameState> {
+    return this.applyTurnRules(state, playerId, 'after-scheme');
+  }
+
   // ===================== AFTER-ATTACK =====================
 
   /**
@@ -468,7 +480,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       // Боец-владелец должен иметь HERO-бойца ИМЕННО ЭТОГО героя (слаг совпадает).
       if (!granter || (granter.heroSlug ?? granter.heroId) !== this.heroId) continue;
 
-      current = this.discardCardsFromHand(
+      current = await this.discardRandomFromHand(
         current,
         defeatedFighter.ownerId,
         (rule.effect as DiscardRandomEffect).count,
@@ -568,10 +580,31 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   }
 
   /**
-   * Иммутабельно сбрасывает первые `count` карт из руки игрока (детерминированный
-   * стенд-ин для «random»). Карты уходят в discardPiles[playerId] (если структура
-   * есть), иначе просто удаляются из руки. Пустая рука / count<=0 → чистый no-op
-   * (тот же объект state).
+   * Сбрасывает `count` СЛУЧАЙНЫХ карт из руки игрока через
+   * DeckManagementService.discardRandomCard (тот же примитив, что у карт).
+   * Пустая рука / count<=0 → чистый no-op (тот же объект state). Без
+   * discardRandomCard в deps (лёгкие тестовые deps) — первые карты руки.
+   */
+  private async discardRandomFromHand(
+    state: GameState,
+    playerId: string,
+    count: number,
+  ): Promise<GameState> {
+    const discardRandom = this.deps.deck.discardRandomCard?.bind(this.deps.deck);
+    if (!discardRandom) return this.discardCardsFromHand(state, playerId, count);
+    let current = state;
+    for (let i = 0; i < count; i++) {
+      if ((current.handZones[playerId]?.cards.length ?? 0) === 0) break;
+      current = (await discardRandom(current, playerId)).gameState;
+    }
+    return current;
+  }
+
+  /**
+   * Иммутабельно сбрасывает первые `count` карт из руки игрока (фолбэк
+   * discardRandomFromHand без DeckManagementService). Карты уходят в
+   * discardPiles[playerId] (если структура есть), иначе просто удаляются из
+   * руки. Пустая рука / count<=0 → чистый no-op (тот же объект state).
    */
   private discardCardsFromHand(
     state: GameState,
@@ -656,7 +689,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   private async applyTurnRules(
     state: GameState,
     playerId: string,
-    trigger: 'turn-start' | 'turn-end',
+    trigger: 'turn-start' | 'turn-end' | 'after-scheme',
   ): Promise<GameState> {
     let current = state;
 
@@ -728,8 +761,13 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   ): Promise<GameState> {
     let current = state;
 
+    // «You may draw» (RULE-02): выбор «не добирать / добрать» вместо добора
+    if (effect.optional) {
+      current = this.offerOptionalDraw(current, playerId, effect);
+    }
+
     // draw N
-    if (typeof effect.draw === 'number' && effect.draw > 0) {
+    if (!effect.optional && typeof effect.draw === 'number' && effect.draw > 0) {
       current = await this.deps.deck.drawCards(current, playerId, effect.draw);
     }
 
@@ -738,7 +776,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     // drawToHandSize N — добираем по дефициту; drawCards применяет истощение
     // за каждую недостающую карту и останавливается при гибели героя.
-    if (typeof effect.drawToHandSize === 'number') {
+    if (!effect.optional && typeof effect.drawToHandSize === 'number') {
       const handSize = current.handZones[playerId]?.cards.length ?? 0;
       const deficit = effect.drawToHandSize - handSize;
       if (deficit > 0) {
@@ -760,6 +798,38 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     }
 
     return current;
+  }
+
+  /**
+   * «You may draw» (RULE-02): optional CHOOSE_ONE «не добирать / добрать N»
+   * (optionalDrawPending: отказ — опция 0, по таймауту — отказ). N — effect.draw
+   * или дефицит до effect.drawToHandSize на момент срабатывания (рука до выбора
+   * не меняется: выбор — голова очереди). Добирать нечего → без выбора.
+   */
+  private offerOptionalDraw(state: GameState, playerId: string, effect: TurnEffect): GameState {
+    const handSize = state.handZones[playerId]?.cards.length ?? 0;
+    const count =
+      typeof effect.drawToHandSize === 'number'
+        ? effect.drawToHandSize - handSize
+        : (effect.draw ?? 0);
+    if (count <= 0) return state;
+    const len = state.metadata.pendingEffects?.length ?? 0;
+    const pending = optionalDrawPending({
+      id: `ability-${this.heroId}-draw-p${len}`,
+      playerId,
+      count,
+      text:
+        typeof effect.drawToHandSize === 'number'
+          ? `${this.abilityName}: you may draw until you have ${effect.drawToHandSize} cards`
+          : `${this.abilityName}: you may draw ${count} card${count === 1 ? '' : 's'}`,
+    });
+    return {
+      ...state,
+      metadata: {
+        ...state.metadata,
+        pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+      },
+    };
   }
 
   /**
@@ -903,17 +973,21 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     playerId: string,
     effect: PendingTargetDamageEffect,
   ): GameState {
-    if (effect.targetScope !== 'enemy-in-zone') return state;
     const hero = this.findHeroFighter(state, playerId);
     if (!hero) return state;
 
     const targets = state.fighters
-      .filter(
-        (f) =>
+      .filter((f) => {
+        if (f.isDefeated === true) return false; // живые
+        if (effect.targetScope === 'any-adjacent') {
+          // Dracula: любой смежный боец, свои тоже (кроме самого героя)
+          return f.id !== hero.id && this.areAdjacent(state, hero.position, f.position);
+        }
+        return (
           f.ownerId !== playerId && // только вражеские
-          f.isDefeated !== true && // живые
-          this.deps.zone.isInSameZone(state, hero.position, f.position),
-      )
+          this.deps.zone.isInSameZone(state, hero.position, f.position)
+        );
+      })
       .map((f) => f.id);
 
     if (targets.length === 0) return state; // нет целей → no-op, pending не создаём
@@ -925,10 +999,15 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       playerId,
       targetFighterIds: targets,
       damage: effect.value,
+      ...(effect.thenDraw ? { drawAfterDamage: effect.thenDraw } : {}),
       optional: true,
       // Только печатный текст — в захвате у способности НЕТ имени (поле name
       // отсутствует), выдумывать каноническое имя не предъявляем игроку.
-      text: `deal ${effect.value} damage to an opposing fighter in ${hero.name}'s zone`,
+      text:
+        effect.targetScope === 'any-adjacent'
+          ? `deal ${effect.value} damage to a fighter adjacent to ${hero.name}` +
+            (effect.thenDraw ? `; if you do, draw ${effect.thenDraw} card${effect.thenDraw === 1 ? '' : 's'}` : '')
+          : `deal ${effect.value} damage to an opposing fighter in ${hero.name}'s zone`,
     };
 
     return {

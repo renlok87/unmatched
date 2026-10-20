@@ -146,6 +146,24 @@ function handOf(n: number): any {
 
 const COMBAT: CombatState = { attackerId: 'hero-fighter-1', defenderId: 'enemy-fighter-1' };
 
+/** RULE-02: «you may draw» — добора нет, открыт optional CHOOSE_ONE
+ *  «не добирать (0) / добрать N (1)» владельцу. */
+function expectOptionalDraw(next: GameState, count: number): void {
+  const pending = next.metadata.pendingEffects ?? [];
+  expect(pending).toHaveLength(1);
+  expect(pending[0].type).toBe('CHOOSE_ONE');
+  expect(pending[0].playerId).toBe('player1');
+  expect(pending[0].optional).toBe(true);
+  expect(pending[0].options?.map((o) => o.label)).toEqual([
+    'Do not draw',
+    `Draw ${count} card${count === 1 ? '' : 's'}`,
+  ]);
+  expect(pending[0].optionEffects?.[0]).toEqual([]);
+  expect(pending[0].optionEffects?.[1]).toEqual([
+    expect.objectContaining({ type: 'DRAW_CARD', value: count }),
+  ]);
+}
+
 // ===================== СЛАГИ ПОПАЛИ В РЕЕСТР =====================
 
 describe('ABILITY_CONFIGS — присутствие героев', () => {
@@ -307,16 +325,17 @@ describe('bloody-mary (turn-start: gainAction +1 when hand size == 3)', () => {
 
 // ===================== TURN-END =====================
 
-describe('philippa (turn-end: drawToHandSize 4)', () => {
-  it('добирает руку до 4 карт', async () => {
+describe('philippa (turn-end: optional drawToHandSize 4)', () => {
+  it('предлагает добрать до 4 карт (можно отказаться), сама не добирает', async () => {
     const deps = makeDeps();
     const handler = handlerFor('philippa', deps);
     const state = makeState({ handZones: handOf(1) as any });
     const next = await handler.onTurnEnd(state, 'player1');
 
-    // дефицит = 4 - 1 = 3
-    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 3);
-    expect(next.handZones['player1'].cards).toHaveLength(4);
+    // дефицит = 4 - 1 = 3, решение за игроком
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next.handZones['player1'].cards).toHaveLength(1);
+    expectOptionalDraw(next, 3);
   });
 
   it('no-op: рука уже >= 4 (drawCards не зовётся)', async () => {
@@ -361,14 +380,15 @@ describe('t-rex (turn-end: draw 1)', () => {
   });
 });
 
-describe('bigfoot (turn-end: draw 1 when no enemy in own zone)', () => {
-  it('добирает 1, когда враг НЕ в зоне героя', async () => {
+describe('bigfoot (turn-end: optional draw 1 when no enemy in own zone)', () => {
+  it('предлагает добрать 1 (можно отказаться), когда враг НЕ в зоне героя', async () => {
     const deps = makeDeps({ zone: makeZoneStub(false) });
     const handler = handlerFor('bigfoot', deps);
     const state = makeState({ handZones: handOf(1) as any });
     const next = await handler.onTurnEnd(state, 'player1');
-    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
-    expect(next.handZones['player1'].cards).toHaveLength(2);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next.handZones['player1'].cards).toHaveLength(1);
+    expectOptionalDraw(next, 1);
   });
 
   it('no-op: враг в зоне героя', async () => {
@@ -396,23 +416,23 @@ function afterCtx(won: boolean): AfterCombatContext {
   };
 }
 
-describe('chupacabra (after-attack: always draw 1)', () => {
-  it('добирает 1 карту после ПОБЕДЫ в бою', async () => {
+describe('chupacabra (after-attack: always optional draw 1)', () => {
+  it('предлагает добрать 1 карту после ПОБЕДЫ в бою', async () => {
     const deps = makeDeps();
     const handler = handlerFor('chupacabra', deps);
     const state = makeState({ handZones: handOf(2) as any });
     const next = await handler.onAfterCombat(state, afterCtx(true));
-    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
-    expect(next.handZones['player1'].cards).toHaveLength(3);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expectOptionalDraw(next, 1);
   });
 
-  it('добирает 1 карту и после ПРОИГРЫША (condition always)', async () => {
+  it('предлагает добрать 1 карту и после ПРОИГРЫША (condition always)', async () => {
     const deps = makeDeps();
     const handler = handlerFor('chupacabra', deps);
     const state = makeState({ handZones: handOf(2) as any });
     const next = await handler.onAfterCombat(state, afterCtx(false));
-    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
-    expect(next.handZones['player1'].cards).toHaveLength(3);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expectOptionalDraw(next, 1);
   });
 });
 
@@ -455,7 +475,20 @@ describe('deadpool (after-attack: always heal 1)', () => {
   });
 });
 
-describe('michelangelo (after-attack: always draw 1)', () => {
+describe('michelangelo (after-attack and after-scheme: draw 1; hand 3)', () => {
+  it('добирает 1 карту после своей схемы', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('michelangelo', deps);
+    const next = await handler.onAfterScheme(makeState({ handZones: handOf(1) as any }), 'player1');
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(2);
+  });
+
+  it('стартовая и максимальная рука — 3 карты', () => {
+    expect(configFor('michelangelo')!.startingHandSize).toBe(3);
+    expect(configFor('michelangelo')!.maxHandSize).toBe(3);
+  });
+
   it('добирает 1 карту после боя (как при победе, так и при проигрыше)', async () => {
     const depsWon = makeDeps();
     const handlerWon = handlerFor('michelangelo', depsWon);
@@ -675,7 +708,7 @@ describe('leonardo (turn-start: pending-move any-own, maxSpaces 1)', () => {
 
 // ===================== TURN-DAMAGE ГЕРОИ =====================
 
-describe('dracula (turn-start: turn-damage enemy-adjacent value 1, thenDraw 1)', () => {
+describe('dracula (turn-start: optional pending-target-damage any-adjacent value 1, thenDraw 1)', () => {
   /** State: dracula-герой p1 и вражеский боец p2 на заданной позиции. */
   const stateWithEnemyAt = (pos: { x: number; y: number }, enemyHealth = 12): GameState =>
     makeState({
@@ -693,7 +726,7 @@ describe('dracula (turn-start: turn-damage enemy-adjacent value 1, thenDraw 1)',
       ],
     });
 
-  it('бьёт смежного врага на 1 урон И добирает 1 карту', async () => {
+  it('открывает optional выбор цели среди смежных бойцов, сам не бьёт и не добирает', async () => {
     const deps = makeDeps(); // реальный manhattanDistance в zone-стабе
     const handler = handlerFor('dracula', deps);
     // враг смежен с героем (manhattan distance === 1)
@@ -701,11 +734,35 @@ describe('dracula (turn-start: turn-damage enemy-adjacent value 1, thenDraw 1)',
 
     const next = await handler.onTurnStart(state, 'player1');
 
-    // -1 урон по врагу
-    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11);
-    // thenDraw: ровно 1 карта действующему игроку
-    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
-    expect(next.handZones['player1'].cards).toHaveLength(2);
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    const pending = next.metadata.pendingEffects ?? [];
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      type: 'TARGET_FIGHTER',
+      playerId: 'player1',
+      optional: true,
+      damage: 1,
+      drawAfterDamage: 1,
+      targetFighterIds: ['enemy-fighter-1'],
+    });
+  });
+
+  it('свои смежные бойцы (Sisters) тоже в целях, сам Dracula — нет', async () => {
+    const handler = handlerFor('dracula', makeDeps());
+    const base = stateWithEnemyAt({ x: 2, y: 1 });
+    const state = makeState({
+      ...base,
+      fighters: [
+        ...base.fighters,
+        makeFighter({ id: 'sister-1', name: 'The Sisters', type: FighterType.MINION, position: { x: 1, y: 2 } }),
+        makeFighter({ id: 'sister-far', name: 'The Sisters', type: FighterType.MINION, position: { x: 5, y: 5 } }),
+      ],
+    });
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    expect(next.metadata.pendingEffects?.[0].targetFighterIds).toEqual(['enemy-fighter-1', 'sister-1']);
   });
 
   it('no-op: смежного врага нет (враг далеко) — без урона и без добора', async () => {
@@ -1136,6 +1193,31 @@ describe('achilles (sidekick-defeated discard + all-sidekicks-defeated combat/af
     const next = await handler.onFighterDefeated(state, patroclus);
     expect(next.handZones['player1'].cards).toHaveLength(2); // 4 - 2
     expect(next.discardPiles['player1']).toHaveLength(2);
+  });
+
+  it('onFighterDefeated: сброс СЛУЧАЙНЫЙ — через deck.discardRandomCard, по разу на карту', async () => {
+    const discardRandomCard = jest.fn(async (s: GameState, userId: string) => {
+      // «случайной» стаб берёт вторую по счёту карту руки
+      const picked = s.handZones[userId].cards[1] ?? s.handZones[userId].cards[0];
+      const remaining = s.handZones[userId].cards.filter((c) => c !== picked);
+      return {
+        gameState: {
+          ...s,
+          handZones: { ...s.handZones, [userId]: { ...s.handZones[userId], cards: remaining } },
+          discardPiles: { ...s.discardPiles, [userId]: [...(s.discardPiles[userId] ?? []), picked] },
+        },
+      };
+    });
+    const deps = makeDeps({ deck: { ...makeDeckStub(), discardRandomCard } });
+    const handler = handlerFor('achilles', deps);
+    const state = stateWithSidekick(true, 4);
+    const patroclus = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+    const next = await handler.onFighterDefeated(state, patroclus);
+
+    expect(discardRandomCard).toHaveBeenCalledTimes(2);
+    expect(next.handZones['player1'].cards.map((c) => c.id)).toEqual(['c0', 'c3']);
+    expect(next.discardPiles['player1'].map((c) => c.id)).toEqual(['c1', 'c2']);
   });
 
   it('onFighterDefeated: no-op при гибели вражеского бойца', async () => {

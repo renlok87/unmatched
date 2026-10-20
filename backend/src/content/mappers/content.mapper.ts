@@ -91,7 +91,7 @@ export class ContentMapper {
       nameEn: prismaHero.nameEn || undefined,
       nameRu: prismaHero.nameRu || undefined,
       health: prismaHero.health,
-      movement: 3,
+      movement: prismaHero.movement,
       set: prismaHero.set,
       abilities: this.parsePrismaAbility(prismaHero.ability).map((a: any, i: number) => ({
         id: `${prismaHero.name}-ability-${i}`,
@@ -227,7 +227,7 @@ export class ContentMapper {
       nameEn: prismaHero.nameEn || undefined,
       nameRu: prismaHero.nameRu || undefined,
       health: prismaHero.health,
-      movement: 3, // Default value, should be stored in DB
+      movement: prismaHero.movement,
       set: prismaHero.set,
       abilities: this.parsePrismaAbility(prismaHero.ability),
       deckCards: cards.map((c) => this.prismaCardToCardDefinition(c)),

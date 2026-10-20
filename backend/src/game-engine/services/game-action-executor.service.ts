@@ -57,6 +57,7 @@ import { boardDistance, hasTopology } from '../engine/board-topology';
 import { DeckManagementService } from './deck-management.service';
 import { applyTerminalState } from '../engine/terminal-state';
 import { pruneHeadPendingsWithoutTargets } from '../effects/pending-targets';
+import { abilityConfigFor, abilityConfigOfPlayer } from '../abilities/ability-rules';
 import { buildCombatEffectLog } from '../effects/combat-effect-log';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
 // Residual-импорт engine→games: DTO-классы мутаций (runtime-импорт, но уже не
@@ -284,7 +285,9 @@ export class GameActionExecutorService {
 
     // Seven is an end-of-turn limit, never a draw limit. Keep the turn until
     // its owner selects exact instances; resume without replaying end effects.
-    const excess = (state.handZones[endingPlayerId]?.cards.length ?? 0) - 7;
+    // Hero override: Michelangelo's maximum hand size is 3 (ABILITY_CONFIGS).
+    const maxHand = abilityConfigOfPlayer(state, endingPlayerId)?.maxHandSize ?? 7;
+    const excess = (state.handZones[endingPlayerId]?.cards.length ?? 0) - maxHand;
     if (excess > 0) {
       return { ...state, phase: GamePhase.TURN_END,
         sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0),
@@ -426,6 +429,25 @@ export class GameActionExecutorService {
     const slug = heroFighter.heroSlug ?? heroFighter.heroId;
     return this.pruneOpenedChoice(state,
       await this.abilityRegistry.triggerOnTurnEndExtended(slug, state, playerId));
+  }
+
+  /**
+   * Вызвать хук «после своей схемы» героя разыгравшего игрока (Michelangelo).
+   * Зеркало triggerHeroTurnEnd; seq не трогаем — «прицеплено» к +1 схемы.
+   */
+  private async triggerHeroAfterScheme(
+    state: GameState,
+    playerId: string,
+  ): Promise<GameState> {
+    const heroFighter = state.fighters.find(
+      (f) => f.ownerId === playerId && f.type === FighterType.HERO,
+    );
+    if (!heroFighter) {
+      return state;
+    }
+    const slug = heroFighter.heroSlug ?? heroFighter.heroId;
+    return this.pruneOpenedChoice(state,
+      await this.abilityRegistry.triggerOnAfterScheme(slug, state, playerId));
   }
 
   /**
@@ -1153,6 +1175,12 @@ export class GameActionExecutorService {
       },
     });
 
+    // Dracula: «If you do, draw a card» — добор только после нанесённого урона
+    const drawn = pending.drawAfterDamage ?? 0;
+    if (drawn > 0 && newState.phase !== GamePhase.GAME_OVER) {
+      newState = applyTerminalState(await this.deckManagement.drawCards(newState, pending.playerId, drawn));
+    }
+
     newState = await this.drainAfterChoice(newState, userId, gameId, currentState.sequenceNumber);
 
     return {
@@ -1172,6 +1200,15 @@ export class GameActionExecutorService {
             valueApplied: damage,
             message: `DAMAGE ${damage} → ${target.name}`,
           },
+          ...(drawn > 0
+            ? [{
+                success: true,
+                effectId: `${pending.id}-draw`,
+                targetIds: [pending.playerId],
+                valueApplied: drawn,
+                message: `DRAW ${drawn}`,
+              }]
+            : []),
         ],
       },
     };
@@ -2424,6 +2461,10 @@ export class GameActionExecutorService {
         // Карта всегда уходит в сброс (instance id; discardCard не трогает seq)
         nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
 
+        // Способность «после схемы» (Michelangelo: «After you attack or scheme,
+        // draw 1 card») — после эффектов карты, до списания действия
+        nextState = applyTerminalState(await this.triggerHeroAfterScheme(nextState, userId));
+
         // Свой +1 к seq — у scheme нет movementService, инкрементим сами
         let newState: GameState = {
           ...nextState,
@@ -3092,6 +3133,19 @@ export class GameActionExecutorService {
           success: false,
           error: `Неизвестная стойка «${dto.stanceId}» (доступны: ${stanceIds.join(', ')})`,
         };
+      }
+      // RULE-03: стойку выбирают только в начале игры (Alice «When you place
+      // Alice, choose…»), один раз и до первого действия своего первого хода.
+      // Дальше стойку меняют только эффекты (CHANGE_SIZE, авто-флип Ali).
+      if (!abilityConfigFor(slug)?.stanceChoiceAtStart) {
+        return { success: false, error: 'Стойку этого героя меняют только эффекты карт и способности' };
+      }
+      if (currentState.metadata.heroStances?.[userId] !== undefined) {
+        return { success: false, error: 'Стойка уже выбрана — дальше её меняют только эффекты карт' };
+      }
+      const firstTurn = currentState.turnCount <= Math.max(1, currentState.players.length);
+      if (!firstTurn || getActionsRemaining(currentState) < ACTIONS_PER_TURN) {
+        return { success: false, error: 'Стойку выбирают в начале игры, до первого действия' };
       }
 
       const newState: GameState = {
