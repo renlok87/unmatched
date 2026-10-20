@@ -16,7 +16,9 @@
  *   - cells = fixture.cells verbatim (spaceId / zones / layout / start / links;
  *     every lattice position without a space is an explicit {x, y, isObstacle});
  *   - name = "<Map> · original map" (Board.name is unique and a scraped
- *     "<Map>" row may already exist); nameEn/nameRu = the map name;
+ *     "<Map>" row may already exist); nameEn = the map name, nameRu = its
+ *     Russian name (MAP_NAME_RU; 2026-10-21 playtest F3f: the RU client shows
+ *     «Мармореаль» / «Сарпедон», not the technical key);
  *   - features = { topology: true, fixture path + sha256, source image path +
  *     sha256 + size (ENV-U3: the image itself stays out of git and out of the
  *     DB - imageUrl is null), zones palette, uuPerPx, spaceRadiusPx, summary }.
@@ -302,12 +304,15 @@ export function loadTopologyFixture(file: string): { fixture: TopologyFixture; s
 const toJsonObject = (value: object): Prisma.InputJsonObject =>
   JSON.parse(JSON.stringify(value)) as Prisma.InputJsonObject;
 
+/** The Russian names of the original maps (docs/art-pipeline art hub; 2026-10-21 playtest F3f). */
+export const MAP_NAME_RU: Readonly<Record<string, string>> = { marmoreal: 'Мармореаль', sarpedon: 'Сарпедон' };
+
 export function topologyBoardRow(fixture: TopologyFixture, sha256: string, fixtureFile: string) {
   return {
     id: fixture.boardId,
     name: `${fixture.name} · original map`,
     nameEn: fixture.name,
-    nameRu: fixture.name,
+    nameRu: MAP_NAME_RU[fixture.map] ?? fixture.name,
     set: fixture.set,
     width: fixture.lattice.width,
     height: fixture.lattice.height,

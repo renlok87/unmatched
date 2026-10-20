@@ -65,12 +65,20 @@ export function engineVersion(): EngineVersion {
 
 /** Keys of serialize(state).m and .m.ci that hold wall-clock time. */
 const CLOCK_KEYS_META = ['la'] as const;
+/**
+ * Presentation records of serialize(state).m the hash leaves out: `le`
+ * (LastEffect, 2026-10-21 playtest F5c) is derived from the rules' own result
+ * and only tells the clients what happened - leaving it out keeps the journals
+ * recorded before it replayable (their hashes stay the same).
+ */
+const PRESENTATION_KEYS_META = ['le'] as const;
 const CLOCK_KEYS_COMBAT = ['sa', 'ta'] as const;
 
 /** sha256 of serialize(state) without clock fields; stable across key order. */
 export function canonicalStateHash(serialized: SerializedGameState): string {
   const m: Record<string, unknown> = { ...serialized.m };
   for (const k of CLOCK_KEYS_META) delete m[k];
+  for (const k of PRESENTATION_KEYS_META) delete m[k];
   if (m.ci && typeof m.ci === 'object') {
     const ci: Record<string, unknown> = { ...(m.ci as Record<string, unknown>) };
     for (const k of CLOCK_KEYS_COMBAT) delete ci[k];

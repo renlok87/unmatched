@@ -13,6 +13,7 @@ import { parseCardEffectTexts, upgradeStaleParserEffects } from '../effects/effe
 import { s03Engine } from '../../test/fixtures/s03-engine.fixture';
 import { nextChoiceStepId } from './game-action-executor.service';
 import { GameStateService } from '../../games/game-state.service';
+import { canonicalStateHash } from '../../games/replay/replay-format';
 
 const { executor } = s03Engine();
 const ctx = (state: GameState, userId = 'a') =>
@@ -465,6 +466,21 @@ describe('GD-022: Restless Spirits (SCHEME x2) — two-stage zone/adjacent area 
     expect(after.metadata.pendingEffects ?? []).toHaveLength(0);
     expect(after.currentTurnPlayerId).toBe('a');
     expect(after.metadata.actionsRemaining).toBe(1);
+    // 2026-10-21 playtest F5c: the public record of the area - the anchor then the adjacent space, the hit, the defeat
+    expect(after.metadata.lastEffect).toEqual({
+      n: 1,
+      seq: after.sequenceNumber,
+      playerId: 'a',
+      sourceRef: pending.id,
+      kind: 'ZONE_AREA_DAMAGE',
+      cells: [{ x: 5, y: 1 }, { x: 4, y: 1 }],
+      targets: ['bmin'],
+      damage: 2,
+      defeated: ['bmin'],
+      drawn: 1,
+    });
+    // no record before stage 2 (stage 1 only asks the next question)
+    expect(cur.metadata.lastEffect).toBeUndefined();
   });
 
   it('positive: урон в ОБЕИХ клетках по вражеским бойцам, свои не задеты', async () => {
@@ -503,6 +519,19 @@ describe('GD-022: Restless Spirits (SCHEME x2) — two-stage zone/adjacent area 
     expect(after.metadata.pendingEffects ?? []).toHaveLength(0);
     expect(after.handZones.a.cards).toHaveLength(0);
     expect(after.decks.a.drawPile.map((c) => c.id)).toEqual(['d1::0']);
+    // F5c: «no enemies there» is a record too (the client says it in the journal)
+    expect(after.metadata.lastEffect).toMatchObject({
+      n: 1, kind: 'ZONE_AREA_DAMAGE', cells: [{ x: 4, y: 1 }, { x: 4, y: 0 }], targets: [], defeated: [], drawn: 0,
+    });
+    // save/load keeps it (key `le`); old saves read as no record; the replay hash leaves it out (journals before F5c)
+    const serializer = new GameStateService({} as never, {} as never);
+    const wire = JSON.parse(JSON.stringify(serializer.serialize(after)));
+    expect(wire.m.le.cells).toHaveLength(2);
+    expect(serializer.deserialize(wire).metadata.lastEffect).toEqual(after.metadata.lastEffect);
+    const withRecord = canonicalStateHash(wire);
+    delete wire.m.le;
+    expect(serializer.deserialize(wire).metadata.lastEffect).toBeUndefined();
+    expect(canonicalStateHash(wire)).toBe(withRecord);
   });
 
   it('negative: чужой игрок не резолвит выбор клетки', async () => {

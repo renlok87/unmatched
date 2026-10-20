@@ -96,6 +96,7 @@ export interface SerializedGameState {
     lm?: GameStateMetadata['lastMovement']; // MS-T-14: публичный след перемещения (сейвы без поля → «следа нет»)
     se?: GameStateMetadata['skippedEffects']; // DE-016: эффекты, пропущенные без целей (сейвы без поля → «пропусков нет»)
     lcr?: GameStateMetadata['lastCombat']; // R-01: публичная запись последнего боя и его эффектов (сейвы без поля → «записи нет»)
+    le?: GameStateMetadata['lastEffect']; // F5c 2026-10-21: публичная запись последнего эффекта области (сейвы без поля → «записи нет»)
     rs?: GameStateMetadata['rng']; // DET-1: состояние RNG игры (сейвы без поля → свежее crypto-состояние при первом броске)
   };
 }
@@ -292,6 +293,8 @@ export function serializeGameState(state: GameState): SerializedGameState {
       se: state.metadata.skippedEffects,
       // R-01: запись последнего боя с журналом эффектов (без поля — undefined)
       lcr: state.metadata.lastCombat,
+      // F5c (2026-10-21): запись последнего эффекта области вне боя (без поля — undefined)
+      le: state.metadata.lastEffect,
       // DET-1: состояние RNG игры (только сервер: filterPrivateData его вырезает)
       rs: state.metadata.rng,
     },
@@ -430,6 +433,8 @@ export function deserializeGameState(data: SerializedGameState | any): GameState
       skippedEffects: data.m.se,
       // R-01: сейвы до журнала боя (без lcr) → undefined, «записи нет»
       lastCombat: data.m.lcr,
+      // F5c: сейвы до записи эффекта области (без le) → undefined, «записи нет»
+      lastEffect: data.m.le,
       // DET-1: сейвы до RNG (или мусор) → undefined, первый бросок возьмёт crypto-состояние
       rng: isRngState(data.m.rs) ? data.m.rs : undefined,
     },

@@ -323,6 +323,39 @@ export interface LastCombat {
 }
 
 /**
+ * 2026-10-21 playtest F5c: public record of the last area effect resolved
+ * out of combat (CHOOSE_SPACE stage 2, Restless Spirits) - the spaces, the
+ * fighters hit, the damage. The choice step itself left no public trace: the
+ * client's journal and the board had nothing to show (the damage, the
+ * defeated, «no enemies there»). Written on the FINAL state of the resolve
+ * (`seq`); `n` is monotonic within the game, so a client shows each record
+ * once. Only fighter ids, positions and the pending effect's own id (public
+ * in pendingEffects) - never a card instance id. Stored in the DB under `le`;
+ * saves without it read as "no record". A presentation record: the replay
+ * hash (canonicalStateHash) leaves it out, so journals before it still match.
+ */
+export interface LastEffect {
+  /** Monotonic within the game (1, 2, …) */
+  readonly n: number;
+  /** sequenceNumber of the state that resolved the effect */
+  readonly seq: number;
+  /** The owner of the effect (who chose the spaces) */
+  readonly playerId: string;
+  /** The pending effect's root id (`<effect id>-p<n>`, without the `#<step>`) */
+  readonly sourceRef: string;
+  readonly kind: 'ZONE_AREA_DAMAGE';
+  /** The chosen spaces: the stage-1 anchor first, then the stage-2 space */
+  readonly cells: readonly { readonly x: number; readonly y: number }[];
+  /** Enemy fighters in those spaces that took the damage */
+  readonly targets: readonly string[];
+  readonly damage: number;
+  /** Of `targets`, the ones this damage defeated */
+  readonly defeated: readonly string[];
+  /** Cards the owner drew for a defeat (drawIfDefeated), 0 when none */
+  readonly drawn: number;
+}
+
+/**
  * Метаданные состояния
  */
 export interface GameStateMetadata {
@@ -334,6 +367,8 @@ export interface GameStateMetadata {
   readonly skippedEffects?: readonly SkippedEffect[];
   /** R-01: public record of the last resolved combat and its fired effects (see LastCombat) */
   readonly lastCombat?: LastCombat;
+  /** 2026-10-21 playtest F5c: public record of the last out-of-combat area effect (see LastEffect) */
+  readonly lastEffect?: LastEffect;
   /** End-turn effects have completed; selected excess instances must be discarded. */
   readonly pendingHandDiscard?: { readonly id: string; readonly playerId: string; readonly count: number };
   readonly lastActionAt: Date;

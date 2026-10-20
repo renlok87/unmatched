@@ -135,6 +135,7 @@ describe('seed-env-map-boards: fixtures', () => {
       id: 'c121b47f8d6eb28daccb76d05',
       name: 'Marmoreal · original map',
       nameEn: 'Marmoreal',
+      nameRu: 'Мармореаль',
       set: 'battle-of-legends-volume-one',
       width: 7,
       height: 6,

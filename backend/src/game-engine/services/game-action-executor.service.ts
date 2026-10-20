@@ -22,6 +22,7 @@ import type {
   PendingEffect,
   LastMovement,
   LastMovementMove,
+  LastEffect,
   Position,
 } from '../models';
 import {
@@ -186,6 +187,21 @@ function withLastMovement(state: GameState, trail: Omit<LastMovement, 'seq'>): G
   return {
     ...state,
     metadata: { ...state.metadata, lastMovement: { seq: state.sequenceNumber, ...trail } },
+  };
+}
+
+/**
+ * 2026-10-21 playtest F5c: records the public area-effect record (LastEffect)
+ * on the FINAL state of a resolve, so `seq` equals the sequenceNumber the
+ * client applies; `n` grows by one per record within the game.
+ */
+function withLastEffect(state: GameState, prev: GameState, record: Omit<LastEffect, 'n' | 'seq'>): GameState {
+  return {
+    ...state,
+    metadata: {
+      ...state.metadata,
+      lastEffect: { n: (prev.metadata.lastEffect?.n ?? 0) + 1, seq: state.sequenceNumber, ...record },
+    },
   };
 }
 
@@ -1570,6 +1586,7 @@ export class GameActionExecutorService {
         ? `ZONE_AREA_DAMAGE ${damage} → ${targets.map((t) => t.name).join(', ')}`
         : 'В выбранных клетках нет вражеских бойцов',
     }];
+    const drawn = defeatedByEffect ? (pending.drawIfDefeated ?? 0) : 0;
     if (defeatedByEffect && (pending.drawIfDefeated ?? 0) > 0) {
       nextState = await this.deckManagement.drawCards(nextState, userId, pending.drawIfDefeated ?? 1);
       applied.push({
@@ -1580,6 +1597,21 @@ export class GameActionExecutorService {
     }
     nextState = applyTerminalState(nextState);
     nextState = await this.drainAfterChoice(nextState, userId, gameId, currentState.sequenceNumber);
+    // 2026-10-21 playtest F5c: the public record of the area (the client's journal line and the pulse on both spaces);
+    // only fighter ids and positions - the pending id is already public in pendingEffects
+    const defeatedIds = nextState.fighters
+      .filter((f) => !defeatedBefore.has(f.id) && f.isDefeated && targets.some((t) => t.id === f.id))
+      .map((f) => f.id);
+    nextState = withLastEffect(nextState, currentState, {
+      playerId: userId,
+      sourceRef: pending.id.replace(/#\d+$/, ''),
+      kind: 'ZONE_AREA_DAMAGE',
+      cells: [{ x: anchor.x, y: anchor.y }, { x: target.x, y: target.y }],
+      targets: targets.map((t) => t.id),
+      damage,
+      defeated: defeatedIds,
+      drawn,
+    });
 
     return {
       success: true,
