@@ -1,0 +1,139 @@
+[
+  {
+    "asset": "ASSET-BRUCE-LEE-001",
+    "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-concept/20261021-sheet-r1",
+    "card": {
+      "schema": "unmatched.concept-acceptance/1",
+      "kind": "concept",
+      "asset_id": "ASSET-BRUCE-LEE-001",
+      "clip": null,
+      "cycle": "r1",
+      "date": "2026-10-21",
+      "previous_card": null,
+      "accepted_object": [
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-front.png",
+          "sha256": "6f8ddd5a9d6c65deda13fd0bd294b1d4591df05352d4bd495d3fce5ed0ebd38e"
+        },
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png",
+          "sha256": "da72946b46715eaac8f930e89b794c72d0a2c1229c070904192179c23ad6d7b7"
+        },
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-back.png",
+          "sha256": "b4636cb7543337ac28a351ad066726a66a26d522d94d49a3ef87d1867599d159"
+        }
+      ],
+      "frames": {
+        "dir": "art/imagegen/concept-bruce-lee-codex",
+        "files": [
+          "sheet-bruce-lee.png",
+          "bruce-lee-front.png",
+          "bruce-lee-side.png",
+          "bruce-lee-back.png",
+          "checks-report.json"
+        ]
+      },
+      "reports": [
+        "art/imagegen/concept-bruce-lee-codex/checks-report.json",
+        "art/imagegen/concept-bruce-lee-codex/generation-records.json",
+        "art/imagegen/concept-bruce-lee-codex/verification.json"
+      ],
+      "gates": {
+        "G-CHECKS": {
+          "status": "PASS",
+          "source": "art/imagegen/concept-bruce-lee-codex/checks-report.json",
+          "note": "check_concept_views.py: verdict PASS, summary PASS 31 / WARN 2 / FAIL 0. WARN: back view.single_component (прочие компоненты 1,29 % и 1,07 %) и set.base_bottom 2,019 % (порог FAIL 3,5 %); учтены в C. sha256 входов совпадают с accepted_object и generation-records.json.",
+          "source_defect": null
+        }
+      },
+      "scores": {
+        "S": {
+          "value": 2,
+          "rationale": "Силуэт ясный на всех трёх видах. bruce-lee-front.png: широкая стойка с большим просветом между ногами, локти отведены, у талии с обеих сторон видны просветы, обе кисти-«когти» на уровне груди. bruce-lee-side.png: обе кисти вынесены вперёд на фоне, профиль строгий. bruce-lee-back.png: левая кисть выходит за силуэт, правая закрыта корпусом, как в ortho_back. Поза боевая, не T и не A; оружия нет (WEAPON_HAND none); лишних или недостающих частей нет, на каждой кисти по пять пальцев. Тонкие части помечены для этапов 3–4: растопыренные пальцы обеих кистей; правая кисть на front лежит на фоне груди и читается по тону кожи на жёлтом.",
+          "frames": [
+            "bruce-lee-front.png",
+            "bruce-lee-side.png",
+            "bruce-lee-back.png",
+            "sheet-bruce-lee.png"
+          ]
+        },
+        "C": {
+          "value": 1.5,
+          "rationale": "Поза совпадает с орто 1b на всех видах. Асимметрия рук выдержана: левая кисть дальше от корпуса и ниже, поэтому на bruce-lee-back.png она выходит слева; на bruce-lee-side.png правая кисть выше и впереди. Широкая стойка front в профиле даёт ноги одной колонной. SIDE_VIEW left выдержан: фигура смотрит влево, как ortho_left. Пропорции: рост 89,5 / 90,8 / 91,3 % (set.height PASS, разброс 1,9 %), центр подставки расходится на 0,24 %. Якоря совпадают: полосы по рукаву, боку корпуса и штанине; рукава закатаны до локтя; обувь чёрная с двумя жёлтыми полосами; короткие чёрные волосы с чёлкой. Профиль и вид сзади строгие, подставка видна в ребро. Мелкие расхождения: WARN set.base_bottom 2,019 % (подставка на front выше примерно на 2 % кадра, фигура чуть меньше); WARN view.single_component на back (визуально одна фигура); волосы на side и back прорисованы крупными чешуйчатыми прядями, на front — мелкими; сзади пояс со шлёвкой, спереди шов по талии.",
+          "frames": [
+            "sheet-bruce-lee.png",
+            "bruce-lee-front.png",
+            "bruce-lee-side.png",
+            "bruce-lee-back.png",
+            "checks-report.json"
+          ]
+        },
+        "Q": {
+          "value": 1.5,
+          "rationale": "Уровень расписанной коллекционной статуэтки: лепка лица с напряжённым выражением, жилы и мышцы предплечий, замшевая фактура костюма, кожаная обувь со шнурками и полосами, каменная фактура подставки. Материалы (ткань, кожа, обувь, камень) различимы. Против medusa-quality-reference.png отдельные зоны беднее: крупные жёлтые плоскости со скупыми мягкими складками (особенно спина на bruce-lee-back.png), однообразные чешуйчатые пряди волос на bruce-lee-side.png и bruce-lee-back.png. Орнамента нет по дизайну. Близко к эталону, отдельные зоны беднее.",
+          "frames": [
+            "bruce-lee-front.png",
+            "bruce-lee-side.png",
+            "bruce-lee-back.png",
+            "sheet-bruce-lee.png"
+          ]
+        },
+        "P": {
+          "value": 2,
+          "rationale": "Свотчи sheet-bruce-lee.png равны PALETTE (#E0B830, #141414, #C49A74, #1E1C1C) и совпадают с фигурой: жёлтый костюм, чёрные полосы, тёплая загорелая кожа, чёрная обувь. Командного цвета и посторонних цветов нет; жёлтые полосы на обуви есть и в утверждённом дизайне. Доли из checks-report.json: suit yellow 22,8 %, stripe black 18,5 %, skin tan 2,8 %, shoe black 26,0 % (вместе с подставкой). Все три якоря (жёлтый комбинезон с чёрными боковыми полосами, боевая стойка без оружия, короткие чёрные волосы) видны на каждом виде, где они видимы.",
+          "frames": [
+            "sheet-bruce-lee.png",
+            "bruce-lee-front.png",
+            "bruce-lee-side.png",
+            "bruce-lee-back.png",
+            "checks-report.json"
+          ]
+        }
+      },
+      "score": 8.8,
+      "verdict": "pass",
+      "verdict_reason": null,
+      "rework_fix_list": [],
+      "known_issues": [
+        {
+          "item": "C",
+          "frame": "bruce-lee-front.png",
+          "note": "set.base_bottom WARN 2,019 %: подставка на front выше примерно на 2 % кадра (ground 93,4 % против 95,1 и 95,4 %), фигура чуть меньше (рост 89,5 % против 90,8 и 91,3 %). При следующей CORRECTION выровнять линию земли."
+        },
+        {
+          "item": "C",
+          "frame": "bruce-lee-back.png",
+          "note": "view.single_component WARN (прочие компоненты 1,29 % и 1,07 %). Визуально одна фигура на одной подставке без лишних частей; вероятно, тёмные обувь, волосы или подставка на тёмном фоне сегментируются отдельно."
+        },
+        {
+          "item": "C",
+          "frame": "bruce-lee-side.png",
+          "note": "Волосы на side и back прорисованы крупными чешуйчатыми прядями, на front — мелкими. Форма причёски и чёлка совпадают."
+        },
+        {
+          "item": "C",
+          "frame": "bruce-lee-back.png",
+          "note": "Сзади пояс читается как пояс брюк со шлёвкой по центру (так же в ortho_back 1b), спереди — шов по талии. Якорь «комбинезон» сохраняется; на этапах 3–4 вести костюм одной тканью."
+        },
+        {
+          "item": "Q",
+          "frame": "bruce-lee-back.png",
+          "note": "Крупные жёлтые плоскости костюма со скупыми мягкими складками, особенно на спине; внутренних деталей меньше, чем у эталона Medusa. Это свойство дизайна, а не дефект генерации."
+        },
+        {
+          "item": "S",
+          "frame": "bruce-lee-front.png",
+          "note": "Тонкие части для этапов 3–4: растопыренные пальцы обеих кистей (в орто 1b уже частично слиты). Правая кисть на front лежит на фоне груди; правое предплечье и кисть сзади закрыты корпусом, как в ortho_back."
+        }
+      ],
+      "acceptor": {
+        "profile": "Opus xhigh",
+        "session_id": "workflow:acceptor-ASSET-BRUCE-LEE-001-r1"
+      },
+      "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe",
+      "decided_by": "delegated (ВР-реестр 2026-10-06)",
+      "status_note": "Лист 1c ASSET-BRUCE-LEE-001, цикл r1: S 2, C 1,5, Q 1,5, P 2, сумма 7 из 8, score 8,8. G-CHECKS PASS (FAIL 0, WARN 2). Pass вне полосы 8,0–8,4, второй приёмщик по правилу не нужен. Художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Виды 1c сгенерированы в Tripo Studio Image (GPT Image 2) по орто 1b и дизайну 1a: Gemini отказал по публичной персоне (verification.json, stage_1c). sha256 видов совпадают с generation-records.json и checks-report.json."
+    }
+  }
+]
