@@ -510,10 +510,10 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `why.immobilized` | {fighterName} не может двигаться | {fighterName} cannot move | `FIGHTER_IMMOBILIZED` |
 | `why.fighter.not.yours` | Это боец соперника | That is an opponent's fighter | `NOT_YOUR_FIGHTER` |
 | `why.fighter.defeated` | Боец побеждён | Fighter is defeated | `FIGHTER_DEFEATED` |
-| `why.boost.no.value` | У карты нет BOOST | This card has no BOOST | `BOOST_NO_VALUE`; клиент (MS-D-20) |
+| `why.boost.no.value` | У карты нет УСИЛЕНИЯ | This card has no BOOST | `BOOST_NO_VALUE`; клиент (MS-D-20) |
 | `why.boost.card.gone` | Карты буста больше нет в руке | The boost card is no longer in hand | `CARD_NOT_IN_HAND` |
 | `why.maneuver.not.open` | Манёвр не начат | No maneuver in progress | `MANEUVER_NOT_OPEN`, `INVALID_PHASE` |
-| `why.place.zone` | Нужно пространство в зоне {fighterName} | Choose a space in {fighterName}'s zone | `PLACE_OUTSIDE_ZONE` |
+| `why.place.zone` | Нужно пространство в зоне бойца: {fighterName} | Choose a space in {fighterName}'s zone | `PLACE_OUTSIDE_ZONE` |
 | `why.predraft.lost` | Цель больше недоступна — выберите заново | Target no longer reachable — choose again | клиент |
 | `why.wait.opponent.choice` | Соперник делает выбор | Waiting for the opponent's choice | клиент (MS-E-47) |
 | `why.board.too.large` | Поле больше 20 — манёвр недоступен | Board wider than 20 — maneuver unavailable | клиент (MS-E-31) |
@@ -584,9 +584,9 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.status.fighter` | Выберите бойца, который пойдёт | Choose a fighter to move |
 | `ms.status.space` | {fighterName}: выберите клетку; Enter — подтвердить манёвр | Choose a space for {fighterName}; Enter confirms the maneuver |
 | `ms.status.attacker` | Выберите атакующего бойца | Choose the attacking fighter |
-| `ms.status.target` | Выберите цель для {fighterName} | Choose a target for {fighterName} |
-| `ms.status.attack.card` | Выберите карту атаки против {target} (1–9) | Choose an attack card against {target} (1–9) |
-| `ms.status.attack.go` | Атакуйте {target} (Enter) | Attack {target} (Enter) |
+| `ms.status.target` | {fighterName}: выберите цель | Choose a target for {fighterName} |
+| `ms.status.attack.card` | Цель — {target}: выберите карту атаки (1–9) | Choose an attack card against {target} (1–9) |
+| `ms.status.attack.go` | Атаковать: {target} (Enter) | Attack {target} (Enter) |
 | `ms.status.scheme` | Выберите карту схемы и сыграйте её (Enter) | Choose a scheme card and play it (Enter) |
 | `ms.status.defend` | Вас атакуют: выберите карту защиты или «Без защиты» (N) | You are attacked: choose a defense card or No defense (N) |
 | `ms.status.defend.none` | Вас атакуют: защититься нечем — нажмите «Без защиты» (N) | You are attacked: nothing to defend with - press No defense (N) |
@@ -606,9 +606,9 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.pending.remembered` | В прошлый раз: {choice} | Last time: {choice} |
 | `ms.btn.collapse` | Свернуть (C) | Collapse (C) |
 | `ms.btn.expand` | Развернуть (C) | Expand (C) |
-| `ms.ability.boost` | {fighterName}: добавить BOOST к этой атаке? | {fighterName}: add a BOOST to this attack? |
-| `ms.btn.boost.attack` | Атаковать с BOOST (Enter) | Attack with BOOST (Enter) |
-| `ms.btn.noboost` | Атаковать без BOOST (N) | Attack without BOOST (N) |
+| `ms.ability.boost` | {fighterName}: УСИЛИТЬ эту атаку? | {fighterName}: add a BOOST to this attack? |
+| `ms.btn.boost.attack` | Атаковать с УСИЛЕНИЕМ (Enter) | Attack with BOOST (Enter) |
+| `ms.btn.noboost` | Атаковать без УСИЛЕНИЯ (N) | Attack without BOOST (N) |
 | `ms.log.maneuver` | {player}: манёвр{boostPart}: {moves} | {player}: maneuver{boostPart}: {moves} |
 | `ms.log.attack` | {attacker} → {target}: урон {damage} | {attacker} → {target}: {damage} damage |
 | `ms.log.boost.part` | , буст +{n} ({cardName}) | , boost +{n} ({cardName}) |
