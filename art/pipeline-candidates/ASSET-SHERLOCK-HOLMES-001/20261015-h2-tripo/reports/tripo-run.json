@@ -1,0 +1,487 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-98",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "date": "2026-10-15",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (оркестратор 3d-model-pipeline) в браузере пользователя через Windows-MCP: клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "734b9954-d674-40b6-beed-e7fd037c26f4",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/734b9954-d674-40b6-beed-e7fd037c26f4"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png",
+        "sha256": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05"
+      },
+      "left": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-side.png",
+        "sha256": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-back.png",
+        "sha256": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "генерация 2026-10-15 (README прогона); текстура 2026-10-20: форма текстуры по видам 1c (Front/Left/Back загружены вручную), 8K, Remove Lighting вкл.",
+    "studio_settings_after": "не менялись"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20410.0,
+        "balance_after": 20350.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20255.0,
+        "balance_after": 20225.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20225.0,
+        "balance_after": 20220.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/sherlock-holmes-h2-tripo-734b9954-parts14.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "97fbb345165c3aa69f80b29e5ca87b6edc04304dacd3db33d6871a4c3b8a8013",
+      "bytes": 47340980,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 14,
+      "triangles": 1966070,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 444110
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 30720
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 10273
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 7970
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 7076
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 784705
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 220419
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 111216
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 105566
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 71339
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 71415
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 37890
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 30488
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 32883
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/sherlock-holmes-h2-tripo-734b9954-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "324143c260d88ecf4061a1c6c927e6c10637af56e22a61cacae7fccfd857384a",
+      "bytes": 80769864,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 14,
+      "triangles": 1966070,
+      "materials": 14,
+      "images": 42,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 444110
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 30720
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 10273
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 7970
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 7076
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 784705
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 220419
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 111216
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 105566
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 71339
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 71415
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 37890
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 30488
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 32883
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 444110,
+      "min": [
+        -0.1132,
+        0.1229,
+        -0.0569
+      ],
+      "max": [
+        0.1132,
+        0.5715,
+        0.0631
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 784705,
+      "min": [
+        -0.2246,
+        0.2137,
+        -0.1247
+      ],
+      "max": [
+        0.234,
+        0.8453,
+        0.1087
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 220419,
+      "min": [
+        -0.2425,
+        0.0,
+        -0.2424
+      ],
+      "max": [
+        0.2425,
+        0.0919,
+        0.2424
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 111216,
+      "min": [
+        -0.0523,
+        0.8902,
+        -0.065
+      ],
+      "max": [
+        0.052,
+        0.9787,
+        0.0944
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 105566,
+      "min": [
+        -0.1976,
+        0.6346,
+        -0.0108
+      ],
+      "max": [
+        -0.1152,
+        0.8363,
+        0.2059
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 71339,
+      "min": [
+        -0.0535,
+        0.8192,
+        -0.0557
+      ],
+      "max": [
+        0.0537,
+        0.9135,
+        0.0635
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 71415,
+      "min": [
+        -0.0736,
+        0.5445,
+        0.0116
+      ],
+      "max": [
+        0.0755,
+        0.7949,
+        0.0821
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 37890,
+      "min": [
+        0.0575,
+        0.0896,
+        -0.0557
+      ],
+      "max": [
+        0.1379,
+        0.1417,
+        0.1007
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 30488,
+      "min": [
+        0.1671,
+        0.4692,
+        0.0286
+      ],
+      "max": [
+        0.2135,
+        0.543,
+        0.1008
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 32883,
+      "min": [
+        0.1104,
+        0.509,
+        -0.0398
+      ],
+      "max": [
+        0.2064,
+        0.6324,
+        0.0649
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 30720,
+      "min": [
+        -0.1378,
+        0.0888,
+        -0.0556
+      ],
+      "max": [
+        -0.0574,
+        0.1426,
+        0.1007
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 10273,
+      "min": [
+        -0.0413,
+        0.7603,
+        -0.0412
+      ],
+      "max": [
+        0.0386,
+        0.8482,
+        0.0387
+      ]
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 7970,
+      "min": [
+        -0.1378,
+        0.0897,
+        -0.0554
+      ],
+      "max": [
+        -0.0574,
+        0.1054,
+        0.0872
+      ]
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "meshes[13]",
+      "tris": 7076,
+      "min": [
+        -0.0154,
+        0.7295,
+        0.0152
+      ],
+      "max": [
+        0.0149,
+        0.8201,
+        0.0574
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-734b9954-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/preview",
+    "out": "\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-SHERLOCK-HOLMES-001\\20261015-h2-tripo\\preview\\draft-orthos-3jxslx5p --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  }
+}

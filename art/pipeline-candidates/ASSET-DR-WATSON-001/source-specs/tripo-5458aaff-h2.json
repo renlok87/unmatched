@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-5458aaff-h2",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "service": "tripo-studio",
+  "task_id": "5458aaff-3354-4d17-9c59-b455eb41ab0f",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/5458aaff-3354-4d17-9c59-b455eb41ab0f",
+  "date": "2026-10-20",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+        "sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4"
+      },
+      "left": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+        "sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+        "sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-dr-watson-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20220.0,
+        "balance_after": 20160.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20160.0,
+        "balance_after": 20130.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20130.0,
+        "balance_after": 20125.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-parts20.glb",
+      "expected_sha256": "24c94687b0fbd2510babd4115df5da9b9e3d8a292946dc3bd99a7162f3b4d8e3",
+      "expected_bytes": 46902716,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-tex8k-pbr.glb",
+      "expected_sha256": "36352ad79a9a6191212072fd55cc6a880f07df04fb283f7b2c993e1122cd6036",
+      "expected_bytes": 82181428,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 20,
+      "glb_triangles": 1946780,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 20,
+      "glb_triangles": 1946780,
+      "glb_materials": 20,
+      "glb_images": 60,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

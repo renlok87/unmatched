@@ -12,9 +12,9 @@
 
 | Фигура | ASSET_ID | VISUAL_CARD_ID | Этап | Текущий run / шаг | Циклы | Заметки |
 |---|---|---|---|---|---|---|
-| Bruce Lee | ASSET-BRUCE-LEE-001 | AN-51 | 1 | 1a принят Sol 9,4 (Codex, 2026-10-13); 1b черновик оплачен в Studio (70729ed4), GLB не выгружен; 1c — Gemini | концепт: 1a r1 | 1a переделать в Gemini для сравнения |
-| Sherlock Holmes | ASSET-SHERLOCK-HOLMES-001 | AN-98 | 2 | 1c принят Sol 8,8 (2026-10-15); H2 геометрия в Studio (734b9954, 60 кр.), выгрузка не завершена; 8K/PBR не начаты | концепт: 1a r1, 1c r1 | — |
-| Dr. Watson | ASSET-DR-WATSON-001 | AN-64 | 2 | 1c принят Sol 8,8 (2026-10-15); H2 не начат | концепт: 1a r1, 1c r1 | помощник Sherlock |
+| Bruce Lee | ASSET-BRUCE-LEE-001 | AN-51 | 1 | 1a принят Sol 9,4 (Codex, 2026-10-13); 1b черновик 70729ed4 выгружен 2026-10-20 (`20261013-draft-tripo/source`, орто чистые); 1c — Gemini отказал (F2), путь лицензионной фигуры — unstability.ai | концепт: 1a r1 | — |
+| Sherlock Holmes | ASSET-SHERLOCK-HOLMES-001 | AN-98 | 3 | этап 2 готов: `20261015-h2-tripo` 734b9954, 14 частей, 1 966 070 tris, parts14 + tex8k-pbr, register-source OK, превью чистое (лупа в правой) | концепт: 1a r1, 1c r1 | 95 кр. (60 + 30 + 5) |
+| Dr. Watson | ASSET-DR-WATSON-001 | AN-64 | 3 | этап 2 готов: `20261020-h2-tripo` 5458aaff, 20 частей, 1 946 780 tris, parts20 + tex8k-pbr, register-source OK, превью чистое (револьвер в правой, саквояж в левой) | концепт: 1a r1, 1c r1 | 95 кр. |
 
 Ресурсы: редактор UE — не поднимать до слова главной сессии; Blender headless — не больше 2; рабочий стол — одна
 полоса Computer Use (Gemini, Z-Code) и Windows-MCP (Tripo в Chrome пользователя).
@@ -34,6 +34,10 @@
 
 ## Калибровка Z-Code (2026-10-20)
 
+**Итог: не пройдена** (`zcode-calibration/RESULT.md`): C2 10,0 против 8,1 (+1,9), C1 — противоположный победитель
+слепого сравнения; карточка Z-Code — невалидный JSON. **Второй приёмщик мини-пачки — Opus `second-acceptor`**
+(свежий контекст), Z-Code — только побочная модель для текста.
+
 См. `zcode-calibration/`. C1 — слепое сравнение витрин King Arthur / Medusa (раунд `blind-s2/r3`, оценки Opus в
 `docs/game-design/select-screens/blind-s2/r3-REVIEW.md`). C2 — повтор принятого листа 1c Ancient Leshen по рубрике
 concept-sheet §11 (Opus `card-2.json` 8,1: S 2, C 1,5, Q 1,5, P 1,5). Входы скопированы в `in/` (копии файлов из git,
@@ -44,3 +48,8 @@ concept-sheet §11 (Opus `card-2.json` 8,1: S 2, C 1,5, Q 1,5, P 1,5). Вход�
 | # | Этап | Находка | Что сделано |
 |---|---|---|---|
 | F1 | 0 | Claude in Chrome привязан к чужому macOS-браузеру; локального нет. Встроенный браузер без входа в Tripo. | Tripo — Windows-MCP в Chrome пользователя (F9 пилота) |
+| F2 | 1a/1c | **Gemini отказывает Bruce Lee** («I can help with images of people, but I can't depict some public figures»): 1a (промпт CORE + эталон Medusa) и 1c front (CORE-FRONT + орто 1b + дизайн 1a), Gemini Pro (Nano Banana), 3:4. Первая попытка 1a с битым промптом (моя выборка текста задания вместо CORE) Gemini нарисовал — крупный план без подставки, в зачёт не идёт. Отказ модерации непостоянный, обходные формулировки — запрет скилла (concept-sheet §20) | Bruce Lee 1c — по пути лицензионных фигур (unstability.ai по решению пользователя 2026-10-13); сравнение 1a Codex↔Gemini невозможно (Gemini не рисует) |
+| F3 | 0 | Z-Code GLM-5.3-Flash сам открывает кадры инструментом Read из репо (вложения не нужны), но каждая запись файла ждёт «Allow» в режиме «Ask before changes»; карточка — невалидный JSON (лишняя `}`) | калибровка `zcode-calibration/RESULT.md`; второй приёмщик — Opus |
+| F4 | 2 | Studio «Texture» на задаче прошлой сессии (Шерлок 734b9954) открылась с **пустыми** слотами видов; на свежей задаче (Ватсон 5458aaff) форма сама подставила Front/Left/Back задачи. Слоты Шерлока загружены вручную теми же файлами 1c (sha256 = input-preflight) | перед «Generate Texture» проверять слоты, не только 8K и Remove Lighting |
+| F5 | 2 | Studio пометила генерацию Ватсона «Sensitive content detected — model set to private» (револьвер) — генерация прошла, приватность и так вкл. | нет действий |
+| F6 | 2 | Экспорт Studio называет файл подписью модели («detective character 3d model.glb», «steampunk detective 3d model.glb»): у Шерлока и Ватсона подписи похожи — переносить сразу после каждой выгрузки, сверять число частей | перенос по одному файлу, `glbcheck` после каждого |

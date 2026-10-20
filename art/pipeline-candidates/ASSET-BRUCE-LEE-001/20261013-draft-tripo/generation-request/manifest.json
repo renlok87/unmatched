@@ -30,7 +30,152 @@
   },
   "run_id": "generation-request",
   "schema": "unmatched.tripo-pipeline.run/1",
-  "sources": {},
+  "sources": {
+    "tripo-70729ed4-draft": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/reports/tripo-run.json",
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "57ffc4365ff8b8f759a68473853f44fe50d42ecae1c42d936e5b29a48597c708"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 46458876,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, unmodified",
+          "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/source/bruce-lee-draft-tripo-70729ed4.glb",
+          "produced_by": "generate",
+          "role": "draft-glb",
+          "sha256": "5c00fd43c46a9218f9460f0cce0de2e4f3077f6f4c9da28bebf8adbdfec130b8",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1935735
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1935735
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png",
+          "present": true,
+          "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 30.0
+      },
+      "registered_at": "2026-10-20T18:30:35+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-BRUCE-LEE-001",
+        "date": "2026-10-13",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "draft-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1935735
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 46458876,
+            "expected_sha256": "5c00fd43c46a9218f9460f0cce0de2e4f3077f6f4c9da28bebf8adbdfec130b8",
+            "in_git": false,
+            "origin": "Studio GLB export, unmodified",
+            "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/source/bruce-lee-draft-tripo-70729ed4.glb",
+            "produced_by": "generate",
+            "role": "draft-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-bruce-lee-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "single-image",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": false,
+            "output": "Геометрия и текстура (по умолчанию формы)",
+            "parts_mode": null,
+            "pbr": false,
+            "polygon_count": null,
+            "privacy": true,
+            "remove_lighting": null,
+            "seed": null,
+            "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный",
+            "texture_8k": false,
+            "topology": null,
+            "ultra_mesh_quality": null
+          },
+          "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+          "views": {
+            "back": null,
+            "front": {
+              "path": "art/imagegen/concept-bruce-lee-codex/design/bruce-lee-front.png",
+              "sha256": "b55ae26171f5283d20abafb6e474580065b554cbb9d4fc82083344439125fe62"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+        "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 21210.0,
+              "balance_before": 21240.0,
+              "observed_debit": 30.0,
+              "quoted": 30.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261013-draft-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+            "op": "generate"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-70729ed4-draft",
+        "task_id": "70729ed4-5b60-4f6b-ba81-20a5d6475e03",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/70729ed4-5b60-4f6b-ba81-20a5d6475e03"
+      },
+      "spec_sha256": "275606cd07e30526e86281c49d039e2a5931e5e5c22fd0f021ca56b72e7eea17"
+    }
+  },
   "stages": {},
   "status_legend": {
     "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",

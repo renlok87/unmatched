@@ -1,0 +1,625 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-64",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "date": "2026-10-20",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (оркестратор 3d-model-pipeline) в браузере пользователя через Windows-MCP: клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "5458aaff-3354-4d17-9c59-b455eb41ab0f",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/5458aaff-3354-4d17-9c59-b455eb41ab0f"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+        "sha256": "697f8429d479f75330085940402809aadcbbd5ba283e08caac040aa6bf6f24d4"
+      },
+      "left": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+        "sha256": "5cf94ccfdfaa0385f7cc6b6778cbb7f5df3644f2b5d9e434d01c72a3ea2a7ac7"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+        "sha256": "dc1a3929b256fc65d7450dac26f211d0108e806d6d863d083323860206aef9a2"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма стояла на H2-настройках (по частям Balanced, без текстуры, Ultra 2M, 8K выкл., Private, H3.1 Best Quality)",
+    "studio_settings_after": "не менялись"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20220.0,
+        "balance_after": 20160.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 20160.0,
+        "balance_after": 20130.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 20130.0,
+        "balance_after": 20125.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-parts20.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "24c94687b0fbd2510babd4115df5da9b9e3d8a292946dc3bd99a7162f3b4d8e3",
+      "bytes": 46902716,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 20,
+      "triangles": 1946780,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 427170
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 71925
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 41299
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 31078
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 23781
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 23874
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 58385
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 9655
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 6354
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 5624
+        },
+        {
+          "name": "meshes[19]",
+          "triangles": 3746
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 261228
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 277332
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 158594
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 113933
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 103341
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 99202
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 101723
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 67113
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 61423
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "36352ad79a9a6191212072fd55cc6a880f07df04fb283f7b2c993e1122cd6036",
+      "bytes": 82181428,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 20,
+      "triangles": 1946780,
+      "materials": 20,
+      "images": 60,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 427170
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 71925
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 41299
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 31078
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 23781
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 23874
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 58385
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 9655
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 6354
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 5624
+        },
+        {
+          "name": "meshes[19]",
+          "triangles": 3746
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 261228
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 277332
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 158594
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 113933
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 103341
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 99202
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 101723
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 67113
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 61423
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 427170,
+      "min": [
+        -0.2842,
+        0.0,
+        -0.2728
+      ],
+      "max": [
+        0.2676,
+        0.0988,
+        0.2728
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 261228,
+      "min": [
+        -0.0707,
+        0.2499,
+        -0.1346
+      ],
+      "max": [
+        0.1721,
+        0.857,
+        0.0955
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 277332,
+      "min": [
+        -0.2107,
+        0.2472,
+        -0.1194
+      ],
+      "max": [
+        0.0286,
+        0.8607,
+        0.0875
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 158594,
+      "min": [
+        0.1201,
+        0.3425,
+        -0.0912
+      ],
+      "max": [
+        0.2842,
+        0.5057,
+        0.0797
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 113933,
+      "min": [
+        -0.0137,
+        0.1323,
+        -0.0699
+      ],
+      "max": [
+        0.1257,
+        0.5865,
+        0.0642
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 103341,
+      "min": [
+        -0.2369,
+        0.6242,
+        -0.0747
+      ],
+      "max": [
+        -0.107,
+        0.7988,
+        0.1108
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 99202,
+      "min": [
+        -0.1407,
+        0.1555,
+        -0.0698
+      ],
+      "max": [
+        -0.0091,
+        0.5786,
+        0.0639
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 101723,
+      "min": [
+        0.0764,
+        0.516,
+        -0.0879
+      ],
+      "max": [
+        0.2138,
+        0.7962,
+        0.013
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 67113,
+      "min": [
+        -0.0634,
+        0.8188,
+        -0.061
+      ],
+      "max": [
+        0.0458,
+        0.91,
+        0.0624
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 61423,
+      "min": [
+        -0.0715,
+        0.9024,
+        -0.0811
+      ],
+      "max": [
+        0.0541,
+        0.9783,
+        0.0812
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 71925,
+      "min": [
+        -0.075,
+        0.551,
+        -0.0002
+      ],
+      "max": [
+        0.056,
+        0.8133,
+        0.0776
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 41299,
+      "min": [
+        0.0591,
+        0.095,
+        -0.0692
+      ],
+      "max": [
+        0.1562,
+        0.1548,
+        0.0976
+      ]
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 31078,
+      "min": [
+        -0.2185,
+        0.7428,
+        0.0851
+      ],
+      "max": [
+        -0.177,
+        0.8589,
+        0.1882
+      ]
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "meshes[13]",
+      "tris": 23781,
+      "min": [
+        0.1632,
+        0.4652,
+        -0.0335
+      ],
+      "max": [
+        0.222,
+        0.536,
+        0.0224
+      ]
+    },
+    {
+      "node": "tripo_part_14",
+      "mesh": "meshes[14]",
+      "tris": 23874,
+      "min": [
+        -0.2397,
+        0.6982,
+        0.083
+      ],
+      "max": [
+        -0.1752,
+        0.7901,
+        0.1507
+      ]
+    },
+    {
+      "node": "tripo_part_15",
+      "mesh": "meshes[15]",
+      "tris": 58385,
+      "min": [
+        -0.1739,
+        0.0944,
+        -0.0699
+      ],
+      "max": [
+        -0.0718,
+        0.1746,
+        0.0976
+      ]
+    },
+    {
+      "node": "tripo_part_16",
+      "mesh": "meshes[16]",
+      "tris": 9655,
+      "min": [
+        -0.0471,
+        0.7667,
+        -0.0271
+      ],
+      "max": [
+        0.0299,
+        0.8503,
+        0.0326
+      ]
+    },
+    {
+      "node": "tripo_part_17",
+      "mesh": "meshes[17]",
+      "tris": 6354,
+      "min": [
+        -0.0263,
+        0.7317,
+        0.0196
+      ],
+      "max": [
+        0.0072,
+        0.8189,
+        0.0552
+      ]
+    },
+    {
+      "node": "tripo_part_18",
+      "mesh": "meshes[18]",
+      "tris": 5624,
+      "min": [
+        -0.0355,
+        0.8494,
+        0.0317
+      ],
+      "max": [
+        0.0177,
+        0.8671,
+        0.0581
+      ]
+    },
+    {
+      "node": "tripo_part_19",
+      "mesh": "meshes[19]",
+      "tris": 3746,
+      "min": [
+        -0.2302,
+        0.6961,
+        0.0904
+      ],
+      "max": [
+        -0.1912,
+        0.7295,
+        0.1429
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-5458aaff-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/preview",
+    "out": "ender-dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-DR-WATSON-001\\20261020-h2-tripo\\preview\\draft-orthos-8cgn1aat --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  }
+}

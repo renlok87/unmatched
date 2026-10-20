@@ -1,0 +1,89 @@
+{
+  "model_seen": "account:zai-individual-coding-plan/GLM-5.3-Flash",
+  "images_seen": true,
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-ANCIENT-LESHEN-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-20",
+  "previous_card": null,
+  "frames": {
+    "dir": "art/imagegen/concept-ancient-leshen-codex",
+    "files": [
+      "sheet-ancient-leshen.png",
+      "ancient-leshen-front.png",
+      "ancient-leshen-side.png",
+      "ancient-leshen-back.png",
+      "checks-report.json"
+    ]
+  },
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-ancient-leshen-codex/checks-report.json",
+      "note": "checks-report.json: summary PASS 33 / WARN 0 / FAIL 0, verdict PASS; все три вида 1086x1448, одна связная фигура, фон, земля и подставка согласованы"
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Ясный силуэт на каждом виде: ancient-leshen-front.png — череп оленя с крупными рогами над скрученным корневым корпусом, длинные руки с когтями-рогами и три ворона; ancient-leshen-side.png — узнаваемый горбатый профиль с рогами, отведёнными назад-вверх; ancient-leshen-back.png — симметричные рога, хребтовая лоза, обе руки с когтями. Руки отделены от корпуса фоном на front и back, поза стоячая расслабленная (не T/A) и совпадает с ortho_front/ortho_left/ortho_back (силуэт и поза не тронуты). Тонкие части читаются: отростки рогов, когти-пальцы, хвосты и лапы воронов. Ближняя рука на side идёт вдоль ствола — так же в ortho_left, это поза по орто, а не слияние; соответствует design-ancient-leshen-front.png.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Все три вида — один персонаж: тот же череп с тем же набором рогов, тот же корневой корпус со мхом, те же три ворона (плечо, левое предплечье, правое предплечье), та же каменная подставка. Поза и пропорции совпадают: по checks-report.json рост 90,54/90,19/90,19 % кадра (spread 0,382 % при лимите 5 %), ширина подставки 47,05/46,13/47,05 %, низ подставки на одной линии земли (0,069 %). Профиль ancient-leshen-side.png и вид ancient-leshen-back.png строгие и соответствуют ortho_left.png и ortho_back.png; фронт согласован с design-ancient-leshen-front.png. Третий ворон на side скрыт корпусом — расстановка согласована с front/back, оружия нет (WEAPON_HAND: none), зеркалить нечего.",
+      "frames": [
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Уровень эталона medusa-quality-reference.png: расписанная коллекционная миниатюра с различимыми материалами — кора с глубокими бороздами, кость черепа и рогов, гранулированный мох, чёрное оперение воронов (ancient-leshen-front.png, ancient-leshen-back.png, sheet-ancient-leshen.png). Детали внутри силуэта: зубы и носовой ход черепа, наросты на стволах рогов, лапы и перья воронов, фактура каменной подставки. Перья воронов мягче, чем змеи и гравировка эталона, но читаются на том же уровне принятой миниатюры, отдельных бедных зон нет.",
+      "frames": [
+        "sheet-ancient-leshen.png",
+        "ancient-leshen-front.png",
+        "ancient-leshen-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Палитра листа совпадает с фигурой и PALETTE: #5A4030 кора и рога, #D9CFB8 кость черепа и костяных когтей, #4E5A36 мох, акцент #141414 вороны — свотчи sheet-ancient-leshen.png соответствуют фигуре; по checks-report.json доли в фигуре в допуске 40 %: 36,45/3,08/33,07/10,56 %. Все якоря на месте там, где видимы на всех трёх видах: череп оленя с большими рогами, тело из скрученных корней, длинные когтистые руки, вороны; тон тона костно-кремовый в допуске эталона.",
+      "frames": [
+        "sheet-ancient-leshen.png",
+        "ancient-leshen-front.png",
+        "ancient-leshen-side.png",
+        "ancient-leshen-back.png"
+      ]
+    }
+  },
+  "score": 10.0,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "note": "На ancient-leshen-side.png третий ворон не виден (скрыт корпусом); расстановка воронов согласована с front/back и ortho — на этапы 3-4 держать всех трёх."
+    },
+    {
+      "item": "Q",
+      "note": "Оперение воронов на ancient-leshen-front.png и ancient-leshen-back.png чуть мягче эталона medusa-quality-reference.png; для H2 достаточно текущего уровня, доработка не требуется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Z-Code GLM-5.3-Flash",
+    "session_id": "zcode:calibration-c2"
+  },
+  "executor_session_id": "launcher:calibration-20261020",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "pass по делегированию (решение 2026-10-06 «Делай сам, все решения принимай», docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md); калибровочная повторная приёмка уже принятого листа"
+}
+}
