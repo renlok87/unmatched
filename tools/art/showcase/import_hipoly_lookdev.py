@@ -143,6 +143,9 @@ def run(key, rel):
                 mel.set_material_instance_static_switch_parameter_value(mi, "UseUV1Metres", False)
             except Exception as e:  # noqa: BLE001
                 log("UseUV1Metres switch: %s" % e)
+            # 2026-10-21 playtest F7: the MI of a Nanite mesh carries the Nanite usage (an override: the master
+            # M_UM_Figure_v2 of every game figure stays without it) - else the package draws the fallback mesh
+            mel.set_material_usage_override(mi, unreal.MaterialUsage.MATUSAGE_NANITE, True, True)
             mel.update_material_instance(mi)
             eal.save_loaded_asset(mi)
             made[team] = mi

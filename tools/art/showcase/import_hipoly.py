@@ -69,6 +69,13 @@ def import_one(key, rel):
     ok = mgr.import_asset(dest, source, params)
     log("import %s -> %s ok=%s" % (key, dest, ok))
     assets = unreal.EditorAssetLibrary.list_assets(dest, recursive=True)
+    # 2026-10-21 playtest F7: the materials of a Nanite mesh need the Nanite usage flag - in -game / the package the
+    # engine never sets it and draws the fallback mesh («missing usage flag Nanite»)
+    for a in assets:
+        m = unreal.load_asset(a)
+        if isinstance(m, unreal.Material) and not unreal.MaterialEditingLibrary.has_material_usage(m, unreal.MaterialUsage.MATUSAGE_NANITE):
+            unreal.MaterialEditingLibrary.set_base_material_usage(m, unreal.MaterialUsage.MATUSAGE_NANITE, True)
+            unreal.EditorAssetLibrary.save_loaded_asset(m)
     meshes = [a for a in assets if isinstance(unreal.load_asset(a), unreal.StaticMesh)]
     log("%s assets=%d staticMeshes=%s" % (key, len(assets), meshes))
     for a in meshes:
