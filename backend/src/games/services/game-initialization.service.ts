@@ -35,6 +35,7 @@ import {
 } from '../../game-engine/models';
 import type { AttackType, BoardState, CardEffect, Cell, Position } from '../../game-engine/models';
 import { parseCardEffectTexts, upgradeStaleParserEffects } from '../../game-engine/effects/effect-text-parser';
+import { handSizeLimitsFor } from '../../game-engine/abilities/ability-rules';
 import { distancesFrom, hasTopology, posKey } from '../../game-engine/engine/board-topology';
 import { randomRngState, rngShuffle, type RngState } from '../../game-engine/engine/rng';
 import type { Board } from '@prisma/client';
@@ -244,8 +245,10 @@ export class GameInitializationService {
 
       let drawPile: Card[];
       [drawPile, rng] = rngShuffle(rng, deckCards);
+      // Michelangelo: стартовая и максимальная рука 3 (ABILITY_CONFIGS)
+      const handLimits = handSizeLimitsFor(heroSlug, { starting: STARTING_HAND_SIZE, max: MAX_HAND_SIZE });
       const hand: HandCard[] = drawPile
-        .splice(0, STARTING_HAND_SIZE)
+        .splice(0, handLimits.starting)
         .map((c) => ({ ...c, isVisible: false }));
 
       decks[player.userId] = {
@@ -254,7 +257,7 @@ export class GameInitializationService {
         topCard: drawPile[0],
       };
       discardPiles[player.userId] = [];
-      handZones[player.userId] = { cards: hand, maxSize: MAX_HAND_SIZE };
+      handZones[player.userId] = { cards: hand, maxSize: handLimits.max };
 
       statePlayers.push({
         userId: player.userId,

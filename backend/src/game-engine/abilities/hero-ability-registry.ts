@@ -180,6 +180,13 @@ export interface ExtendedHeroAbilityHandler {
   onAfterCombat?(state: GameState, ctx: AfterCombatContext): Promise<GameState>;
 
   /**
+   * Вызывается ПОСЛЕ розыгрыша схемы игроком (эффекты карты исполнены, карта в
+   * сбросе, действие ещё не списано). Michelangelo: «After you attack or
+   * scheme, draw 1 card».
+   */
+  onAfterScheme?(state: GameState, playerId: string): Promise<GameState>;
+
+  /**
    * Вызывается, когда боец помечен повергнутым (РЕАНИМИРОВАННЫЙ on-defeat хук).
    * В отличие от мёртвого классического onDefeat(fighter): GameEvent[] (никогда
    * не вызывался в проде), этот EXTENDED-хук мутирует GameState и реально
@@ -516,6 +523,28 @@ export class HeroAbilityRegistry {
       return await handler.onTurnEnd(state, playerId);
     } catch (error) {
       this.logger.error(`Error in onTurnEnd for hero ${heroId}:`, error);
+      return state;
+    }
+  }
+
+  /**
+   * Вызвать обработчик «после своей схемы» (расширенный, Michelangelo).
+   * Зеркало triggerOnTurnEndExtended: нет хука/ошибка — state без изменений.
+   */
+  async triggerOnAfterScheme(
+    heroId: string,
+    state: GameState,
+    playerId: string,
+  ): Promise<GameState> {
+    const handler = this.getExtended(heroId);
+    if (!handler?.onAfterScheme) {
+      return state;
+    }
+
+    try {
+      return await handler.onAfterScheme(state, playerId);
+    } catch (error) {
+      this.logger.error(`Error in onAfterScheme for hero ${heroId}:`, error);
       return state;
     }
   }

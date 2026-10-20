@@ -6,7 +6,13 @@
  */
 
 import { EffectTiming, EffectType, EffectTarget } from '../models/card.model';
-import { parseCardEffectTexts, parseFieldText, upgradeStaleParserEffects, PARSER_VERSION } from './effect-text-parser';
+import {
+  isUncancellableCardText,
+  parseCardEffectTexts,
+  parseFieldText,
+  upgradeStaleParserEffects,
+  PARSER_VERSION,
+} from './effect-text-parser';
 
 const after = (text: string) => parseFieldText(text, EffectTiming.AFTER_COMBAT);
 const during = (text: string) => parseFieldText(text, EffectTiming.DURING_COMBAT);
@@ -820,6 +826,38 @@ describe('effect-text-parser', () => {
       // свежий parserVersion — не апгрейдится
       const fresh = [{ id: 'z', type: EffectType.SET_HEALTH, timing: EffectTiming.AFTER_COMBAT, source: 'parser' as const, parserVersion: PARSER_VERSION }];
       expect(upgradeStaleParserEffects(fresh, { after: 'anything' }, 'z')).toEqual(fresh);
+    });
+  });
+
+  // Разбор DE 2026-10-20 (RULE-01..03)
+  describe('v10: «you may draw», «Change size», неотменяемость', () => {
+    it('Good Enough For Us: «You may draw 2 cards.» → optional DRAW_CARD', () => {
+      const { drafts } = after('You may draw 2 cards.');
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.DRAW_CARD, value: 2, optional: true });
+      // обычный добор остаётся обязательным
+      expect(after('Draw 1 card.').drafts[0].draft.optional).toBeUndefined();
+    });
+
+    it('Alice: «Move Alice up to 3 spaces. Change size.» → MOVE + CHANGE_SIZE, без UNSUPPORTED', () => {
+      const { drafts, unsupported } = after('Move Alice up to 3 spaces. Change size.');
+      expect(unsupported).toEqual([]);
+      expect(drafts.map((d) => d.draft.type)).toEqual([EffectType.MOVE, EffectType.CHANGE_SIZE]);
+    });
+
+    it("«This card's effects cannot be canceled.» — признак карты, не эффект и не UNSUPPORTED", () => {
+      const { drafts, unsupported } = after("This card's effects cannot be canceled. Draw 1 card.");
+      expect(unsupported).toEqual([]);
+      expect(drafts.map((d) => d.draft.type)).toEqual([EffectType.DRAW_CARD]);
+      expect(isUncancellableCardText("This card's effect cannot be canceled.")).toBe(true);
+      expect(isUncancellableCardText("This card's effects cannot be canceled. If Daisy …")).toBe(true);
+      expect(isUncancellableCardText('Cancel all effects on your opponent\'s card.')).toBe(false);
+      expect(isUncancellableCardText(undefined)).toBe(false);
+    });
+
+    it('«(This effect cannot be canceled.)» — эффекты поля помечены uncancellable', () => {
+      const { drafts } = after('Draw 1 card. (This effect cannot be canceled.)');
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.DRAW_CARD, uncancellable: true });
+      expect(after('Draw 1 card.').drafts[0].draft.uncancellable).toBeUndefined();
     });
   });
 });

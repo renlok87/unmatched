@@ -31,6 +31,9 @@
  *                       бойца ПОСЛЕ установки isDefeated, но ДО game-over/передачи
  *                       хода. Handler реагирует, только если defeatedFighter —
  *                       НЕ-HERO боец владельца ЭТОГО героя (свой сайдкик).
+ *  - 'after-scheme'   — эффект ПОСЛЕ розыгрыша своей схемы (Michelangelo: «After
+ *                       you attack or scheme, draw 1 card»). Тот же TurnEffect,
+ *                       что turn-start/turn-end; цель — разыгравший игрок.
  *  - 'enemy-hero-left-my-zone' — РЕАКТИВНЫЙ кросс-героевый триггер (Tomoe-style:
  *                       «When an opposing hero leaves Tomoe Gozen's zone, deal 1
  *                       damage to that hero»). Диспетчеризуется через
@@ -49,6 +52,7 @@ export type AbilityTrigger =
   | 'after-attack'
   | 'after-defense'
   | 'sidekick-defeated'
+  | 'after-scheme'
   | 'enemy-hero-left-my-zone';
 
 /**
@@ -193,17 +197,21 @@ export interface TurnEffect {
   readonly heal?: number;
   /** Прибавить N к оставшимся действиям хода */
   readonly gainAction?: number;
+  /**
+   * Печатное «you may draw» (RULE-02): добор draw/drawToHandSize не
+   * применяется сразу, а открывает optional CHOOSE_ONE «не добирать / добрать»
+   * (отказ — опция 0 и declinePendingEffect; по таймауту — отказ). Иначе на
+   * пустой колоде принудительный добор бьёт своих бойцов истощением.
+   * heal/gainAction при optional не поддержаны (не нужны ни одному герою).
+   */
+  readonly optional?: boolean;
 }
 
 /**
- * Эффект «сброс карт» (discard-random): способность сбрасывает N карт из руки
- * ДЕЙСТВУЮЩЕГО игрока (Achilles-style: «discard 2 random cards» при гибели
- * Patroclus). Карты уходят в discardPile владельца (если он есть), иначе просто
- * удаляются из руки.
- *
- * ПРИБЛИЖЕНИЕ / ДЕТЕРМИНИЗМ: печатное «random» НЕ моделируется случайным выбором
- * (нет источника энтропии в движке и нет выбора игроком) — детерминированно
- * сбрасываем ПЕРВЫЕ count карт руки. Если в руке меньше count — сбрасываем
+ * Эффект «сброс карт» (discard-random): способность сбрасывает N СЛУЧАЙНЫХ карт
+ * из руки ДЕЙСТВУЮЩЕГО игрока (Achilles: «discard 2 random cards» при гибели
+ * Patroclus). Случайный выбор — тот же DeckManagementService.discardRandomCard,
+ * что у карт с «discard … at random». Если в руке меньше count — сбрасываем
  * сколько есть (пустая рука → чистый no-op).
  *
  * Используется с триггером 'sidekick-defeated' (handler гейтит: defeatedFighter —
@@ -211,7 +219,7 @@ export interface TurnEffect {
  */
 export interface DiscardRandomEffect {
   readonly kind: 'discard-random';
-  /** Сколько карт сбросить из руки (детерминированный стенд-ин для «random») */
+  /** Сколько случайных карт сбросить из руки */
   readonly count: number;
 }
 
@@ -329,7 +337,7 @@ export interface CycleStanceEffect {
 /**
  * Эффект «выбор цели урона» (pending-target-damage, S05): способность в начале
  * хода ПОРОЖДАЕТ optional TARGET_FIGHTER PendingEffect — игрок сам выбирает
- * врага ИЗ легальных целей или отклоняет выбор (declinePendingEffect, «you may»).
+ * цель ИЗ легальных или отклоняет выбор (declinePendingEffect, «you may»).
  *
  * В отличие от turn-damage (авто-выбор первого врага, нет UI) здесь НЕТ
  * авто-таргета: цели сериализуются в pending.targetFighterIds (ревалидация на
@@ -341,10 +349,18 @@ export interface CycleStanceEffect {
  */
 export interface PendingTargetDamageEffect {
   readonly kind: 'pending-target-damage';
-  /** Область выбора цели: вражеский боец в зоне героя действующего игрока */
-  readonly targetScope: 'enemy-in-zone';
-  /** Сколько урона нанести выбранному врагу */
+  /**
+   * Область выбора цели:
+   *  - 'enemy-in-zone' — вражеский боец в зоне героя действующего игрока (Medusa);
+   *  - 'any-adjacent'  — ЛЮБОЙ живой боец, смежный с героем, включая своих
+   *                      (Dracula: «a fighter adjacent to Dracula» — Sisters тоже).
+   */
+  readonly targetScope: 'enemy-in-zone' | 'any-adjacent';
+  /** Сколько урона нанести выбранной цели */
   readonly value: number;
+  /** (Опц.) добрать N карт ПОСЛЕ нанесённого урона (Dracula: «If you do, draw a card»).
+   *  Отказ от выбора — без добора. */
+  readonly thenDraw?: number;
 }
 
 /**
@@ -442,6 +458,26 @@ export interface AbilityConfig {
    * Примеры: Alice (big/small), Muhammad Ali (float/sting).
    */
   readonly stances?: readonly StanceConfig[];
+  /**
+   * (Опц., STANCE) Стойку игрок выбирает сам в начале игры (Alice: «When you
+   * place Alice, choose whether she starts the game BIG or SMALL»). Мутация
+   * setStance разрешена ТОЛЬКО этим героям и только до первого действия
+   * своего первого хода, один раз. Дальше стойку меняют эффекты (CHANGE_SIZE,
+   * set-stance). Без флага setStance запрещён (Ali меняет стойку только сам).
+   */
+  readonly stanceChoiceAtStart?: boolean;
+  /**
+   * (Опц.) Эффекты на картах бойцов героя нельзя отменить (RULE-01):
+   *  - 'hero'               — карты с банером героя (Ciri, Winter Soldier);
+   *  - 'hero-and-sidekicks' — карты с банером героя или помощника (Holmes и
+   *                           Dr. Watson). Карты 'Any' отменить можно.
+   * Проверка — isCardUncancellable (ability-rules.ts) в CANCEL_EFFECTS.
+   */
+  readonly uncancellableCards?: 'hero' | 'hero-and-sidekicks';
+  /** (Опц.) Стартовая рука вместо общих 5 (Michelangelo: 3). */
+  readonly startingHandSize?: number;
+  /** (Опц.) Максимум руки в конце хода вместо общих 7 (Michelangelo: 3). */
+  readonly maxHandSize?: number;
 }
 
 /**
@@ -511,15 +547,16 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // Philippa — добор до 4 карт в конце хода.
+    // Philippa — «Two Steps Ahead: At the end of your turn, you may draw until
+    // you have a hand of 4 cards.» Добор необязательный (RULE-02).
     heroId: 'philippa',
-    abilityName: 'Spellbreaker',
-    description: 'В конце хода Philippa добирает карты до 4 в руке.',
+    abilityName: 'Two Steps Ahead',
+    description: 'В конце хода Philippa может добрать карты до 4 в руке (можно отказаться).',
     rules: [
       {
         trigger: 'turn-end',
         condition: 'always',
-        effect: { kind: 'turn-effect', drawToHandSize: 4 },
+        effect: { kind: 'turn-effect', drawToHandSize: 4, optional: true },
       },
     ],
   },
@@ -539,29 +576,31 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // Bigfoot — «It's Just Your Imagination»: добор 1 карты в конце хода, если в
-    // зоне Bigfoot нет вражеских бойцов.
+    // Bigfoot — «At the end of your turn, if there are no opposing fighters in
+    // Bigfoot's zone, you may draw 1 card.» Добор необязательный (RULE-02).
+    // abilityName — внутренний лейбл (имя карты его колоды), печатного имени нет.
     heroId: 'bigfoot',
     abilityName: "It's Just Your Imagination",
-    description: 'В конце хода: если в зоне Bigfoot нет врагов — добор 1 карты.',
+    description: 'В конце хода: если в зоне Bigfoot нет врагов — можно добрать 1 карту.',
     rules: [
       {
         trigger: 'turn-end',
         condition: 'no-enemy-in-own-zone',
-        effect: { kind: 'turn-effect', draw: 1 },
+        effect: { kind: 'turn-effect', draw: 1, optional: true },
       },
     ],
   },
   {
-    // Chupacabra — после своей атаки добирает 1 карту (вне зависимости от исхода).
+    // Chupacabra — «The Hunger: After you attack, you may draw a card.»
+    // Добор необязательный (RULE-02), исход боя не важен.
     heroId: 'chupacabra',
-    abilityName: 'Blood Frenzy',
-    description: 'После своей атаки Chupacabra добирает 1 карту (независимо от исхода боя).',
+    abilityName: 'The Hunger',
+    description: 'После своей атаки Chupacabra может добрать 1 карту (независимо от исхода боя).',
     rules: [
       {
         trigger: 'after-attack',
         condition: 'always',
-        effect: { kind: 'turn-effect', draw: 1 },
+        effect: { kind: 'turn-effect', draw: 1, optional: true },
       },
     ],
   },
@@ -579,16 +618,23 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // Michelangelo — после своей атаки добирает 1 карту.
-    // ПРИБЛИЖЕНИЕ: печатный лимит руки в 3 карты НЕ моделируется (см. notes).
+    // Michelangelo — «Pizza Party: After you attack or scheme, draw 1 card.
+    // Your starting and maximum hand size is 3.»
     heroId: 'michelangelo',
-    abilityName: 'Party Dude',
+    abilityName: 'Pizza Party',
     description:
-      'После своей атаки Michelangelo добирает 1 карту (независимо от исхода боя). ' +
-      'Примечание: печатный лимит руки в 3 карты не моделируется.',
+      'После своей атаки или схемы Michelangelo добирает 1 карту (независимо от исхода боя). ' +
+      'Стартовая и максимальная рука — 3 карты.',
+    startingHandSize: 3,
+    maxHandSize: 3,
     rules: [
       {
         trigger: 'after-attack',
+        condition: 'always',
+        effect: { kind: 'turn-effect', draw: 1 },
+      },
+      {
+        trigger: 'after-scheme',
         condition: 'always',
         effect: { kind: 'turn-effect', draw: 1 },
       },
@@ -694,22 +740,21 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // Dracula — «Children of the Night»-подобный укус: в начале хода может нанести
-    // 1 урон бойцу, СМЕЖНОМУ с Dracula; если урон нанесён — добирает 1 карту.
-    // ПРИБЛИЖЕНИЕ (MVP): печатное «you may» (выбор/opt-out игроком) не моделируется
-    // — авто-бьём ПЕРВОГО смежного вражеского бойца (порядок state.fighters);
-    // thenDraw срабатывает ТОЛЬКО при реальном попадании (нет цели → no-op без добора).
+    // Dracula — «At the start of your turn, you may deal 1 damage to a fighter
+    // adjacent to Dracula. If you do, draw a card.» (RULE-02): optional
+    // TARGET_FIGHTER — цель выбирает игрок среди ЛЮБЫХ смежных бойцов (свои
+    // Sisters тоже), отказ легален; добор только после нанесённого урона.
+    // abilityName — внутренний лейбл, печатного имени у способности нет.
     heroId: 'dracula',
     abilityName: 'Children of the Night',
     description:
-      'В начале хода Dracula может нанести 1 урон смежному бойцу; если урон нанесён — добрать 1 карту. ' +
-      'Примечание (приближение MVP): выбор цели/opt-out игроком не моделируется — авто-удар по первому ' +
-      'смежному врагу; добор только при реальном попадании.',
+      'В начале хода Dracula может нанести 1 урон любому смежному бойцу (свои тоже); ' +
+      'если урон нанесён — добрать 1 карту. Цель выбирает игрок, можно отказаться.',
     rules: [
       {
         trigger: 'turn-start',
         condition: 'always',
-        effect: { kind: 'turn-damage', targetScope: 'enemy-adjacent', value: 1, thenDraw: 1 },
+        effect: { kind: 'pending-target-damage', targetScope: 'any-adjacent', value: 1, thenDraw: 1 },
       },
     ],
   },
@@ -815,8 +860,8 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
   {
     // Achilles — «Grief of Achilles»: пока Patroclus (единственный сайдкик)
     // повержен — +2 к атаке Achilles; при ПОБЕДЕ в бою (когда сайдкик повержен)
-    // добор 1 карты. В момент гибели Patroclus — сброс 2 карт из руки Achilles
-    // (детерминированный стенд-ин для «discard 2 random cards»).
+    // добор 1 карты. В момент гибели Patroclus — сброс 2 случайных карт из руки
+    // Achilles.
     // Печатный текст: «When Patroclus is defeated, discard 2 random cards.
     //   While Patroclus is defeated: +2 to the value of all Achilles' attacks;
     //   if Achilles wins combat, draw 1 card.»
@@ -825,8 +870,7 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     abilityName: 'Grief of Achilles',
     description:
       "While Patroclus is defeated: +2 to all Achilles' attacks; if Achilles wins combat, draw 1 card. " +
-      'When Patroclus is defeated, discard 2 cards. ' +
-      'Примечание (приближение MVP): «random» сброс детерминирован — сбрасываются первые 2 карты руки.',
+      'When Patroclus is defeated, discard 2 random cards.',
     rules: [
       {
         trigger: 'combat-passive',
@@ -870,15 +914,17 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     //   of her attack cards. When Alice is SMALL, add 1 to the value of her
     //   defense cards.»
     // BIG: +2 к значению карт атаки Alice. SMALL: +1 к значению карт защиты.
-    // Стойка — РУЧНАЯ: выбор при размещении (setStance) и «Change size»-карты
-    // (Mad as a Hatter / Drink Me / Eat Me / …) — авто-флипа НЕТ.
+    // Стойка — РУЧНАЯ: выбор в начале игры (setStance, stanceChoiceAtStart) и
+    // эффект CHANGE_SIZE карт «Change size» (Mad as a Hatter / Drink Me / Eat Me
+    // / …) — авто-флипа НЕТ. Выбор не сделан — BIG (default).
     // Слаг подтверждён через slugifyHeroName('Alice') → 'alice'.
     heroId: 'alice',
     abilityName: 'Big / Small',
     description:
       'Place BIG or SMALL. BIG: +2 to the value of Alice\'s attack cards. ' +
-      'SMALL: +1 to the value of her defense cards. Toggled manually ' +
-      '(placement choice / «Change size» cards via setStance).',
+      'SMALL: +1 to the value of her defense cards. Size is chosen at the start ' +
+      '(setStance before the first action) and changed by «Change size» cards.',
+    stanceChoiceAtStart: true,
     stances: [
       { id: 'big', label: 'Big', default: true },
       { id: 'small', label: 'Small' },
@@ -930,6 +976,34 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
         effect: { kind: 'set-stance', to: 'toggle' },
       },
     ],
+  },
+  {
+    // Sherlock Holmes — «Effects on HOLMES and DR. WATSON cards cannot be canceled
+    // by an opponent. Effects on ANY cards can be canceled.» (RULE-01)
+    heroId: 'sherlock-holmes',
+    abilityName: 'Uncancellable (Holmes and Watson)',
+    description:
+      'Effects on HOLMES and DR. WATSON cards cannot be canceled by an opponent. ' +
+      'Effects on ANY cards can be canceled.',
+    uncancellableCards: 'hero-and-sidekicks',
+    rules: [],
+  },
+  {
+    // Ciri — «Uncontainable Power: Effects on Ciri's cards cannot be canceled.» (RULE-01)
+    heroId: 'ciri',
+    abilityName: 'Uncontainable Power',
+    description: "Effects on Ciri's cards cannot be canceled.",
+    uncancellableCards: 'hero',
+    rules: [],
+  },
+  {
+    // Winter Soldier — «Brainwashed: Effects on Winter Soldier's cards cannot be
+    // canceled.» (RULE-01)
+    heroId: 'winter-soldier',
+    abilityName: 'Brainwashed',
+    description: "Effects on Winter Soldier's cards cannot be canceled.",
+    uncancellableCards: 'hero',
+    rules: [],
   },
   // NB: триггер 'after-defense' + AfterCombatContext.defenderPlayerId — инфра
   // для defender-side способностей (зеркало 'after-attack'), пока без героя:

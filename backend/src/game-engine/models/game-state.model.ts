@@ -139,6 +139,9 @@ export interface EffectContext {
   /** Урон, нанесённый/полученный этой стороной (для count DAMAGE_*) */
   readonly damageDealt?: number;
   readonly damageTaken?: number;
+  /** RULE-01: карту соперника отменить нельзя (печатный текст карты или
+   *  способность его героя) — CANCEL_EFFECTS этой стороны не действует */
+  readonly opposingCardUncancellable?: boolean;
 }
 
 /** A serializable, ordered combat stage paused for a player choice. */
@@ -422,6 +425,9 @@ export interface PendingEffect {
   readonly targetFighterIds?: readonly string[];
   /** TARGET_FIGHTER: урон выбранной цели */
   readonly damage?: number;
+  /** TARGET_FIGHTER: добор владельца выбора ПОСЛЕ урона (Dracula: «If you do,
+   *  draw a card»); отказ от выбора — без добора */
+  readonly drawAfterDamage?: number;
   /** MOVE: путь может проходить через врагов (Winged Frenzy) */
   readonly canPassThroughEnemies?: boolean;
   /** PLACE: клетка обязана делить зону с этим бойцом (return Harpy в зону Medusa) */
