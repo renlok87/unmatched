@@ -32,6 +32,7 @@ import { HeroAbilityRegistry } from '../game-engine/abilities/hero-ability-regis
 import { GamePhase } from '../game-engine/models';
 import { journalActionType } from './models/game-action.model';
 import { loadReplay, replayGame } from './replay/replay';
+import { DEFAULT_BOARD_ID } from './default-board';
 import type { GameState } from './game-state.service';
 
 const dbUrl = process.env.S10_TEST_DB_URL;
@@ -111,8 +112,9 @@ describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+R
         { id: humanId, email: `${humanId}@test.invalid`, username: humanId, password: 'test' },
       ],
     });
-    const board = await prisma.board.findFirst({ orderBy: { createdAt: 'asc' } });
-    if (!board) throw new Error('S10 test DB: нет досок — сиды не прогнаны');
+    // Только реальные карты (решение 2026-10-04): матч идёт на Marmoreal · original map
+    const board = await prisma.board.findUnique({ where: { id: DEFAULT_BOARD_ID } });
+    if (!board) throw new Error('S10 test DB: нет Marmoreal · original map — сиды карт не прогнаны');
     boardId = board.id;
   }, 60_000);
 

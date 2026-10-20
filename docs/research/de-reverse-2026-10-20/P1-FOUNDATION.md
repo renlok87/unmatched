@@ -78,6 +78,12 @@
   - CI: 24 партии, около 20 с.
   - Длинный прогон: `SELFPLAY_SEEDS=1000 npx jest src/games/services/s09-card-instance-dup.spec.ts`; с
     `SELFPLAY_REPORT=1` печатает покрытие.
+- Живой `s10-vs-ai-full-match.spec.ts` на стенде S10 (настоящие Postgres :55435 и Redis :6382):
+  - два полных матча VS_AI;
+  - доска заменена с первой в БД (McMinnville) на Marmoreal;
+  - журнал пишется в транзакции, `eventsSince` не отдаёт `cmd` и `hash`;
+  - реплей из настоящих строк Postgres сходится хеш в хеш.
+  - 2 из 2 зелёные, 2026-10-20.
 - E2E живого пути: `backend/src/games/replay/replay.spec.ts`.
   - Партия идёт через резолвер мутаций, VS_AI-дрейн и серверный таймаут боя.
   - Сохраняет её настоящий `GameStateService` в Postgres-двойник.
@@ -117,8 +123,6 @@
 - Реплей легаси-сейва без `combatInfo.timeoutAt` не повторит системный резолв: подмена дедлайна в
   `CombatTimeoutService` в команду не входит. Партии до DET-2 без снимка `loadReplay` возвращает как `null`.
 - `lastActionAt` и `performedAt` по-прежнему ставятся через `new Date()`. В хеш они не входят.
-- Живой `s10-vs-ai-full-match.spec.ts` (Postgres + Redis) переведён на транзакционный журнал и сверку
-  реплеем, но не запускался: Docker на машине не отвечает.
 - Нет входа для реплея живой партии из админки или Game Tester (AI-14): есть только `loadReplay` и
   `replayGame`.
 - DET-4 (уникальные id выборов) не входил в задачу. Многошаговые pending по-прежнему держат прежний id.
