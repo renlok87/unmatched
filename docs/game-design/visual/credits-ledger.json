@@ -89,6 +89,12 @@
       "model": "Tripo Studio H3.1",
       "url": "https://www.tripo3d.ai/terms",
       "checked": "2026-10-13"
+    },
+    {
+      "service": "Gemini",
+      "model": "Gemini app Pro image generation (Nano Banana)",
+      "url": "https://policies.google.com/terms/generative-ai",
+      "checked": "2026-10-20"
     }
   ],
   "entries": [
@@ -3817,13 +3823,49 @@
       "result_path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/",
       "status": "ok",
       "note": "этап 2: pbr (мини-пачка 2026-10-20)"
+    },
+    {
+      "date": "2026-10-20T23:49:23+05:00",
+      "service": "Gemini",
+      "model": "Gemini app Pro image generation (Nano Banana)",
+      "template": "T-GEMINI-IMG",
+      "task_id": "AN-51",
+      "units": "3 генераций",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": null,
+      "seed": null,
+      "prompt_file": "docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/bruce-lee-1a-front.txt",
+      "result_path": "docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/",
+      "status": "ok",
+      "note": "Bruce Lee: 1a g1 (битый промпт, кадр без подставки, не в зачёт), 1a g2 и 1c-front g1 — отказ «can't depict some public figures» (F2)"
+    },
+    {
+      "date": "2026-10-20T23:54:14+05:00",
+      "service": "Gemini",
+      "model": "Gemini app Pro image generation (Nano Banana)",
+      "template": "T-GEMINI-IMG",
+      "task_id": "AN-64",
+      "units": "3 генераций",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": null,
+      "seed": null,
+      "prompt_file": "docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/dr-watson-1c-front.txt",
+      "result_path": "docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/watson-1c/",
+      "status": "ok",
+      "note": "проверка пути Gemini 1c на принятом Watson (front/side/back поверх орто 1b): 0 FAIL / 2 WARN, принятый лист Codex не заменяется"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 1415,
     "codex_packages": 149,
-    "gemini_generations": 0,
+    "gemini_generations": 6,
     "stiva_generations": 0
   }
 }

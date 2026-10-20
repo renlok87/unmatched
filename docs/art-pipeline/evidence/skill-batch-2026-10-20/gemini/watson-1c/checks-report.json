@@ -1,0 +1,666 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-20T18:53:34+00:00",
+  "set": "C:/tmp/watson-gemini-1c-set",
+  "key": "dr-watson",
+  "role": "hero",
+  "views": [
+    "front",
+    "side",
+    "back"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "C:/tmp/watson-gemini-1c-set/dr-watson-front.png",
+      "sha256": "cf7a4d6a541d06da8124b44181f44e7fcf9ad355376cc5467bdf1077471e51b4",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1792,
+        2400
+      ]
+    },
+    {
+      "view": "side",
+      "path": "C:/tmp/watson-gemini-1c-set/dr-watson-side.png",
+      "sha256": "2b6753bf6cd96878f91da9c547dc9c90588d149727bccdec8a83b98b89caacfe",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1792,
+        2400
+      ]
+    },
+    {
+      "view": "back",
+      "path": "C:/tmp/watson-gemini-1c-set/dr-watson-back.png",
+      "sha256": "27a047812f76c86244f616aa669c98d290bcf24a6f51286e89fb0063607c8f2f",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1792,
+        2400
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "facing": {
+    "verdict": "OK",
+    "iou_direct": 0.9854,
+    "iou_mirror": 0.7633,
+    "ortho_size": [
+      1152,
+      1536
+    ],
+    "margin": 0.05,
+    "view": "side",
+    "ortho": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho_left.png",
+    "ortho_sha256": "2e4816806d4db6e2c481acdebe56b8dab83559ff17c9a7a5b4b89023bc7d2493"
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1792,
+        2400
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 36,
+        "median_rgb": [
+          44.0,
+          44.0,
+          46.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 3.0,
+        "neutral_delta": 2.0,
+        "luma": 44.1
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.7,
+          0.98,
+          0.86
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 35.723,
+        "filled_area_pct": 35.723,
+        "components_kept": 1,
+        "main_component_pct": 35.723,
+        "other_components_pct": [],
+        "bbox_px": [
+          321,
+          95,
+          1524,
+          2275
+        ],
+        "top_pct": 3.958,
+        "bottom_pct": 94.792,
+        "left_pct": 17.913,
+        "right_pct": 85.045,
+        "height_pct": 90.833,
+        "base_center_x_pct": 50.419,
+        "base_width_pct": 65.011,
+        "base_top_pct_est": 84.583
+      }
+    },
+    "side": {
+      "size": [
+        1792,
+        2400
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 36,
+        "median_rgb": [
+          45.0,
+          44.0,
+          47.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 4.0,
+        "neutral_delta": 3.0,
+        "luma": 44.4
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.98,
+          1.05,
+          1.27
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 22.039,
+        "filled_area_pct": 22.039,
+        "components_kept": 2,
+        "main_component_pct": 21.447,
+        "other_components_pct": [
+          0.591,
+          0.001,
+          0.001,
+          0.001
+        ],
+        "bbox_px": [
+          298,
+          96,
+          1492,
+          2257
+        ],
+        "top_pct": 4.0,
+        "bottom_pct": 94.042,
+        "left_pct": 16.629,
+        "right_pct": 83.259,
+        "height_pct": 90.042,
+        "base_center_x_pct": 49.944,
+        "base_width_pct": 66.629,
+        "base_top_pct_est": 84.875
+      }
+    },
+    "back": {
+      "size": [
+        1792,
+        2400
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 36,
+        "median_rgb": [
+          46.0,
+          45.0,
+          48.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 4.0,
+        "neutral_delta": 3.0,
+        "luma": 45.4
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.9,
+          0.95,
+          1.12
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 35.316,
+        "filled_area_pct": 35.316,
+        "components_kept": 2,
+        "main_component_pct": 34.774,
+        "other_components_pct": [
+          0.542,
+          0.012,
+          0.007,
+          0.003,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.001,
+          0.001
+        ],
+        "bbox_px": [
+          262,
+          96,
+          1498,
+          2251
+        ],
+        "top_pct": 4.0,
+        "bottom_pct": 93.792,
+        "left_pct": 14.621,
+        "right_pct": 83.594,
+        "height_pct": 89.792,
+        "base_center_x_pct": 50.028,
+        "base_width_pct": 67.076,
+        "base_top_pct_est": 84.833
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1792,
+            2400
+          ],
+          "side": [
+            1792,
+            2400
+          ],
+          "back": [
+            1792,
+            2400
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1792,
+          2400
+        ],
+        "side": [
+          1792,
+          2400
+        ],
+        "back": [
+          1792,
+          2400
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 3.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        44.0,
+        44.0,
+        46.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 44.1,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 35.723,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 3.958,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 94.792,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 14.955,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "PASS",
+      "value": [],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 4.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        45.0,
+        44.0,
+        47.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 44.4,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 22.039,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 4.0,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 94.042,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 16.629,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "WARN",
+      "value": [
+        0.591,
+        0.001,
+        0.001,
+        0.001
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 4.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "back",
+      "result": "PASS",
+      "value": [
+        46.0,
+        45.0,
+        48.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "back",
+      "result": "PASS",
+      "value": 45.4,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "back",
+      "result": "PASS",
+      "value": 35.316,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 4.0,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 93.792,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 14.621,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "back",
+      "result": "WARN",
+      "value": [
+        0.542,
+        0.012,
+        0.007,
+        0.003,
+        0.002,
+        0.002,
+        0.002,
+        0.002,
+        0.001,
+        0.001
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 2.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    },
+    {
+      "id": "set.base_bottom",
+      "scope": "set",
+      "result": "PASS",
+      "value": 1.0,
+      "limit": "<= 3.5 % высоты (WARN > 1.5)",
+      "message": "низ подставки на одной линии земли"
+    },
+    {
+      "id": "set.base_center",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.475,
+      "limit": "<= 6.5 % ширины (WARN > 2.0)",
+      "message": "центр подставки на одной вертикали"
+    },
+    {
+      "id": "set.height",
+      "scope": "set",
+      "result": "PASS",
+      "value": 1.146,
+      "limit": "<= 5.0 % от наибольшего (WARN > 3.0)",
+      "message": "рост фигуры одинаков во всех видах"
+    },
+    {
+      "id": "view.facing",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "verdict": "OK",
+        "iou_direct": 0.9854,
+        "iou_mirror": 0.7633,
+        "ortho": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261015-draft-tripo/orthos/ortho_left.png"
+      },
+      "limit": "IoU прямо > зеркало + 0.05 (WARN: оба < 0.5)",
+      "message": "боковой вид смотрит в ту же сторону, что ортопроекция SIDE_VIEW черновика (F8)"
+    }
+  ],
+  "summary": {
+    "PASS": 32,
+    "WARN": 2,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "C:/tmp/watson-gemini-1c-set/palette.json",
+    "asset_id": null,
+    "swatches": [
+      {
+        "name": "coat brown",
+        "hex": "#5E4532",
+        "role": "main",
+        "figure_share_within_40_pct": 55.22
+      },
+      {
+        "name": "bowler black",
+        "hex": "#1F1E1E",
+        "role": "main",
+        "figure_share_within_40_pct": 27.6
+      },
+      {
+        "name": "waistcoat tan",
+        "hex": "#A08262",
+        "role": "main",
+        "figure_share_within_40_pct": 6.11
+      },
+      {
+        "name": "watch chain gold",
+        "hex": "#C9A24A",
+        "role": "accent",
+        "figure_share_within_40_pct": 0.05
+      }
+    ]
+  },
+  "sheet": "C:/tmp/watson-gemini-1c-set/sheet-dr-watson.png"
+}
