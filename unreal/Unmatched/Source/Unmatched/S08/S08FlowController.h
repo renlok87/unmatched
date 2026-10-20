@@ -246,7 +246,9 @@ public:
   /** boardList (Board rows id -> name): the boards stage and the board name of the resume line. */
   void FetchBoards();
   EBootQuery GetBoardsState() const { return BoardsState; }
-  const TMap<FString, FString>& GetBoardNames() const { return BoardNames; }
+  /** Board row id -> the board's name in the interface language (2026-10-21 playtest F3f: boardList nameRu / nameEn,
+   *  else the technical name). */
+  const TMap<FString, FString>& GetBoardNames() const;
   /** GD-053: serverInfo { protocol } - Done with GetServerProtocol() (0 = an older server without the query,
    *  Failed = no answer). The BOOT pass compares it with S08ClientProtocol (S08Protocol.h). */
   void FetchServerInfo();
@@ -893,7 +895,12 @@ private:
   // VS-7 BOOT pass (S08FlowControllerBoot.cpp)
   int32 HeroesFailures = 0;
   EBootQuery BoardsState = EBootQuery::Idle;
-  TMap<FString, FString> BoardNames;
+  struct FBoardRowNames {
+    FString Name, NameEn, NameRu;
+  };
+  TMap<FString, FBoardRowNames> BoardRows;
+  mutable TMap<FString, FString> BoardNames;  // GetBoardNames: BoardRows in the language BoardNamesLang
+  mutable FString BoardNamesLang;
   EBootQuery ServerInfoState = EBootQuery::Idle;
   int32 ServerProtocol = -1;
   EBootQuery ActiveGameState = EBootQuery::Idle;

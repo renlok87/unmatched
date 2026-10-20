@@ -36,6 +36,10 @@ UClass* UUmScreenLobby::WidgetClass() { return UmGameHudSlots::WbpOrNative(UUmSc
 // ------------------------------------------------------------------------------------------------ the model
 
 namespace UmLobby {
+FString AiBotName() { return UmText::Get(EUmTable::Screens, TEXT("screens.ai.name")).ToString(); }
+FString MarmorealName() { return UmText::Get(EUmTable::Screens, TEXT("screens.board.marmoreal")).ToString(); }
+FString SarpedonName() { return UmText::Get(EUmTable::Screens, TEXT("screens.board.sarpedon")).ToString(); }
+
 FUmLobbyLayout Layout(const FVector2D& CanvasSu, bool bClassS) {
   FUmLobbyLayout L;
   L.bClassS = bClassS;
@@ -317,8 +321,8 @@ bool UUmScreenLobby::Initialize() {
   if (!bFirst || !WidgetTree) return bFirst;
   SetUiId(TEXT("UI-SCR-LOBBY"));
   SetScreenState(FName(TEXT("loading")));
-  BoardName[0] = UmLobby::MarmorealName;
-  BoardName[1] = UmLobby::SarpedonName;
+  BoardName[0] = UmLobby::MarmorealName();
+  BoardName[1] = UmLobby::SarpedonName();
   BindParts();
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const float ScalePx = UmHudScale::Current().PxPerSu();
@@ -581,8 +585,8 @@ void UUmScreenLobby::SetNickname(const FString& Name) {
 }
 
 void UUmScreenLobby::SetBoardNames(const FString& Marmoreal, const FString& Sarpedon) {
-  const FString A = Marmoreal.IsEmpty() ? FString(UmLobby::MarmorealName) : Marmoreal;
-  const FString B = Sarpedon.IsEmpty() ? FString(UmLobby::SarpedonName) : Sarpedon;
+  const FString A = Marmoreal.IsEmpty() ? FString(UmLobby::MarmorealName()) : Marmoreal;
+  const FString B = Sarpedon.IsEmpty() ? FString(UmLobby::SarpedonName()) : Sarpedon;
   if (A == BoardName[0] && B == BoardName[1]) return;
   BoardName[0] = A;
   BoardName[1] = B;
@@ -727,7 +731,7 @@ void UUmScreenLobby::RefreshTexts() {
   if (ModeLabel) ModeLabel->SetText(UmLbS(TEXT("screens.lobby.create.mode")));
   if (CreateNote) {
     FFormatNamedArguments Args;
-    Args.Add(TEXT("name"), FText::FromString(UmLobby::AiBotName));
+    Args.Add(TEXT("name"), FText::FromString(UmLobby::AiBotName()));
     CreateNote->SetText(FText::Format(UmLbS(TEXT("screens.lobby.create.ai.note")), Args));
   }
   if (BoardLabel) BoardLabel->SetText(UmLbS(TEXT("screens.lobby.create.board")));

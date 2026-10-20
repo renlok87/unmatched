@@ -279,7 +279,10 @@ void UUmGameHud::ApplyLayout(const FUmHudLayout& InLayout, const TArray<FName>& 
       // slice 12: under the table look the actions' tray is the control panel's plate - it lies under the prompt and
       // the stage strip that stand on it
       if (Which == EUmGameSlot::Actions || Which == EUmGameSlot::OppHand) {
-        CanvasSlot->SetZOrder(S08ArtLook::HudTable() ? -1 : 0);
+        // 2026-10-21 playtest F10: in class S (no panel plate) the actions' why tip stands over the DECKS chips right
+        // above the row - the actions draw over them there, the tip is never cut by the chips
+        const bool bSActions = Which == EUmGameSlot::Actions && InLayout.bClassS;
+        CanvasSlot->SetZOrder(bSActions ? 1 : S08ArtLook::HudTable() ? -1 : 0);
       }
     }
   }
@@ -292,6 +295,18 @@ void UUmGameHud::CollectShotLines(TArray<FString>& Out, const FIntPoint& WindowP
       TEXT("SHOT widget id=UI-SCR-GAME impl=umg state=%s fighter=none bbox=0,0,%d,%d geom=painted visible=%d twin=0 "
            "source=%s slots=%d"),
       *ScreenState, WindowPx.X, WindowPx.Y, bVisible ? 1 : 0, *Source, UmGameSlotCount));
+}
+
+void UUmGameHud::SyncTableDecor() {
+  const USizeBox* Owners[4] = {PanelLoc, PanelOpp, Actions, Decks};
+  uint8 Mask = 0;
+  for (int32 P = 0; P < 4; ++P) {
+    const UWidget* Content = Owners[P] ? Owners[P]->GetContent() : nullptr;
+    if (Content && UmGameHudSlots::ShownByProperty(Owners[P]) && UmGameHudSlots::ShownByProperty(Content)) Mask |= 1 << P;
+  }
+  if (Mask == TableDecorMask) return;
+  TableDecorMask = Mask;
+  ApplyTableDepth(Layout);
 }
 
 void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
@@ -319,7 +334,7 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
   for (int32 P = 0; P < 4; ++P) {
     const FName Name(*FString::Printf(TEXT("TableRim%d"), P));
     UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
-    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid;
+    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid && (TableDecorMask & (1 << P));
     if (!Img && bShow) {
       Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
       Canvas->AddChildToCanvas(Img);
@@ -344,7 +359,7 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
     const bool bTopLine = (B % 2) == 0;
     const FName Name(*FString::Printf(TEXT("TableBevel%d"), B));
     UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
-    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid;
+    const bool bShow = bOn && Plates.IsValidIndex(P) && Plates[P].bIsValid && (TableDecorMask & (1 << P));
     if (!Img && bShow) {
       Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
       Canvas->AddChildToCanvas(Img);
@@ -368,7 +383,7 @@ void UUmGameHud::ApplyTableDepth(const FUmHudLayout& L) {
     const bool bOuter = (I % 2) == 1;
     const FName Name(*FString::Printf(TEXT("TableDepth%d"), I));
     UImage* Img = Cast<UImage>(WidgetTree->FindWidget(Name));
-    const bool bShow = bOn && Plates.IsValidIndex(Plate) && Plates[Plate].bIsValid;
+    const bool bShow = bOn && Plates.IsValidIndex(Plate) && Plates[Plate].bIsValid && (TableDecorMask & (1 << Plate));
     if (!Img && bShow) {
       Img = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), Name);
       Canvas->AddChildToCanvas(Img);

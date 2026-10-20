@@ -121,8 +121,8 @@ FUmRoomModel Base(bool bHost) {
   M.Code = TEXT("AB12CD");
   M.bHost = bHost;
   M.BoardId = UmLobby::MarmorealId;
-  M.BoardNames[0] = UmLobby::MarmorealName;
-  M.BoardNames[1] = UmLobby::SarpedonName;
+  M.BoardNames[0] = UmLobby::MarmorealName();
+  M.BoardNames[1] = UmLobby::SarpedonName();
   M.Slots[0] = Seat(TEXT("ProGamer"), true, false);
   M.Slots[1] = Seat(TEXT("Veteran"), false, false);
   M.Heroes = {Arthur(), Medusa()};
@@ -282,7 +282,7 @@ bool FUmScreensRoomTreeTest::RunTest(const FString& Parameters) {
     if (TestNotNull(TEXT("Marmoreal card"), B0) && TestNotNull(TEXT("Sarpedon card"), B1)) {
       TestTrue(TEXT("Marmoreal is the room board"), B0->IsRoomBoard() && B0->IsCheckShown());
       TestFalse(TEXT("Sarpedon locked"), B1->IsRoomBoard() || B1->IsCheckShown());
-      TestEqual(TEXT("names from the model"), B1->GetNameText(), FString(UmLobby::SarpedonName));
+      TestEqual(TEXT("names from the model"), B1->GetNameText(), FString(UmLobby::SarpedonName()));
     }
     TestEqual(TEXT("locked why"), R->GetBoardWhyText(), FString(TEXT("Доску выбирают при создании комнаты")));
     // ---- SHOT lines: the main + board + deck, no code
@@ -334,7 +334,7 @@ bool FUmScreensRoomTreeTest::RunTest(const FString& Parameters) {
     Ai.bOppPresent = Ai.bOppHero = Ai.bOppReady = true;
     R->ApplyModel(Ai);
     if (UUmRoomSlot* S1 = R->GetSlot(1)) {
-      TestEqual(TEXT("AI seat «AI Bot»"), S1->GetNameText(), FString(TEXT("AI Bot")));
+      TestEqual(TEXT("AI seat «Бот» (2026-10-21 F3e)"), S1->GetNameText(), FString(TEXT("Бот")));
       TestEqual(TEXT("AI hero line"), S1->GetHeroLine(), FString(TEXT("Герой ИИ — при старте")));
     }
     // ---- class S (720p 150 %: 1138 x 640 su) stays inside the canvas
@@ -379,12 +379,12 @@ bool FUmScreensLoadingTreeTest::RunTest(const FString& Parameters) {
     L->PlayShow();
     FUmLoadingSide Own{TEXT("Medusa"), FName(TEXT("medusa")), TEXT("ProGamer")};
     FUmLoadingSide Opp{TEXT("King Arthur"), FName(TEXT("king-arthur")), TEXT("Veteran")};
-    L->SetSides(Own, Opp, UmLobby::MarmorealId, UmLobby::MarmorealName);
+    L->SetSides(Own, Opp, UmLobby::MarmorealId, UmLobby::MarmorealName());
     TestEqual(TEXT("connect"), L->GetScreenState(), FName(TEXT("connect")));
     TestEqual(TEXT("«Подключение к партии…»"), L->GetStageText(), FString(TEXT("Подключение к партии…")));
     TestEqual(TEXT("own hero left"), L->GetLeftName(), FString(TEXT("Medusa")));
     TestEqual(TEXT("opponent right"), L->GetRightName(), FString(TEXT("King Arthur")));
-    TestEqual(TEXT("board name"), L->GetBoardText(), FString(UmLobby::MarmorealName));
+    TestEqual(TEXT("board name"), L->GetBoardText(), FString(UmLobby::MarmorealName()));
     TestEqual(TEXT("«против»"), L->VersusText->GetText().ToString(), FString(TEXT("против")));
     TestTrue(TEXT("spinner slot"), L->IsSpinnerSlotSpinner() && !L->IsErrorIconShown());
     TestFalse(TEXT("no buttons while loading"), L->AreButtonsShown());

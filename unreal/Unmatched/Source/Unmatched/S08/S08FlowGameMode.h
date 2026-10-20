@@ -836,6 +836,7 @@ private:
   FString S09PendingRevealTraceKey;  // same, for the owner PENDING panel's revealed line
   // DE-020: the deferred-choice service (skipped-effect notes, modal / compact / toast, collapse, memory).
   FS09SkippedEffectsFeed SkippedEffects;
+  FS09LastEffectFeed LastEffects;  // 2026-10-21 playtest F5c: metadata.lastEffect (the area of «Беспокойные духи»)
   FS09PendingPresenter PendingPresenter;
   FString PendingStepTraceKey;      // MS-PENDING step=... once per (head, step)
   FString PendingNoTargetsTraceKey; // MS-REJECT pending.no.targets once per head
@@ -1385,6 +1386,8 @@ private:
   void UmHudLogTrail(const struct FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters);
   /** 2026-10-15 playtest: one journal row per closed combat («Король Артур → Медуза: урон 6», ms.log.attack). */
   void UmHudLogCombat(const FString& AttackerId, const FString& AttackerOwnerId, const FString& TargetId, int32 Damage, int32 Seq);
+  /** 2026-10-21 playtest F5c: the journal line of an area effect (lastEffect) - «Беспокойные духи: Гарпия 1 — урон 2». */
+  void UmHudLogEffect(const struct FS09LastEffect& Area);
   /** ShowReason: the UMG toast of a keyed message (CUE-004 refusals, the skipped effect, ...). */
   void UmHudToastReason(const FS09Reason& Reason, float Seconds);
   /** RefreshUi: what the Slate toast line still shows - all of it with -S08SlateHud=toast, the non-keyed developer

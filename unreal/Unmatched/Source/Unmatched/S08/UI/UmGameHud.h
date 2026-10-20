@@ -80,6 +80,12 @@ class UNMATCHED_API UUmGameHud : public UUserWidget {
   /** "SHOT widget id=UI-SCR-GAME impl=umg state=.. fighter=none bbox=0,0,W,H geom=painted visible=1 twin=0 source=..":
    *  the screen line of the gate (04 §1.6); an empty slot writes nothing (its block is still Slate or not built yet). */
   void CollectShotLines(TArray<FString>& Out, const FIntPoint& WindowPx) const;
+  /** 2026-10-21 playtest F6: the table decor of each plate (rim, bevel, contact shadow - slices 15 / 17 / 19) follows
+   *  its block - PANEL-LOC, PANEL-OPP, the control panel (ACTIONS), the piles tray (DECKS): a hidden block (the result
+   *  modal, «Посмотреть доску», a Slate block) leaves no empty frame. Cheap per frame (early out on the same mask). */
+  void SyncTableDecor();
+  /** Bit P = plate P's block is shown (0 PanelLoc, 1 PanelOpp, 2 Actions, 3 Decks). */
+  uint8 GetTableDecorMask() const { return TableDecorMask; }
 
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget))
   TObjectPtr<UCanvasPanel> Canvas;
@@ -129,6 +135,7 @@ class UNMATCHED_API UUmGameHud : public UUserWidget {
   /** HUD "Стол" slice 15: soft contact shadows under the table plates (class L). */
   void ApplyTableDepth(const FUmHudLayout& L);
   FUmHudLayout Layout;
+  uint8 TableDecorMask = 0xF;
   FString ScreenState = TEXT("own");
   bool bCodeDefaultTree = false;
 };

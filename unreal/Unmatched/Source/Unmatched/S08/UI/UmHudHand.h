@@ -202,6 +202,12 @@ struct UNMATCHED_API FGatherIn {
 UNMATCHED_API FUmHandModel Gather(const FGatherIn& In);
 /** The instance id the key 1-9 picks (Key 1-based; '' when there is no such card). */
 UNMATCHED_API FString KeyTarget(const FUmHandModel& Model, int32 Key);
+/** 2026-10-21 playtest F1: the hand index (Own.Cards) a pressed card id means - the exact instance; a widget wired to a
+ *  card that left (the scheme handed to SLOT, HB-37) means the card the hand has under the pointer (Model.Cards[Hover],
+ *  the card the player sees); only without one a copy of the same catalog card (the 2026-10-15 fallback took the second
+ *  copy of the played scheme over the card under the pointer). OutSrc: exact | hover | catalog | none. */
+UNMATCHED_API int32 PressedIndex(const FS09PlayerPanel& Own, const FUmHandModel& Model, int32 HoverIndex,
+                                 const FString& PressedId, const TCHAR** OutSrc = nullptr);
 }  // namespace UmHudHand
 
 UCLASS(Blueprintable, BlueprintType)
@@ -272,6 +278,9 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   void ClearHover();
   /** One wheel notch over the hand: the preview walks to the next (bForward) / previous card of the row. */
   bool WheelStep(bool bForward);
+  /** 2026-10-21 playtest F1: a press that bubbled from a released pool widget presses the card under the pointer. */
+  virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+  virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
   // ---- tests and the review sheet ----
   void SetClockOverrideMs(double Ms);
@@ -368,4 +377,6 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   TFunction<void(const FS09HudPressOutcome&, const FString&)> OnPress;
   TFunction<void(const FString&)> OnInspect;
   TFunction<void(const FString&)> OnPlay;
+  FString StrayPressId;      // F1: the card a bubbled press went to (empty: none)
+  bool bStrayRight = false;  // F1: that press was the right button (the inspector on release)
 };

@@ -1,4 +1,5 @@
 #include "UmHudTheme.h"
+#include "../S08ArtHudStyle.h"
 #include "../S08ArtLook.h"
 
 #include "../S08HudTokens.generated.h"
@@ -136,6 +137,11 @@ FSlateFontInfo UUmHudTheme::Font(FName Token) const {
     if (Found->FontObject || Found->CompositeFont.IsValid()) return *Found;
     Typeface = Found->TypefaceFontName;
     Size = Found->Size;
+  } else if (Token == FName(TEXT("font.card"))) {
+    // 2026-10-21 playtest F7b: «font.card» is the face token of hud-style-tokens.json typography (HI-07: the card
+    // digits in Roboto Bold Condensed), not a type.* size - the chips «+N», the order numbers and the number picker
+    // ask for it and set their own size; it fell back to Regular with a warning
+    Typeface = FName(S08ArtHudFonts::CardTypeface);
   } else {
     WarnMissing(TEXT("type"), Token);
   }

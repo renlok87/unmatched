@@ -419,3 +419,26 @@ FS09CombatReveal FS09CombatReveal::Derive(const FS08CombatInfo& Combat, const FS
   Out.DefenseValue = Out.bDefenseKnown ? Out.Defense.DefenseValue : Out.bNoDefense ? 0 : -1;
   return Out;
 }
+
+bool FS09CombatReveal::AddClosingBoosts(const FString& AttackerOwnerId, const TSharedPtr<FJsonValue>& BaselinePiles,
+                                        const TSharedPtr<FJsonValue>& ClosingPiles) {
+  if (Boosts.Num() > 0) return false;
+  const TArray<FS09CardView> Base = PileCards(BaselinePiles, AttackerOwnerId);
+  const TArray<FS09CardView> Now = PileCards(ClosingPiles, AttackerOwnerId);
+  bool bAdded = false;
+  for (int32 I = Base.Num(); I < Now.Num(); ++I) {
+    const FS09CardView& Card = Now[I];
+    if (Card.bHidden || !Card.bHasBoostValue || Card.BoostValue <= 0) continue;
+    if (bAttackKnown && Card.InstanceId == Attack.InstanceId) continue;
+    if (CardById(Base, Card.InstanceId)) continue;
+    Boosts.Add(Card);
+    if (bAttackKnown && AttackValue >= 0) AttackValue += Card.BoostValue;
+    bAdded = true;
+  }
+  return bAdded;
+}
+
+void FS09CombatReveal::ApplyFinalValues(int32 FinalAttack, int32 FinalDefense) {
+  if (FinalAttack >= 0) AttackValue = FinalAttack;
+  if (FinalDefense >= 0) DefenseValue = FinalDefense;
+}

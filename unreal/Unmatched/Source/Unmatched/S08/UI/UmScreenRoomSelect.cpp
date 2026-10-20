@@ -403,7 +403,7 @@ void UUmScreenRoom::SelRefresh() {
     const ES08TeamSlot Look = SelLookOfSide(Own, S);
     PlateName[S]->SetText(H ? FText::FromString(H->Name) : FText::FromString(TEXT("?")));
     FString Nick = Seat.Username;
-    if (S == 1 && Model.bVsAi) Nick = TEXT("AI Bot");
+    if (S == 1 && Model.bVsAi) Nick = UmLobby::AiBotName();  // 2026-10-21 playtest F3e: «Бот» in RU
     if (Nick.IsEmpty()) Nick = TEXT("—");
     PlateNick[S]->SetText(FText::FromString(Nick));
     FText Chip;
@@ -488,7 +488,7 @@ void UUmScreenRoom::SelRefresh() {
       B.DrawAs = ESlateBrushDrawType::Image;
       Preview->SetBrush(B);
     }
-    const FString Name = Model.BoardNames[PrevIdx].IsEmpty() ? FString(PrevIdx == 0 ? UmLobby::MarmorealName : UmLobby::SarpedonName) : Model.BoardNames[PrevIdx];
+    const FString Name = Model.BoardNames[PrevIdx].IsEmpty() ? FString(PrevIdx == 0 ? UmLobby::MarmorealName() : UmLobby::SarpedonName()) : Model.BoardNames[PrevIdx];
     PreviewName->SetText(FText::FromString(Name));
     FText Hint;
     if (!Model.bHost) {
@@ -503,9 +503,8 @@ void UUmScreenRoom::SelRefresh() {
       FUmSelectTileModel M;
       if (I < 2) {
         M.Id = I == 0 ? UmLobby::MarmorealId : UmLobby::SarpedonId;
-        M.Label = (I == 0 ? UmLobby::MarmorealName : UmLobby::SarpedonName);
-        int32 Dot = INDEX_NONE;
-        if (M.Label.FindChar(TEXT('·'), Dot)) M.Label = M.Label.Left(Dot).TrimEnd();
+        // 2026-10-21 playtest F3f: the board's own name in the interface language (boardList nameRu / nameEn)
+        M.Label = Model.BoardNames[I].IsEmpty() ? (I == 0 ? UmLobby::MarmorealName() : UmLobby::SarpedonName()) : Model.BoardNames[I];
         M.Image = BoardThumbs[I];
         M.bSelected = M.Id == Model.BoardId;
         M.bBadge = M.bSelected;

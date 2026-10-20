@@ -48,11 +48,13 @@ const FRow GRows[] = {
     {TEXT("why.defense.none"), TEXT("Nothing to defend with")},
     {TEXT("why.discard.count"), TEXT("Choose {need} cards to discard: {have} chosen")},
     {TEXT("why.scheme.none"), TEXT("Pick a scheme card first")},
+    {TEXT("why.scheme.unplayable"), TEXT("No scheme you can play")},  // 2026-10-21 playtest F10: the СХЕМА button
     {TEXT("why.choice.required"), TEXT("This choice is mandatory")},
     {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
     {TEXT("why.defense.pick"), TEXT("Pick a defense card in your hand")},  // VS-3 HB-30 (ВР-VS3-51)
     {TEXT("why.boost.pick"), TEXT("Pick a card with BOOST in your hand")},  // 2026-10-15 playtest: BOOST_CHOICE
     {TEXT("why.space.pick"), TEXT("Click a highlighted space on the board")},  // 2026-10-15 playtest: CHOOSE_SPACE
+    {TEXT("why.space.pick.adjacent"), TEXT("Click a highlighted space next to the chosen one")},  // 2026-10-21 F5: step 2
     {TEXT("why.order.pick"), TEXT("Click the cards in order: the first goes on top of the deck")},  // 2026-10-15 playtest: ORDER
     {TEXT("why.target.pick"), TEXT("Click a highlighted fighter on the board")},  // 2026-10-15 playtest: TARGET_FIGHTER
     {TEXT("why.pick.count"), TEXT("Make your choice: {need} needed, {have} chosen")},  // VS-4 HB-35 (ВР-VS4-08)

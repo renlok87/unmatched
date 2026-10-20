@@ -300,6 +300,9 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   void SetOnHoverChanged(TFunction<void(bool)> In) { OnHoverChanged = MoveTemp(In); }
   void SetOnInspect(TFunction<void()> In) { OnInspect = MoveTemp(In); }
   FName GetPressId() const { return PressId; }
+  /** 2026-10-21 playtest F1: false for a released pool widget (no press id) or a collapsed one - its mouse handlers
+   *  then return Unhandled, the press bubbles to the owner. */
+  bool TakesPointer() const;
 
   // ---- what is drawn now (tests, gallery) ----
   EUmCardFace GetFace() const { return FaceKind; }

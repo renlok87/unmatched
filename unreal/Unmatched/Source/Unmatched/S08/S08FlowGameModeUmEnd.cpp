@@ -36,6 +36,7 @@
 #include "UI/UmReconnectOverlay.h"
 #include "UI/UmScreenAborted.h"
 #include "UI/UmScreenGameOver.h"
+#include "UI/UmScreenLobby.h"
 #include "UI/UmText.h"
 #include "UI/UmWorldLayer.h"
 #include "Blueprint/WidgetTree.h"
@@ -484,11 +485,9 @@ void AS08FlowGameMode::TickUmEndScreens() {
           O.Role = UmText::Get(EUmTable::Screens, TEXT("screens.result.you")).ToString();
         } else {
           O.Role = UmText::Get(EUmTable::Screens, TEXT("screens.result.opponent")).ToString();
-          if (M.bVsAi) {  // ВР-VS5-SC37-01: in VS_AI the opponent's role word is the bot's nickname from data
-            for (const FS08RoomPlayer& P : Room->Players) {
-              if (P.UserId == S.PlayerId && !P.Username.IsEmpty()) O.Role = P.Username;
-            }
-          }
+          // ВР-VS5-SC37-01 revised (2026-10-21 playtest F3e): in VS_AI the opponent is the bot as a role in the
+          // interface language («Бот»), not the data nickname 'AI Bot'
+          if (M.bVsAi) O.Role = UmLobby::AiBotName();
         }
         if (M.Outcome != EUmGameOverOutcome::Draw && S.bHpKnown) {
           O.Hp = S.Hp;

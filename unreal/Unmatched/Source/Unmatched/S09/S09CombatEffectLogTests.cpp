@@ -125,6 +125,9 @@ bool FS09CombatEffectLogParseTest::RunTest(const FString&) {
   TestEqual("n", Owner.N, 3);
   TestEqual("six entries", Owner.Entries.Num(), 6);
   TestEqual("damage", Owner.DefenderDamage, 2);
+  // 2026-10-21 playtest F9: the server's score of the combat (the centre shows it, not the printed sum)
+  TestEqual("finalAttack", Owner.FinalAttack, 5);
+  TestEqual("finalDefense", Opponent.FinalDefense, 3);
   TestTrue("attacker won", Owner.bAttackerWon);
   TestEqual("parent of the chosen option", Owner.Entries[2].Parent, 1);
   TestTrue("value", Owner.Entries[2].bHasValue && Owner.Entries[2].Value == 1);

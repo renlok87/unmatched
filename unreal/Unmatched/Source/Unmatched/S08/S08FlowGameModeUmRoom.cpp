@@ -103,8 +103,8 @@ const TCHAR* const UmRmRoster[] = {TEXT("King Arthur"), TEXT("Medusa")};
 
 FString UmRmBoardName(const TMap<FString, FString>& Names, const FString& Id) {
   if (const FString* N = Names.Find(Id)) return *N;
-  if (Id == UmLobby::MarmorealId) return UmLobby::MarmorealName;
-  if (Id == UmLobby::SarpedonId) return UmLobby::SarpedonName;
+  if (Id == UmLobby::MarmorealId) return UmLobby::MarmorealName();
+  if (Id == UmLobby::SarpedonId) return UmLobby::SarpedonName();
   return Id;
 }
 
@@ -672,7 +672,7 @@ void AS08FlowGameMode::TickUmLoading(bool bShowing) {
         }
       }
     }
-    if (Room.Mode == TEXT("VS_AI") && Sides[1].Nick.IsEmpty()) Sides[1].Nick = UmLobby::AiBotName;
+    if (Room.Mode == TEXT("VS_AI")) Sides[1].Nick = UmLobby::AiBotName();  // 2026-10-21 playtest F3e: the role, not the nick
     L->SetSides(Sides[0], Sides[1], Room.BoardId, UmRmBoardName(Flow->GetBoardNames(), Room.BoardId));
     FS08Trace::Write(FString::Printf(TEXT("LOADING shown game=%s board=%s players=%d"), *Room.GameId, *Room.BoardId, Room.Players.Num()));
     for (const FString& Line : L->GetPortraitLines()) FS08Trace::Write(Line);

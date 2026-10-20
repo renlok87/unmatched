@@ -6,9 +6,11 @@
 // session stage, goes to LOGIN and continues with the catalogue after the login (ВР-VS7-01).
 #include "S08FlowController.h"
 #include "S08Protocol.h"
+#include "UI/UmCardMedia.h"
 
 namespace {
-const TCHAR* BootBoardsQuery = TEXT("query BL($limit: Int) { boardList(limit: $limit) { items { id name } } }");
+// 2026-10-21 playtest F3f: nameEn / nameRu - the name is the technical unique key «<Map> · original map»
+const TCHAR* BootBoardsQuery = TEXT("query BL($limit: Int) { boardList(limit: $limit) { items { id name nameEn nameRu } } }");
 const TCHAR* BootServerInfoQuery = TEXT("query SI { serverInfo { protocol } }");
 const TCHAR* BootActiveGameQuery =
     TEXT("query MA($status: GameStatus) { myGames(filters: { status: $status }) {")
@@ -32,15 +34,38 @@ void FS08FlowController::FetchBoards() {
                Trace(TEXT("BOARDS failed: ") + (Errors.Num() ? Errors[0].Message : FString(TEXT("no list"))));
                return;
              }
-             BoardNames.Reset();
+             BoardRows.Reset();
              for (const TSharedPtr<FJsonValue>& Value : *Items) {
                const TSharedPtr<FJsonObject>* Row = nullptr;
                if (!Value.IsValid() || !Value->TryGetObject(Row) || !Row->IsValid()) continue;
-               BoardNames.Add((*Row)->GetStringField(TEXT("id")), (*Row)->GetStringField(TEXT("name")));
+               FString Id;
+               if (!(*Row)->TryGetStringField(TEXT("id"), Id) || Id.IsEmpty()) continue;
+               FBoardRowNames& N = BoardRows.Add(Id);
+               (*Row)->TryGetStringField(TEXT("name"), N.Name);
+               (*Row)->TryGetStringField(TEXT("nameEn"), N.NameEn);
+               (*Row)->TryGetStringField(TEXT("nameRu"), N.NameRu);
              }
+             BoardNamesLang.Reset();  // GetBoardNames rebuilds
              BoardsState = EBootQuery::Done;
-             Trace(FString::Printf(TEXT("BOARDS loaded %d"), BoardNames.Num()));
+             Trace(FString::Printf(TEXT("BOARDS loaded %d"), BoardRows.Num()));
            });
+}
+
+const TMap<FString, FString>& FS08FlowController::GetBoardNames() const {
+  const FString Lang = UmCardMedia::PreferredLang();
+  if (Lang != BoardNamesLang) {
+    BoardNamesLang = Lang;
+    BoardNames.Reset();
+    const bool bRu = Lang != TEXT("en");
+    for (const TPair<FString, FBoardRowNames>& P : BoardRows) {
+      const FBoardRowNames& N = P.Value;
+      FString Shown = bRu ? N.NameRu.TrimStartAndEnd() : FString();
+      if (Shown.IsEmpty()) Shown = N.NameEn.TrimStartAndEnd();
+      if (Shown.IsEmpty()) Shown = N.Name;
+      BoardNames.Add(P.Key, Shown);
+    }
+  }
+  return BoardNames;
 }
 
 void FS08FlowController::FetchServerInfo() {

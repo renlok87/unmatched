@@ -1234,6 +1234,62 @@ bool FS09PendingDe020SkippedTest::RunTest(const FString&) {
   return true;
 }
 
+// 2026-10-21 playtest F5c: metadata.lastEffect (the area of «Беспокойные духи») - decoded, primed silently on entry, each
+// record shown once
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingLastEffectTest,
+    "Unmatched.S09.PENDING lastEffect: the area record decodes, the first snapshot primes silently, each n shown once",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingLastEffectTest::RunTest(const FString&) {
+  auto With = [](int32 N, bool bTargets) {
+    FS08Snapshot S;
+    const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>();
+    if (N > 0) {
+      const TSharedRef<FJsonObject> Rec = MakeShared<FJsonObject>();
+      Rec->SetNumberField(TEXT("n"), N);
+      Rec->SetNumberField(TEXT("seq"), 50 + N);
+      Rec->SetStringField(TEXT("playerId"), TEXT("pA"));
+      Rec->SetStringField(TEXT("sourceRef"), TEXT("cat-spirits-effects-0-p0"));
+      Rec->SetStringField(TEXT("kind"), TEXT("ZONE_AREA_DAMAGE"));
+      TArray<TSharedPtr<FJsonValue>> Cells;
+      for (const FIntPoint& P : {FIntPoint(5, 1), FIntPoint(4, 1)}) {
+        const TSharedRef<FJsonObject> C = MakeShared<FJsonObject>();
+        C->SetNumberField(TEXT("x"), P.X);
+        C->SetNumberField(TEXT("y"), P.Y);
+        Cells.Add(MakeShared<FJsonValueObject>(C));
+      }
+      Rec->SetArrayField(TEXT("cells"), Cells);
+      TArray<TSharedPtr<FJsonValue>> Ids;
+      if (bTargets) Ids.Add(MakeShared<FJsonValueString>(TEXT("harpy-1")));
+      Rec->SetArrayField(TEXT("targets"), Ids);
+      Rec->SetArrayField(TEXT("defeated"), Ids);
+      Rec->SetNumberField(TEXT("damage"), 2);
+      Rec->SetNumberField(TEXT("drawn"), bTargets ? 1 : 0);
+      Meta->SetObjectField(TEXT("lastEffect"), Rec);
+    }
+    S.Metadata = MakeShared<FJsonValueObject>(Meta);
+    return S;
+  };
+  FS09LastEffect Rec;
+  TestFalse(TEXT("no field: no record"), FS09LastEffect::Read(With(0, false), Rec));
+  TestTrue(TEXT("the record decodes"), FS09LastEffect::Read(With(1, true), Rec));
+  TestTrue(TEXT("cells anchor then adjacent"), Rec.Cells.Num() == 2 && Rec.Cells[0] == FIntPoint(5, 1) && Rec.Cells[1] == FIntPoint(4, 1));
+  TestTrue(TEXT("targets, damage, defeated, drawn"),
+           Rec.Targets.Num() == 1 && Rec.Targets[0] == TEXT("harpy-1") && Rec.Damage == 2 && Rec.Defeated.Num() == 1 && Rec.Drawn == 1);
+  TestEqual(TEXT("sourceRef"), Rec.SourceRef, FString(TEXT("cat-spirits-effects-0-p0")));
+  FS09LastEffectFeed Feed;
+  FS09LastEffect Out;
+  TestFalse(TEXT("entry with an old record: primed, nothing shown"), Feed.Consume(With(1, true), Out));
+  TestFalse(TEXT("the same record again: nothing"), Feed.Consume(With(1, true), Out));
+  TestTrue(TEXT("a new record shows"), Feed.Consume(With(2, false), Out) && Out.N == 2 && Out.Targets.Num() == 0);
+  TestFalse(TEXT("shown once"), Feed.Consume(With(2, false), Out));
+  FS08Snapshot NoMeta;
+  TestFalse(TEXT("a body without metadata: nothing"), Feed.Consume(NoMeta, Out));
+  FS09LastEffectFeed Fresh;
+  TestFalse(TEXT("first body without a record primes with 0"), Fresh.Consume(With(0, false), Out));
+  TestTrue(TEXT("then the first record of the game shows"), Fresh.Consume(With(1, true), Out) && Out.N == 1);
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020PresentTest,
     "Unmatched.S09.PENDING DE-020 presentation: modal first, toast for a repeating optional trigger, compact every turn, collapse, memory",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
@@ -1421,6 +1477,27 @@ bool FS09PendingDe020StepsTest::RunTest(const FString&) {
   TargetUi.OnSnapshot(TargetView, Board, Fighters);
   Step = S09DescribePendingStep(TargetUi, TargetView, Board, Fighters);
   TestTrue(TEXT("TARGET: one step"), Step.bValid && Step.Steps == 1 && Step.Step == 1 && Step.N == 1);
+  // 2026-10-21 playtest F5b: CHOOSE_SPACE («Беспокойные духи») is two steps - step 2 asks for the adjacent space
+  for (const int32 Stage : {1, 2}) {
+    const TSharedRef<FJsonObject> SpaceHead = MakeHead(Stage == 2 ? TEXT("rs-0-p0#2") : TEXT("rs-0-p0"), Host, TEXT("CHOOSE_SPACE"));
+    SpaceHead->SetNumberField(TEXT("stage"), Stage);
+    SpaceHead->SetStringField(TEXT("text"), TEXT("Choose any space in Merlin's zone."));
+    if (Stage == 2) {
+      const TSharedRef<FJsonObject> Anchor = MakeShared<FJsonObject>();
+      Anchor->SetNumberField(TEXT("x"), 1);
+      Anchor->SetNumberField(TEXT("y"), 1);
+      SpaceHead->SetObjectField(TEXT("anchor"), Anchor);
+    }
+    const FS08Snapshot SpaceView = WithPendingHead(Base, SpaceHead);
+    FS09CommandUi SpaceUi;
+    SpaceUi.ViewerId = Host;
+    SpaceUi.OnSnapshot(SpaceView, Board, Fighters);
+    Step = S09DescribePendingStep(SpaceUi, SpaceView, Board, Fighters);
+    TestTrue(FString::Printf(TEXT("CHOOSE_SPACE stage %d: step %d of 2 (got %d of %d)"), Stage, Stage, Step.Step, Step.Steps),
+             Step.bValid && Step.Steps == 2 && Step.Step == Stage);
+    TestEqual(FString::Printf(TEXT("CHOOSE_SPACE stage %d: the prompt"), Stage), Step.Prompt.Key,
+              FName(Stage == 2 ? TEXT("why.space.pick.adjacent") : TEXT("ms.choice.space.board")));
+  }
   TestFalse(TEXT("TARGET with a living target: not empty"),
             S09PendingHasNoTargets(TargetUi, TargetView, Board, Fighters));
   const TSharedRef<FJsonObject> EmptyHead = MakeHead(TEXT("de020-empty"), Host, TEXT("TARGET_FIGHTER"));

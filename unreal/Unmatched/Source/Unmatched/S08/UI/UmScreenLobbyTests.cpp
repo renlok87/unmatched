@@ -145,13 +145,13 @@ bool FUmScreensLobbyTreeTest::RunTest(const FString& Parameters) {
     TestEqual(TEXT("Marmoreal by default"), L->GetBoardId(), FString(UmLobby::MarmorealId));
     TestTrue(TEXT("exactly two boards, Marmoreal selected"),
              L->GetBoardChip(0) && L->GetBoardChip(1) && !L->GetBoardChip(2) && L->GetBoardChip(0)->IsSelected() && !L->GetBoardChip(1)->IsSelected());
-    TestEqual(TEXT("board names"), L->GetBoardChip(1) ? L->GetBoardChip(1)->GetNameText() : FString(), FString(UmLobby::SarpedonName));
+    TestEqual(TEXT("board names"), L->GetBoardChip(1) ? L->GetBoardChip(1)->GetNameText() : FString(), FString(UmLobby::SarpedonName()));
     L->SimulatePress(FName(TEXT("screens.lobby.board.1")));
     TestTrue(TEXT("Sarpedon selected"), L->GetBoardId() == UmLobby::SarpedonId && L->GetBoardChip(1)->IsSelected());
     TestEqual(TEXT("create"), L->GetScreenState(), FName(TEXT("create")));
     TestEqual(TEXT("no AI note in 1v1"), L->GetNoteText(), FString());
     L->SimulatePress(FName(TEXT("screens.lobby.create.mode.ai")));
-    TestEqual(TEXT("AI note (seed-ai.ts:24)"), L->GetNoteText(), FString(TEXT("Соперник — ИИ: AI Bot")));
+    TestEqual(TEXT("AI note (2026-10-21 F3e: the role «Бот»)"), L->GetNoteText(), FString(TEXT("Соперник — ИИ: Бот")));
     L->SimulatePress(FName(TEXT("screens.lobby.create.submit")));
     L->SimulatePress(FName(TEXT("screens.lobby.create.submit")));  // a double click
     TestTrue(TEXT("one create, VS_AI on Sarpedon"), Creates == 1 && LastMode == EUmLobbyMode::VsAi && LastBoard == UmLobby::SarpedonId);

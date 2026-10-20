@@ -1272,7 +1272,16 @@ void UUmCardWidget::SetPress(FName InId, const TSharedPtr<FS09HudPressArbiter>& 
   OnOutcome = InOnOutcome;
 }
 
+bool UUmCardWidget::TakesPointer() const {
+  // 2026-10-21 playtest F1: a pool widget released by its owner (no press id, no inspect / double click) or collapsed
+  // never answers the pointer - a stale hit-test entry of it (the scheme handed to SLOT) lets the press bubble to the
+  // owner, which presses the card it has under the pointer
+  const bool bWired = !PressId.IsNone() || static_cast<bool>(OnInspect) || static_cast<bool>(OnDoubleClick);
+  return bWired && GetVisibility() != ESlateVisibility::Collapsed && GetVisibility() != ESlateVisibility::Hidden;
+}
+
 FReply UUmCardWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  if (!TakesPointer()) return FReply::Unhandled();
   if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton && OnInspect) return FReply::Handled();
   if (InMouseEvent.GetEffectingButton() != EKeys::LeftMouseButton || !Arbiter.IsValid()) return FReply::Unhandled();
   // DE-014: the press belongs to the logical id (the instance id), the release decides (an unplayable card takes it too)
@@ -1283,6 +1292,7 @@ FReply UUmCardWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const
 }
 
 FReply UUmCardWidget::NativeOnMouseButtonDoubleClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  if (!TakesPointer()) return FReply::Unhandled();
   if (OnDoubleClick && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
     // HB-24 (UI-INP-003): the double click plays the card - the owner decides; no second press (its release is a
     // release without a press: nothing)
@@ -1293,6 +1303,7 @@ FReply UUmCardWidget::NativeOnMouseButtonDoubleClick(const FGeometry& InGeometry
 }
 
 FReply UUmCardWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  if (!TakesPointer()) return FReply::Unhandled();
   if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton && OnInspect) {
     OnInspect();
     return FReply::Handled();

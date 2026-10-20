@@ -33,6 +33,7 @@
 #include "UmHudLayout.h"
 #include "UmHudRoot.h"
 #include "Components/InvalidationBox.h"
+#include "Blueprint/WidgetTree.h"
 #include "UmHudTheme.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
@@ -197,6 +198,36 @@ bool FUmHudRootTreeTest::RunTest(const FString&) {
   TestTrue(TEXT("class S: the hand slot back"), Game->GetSlot(EUmGameSlot::Hand)->GetVisibility() == ESlateVisibility::HitTestInvisible);
   Game->ApplyLayout(S, {}, /*bAllSlate=*/true);
   TestTrue(TEXT("whole Slate: every slot collapsed"), Game->GetSlot(EUmGameSlot::Top)->GetVisibility() == ESlateVisibility::Collapsed);
+  // 2026-10-21 playtest F6: the table decor of a plate follows its block (no empty frame under the result modal)
+  {
+    const S08ArtLook::FHudTableTestScope Table(true);
+    const FUmHudLayout T = FUmHudLayout::Compute(FVector2D(1920.0, 1080.0), 1.0f, nullptr, true);
+    UTextBlock* ActionsBlock = NewObject<UTextBlock>(Game);
+    Game->SetBlock(EUmGameSlot::Actions, ActionsBlock);
+    UTextBlock* LocBlock = NewObject<UTextBlock>(Game);
+    Game->SetBlock(EUmGameSlot::PanelLoc, LocBlock);
+    Game->ApplyLayout(T, {});
+    auto Shown = [&](const TCHAR* Name) {
+      const UWidget* Img = Game->WidgetTree ? Game->WidgetTree->FindWidget(FName(Name)) : nullptr;
+      return Img && UmGameHudSlots::ShownByProperty(Img);
+    };
+    ActionsBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
+    LocBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
+    Game->SyncTableDecor();
+    TestTrue(TEXT("decor: the control panel's rim, bevel and shadow with ACTIONS shown"),
+             Shown(TEXT("TableRim2")) && Shown(TEXT("TableBevel4")) && Shown(TEXT("TableBevel5")) && Shown(TEXT("TableDepth4")) && Shown(TEXT("TableDepth5")));
+    TestTrue(TEXT("decor: the PANEL-LOC rim"), Shown(TEXT("TableRim0")));
+    TestFalse(TEXT("decor: no piles tray frame without DECKS"), Shown(TEXT("TableRim3")) || Shown(TEXT("TableDepth6")));
+    ActionsBlock->SetVisibility(ESlateVisibility::Collapsed);
+    Game->SyncTableDecor();
+    TestFalse(TEXT("decor: ACTIONS hidden (the result modal) - no empty control panel frame"),
+              Shown(TEXT("TableRim2")) || Shown(TEXT("TableBevel4")) || Shown(TEXT("TableBevel5")) || Shown(TEXT("TableDepth4")) || Shown(TEXT("TableDepth5")));
+    TestTrue(TEXT("decor: PANEL-LOC keeps its rim («Посмотреть доску»)"), Shown(TEXT("TableRim0")));
+    TestEqual(TEXT("decor mask"), static_cast<int32>(Game->GetTableDecorMask()), 1);
+    ActionsBlock->SetVisibility(ESlateVisibility::HitTestInvisible);
+    Game->SyncTableDecor();
+    TestTrue(TEXT("decor: back with ACTIONS"), Shown(TEXT("TableRim2")));
+  }
   TArray<FString> Lines;
   Game->SetScreenState(TEXT("combat"));
   Game->CollectShotLines(Lines, FIntPoint(1920, 1080));

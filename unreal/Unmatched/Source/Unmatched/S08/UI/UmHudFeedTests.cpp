@@ -309,6 +309,9 @@ bool FUmHudToastPlaceTest::RunTest(const FString&) {
   TestTrue(TEXT("holds: error 4 s, others 2...4 s"), HoldSec(EUmToastKind::Error, 1.0f) == 4.0f && HoldSec(EUmToastKind::Info, 10.0f) == 4.0f &&
                                                        HoldSec(EUmToastKind::Info, 1.0f) == 2.0f && HoldSec(EUmToastKind::Warning, 3.0f) == 3.0f);
   TestEqual(TEXT("why.not.your.turn RU"), ReasonText(FS09Reason::Make(TEXT("why.not.your.turn"))).ToString(), FString(TEXT("Сейчас не ваш ход")));
+  // 2026-10-21 playtest F3c: no raw space id («S35: ») before a reason of a space
+  TestEqual(TEXT("why.cell.no.path RU without the cell id"),
+            ReasonText(FS09Reason::Make(TEXT("why.cell.no.path")).Arg(TEXT("cell"), TEXT("S35"))).ToString(), FString(TEXT("Туда не пройти")));
   // ---- the plans: width = text + padding (+ sign, + cross), two lines at the cap, never cut ----
   const FUmToastPlan Info = UmToast::Plan(Spec(EUmToastKind::Info, TEXT("hud.toast.reconnected"), TEXT("Позиции обновлены (пропущено 0)")), 560.0f, &Est);
   const FUmToastPlan Err = UmToast::Plan(Spec(EUmToastKind::Error, TEXT("why.not.your.turn"), TEXT("Сейчас не ваш ход")), 560.0f, &Est);

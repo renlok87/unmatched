@@ -202,8 +202,8 @@ void UUmScreenRoom::BuildBoards() {
     BoardCards->AddChild(Card);
     Boards.Add(Card);
   }
-  Boards[0]->Setup(UmLobby::MarmorealId, UmLobby::MarmorealName);
-  Boards[1]->Setup(UmLobby::SarpedonId, UmLobby::SarpedonName);
+  Boards[0]->Setup(UmLobby::MarmorealId, UmLobby::MarmorealName());
+  Boards[1]->Setup(UmLobby::SarpedonId, UmLobby::SarpedonName());
 }
 
 bool UUmScreenRoom::Initialize() {
@@ -312,7 +312,7 @@ void UUmScreenRoom::ApplyModel(const FUmRoomModel& InModel) {
   Model = InModel;
   if (Boards.Num() == 2) {
     for (int32 I = 0; I < 2; ++I) {
-      const FString Name = Model.BoardNames[I].IsEmpty() ? FString(I == 0 ? UmLobby::MarmorealName : UmLobby::SarpedonName) : Model.BoardNames[I];
+      const FString Name = Model.BoardNames[I].IsEmpty() ? FString(I == 0 ? UmLobby::MarmorealName() : UmLobby::SarpedonName()) : Model.BoardNames[I];
       if (Boards[I]->GetNameText() != Name) Boards[I]->Setup(Boards[I]->GetBoardId(), Name);
     }
   }

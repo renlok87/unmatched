@@ -48,6 +48,10 @@ struct UNMATCHED_API FS09LastCombat {
   FString AttackerPlayerId;
   FString DefenderPlayerId;
   int32 DefenderDamage = 0;
+  /** 2026-10-21 playtest F9: the server's final values of the combat (printed + boosts + hero / aura modifiers) - the
+   *  score of the centre; -1 when the record has none (saves before R-01's finalAttack / finalDefense). */
+  int32 FinalAttack = -1;
+  int32 FinalDefense = -1;
   bool bAttackerWon = false;
   bool bAttackerCardCancelled = false;  // AU-S5: the attack card's effects (and its boost) were cancelled
   TArray<FS09CombatEffectEntry> Entries;

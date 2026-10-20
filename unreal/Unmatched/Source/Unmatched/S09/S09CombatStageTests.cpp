@@ -452,6 +452,42 @@ bool FS09CombatStageRevealTest::RunTest(const FString&) {
         FS09CombatReveal::Derive(Combat, AttackerOwner, OpenAttacker.DiscardPiles, DoneAttacker.DiscardPiles);
     TestTrue("no defense", R.bNoDefense && !R.bDefenseKnown && R.DefenseValue == 0);
   }
+  // 2026-10-21 playtest F9 (Sarpedon seq 91): the AI's BOOST_CHOICE answered in the closing step - the baseline's
+  // combatInfo has no cardBoostCardId; the new boost face of the attacker's pile is the boost, the score the server's.
+  {
+    auto Piles = [](const FString& Json) {
+      TSharedPtr<FJsonObject> Object;
+      const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
+      FJsonSerializer::Deserialize(Reader, Object);
+      return Object.IsValid() ? TSharedPtr<FJsonValue>(MakeShared<FJsonValueObject>(Object)) : TSharedPtr<FJsonValue>();
+    };
+    const FString Old = TEXT("{\"id\":\"old::0\",\"cardId\":\"old\",\"name\":\"Old\",\"nameRu\":\"\",\"bannerName\":\"\",\"text\":\"\",\"cardType\":\"ATTACK\",\"attackValue\":3,\"boostValue\":1,\"isVisible\":true}");
+    const FString Noble = TEXT("{\"id\":\"noble::0\",\"cardId\":\"noble\",\"name\":\"Noble Sacrifice\",\"nameRu\":\"\",\"bannerName\":\"\",\"text\":\"\",\"cardType\":\"ATTACK\",\"attackValue\":2,\"boostValue\":1,\"isVisible\":true}");
+    const FString Storm = TEXT("{\"id\":\"storm::0\",\"cardId\":\"storm\",\"name\":\"Command the Storms\",\"nameRu\":\"\",\"bannerName\":\"\",\"text\":\"\",\"cardType\":\"SCHEME\",\"boostValue\":2,\"isVisible\":true}");
+    const FString Dash = TEXT("{\"id\":\"dash::2\",\"cardId\":\"dash\",\"name\":\"Dash\",\"nameRu\":\"\",\"bannerName\":\"\",\"text\":\"\",\"cardType\":\"VERSATILE\",\"attackValue\":3,\"defenseValue\":3,\"boostValue\":1,\"isVisible\":true}");
+    const TSharedPtr<FJsonValue> Base = Piles(FString::Printf(TEXT("{\"pA\":[%s,%s],\"pD\":[%s]}"), *Old, *Noble, *Dash));
+    const TSharedPtr<FJsonValue> Done = Piles(FString::Printf(TEXT("{\"pA\":[%s,%s,%s],\"pD\":[%s]}"), *Old, *Noble, *Storm, *Dash));
+    FS08CombatInfo Combat;
+    Combat.bPresent = true;
+    Combat.AttackerId = TEXT("arthur");
+    Combat.DefenderId = TEXT("pD");
+    Combat.TargetFighterId = TEXT("medusa");
+    Combat.bHasAttackerCard = true;
+    Combat.AttackerCardId = TEXT("noble::0");
+    Combat.bHasDefenderCard = true;
+    Combat.DefenderCardId = TEXT("dash::2");
+    FS09CombatReveal R = FS09CombatReveal::Derive(Combat, TEXT("pA"), Base, Done);
+    TestEqual("before: the printed 2 : 3, no boost", FString::Printf(TEXT("%d:%d/%d"), R.AttackValue, R.DefenseValue, R.Boosts.Num()), FString(TEXT("2:3/0")));
+    TestTrue("the closing step's boost face is the boost", R.AddClosingBoosts(TEXT("pA"), Base, Done));
+    TestTrue("Command the Storms +2", R.Boosts.Num() == 1 && R.Boosts[0].Name == TEXT("Command the Storms") && R.AttackValue == 4);
+    TestFalse("never twice", R.AddClosingBoosts(TEXT("pA"), Base, Done));
+    R.ApplyFinalValues(4, 3);
+    TestEqual("the server's score 4 : 3", FString::Printf(TEXT("%d:%d"), R.AttackValue, R.DefenseValue), FString(TEXT("4:3")));
+    R.ApplyFinalValues(-1, -1);
+    TestEqual("-1 keeps the values (no record)", FString::Printf(TEXT("%d:%d"), R.AttackValue, R.DefenseValue), FString(TEXT("4:3")));
+    FS09CombatReveal Same = FS09CombatReveal::Derive(Combat, TEXT("pA"), Base, Base);
+    TestFalse("no new face: no boost", Same.AddClosingBoosts(TEXT("pA"), Base, Base));
+  }
   // Effect text: Text or effects[] on a revealed attack / defense card.
   {
     FS09CombatReveal R;

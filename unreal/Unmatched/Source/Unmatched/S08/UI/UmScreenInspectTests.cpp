@@ -307,7 +307,7 @@ bool FUmInspectInputTest::RunTest(const FString& Parameters) {
   TestTrue(TEXT("own: shown, state own"), S->IsShown() && S->GetScreenState() == FName(TEXT("own")));
   TestEqual(TEXT("type word «Атака»"), S->GetTypeText(), FString(TEXT("Атака")));
   TestEqual(TEXT("value «Значение 2»"), S->GetValueText(), FString(TEXT("Значение 2")));
-  TestEqual(TEXT("«BOOST 4»"), S->GetBoostText(), FString(TEXT("BOOST 4")));
+  TestEqual(TEXT("«УСИЛЕНИЕ 4» (2026-10-21 F3a: the RU edition term)"), S->GetBoostText(), FString(TEXT("УСИЛЕНИЕ 4")));
   TestEqual(TEXT("copies «В колоде: 1 · в руке: 2 · в сбросе: 0»"), S->GetCopiesText(), FString(TEXT("В колоде: 1 · в руке: 2 · в сбросе: 0")));
   TestTrue(TEXT("the effect text from the data"), !S->GetBodyText().IsEmpty());
   // the four ways out, once each; nothing else is ever called (UI-INP-006: no command)

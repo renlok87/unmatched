@@ -37,6 +37,7 @@
 #include "UmButton.h"
 #include "UmGameHud.h"
 #include "UmHudActions.h"
+#include "UmHudLayout.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
 
@@ -236,8 +237,8 @@ bool FUmHudActionsStatesTest::RunTest(const FString&) {
     FUmActionsInput NS = Own(2);
     NS.bNoScheme = true;
     const FUmActionsModel NM = UmHudActions::Decide(NS);
-    TestTrue(TEXT("no playable scheme: СХЕМА why.scheme.none, the others available"),
-             !B(NM, K::Scheme).bEnabled && B(NM, K::Scheme).Reason.Key == FName(TEXT("why.scheme.none")) && B(NM, K::Attack).bEnabled);
+    TestTrue(TEXT("no playable scheme: СХЕМА why.scheme.unplayable (2026-10-21 F10), the others available"),
+             !B(NM, K::Scheme).bEnabled && B(NM, K::Scheme).Reason.Key == FName(TEXT("why.scheme.unplayable")) && B(NM, K::Attack).bEnabled);
   }
   // ---- the widget ----
   FWorld W(TEXT("UmHudActionsStates"));
@@ -297,7 +298,11 @@ bool FUmHudActionsStatesTest::RunTest(const FString&) {
   A->TickForTest();
   TestEqual(TEXT("L: the end's why after 300 ms"), A->GetTipKey(), K::EndTurn);
   const FBox2D Tip = A->TipRectSu();
-  TestTrue(FString::Printf(TEXT("L: the tooltip bottom 8 su over the row (%.1f)"), Tip.Max.Y), Near(Tip.Max.Y, 984.0 - 8.0, 0.01));
+  // 2026-10-21 playtest F10: under the table look the tip stands over the prompt and the stage rows of the panel
+  const double TipBottom = S08ArtLook::HudTable()
+                               ? 984.0 - UmHudLayout::TablePromptSu - UmHudLayout::TableStageSu - UmHudLayout::TableTrayPadSu - 8.0
+                               : 984.0 - 8.0;
+  TestTrue(FString::Printf(TEXT("L: the tooltip bottom 8 su over the row / the panel (%.1f)"), Tip.Max.Y), Near(Tip.Max.Y, TipBottom, 0.01));
   TestTrue(TEXT("L: one line 44 su"), Near(Tip.GetSize().Y, 44.0, 0.01));
   TestTrue(TEXT("L: right edge on the cell's, inside the margin"), Tip.Max.X <= 1920.0 - 24.0 + 0.01 && Tip.Max.X >= 1896.0 - 0.01);
   TestTrue(TEXT("L: width <= 360 su"), Tip.GetSize().X <= 360.0 + 0.01);

@@ -319,6 +319,26 @@ FUmHandModel Gather(const FGatherIn& In) {
 FString KeyTarget(const FUmHandModel& Model, int32 Key) {
   return Key >= 1 && Model.Cards.IsValidIndex(Key - 1) ? Model.Cards[Key - 1].Card.InstanceId : FString();
 }
+
+int32 PressedIndex(const FS09PlayerPanel& Own, const FUmHandModel& Model, int32 HoverIndex, const FString& PressedId,
+                   const TCHAR** OutSrc) {
+  const TCHAR* Src = TEXT("exact");
+  int32 Index = Own.Cards.IndexOfByPredicate([&PressedId](const FS09CardView& C) { return C.InstanceId == PressedId; });
+  if (Index == INDEX_NONE && Model.Cards.IsValidIndex(HoverIndex)) {
+    const FString Under = Model.Cards[HoverIndex].Card.InstanceId;
+    Index = Own.Cards.IndexOfByPredicate([&Under](const FS09CardView& C) { return C.InstanceId == Under; });
+    Src = TEXT("hover");
+  }
+  if (Index == INDEX_NONE) {
+    FString CatalogId = PressedId;
+    CatalogId.Split(TEXT("::"), &CatalogId, nullptr);
+    Index = Own.Cards.IndexOfByPredicate([&CatalogId](const FS09CardView& C) { return !C.bHidden && C.CardId == CatalogId; });
+    Src = TEXT("catalog");
+  }
+  if (Index == INDEX_NONE) Src = TEXT("none");
+  if (OutSrc) *OutSrc = Src;
+  return Index;
+}
 }  // namespace UmHudHand
 
 // ------------------------------------------------------------------------------------------------ tree
@@ -547,6 +567,7 @@ void UUmHudHand::HealPool() {
       }
       if (Fresh) {
         WireCard(Fresh, It.Key());
+        Fresh->SetVisualHitTest(true);
         Fresh->SetVisibility(ESlateVisibility::Visible);
         It.Value() = Fresh;
         W = Fresh;
@@ -596,6 +617,12 @@ void UUmHudHand::HealPool() {
 void UUmHudHand::Release(UUmCardWidget* W) {
   if (!W) return;
   W->SetVisibility(ESlateVisibility::Collapsed);
+  // 2026-10-21 playtest F1: a free widget is wired to nothing - a stale hit-test entry of it (the scheme handed to SLOT,
+  // HB-37) took the press with the gone card's id; unwired, the press bubbles to the hand (NativeOnMouseButtonDown)
+  W->SetPress(NAME_None, nullptr, FS09OnHudPressOutcome());
+  W->SetOnInspect(nullptr);
+  W->SetOnDoubleClick(nullptr);
+  W->SetVisualHitTest(false);
   W->SetHover(false);
   W->SetSelected(false);
   W->SetLowered(false);
@@ -660,6 +687,11 @@ void UUmHudHand::SetFrame(const FUmHandFrame& InFrame) {
     Relayout(false);
     ApplyCardStates();
     ApplyOffsets(0.0f);
+    // 2026-10-21 playtest F4 check: a window / scale change re-places the caption, the why plate and the BOOST ribbon
+    // too (the ribbon stayed at the old canvas's place over the slot card after «res 1280x720»)
+    ApplyCaption();
+    ApplyTooltip();
+    ApplyRibbon();
     Step();
   }
 }
@@ -888,9 +920,12 @@ void UUmHudHand::ApplyCardStates() {
     W->SetHover(I == HoverIndex && !C.bBoostPlaced);
     // HB-25 / CP-18: the boost card turns face down (the face stays in the own widget) and carries "+N"
     if (C.bBoostPlaced) {
-      W->SetChipRightAbove(Model.BoostSlot == EUmHandBoostSlot::Combat);
+      // 2026-10-21 playtest F4: in the maneuver slot the «+N» is in the BOOST ribbon (as the UMG slot, ВР-VS2-HB34-16) -
+      // a chip over the card's top stood on TOP at 720p and in class S; beside COMBAT-L the chip stays (ВР-VS2-HB22-11)
+      const bool bInSlot = Model.BoostSlot == EUmHandBoostSlot::Slot;
+      W->SetChipRightAbove(!bInSlot);
       if (!W->IsFaceDown()) W->SetFaceDown(true);
-      W->SetBoostChip(C.Card.BoostValue);
+      W->SetBoostChip(bInSlot ? UmCardWidget::NoBoostChip : C.Card.BoostValue);
     } else {
       if (W->IsFaceDown()) W->SetFaceDown(false);
       W->SetBoostChip(UmCardWidget::NoBoostChip);
@@ -908,7 +943,13 @@ void UUmHudHand::ApplyOffsets(float DurMs) {
   for (int32 I = 0; I < Model.Cards.Num(); ++I) {
     const FUmHandCardModel& C = Model.Cards[I];
     UUmCardWidget* W = Live.FindRef(C.Card.InstanceId);
-    if (!W || C.bBoostPlaced) continue;
+    if (!W) continue;
+    if (C.bBoostPlaced) {
+      // 2026-10-21 playtest F4: the card in the slot carries no hover lift / selected raise of the row - the reflow
+      // flight (ApplyModel) lands on this target; a skipped card kept the -48 su hover lift over TOP
+      W->SetOwnerOffset(FVector2D::ZeroVector, DurMs);
+      continue;
+    }
     FVector2D Target = FVector2D::ZeroVector;
     const FBox2D Rest = RestRectSu(I);
     if (I == HoverIndex && !Model.bLowered && Rest.bIsValid) {
@@ -1000,9 +1041,22 @@ void UUmHudHand::ApplyRibbon() {
   if (!BoostRibbon) return;
   // HB-22: the BOOST ribbon under the own boost card in SLOT (the source slot block, H10, owns it later)
   bool bSlotBoost = false;
-  for (const FUmHandCardModel& C : Model.Cards) bSlotBoost |= C.bBoostPlaced && Model.BoostSlot == EUmHandBoostSlot::Slot;
+  int32 BoostN = 0;
+  for (const FUmHandCardModel& C : Model.Cards) {
+    if (C.bBoostPlaced && Model.BoostSlot == EUmHandBoostSlot::Slot) {
+      bSlotBoost = true;
+      BoostN += C.Card.BoostValue;
+    }
+  }
   BoostRibbon->SetVisibility(bSlotBoost && Model.bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   if (!bSlotBoost) return;
+  if (RibbonText) {
+    // 2026-10-21 playtest F4: the ribbon carries the «+N» of the card in the slot (no chip over its top)
+    FFormatNamedArguments A;
+    A.Add(TEXT("n"), FText::AsNumber(BoostN));
+    RibbonText->SetText(FText::FromString(UmText::Get(EUmTable::Hud, TEXT("hud.slot.boost")).ToString() + TEXT(" ") +
+                                          UmText::Format(EUmTable::Hud, TEXT("hud.card.boost"), A).ToString()));
+  }
   const FBox2D R = UmHudHand::RibbonRect(Frame);
   if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(BoostRibbon->Slot)) {
     S->SetAutoSize(false);
@@ -1070,6 +1124,50 @@ void UUmHudHand::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerE
 void UUmHudHand::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
   Super::NativeOnMouseLeave(InMouseEvent);
   ClearHover();
+}
+
+FReply UUmHudHand::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  // 2026-10-21 playtest F1: a press no live card took (it bubbled from a released pool widget) goes to the card the
+  // hand has under the pointer - the card the player sees there
+  const FKey Button = InMouseEvent.GetEffectingButton();
+  if ((Button != EKeys::LeftMouseButton && Button != EKeys::RightMouseButton) || !Model.Cards.IsValidIndex(HoverIndex) ||
+      Model.Cards[HoverIndex].bBoostPlaced) {
+    return FReply::Unhandled();
+  }
+  StrayPressId = Model.Cards[HoverIndex].Card.InstanceId;
+  bStrayRight = Button == EKeys::RightMouseButton;
+  if (!bStrayRight && Arbiter.IsValid()) Arbiter->Press(FName(*(TEXT("hand.") + StrayPressId)), Arbiter->Now());
+  FS08Trace::Write(FString::Printf(TEXT("HUD-HAND stray-press id=%s hover=%d button=%s"), *StrayPressId, HoverIndex,
+                                   bStrayRight ? TEXT("right") : TEXT("left")));
+  FReply Reply = FReply::Handled();
+  if (const TSharedPtr<SWidget> Cached = GetCachedWidget()) Reply.CaptureMouse(Cached.ToSharedRef());
+  return Reply;
+}
+
+FReply UUmHudHand::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  if (StrayPressId.IsEmpty()) return FReply::Unhandled();
+  const FString Id = MoveTemp(StrayPressId);
+  StrayPressId.Reset();
+  const FKey Button = InMouseEvent.GetEffectingButton();
+  // the release over the same card (the hover follows the pointer: HoverAtSu on the move)
+  const FVector2D Local = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+  HoverAtSu(Local + (Frame.SlotSu.bIsValid ? Frame.SlotSu.Min : FVector2D::ZeroVector));
+  const bool bOver = Model.Cards.IsValidIndex(HoverIndex) && Model.Cards[HoverIndex].Card.InstanceId == Id;
+  if (bStrayRight) {
+    if (Button == EKeys::RightMouseButton && bOver && OnInspect) OnInspect(Id);
+    return FReply::Handled().ReleaseMouseCapture();
+  }
+  if (Button != EKeys::LeftMouseButton || !Arbiter.IsValid()) return FReply::Handled().ReleaseMouseCapture();
+  const FName PressName(*(TEXT("hand.") + Id));
+  const FS09HudPressOutcome Outcome = Arbiter->Release(bOver ? PressName : NAME_None, Arbiter->Now());
+  if (Outcome.Result == ES09HudPressResult::Act || Outcome.Result == ES09HudPressResult::Refused) {
+    FS09Reason Blocked;
+    if (const UUmCardWidget* W = Live.FindRef(Id)) {
+      if (!W->IsPlayable() && W->GetReason().IsSet()) Blocked = W->GetReason();
+    }
+    if (OnPress) OnPress(FS09HudPressArbiter::Decide(Outcome, Blocked), Id);
+  }
+  return FReply::Handled().ReleaseMouseCapture();
 }
 
 FReply UUmHudHand::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {

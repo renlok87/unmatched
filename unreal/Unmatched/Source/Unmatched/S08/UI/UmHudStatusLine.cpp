@@ -415,7 +415,8 @@ void UUmHudStatusLine::Render() {
   bShown = !FullText.IsEmpty();
   if (Frame) {
     Frame->SetVisibility(bShown ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
-    // slice 12: the L table prompt stands on the actions (bottom of its two-line room)
+    // slice 12: the L table prompt stands on the actions (slice 13 packed its room to one 48 su row; the body fills it,
+    // 2026-10-21 playtest F2)
     Frame->SetVerticalAlignment(S08ArtLook::HudTable() && StatusFrame.MaxWidthSu > 300.0f ? VAlign_Bottom : VAlign_Top);
   }
   if (!bShown) return;
@@ -461,7 +462,13 @@ void UUmHudStatusLine::Render() {
   FitNow = UmHudStatus::Fit(FullText, Room, Sizes,
                             [this](const FString& T, float S) { return MeasureSu(T, S); },
                             RimSu > 0.0f);  // slice 12 (final blind review 08): one line first, the table prompt too
-  const float Height = UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
+  // 2026-10-21 playtest F2: the L table prompt has one 48 su row over the actions (slice 13, TablePromptSu) - one line
+  // at 24 / 20 / 16 su or two lines only at 16 su (2 x 1.25 x 16 = 40); the body never grows down onto the buttons
+  if (bTablePanel && FitNow.Lines > 1) {
+    FitNow = UmHudStatus::Fit(FullText, Room, TArray<float>{UmTypeSu(Theme, TEXT("type.body"))},
+                              [this](const FString& T, float S) { return MeasureSu(T, S); }, false);
+  }
+  const float Height = bTablePanel ? UmHudLayout::TablePromptSu : UmHudStatus::BodyHeightSu(FitNow, Base) + 2.0f * RimSu;
   const float Width = FMath::Min(StatusFrame.MaxWidthSu, FMath::CeilToFloat(FitNow.TextWidthSu) + 2.0f * PadX + Extras);
   BodySizeSu = FVector2D(Width, Height);
   if (BodyBox) {
@@ -482,7 +489,7 @@ void UUmHudStatusLine::Render() {
     } else if (const FSlateBrush* Skin = Theme.SkinFor(BannerKey, StatusFrame.PxPerSu)) {
       Body->SetBrush(*Skin);
     }
-    Body->SetPadding(FMargin(PadX, RimSu));
+    Body->SetPadding(FMargin(PadX, bTablePanel ? 0.0f : RimSu));
     // «…»: the full text in the tooltip - the capsule then takes the hover
     Body->SetToolTipText(FitNow.bEllipsis ? FText::FromString(FullText) : FText::GetEmpty());
     Body->SetVisibility(FitNow.bEllipsis ? ESlateVisibility::Visible : ESlateVisibility::HitTestInvisible);

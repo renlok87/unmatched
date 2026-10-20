@@ -1145,6 +1145,8 @@ void AS08FlowGameMode::TickUmHud() {
   TickUmTurnStrip();  // HB-50: the turn stage strip
   TickUmPanels();    // VS-2 HB-18...HB-21
   RefreshUmCombat();  // VS-3 HB-30...HB-33: the staging's clock moves the edges and the centre
+  // 2026-10-21 playtest F6: the table decor follows its plates' blocks (no empty frames under the result modal)
+  if (UUmGameHud* GameHud = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr) GameHud->SyncTableDecor();
   FUmHudRuntime& R = *UmHud;
   // VS-4 HB-35: what changes the choice between snapshots - the staging ends, the slot's hold, a command in flight, the
   // combat centre it sits under
@@ -1761,6 +1763,15 @@ bool AS08FlowGameMode::RefreshUmHand() {
   return true;
 }
 
+namespace {
+/** 2026-10-21 playtest F1: UmHudHand::PressedIndex with the hand's own model and hover (none without the UMG hand). */
+int32 UmHandIndexOf(const FS09PlayerPanel& Own, const UUmHudHand* Hand, const FString& InstanceId, const TCHAR** OutSrc) {
+  static const FUmHandModel NoModel;
+  return UmHudHand::PressedIndex(Own, Hand ? Hand->GetModel() : NoModel, Hand ? Hand->GetHoverIndex() : INDEX_NONE,
+                                 InstanceId, OutSrc);
+}
+}  // namespace
+
 void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, const FString& InstanceId) {
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   // DE-014 / UI-INP-011: the old hand.<instance> action - the card by its CURRENT position (a snapshot may have moved it)
@@ -1768,30 +1779,15 @@ void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, con
     AS08FlowGameMode* Self = WeakThis.Get();
     const FS09PlayerPanel* Own = Self ? Self->Hud.ViewerPanel() : nullptr;
     if (!Own) return;
-    int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
-    if (Index == INDEX_NONE) {
-      // 2026-10-15 playtest (defense window): the pressed widget's copy id was not in the hand any more while the same
-      // card was - fall back to the catalog id (the part before "::") and trace both lists for the diagnosis
-      FString CatalogId = InstanceId;
-      CatalogId.Split(TEXT("::"), &CatalogId, nullptr);
-      Index = Own->Cards.IndexOfByPredicate([&CatalogId](const FS09CardView& C) { return !C.bHidden && C.CardId == CatalogId; });
-      // RC acceptance 2026-10-15 (B1, P1): a widget still wired to a card that left took the click - the card the hand
-      // itself has under the pointer (its row geometry, HoverIndex) is the one the player meant
-      if (Index == INDEX_NONE && Self->UmHud.IsValid()) {
-        if (const UUmHudHand* Hand = Self->UmHud->Hand.Get()) {
-          const FUmHandModel& HM = Hand->GetModel();
-          const int32 H = Hand->GetHoverIndex();
-          if (HM.Cards.IsValidIndex(H)) {
-            const FString Under = HM.Cards[H].Card.InstanceId;
-            Index = Own->Cards.IndexOfByPredicate([&Under](const FS09CardView& C) { return C.InstanceId == Under; });
-          }
-        }
-      }
+    const UUmHudHand* Hand = Self->UmHud.IsValid() ? Self->UmHud->Hand.Get() : nullptr;
+    const TCHAR* Src = TEXT("exact");
+    const int32 Index = UmHandIndexOf(*Own, Hand, InstanceId, &Src);
+    if (FCString::Strcmp(Src, TEXT("exact")) != 0) {
+      // 2026-10-15 playtest (defense window) / RC B1 / 2026-10-21 F1: the pressed widget's id was not in the hand
       TArray<FString> Ids;
       for (const FS09CardView& C : Own->Cards) Ids.Add(C.InstanceId);
-      FS08Trace::Write(FString::Printf(TEXT("HUD-HAND press-miss id=%s fallback=%d hand=%s hover=%d"), *InstanceId,
-                                       Index, *FString::Join(Ids, TEXT(",")),
-                                       Self->UmHud.IsValid() && Self->UmHud->Hand.IsValid() ? Self->UmHud->Hand->GetHoverIndex() : -2));
+      FS08Trace::Write(FString::Printf(TEXT("HUD-HAND press-miss id=%s fallback=%d src=%s hand=%s hover=%d"), *InstanceId,
+                                       Index, Src, *FString::Join(Ids, TEXT(",")), Hand ? Hand->GetHoverIndex() : -2));
     }
     if (Index == INDEX_NONE) {
       Self->ShowReason(FS09Reason::Make(TEXT("why.state.changed")), 3.0f);
@@ -1804,13 +1800,15 @@ void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, con
   });
 }
 
-void AS08FlowGameMode::HandleUmHandPlay(const FString& InstanceId) {
+void AS08FlowGameMode::HandleUmHandPlay(const FString& PressedId) {
   // UI-INP-003: the double click plays - its first click already selected the card; the scheme and the defense card
   // then go as with Enter (an attack goes on its own once complete, DE-020)
   const FS09PlayerPanel* Own = Hud.ViewerPanel();
   if (!Own) return;
-  const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+  // 2026-10-21 playtest F1: a stale widget id resolves like a press (the card under the pointer)
+  const int32 Index = UmHandIndexOf(*Own, UmHud.IsValid() ? UmHud->Hand.Get() : nullptr, PressedId, nullptr);
   if (Index == INDEX_NONE) return;
+  const FString InstanceId = Own->Cards[Index].InstanceId;
   const bool bScheme = CommandUi.Mode == ES09CommandMode::SchemeChoice;
   const bool bDefense = CommandUi.Mode == ES09CommandMode::CombatDefense;
   if (!bScheme && !bDefense) return;
@@ -1820,10 +1818,10 @@ void AS08FlowGameMode::HandleUmHandPlay(const FString& InstanceId) {
   if ((bScheme ? CommandUi.SchemeCardId : CommandUi.DefenseCardId) == InstanceId) ConfirmCombat();
 }
 
-void AS08FlowGameMode::HandleUmHandInspect(const FString& InstanceId) {
+void AS08FlowGameMode::HandleUmHandInspect(const FString& PressedId) {
   const FS09PlayerPanel* Own = Hud.ViewerPanel();
   if (!Own) return;
-  const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+  const int32 Index = UmHandIndexOf(*Own, UmHud.IsValid() ? UmHud->Hand.Get() : nullptr, PressedId, nullptr);
   if (Index == INDEX_NONE) return;
   // 04 §2.6: the right button opens the inspector on the card (VS-4 H13: the UMG INSPECT)
   NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Hand));
@@ -2779,6 +2777,57 @@ void AS08FlowGameMode::UmHudLogCombat(const FString& AttackerId, const FString& 
   R.Feed.PushLog(E, static_cast<double>(NowMs()));
   FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d kind=combat damage=%d total=%d"), E.Seq, E.Turn,
                                    E.TeamSlot, Damage, R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
+}
+
+void AS08FlowGameMode::UmHudLogEffect(const FS09LastEffect& Area) {
+  if (!UmHud.IsValid() || !UmHud->Feed.LogOnUmg()) return;
+  FUmHudRuntime& R = *UmHud;
+  const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  // the source card: the catalog card whose id prefixes the effect id («<catalog id>-<field>-<i>-p<n>», UmHudPending)
+  FString CardName, CardId;
+  int32 BestLen = 0;
+  for (const FS09DeckList& List : DeckLists) {
+    for (const FS09DeckListCard& C : List.Cards) {
+      if (C.CardId.Len() > BestLen && Area.SourceRef.StartsWith(C.CardId + TEXT("-"))) {
+        BestLen = C.CardId.Len();
+        CardId = C.CardId;
+        CardName = bRu && !C.NameRu.IsEmpty() ? C.NameRu : C.Name;
+      }
+    }
+  }
+  if (CardName.IsEmpty()) CardName = UmText::Get(EUmTable::Hud, TEXT("hud.log.area.effect")).ToString();
+  auto Name = [this](const FString& Id) -> FString {
+    const FS08BoardFighter* F = FindFighter(Id);
+    return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
+  };
+  TArray<FString> Hit;
+  for (const FString& Id : Area.Targets) Hit.Add(Name(Id));
+  FUmLogEntry E;
+  E.Seq = Area.Seq;
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Area.Seq && R.SeqTurns[I].Player == Area.PlayerId) E.Turn = R.SeqTurns[I].Turn;
+  }
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Area.Seq) E.Turn = R.SeqTurns[I].Turn;
+  }
+  // the stripe: the owner's team as the board draws it
+  const FS08BoardFighter* AreaOwner = Fighters.FindByPredicate([&Area](const FS08BoardFighter& F) { return F.OwnerId == Area.PlayerId; });
+  if (AreaOwner && BoardActor) {
+    const ES08TeamSlot Look =
+        S08TeamLook(BoardActor->TeamOfFighter(*AreaOwner), AreaOwner->OwnerId == ViewerIdNow(), BoardActor->GetTeamColorMode());
+    E.TeamSlot = Look == ES08TeamSlot::P2 ? 1 : 0;
+  }
+  FFormatNamedArguments Args;
+  Args.Add(TEXT("card"), FText::FromString(CardName));
+  Args.Add(TEXT("targets"), FText::FromString(FString::Join(Hit, TEXT(", "))));
+  Args.Add(TEXT("damage"), Area.Damage);
+  E.Text = E.Full = UmText::Format(EUmTable::Hud, Hit.Num() > 0 ? TEXT("hud.log.area") : TEXT("hud.log.area.none"), Args);
+  E.CardId = CardId;
+  R.Feed.PushLog(E, static_cast<double>(NowMs()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d kind=area cells=%d targets=%d damage=%d card=%d total=%d"),
+                                   E.Seq, E.Turn, E.TeamSlot, Area.Cells.Num(), Area.Targets.Num(), Area.Damage, CardId.IsEmpty() ? 0 : 1,
+                                   R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
+  RefreshHud();
 }
 
 void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters) {

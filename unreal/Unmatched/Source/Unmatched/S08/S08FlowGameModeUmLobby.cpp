@@ -68,8 +68,8 @@ const TCHAR* UmLbModeArg(EUmLobbyMode M) { return M == EUmLobbyMode::VsAi ? TEXT
 
 FString UmLbBoardName(const TMap<FString, FString>& Names, const FString& Id) {
   if (const FString* N = Names.Find(Id)) return *N;
-  if (Id == UmLobby::MarmorealId) return UmLobby::MarmorealName;
-  if (Id == UmLobby::SarpedonId) return UmLobby::SarpedonName;
+  if (Id == UmLobby::MarmorealId) return UmLobby::MarmorealName();
+  if (Id == UmLobby::SarpedonId) return UmLobby::SarpedonName();
   return Id;  // never an invented name: the id as the server gave it
 }
 }  // namespace

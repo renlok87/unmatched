@@ -58,6 +58,16 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
       } else {
         In.PendingCells = Ui.ComputePendingCells(FS08Snapshot(), Board, Fighters);
       }
+      // 2026-10-21 playtest F5b: step 2 keeps the step 1 space marked (the V-04 destination ring, unlike the V-12 rings
+      // of its neighbours) - the area is the two spaces together
+      if (Ui.PendingChoice.Stage == 2 && Ui.PendingChoice.bHasAnchor) {
+        const FIntPoint Anchor(Ui.PendingChoice.AnchorX, Ui.PendingChoice.AnchorY);
+        In.PendingCells.Remove(FS08BoardModel::CellKey(Anchor.X, Anchor.Y));
+        FS08MoveDraftInput::FMove& A = In.Moves.AddDefaulted_GetRef();
+        A.Start = Anchor;
+        A.Dest = Anchor;
+        A.Status = FS08MoveDraftInput::EMoveStatus::Ok;
+      }
     }
     // 2026-10-15 playtest: a TARGET_FIGHTER head (A Momentary Glance) - the V-17 rings under its legal targets, only
     // the picked one once clicked (the board never showed who may be picked, the panel said «щёлкните подсвеченного»)

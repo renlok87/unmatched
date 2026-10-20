@@ -532,7 +532,7 @@ bool FS09HudPressArbiterTest::RunTest(const FString&) {
   // Every reason a HUD element can answer is a key of the EN table (why-reasons.json).
   for (const TCHAR* Key : {TEXT("why.state.changed"), TEXT("why.syncing"), TEXT("why.no.actions"),
                            TEXT("why.actions.remaining"), TEXT("why.discard.count"), TEXT("why.scheme.none"),
-                           TEXT("why.choice.required"), TEXT("why.deadline.passed"), TEXT("why.wait.opponent.choice"),
+                           TEXT("why.scheme.unplayable"), TEXT("why.choice.required"), TEXT("why.deadline.passed"), TEXT("why.wait.opponent.choice"),
                            TEXT("why.not.your.turn"), TEXT("why.wait.defender")}) {
     TestTrue(FString::Printf(TEXT("%s in the EN table"), Key), S08WhyText::Has(FName(Key)));
   }

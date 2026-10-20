@@ -19,6 +19,7 @@
 #include "UmButton.h"
 #include "UmConnectionBadge.h"
 #include "UmHudBanner.h"
+#include "UmHudLayout.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTheme.h"
 #include "UmHudTop.h"
@@ -302,8 +303,33 @@ bool FUmHudStatusTreeTest::RunTest(const FString&) {
   TestFalse(TEXT("game over: no line, hidden"), Line->IsShown());
   Line->ApplyModel(OwnTurn());
   TestTrue(TEXT("own turn: shown"), Line->IsShown());
-  // HUD v2: + the cartouche's marble rims (0 with the plain capsule)
-  TestEqual(TEXT("one line: the capsule is 48 su"), static_cast<float>(Line->GetBodySizeSu().Y), 48.0f + 2.0f * UmHudStatus::BannerRimSu());
+  // HUD v2: + the cartouche's marble rims (0 with the plain capsule); the L table prompt (the default 880 su frame under
+  // the table look) is its 48 su row (2026-10-21 playtest F2)
+  const bool bTableRow = S08ArtLook::HudTable();
+  TestEqual(TEXT("one line: the capsule is 48 su"), static_cast<float>(Line->GetBodySizeSu().Y),
+            bTableRow ? UmHudLayout::TablePromptSu : 48.0f + 2.0f * UmHudStatus::BannerRimSu());
+  // 2026-10-21 playtest F2: the L table prompt of the control panel (360 su) never grows past its 48 su row onto the
+  // actions - two lines only at 16 su
+  {
+    const S08ArtLook::FHudTableTestScope Table(true);
+    FUmStatusFrame Panel;
+    Panel.MaxWidthSu = 360.0f;
+    Line->SetFrame(Panel);
+    FS09TurnStatusInput Defend;
+    Defend.Mode = ES09CommandMode::CombatDefense;
+    Line->ApplyModel(Defend);
+    TestTrue(FString::Printf(TEXT("table defend: the body %.0f su <= 48"), Line->GetBodySizeSu().Y), Line->GetBodySizeSu().Y <= UmHudLayout::TablePromptSu + 0.01);
+    TestTrue(FString::Printf(TEXT("table defend: %d line(s) at %.0f su"), Line->GetFit().Lines, Line->GetFit().SizeSu),
+             Line->GetFit().Lines == 1 || (Line->GetFit().Lines == 2 && FMath::IsNearlyEqual(Line->GetFit().SizeSu, 16.0f)));
+    FS09TurnStatusInput Choice = OwnTurn();
+    Choice.Mode = ES09CommandMode::PendingChoice;
+    Choice.PendingPrompt = FS09Reason::Make(TEXT("ms.status.choice")).Arg(TEXT("choice"), TEXT("Выберите любое место в зоне Мерлина. Затем выберите соседнюю клетку · осталось 25 с"));
+    Line->ApplyModel(Choice);
+    TestTrue(FString::Printf(TEXT("table choice: the body %.0f su <= 48"), Line->GetBodySizeSu().Y), Line->GetBodySizeSu().Y <= UmHudLayout::TablePromptSu + 0.01);
+    TestTrue(TEXT("table choice: at most two lines"), Line->GetFit().Lines <= 2);
+    Line->SetFrame(FUmStatusFrame());
+    Line->ApplyModel(OwnTurn());
+  }
   TestTrue(TEXT("the capsule never takes the mouse (no «…»)"), Line->Body->GetVisibility() == ESlateVisibility::HitTestInvisible);
   TestFalse(TEXT("no pulse dot in the own turn"), Visible(Line->PulseDot));
   TestFalse(TEXT("no key chip by default (UI-ACC-017 off until HB-43)"), Visible(Line->KeyChip));

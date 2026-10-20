@@ -595,6 +595,16 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
     }
     M.bDecline = H.bOptional;
     M.bCollapse = true;
+    // 2026-10-21 playtest F5b: the two steps of CHOOSE_SPACE («Беспокойные духи») named in the title - both steps showed
+    // the same text, the step 2 question went unnoticed
+    const bool bSpaceStep2 = H.Type == TEXT("CHOOSE_SPACE") && H.Stage == 2;
+    if (H.Type == TEXT("CHOOSE_SPACE")) {
+      FFormatNamedArguments SA;
+      SA.Add(TEXT("k"), FText::AsNumber(bSpaceStep2 ? 2 : 1));
+      SA.Add(TEXT("n"), FText::AsNumber(2));
+      const FString Step = UmPdString(TEXT("hud.pending.step"), &SA);
+      if (!Step.IsEmpty()) M.Title = M.Title.IsEmpty() ? Step : M.Title + TEXT(" · ") + Step;
+    }
     // 2026-10-15 PvP playtest: an after-combat choice («Стычка») closed by itself 7 s later - the server's resolve
     // deadline (10 s) applied the default; the panel now counts it down in its title row
     if (In.DeadlineSec >= 0) {
@@ -663,10 +673,12 @@ FUmPendingModel Gather(const FUmPendingInput& In) {
       // 2026-10-15 playtest («Беспокойные духи»): no lit spaces, no button and the status «Выберите цель (до 1)» - the
       // panel says to click a lit space and confirms like the target choice
       const bool bPicked = Ui.bPendingCellSet;
-      const FString Hint = UmPdString(TEXT("why.space.pick"));
-      M.Text = Hint.IsEmpty() ? FirstSentence(Printed) : FirstSentence(Printed) + TEXT(" ") + Hint;
+      const TCHAR* const PickKey = bSpaceStep2 ? TEXT("why.space.pick.adjacent") : TEXT("why.space.pick");
+      const FString Hint = UmPdString(PickKey);
+      // F5b: step 2 asks for the space next to the chosen one (the card text was the step 1 question)
+      M.Text = bSpaceStep2 && !Hint.IsEmpty() ? Hint : Hint.IsEmpty() ? FirstSentence(Printed) : FirstSentence(Printed) + TEXT(" ") + Hint;
       M.bConfirm = true;
-      M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(TEXT("why.space.pick")));
+      M.ConfirmWhy = Busy(bPicked ? FS09Reason() : FS09Reason::Make(PickKey));
     } else if (T == TEXT("DISCARD_CARDS")) {
       M.View = EUmPendingView::Compact;
       M.Compact = EUmPendingCompact::Discard;

@@ -66,7 +66,8 @@ struct UNMATCHED_API FUmActionsInput {
   FS09Reason EndTurn;
   /** A combat window is open (the attacker waits for the defender). */
   bool bCombat = false;
-  /** No scheme of the hand is playable by a living fighter (PlaySchemeCommand refuses): СХЕМА why.scheme.none. */
+  /** No scheme of the hand is playable by a living fighter (PlaySchemeCommand refuses): СХЕМА why.scheme.unplayable
+   *  (2026-10-21 playtest F10; why.scheme.none stays «Сыграть схему» without a picked card). */
   bool bNoScheme = false;
   /** UI-ACC-017 shows the key chips. */
   bool bKeyHints = false;

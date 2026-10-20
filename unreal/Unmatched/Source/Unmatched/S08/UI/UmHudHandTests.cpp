@@ -443,6 +443,78 @@ bool FUmHandInputTest::RunTest(const FString&) {
   return true;
 }
 
+// 2026-10-21 playtest F1 (PLAYTEST-2026-10-21-night): the scheme handed to SLOT left its pool widget wired to the gone
+// card - a stale hit-test entry of it took the press («why.state.changed», the second copy of the scheme sent as the
+// defense card). A released widget is wired to nothing, its press bubbles to the hand, which presses the card under the
+// pointer; a stale id resolves to the card under the pointer before a copy of the same catalog card.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandGhostTest,
+    "Unmatched.S08.Hud.Hand.Ghost a released pool widget is unwired, a bubbled press goes to the card under the pointer",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHandGhostTest::RunTest(const FString&) {
+  const S08ArtLook::FHudTableTestScope HudV2(false);
+  using namespace UmHandTest;
+  FWorld W(TEXT("UmHandGhost"));
+  const FUmHandFrame F = Frame(Canvases[0], false);
+  UUmHudHand* H = Make(W.World, F);
+  if (!TestNotNull(TEXT("hand"), H)) return false;
+  TSharedPtr<FS09HudPressArbiter> Arbiter = MakeShared<FS09HudPressArbiter>();
+  uint64 Frames = 100;
+  Arbiter->SetFrameClock([&Frames]() { return Frames; });
+  TArray<FString> Pressed, Inspected;
+  H->SetInput(Arbiter, [&Pressed](const FS09HudPressOutcome& O, const FString& Id) {
+        if (O.Result == ES09HudPressResult::Act) Pressed.Add(Id);
+      },
+      [&Inspected](const FString& Id) { Inspected.Add(Id); }, [](const FString&) {});
+  // the Sarpedon hand: Glance::0 (played as a scheme), Snipe, Glance::1
+  const FS09CardView Glance0 = Card(TEXT("medusa"), TEXT("A Momentary Glance"), 0);
+  const FS09CardView Snipe = Card(TEXT("medusa"), TEXT("Snipe"));
+  const FS09CardView Glance1 = Card(TEXT("medusa"), TEXT("A Momentary Glance"), 1);
+  H->ApplyModel(Model({Glance0, Snipe, Glance1}));
+  At(H, 500.0);
+  UUmCardWidget* Ghost = H->FindCard(Glance0.InstanceId);
+  FBox2D Rect;
+  TestTrue(TEXT("the scheme handed to SLOT (HB-37)"), Ghost && H->HandOffCard(Glance0.InstanceId, Rect));
+  H->ApplyModel(Model({Snipe, Glance1}));
+  At(H, 1500.0);
+  TestTrue(TEXT("the handed card has no live widget"), H->FindCard(Glance0.InstanceId) == nullptr);
+  TestTrue(TEXT("its released widget is wired to nothing"), Ghost && Ghost->GetPressId().IsNone() && !Ghost->TakesPointer());
+  // a press on the released widget is not its own: it bubbles (Unhandled), the hand presses the card under the pointer
+  const UmHudHand::FRow R = H->GetRow();
+  const FVector2D OverSnipe(R.CardPos[0].X + 10.0, F.CanvasSu.Y - 40.0);
+  H->HoverAtSu(OverSnipe);
+  TestEqual(TEXT("the pointer over Snipe"), H->GetHoverIndex(), 0);
+  const FGeometry CardGeo = FGeometry::MakeRoot(FVector2D(150.0, 208.0), FSlateLayoutTransform());
+  const FReply GhostDown = Ghost ? Ghost->NativeOnMouseButtonDown(CardGeo, Left(FVector2D(75.0, 40.0), true)) : FReply::Handled();
+  TestFalse(TEXT("the released widget does not take the press"), GhostDown.IsEventHandled());
+  const FGeometry HandGeo = FGeometry::MakeRoot(F.CanvasSu, FSlateLayoutTransform());
+  const FVector2D Local = OverSnipe - (F.SlotSu.bIsValid ? FVector2D(F.SlotSu.Min) : FVector2D::ZeroVector);
+  TestTrue(TEXT("the hand takes the bubbled press"), H->NativeOnMouseButtonDown(HandGeo, Left(Local, true)).IsEventHandled());
+  H->NativeOnMouseButtonUp(HandGeo, Left(Local, false));
+  TestTrue(TEXT("the press -> Snipe (the card under the pointer), not the gone scheme"), Pressed.Num() == 1 && Pressed[0] == Snipe.InstanceId);
+  H->NativeOnMouseButtonDown(HandGeo, Right(Local, true));
+  H->NativeOnMouseButtonUp(HandGeo, Right(Local, false));
+  TestTrue(TEXT("the right button -> the inspector of Snipe"), Inspected.Num() == 1 && Inspected[0] == Snipe.InstanceId);
+  // the press id resolution of the game mode (HandleUmHandPress): exact, the card under the pointer, then a copy
+  FS09PlayerPanel Own;
+  auto Real = [](const FS09CardView& C, int32 Copy) {
+    FS09CardView Out = C;
+    Out.CardId = TEXT("cat-") + UmCardWidget::Slug(C.Name);
+    Out.InstanceId = FString::Printf(TEXT("%s::%d"), *Out.CardId, Copy);
+    return Out;
+  };
+  Own.Cards = {Real(Snipe, 2), Real(Glance1, 1)};
+  const FUmHandModel HM = Model(Own.Cards);
+  const FString GoneId = Real(Glance0, 0).InstanceId;
+  const TCHAR* Src = nullptr;
+  TestEqual(TEXT("exact"), UmHudHand::PressedIndex(Own, HM, 0, Own.Cards[1].InstanceId, &Src), 1);
+  TestEqual(TEXT("a gone id with the pointer over index 0 -> index 0 (not the catalog copy)"), UmHudHand::PressedIndex(Own, HM, 0, GoneId, &Src), 0);
+  TestEqual(TEXT("src=hover"), FString(Src), FString(TEXT("hover")));
+  TestEqual(TEXT("a gone id without a hover -> the catalog copy"), UmHudHand::PressedIndex(Own, HM, INDEX_NONE, GoneId, &Src), 1);
+  TestEqual(TEXT("src=catalog"), FString(Src), FString(TEXT("catalog")));
+  TestEqual(TEXT("an unknown id without a hover -> none"), UmHudHand::PressedIndex(Own, HM, INDEX_NONE, TEXT("nope::0"), &Src), static_cast<int32>(INDEX_NONE));
+  return true;
+}
+
 // VS-3 frames step (ВР-VS3-69): the live client showed the CP-16 unplayable look stuck at the first step of its tween -
 // the owner steps the running card tweens (StepAnimating: NativeTick and the game mode), no other call in between.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandAnimateTest,
@@ -599,6 +671,9 @@ bool FUmHandBoostTest::RunTest(const FString&) {
   if (!TestNotNull(TEXT("hand"), H)) return false;
   H->ApplyModel(M);
   At(H, 500.0);
+  // 2026-10-21 playtest F4: the card is hovered (raised preview, -48 su) when it is clicked as the boost
+  H->SetHoverIndex(4);
+  At(H, 700.0);
   Ui.BoostCardId = Run[4].InstanceId;
   M = UmHudHand::Gather(In);
   TestTrue(TEXT("Dash placed"), M.Cards[4].bBoostPlaced);
@@ -610,9 +685,11 @@ bool FUmHandBoostTest::RunTest(const FString&) {
   const FBox2D Slot = UmHudHand::BoostRect(EUmHandBoostSlot::Slot, F);
   TestTrue(TEXT("in SLOT (24, 84) at 190 x 264"), Dash && SlotPos(Dash).Equals(Slot.Min - F.SlotSu.Min, 0.01) &&
                                                      Dash->GetState().Show == EUmCardShow::Slot && Near(Dash->GetOwnerOffset().Size(), 0.0));
-  TestTrue(TEXT("face down, chip +1 (the own face kept, CP-18)"), Dash && Dash->IsFaceDown() && Dash->GetChipText() == TEXT("+1") &&
-                                                                     Near(Dash->GetChipOpacity(), 1.0) && Dash->GetCard().Name == TEXT("Dash"));
+  TestTrue(TEXT("face down, no chip over its top (the own face kept, CP-18; F4: «+1» in the ribbon)"),
+           Dash && Dash->IsFaceDown() && Dash->GetBoost() == UmCardWidget::NoBoostChip && Dash->GetCard().Name == TEXT("Dash"));
   TestTrue(TEXT("the BOOST ribbon under it"), H->BoostRibbon && H->BoostRibbon->GetVisibility() != ESlateVisibility::Collapsed);
+  TestTrue(FString::Printf(TEXT("the ribbon says +1 (%s)"), H->RibbonText ? *H->RibbonText->GetText().ToString() : TEXT("-")),
+           H->RibbonText && H->RibbonText->GetText().ToString().EndsWith(TEXT("+1")));
   TestEqual(TEXT("the hand lost it: «Рука 5/7»"), H->CountText->GetText().ToString(), UmHudHand::Caption(5, 7).ToString());
   TestEqual(TEXT("the row closed up: 5 cards"), H->GetRow().CardPos.Num(), 5);
   // cleared: back into the hand, face up

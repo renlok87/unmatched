@@ -532,7 +532,10 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& InView) {
     TArray<FS08PlateView> Kept;
     const bool bSpaceChoice = View.Source == TEXT("space");  // CHOOSE_SPACE: its V-12 rings stay (2026-10-15)
     for (const FS08PlateView& P : View.Plates) {
-      if (P.Ring != ES08RingState::Candidate && !(bSpaceChoice && P.Ring == ES08RingState::PendingPlace)) continue;
+      // 2026-10-21 playtest F5b: CHOOSE_SPACE step 2 keeps its step 1 space (the anchor, a V-04 destination ring) next
+      // to the V-12 rings of its neighbours - the area is the two spaces together (no order glyph: stripped below)
+      const bool bSpaceRing = P.Ring == ES08RingState::PendingPlace || P.Ring == ES08RingState::Destination;
+      if (P.Ring != ES08RingState::Candidate && !(bSpaceChoice && bSpaceRing)) continue;
       FS08PlateView C = P;
       C.Outline = ES08OutlineState::None;
       C.bPathDot = false;

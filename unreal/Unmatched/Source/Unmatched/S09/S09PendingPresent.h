@@ -46,6 +46,33 @@ public:
   bool bPrimed = false;
 };
 
+/** 2026-10-21 playtest F5c: metadata.lastEffect - the public record of the last out-of-combat area effect (CHOOSE_SPACE
+ *  stage 2, «Беспокойные духи»): its spaces, the enemy fighters hit, the damage. Only ids and positions. */
+struct UNMATCHED_API FS09LastEffect {
+  int32 N = 0;
+  int32 Seq = -1;
+  FString PlayerId;
+  FString SourceRef;  // the pending effect's root id «<effect id>-p<n>» (the source card by its catalog prefix)
+  FString Kind;       // ZONE_AREA_DAMAGE
+  TArray<FIntPoint> Cells;
+  TArray<FString> Targets;
+  int32 Damage = 0;
+  TArray<FString> Defeated;
+  int32 Drawn = 0;
+  /** False when the field is absent or has no positive n (saves and servers before F5c). */
+  static bool Read(const FS08Snapshot& Snapshot, FS09LastEffect& Out);
+};
+
+/** Each lastEffect record once: n above the last shown; the first snapshot with metadata primes silently (entry,
+ *  reconnect never replay an old record). */
+class UNMATCHED_API FS09LastEffectFeed {
+public:
+  bool Consume(const FS08Snapshot& Snapshot, FS09LastEffect& Out);
+  void Reset();
+  int32 LastShownN = 0;
+  bool bPrimed = false;
+};
+
 enum class ES09PendingPresent : uint8 { Modal, Compact, Toast };
 
 UNMATCHED_API const TCHAR* S09PendingPresentName(ES09PendingPresent Present);

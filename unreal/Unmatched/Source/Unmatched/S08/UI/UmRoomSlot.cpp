@@ -109,7 +109,7 @@ void UUmRoomSlot::Apply(const FUmRoomSlotModel& InModel, const FVector2D& InSize
   const bool bAi = Model.Seat == EUmRoomSeat::Ai;
   const bool bWaiting = Model.Seat == EUmRoomSeat::Waiting;
   if (NameText) {
-    NameText->SetText(bWaiting ? S(TEXT("screens.room.slot.waiting")) : FText::FromString(bAi ? FString(UmLobby::AiBotName) : Model.Username));
+    NameText->SetText(bWaiting ? S(TEXT("screens.room.slot.waiting")) : FText::FromString(bAi ? UmLobby::AiBotName() : Model.Username));
     NameText->SetColorAndOpacity(FSlateColor(Theme.Color(bWaiting ? TEXT("text.secondary") : TEXT("text.primary"))));
   }
   if (HostText) HostText->SetText(S(bAi ? TEXT("screens.room.slot.ai") : TEXT("screens.room.slot.host")));

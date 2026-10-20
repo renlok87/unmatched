@@ -60,6 +60,77 @@ void FS09SkippedEffectsFeed::Reset() {
   bPrimed = false;
 }
 
+// ---- the area-effect record (metadata.lastEffect, 2026-10-21 playtest F5c) ----
+
+namespace {
+bool S09AreaInt(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, int32& V) {
+  double Number = 0.0;
+  if (!O.IsValid() || !O->TryGetNumberField(Field, Number) || !FMath::IsFinite(Number)) return false;
+  V = static_cast<int32>(FMath::Clamp(Number, -2147483648.0, 2147483647.0));
+  return true;
+}
+
+void S09AreaIds(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, TArray<FString>& Out) {
+  const TArray<TSharedPtr<FJsonValue>>* Ids = nullptr;
+  if (!O->TryGetArrayField(Field, Ids) || !Ids) return;
+  for (const TSharedPtr<FJsonValue>& V : *Ids) {
+    FString Id;
+    if (V.IsValid() && V->TryGetString(Id) && !Id.IsEmpty()) Out.Add(Id);
+  }
+}
+}  // namespace
+
+bool FS09LastEffect::Read(const FS08Snapshot& Snapshot, FS09LastEffect& Out) {
+  Out = FS09LastEffect();
+  if (!Snapshot.Metadata.IsValid()) return false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata->AsObject();
+  const TSharedPtr<FJsonObject>* Rec = nullptr;
+  if (!Meta.IsValid() || !Meta->TryGetObjectField(TEXT("lastEffect"), Rec) || !Rec || !Rec->IsValid()) return false;
+  if (!S09AreaInt(*Rec, TEXT("n"), Out.N) || Out.N < 1) {
+    Out = FS09LastEffect();
+    return false;
+  }
+  S09AreaInt(*Rec, TEXT("seq"), Out.Seq);
+  S09AreaInt(*Rec, TEXT("damage"), Out.Damage);
+  S09AreaInt(*Rec, TEXT("drawn"), Out.Drawn);
+  (*Rec)->TryGetStringField(TEXT("playerId"), Out.PlayerId);
+  (*Rec)->TryGetStringField(TEXT("sourceRef"), Out.SourceRef);
+  (*Rec)->TryGetStringField(TEXT("kind"), Out.Kind);
+  const TArray<TSharedPtr<FJsonValue>>* Cells = nullptr;
+  if ((*Rec)->TryGetArrayField(TEXT("cells"), Cells) && Cells) {
+    for (const TSharedPtr<FJsonValue>& V : *Cells) {
+      const TSharedPtr<FJsonObject>* C = nullptr;
+      FIntPoint P(-1, -1);
+      if (V.IsValid() && V->TryGetObject(C) && C && S09AreaInt(*C, TEXT("x"), P.X) && S09AreaInt(*C, TEXT("y"), P.Y)) {
+        Out.Cells.Add(P);
+      }
+    }
+  }
+  S09AreaIds(*Rec, TEXT("targets"), Out.Targets);
+  S09AreaIds(*Rec, TEXT("defeated"), Out.Defeated);
+  return true;
+}
+
+bool FS09LastEffectFeed::Consume(const FS08Snapshot& Snapshot, FS09LastEffect& Out) {
+  if (!Snapshot.Metadata.IsValid()) return false;  // a body without metadata says nothing
+  FS09LastEffect Rec;
+  const bool bHas = FS09LastEffect::Read(Snapshot, Rec);
+  if (!bPrimed) {
+    bPrimed = true;
+    if (bHas) LastShownN = FMath::Max(LastShownN, Rec.N);
+    return false;
+  }
+  if (!bHas || Rec.N <= LastShownN) return false;
+  LastShownN = Rec.N;
+  Out = MoveTemp(Rec);
+  return true;
+}
+
+void FS09LastEffectFeed::Reset() {
+  LastShownN = 0;
+  bPrimed = false;
+}
+
 // ---- presentation of an own head ----
 
 const TCHAR* S09PendingPresentName(ES09PendingPresent Present) {
@@ -222,6 +293,13 @@ FS09PendingStep S09DescribePendingStep(const FS09CommandUi& Ui, const FS08Snapsh
     // 2026-10-15 playtest: one target - «Выберите цель на поле», «(до 1)» read as an optional choice
     Out.Prompt = Head.Type == TEXT("TARGET_FIGHTER") ? FS09Reason::Make(TEXT("ms.choice.target.board"))
                                                      : FS09Reason::Make(TEXT("ms.choice.space.board"));
+    if (Head.Type == TEXT("CHOOSE_SPACE")) {
+      // 2026-10-21 playtest F5b: CHOOSE_SPACE is two steps (a space of the zone, then one next to it) - the status said
+      // the same «Выберите клетку на поле» on both
+      Out.Steps = 2;
+      Out.Step = Head.Stage == 2 ? 2 : 1;
+      if (Out.Step == 2) Out.Prompt = FS09Reason::Make(TEXT("why.space.pick.adjacent"));
+    }
   }
   return Out;
 }

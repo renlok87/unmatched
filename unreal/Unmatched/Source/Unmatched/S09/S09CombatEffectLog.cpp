@@ -39,6 +39,8 @@ bool FS09LastCombat::Read(const FS08Snapshot& Snapshot, FS09LastCombat& Out) {
   Record->TryGetStringField(TEXT("attackerPlayerId"), Out.AttackerPlayerId);
   Record->TryGetStringField(TEXT("defenderPlayerId"), Out.DefenderPlayerId);
   ReadInt(Record, TEXT("defenderDamage"), Out.DefenderDamage);
+  if (!ReadInt(Record, TEXT("finalAttack"), Out.FinalAttack) || Out.FinalAttack < 0) Out.FinalAttack = -1;
+  if (!ReadInt(Record, TEXT("finalDefense"), Out.FinalDefense) || Out.FinalDefense < 0) Out.FinalDefense = -1;
   Record->TryGetBoolField(TEXT("attackerWon"), Out.bAttackerWon);
   Record->TryGetBoolField(TEXT("attackerCardCancelled"), Out.bAttackerCardCancelled);
   const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;

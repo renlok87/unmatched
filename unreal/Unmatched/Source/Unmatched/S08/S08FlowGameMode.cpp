@@ -5,6 +5,7 @@
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
 #include "UI/UmButton.h"
+#include "UI/UmCardMedia.h"
 #include "UI/UmWorldLayer.h"
 #include "UI/UmWorldDamage.h"
 #include "S08Render.h"
@@ -1361,6 +1362,23 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   const bool bOwnLog = bHasLog && Log.Matches(Baseline.SequenceNumber, Closing.SequenceNumber, Combat.AttackerId,
                                               Combat.TargetFighterId);
   if (bOwnLog) In.Effects = S09CombatEffectLog::Lines(Log);
+  // 2026-10-21 playtest F9 (Sarpedon seq 91): the AI's BOOST_CHOICE resolved in the closing step - the baseline's
+  // combatInfo had no cardBoostCardId, the centre showed 2 : 3 with the attacker winning. The new boost face of the
+  // attacker's pile is the boost; the score is the server's (finalAttack / finalDefense of lastCombat).
+  {
+    TArray<FS08PendingEffect> BasePending;
+    FS08Contracts::PendingEffects(Baseline, BasePending);
+    const bool bBoostChoiceOpen = BasePending.ContainsByPredicate([&Attacker](const FS08PendingEffect& P) {
+      return P.Type == TEXT("BOOST_CHOICE") && (P.PlayerId.IsEmpty() || P.PlayerId == Attacker->OwnerId);
+    });
+    const bool bLateBoost = bBoostChoiceOpen && In.Reveal.AddClosingBoosts(Attacker->OwnerId, Baseline.DiscardPiles, Closing.DiscardPiles);
+    const int32 DerivedA = In.Reveal.AttackValue, DerivedD = In.Reveal.DefenseValue;
+    if (bOwnLog) In.Reveal.ApplyFinalValues(Log.FinalAttack, Log.FinalDefense);
+    if (bLateBoost || In.Reveal.AttackValue != DerivedA || In.Reveal.DefenseValue != DerivedD) {
+      FS08Trace::Write(FString::Printf(TEXT("COMBAT-SCORE seq=%d derived=%d:%d final=%d:%d lateBoost=%d"), Closing.SequenceNumber,
+                                       DerivedA, DerivedD, In.Reveal.AttackValue, In.Reveal.DefenseValue, bLateBoost ? 1 : 0));
+    }
+  }
   In.EffectLines = In.Effects.Num();
   In.bAttackCardCancelled = bOwnLog && Log.bAttackerCardCancelled;  // VS-3 HB-33: the centre's X line
   FS08Trace::Write(S09CombatEffectLog::TraceLine(Closing.SequenceNumber, bHasLog ? &Log : nullptr,
@@ -1981,18 +1999,13 @@ void AS08FlowGameMode::HandleClick() {
     FHitResult Hit;
     if (!PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit)) return;
     FString Reason;
-    if (AS08FighterActor* FighterActor = Cast<AS08FighterActor>(Hit.GetActor())) {
-      if (!bTakesFighter) {
-        Toast = TEXT("this choice does not take a fighter");
-      } else if (CommandUi.SelectPendingFighter(FighterActor->GetFighter().Id,
-                                                 EffectiveSnapshot(), Fighters, Reason)) {
+    auto PickFighter = [&](const FS08BoardFighter& Picked) {
+      if (CommandUi.SelectPendingFighter(Picked.Id, EffectiveSnapshot(), Fighters, Reason)) {
         CommandUi.PendingCells = CommandUi.ComputePendingCells(EffectiveSnapshot(), BoardModel,
                                                                Fighters);
         BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells);
-        Toast = FString::Printf(TEXT("pending: %s selected - click a highlighted space or Enter"),
-                                *FighterActor->GetFighter().Label);
-        if (!bTakesCell) Toast = FString::Printf(TEXT("pending target: %s - Enter confirms"),
-                                                 *FighterActor->GetFighter().Label);
+        Toast = FString::Printf(TEXT("pending: %s selected - click a highlighted space or Enter"), *Picked.Label);
+        if (!bTakesCell) Toast = FString::Printf(TEXT("pending target: %s - Enter confirms"), *Picked.Label);
       } else {
         Toast = TEXT("pending pick rejected: ") + Reason;
         // 2026-10-15 playtest (720p, «Мимолётный взгляд»): a click on a fighter outside the choice said nothing on
@@ -2002,11 +2015,27 @@ void AS08FlowGameMode::HandleClick() {
       ToastUntil = Elapsed + 3.0f;
       RefreshUi();
       RefreshHud();  // 2026-10-15 playtest: the UMG panel's «Подтвердить» follows the pick in this frame
-      return;
+    };
+    int32 CellX = -1, CellY = -1;
+    bool bCellFromFighter = false;
+    if (AS08FighterActor* FighterActor = Cast<AS08FighterActor>(Hit.GetActor())) {
+      if (bTakesFighter) {
+        PickFighter(FighterActor->GetFighter());
+        return;
+      }
+      // 2026-10-21 playtest F5a («Беспокойные духи»): the figure's click capsule took the click before its space - a
+      // choice of spaces (CHOOSE_SPACE) reads a figure as the space it stands on (the spaces of enemies are the point)
+      CellX = FighterActor->GetFighter().X;
+      CellY = FighterActor->GetFighter().Y;
+      bCellFromFighter = true;
     }
-    int32 CellX, CellY;
-    if (!BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY)) return;
+    if (!bCellFromFighter && !BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY)) return;
     if (!bTakesCell) {
+      // 2026-10-21 playtest F5a: a TARGET_FIGHTER click on the plate under a target picks the fighter standing there
+      if (const FS08BoardFighter* There = FS08BoardModel::FighterAt(Fighters, CellX, CellY, FString())) {
+        PickFighter(*There);
+        return;
+      }
       Toast = TEXT("this choice does not take a cell");
       ToastUntil = Elapsed + 3.0f;
       RefreshUi();
@@ -2019,7 +2048,12 @@ void AS08FlowGameMode::HandleClick() {
       Toast = TEXT("pending cell rejected: ") + Reason;
       BoardActor->ShowIllegalCell(CellX, CellY);
       UmHudRefuseCell(CellX, CellY);  // VS-4 HB-40: badge-refuse + the why.* of the space as a UMG toast
-      UmHudToastReason(CommandUi.PendingCellReason(CellX, CellY, BoardModel, Fighters), 3.0f);
+      FS09Reason Why = CommandUi.PendingCellReason(CellX, CellY, BoardModel, Fighters);
+      if (!Why.IsSet()) {
+        // 2026-10-21 playtest F5a: CHOOSE_SPACE has no cell reason of its own - the UMG toast says what to click
+        Why = FS09Reason::Make(CommandUi.PendingChoice.Stage == 2 ? TEXT("why.space.pick.adjacent") : TEXT("why.space.pick"));
+      }
+      UmHudToastReason(Why, 3.0f);
       IllegalUntil = Elapsed + 1.5f;
     }
     ToastUntil = Elapsed + 3.0f;
@@ -2805,6 +2839,19 @@ void AS08FlowGameMode::FeedPendingPresentation(const FS08Snapshot& Snapshot) {
                                      Note.PlayerId == CommandUi.ViewerId ? 1 : 0, *Why.Key.ToString()));
     ShowReason(Why, 4.0f); // CUE-004
     AudioOnSkippedEffect();  // AU-S5: FX-NO-TARGET
+  }
+  // (1b) 2026-10-21 playtest F5c: an area effect resolved out of combat (CHOOSE_SPACE stage 2) - the pulse on both
+  // spaces, the effect sound and the journal line, for both seats (entry / reconnect primes silently)
+  FS09LastEffect Area;
+  if (LastEffects.Consume(Snapshot, Area)) {
+    if (BoardActor) {
+      for (const FIntPoint& C : Area.Cells) BoardActor->PlayConfirmPulse(C.X, C.Y, true);
+    }
+    PlayBankSfx(TEXT("FX-SPIRITS"), TEXT("SFX"), TEXT("spirits"));
+    FS08Trace::Write(FString::Printf(TEXT("MS-AREA n=%d seq=%d kind=%s cells=%d targets=%d damage=%d defeated=%d own=%d"), Area.N,
+                                     Area.Seq, Area.Kind.IsEmpty() ? TEXT("-") : *Area.Kind, Area.Cells.Num(), Area.Targets.Num(),
+                                     Area.Damage, Area.Defeated.Num(), Area.PlayerId == CommandUi.ViewerId ? 1 : 0));
+    UmHudLogEffect(Area);
   }
   // (2) SD-19 / SD-28: one presentation per open of an own head; a compact / toast open pre-selects the variant
   // answered last time where it is still legal (nothing is sent).
@@ -5778,6 +5825,7 @@ void AS08FlowGameMode::ClearGameplayHud() {
   CueDispatcher = FS08CueDispatcher();
   DeathStage = FS09DeathStage();
   SkippedEffects.Reset();
+  LastEffects.Reset();
   PendingPresenter.Reset();
   PendingStepTraceKey.Reset();
   PendingNoTargetsTraceKey.Reset();
@@ -6514,7 +6562,10 @@ void AS08FlowGameMode::RefreshHud() {
       Args.Add(TEXT("n"), CommandUi.Moves.Num());
       if (Boost) {
         Args.Add(TEXT("b"), Boost->BoostValue);
-        Args.Add(TEXT("cardName"), FText::FromString(Boost->Name));
+        // 2026-10-21 playtest F3b: the card name in the interface language (the INT-018 rule of the card face)
+        const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
+        const bool bRuMissing = Boost->NameRu.IsEmpty() || Boost->NameRu == Boost->Name;
+        Args.Add(TEXT("cardName"), FText::FromString(bRu && !bRuMissing ? Boost->NameRu : Boost->Name));
       }
       const TCHAR* Key = CommandUi.Moves.Num() == 0
                              ? (Boost ? TEXT("ms.btn.confirm.zero.boost") : TEXT("ms.btn.confirm.zero"))

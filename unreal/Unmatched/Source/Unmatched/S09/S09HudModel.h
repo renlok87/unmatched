@@ -159,6 +159,13 @@ struct UNMATCHED_API FS09CombatReveal {
   static FS09CombatReveal Derive(const FS08CombatInfo& Combat, const FString& AttackerOwnerId,
                                  const TSharedPtr<FJsonValue>& BaselinePiles,
                                  const TSharedPtr<FJsonValue>& ClosingPiles);
+  /** 2026-10-21 playtest F9: a BOOST_CHOICE answered in the closing step (the baseline still waited on it, so its
+   *  combatInfo had no cardBoostCardId) - with no boost known yet, the face cards the attacker's pile gained after the
+   *  baseline (past its length, not the attack card) with a printed BOOST are the boost. False when none was added. */
+  bool AddClosingBoosts(const FString& AttackerOwnerId, const TSharedPtr<FJsonValue>& BaselinePiles,
+                        const TSharedPtr<FJsonValue>& ClosingPiles);
+  /** The server's final score of the combat (metadata.lastCombat finalAttack / finalDefense; -1 keeps the derived). */
+  void ApplyFinalValues(int32 FinalAttack, int32 FinalDefense);
 };
 
 class UNMATCHED_API FS09HudFactory {

@@ -1,6 +1,8 @@
 // VS-4 HB-40 / HB-41: the toast and subtitle rules - see UmHudFeed.h.
 #include "UmHudFeed.h"
 
+#include "../S08ArtLook.h"
+
 #include "UmText.h"
 
 namespace UmHudFeed {
@@ -58,8 +60,13 @@ FText ReasonText(const FS09Reason& Reason) {
     // MS-E-34 (FS09Reason::Text): the ally leaves later in the order - say how to fix it
     Out = FText::Format(FText::FromString(TEXT("{0}. {1}")), Out, UmText::Get(EUmTable::Ms, TEXT("ms.order.swap.hint")));
   }
+  // 2026-10-21 playtest F3c: no «S35: » before the reason - the raw space id is on no painted map (the journal dropped
+  // it too, UmHudLog); the toast comes right after the click on that space. The `cell` argument stays for the trace
+  // (FS09Reason::Text). -S09Markers (debug) keeps the prefix.
   const FString* Cell = Reason.Args.Find(TEXT("cell"));
-  if (Cell && !Cell->IsEmpty()) Out = FText::Format(FText::FromString(TEXT("{0}: {1}")), FText::FromString(*Cell), Out);
+  if (Cell && !Cell->IsEmpty() && S08ArtLook::S08Markers()) {
+    Out = FText::Format(FText::FromString(TEXT("{0}: {1}")), FText::FromString(*Cell), Out);
+  }
   return Out;
 }
 

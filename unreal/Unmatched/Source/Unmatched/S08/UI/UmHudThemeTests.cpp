@@ -123,6 +123,8 @@ bool FUmHudThemeLoadTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("JSON skin %s in Skins"), *P.Key), Theme->Skins.Contains(FName(*P.Key)));
   }
   CheckHeaderValues(*this, *Theme, TEXT("asset"));
+  // 2026-10-21 playtest F7b: «font.card» (the HI-07 face token) is Roboto Bold Condensed, not the Regular fallback
+  TestEqual(TEXT("font.card -> BoldCondensed"), Theme->Font(TEXT("font.card")).TypefaceFontName, FName(TEXT("BoldCondensed")));
   return true;
 }
 

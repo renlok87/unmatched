@@ -77,11 +77,13 @@ struct UNMATCHED_API FUmLobbyLayout {
 namespace UmLobby {
 inline const TCHAR* const MarmorealId = TEXT("c121b47f8d6eb28daccb76d05");  // AGENTS.md: the default board
 inline const TCHAR* const SarpedonId = TEXT("c7fa64a26c29a0835f2383e63");
-/** The fallback names of the two maps (AGENTS.md) while boardList has not answered. */
-inline const TCHAR* const MarmorealName = TEXT("Marmoreal · original map");
-inline const TCHAR* const SarpedonName = TEXT("Sarpedon · original map");
-/** The AI opponent's username (backend/prisma/seed-ai.ts line 24, ВР-VS4-SC10-01). */
-inline const TCHAR* const AiBotName = TEXT("AI Bot");
+/** The fallback names of the two maps (AGENTS.md) while boardList has not answered - screens.board.marmoreal /
+ *  .sarpedon in the interface language (2026-10-21 playtest F3f: «Мармореаль» / «Сарпедон», no «· original map»). */
+UNMATCHED_API FString MarmorealName();
+UNMATCHED_API FString SarpedonName();
+/** The AI opponent as a role in the interface language - screens.ai.name «Бот» / «AI Bot» (2026-10-21 playtest F3e;
+ *  the data nickname 'AI Bot' of backend/prisma/seed-ai.ts:24 is one language only - ВР-VS4-SC10-01 revised). */
+UNMATCHED_API FString AiBotName();
 inline constexpr int32 CodeLength = 6;
 inline constexpr double PollMs = 15000.0;     // ВР-H20
 inline constexpr double TimeoutMs = 10000.0;  // SC-13: the error not later than 10 s

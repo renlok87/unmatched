@@ -196,7 +196,8 @@ FUmActionsModel Decide(const FUmActionsInput& In) {
     // the local drafts select their button; the other two switch the mode (ВР-VS2-HB42-05, ВР-VS4-41)
     At.bSelected = In.Mode == ES09CommandMode::AttackDraft;
     Sc.bSelected = In.Mode == ES09CommandMode::SchemeChoice;
-    if (In.bNoScheme && !Sc.bSelected) Off(Sc, FS09Reason::Make(TEXT("why.scheme.none")));
+    // 2026-10-21 playtest F10: «Нет схем, которые можно сыграть» (why.scheme.none is «Сыграть схему» without a card)
+    if (In.bNoScheme && !Sc.bSelected) Off(Sc, FS09Reason::Make(TEXT("why.scheme.unplayable")));
   }
   // КОНЕЦ ХОДА: the primary cell only while the end of turn is open (SD-44), else an ordinary disabled cell
   if (In.EndTurn.IsSet()) {
@@ -573,13 +574,18 @@ void UUmHudActions::ShowTip(int32 Index) {
   // bottom = the row top - 8 su; the right edge = the pointed cell's, inside the canvas side margins
   const FBox2D Cell = CellLocalSu(Key, Frame.bClassS);
   float Right = static_cast<float>(Cell.Max.X);
+  // 2026-10-21 playtest F10: under the L table look the prompt and the stage rows stand on the actions (slice 13 / 19) -
+  // the tip goes over the whole control panel, flush with its right edge, never over «Выберите действие»
+  const bool bTablePanel = S08ArtLook::HudTable() && !Frame.bClassS;
+  if (bTablePanel) Right = static_cast<float>(CellLocalSu(EUmActionKey::EndTurn, false).Max.X);
+  const float Lift = bTablePanel ? UmHudLayout::TablePromptSu + UmHudLayout::TableStageSu + UmHudLayout::TableTrayPadSu : 0.0f;
   if (Frame.RectSu.bIsValid && Frame.CanvasSu.X > 0.0) {
     const float MaxRight = static_cast<float>(Frame.CanvasSu.X - Frame.MarginSu - Frame.RectSu.Min.X);
     const float MinLeft = static_cast<float>(Frame.MarginSu - Frame.RectSu.Min.X);
     Right = FMath::Min(Right, MaxRight);
     Right = FMath::Max(Right, MinLeft + W);
   }
-  const FVector2D Pos(Right - W, -TipGapSu - H);
+  const FVector2D Pos(Right - W, -Lift - TipGapSu - H);
   if (TipCaption) {
     TipCaption->SetText(FText::FromString(CaptionS));
     TipCaption->SetVisibility(CaptionS.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
