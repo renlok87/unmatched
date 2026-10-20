@@ -5,6 +5,7 @@
 import { GameStateService } from '../game-state.service';
 import { GamePhase, CardType, FighterType } from '../../game-engine/models';
 import { s03Engine } from '../../test/fixtures/s03-engine.fixture';
+import { rngFromSeed } from '../../game-engine/engine/rng';
 import type { GameState, Fighter } from '../game-state.service';
 
 // --- Минимальные моки инфраструктуры (как в s06-full-games) ---
@@ -187,6 +188,48 @@ describe('S07 GD-025 viewer-aware projection (raw JSON)', () => {
       const parsed = JSON.parse(e.payload);
       expect(parsed).toHaveProperty('action');
       expect(parsed).not.toHaveProperty('handZones');
+    }
+  });
+
+  it('DET-1: состояние RNG сохраняется на сервере, но не уходит ни одному зрителю', async () => {
+    const { service } = makeDeps();
+    const rng = rngFromSeed(2026);
+    const state = { ...combatFixture(), metadata: { ...combatFixture().metadata, rng } } as GameState;
+    // сервер: rng переживает Postgres-путь (serialize → JSON → deserialize)
+    const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(state))));
+    expect(restored.metadata.rng).toEqual(rng);
+    // мусор вместо состояния не принимается за генератор
+    const garbage = service.serialize(state) as any;
+    expect(service.deserialize({ ...garbage, m: { ...garbage.m, rs: [1, 2, 'x', 4] } }).metadata.rng).toBeUndefined();
+    // клиенты: ни ключа, ни слов состояния в сыром JSON проекции
+    for (const viewer of ['a', 'b', 'spectator']) {
+      const projected = service.filterPrivateData(restored, viewer);
+      expect(projected.metadata).not.toHaveProperty('rng');
+      const raw = JSON.stringify(projected);
+      expect(raw).not.toContain('"rng"');
+      expect(raw).not.toContain(JSON.stringify(rng));
+    }
+    // проекция не трогает серверное состояние
+    expect(restored.metadata.rng).toEqual(rng);
+  });
+
+  it('DET-2: eventsSince не отдаёт команду реплея и хеш состояния — даже владельцу', async () => {
+    const { service, gameActions } = makeDeps();
+    gameActions.push({
+      sequenceNumber: 11, type: 'CARD_DISCARDED', gameId: 'g1', playerId: 'b', timestamp: new Date(),
+      payload: {
+        action: 'autoResolveChoice', reason: 'defense-timeout',
+        cmd: { kind: 'resolvePendingEffect', userId: 'b', input: { gameId: 'g1', effectId: 'e', cardIds: ['b-secret-1'] }, now: new Date(0).toISOString() },
+        hash: 'f'.repeat(64),
+      },
+    });
+    for (const viewer of ['a', 'b']) {
+      const events = await service.getEventsSince('g1', 10, viewer);
+      expect(events).toHaveLength(1);
+      const raw = JSON.stringify(events);
+      expect(raw).not.toContain('b-secret-1');
+      expect(raw).not.toContain('f'.repeat(64));
+      expect(JSON.parse(events[0].payload)).toEqual({ action: 'autoResolveChoice' });
     }
   });
 

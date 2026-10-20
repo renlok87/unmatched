@@ -16,9 +16,7 @@ import { GameJobsModule } from '../game/jobs';
 import { ContentModule } from '../content/content.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { CardValueCacheService } from './cache/card-value-cache.service';
-import { daredevilHandler, msMarvelHandler, arthurAbilityHandler } from './abilities/heroes';
-import { ABILITY_CONFIGS } from './abilities/ability-config';
-import { GenericHeroAbilityHandler } from './abilities/generic-hero-ability.handler';
+import { registerHeroAbilities } from './abilities/register-hero-abilities';
 
 /**
  * Game Engine Module
@@ -36,42 +34,6 @@ import { GenericHeroAbilityHandler } from './abilities/generic-hero-ability.hand
  *
  * Мигрирован из game/ для ясности ответственности.
  */
-
-/**
- * Provider для автоматической регистрации Daredevil
- */
-const DaredevilRegistryProvider = {
-  provide: 'DAREDEVIL_REGISTRY',
-  useFactory: (registry: HeroAbilityRegistry) => {
-    registry.registerExtended(daredevilHandler);
-    return daredevilHandler;
-  },
-  inject: [HeroAbilityRegistry],
-};
-
-/**
- * Provider для автоматической регистрации Ms. Marvel
- */
-const MsMarvelRegistryProvider = {
-  provide: 'MS_MARVEL_REGISTRY',
-  useFactory: (registry: HeroAbilityRegistry) => {
-    registry.registerExtended(msMarvelHandler);
-    return msMarvelHandler;
-  },
-  inject: [HeroAbilityRegistry],
-};
-
-/**
- * Provider для автоматической регистрации Arthur
- */
-const ArthurRegistryProvider = {
-  provide: 'ARTHUR_REGISTRY',
-  useFactory: (registry: HeroAbilityRegistry) => {
-    registry.register(arthurAbilityHandler);
-    return arthurAbilityHandler;
-  },
-  inject: [HeroAbilityRegistry],
-};
 
 @Module({
   imports: [GameJobsModule, ContentModule, MetricsModule],
@@ -93,9 +55,6 @@ const ArthurRegistryProvider = {
     CardEffectExecutorService,
     // Abilities
     HeroAbilityRegistry,
-    DaredevilRegistryProvider,
-    MsMarvelRegistryProvider,
-    ArthurRegistryProvider,
     // Movement services
     AStarService,
     PathfindingCacheService,
@@ -127,18 +86,12 @@ export class GameEngineModule {
   ) {}
 
   onModuleInit() {
-    // Регистрируем обработчики способностей героев (классические — DO NOT break)
-    this.registry.register(arthurAbilityHandler);
-
-    // Data-driven generic-способности: один GenericHeroAbilityHandler на каждый
-    // декларативный AbilityConfig. registerExtended → extended-карта реестра
-    // обслуживает turn-хуки И stateful combat (через getAny).
-    const deps = {
+    // Способности героев: ручные handler'ы (Daredevil, Ms. Marvel, Arthur),
+    // затем data-driven ABILITY_CONFIGS. Та же функция собирает реестр
+    // headless-харнессов (s03Engine, self-play), чтобы они играли те же герои.
+    registerHeroAbilities(this.registry, {
       deck: this.deckManagement,
       zone: this.adjacency,
-    };
-    for (const config of ABILITY_CONFIGS) {
-      this.registry.registerExtended(new GenericHeroAbilityHandler(config, deps));
-    }
+    });
   }
 }

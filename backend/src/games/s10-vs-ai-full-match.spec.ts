@@ -19,7 +19,6 @@ import { GameSubscriptionService } from './game-subscription.service';
 import { RedisService } from '../redis/redis.service';
 import { DistributedLockService } from '../common/services/distributed-lock.service';
 import { GameInitializationService } from './services/game-initialization.service';
-import { GameActionService } from './services/game-action.service';
 import { AiTurnService, dispatchAiAction } from './services/ai-turn.service';
 import { AiDecisionService } from '../game-engine/services/ai-decision.service';
 import { GameActionExecutorService } from '../game-engine/services/game-action-executor.service';
@@ -31,7 +30,8 @@ import { AdjacencyService } from '../game-engine/engine/adjacency.service';
 import { ValueModifierService } from '../game-engine/engine/value-modifier.service';
 import { HeroAbilityRegistry } from '../game-engine/abilities/hero-ability-registry';
 import { GamePhase } from '../game-engine/models';
-import { GameActionType } from './models/game-action.model';
+import { journalActionType } from './models/game-action.model';
+import { loadReplay, replayGame } from './replay/replay';
 import type { GameState } from './game-state.service';
 
 const dbUrl = process.env.S10_TEST_DB_URL;
@@ -67,27 +67,8 @@ function buildStack(prisma: unknown, redis: RedisService) {
   const subscription = new GameSubscriptionService(redis);
   const stateService = new GameStateService(prisma as any, redis, subscription as any);
   const lock = new DistributedLockService(redis);
-  // Журнал — та же BullMQ-форма записи (id/попытки), но persistence напрямую
-  // в Prisma (мимикрия GameActionProcessor): recordAction остаётся async.
-  const gameActionService = new GameActionService(
-    {
-      add: async (_name: string, data: any) => {
-        await (prisma as PrismaClient).gameAction.create({
-          data: {
-            id: data.id,
-            gameId: data.gameId,
-            sequenceNumber: data.sequenceNumber,
-            type: data.type,
-            playerId: data.playerId,
-            timestamp: data.timestamp,
-            payload: data.metadata,
-          },
-        });
-        return {} as any;
-      },
-    } as any,
-    prisma as any,
-  );
+  // Журнал команд пишет saveState в своей транзакции (DET-2) — отдельного
+  // сервиса журнала харнессу не нужно.
   const decision = new AiDecisionService(adjacency);
   const aiTurn = new AiTurnService(
     prisma as any,
@@ -96,10 +77,8 @@ function buildStack(prisma: unknown, redis: RedisService) {
     subscription as any,
     executor,
     decision,
-    undefined,
-    gameActionService,
   );
-  return { executor, subscription, stateService, lock, gameActionService, decision, aiTurn };
+  return { executor, subscription, stateService, lock, decision, aiTurn };
 }
 
 describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+Redis', () => {
@@ -195,8 +174,8 @@ describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+R
 
       const action = stack.decision.decide(state, humanId);
       if (action) {
-        const { result, eventType } = await dispatchAiAction(stack.executor, action, {
-          userId: humanId, gameId, currentState: state,
+        const { result, eventType, command } = await dispatchAiAction(stack.executor, action, {
+          userId: humanId, gameId, currentState: state, now: new Date(),
         });
         if (!result.success || !result.gameState) {
           throw new Error(`human ${action.kind} отклонён: ${result.error}`);
@@ -204,22 +183,16 @@ describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+R
         if (result.gameState.sequenceNumber <= state.sequenceNumber) {
           throw new Error(`human ${action.kind} без прогресса seq`);
         }
-        await stack.stateService.saveState(gameId, result.gameState);
-        const type = GameActionType[eventType as keyof typeof GameActionType];
-        if (type) {
-          await stack.gameActionService.recordAction({
-            gameId, sequenceNumber: result.gameState.sequenceNumber, type,
-            playerId: humanId, metadata: { action: `human:${action.kind}`, input: action },
-          });
-        }
-        if (result.gameState.phase === GamePhase.GAME_OVER) {
-          // зеркало game-actions.resolver: терминал журналируется отдельно
-          await stack.gameActionService.recordAction({
-            gameId, sequenceNumber: result.gameState.sequenceNumber,
-            type: GameActionType.GAME_ENDED, playerId: humanId,
-            metadata: { action: `human:${action.kind}`, winnerId: result.gameState.metadata.winnerId },
-          });
-        }
+        // зеркало game-actions.resolver: команда и (терминал) GAME_ENDED —
+        // в транзакции состояния
+        await stack.stateService.saveState(gameId, result.gameState, {
+          journal: [{
+            type: journalActionType(eventType),
+            playerId: humanId,
+            payload: { action: `human:${action.kind}`, input: action },
+            command,
+          }],
+        });
       }
       // action===null → ход бота/бой на стороне бота: следующий круг дрейна
     }
@@ -281,10 +254,10 @@ describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+R
     // end-to-end ДОСТАВКИ, а не multi-page/boundary-разреза. Доказательство
     // пагинации по границе — синтетическая 151-строчная регрессия в
     // s10-journal-pagination.spec.ts.
-    // Residual: журнал пишется асинхронно ПОСЛЕ коммита состояния — запись
-    // может закоммититься позже продвижения клиентского курсора. Журнал —
-    // НЕ replay (16-network-contract.md §3): snapshot авторитетен, CUE
-    // записей с seq <= применённого клиентом не проигрывается.
+    // DET-2: журнал пишется в транзакции состояния — запись не может
+    // закоммититься позже продвижения клиентского курсора. Для клиента журнал
+    // по-прежнему НЕ replay (16-network-contract.md §3): snapshot авторитетен,
+    // CUE записей с seq <= применённого клиентом не проигрывается.
     const dbCount = await prisma.gameAction.count({ where: { gameId } });
     const PAGE = 100;
     const catchUp: Awaited<ReturnType<typeof stack.stateService.getEventsSince>> = [];
@@ -299,9 +272,20 @@ describeLive('S10 GD-039: полный матч VS_AI на живых Postgres+R
     expect(new Set(catchUp.map((e) => `${e.sequenceNumber}:${e.type}`)).size).toBe(dbCount); // без дублей
     expect(catchUp[catchUp.length - 1].type).toBe('GAME_ENDED'); // терминал последним
     for (const e of catchUp) {
-      // приватность на каждой странице: input бота не утекает человеку
+      // приватность на каждой странице: input бота не утекает человеку,
+      // команда реплея и хеш состояния не уходят никому
       if (e.playerId === botId) expect(JSON.parse(e.payload).input).toBeUndefined();
+      expect(JSON.parse(e.payload).cmd).toBeUndefined();
+      expect(JSON.parse(e.payload).hash).toBeUndefined();
     }
+
+    // DET-2: живой матч на Postgres воспроизводится по стартовому снимку и
+    // журналу команд с совпадением канонического хеша на каждом шаге
+    const replay = await loadReplay(prisma as any, gameId);
+    expect(replay).not.toBeNull();
+    const replayed = await replayGame(stack.executor, replay!.start, replay!.rows);
+    expect(replayed.divergence).toBeUndefined();
+    expect(replayed.state.sequenceNumber).toBe(final.sequenceNumber);
   };
 
   it('бот=Medusa vs человек=King Arthur: полный матч до GAME_OVER на реальной персистентности', async () => {

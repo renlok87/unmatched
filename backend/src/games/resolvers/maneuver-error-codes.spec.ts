@@ -328,7 +328,6 @@ describe('MS-AT-04 rule codes of beginManeuver / maneuver / resolvePendingEffect
         { withLockOptions: async (_k: string, run: () => Promise<unknown>) => run() } as any,
         {} as any,
         { executeBeginManeuver: () => runExecutor(c), executeManeuver: () => runExecutor(c) } as any,
-        {} as any,
         { maybeRunAiTurns: async () => {} } as any,
       );
       const call = c.op === 'beginManeuver'
@@ -345,7 +344,7 @@ describe('MS-AT-04 rule codes of beginManeuver / maneuver / resolvePendingEffect
       const resolver = new GameActionsResolver(
         { loadState: async () => base() } as any, {} as any,
         { withLockOptions: async (_k: string, run: () => Promise<unknown>) => run() } as any, {} as any,
-        { executeBeginManeuver: async () => ({ success: false, error: 'legacy text' }) } as any, {} as any,
+        { executeBeginManeuver: async () => ({ success: false, error: 'legacy text' }) } as any,
         { maybeRunAiTurns: async () => {} } as any,
       );
       await expect(

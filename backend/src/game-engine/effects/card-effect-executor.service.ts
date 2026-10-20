@@ -24,6 +24,7 @@ import { MetricsService } from '../../metrics/metrics.service';
 import type { GameState, Card, CombatContext, EffectContext, CombatEffectContinuation, PendingEffect } from '../models';
 import { GamePhase } from '../models';
 import { applyTerminalState } from '../engine/terminal-state';
+import { stateRandomInt, stateShuffle } from '../engine/rng';
 import {
   CardEffect,
   EffectCondition,
@@ -910,9 +911,9 @@ export class CardEffectExecutorService {
           }
         }
         // Deck searched → shuffle it (order unknown to everyone afterwards).
-        const shuffled = this.shuffleDrawPile(next.decks[playerId].drawPile);
+        const { items: shuffled, state: shuffledState } = stateShuffle(next, next.decks[playerId].drawPile);
         next = {
-          ...next,
+          ...shuffledState,
           decks: {
             ...next.decks,
             [playerId]: { ...next.decks[playerId], drawPile: shuffled, topCard: shuffled[0] },
@@ -1376,16 +1377,6 @@ export class CardEffectExecutorService {
     };
   }
 
-  /** Fisher-Yates (тот же алгоритм, что DeckManagementService.shuffle) */
-  private shuffleDrawPile<T>(pile: readonly T[]): T[] {
-    const result = [...pile];
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-  }
-
   /** BLIND BOOST: сброс верха СВОЕЙ колоды, += его boostValue */
   private applyDeckTopBoost(
     state: GameState,
@@ -1443,11 +1434,12 @@ export class CardEffectExecutorService {
         result: { success: false, effectId: effect.id, targetIds: [], message: 'У оппонента нет карт' },
       };
     }
-    const idx = Math.floor(Math.random() * hand.cards.length);
+    const drawn = stateRandomInt(state, hand.cards.length);
+    const idx = drawn.value;
     const card = hand.cards[idx];
     const boost = card.boostValue ?? 0;
     const next: GameState = {
-      ...state,
+      ...drawn.state,
       handZones: {
         ...state.handZones,
         [opponentId]: { ...hand, cards: hand.cards.filter((_, i) => i !== idx) },

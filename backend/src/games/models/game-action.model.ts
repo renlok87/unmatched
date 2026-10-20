@@ -21,6 +21,15 @@ export enum GameActionType {
   DOOR_TOGGLED = 'DOOR_TOGGLED',
 }
 
+/**
+ * DET-2: тип строки журнала по имени события мутации. Команда журналируется
+ * всегда (реплею нужна каждая), поэтому имя вне enum не пропускает запись,
+ * а пишется как EFFECT_APPLIED.
+ */
+export function journalActionType(eventType: string): GameActionType {
+  return GameActionType[eventType as keyof typeof GameActionType] ?? GameActionType.EFFECT_APPLIED;
+}
+
 export interface GameAction {
   id: string;
   gameId: string;

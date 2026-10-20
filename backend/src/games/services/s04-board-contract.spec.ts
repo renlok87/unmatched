@@ -34,7 +34,7 @@ async function initialize(order: string[]) {
   const saveState = jest.fn(async () => undefined);
   const service = new GameInitializationService(prisma as any, { saveState } as any);
   const state = await service.initializeGameState('s04-board');
-  expect(saveState).toHaveBeenCalledWith('s04-board', state);
+  expect(saveState).toHaveBeenCalledWith('s04-board', state, { startSnapshot: true });
   return state;
 }
 

@@ -11,7 +11,7 @@ import { CombatTimeoutService } from './combat-timeout.service';
 import { AiTurnService } from './ai-turn.service';
 import { AiDecisionService } from '../../game-engine/services/ai-decision.service';
 import { AdjacencyService } from '../../game-engine/engine/adjacency.service';
-import { GameStateService } from '../game-state.service';
+import { GameStateService, buildJournalRows, serializeGameState, type SaveStateOptions } from '../game-state.service';
 import { GamePhase, CardType, FighterType, EffectType, EffectTiming } from '../../game-engine/models';
 import { normalizeCardEffects } from '../../game-engine/models';
 import { parseCardEffectTexts } from '../../game-engine/effects/effect-text-parser';
@@ -39,6 +39,14 @@ function fixture(): GameState {
     boardState: { width: 4, height: 1, cells: [[{ x: 0, y: 0, type: 'normal' }, { x: 1, y: 0, type: 'normal' }, { x: 2, y: 0, type: 'normal' }, { x: 3, y: 0, type: 'normal' }]], doors: {}, fog: {}, tokens: {} },
     metadata: { lastActionAt: new Date(), lastActionBy: 'a', version: 1, actionsRemaining: 2 },
   } as any;
+}
+
+/** The journal payload without the replay command and state hash (eventsSince never sends them). */
+function eventsSinceVisible(payload: Record<string, unknown>): Record<string, unknown> {
+  const visible = { ...payload };
+  delete visible.cmd;
+  delete visible.hash;
+  return visible;
 }
 
 function makeHarness(executorOverride?: Record<string, unknown>, aiTurnOverride?: { maybeRunAiTurns: jest.Mock }) {
@@ -70,9 +78,13 @@ function makeHarness(executorOverride?: Record<string, unknown>, aiTurnOverride?
     if (!st) throw new Error('not found');
     return st;
   };
-  gameStateService.saveState = async (gameId: string, st: GameState) => {
+  gameStateService.saveState = async (gameId: string, st: GameState, options?: SaveStateOptions) => {
     states.set(gameId, st);
     saved.push(st);
+    // DET-2: journal rows saveState writes in its transaction (production row builder)
+    for (const row of buildJournalRows(gameId, st, serializeGameState(st), options?.journal ?? [])) {
+      audits.push({ gameId, sequenceNumber: row.sequenceNumber, type: row.type, playerId: row.playerId, metadata: row.payload });
+    }
   };
   const lock: any = { withLockOptions: async (_k: string, fn: () => Promise<unknown>) => fn() };
   const queue: any = {
@@ -106,7 +118,6 @@ function makeHarness(executorOverride?: Record<string, unknown>, aiTurnOverride?
     prisma,
     (executorOverride ?? executor) as any,
     { publishGameUpdate: async (gameId: string, eventType: string, st: GameState) => published.push({ gameId, eventType, seq: st.sequenceNumber }) } as any,
-    { recordAction: async (dto: any) => { audits.push(dto); return 'id'; } } as any,
     aiTurnOverride as any,
   );
   return { executor, service, states, saved, audits, queueAdds, published, gameStateService, jobs, queue, lock, gameStateServiceRef: gameStateService };
@@ -544,10 +555,15 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     expect(after.handZones.a.cards.map((c) => c.id)).toContain('boost::0');
     // легальные промежуточные seq: attack(11) → pause(12) → decline+resume(13)
     expect(after.sequenceNumber).toBe(before.sequenceNumber + 2);
-    // аудит: один авто-выбор + один исход
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
-    expect(h.audits[0].metadata.action).toBe('autoResolveChoice');
-    expect(h.audits[0].metadata.method).toBe('decline');
+    // журнал (DET-2): строка на каждый seq — пауза резолва, затем авто-выбор,
+    // который довёл бой до конца (единственный исход COMBAT_RESOLVED)
+    expect(h.audits.map((a) => [a.sequenceNumber, a.type])).toEqual([
+      [before.sequenceNumber + 1, 'EFFECT_APPLIED'],
+      [before.sequenceNumber + 2, 'COMBAT_RESOLVED'],
+    ]);
+    expect(h.audits[0].metadata).toMatchObject({ action: 'autoResolve', reason: 'defense-timeout' });
+    expect(h.audits[1].metadata.action).toBe('autoResolveChoice');
+    expect(h.audits[1].metadata.method).toBe('decline');
     expect(h.audits[1].metadata.reason).toBe('defense-timeout');
     // публикация: пауза + шаг дрейна + исход
     expect(h.published.map((p) => p.eventType)).toEqual(['STATE_UPDATED', 'STATE_UPDATED', 'COMBAT_RESOLVED']);
@@ -613,12 +629,14 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     // один финальный исход: одна COMBAT_RESOLVED-публикация, одна audit
     expect(h.published.map((p) => p.eventType)).toEqual(['STATE_UPDATED', 'STATE_UPDATED', 'COMBAT_RESOLVED']);
     expect(h.published.filter((p) => p.eventType === 'COMBAT_RESOLVED')).toHaveLength(1);
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'CARD_PLAYED', 'COMBAT_RESOLVED']);
+    // журнал (DET-2): по строке на шаг; второй шаг довёл бой — он и есть исход
+    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
     expect(h.audits.filter((a) => a.type === 'COMBAT_RESOLVED')).toHaveLength(1);
     expect(h.audits[0].metadata.method).toBe('deterministic-fallback');
     expect(h.audits[1].metadata.method).toBe('deterministic-fallback');
-    // приватность: аудит авто-выбора без id карт руки/колоды
-    const auditJson = JSON.stringify(h.audits);
+    // приватность: часть, которую видит eventsSince, без id карт руки/колоды
+    // (параметры фолбэка — только в cmd реплея, клиентам он не уходит)
+    const auditJson = JSON.stringify(h.audits.map((a) => eventsSinceVisible(a.metadata)));
     expect(auditJson).not.toContain('r1');
     expect(auditJson).not.toContain('r2');
     expect(auditJson).not.toContain('r3');
@@ -653,14 +671,18 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     expect(after.metadata.combatInfo).toBeUndefined();
     // seq: attack(11) → defend(12) → pause(13) → discard(14) → decline+resume(15)
     expect(after.sequenceNumber).toBe(15);
-    // два авто-выбора + один исход
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'CARD_PLAYED', 'COMBAT_RESOLVED']);
-    expect(h.audits[0].metadata.method).toBe('deterministic-fallback');
-    expect(h.audits[1].metadata.method).toBe('decline');
-    // приватность аудита: без id карт
-    for (const a of h.audits) {
-      expect(a.metadata.cardIds).toBeUndefined();
-      expect(JSON.stringify(a.metadata)).not.toContain('victim::0');
+    // журнал (DET-2): пауза резолва (13), авто-сброс (14), decline+resume (15) — исход
+    expect(h.audits.map((a) => [a.sequenceNumber, a.type])).toEqual([
+      [13, 'EFFECT_APPLIED'], [14, 'CARD_PLAYED'], [15, 'COMBAT_RESOLVED'],
+    ]);
+    expect(h.audits[1].metadata.method).toBe('deterministic-fallback');
+    expect(h.audits[2].metadata.method).toBe('decline');
+    // команда авто-сброса несёт выбранные карты — реплею они нужны
+    expect(h.audits[1].metadata.cmd.input.cardIds).toEqual(['victim::0']);
+    // приватность видимой eventsSince части: без id карт
+    for (const visible of h.audits.map((a) => eventsSinceVisible(a.metadata))) {
+      expect(visible.cardIds).toBeUndefined();
+      expect(JSON.stringify(visible)).not.toContain('victim::0');
     }
   });
 
@@ -700,7 +722,7 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     expect(after.decks.a.drawPile.map((c: any) => c.id)).toEqual(['r3', 'r4', 'old1', 'old2']);
     expect(after.metadata.pendingEffects ?? []).toHaveLength(0);
     expect(after.metadata.combatInfo).toBeUndefined();
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'CARD_PLAYED', 'COMBAT_RESOLVED']);
+    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
   });
 
   it('mandatory TARGET_FIGHTER + оба офлайн → первый живой из допустимых целей, урон ровно один', async () => {
@@ -731,7 +753,7 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     expect(after.fighters.find((f) => f.id === 'fA')!.health).toBe(8);
     // fB: только боевой урон 4 − 2 защиты
     expect(after.fighters.find((f) => f.id === 'fB')!.health).toBe(8);
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
+    expect(h.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED']);
     expect(h.published.at(-1)!.eventType).toBe('COMBAT_RESOLVED');
   });
 
@@ -763,7 +785,7 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     const fA = after.fighters.find((f) => f.id === 'fA')!;
     expect(fA.position).toEqual({ x: 2, y: 0 });
     expect(after.fighters.find((f) => f.id === 'fB')!.health).toBe(8);
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
+    expect(h.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED']);
   });
 
   it('mandatory CHOOSE_SPACE stage1→stage2 (тот же id) + оба офлайн → обе стадии дрейнятся, одна клетка на стадию', async () => {
@@ -800,8 +822,8 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     // anchor (2,0) → (3,0). Обе клетки свободны → урона нет (фолбэк честно
     // не бьёт своих/пустые клетки), бой завершён одним исходом.
     expect(after.fighters.find((f) => f.id === 'fB')!.health).toBe(8);
-    // обе стадии прошли как отдельные шаги: два авто-выбора + один исход
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'CARD_PLAYED', 'COMBAT_RESOLVED']);
+    // обе стадии прошли как отдельные шаги; вторая довела бой — исход
+    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
     expect(h.published.at(-1)!.eventType).toBe('COMBAT_RESOLVED');
   });
 
@@ -831,7 +853,7 @@ describe('S07 GD-026 P1: серверная прогрессия mid-combat вы
     // фолбэк: первая свободная смежная с anchor (1,0) = (2,0); клетки
     // {(1,0),(2,0)}: враг fB(1,0) получает 1 урон + боевые 4−2 → 10−1−2
     expect(after.fighters.find((f) => f.id === 'fB')!.health).toBe(7);
-    expect(h.audits.map((a) => a.type)).toEqual(['CARD_PLAYED', 'COMBAT_RESOLVED']);
+    expect(h.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED']);
   });
 
   it('mandatory без безопасного фолбэка (synthetic mandatory BOOST) → блокер, очередь нетронута, без аудита', async () => {

@@ -138,6 +138,9 @@ describe('S08 GD-029: code resolution and duplicate-create guard', () => {
           return create;
         },
       },
+      // DET-2: saveState writes the command journal and the start snapshot in its transaction
+      gameAction: { createMany: async ({ data }: any) => ({ count: data.length }) },
+      gameStateSnapshot: { create: async ({ data }: any) => data },
       $transaction: async (run: (tx: unknown) => unknown) => run(prisma),
       $queryRaw: async () => [],
     };

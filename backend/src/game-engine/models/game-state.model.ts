@@ -9,6 +9,7 @@ import type { Fighter, Position } from './fighter.model';
 import type { Card, CardEffect, DeckState, HandZone } from './card.model';
 import type { BoardState } from './board.model';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
+import type { RngState } from '../engine/rng';
 
 /**
  * GD-026: серверные дедлайны боя (секунды). Единственный источник значений
@@ -375,6 +376,10 @@ export interface GameStateMetadata {
    *  (pendingEffects). endEffectsApplied — были ли уже выполнены TURN_END-хуки
    *  завершающего игрока (true — не повторять при возобновлении). */
   readonly pendingTurnEnd?: { readonly playerId: string; readonly endEffectsApplied?: boolean };
+  /** DET-1: state of the game RNG (engine/rng.ts). Server-only: it reveals every
+   *  future shuffle, filterPrivateData removes it. Saves without it get a fresh
+   *  crypto state on their first random step. */
+  readonly rng?: RngState;
 }
 
 /**

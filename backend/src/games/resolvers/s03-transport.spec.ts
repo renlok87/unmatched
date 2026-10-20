@@ -98,6 +98,9 @@ describe('S03 real HTTP/WS resource lifecycle', () => {
       },
       gamePlayer: { findUnique: async ({ where }: any) =>
         rows.has(where.gameId_userId.gameId) && ['a', 'b'].includes(where.gameId_userId.userId) ? {} : null },
+      // DET-2: saveState writes the command journal and the start snapshot in its transaction
+      gameAction: { createMany: async ({ data }: any) => ({ count: data.length }) },
+      gameStateSnapshot: { create: async ({ data }: any) => data },
       $transaction: async (run: (tx: unknown) => unknown) => run(prisma),
     };
     let lockTail = Promise.resolve();

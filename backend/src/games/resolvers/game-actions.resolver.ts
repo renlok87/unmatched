@@ -8,8 +8,8 @@
  * 3. GamePlayerGuard → userId ∈ game.players
  * 4. PhaseGuard → проверка фазы игры
  * 5. DistributedLockService.withLock() → предотвращение race conditions
- * 6. GameActionExecutorService.executeAction() → выполнение действия
- * 7. GameStateService.saveState() → сохранение состояния
+ * 6. executeGameCommand() → входная команда (DTO + часы) в GameActionExecutorService
+ * 7. GameStateService.saveState() → состояние и команда журнала в одной транзакции (DET-2)
  * 8. GameSubscriptionService.publishUpdate() → уведомление подписчиков
  * 9. Return filtered state with metadata → возврат отфильтрованного состояния
  */
@@ -24,8 +24,7 @@ import { GameStateService, GameState } from '../game-state.service';
 import { GameSubscriptionService } from '../game-subscription.service';
 import { DistributedLockService } from '../../common/services/distributed-lock.service';
 import { CombatTimeoutService } from '../services/combat-timeout.service';
-import { GameActionService } from '../services/game-action.service';
-import { GameActionType } from '../models/game-action.model';
+import { journalActionType } from '../models/game-action.model';
 import { GamePhase } from '../dto';
 import {
   BeginManeuverDto,
@@ -53,7 +52,8 @@ import {
   DefensePlayGuard,
   CombatResolveGuard,
 } from '../guards';
-import { GameActionExecutorService, ActionContext } from '../../game-engine/services/game-action-executor.service';
+import { GameActionExecutorService } from '../../game-engine/services/game-action-executor.service';
+import { executeGameCommand, makeCommand, type GameCommandKind } from '../../game-engine/services/game-command';
 import { DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { AiTurnService } from '../services/ai-turn.service';
 
@@ -95,39 +95,8 @@ export class GameActionsResolver {
     private readonly distributedLockService: DistributedLockService,
     private readonly combatTimeoutService: CombatTimeoutService,
     private readonly actionExecutor: GameActionExecutorService,
-    private readonly gameActionService: GameActionService,
     private readonly aiTurnService: AiTurnService,
   ) {}
-
-  /**
-   * Записать игровое действие в журнал GameAction (через BullMQ-очередь).
-   * Запись best-effort: ошибка журнала НЕ должна ронять мутацию.
-   */
-  private async recordGameAction(
-    gameId: string,
-    userId: string,
-    eventType: string,
-    sequenceNumber: number,
-    actionName: string,
-    input: unknown,
-  ): Promise<void> {
-    const type = GameActionType[eventType as keyof typeof GameActionType];
-    if (!type) {
-      this.logger.warn(`No GameActionType for event ${eventType}, skip log`);
-      return;
-    }
-    try {
-      await this.gameActionService.recordAction({
-        gameId,
-        sequenceNumber,
-        type,
-        playerId: userId,
-        metadata: { action: actionName, input: JSON.parse(JSON.stringify(input ?? {})) },
-      });
-    } catch (e) {
-      this.logger.warn(`Failed to record game action ${eventType} for ${gameId}: ${e}`);
-    }
-  }
 
   /**
    * Обработка ошибок выполнения действия с логированием.
@@ -149,13 +118,14 @@ export class GameActionsResolver {
   }
 
   /**
-   * Общая логика выполнения мутации
+   * Общая логика выполнения мутации. Мутация — входная команда (DET-2):
+   * тот же executeGameCommand исполняет её при реплее, а журнал GameAction
+   * пишется в транзакции saveState вместе с состоянием.
    */
   private async executeMutation<T extends { gameId: string }>(
     dto: T,
     userId: string,
-    actionName: string,
-    executor: (context: ActionContext) => Promise<{ success: boolean; gameState?: GameState; error?: string; code?: string }>,
+    actionName: GameCommandKind,
     eventType: string,
     scheduleAutoResolve?: boolean,
   ): Promise<GameMutationResult> {
@@ -166,22 +136,24 @@ export class GameActionsResolver {
           // Загружаем состояние
           const state = await this.gameStateService.loadState(dto.gameId);
 
-          // Создаём контекст выполнения
-          const actionContext: ActionContext = {
-            userId,
-            gameId: dto.gameId,
-            currentState: state,
-          };
-
-          // Выполняем действие через GameActionExecutorService
-          const result = await executor(actionContext);
+          // Команда: DTO как plain JSON и часы действия (ActionContext.now)
+          const command = makeCommand(actionName, userId, dto, new Date());
+          const result = await executeGameCommand(this.actionExecutor, command, state);
 
           if (!result.success) {
             this.handleActionResult(result, actionName);
           }
 
-          // Сохраняем состояние
-          await this.gameStateService.saveState(dto.gameId, result.gameState!);
+          // Сохраняем состояние вместе со строкой журнала (eventsSince-часть —
+          // action и input, как раньше; GAME_ENDED того же seq добавит saveState)
+          await this.gameStateService.saveState(dto.gameId, result.gameState!, {
+            journal: [{
+              type: journalActionType(eventType),
+              playerId: userId,
+              payload: { action: actionName, input: command.input },
+              command,
+            }],
+          });
 
           // GD-026: планирование серверных дедлайнов боя.
           if (scheduleAutoResolve) {
@@ -219,33 +191,12 @@ export class GameActionsResolver {
             result.gameState!,
           );
 
-          // Записываем действие в журнал GameAction (для eventsSince/catch-up)
-          await this.recordGameAction(
-            dto.gameId,
-            userId,
-            eventType,
-            result.gameState!.sequenceNumber,
-            actionName,
-            dto,
-          );
           if (result.gameState!.phase === GamePhase.GAME_OVER) {
             // Публикуем GAME_ENDED для подписки gameEnded (никто иначе не публикует)
             await this.gameSubscriptionService.publishGameUpdate(
               dto.gameId,
               'GAME_ENDED',
               result.gameState!,
-            );
-            await this.recordGameAction(
-              dto.gameId,
-              userId,
-              'GAME_ENDED',
-              result.gameState!.sequenceNumber,
-              actionName,
-              {
-                winnerId:
-                  (result.gameState! as any).winnerId ??
-                  (result.gameState! as any).metadata?.winnerId,
-              },
             );
           }
 
@@ -296,8 +247,7 @@ export class GameActionsResolver {
     @Context() context: any,
   ): Promise<GameMutationResult> {
     const userId = getUserId(context);
-    return this.executeMutation(dto, userId, 'beginManeuver',
-      (ctx) => this.actionExecutor.executeBeginManeuver(dto, ctx), 'MANEUVER');
+    return this.executeMutation(dto, userId, 'beginManeuver', 'MANEUVER');
   }
 
   /** Завершить начатый манёвр; moves: [] оставляет всех бойцов на месте. */
@@ -314,7 +264,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'maneuver',
-      (ctx) => this.actionExecutor.executeManeuver(dto, ctx),
       'MANEUVER',
     );
   }
@@ -328,8 +277,7 @@ export class GameActionsResolver {
     @Context() context: any,
   ): Promise<GameMutationResult> {
     const userId = getUserId(context);
-    return this.executeMutation(dto, userId, 'discardToLimit',
-      (ctx) => this.actionExecutor.executeDiscardToLimit(dto, ctx), 'CARD_DISCARDED');
+    return this.executeMutation(dto, userId, 'discardToLimit', 'CARD_DISCARDED');
   }
 
   // ============================================
@@ -352,7 +300,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'moveFighter',
-      (ctx) => this.actionExecutor.executeMoveFighter(dto, ctx),
       'FIGHTER_MOVED',
     );
   }
@@ -379,7 +326,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'attack',
-      (ctx) => this.actionExecutor.executeAttack(dto, ctx),
       'ATTACK_INITIATED',
       true, // scheduleAutoResolve
     );
@@ -406,7 +352,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'playDefense',
-      (ctx) => this.actionExecutor.executePlayDefense(dto, ctx),
       'DEFENSE_PLAYED',
     );
   }
@@ -432,7 +377,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'playScheme',
-      (ctx) => this.actionExecutor.executePlayScheme(dto, ctx),
       'CARD_PLAYED',
     );
   }
@@ -456,7 +400,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'resolvePendingEffect',
-      (ctx) => this.actionExecutor.executeResolvePendingEffect(dto, ctx),
       'CARD_PLAYED',
     );
   }
@@ -480,7 +423,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'declinePendingEffect',
-      (ctx) => this.actionExecutor.executeDeclinePendingEffect(dto, ctx),
       'CARD_PLAYED',
     );
   }
@@ -506,7 +448,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'resolveCombat',
-      (ctx) => this.actionExecutor.executeResolveCombat(dto, ctx),
       'COMBAT_RESOLVED',
     );
   }
@@ -532,7 +473,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'endTurn',
-      (ctx) => this.actionExecutor.executeEndTurn(dto, ctx),
       'TURN_ENDED',
     );
   }
@@ -554,7 +494,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'pass',
-      (ctx) => this.actionExecutor.executePass(dto, ctx),
       'CARD_PLAYED',
     );
   }
@@ -580,7 +519,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'toggleDoor',
-      (ctx) => this.actionExecutor.executeToggleDoor(dto, ctx),
       'DOOR_TOGGLED',
     );
   }
@@ -609,7 +547,6 @@ export class GameActionsResolver {
       dto,
       userId,
       'setStance',
-      (ctx) => this.actionExecutor.executeSetStance(dto, ctx),
       'SPECIAL_ABILITY',
     );
   }

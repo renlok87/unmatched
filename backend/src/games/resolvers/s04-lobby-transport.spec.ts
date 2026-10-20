@@ -149,6 +149,9 @@ describe('GD-016: lobby hero selection over real HTTP transport', () => {
           return row;
         },
       },
+      // DET-2: saveState writes the command journal and the start snapshot in its transaction
+      gameAction: { createMany: async ({ data }: any) => ({ count: data.length }) },
+      gameStateSnapshot: { create: async ({ data }: any) => data },
       $transaction: serializeTx,
       $queryRaw: async () => [],
     };

@@ -36,6 +36,7 @@ import {
 import type { AttackType, BoardState, CardEffect, Cell, Position } from '../../game-engine/models';
 import { parseCardEffectTexts, upgradeStaleParserEffects } from '../../game-engine/effects/effect-text-parser';
 import { distancesFrom, hasTopology, posKey } from '../../game-engine/engine/board-topology';
+import { randomRngState, rngShuffle, type RngState } from '../../game-engine/engine/rng';
 import type { Board } from '@prisma/client';
 
 const STARTING_HAND_SIZE = 5;
@@ -44,15 +45,6 @@ const MAX_HAND_SIZE = 7;
 /** Sanity-границы сетки: отсекают пиксельные координаты (картинки 400×230 и т.п.) */
 const MIN_GRID_SIZE = 2;
 const MAX_GRID_SIZE = 50;
-
-function shuffle<T>(array: readonly T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 
 /** Клетка Board.cells как она лежит в БД (JSON): поля топологии не доверенные */
 interface RawTopologyCell {
@@ -71,6 +63,10 @@ function clampCoord(v: number, max: number): number {
 @Injectable()
 export class GameInitializationService {
   private readonly logger = new Logger(GameInitializationService.name);
+
+  /** DET-1: seed of a new game's RNG (crypto). Public field for seeded tests and
+   *  self-play, the same pattern as CombatTimeoutService.now. */
+  rngSeed: () => RngState = randomRngState;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -119,6 +115,8 @@ export class GameInitializationService {
     const topology = hasTopology(boardState);
     const topologyStarts = topology ? this.computeTopologyStarts(boardState, players.length) : [];
     const occupied = new Set<string>();
+    // DET-1: the deal is the first draw of the game RNG; its state goes into metadata.rng
+    let rng = this.rngSeed();
 
     for (let seat = 0; seat < players.length; seat++) {
       const player = players[seat];
@@ -244,7 +242,8 @@ export class GameInitializationService {
         }));
       });
 
-      const drawPile = shuffle(deckCards);
+      let drawPile: Card[];
+      [drawPile, rng] = rngShuffle(rng, deckCards);
       const hand: HandCard[] = drawPile
         .splice(0, STARTING_HAND_SIZE)
         .map((c) => ({ ...c, isVisible: false }));
@@ -288,10 +287,12 @@ export class GameInitializationService {
         actionsRemaining: ACTIONS_PER_TURN,
         // GD-016: явный первый игрок матча — seatOrder 0, виден клиентам
         firstPlayerId: players[0].userId,
+        rng,
       },
     };
 
-    await this.gameStateService.saveState(gameId, state);
+    // DET-2: стартовый снимок реплея (GameStateSnapshot) — в той же транзакции
+    await this.gameStateService.saveState(gameId, state, { startSnapshot: true });
     this.logger.log(
       `Инициализировано состояние игры ${gameId}: ${fighters.length} бойцов, ` +
         `${statePlayers.length} игроков, первым ходит ${state.currentTurnPlayerId}`,

@@ -27,7 +27,7 @@ describe('physical card instance identity', () => {
     const projection = new GameStateService({} as any, {} as any, {} as any);
     const deck = new DeckManagementService();
     const initial = await initializer.initializeGameState('mirror-game');
-    expect(saveState).toHaveBeenCalledWith('mirror-game', initial);
+    expect(saveState).toHaveBeenCalledWith('mirror-game', initial, { startSnapshot: true });
 
     const physicalCards = (state: typeof initial) =>
       ['first', 'second'].flatMap((owner) => [

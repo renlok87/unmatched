@@ -60,17 +60,20 @@ describe('S03 action API contract', () => {
       filterPrivateData: jest.fn().mockReturnValue({ ...after, filtered: true }) };
     const subscriptions = { publishGameUpdate: jest.fn().mockResolvedValue(undefined) };
     const lock = { withLockOptions: jest.fn().mockImplementation(async (_id, run) => run()) };
-    const actions = { recordAction: jest.fn().mockResolvedValue(undefined) };
     const ai = { maybeRunAiTurns: jest.fn().mockResolvedValue(undefined) };
     const resolver = new GameActionsResolver(state as any, subscriptions as any, lock as any, {} as any,
-      executor as any, actions as any, ai as any);
+      executor as any, ai as any);
     expect(typeof (resolver as any)[method as string]).toBe('function');
     const result = await (resolver as any)[method as string](dto, { req: { user: { id: 'p1' } } });
     expect(lock.withLockOptions).toHaveBeenCalledWith('game:g', expect.any(Function), expect.any(Object));
-    expect(executor[executorMethod as string]).toHaveBeenCalledWith(dto, { gameId: 'g', userId: 'p1', currentState: before });
-    expect(state.saveState).toHaveBeenCalledWith('g', after);
+    expect(executor[executorMethod as string]).toHaveBeenCalledWith(dto, {
+      gameId: 'g', userId: 'p1', currentState: before, now: expect.any(Date) });
+    // DET-2: the journal row of the command is saved with the state, in one transaction
+    expect(state.saveState).toHaveBeenCalledWith('g', after, { journal: [expect.objectContaining({
+      type: eventType, playerId: 'p1', payload: { action: method, input: dto },
+      command: expect.objectContaining({ kind: method, userId: 'p1', input: dto }),
+    })] });
     expect(subscriptions.publishGameUpdate).toHaveBeenCalledWith('g', eventType, after);
-    expect(actions.recordAction).toHaveBeenCalledWith(expect.objectContaining({ type: eventType, sequenceNumber: 5 }));
     expect(JSON.parse(result.state)).toMatchObject({ filtered: true });
   });
 });

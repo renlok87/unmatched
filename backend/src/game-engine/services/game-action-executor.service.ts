@@ -121,6 +121,15 @@ export interface ActionContext {
   /** GD-026: системный вызов (серверный таймаут боя) — обходит запрет
    *  раннего резолва, но требует истёкшего combatInfo.timeoutAt. */
   readonly systemInitiator?: boolean;
+  /** DET-2: the clock of this action. The rules read it instead of Date.now(),
+   *  and the command journal records it, so a replay sees the same deadlines.
+   *  Callers set it; without it the executor falls back to the wall clock. */
+  readonly now?: Date;
+}
+
+/** The action's clock (ActionContext.now, else the wall clock). */
+function actionNow(context: ActionContext): Date {
+  return context.now ?? new Date();
 }
 
 /**
@@ -2152,10 +2161,10 @@ export class GameActionExecutorService {
           boostValue: abilityBoostCard?.boostValue ?? 0,
           abilityBoostCardId: abilityBoostCard?.id,
           defenseValue: 0,
-          startedAt: new Date(),
+          startedAt: actionNow(context),
           // GD-026: персистентный дедлайн окна защиты — планировщик BullMQ
           // и recovery после рестарта читают его, а не process-local таймер
-          timeoutAt: new Date(Date.now() + DEFENSE_TIMEOUT_SECONDS * 1000),
+          timeoutAt: new Date(actionNow(context).getTime() + DEFENSE_TIMEOUT_SECONDS * 1000),
         };
 
         const newState: GameState = {
@@ -2240,7 +2249,7 @@ export class GameActionExecutorService {
       // Если срок истёк — auto-resolve job вот-вот применит исход; опоздавшая
       // защита не должна продлевать окно (ноль локального таймера не даёт
       // права на просроченную защиту).
-      if (combatInfo.timeoutAt && combatInfo.timeoutAt.getTime() <= Date.now()) {
+      if (combatInfo.timeoutAt && combatInfo.timeoutAt.getTime() <= actionNow(context).getTime()) {
         return { success: false, error: 'Defense window has expired' };
       }
 
@@ -2298,7 +2307,7 @@ export class GameActionExecutorService {
         // перепланируется (CombatTimeoutService в резолвере), а дедлайн
         // новой стадии персистится здесь. Оба клиента могут отключиться:
         // сервер завершит бой по истечении этого окна.
-        timeoutAt: new Date(Date.now() + RESOLVE_TIMEOUT_SECONDS * 1000),
+        timeoutAt: new Date(actionNow(context).getTime() + RESOLVE_TIMEOUT_SECONDS * 1000),
       };
 
       const newState: GameState = {
@@ -2527,7 +2536,7 @@ export class GameActionExecutorService {
         // (защиты или ручного резолва после защиты).
         if (context.systemInitiator) {
           const deadline = combatInfo.timeoutAt?.getTime() ?? Number.NaN;
-          if (!(deadline <= Date.now())) {
+          if (!(deadline <= actionNow(context).getTime())) {
             return { success: false, error: 'Combat stage deadline has not expired yet' };
           }
         } else if (currentState.phase === GamePhase.COMBAT && combatInfo.defenderId !== userId) {

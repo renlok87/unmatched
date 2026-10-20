@@ -22,6 +22,16 @@ import type {
 } from '../game-engine/models';
 import { FighterType, CardType, createEmptyBoardState } from '../game-engine/models';
 import { projectLastCombat } from '../game-engine/effects/combat-effect-log';
+import { isRngState } from '../game-engine/engine/rng';
+import type { GameCommand } from '../game-engine/services/game-command';
+import { GameActionType } from './models/game-action.model';
+import {
+  REPLAY_FORMAT_VERSION,
+  canonicalStateHash,
+  engineVersion,
+  type CommandJournalPayload,
+  type StartSnapshot,
+} from './replay/replay-format';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -86,6 +96,7 @@ export interface SerializedGameState {
     lm?: GameStateMetadata['lastMovement']; // MS-T-14: публичный след перемещения (сейвы без поля → «следа нет»)
     se?: GameStateMetadata['skippedEffects']; // DE-016: эффекты, пропущенные без целей (сейвы без поля → «пропусков нет»)
     lcr?: GameStateMetadata['lastCombat']; // R-01: публичная запись последнего боя и его эффектов (сейвы без поля → «записи нет»)
+    rs?: GameStateMetadata['rng']; // DET-1: состояние RNG игры (сейвы без поля → свежее crypto-состояние при первом броске)
   };
 }
 
@@ -159,6 +170,333 @@ export interface SerializedBoard {
   h?: number;
 }
 
+/** Версия формата сериализации SerializedGameState (поле v) */
+const SERIALIZATION_VERSION = 1;
+
+/**
+ * Сериализовать состояние для хранения (Postgres GameState.state, стартовый
+ * снимок реплея). Приватные данные НЕ убирает: клиент получает только
+ * filterPrivateData.
+ */
+export function serializeGameState(state: GameState): SerializedGameState {
+  return {
+    v: SERIALIZATION_VERSION,
+    g: state.gameId,
+    s: state.sequenceNumber,
+    p: state.phase,
+    t: state.turnCount,
+    c: state.currentTurnPlayerId,
+    pl: state.players.map((p) => ({
+      uid: p.userId,
+      hid: p.heroId,
+      hp: p.health,
+      mhp: p.maxHealth,
+      fid: p.fighterIds,
+      alv: p.isAlive,
+    })),
+    f: state.fighters.map((f) => ({
+      id: f.id,
+      oid: f.ownerId,
+      hid: f.heroId,
+      n: f.name,
+      ty: f.type,
+      hp: f.health,
+      mhp: f.maxHealth,
+      pos: f.position,
+      e: f.effects,
+      hs: f.hasSidekick,
+      si: f.sidekickIds,
+      df: f.isDefeated,
+      mv: f.movement,
+      at: f.attackType,
+      sl: f.heroSlug,
+    })),
+    d: Object.entries(state.decks).reduce(
+      (acc, [userId, deck]) => {
+        acc[userId] = {
+          c: deck.drawPile.length,
+          tc: deck.topCard,
+          cards: deck.cards,
+          pile: deck.drawPile,
+        };
+        return acc;
+      },
+      {} as Record<string, SerializedDeck>,
+    ),
+    dp: state.discardPiles,
+    h: Object.entries(state.handZones).reduce(
+      (acc, [userId, hand]) => {
+        acc[userId] = {
+          c: hand.cards.map((card) => ({
+            ...card,
+            v: card.isVisible,
+          })),
+          ms: hand.maxSize,
+        };
+        return acc;
+      },
+      {} as Record<string, SerializedHand>,
+    ),
+    b: {
+      dr: state.boardState.doors,
+      fg: state.boardState.fog,
+      tk: state.boardState.tokens,
+      cells: state.boardState.cells,
+      w: state.boardState.width,
+      h: state.boardState.height,
+    },
+    m: {
+      la: state.metadata.lastActionAt.toISOString(),
+      lb: state.metadata.lastActionBy,
+      v: state.metadata.version,
+      ar: state.metadata.actionsRemaining,
+      ci: state.metadata.combatInfo
+        ? {
+            aid: state.metadata.combatInfo.attackerId,
+            did: state.metadata.combatInfo.defenderId,
+            tf: state.metadata.combatInfo.targetFighterId,
+            ac: state.metadata.combatInfo.attackerCardId,
+            dc: state.metadata.combatInfo.defenderCardId,
+            av: state.metadata.combatInfo.attackValue,
+            bv: state.metadata.combatInfo.boostValue,
+            cbc: state.metadata.combatInfo.cardBoostCardId,
+            abc: state.metadata.combatInfo.abilityBoostCardId,
+            dv: state.metadata.combatInfo.defenseValue,
+            sa: new Date(state.metadata.combatInfo.startedAt).toISOString(),
+            ta: state.metadata.combatInfo.timeoutAt
+              ? new Date(state.metadata.combatInfo.timeoutAt).toISOString()
+              : undefined,
+          }
+        : undefined,
+      pc: state.metadata.passCount,
+      wi: state.metadata.winnerId,
+      tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
+      pe: state.metadata.pendingEffects,
+      pm: state.metadata.pendingManeuver,
+      phd: state.metadata.pendingHandDiscard,
+      cc: state.metadata.combatEffectContinuation,
+      cp: state.metadata.combatResolutionProgress,
+      // Per-turn флаги действий (TASK)
+      mt: state.metadata.maneuveredThisTurn,
+      at: state.metadata.attackedThisTurn,
+      lc: state.metadata.lostCombatThisTurn,
+      // STANCE: текущие стойки героев по userId (легаси-сейвы без поля → undefined)
+      hs: state.metadata.heroStances as Record<string, string> | undefined,
+      // GD-016: явный первый игрок матча (легаси-сейвы без поля → undefined)
+      fp: state.metadata.firstPlayerId,
+      // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
+      pte: state.metadata.pendingTurnEnd,
+      // MS-T-14: публичный след последнего перемещения (без поля — undefined)
+      lm: state.metadata.lastMovement,
+      // DE-016: эффекты, пропущенные без допустимых целей (без поля — undefined)
+      se: state.metadata.skippedEffects,
+      // R-01: запись последнего боя с журналом эффектов (без поля — undefined)
+      lcr: state.metadata.lastCombat,
+      // DET-1: состояние RNG игры (только сервер: filterPrivateData его вырезает)
+      rs: state.metadata.rng,
+    },
+  };
+}
+
+/**
+ * Десериализовать состояние из формата хранения
+ */
+export function deserializeGameState(data: SerializedGameState | any): GameState {
+  // Если это не наша сериализованная структура, возвращаем как есть
+  if (!data.v || !data.g) {
+    return data as GameState;
+  }
+
+  // Легаси-состояния могли быть сохранены без cells/w/h, а engine-BoardState
+  // требует их обязательно — fallback на пустую сетку 20×20. Это только ЧТЕНИЕ
+  // старых сейвов, новые игры без доски не стартуют (НД-2). Путь оставлен: в основной
+  // БД на 2026-10-04 такой сейв есть у 3 строк GameState (игры ABORTED от 2026-06-11,
+  // b = {dr, fg, tk} без cells/w/h). Нет таких строк — путь можно удалить.
+  const hasCells = Array.isArray(data.b?.cells) && data.b.cells.length > 0;
+  const fallbackBoard = hasCells ? null : createEmptyBoardState(20, 20);
+
+  return {
+    gameId: data.g,
+    sequenceNumber: data.s,
+    phase: data.p,
+    turnCount: data.t,
+    currentTurnPlayerId: data.c,
+    players: data.pl.map((p: SerializedPlayer) => ({
+      userId: p.uid,
+      heroId: p.hid,
+      health: p.hp,
+      maxHealth: p.mhp,
+      fighterIds: p.fid,
+      isAlive: p.alv,
+    })),
+    fighters: data.f.map((f: SerializedFighter) => ({
+      id: f.id,
+      ownerId: f.oid,
+      heroId: f.hid,
+      name: f.n,
+      type: f.ty,
+      health: f.hp,
+      maxHealth: f.mhp,
+      position: f.pos,
+      effects: f.e,
+      hasSidekick: f.hs,
+      sidekickIds: f.si,
+      isDefeated: f.df,
+      // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterMovement
+      movement: f.mv,
+      // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterAttackType
+      attackType: f.at as Fighter['attackType'],
+      heroSlug: f.sl,
+    })),
+    decks: Object.entries(data.d).reduce(
+      (acc, [userId, deck]: [string, any]) => {
+        acc[userId] = {
+          cards: deck.cards ?? [],
+          drawPile: deck.pile ?? [],
+          topCard: deck.tc,
+        };
+        return acc;
+      },
+      {} as Record<string, DeckState>,
+    ),
+    discardPiles: data.dp ?? {},
+    handZones: Object.entries(data.h).reduce(
+      (acc, [userId, hand]: [string, any]) => {
+        acc[userId] = {
+          // Ключ формата `v` на карте не остаётся: иначе загруженная из БД
+          // карта отличалась от карты из Redis-кеша и несла `v` дальше в сброс
+          // (DET-3: реплей по журналу расходился по хешу).
+          cards: hand.c.map(({ v, ...card }: SerializedHandCard) => ({
+            ...card,
+            isVisible: v,
+          })),
+          maxSize: hand.ms,
+        };
+        return acc;
+      },
+      {} as Record<string, HandZone>,
+    ),
+    boardState: {
+      doors: data.b.dr,
+      fog: data.b.fg,
+      tokens: data.b.tk,
+      cells: hasCells ? data.b.cells : fallbackBoard.cells,
+      width: data.b.w ?? 20,
+      height: data.b.h ?? 20,
+    },
+    metadata: {
+      lastActionAt: new Date(data.m.la),
+      lastActionBy: data.m.lb,
+      version: data.m.v,
+      // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getActionsRemaining
+      actionsRemaining: data.m.ar,
+      combatInfo: data.m.ci
+        ? {
+            attackerId: data.m.ci.aid,
+            defenderId: data.m.ci.did,
+            targetFighterId: data.m.ci.tf,
+            attackerCardId: data.m.ci.ac,
+            defenderCardId: data.m.ci.dc,
+            attackValue: data.m.ci.av,
+            boostValue: data.m.ci.bv,
+            cardBoostCardId: data.m.ci.cbc,
+            abilityBoostCardId: data.m.ci.abc,
+            defenseValue: data.m.ci.dv,
+            startedAt: new Date(data.m.ci.sa),
+            timeoutAt: data.m.ci.ta ? new Date(data.m.ci.ta) : undefined,
+          }
+        : undefined,
+      passCount: data.m.pc,
+      winnerId: data.m.wi,
+      turnStartPositions: data.m.tsp,
+      pendingEffects: data.m.pe,
+      pendingManeuver: data.m.pm,
+      pendingHandDiscard: data.m.phd,
+      combatEffectContinuation: data.m.cc,
+      combatResolutionProgress: data.m.cp,
+      // Per-turn флаги действий (TASK): undefined прозрачно проходит (легаси)
+      maneuveredThisTurn: data.m.mt,
+      attackedThisTurn: data.m.at,
+      lostCombatThisTurn: data.m.lc,
+      // STANCE: текущие стойки героев (undefined прозрачно проходит — легаси)
+      heroStances: data.m.hs,
+      // GD-016: явный первый игрок (undefined прозрачно проходит — легаси)
+      firstPlayerId: data.m.fp,
+      // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
+      pendingTurnEnd: data.m.pte,
+      // MS-T-14: сейвы до следа (без lm) → undefined, «следа нет» (MS-E-108)
+      lastMovement: data.m.lm,
+      // DE-016: сейвы без se → undefined, «пропусков нет»
+      skippedEffects: data.m.se,
+      // R-01: сейвы до журнала боя (без lcr) → undefined, «записи нет»
+      lastCombat: data.m.lcr,
+      // DET-1: сейвы до RNG (или мусор) → undefined, первый бросок возьмёт crypto-состояние
+      rng: isRngState(data.m.rs) ? data.m.rs : undefined,
+    },
+  };
+}
+
+/**
+ * DET-2: строка журнала GameAction, которую saveState пишет в своей транзакции,
+ * с sequenceNumber сохраняемого состояния. command — входная команда, давшая это
+ * состояние: тогда в payload добавляются cmd и канонический хеш состояния
+ * (replay/replay-format.ts). eventsSince отдаёт из payload только action и
+ * собственный input зрителя — cmd и hash клиентам не уходят.
+ */
+export interface JournalEntry {
+  readonly type: GameActionType;
+  readonly playerId: string | null;
+  /** eventsSince-часть: { action, input? } и прежние поля аудита */
+  readonly payload: Readonly<Record<string, unknown>>;
+  readonly command?: GameCommand;
+}
+
+export interface SaveStateOptions {
+  /** DET-2: строки журнала этого seq; пишутся атомарно с состоянием */
+  readonly journal?: readonly JournalEntry[];
+  /** DET-2: состояние — старт новой партии; пишется стартовый снимок реплея */
+  readonly startSnapshot?: boolean;
+}
+
+/** Строки GameAction для транзакции saveState (см. JournalEntry). Чистая: её зовут и тест-харнессы. */
+export function buildJournalRows(
+  gameId: string,
+  state: GameState,
+  serialized: SerializedGameState,
+  entries: readonly JournalEntry[],
+): Prisma.GameActionCreateManyInput[] {
+  if (entries.length === 0) return [];
+  const hash = entries.some((e) => e.command) ? canonicalStateHash(serialized) : undefined;
+  const rows = entries.map((entry) => {
+    const payload = entry.command
+      ? ({ ...entry.payload, cmd: entry.command, hash } as unknown as CommandJournalPayload)
+      : entry.payload;
+    return {
+      gameId,
+      sequenceNumber: state.sequenceNumber,
+      type: entry.type,
+      playerId: entry.playerId,
+      payload: payload as Prisma.InputJsonValue,
+    };
+  });
+  const terminal = state.phase === GamePhase.GAME_OVER &&
+    !entries.some((e) => e.type === GameActionType.GAME_ENDED);
+  if (terminal) {
+    // Терминальная пара делит seq (eventsSince ставит GAME_ENDED последним);
+    // поля аудита действия (action, reason…) — без его input
+    const audit: Record<string, unknown> = { ...entries[0].payload };
+    delete audit.input;
+    rows.push({
+      gameId,
+      sequenceNumber: state.sequenceNumber,
+      type: GameActionType.GAME_ENDED,
+      playerId: entries[0].playerId,
+      payload: { ...audit, winnerId: state.metadata.winnerId ?? null } as Prisma.InputJsonValue,
+    });
+  }
+  return rows;
+}
+
 /**
  * GameStateService управляет состоянием игры:
  * - Сохранение/загрузка из БД
@@ -171,7 +509,6 @@ export class GameStateService {
   private readonly logger = new Logger(GameStateService.name);
   private readonly STATE_CACHE_TTL = 600; // 10 минут
   private readonly STATE_CACHE_PREFIX = 'gamestate:';
-  private readonly SERIALIZATION_VERSION = 1;
 
   constructor(
     private prisma: PrismaService,
@@ -184,10 +521,15 @@ export class GameStateService {
   ) {}
 
   /**
-   * Сохранить состояние игры в БД
+   * Сохранить состояние игры в БД.
+   * DET-2: журнал команд (options.journal) и стартовый снимок
+   * (options.startSnapshot) пишутся в той же транзакции, что и состояние:
+   * закоммиченное состояние без своей команды невозможно. Терминальное
+   * состояние с журналом получает и строку GAME_ENDED того же seq.
    */
-  async saveState(gameId: string, state: GameState): Promise<void> {
+  async saveState(gameId: string, state: GameState, options: SaveStateOptions = {}): Promise<void> {
     const serialized = this.serialize(state);
+    const journal = buildJournalRows(gameId, state, serialized, options.journal ?? []);
 
     await this.prisma.$transaction(async (tx) => {
       // startGame commits IN_PROGRESS before its initial save. Claim that row
@@ -236,6 +578,20 @@ export class GameStateService {
           turnCount: state.turnCount,
         },
       });
+
+      if (options.startSnapshot) {
+        const snapshot: StartSnapshot = {
+          format: REPLAY_FORMAT_VERSION,
+          engine: engineVersion(),
+          state: serialized,
+        };
+        await tx.gameStateSnapshot.create({
+          data: { gameId, sequence: state.sequenceNumber, fullState: snapshot as any },
+        });
+      }
+      if (journal.length > 0) {
+        await tx.gameAction.createMany({ data: journal });
+      }
 
       // Статистика (gamesPlayed/won/lost + ELO) применяется в той же
       // транзакции, что и переход IN_PROGRESS → FINISHED: ровно один вызов
@@ -554,258 +910,16 @@ export class GameStateService {
   }
 
   /**
-   * Сериализовать состояние для передачи клиенту
-   * Убирает приватные данные для указанного игрока
+   * Сериализовать состояние для хранения (короткие ключи, белый список полей).
+   * Тело — serializeGameState (чистая функция: её зовёт и реплей, DET-2).
    */
   serialize(state: GameState): SerializedGameState {
-    return {
-      v: this.SERIALIZATION_VERSION,
-      g: state.gameId,
-      s: state.sequenceNumber,
-      p: state.phase,
-      t: state.turnCount,
-      c: state.currentTurnPlayerId,
-      pl: state.players.map((p) => ({
-        uid: p.userId,
-        hid: p.heroId,
-        hp: p.health,
-        mhp: p.maxHealth,
-        fid: p.fighterIds,
-        alv: p.isAlive,
-      })),
-      f: state.fighters.map((f) => ({
-        id: f.id,
-        oid: f.ownerId,
-        hid: f.heroId,
-        n: f.name,
-        ty: f.type,
-        hp: f.health,
-        mhp: f.maxHealth,
-        pos: f.position,
-        e: f.effects,
-        hs: f.hasSidekick,
-        si: f.sidekickIds,
-        df: f.isDefeated,
-        mv: f.movement,
-        at: f.attackType,
-        sl: f.heroSlug,
-      })),
-      d: Object.entries(state.decks).reduce(
-        (acc, [userId, deck]) => {
-          acc[userId] = {
-            c: deck.drawPile.length,
-            tc: deck.topCard,
-            cards: deck.cards,
-            pile: deck.drawPile,
-          };
-          return acc;
-        },
-        {} as Record<string, SerializedDeck>,
-      ),
-      dp: state.discardPiles,
-      h: Object.entries(state.handZones).reduce(
-        (acc, [userId, hand]) => {
-          acc[userId] = {
-            c: hand.cards.map((card) => ({
-              ...card,
-              v: card.isVisible,
-            })),
-            ms: hand.maxSize,
-          };
-          return acc;
-        },
-        {} as Record<string, SerializedHand>,
-      ),
-      b: {
-        dr: state.boardState.doors,
-        fg: state.boardState.fog,
-        tk: state.boardState.tokens,
-        cells: state.boardState.cells,
-        w: state.boardState.width,
-        h: state.boardState.height,
-      },
-      m: {
-        la: state.metadata.lastActionAt.toISOString(),
-        lb: state.metadata.lastActionBy,
-        v: state.metadata.version,
-        ar: state.metadata.actionsRemaining,
-        ci: state.metadata.combatInfo
-          ? {
-              aid: state.metadata.combatInfo.attackerId,
-              did: state.metadata.combatInfo.defenderId,
-              tf: state.metadata.combatInfo.targetFighterId,
-              ac: state.metadata.combatInfo.attackerCardId,
-              dc: state.metadata.combatInfo.defenderCardId,
-              av: state.metadata.combatInfo.attackValue,
-              bv: state.metadata.combatInfo.boostValue,
-              cbc: state.metadata.combatInfo.cardBoostCardId,
-              abc: state.metadata.combatInfo.abilityBoostCardId,
-              dv: state.metadata.combatInfo.defenseValue,
-              sa: new Date(state.metadata.combatInfo.startedAt).toISOString(),
-              ta: state.metadata.combatInfo.timeoutAt
-                ? new Date(state.metadata.combatInfo.timeoutAt).toISOString()
-                : undefined,
-            }
-          : undefined,
-        pc: state.metadata.passCount,
-        wi: state.metadata.winnerId,
-        tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
-        pe: state.metadata.pendingEffects,
-        pm: state.metadata.pendingManeuver,
-        phd: state.metadata.pendingHandDiscard,
-        cc: state.metadata.combatEffectContinuation,
-        cp: state.metadata.combatResolutionProgress,
-        // Per-turn флаги действий (TASK)
-        mt: state.metadata.maneuveredThisTurn,
-        at: state.metadata.attackedThisTurn,
-        lc: state.metadata.lostCombatThisTurn,
-        // STANCE: текущие стойки героев по userId (легаси-сейвы без поля → undefined)
-        hs: state.metadata.heroStances as Record<string, string> | undefined,
-        // GD-016: явный первый игрок матча (легаси-сейвы без поля → undefined)
-        fp: state.metadata.firstPlayerId,
-        // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
-        pte: state.metadata.pendingTurnEnd,
-        // MS-T-14: публичный след последнего перемещения (без поля — undefined)
-        lm: state.metadata.lastMovement,
-        // DE-016: эффекты, пропущенные без допустимых целей (без поля — undefined)
-        se: state.metadata.skippedEffects,
-        // R-01: запись последнего боя с журналом эффектов (без поля — undefined)
-        lcr: state.metadata.lastCombat,
-      },
-    };
+    return serializeGameState(state);
   }
 
-  /**
-   * Десериализовать состояние из формата передачи
-   */
+  /** Десериализовать состояние из формата хранения (deserializeGameState) */
   deserialize(data: SerializedGameState | any): GameState {
-    // Если это не наша сериализованная структура, возвращаем как есть
-    if (!data.v || !data.g) {
-      return data as GameState;
-    }
-
-    // Легаси-состояния могли быть сохранены без cells/w/h, а engine-BoardState
-    // требует их обязательно — fallback на пустую сетку 20×20. Это только ЧТЕНИЕ
-    // старых сейвов, новые игры без доски не стартуют (НД-2). Путь оставлен: в основной
-    // БД на 2026-10-04 такой сейв есть у 3 строк GameState (игры ABORTED от 2026-06-11,
-    // b = {dr, fg, tk} без cells/w/h). Нет таких строк — путь можно удалить.
-    const hasCells = Array.isArray(data.b?.cells) && data.b.cells.length > 0;
-    const fallbackBoard = hasCells ? null : createEmptyBoardState(20, 20);
-
-    return {
-      gameId: data.g,
-      sequenceNumber: data.s,
-      phase: data.p,
-      turnCount: data.t,
-      currentTurnPlayerId: data.c,
-      players: data.pl.map((p: SerializedPlayer) => ({
-        userId: p.uid,
-        heroId: p.hid,
-        health: p.hp,
-        maxHealth: p.mhp,
-        fighterIds: p.fid,
-        isAlive: p.alv,
-      })),
-      fighters: data.f.map((f: SerializedFighter) => ({
-        id: f.id,
-        ownerId: f.oid,
-        heroId: f.hid,
-        name: f.n,
-        type: f.ty,
-        health: f.hp,
-        maxHealth: f.mhp,
-        position: f.pos,
-        effects: f.e,
-        hasSidekick: f.hs,
-        sidekickIds: f.si,
-        isDefeated: f.df,
-        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterMovement
-        movement: f.mv,
-        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterAttackType
-        attackType: f.at as Fighter['attackType'],
-        heroSlug: f.sl,
-      })),
-      decks: Object.entries(data.d).reduce(
-        (acc, [userId, deck]: [string, any]) => {
-          acc[userId] = {
-            cards: deck.cards ?? [],
-            drawPile: deck.pile ?? [],
-            topCard: deck.tc,
-          };
-          return acc;
-        },
-        {} as Record<string, DeckState>,
-      ),
-      discardPiles: data.dp ?? {},
-      handZones: Object.entries(data.h).reduce(
-        (acc, [userId, hand]: [string, any]) => {
-          acc[userId] = {
-            cards: hand.c.map((card: SerializedHandCard) => ({
-              ...card,
-              isVisible: card.v,
-            })),
-            maxSize: hand.ms,
-          };
-          return acc;
-        },
-        {} as Record<string, HandZone>,
-      ),
-      boardState: {
-        doors: data.b.dr,
-        fog: data.b.fg,
-        tokens: data.b.tk,
-        cells: hasCells ? data.b.cells : fallbackBoard.cells,
-        width: data.b.w ?? 20,
-        height: data.b.h ?? 20,
-      },
-      metadata: {
-        lastActionAt: new Date(data.m.la),
-        lastActionBy: data.m.lb,
-        version: data.m.v,
-        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getActionsRemaining
-        actionsRemaining: data.m.ar,
-        combatInfo: data.m.ci
-          ? {
-              attackerId: data.m.ci.aid,
-              defenderId: data.m.ci.did,
-              targetFighterId: data.m.ci.tf,
-              attackerCardId: data.m.ci.ac,
-              defenderCardId: data.m.ci.dc,
-              attackValue: data.m.ci.av,
-              boostValue: data.m.ci.bv,
-              cardBoostCardId: data.m.ci.cbc,
-              abilityBoostCardId: data.m.ci.abc,
-              defenseValue: data.m.ci.dv,
-              startedAt: new Date(data.m.ci.sa),
-              timeoutAt: data.m.ci.ta ? new Date(data.m.ci.ta) : undefined,
-            }
-          : undefined,
-        passCount: data.m.pc,
-        winnerId: data.m.wi,
-        turnStartPositions: data.m.tsp,
-        pendingEffects: data.m.pe,
-        pendingManeuver: data.m.pm,
-        pendingHandDiscard: data.m.phd,
-        combatEffectContinuation: data.m.cc,
-        combatResolutionProgress: data.m.cp,
-        // Per-turn флаги действий (TASK): undefined прозрачно проходит (легаси)
-        maneuveredThisTurn: data.m.mt,
-        attackedThisTurn: data.m.at,
-        lostCombatThisTurn: data.m.lc,
-        // STANCE: текущие стойки героев (undefined прозрачно проходит — легаси)
-        heroStances: data.m.hs,
-        // GD-016: явный первый игрок (undefined прозрачно проходит — легаси)
-        firstPlayerId: data.m.fp,
-        // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
-        pendingTurnEnd: data.m.pte,
-        // MS-T-14: сейвы до следа (без lm) → undefined, «следа нет» (MS-E-108)
-        lastMovement: data.m.lm,
-        // DE-016: сейвы без se → undefined, «пропусков нет»
-        skippedEffects: data.m.se,
-        // R-01: сейвы до журнала боя (без lcr) → undefined, «записи нет»
-        lastCombat: data.m.lcr,
-      },
-    };
+    return deserializeGameState(data);
   }
 
   /**
@@ -873,6 +987,9 @@ export class GameStateService {
     const publicMetadata = { ...state.metadata };
     delete publicMetadata.combatEffectContinuation;
     delete publicMetadata.combatResolutionProgress;
+    // DET-1: состояние RNG предсказывает каждую будущую перетасовку и случайный
+    // сброс — его не видит никто, даже владелец колоды.
+    delete publicMetadata.rng;
 
     // R-01: журнал эффектов последнего боя публичен, кроме `hidden` —
     // заметки движка и непубличных ссылок (instance id карт); их видит только
@@ -1244,13 +1361,14 @@ export class GameStateService {
    * детерминирован между выборками; страница может превысить 100 на хвост
    * boundary-группы.
    *
-   * Residual (S10, явный): запись журнала пишется асинхронно ПОСЛЕ коммита
-   * состояния (GameActionProcessor/AiTurnService.recordJournal) и может
-   * закоммититься позже, чем клиентский курсор eventsSince уже прошёл её seq
-   * — complete-boundary не покрывает такие ПЕРЕКРЁСТНЫЕ с выборкой поздние
-   * записи. Журнал — НЕ replay состояния (16-network-contract.md §3):
-   * свежесть гарантирует snapshot (gameState/барьер), а не журнал; записи с
-   * seq <= применённого клиентом sequenceNumber не должны проигрывать CUE.
+   * DET-2: строки игровых мутаций (человек, ИИ, таймаут) пишет saveState в
+   * транзакции состояния, поэтому запись не может закоммититься позже, чем
+   * курсор клиента прошёл её seq. Через BullMQ (GameActionProcessor) идут
+   * только лобби-события. Команда реплея (payload.cmd) и хеш состояния
+   * (payload.hash) в ответ не уходят. Для клиента журнал по-прежнему НЕ replay
+   * состояния (16-network-contract.md §3): свежесть гарантирует snapshot
+   * (gameState/барьер); записи с seq <= применённого клиентом sequenceNumber
+   * не должны проигрывать CUE.
    */
   private static readonly JOURNAL_PAGE_SIZE = 100;
 

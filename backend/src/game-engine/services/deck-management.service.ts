@@ -12,6 +12,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { GameState, GamePhase } from '../models/game-state.model';
 import { applyTerminalState } from '../engine/terminal-state';
 import { Card, HandCard, DeckState, HandZone } from '../models/card.model';
+import { stateRandomInt, stateShuffle } from '../engine/rng';
 
 /**
  * Результат операции с колодой
@@ -22,18 +23,6 @@ export interface DeckOperationResult {
   readonly drawnCards?: readonly Card[];
   readonly discardedCard?: Card;
   readonly error?: string;
-}
-
-/**
- * Fisher-Yates алгоритм перетасовки
- */
-function shuffle<T>(array: readonly T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 @Injectable()
@@ -188,11 +177,11 @@ export class DeckManagementService {
       throw new NotFoundException(`No cards in hand for user ${userId}`);
     }
 
-    // Выбираем случайную карту
-    const randomIndex = Math.floor(Math.random() * handZone.cards.length);
-    const card = handZone.cards[randomIndex];
+    // Выбираем случайную карту (DET-1: генератор игры, а не Math.random)
+    const drawn = stateRandomInt(state, handZone.cards.length);
+    const card = handZone.cards[drawn.value];
 
-    const newState = await this.discardCard(state, userId, card.id);
+    const newState = await this.discardCard(drawn.state, userId, card.id);
 
     return {
       gameState: newState,
@@ -225,10 +214,10 @@ export class DeckManagementService {
     }
 
     // Перетасовываем сброс
-    const shuffledDiscard = shuffle(discardPile);
+    const shuffled = stateShuffle(state, discardPile);
 
     // Добавляем к текущей колоде
-    const newDrawPile = [...shuffledDiscard, ...deck.drawPile];
+    const newDrawPile = [...shuffled.items, ...deck.drawPile];
 
     const newDeckState: DeckState = {
       ...deck,
@@ -237,7 +226,7 @@ export class DeckManagementService {
     };
 
     return {
-      ...state,
+      ...shuffled.state,
       decks: {
         ...state.decks,
         [userId]: newDeckState,

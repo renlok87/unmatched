@@ -11,6 +11,7 @@ import { HeroAbilityRegistry } from '../../game-engine/abilities/hero-ability-re
 import { HandCard, CardType, FighterType, GamePhase, GameState, createEmptyBoardState, DEFENSE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { ABILITY_CONFIGS } from '../../game-engine/abilities/ability-config';
 import { GenericHeroAbilityHandler } from '../../game-engine/abilities/generic-hero-ability.handler';
+import { buildJournalRows, serializeGameState, type SaveStateOptions } from '../game-state.service';
 
 const card = (id: string): HandCard => ({ id, cardId: 'defense', name: id, nameEn: id, nameRu: id,
   cardType: CardType.DEFENSE, defenseValue: 2, isVisible: true });
@@ -43,7 +44,6 @@ function fixture(): GameState {
 function harness(initial: GameState, aiUserId = 'ai', overrides: {
   publish?: (gameId: string, event: string, state: GameState) => Promise<void>;
   save?: (gameId: string, state: GameState) => Promise<void>;
-  record?: (dto: { gameId: string; sequenceNumber: number; type: string; playerId: string; metadata: any }) => Promise<string>;
 } = {}, opts: { withAbilityConfigs?: boolean } = {}) {
   let saved = initial;
   const snapshots: GameState[] = [];
@@ -54,14 +54,9 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
     scheduleAutoResolve: async (...args: unknown[]) => { combatTimeoutCalls.push({ op: 'schedule', args }); },
     cancelAutoResolve: async (...args: unknown[]) => { combatTimeoutCalls.push({ op: 'cancel', args }); },
   };
+  // DET-2: the journal rows saveState writes in its transaction, built by the production row builder
   const journal: Array<{ gameId: string; sequenceNumber: number; type: string; playerId: string; metadata: any }> = [];
-  const gameActionService = {
-    recordAction: async (dto: any) => {
-      if (overrides.record) return overrides.record(dto);
-      journal.push(dto);
-      return 'id';
-    },
-  };
+  const saveCalls: Array<{ seq: number; rows: string[] }> = [];
   const metrics = { measureServiceDuration: async (_a: string, _b: string, run: () => unknown) => run(),
     measureValidation: async (_a: string, run: () => unknown) => run(),
     incrementGameAction: () => {}, incrementError: () => {} } as any;
@@ -81,10 +76,14 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
   const service = new AiTurnService(
     { game: { findUnique: async () => ({ mode: 'VS_AI', status: 'IN_PROGRESS', opponentId: aiUserId }) } } as any,
     { withLockOptions: async (_key: string, run: () => Promise<boolean>) => run() } as any,
-    { loadState: async () => clone(saved), saveState: async (id: string, state: GameState) => {
+    { loadState: async () => clone(saved), saveState: async (id: string, state: GameState, options?: SaveStateOptions) => {
       if (overrides.save) return overrides.save(id, state);
       saved = clone(state);
       snapshots.push(saved);
+      const rows = buildJournalRows(id, state, serializeGameState(state), options?.journal ?? []);
+      saveCalls.push({ seq: state.sequenceNumber, rows: rows.map((r) => r.type) });
+      journal.push(...rows.map((r) => ({ gameId: r.gameId, sequenceNumber: r.sequenceNumber, type: r.type,
+        playerId: r.playerId!, metadata: r.payload as any })));
     } } as any,
     { publishGameUpdate: async (id: string, event: string, state: GameState) => {
       if (overrides.publish) return overrides.publish(id, event, state);
@@ -93,9 +92,8 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
     } } as any,
     executor, new AiDecisionService(adjacency),
     combatTimeout as any,
-    gameActionService as any,
   );
-  return { run: () => service.maybeRunAiTurns(initial.gameId), state: () => saved, snapshots, events, publishCalls, combatTimeoutCalls, journal, executor };
+  return { run: () => service.maybeRunAiTurns(initial.gameId), state: () => saved, snapshots, events, publishCalls, combatTimeoutCalls, journal, saveCalls, executor };
 }
 
 describe('AiTurnService with the S03 production executor', () => {
@@ -188,9 +186,10 @@ describe('AiTurnService GD-039: публикация отказала после
   });
 });
 
-/** GD-039 review: терминальные публикации/журналы независимы от судьбы
- *  соседней записи — отказ publish/recordAction самого действия НЕ глотает
- *  GAME_ENDED. И endTurn бота журналируется TURN_ENDED (GameActionType), а
+/** GD-039 review: терминальные публикации независимы от судьбы соседней —
+ *  отказ publish самого действия НЕ глотает GAME_ENDED. Журнал (DET-2)
+ *  атомарен с состоянием: строка действия и GAME_ENDED одного seq пишет один
+ *  saveState. И endTurn бота журналируется TURN_ENDED (GameActionType), а
  *  не TURN_CHANGED, который выпадал из enum → ход бота невидим eventsSince. */
 describe('AiTurnService GD-039 review: терминал не глотается соседним отказом + endTurn-журнал', () => {
   /** Летальная exhaustion на старте манёвра — терминальный MANEUVER-шаг. */
@@ -216,18 +215,17 @@ describe('AiTurnService GD-039 review: терминал не глотается 
     expect(published).toEqual(['GAME_ENDED']);
   });
 
-  it('recordAction действия падает на терминальном шаге → GAME_ENDED всё равно записан', async () => {
-    const journaled: string[] = [];
-    const game = harness(lethalFixture(), 'ai', {
-      record: async (dto) => {
-        if (dto.type !== 'GAME_ENDED') throw new Error('queue down');
-        journaled.push(dto.type);
-        return 'id';
-      },
-    });
+  it('терминальный шаг: строка действия и GAME_ENDED пишутся одним saveState (одна транзакция)', async () => {
+    const game = harness(lethalFixture());
     await game.run();
     expect(game.state().phase).toBe(GamePhase.GAME_OVER);
-    expect(journaled).toEqual(['GAME_ENDED']);
+    const last = game.saveCalls[game.saveCalls.length - 1];
+    expect(last).toEqual({ seq: game.state().sequenceNumber, rows: ['MANEUVER', 'GAME_ENDED'] });
+    // строка действия несёт команду реплея и хеш состояния; GAME_ENDED — нет
+    const [step, end] = game.journal.slice(-2);
+    expect(step.metadata.cmd).toMatchObject({ kind: 'beginManeuver', userId: 'ai' });
+    expect(step.metadata.hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(end.metadata.cmd).toBeUndefined();
   });
 
   it('обычный endTurn бота: событие и журнал TURN_ENDED, ход передан человеку', async () => {

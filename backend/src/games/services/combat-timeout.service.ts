@@ -19,8 +19,8 @@ import { GameStateService, GameState } from '../game-state.service';
 import { DistributedLockService } from '../../common/services/distributed-lock.service';
 import { GamePhase, DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { GameActionExecutorService } from '../../game-engine/services/game-action-executor.service';
+import { executeGameCommand, makeCommand, type GameCommand } from '../../game-engine/services/game-command';
 import { GameSubscriptionService } from '../game-subscription.service';
-import { GameActionService } from './game-action.service';
 import { GameActionType } from '../models/game-action.model';
 import { AiTurnService } from './ai-turn.service';
 
@@ -78,7 +78,6 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
     private readonly prisma: PrismaService,
     private readonly actionExecutor: GameActionExecutorService,
     @Optional() private readonly gameSubscriptionService?: GameSubscriptionService,
-    @Optional() private readonly gameActionService?: GameActionService,
     // forwardRef: AiTurnService планирует боевые дедлайны бота через нас,
     // а мы после авто-резолва дёргаем его дрейн — иначе circular DI
     @Optional()
@@ -432,31 +431,37 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
             };
 
         // Системный резолв: userId — защитник (его окно истекло / его защита
-        // уже сыграна); executor сам проверит дедлайн и применит один исход.
-        const result = await this.actionExecutor.executeResolveCombat(
-          { gameId },
-          {
-            userId: combatInfo.defenderId,
-            gameId,
-            currentState: stateForExecutor,
-            systemInitiator: true,
-          },
-        );
+        // уже сыграна); executor сам проверит дедлайн по часам сервиса
+        // (ActionContext.now) и применит один исход. DET-2: каждый раунд —
+        // своя команда журнала (+1 seq за раунд, а не один аудит в конце).
+        // Легаси-сейв без timeoutAt реплей не повторит: подмена дедлайна выше
+        // не входит в команду.
+        const command = makeCommand('resolveCombat', combatInfo.defenderId, { gameId }, this.now(), true);
+        const result = await executeGameCommand(this.actionExecutor, command, stateForExecutor);
 
         if (!result.success) {
           this.logger.warn(`Auto-resolve rejected for game ${gameId}: ${result.error}`);
           return { success: false, resolvedSequenceNumber: current.sequenceNumber, reason: result.error || 'Executor rejected' };
         }
         current = result.gameState!;
-        await this.gameStateService.saveState(gameId, current);
-
-        // Пауза на новом выборе (COMBAT_RESOLVE + очередь): публикуем
-        // промежуточное состояние, следующий круг дренирует. Иначе бой
-        // завершён — финальная публикация COMBAT_RESOLVED ниже.
-        if (
+        // Пауза на новом выборе (COMBAT_RESOLVE + очередь): журнал зовёт раунд
+        // EFFECT_APPLIED, а COMBAT_RESOLVED остаётся за раундом, который бой
+        // действительно завершил.
+        const paused =
           current.phase === GamePhase.COMBAT_RESOLVE &&
-          (current.metadata.pendingEffects?.length ?? 0) > 0
-        ) {
+          (current.metadata.pendingEffects?.length ?? 0) > 0;
+        await this.gameStateService.saveState(gameId, current, {
+          journal: [{
+            type: paused ? GameActionType.EFFECT_APPLIED : GameActionType.COMBAT_RESOLVED,
+            playerId: combatInfo.defenderId,
+            payload: { action: 'autoResolve', reason },
+            command,
+          }],
+        });
+
+        // Пауза: публикуем промежуточное состояние, следующий круг дренирует.
+        // Иначе бой завершён — финальная публикация COMBAT_RESOLVED ниже.
+        if (paused) {
           await this.publishCue(gameId, 'STATE_UPDATED', current);
           continue;
         }
@@ -483,17 +488,13 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       }
 
       await this.publishCue(gameId, 'COMBAT_RESOLVED', current);
-      await this.recordAudit(gameId, combatInfo.defenderId, current.sequenceNumber, reason);
       if (current.phase === GamePhase.GAME_OVER) {
-        // Финальный удар нанесён таймаутом: saveState уже закоммитил FINISHED —
-        // авторитетный исход несут gameStateUpdated-барьер и HTTP query,
-        // а не gameEnded: это lossy named-CUE (16-network-contract §4). CUE и
-        // аудиты — best-effort и независимы: отказ COMBAT_RESOLVED не отменяет
-        // попытку GAME_ENDED и не проваливает закоммиченный результат.
+        // Финальный удар нанесён таймаутом: saveState уже закоммитил FINISHED
+        // вместе со строкой GAME_ENDED журнала — авторитетный исход несут
+        // gameStateUpdated-барьер и HTTP query, а не gameEnded: это lossy
+        // named-CUE (16-network-contract §4). CUE best-effort и независимы:
+        // отказ COMBAT_RESOLVED не отменяет попытку GAME_ENDED.
         await this.publishCue(gameId, 'GAME_ENDED', current);
-        await this.recordAudit(gameId, combatInfo.defenderId, current.sequenceNumber, reason, GameActionType.GAME_ENDED, {
-          winnerId: current.metadata.winnerId,
-        });
       }
 
       this.logger.log(`Auto-resolved combat for game ${gameId} (${reason}), seq=${current.sequenceNumber}`);
@@ -537,12 +538,11 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       const head = queue[0]!;
       const actor = head.playerId;
 
-      let result: { success: boolean; gameState?: GameState; error?: string };
+      // DET-2: авто-выбор — команда журнала с конкретными параметрами
+      // фолбэка (в cmd; eventsSince их не отдаёт — приватность руки/колоды).
+      let command: GameCommand;
       if (head.optional) {
-        result = await this.actionExecutor.executeDeclinePendingEffect(
-          { gameId, effectId: head.id },
-          { userId: actor, gameId, currentState: state },
-        );
+        command = makeCommand('declinePendingEffect', actor, { gameId, effectId: head.id }, this.now());
       } else {
         const fallback = await this.actionExecutor.buildSystemPendingFallback(head, state);
         if (!fallback) {
@@ -551,11 +551,9 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
             blocker: `mandatory ${head.type} (${head.id}) has no safe deterministic fallback`,
           };
         }
-        result = await this.actionExecutor.executeResolvePendingEffect(
-          { gameId, effectId: head.id, ...fallback },
-          { userId: actor, gameId, currentState: state },
-        );
+        command = makeCommand('resolvePendingEffect', actor, { gameId, effectId: head.id, ...fallback }, this.now());
       }
+      const result = await executeGameCommand(this.actionExecutor, command, state);
       if (!result.success || !result.gameState) {
         return { ok: false, blocker: result.error ?? `pending ${head.type} (${head.id}) rejected` };
       }
@@ -581,39 +579,26 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
         };
       }
       state = result.gameState;
-      await this.gameStateService.saveState(gameId, state);
+      // Шаг, который сам довёл бой до конца (resume после выбора), — исход
+      // боя: ровно один COMBAT_RESOLVED на бой, завершённый таймаутом.
+      const finishedCombat = state.phase !== GamePhase.COMBAT && state.phase !== GamePhase.COMBAT_RESOLVE;
+      await this.gameStateService.saveState(gameId, state, {
+        journal: [{
+          type: finishedCombat ? GameActionType.COMBAT_RESOLVED : GameActionType.CARD_PLAYED,
+          playerId: actor,
+          payload: {
+            action: 'autoResolveChoice',
+            reason,
+            pendingType: head.type,
+            effectId: head.id,
+            method: head.optional ? 'decline' : 'deterministic-fallback',
+          },
+          command,
+        }],
+      });
       await this.publishCue(gameId, 'STATE_UPDATED', state);
-      await this.recordChoiceAudit(gameId, actor, state.sequenceNumber, reason, head);
     }
     return { ok: false, blocker: 'pending choice chain exceeded 32 steps' };
-  }
-
-  /** Аудит системного авто-выбора; без id карт — приватность руки/колоды. */
-  private async recordChoiceAudit(
-    gameId: string,
-    playerId: string,
-    sequenceNumber: number,
-    reason: string,
-    pending: { id: string; type: string; optional?: boolean },
-  ): Promise<void> {
-    if (!this.gameActionService) return;
-    try {
-      await this.gameActionService.recordAction({
-        gameId,
-        sequenceNumber,
-        type: GameActionType.CARD_PLAYED,
-        playerId,
-        metadata: {
-          action: 'autoResolveChoice',
-          reason,
-          pendingType: pending.type,
-          effectId: pending.id,
-          method: pending.optional ? 'decline' : 'deterministic-fallback',
-        },
-      });
-    } catch (e) {
-      this.logger.warn(`Failed to record auto-choice audit for ${gameId}: ${e}`);
-    }
   }
 
   /** Named-CUE после коммита saveState — best-effort и независимы. Redis
@@ -626,29 +611,6 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       await this.gameSubscriptionService.publishGameUpdate(gameId, eventType, state);
     } catch (e) {
       this.logger.warn(`Failed to publish ${eventType} for game ${gameId}: ${e}`);
-    }
-  }
-
-  /** Журнал исхода таймаута — best-effort, тем же типом что ручной резолв. */
-  private async recordAudit(
-    gameId: string,
-    playerId: string,
-    sequenceNumber: number,
-    reason: string,
-    type: GameActionType = GameActionType.COMBAT_RESOLVED,
-    extraMetadata: Record<string, unknown> = {},
-  ): Promise<void> {
-    if (!this.gameActionService) return;
-    try {
-      await this.gameActionService.recordAction({
-        gameId,
-        sequenceNumber,
-        type,
-        playerId,
-        metadata: { action: 'autoResolve', reason, ...extraMetadata },
-      });
-    } catch (e) {
-      this.logger.warn(`Failed to record auto-resolve audit for ${gameId}: ${e}`);
     }
   }
 

@@ -125,7 +125,7 @@ async function initialize(board: unknown, order: string[]): Promise<GameState> {
   const saveState = jest.fn(async () => undefined);
   const service = new GameInitializationService(prisma as any, { saveState } as any);
   const state = await service.initializeGameState('env-maps');
-  expect(saveState).toHaveBeenCalledWith('env-maps', state);
+  expect(saveState).toHaveBeenCalledWith('env-maps', state, { startSnapshot: true });
   return state;
 }
 

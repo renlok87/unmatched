@@ -10,8 +10,13 @@ import {
 import { AiDecisionService, AiAction } from '../../game-engine/services/ai-decision.service';
 import { GamePhase, DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { CombatTimeoutService } from './combat-timeout.service';
-import { GameActionService } from './game-action.service';
-import { GameActionType } from '../models/game-action.model';
+import { journalActionType } from '../models/game-action.model';
+import {
+  executeGameCommand,
+  makeCommand,
+  type GameCommand,
+  type GameCommandKind,
+} from '../../game-engine/services/game-command';
 
 /**
  * Оркестрация ходов ИИ-оппонента (VS_AI). Вызывается fire-and-forget из
@@ -22,134 +27,113 @@ import { GameActionType } from '../models/game-action.model';
  * человек видит без F5.
  */
 /**
- * Диспетчер AiAction → production-executor (тот же путь, что у человека
- * через resolver'ы). Выделен из AiTurnService для переиспользования
- * тест-харнессами полного матча (человеческий сид на той же механике).
+ * AiAction → входная команда движка (DET-2): тот же kind и DTO, что у
+ * человеческой мутации того же действия, и то же имя события журнала.
  */
-export async function dispatchAiAction(
-  executor: GameActionExecutorService,
+export function aiActionCommand(
   action: AiAction,
-  ctx: ActionContext,
-): Promise<{ result: { success: boolean; gameState?: any; error?: string }; eventType: string }> {
-  const gameId = ctx.gameId;
+  gameId: string,
+): { kind: GameCommandKind; input: Record<string, unknown>; eventType: string } {
   switch (action.kind) {
     case 'attack':
       return {
-        result: await executor.executeAttack(
-          { gameId, attackerId: action.attackerId, targetId: action.targetId, cardId: action.cardId },
-          ctx,
-        ),
+        kind: 'attack',
+        input: { gameId, attackerId: action.attackerId, targetId: action.targetId, cardId: action.cardId },
         eventType: 'ATTACK_INITIATED',
       };
     case 'defense':
-      return {
-        result: await executor.executePlayDefense({ gameId, cardId: action.cardId }, ctx),
-        eventType: 'DEFENSE_PLAYED',
-      };
+      return { kind: 'playDefense', input: { gameId, cardId: action.cardId }, eventType: 'DEFENSE_PLAYED' };
     case 'resolveCombat':
-      return {
-        result: await executor.executeResolveCombat({ gameId }, ctx),
-        eventType: 'COMBAT_RESOLVED',
-      };
+      return { kind: 'resolveCombat', input: { gameId }, eventType: 'COMBAT_RESOLVED' };
     case 'maneuver':
       return {
-        result: await executor.executeManeuver(
-          { gameId, maneuverId: action.maneuverId, moves: action.moves, boostCardId: action.boostCardId },
-          ctx,
-        ),
+        kind: 'maneuver',
+        input: { gameId, maneuverId: action.maneuverId, moves: action.moves, boostCardId: action.boostCardId },
         eventType: 'MANEUVER',
       };
     case 'beginManeuver':
       return {
-        result: await executor.executeBeginManeuver(
-          { gameId, expectedSequenceNumber: action.expectedSequenceNumber }, ctx,
-        ),
+        kind: 'beginManeuver',
+        input: { gameId, expectedSequenceNumber: action.expectedSequenceNumber },
         eventType: 'MANEUVER',
       };
     case 'discardToLimit':
       return {
-        result: await executor.executeDiscardToLimit(
-          { gameId, pendingId: action.pendingId, cardIds: action.cardIds }, ctx,
-        ),
+        kind: 'discardToLimit',
+        input: { gameId, pendingId: action.pendingId, cardIds: action.cardIds },
         eventType: 'CARD_DISCARDED',
       };
     case 'resolveChoose':
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, optionIndex: action.optionIndex },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, optionIndex: action.optionIndex },
         eventType: 'CARD_PLAYED',
       };
     case 'resolveMove':
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, fighterId: action.fighterId, x: action.x, y: action.y },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, fighterId: action.fighterId, x: action.x, y: action.y },
         eventType: 'CARD_PLAYED',
       };
     case 'resolveTarget':
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, fighterId: action.fighterId },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, fighterId: action.fighterId },
         eventType: 'CARD_PLAYED',
       };
     case 'resolveDiscard':
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, cardIds: action.cardIds },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, cardIds: action.cardIds },
         eventType: 'CARD_DISCARDED',
       };
     case 'resolveBoost':
       // BOOST_CHOICE (S05): карта-буст уходит в сброс, значение — в бой
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, cardIds: action.cardIds },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, cardIds: action.cardIds },
         eventType: 'CARD_DISCARDED',
       };
     case 'resolveSpace':
       // CHOOSE_SPACE (S06, Restless Spirits): клетка без бойца
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, x: action.x, y: action.y },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, x: action.x, y: action.y },
         eventType: 'CARD_PLAYED',
       };
     case 'resolveDeckPick':
       // DECK_TOP_PICK (S06, Prophecy): PICK 2 в руку / ORDER порядок возврата
       return {
-        result: await executor.executeResolvePendingEffect(
-          { gameId, effectId: action.effectId, cardIds: action.cardIds },
-          ctx,
-        ),
+        kind: 'resolvePendingEffect',
+        input: { gameId, effectId: action.effectId, cardIds: action.cardIds },
         eventType: 'CARD_PLAYED',
       };
     case 'declinePending':
-      return {
-        result: await executor.executeDeclinePendingEffect(
-          { gameId, effectId: action.effectId }, ctx,
-        ),
-        eventType: 'CARD_PLAYED',
-      };
+      return { kind: 'declinePendingEffect', input: { gameId, effectId: action.effectId }, eventType: 'CARD_PLAYED' };
     case 'endTurn':
       // TURN_ENDED — как у человека в game-actions.resolver.endTurn и как
       // GameActionType в журнале; TURN_CHANGED не входит в enum → запись
       // бот-endTurn молча выпадала из eventsSince-catchup (и GAME_ENDED при
-      // терминальном endTurn вместе с ней — ранний return в recordJournal).
+      // терминальном endTurn вместе с ней).
       // Подписка turnChanged принимает оба имени (TURN_ENDED|TURN_CHANGED).
-      return {
-        result: await executor.executeEndTurn({ gameId } as any, ctx),
-        eventType: 'TURN_ENDED',
-      };
+      return { kind: 'endTurn', input: { gameId }, eventType: 'TURN_ENDED' };
   }
+}
+
+/**
+ * Диспетчер AiAction → production-executor (тот же путь, что у человека
+ * через resolver'ы: executeGameCommand). Выделен из AiTurnService для
+ * переиспользования тест-харнессами полного матча (человеческий сид на той
+ * же механике). Часы — ctx.now (или сейчас); команда возвращается для журнала.
+ */
+export async function dispatchAiAction(
+  executor: GameActionExecutorService,
+  action: AiAction,
+  ctx: ActionContext,
+): Promise<{ result: { success: boolean; gameState?: any; error?: string }; eventType: string; command: GameCommand }> {
+  const { kind, input, eventType } = aiActionCommand(action, ctx.gameId);
+  const command = makeCommand(kind, ctx.userId, input, ctx.now ?? new Date(), ctx.systemInitiator);
+  return { result: await executeGameCommand(executor, command, ctx.currentState), eventType, command };
 }
 
 @Injectable()
@@ -169,7 +153,6 @@ export class AiTurnService {
     @Optional()
     @Inject(forwardRef(() => CombatTimeoutService))
     private readonly combatTimeout?: CombatTimeoutService,
-    @Optional() private readonly gameActionService?: GameActionService,
   ) {}
 
   /** Прогоняет ходы бота, если это VS_AI и боту есть что делать. Не бросает. */
@@ -203,8 +186,8 @@ export class AiTurnService {
         const action = this.decision.decide(state, aiUserId);
         if (!action) return false;
 
-        const ctx: ActionContext = { userId: aiUserId, gameId, currentState: state };
-        const { result, eventType } = await this.dispatch(action, ctx);
+        const ctx: ActionContext = { userId: aiUserId, gameId, currentState: state, now: new Date() };
+        const { result, eventType, command } = await this.dispatch(action, ctx);
 
         if (!result.success || !result.gameState) {
           this.logger.warn(`AI шаг «${action.kind}» не выполнен: ${result.error}`);
@@ -216,9 +199,19 @@ export class AiTurnService {
           return false;
         }
 
-        await this.stateService.saveState(gameId, result.gameState);
+        // GD-039 Sol6 + DET-2: журнал хода бота для eventsSince-catchup человека —
+        // в транзакции состояния. input с instance-id карт приватен боту:
+        // getEventsSince отдаёт input только владельцу действия (playerId).
+        // GAME_ENDED того же seq добавляет saveState.
+        await this.stateService.saveState(gameId, result.gameState, {
+          journal: [{
+            type: journalActionType(eventType),
+            playerId: aiUserId,
+            payload: { action: `ai:${action.kind}`, input: JSON.parse(JSON.stringify(action)) },
+            command,
+          }],
+        });
         await this.scheduleCombatDeadline(gameId, eventType, result.gameState);
-        await this.recordJournal(gameId, aiUserId, eventType, action, result.gameState);
         // Named-CUE публикация — best-effort ПОСЛЕ коммита: транзитный отказ
         // Redis/PubSub не должен прерывать дрейн (иначе VS_AI-матч виснет),
         // закоммиченный seq — источник истины; подписчики догонят eventsSince.
@@ -285,56 +278,10 @@ export class AiTurnService {
     }
   }
 
-  /**
-   * GD-039 Sol6: журнал действий бота для eventsSince-catchup человека —
-   * без записей ход бота невидим реконнекту. Форма как у ручного пути
-   * (game-actions.resolver.recordGameAction): metadata.input с instance-id
-   * карт приватен боту — getEventsSince отдаёт input только владельцу
-   * действия (playerId), человек получает только action. Лучший-усилие:
-   * отказ журнала не роняет дрейн. GAME_ENDED — отдельной записью с
-   * победителем, тем же seq (зеркало ручного пути), ОТДЕЛЬНОЙ best-effort
-   * попыткой: отказ записи самого действия не должен глотать терминал.
-   */
-  private async recordJournal(
-    gameId: string,
-    aiUserId: string,
-    eventType: string,
-    action: AiAction,
-    state: any,
-  ): Promise<void> {
-    if (!this.gameActionService) return;
-    const type = GameActionType[eventType as keyof typeof GameActionType];
-    if (!type) return; // unmapped named-CUE (STATE_UPDATED) не журналим — как у человека
-    try {
-      await this.gameActionService.recordAction({
-        gameId,
-        sequenceNumber: state.sequenceNumber,
-        type,
-        playerId: aiUserId,
-        metadata: { action: `ai:${action.kind}`, input: JSON.parse(JSON.stringify(action)) },
-      });
-    } catch (e) {
-      this.logger.warn(`AI journal для ${gameId} (${eventType}) не записан: ${e}`);
-    }
-    if (state.phase === GamePhase.GAME_OVER) {
-      try {
-        await this.gameActionService.recordAction({
-          gameId,
-          sequenceNumber: state.sequenceNumber,
-          type: GameActionType.GAME_ENDED,
-          playerId: aiUserId,
-          metadata: { action: `ai:${action.kind}`, winnerId: state.metadata?.winnerId },
-        });
-      } catch (e) {
-        this.logger.warn(`AI journal GAME_ENDED для ${gameId} не записан: ${e}`);
-      }
-    }
-  }
-
   private async dispatch(
     action: AiAction,
     ctx: ActionContext,
-  ): Promise<{ result: { success: boolean; gameState?: any; error?: string }; eventType: string }> {
+  ): Promise<{ result: { success: boolean; gameState?: any; error?: string }; eventType: string; command: GameCommand }> {
     return dispatchAiAction(this.executor, action, ctx);
   }
 }

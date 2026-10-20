@@ -6,6 +6,7 @@ import { AdjacencyService } from '../../game-engine/engine/adjacency.service';
 import { ValueModifierService } from '../../game-engine/engine/value-modifier.service';
 import { CombatResolverService } from '../../game-engine/engine/combat-resolver.service';
 import { HeroAbilityRegistry } from '../../game-engine/abilities/hero-ability-registry';
+import { registerHeroAbilities } from '../../game-engine/abilities/register-hero-abilities';
 import { MovementService } from '../../game-engine/engine/movement.service';
 import { AStarService, PathCacheService } from '../../game-engine/movement';
 import { Card, CardType, FighterType, GamePhase, GameState } from '../../game-engine/models';
@@ -32,13 +33,19 @@ export function s03Fixture(hand = 0, actions = 2): GameState {
     metadata: { lastActionAt: new Date(0), lastActionBy: 'a', version: 1, actionsRemaining: actions },
   } as GameState;
 }
-export function s03Engine() {
+/**
+ * The production executor without Nest, Postgres or Redis. `abilities: true`
+ * registers the production hero handlers (registerHeroAbilities); without it
+ * the registry stays empty, as the specs written against it expect.
+ */
+export function s03Engine(opts: { abilities?: boolean } = {}) {
   const metrics = { measureServiceDuration: async (_a: string, _b: string, run: () => unknown) => run(),
     measureValidation: async (_a: string, run: () => unknown) => run(), incrementGameAction: () => {}, incrementError: () => {} } as any;
   const adjacency = new AdjacencyService();
   const values = new ValueModifierService();
   const decks = new DeckManagementService();
   const registry = new HeroAbilityRegistry();
+  if (opts.abilities) registerHeroAbilities(registry, { deck: decks, zone: adjacency });
   const effects = new CardEffectExecutorService(values, metrics, adjacency, decks);
   const executor = new GameActionExecutorService(new GameRulesValidator(adjacency),
     new CombatResolverService(registry, metrics), new MovementService(new AStarService(), new PathCacheService()), values, adjacency, metrics, decks, effects, registry);
