@@ -313,6 +313,14 @@ The user's words: «Я не хочу полностью пересобирать
 - **Locks:** while a `-LiveCoding` client lives, Build.bat of UnmatchedEditor fails in every checkout (Live Coding
   mutex), and `safe-integrate.sh` of other sessions waits on the running UnrealEditor of the main checkout. Stop the
   client before a full build, before packaging and at the end of the task (`devexec.py stop` kills only its own PID).
+- **Worktree clients need the ignored art (trap seen 2026-10-20).** `unreal/Unmatched/.gitignore` ignores `Content/`, so a
+  fresh git worktree has about 1.9k of the 3.8k Content files (517 MB of 3.5 GB). ART004, EnvKit, EnvMaps, most of
+  PipelineCandidates and the Fab packs are missing. A client started there still logs `ARTLOOK art=1 heroes=v2`, but it
+  renders the grey fallback: a grey board with white cells and grey blockout figures. The user took it for a broken game.
+  Before the first `devexec.py start`, editor or `-game` launch in a worktree, run an add-only copy from the main checkout:
+  `robocopy <main>\unreal\Unmatched\Content <worktree>\unreal\Unmatched\Content /E /XC /XN /XO /R:1 /W:1 /NFL /NDL /NJH`.
+  It never overwrites a file; exit codes 0–7 mean success. Never `git add` the copied files. Read the first shot and
+  check the real map, its backdrop and the v2 figures before going on.
 - **Gates stay light:** after the fix, only the UE tests of the touched area
   (`node tools/s08/run-ue-tests.cjs "<filter>" <log>`, client stopped) and the backend specs of the touched files.
   Package once at the end of the task, only when the user's normal launch must get the fix (Iteration speed rules
