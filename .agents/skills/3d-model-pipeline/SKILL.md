@@ -1,6 +1,6 @@
 ---
 name: 3d-model-pipeline
-description: Сквозной пайплайн новой 3D-фигуры Unmatched (герой, помощник, крылатое существо-бипед, проп). Этапы — концепт-лист в Codex, генерация в Tripo3D Studio, сборка H2 в Blender, приёмка с коэффициентом и доработкой, анимация с VFX/SFX и упаковка с подключением в Unreal. Триггеры — «сгенерируй 3D-модель», «новый герой / помощник / существо / проп», «новая фигура», «3D model pipeline», «модель через Tripo», «концепт-лист героя». Статический проп (бочка, фонарь, ящик) — да, до импорта в UE; его размещение в раскладке доски — нет. НЕ для окружения, задников и сцен досок и размещения пропов в EnvLayouts (Marmoreal/Sarpedon — трек ENV-MAPS) и НЕ для разовых правок существующих ассетов.
+description: Сквозной пайплайн новой 3D-фигуры Unmatched (герой, помощник, крылатое существо-бипед, проп). Этапы — концепт-лист в Gemini, генерация в Tripo3D Studio, сборка H2 в Blender, приёмка с коэффициентом и доработкой, анимация с VFX/SFX и упаковка с подключением в Unreal. Триггеры — «сгенерируй 3D-модель», «новый герой / помощник / существо / проп», «новая фигура», «3D model pipeline», «модель через Tripo», «концепт-лист героя». Статический проп (бочка, фонарь, ящик) — да, до импорта в UE; его размещение в раскладке доски — нет. НЕ для окружения, задников и сцен досок и размещения пропов в EnvLayouts (Marmoreal/Sarpedon — трек ENV-MAPS) и НЕ для разовых правок существующих ассетов.
 ---
 
 # 3d-model-pipeline
@@ -9,6 +9,46 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 героя и пропа — `docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md` (далее HANDBOOK). Он главнее скилла, а скилл его числа
 не копирует. Пометка «решение скилла» означает, что источника в репо нет и значение выбрано здесь по делегированию
 (`docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`, далее «ВР-реестр»).
+
+## 0. Исполнители с 2026-10-20: Codex и Sol отключены (главнее всех упоминаний ниже)
+
+Пользователь, 2026-10-20: «Я отменил подписку на ChatGPT, так что если нужно генерировать ассеты, либо использовать
+какой-то побочную модель, переключись на приложение Z-Code, оно использует модель GLM5.3. С F-Max. А для ассетов можно
+использовать создание изображений в приложении Gemini. Музыку можно создавать как и в моих существующих подписках
+Syntax и вот второй сервис тоже на букву S английскую … Либо пользоваться сервисами Гугла, которые встроены в Gemini.»
+Затем: «Этот код можешь использовать через Computer Use». Норма — AGENTS.md «AI tools and side models». Этот раздел
+перекрывает каждое упоминание Codex, приложения ChatGPT, `codex exec`, `codex_lane.py`, приёмщика «Sol 6.1 xhigh» и GPT
+Astra в SKILL.md и в `references/`, пока те не переписаны.
+
+| Было | Стало | Где в скилле |
+|---|---|---|
+| Codex `image_gen`: 1a дизайн-front, 1c виды поверх орто | генерация изображений **Gemini** (приложение Gemini через Computer Use или gemini.google.com в Chrome пользователя через Claude in Chrome), либо сервисы Google внутри Gemini. Вход 1a — промпт и `QUALITY_REFERENCE`; вход 1c — `ortho_<view>` и утверждённый front | §2 этап 1, §6 этап 1, `references/concept-sheet.md` |
+| Codex как исполнитель пакета: сам гонял `check_concept_views.py`, писал `verification.json` | Gemini только рисует. Файлы в папку пакета сохраняет запускающий агент, он же гоняет автопроверки и пишет `verification.json` | `references/concept-sheet.md` §5 |
+| приёмщик «Sol 6.1 xhigh», второй приёмщик «другим профилем» | **Z-Code GLM-5.3-Flash**: видит картинки, а GLM-5.3 в тарифе пользователя только текст. Пока скриптовой полосы Z-Code нет, второй приёмщик — Opus `second-acceptor` (§4), факт пишется в `ACCEPTOR_PROFILE` и карточку | §4, §6 этап 4, §7, `references/acceptance-and-blender.md` §8.4–8.5, `references/animation-vfx-sfx.md` §10 |
+| побочная модель для текста: ревью промпта, scope, второе мнение | **Z-Code GLM-5.3**, рассуждение max, через Computer Use | весь скилл |
+| звук и музыка этапа 6 | **SYNTX** (MCP `syntx-ai`, журнал как раньше), **stiva.ai** (там же звуки ElevenLabs) или сервисы Google в Gemini | §6 этап 6, `references/animation-vfx-sfx.md` |
+
+- **Z-Code через Computer Use** — основной путь. Claude пишет промпт-файл в репо. Затем в Z-Code: проект `unmached`,
+  новая задача, модель GLM-5.3 (картинки — GLM-5.3-Flash), вставить промпт, кадры приложить в поле ввода. Z-Code пишет
+  только в названную промптом папку и не коммитит. Запасной headless-путь (`zcode.cjs -p … --attach …`) заработает
+  после `zcode login zai` пользователя (AGENTS.md); до этого его не пробовать в пачке.
+- **Имена путей не меняются.** Папка пакета `art/imagegen/concept-<key>-codex/`, промпт-файлы
+  `<ASSET_ID>-concept.codex.md` и `…-concept-views.codex.md` сохраняют суффикс `codex`: их ждут `make_tasks.py`,
+  `make_1c.py`, `check_concept_views.py` и `capture_acceptance_set.py --sheet`. Суффикс исторический, содержимое — для
+  Gemini.
+- **Мёртвые полосы до порта:** `tools/art/pipeline_batch/codex_lane.py`, Sol-путь `sheet_acceptance.py`, Sol в
+  `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` и в `tools/art/acceptance/*`. Брать их Opus-путь. Полосы пачки
+  §11.2–11.4 для Codex и Sol не действуют.
+- **Журнал трат.** `tools/art/visual/ledger.py` на 2026-10-20 знает только SYNTX, Tripo и Codex. Каждая генерация
+  Gemini и stiva.ai, а также условия сервиса пишутся строкой в `NOTES` карточки, пока `ledger.py` их не выучит.
+  Строки `--service Codex` больше не пишутся.
+- **Пробы этапа 0** (вместо пробы `codex exec`):
+  - Gemini — открыт под учёткой пользователя и предлагает генерацию изображений; экран входа — гейт §5 п.2;
+  - Z-Code — в проекте `unmached` выбрана нужная модель, на «Ответь OK» пришёл ответ OK; для приёмки GLM-5.3-Flash
+    описывает приложенный кадр.
+- **Не проверено вживую.** Путь Gemini для 1a/1c и приёмщик Z-Code ещё ни разу не шли боевым прогоном. Первый прогон
+  проверяет их и пишет находки строками F в `NOTES`: сетку и аспект видов, фон, водяной знак, держит ли Gemini силуэт
+  орто в 1c.
 
 ## 1. Когда использовать
 
@@ -33,7 +73,7 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 | Этап | Что | Исполнитель | Выход | Критерий выхода |
 |---|---|---|---|---|
 | 0 | Заявка, проверка исполнителей, реестр | запускающий агент | `ASSET_DIR/asset-card.yaml`, `.gitignore` ассета, запись в `docs/art-pipeline/asset-registry.json`, строка карточки в `06-tasks/anim.csv` | все поля карточки заполнены (дефолты §7 разрешены); `validate_registry.py` без ERROR по `ASSET_ID` (по строкам ERROR, не по коду выхода); пробы исполнителей прошли; гейты §5 не сработали |
-| 1 | Концепт-лист: 1a дизайн-front → 1b черновая модель Tripo → 1c виды поверх орто | Codex, приёмщик | `art/imagegen/concept-<key>-codex/` | `check_concept_views.py` 0 FAIL и коэффициент листа ≥ 8,0 |
+| 1 | Концепт-лист: 1a дизайн-front → 1b черновая модель Tripo → 1c виды поверх орто | Gemini (изображения), запускающий агент (сохранение, автопроверки), приёмщик (§0) | `art/imagegen/concept-<key>-codex/` | `check_concept_views.py` 0 FAIL и коэффициент листа ≥ 8,0 |
 | 2 | Генерация Tripo H2 | запускающий агент (Studio в браузере) или пользователь по чек-листу | `<ASSET_ID>/<YYYYMMDD>-h2-tripo/` + `source-specs/tripo-<task8>-h2.json` (проп — `<YYYYMMDD>-prop-tripo/`, `tripo-<task8>.json`) | чек-лист выхода этапа 2 в `references/tripo3d-stages.md` §9 |
 | 3 | Регистрация персонажа → H2 bake → look-dev → TeamAccent (проп — сборка статического пропа) | запускающий агент, headless | `SK_<Key>_H2.fbx`, `SK_<Key>_H2LD.fbx`, текстуры (проп — `<YYYYMMDD>-prop-build/export/SM_<Name>.fbx` + `T_<Name>_{BC,N,ORM}`) | все стадии `run_h2_bake.py` OK, probes `n/N` (`probes.passed`; расширенные пробы блокируют при `profile_version` ≥ 2, ДС-5), чек-лист «Сдача модели» (HANDBOOK §4.4); проп — `reports/candidate-report.json` с `checks_passed: true` и `reports/fbx-readback.json` (HANDBOOK §5) |
 | 4 | Приёмка модели (коэффициент) | приёмщик (при неустойчивом pass — второй, другим профилем) | `evidence/acceptance/<YYYYMMDD>-r<N>/card.json` (+ `card-2.json`, `final.json`) + `frames/` (`capture_acceptance_set.py --sheet`, JPEG 1200 px, ДС-8) | вердикт `validate_card.py`: код 0 — по карточке; код 3 — по `final.json` пары |
@@ -68,13 +108,16 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 
 | Роль | Как вызвать | Правила |
 |---|---|---|
-| Codex (этап 1) | `codex.exe exec` после пробы exec (выбор exe, команда, кодировки — `references/concept-sheet.md` §5.2): exe приложения из `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/` — только глобом, хэш и версию не закреплять (F37); флаг `-c 'windows.sandbox="unelevated"'` обязателен (без него песочница при открытом приложении не запускает команд, а код выхода 0). Exec не работает — приложение ChatGPT через управление рабочим столом (concept-sheet §5.3). Приложение пользователя не закрывать; npm-`codex` не работает. Пачка — полосы `codex_lane.py` (§11.3) | Промпт-файл пишет Claude: `docs/game-design/visual/06-tasks/prompts/<ASSET_ID>-concept.codex.md`. Codex пишет только в `art/imagegen/concept-<key>-codex/` и не коммитит |
+| Gemini (этап 1, с 2026-10-20) | Приложение Gemini через Computer Use или gemini.google.com в Chrome пользователя (Claude in Chrome); промпт — из промпт-файла, входные картинки прикладываются; результат запускающий агент сохраняет в `art/imagegen/concept-<key>-codex/` (§0) | Промпт-файл пишет Claude (прежнее имя `<ASSET_ID>-concept.codex.md`). Выход Gemini не правится; автопроверки и `verification.json` — запускающий агент. Вживую не проверено (§0) |
+| Z-Code (побочная модель, второй приёмщик, с 2026-10-20) | Приложение Z-Code через Computer Use: проект `unmached`, новая задача, GLM-5.3 (текст) или GLM-5.3-Flash (кадры); headless `zcode.cjs` — после `zcode login zai` пользователя (AGENTS.md «AI tools and side models») | Пишет только в папку из промпта, не коммитит. Пока скриптовой полосы нет — второй приёмщик Opus `second-acceptor`, факт в карточке |
+| ~~Codex (этап 1)~~ — **отключён 2026-10-20 (§0)**, строка — история | `codex.exe exec` после пробы exec (выбор exe, команда, кодировки — `references/concept-sheet.md` §5.2): exe приложения из `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/` — только глобом, хэш и версию не закреплять (F37); флаг `-c 'windows.sandbox="unelevated"'` обязателен (без него песочница при открытом приложении не запускает команд, а код выхода 0). Exec не работает — приложение ChatGPT через управление рабочим столом (concept-sheet §5.3). Приложение пользователя не закрывать; npm-`codex` не работает. Пачка — полосы `codex_lane.py` (§11.3) | Промпт-файл пишет Claude: `docs/game-design/visual/06-tasks/prompts/<ASSET_ID>-concept.codex.md`. Codex пишет только в `art/imagegen/concept-<key>-codex/` и не коммитит |
 | Приёмщик «Opus xhigh» (по умолчанию) | Агент Workflow `agent(prompt, {model: 'opus', effort: 'xhigh', schema: <строгая выходная схема своего вида>, label})`, свежий контекст (скрипт и промпт — `references/acceptance-and-blender.md` §8.2–8.3). Схема — `tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json`, как у Sol: с полной схемой Workflow возвращал строки `"null"` (F6, F102, RA-11). Второй приёмщик Opus — сохранённый workflow `.claude/workflows/second-acceptor.js` (`Workflow({name: "second-acceptor", args: {kind, items, schema}})`; ASCII-аргументы — `python tools/art/acceptance/_output_schema.py --workflow-args <kind> --item <ASSET_ID>=<evidence>`, лист концепта — `sheet_acceptance.py prepare-second`), затем `finish_second.py` (там же §8.3). На вход — только кадры, отчёты, концепт и рубрика | Не правит. Его сессия отлична от сессии исполнителя. `session_id` обоих пишутся в карточку |
-| Приёмщик «Sol 6.1 xhigh» | Тот же `$exe`, прошедший пробу exec (GUI-путь приёмщику не подходит — нужны `--output-schema` и `-o`). Обязательно: `--ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -c 'windows.sandbox="unelevated"' -s read-only`, строгая схема своего вида `…output-<kind>.schema.json` (не полная — её строгий режим отвергает), каждый кадр отдельным `-i`, `--` перед `-`; затем `validate_card.py`. Полная команда, отказ схемы и разбор событий — `references/acceptance-and-blender.md` §8.4. Промпт несёт блок чтения кириллицы (OEM, `cmd /c type`) и строку «рубрика — только этот файл» дословно по `references/concept-sheet.md` §11 (RA-03; без них Sol читал рубрику кракозябрами при коде 0 и открывал SKILL.md, F36, F75). Сбой песочницы (код 0, карточка-заглушка) или карточка «СБОЙ ОКРУЖЕНИЯ» — сбой окружения, не попытка: цикл не тратится. Пилот: модель 10–14,5 мин, клип ≈ 5 мин | Только по явному выбору запускающего; второй приёмщик пары «другим профилем» — почти всегда Sol (в пилоте 13 из 16 карточек). Повторная приёмка — тем же профилем |
+| ~~Приёмщик «Sol 6.1 xhigh»~~ — **отключён 2026-10-20 (§0)**, строка — история | Тот же `$exe`, прошедший пробу exec (GUI-путь приёмщику не подходит — нужны `--output-schema` и `-o`). Обязательно: `--ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -c 'windows.sandbox="unelevated"' -s read-only`, строгая схема своего вида `…output-<kind>.schema.json` (не полная — её строгий режим отвергает), каждый кадр отдельным `-i`, `--` перед `-`; затем `validate_card.py`. Полная команда, отказ схемы и разбор событий — `references/acceptance-and-blender.md` §8.4. Промпт несёт блок чтения кириллицы (OEM, `cmd /c type`) и строку «рубрика — только этот файл» дословно по `references/concept-sheet.md` §11 (RA-03; без них Sol читал рубрику кракозябрами при коде 0 и открывал SKILL.md, F36, F75). Сбой песочницы (код 0, карточка-заглушка) или карточка «СБОЙ ОКРУЖЕНИЯ» — сбой окружения, не попытка: цикл не тратится. Пилот: модель 10–14,5 мин, клип ≈ 5 мин | Только по явному выбору запускающего; второй приёмщик пары «другим профилем» — почти всегда Sol (в пилоте 13 из 16 карточек). Повторная приёмка — тем же профилем |
 | Доработка «Opus xhigh» (этапы 5, 6) | Агент Workflow `{model: 'opus', effort: 'xhigh'}` с брифом доработки (модель — `references/acceptance-and-blender.md` §10, клип — `references/animation-vfx-sfx.md` §10.6), работает headless-скриптами. Фактический механизм и effort записываются (RA-21): блок этапа в заявке (`STAGE5[]`, `STAGE6.executor`, §7.2) и `executor_session_id` следующей карточки (субагент — `claude-code:<uuid>/agent:<name>`, F40) | Делает лично, не делегирует, свою работу не принимает |
 | Tripo Studio (шаги 1b и 2) | Запускающий агент через Claude in Chrome в своей вкладке; расширение не подключено, а Studio открыта и залогинена в Chrome пользователя — клики Windows-MCP в этой вкладке (`references/tripo3d-stages.md` §2, F9). Разрешение трат — сама заявка пользователя (§1), в лимите и сроке журнала; отдельно не спрашивать. Если клик блокирует классификатор прав сессии (живая проверка 2026-10-09: Real-World Transactions) или пользователь — гейт §5 п.2: пользователь проходит чек-лист `references/tripo3d-stages.md` §8 сам, агент проверяет результат | Цена — с кнопки до клика. Строка журнала — после каждой операции |
 
-Требование заказчика №3 исполняется буквально. Коэффициент ставит «Opus xhigh» или «Sol 6.1 xhigh». Ниже порога
+Требование заказчика №3 исполняется буквально. Коэффициент ставит «Opus xhigh» или «Sol 6.1 xhigh» (Sol с 2026-10-20
+отключён; второй профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor`, §0). Ниже порога
 дорабатывает лично «Opus xhigh». Затем повторная приёмка — новым агентом-приёмщиком, а не тем же контекстом.
 Запускающий агент не принимает свою работу и не подменяет внешнего исполнителя. В каждый промпт агента Workflow
 дословно цитируйте делегирование пользователя и разрешение на траты. Иначе агент примет за границу полномочий
@@ -166,7 +209,10 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    `VISUAL_CARD_ID`. Без неё `ledger.py add` откажет («no spend without a card»).
 4. Пробный вызов исполнителей §4 — каждый с командой и критерием; не прошёл после повтора — гейт §5 п.2. В пачке
    пробы — один раз на сессию пачки, а не на фигуру (§11; пилот откладывал пробы до первой платной операции).
-   - **Codex** — проба именно `exec` (`references/concept-sheet.md` §5.2, шаги 1–3:
+   - **Gemini и Z-Code** (с 2026-10-20 вместо пробы Codex, §0): Gemini открыт под учёткой пользователя и предлагает
+     генерацию изображений; Z-Code в проекте `unmached` ответил OK, GLM-5.3-Flash описал приложенный кадр. Экран входа
+     или нет приложения — гейт §5 п.2. Проба Codex ниже — история.
+   - ~~**Codex**~~ (отключён) — проба именно `exec` (`references/concept-sheet.md` §5.2, шаги 1–3:
      `exec … -c 'windows.sandbox="unelevated"' -s read-only --json "Run exactly one shell command: …"`). Прошла, если в
      событиях есть `command_execution` с `"exit_code":0`; `--version` и «Reply OK» не годятся — они проходят и при
      заблокированном exec или сломанной песочнице. Не прошла — путь через приложение (concept-sheet §5.3).
@@ -179,8 +225,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
        schema: {type: 'object', properties: {ok: {type: 'boolean'}}, required: ['ok'], additionalProperties: false},
      })
      ```
-     Прошла — вернулся объект `{"ok": true}`. `null` или ошибка — один повтор. Приёмщик «Sol 6.1 xhigh» (только
-     если выбран в `ACCEPTOR_PROFILE`) — проба `exec` выше тем же exe с `--ignore-user-config -m gpt-6.1-sol`.
+     Прошла — вернулся объект `{"ok": true}`. `null` или ошибка — один повтор. Приёмщик «Sol 6.1 xhigh» отключён
+     2026-10-20 (§0); профиль `sol-6.1-xhigh` в `ACCEPTOR_PROFILE` не выбирать.
    - **Claude in Chrome** (шаги 1b и 2). Инструменты загрузить одним `ToolSearch`
      (`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__get_page_text,mcp__claude-in-chrome__computer`).
      Критерий 1: `tabs_context_mcp` возвращает подключённый браузер и список вкладок; молчит — сначала
@@ -203,7 +249,7 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    (`references/new-character-registration.md` §2, там же команда проверки).
 
 **Этап 1 — концепт-лист** (`references/concept-sheet.md`). Строгая сетка и набор проекций:
-1. **1a дизайн-front.** image_gen text→image, единственный ref — первый файл `QUALITY_REFERENCE`. Подставка — словами
+1. **1a дизайн-front.** Генерация изображения в Gemini (до 2026-10-20 — Codex image_gen, §0) text→image, единственный ref — первый файл `QUALITY_REFERENCE`. Подставка — словами
    (`{{PEDESTAL_EN}}`: круглая тёмная каменная, без кольца, «seen exactly edge-on, top surface not visible»):
    коллаж `ref-base-hero-p1.png` во входах тянул камеру вверх (живой тест 2026-10-09), строгого вида подставки сбоку в
    репо нет (`references/concept-sheet.md` §6.1). Проверка кандидата — с `--min-top-pct 4` (WARN `view.frame_top`).
@@ -213,7 +259,7 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    `python tools/art/concept/draft_orthos.py --glb <draft.glb> --out <ASSET_DIR>/<YYYYMMDD>-draft-tripo/orthos --views front,left,back,right --aspect 3:4`
    (winged-biped — `4:3`) → `ortho_{front,left,right,back}.png` + `ortho-framing.json`. Здесь же окончательно
    выбирается `SIDE_VIEW` (`references/concept-sheet.md` §4.1).
-3. **1c виды.** image_gen style-transfer поверх `ortho_<view>` (силуэт, поза и хват неприкосновенны), второе
+3. **1c виды.** Gemini (§0) style-transfer поверх `ortho_<view>` (силуэт, поза и хват неприкосновенны), второе
    изображение — утверждённый front (рецепт hero-quality-v1, HANDBOOK §3.1).
 4. Набор front, side, back: один размер и аспект, ровный нейтральный тёмно-серый фон, фигура целиком с подставкой,
    одинаковое размещение в % кадра; разброс роста > 3 % — WARN, > 5 % — FAIL (двухступенчатые допуски —
@@ -322,8 +368,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    §8.1): весь bake-профиль с заметками исполнителя приёмщику не идёт (F147, F152).
 2. Гейты PASS/FAIL по отчётам: G-TOPO (по финальному FBX, `ld-fbx-report`), G-UV, G-TEX, G-RIG, G-NAMES. Баллы S/F/T/D
    0–2, `score = round(sum / (2 × n) × 10, 1)`; приёмщик возвращает только JSON, `card.json` пишет запускающий.
-   Приёмщик «Sol 6.1 xhigh» — `codex exec` с `-c 'windows.sandbox="unelevated"'` и `--ignore-user-config`; сбой
-   песочницы (код 0, карточка-заглушка) — сбой окружения, не попытка (`references/acceptance-and-blender.md` §8.4).
+   Приёмщик «Sol 6.1 xhigh» (`codex exec`, `references/acceptance-and-blender.md` §8.4) отключён 2026-10-20; второй
+   профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor` (§0).
 3. `python tools/art/acceptance/validate_card.py <card.json> --print-verdict --check-files`. Код 0: `pass` → этап 6;
    `rework_blender` → этап 5; `return_to_stage_1` или `return_to_stage_2` (S < 1,5 или дефект исходника) → назад;
    после r3 без pass — `escalate_user`. Код 3 `needs_second_acceptor` (pass с `score` 8,0–8,4; правило общее для
@@ -452,14 +498,14 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 
 | Точка | Дефолт | Источник |
 |---|---|---|
-| Приёмщик | «Opus xhigh»; «Sol 6.1 xhigh» — по явному выбору. В карточку (`acceptor.profile`) и в `ACCEPTOR_PROFILE` заявки пишется фактический профиль запуска: явный выбор запускающего важнее заявки (F76, F119, RA-17) | требование заказчика №3 |
+| Приёмщик | «Opus xhigh»; «Sol 6.1 xhigh» — отключён 2026-10-20, второй профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor` (§0). В карточку (`acceptor.profile`) и в `ACCEPTOR_PROFILE` заявки пишется фактический профиль запуска: явный выбор запускающего важнее заявки (F76, F119, RA-17) | требование заказчика №3 |
 | Исполнитель доработки | «Opus xhigh»; механизм (Workflow или субагент), модель и effort — фактические, в блоке этапа заявки (§7.2) | требование заказчика №3; RA-21 |
 | Порог и вето | `score` ≥ 8,0; любое измерение < 1,0 → не pass; S < 1,5 → возврат на этап 1 или 2; pass модели с `score` 8,0–8,4 — второй приёмщик другим профилем, итог по минимуму | решение скилла (`references/acceptance-and-blender.md` §6, §8.5) |
 | Циклы | концепт 3, модель 2 (r1→r3), клип 2; генераций на вид ≤ 4 | решение скилла |
 | Кредиты Tripo | лимит и срок — из журнала `credits-ledger.json` (`limits.tripo.credits`, `limits.tripo.until`; решение 2026-10-13 «На триппо нет лимита» сняло потолок 3000 ВР-04); `until: null` = окно открыто; граница — свежий баланс Studio. На 2026-10-14 в журнале ещё `until` «2026-10-28»: снимает ли «нет лимита» и срок — решает пользователь, данные журнала агент не меняет (RA-04). Предпроверка — `ledger.py check --service tripo` (§5 п.3): на этапе 0 без `--balance`, с шага 1b — с `--balance <баланс Studio>` перед каждой операцией (`references/tripo3d-stages.md` §1). Ожидаемо на героя: черновик ≈ 30 + H2 95 (60 + 30 + 5); точная цена — с кнопки до клика (§3 там же) | ВР-реестр ВР-04; `references/tripo3d-stages.md` §1, §3 |
 | Описание и имя бойца | `DESCRIPTION`, `ANCHORS`, `FIGHTER_NAME` — из `scraped-data/api/heroes/<slug>.json` и эталонной БД (имя, оружие, помощники) текстом; аватар и сканы в генератор не подаются. Персонажа там нет (новый помощник, например Sir Gawain) — пишутся по заявке пользователя с `decided_by: delegated (ВР-реестр 2026-10-06)`; это не гейт стопа | `07-prompt-templates.md` §3.1, ВР-PR08; решение скилла |
 | Помощник без нового героя | `OWNER_HERO_SLUG` — слаг героя-владельца (из заявки; не задан — ближайший по сюжету герой ростера, решение по делегированию); `HERO_SLUG` = он же; вариант bench-фикстуры: `--hero-name "<FighterName владельца>" --hero-slug <OWNER_HERO_SLUG> --sidekick-name "<FIGHTER_NAME>"`; `S08FighterNames.json` не трогается (формат держит одного помощника на героя), строка в NOTES | решение скилла; `references/new-character-registration.md` §0, Д-2, Р7-8 |
-| SYNTX и Codex | SYNTX — без подтверждения каждой генерации, в лимитах и сроке журнала (ВР-04/ВР-PR04); Codex — по подписке, строка журнала `ledger.py add --service Codex` на каждый пакет-запуск и на каждую приёмку Sol (квота общая, RC-12); бюджет сессий пачки — §11 | `07-prompt-templates.md` §4 |
+| SYNTX, stiva.ai, Gemini (Codex — история) | SYNTX — без подтверждения каждой генерации, в лимитах и сроке журнала (ВР-04/ВР-PR04); stiva.ai и Gemini — по подпискам пользователя, строкой в `NOTES`, пока `ledger.py` их не знает (§0); Codex отключён 2026-10-20, прежнее правило: по подписке, строка журнала `ledger.py add --service Codex` на каждый пакет-запуск и на каждую приёмку Sol (квота общая, RC-12); бюджет сессий пачки — §11 | `07-prompt-templates.md` §4 |
 | Источник движения клипов | паттерн библиотеки героя с тем же классом оружия (`MOTION_SOURCE: "library: <Key образца>"`); нет образца — бесплатный пресет Tripo как образец тайминга и поз (`"tripo-preset: <имя>"`, решение 2026-10-14); видеорефы SYNTX — только нестандартное движение, причина в `MOTION_SOURCE` (визуального лимита SYNTX хватает примерно на одного героя) | ДС-6; `references/animation-vfx-sfx.md` §6.1 |
 | Редактор UE 7a | агентский скрытый редактор пачки, его поднимает и закрывает оркестратор; 7a — один герой за раз; гейт §5 п.7 — только интерактивный редактор | ДС-3; `references/ue-import-package.md` §1 п.1 |
 | Кадры приёмки, листы, бенч | кадры приёмщику модели и клипа — 1200 px по длинной стороне, JPEG q92 (клипа — копии `prep_acceptance.py`, листы уменьшаются целиком); PNG листов K1/K2 и бенча — в рабочий каталог вне git, JPEG-листы инструментов — в git | ДС-8; HANDBOOK §8 |
@@ -598,7 +644,7 @@ CREDITS:
   tripo_limit: "лимит и срок — из журнала (решение 2026-10-13; until: null = окно открыто); граница — баланс Studio"
   planned: "<черновик ≈ 30 + 95>"   # проп: "<multi-view 60–130>" (references/tripo3d-stages.md §3)
 VISUAL_CARD_ID: "AN-<NN>"           # строка 06-tasks/anim.csv (area hero, проп — prop); --task ledger.py add (Codex, Tripo)
-ACCEPTOR_PROFILE: "opus-xhigh"      # | sol-6.1-xhigh → acceptor.profile "Opus xhigh" | "Sol 6.1 xhigh"; повторы тем же.
+ACCEPTOR_PROFILE: "opus-xhigh"      # | sol-6.1-xhigh (отключён 2026-10-20, §0) → acceptor.profile "Opus xhigh" | "Sol 6.1 xhigh"; повторы тем же.
                                     #   Пишется ФАКТ: запускающий выбрал другой профиль — поле переписать (RA-17, F119)
 ASSET_DIR: "art/pipeline-candidates/<ASSET_ID>"
 NOTES:
@@ -660,8 +706,8 @@ decided_by:                         # ОДИН ключ на файл; по ка
   (HANDBOOK §8). Без `git add -A`, `stash`, `reset`, `clean`, push. Чужие незакоммиченные файлы не трогать. Перед
   коммитом сверить `git diff` с объёмом задачи: агенты-исполнители выходят за рамки. В пачке коммитит один агент
   (оркестратор), агенты героев не коммитят параллельно (§11).
-- **`.git/index.lock`.** Приложение Codex раз в несколько секунд гоняет `git diff` по главному чекауту и дважды
-  оставило зависшую блокировку (F82, RC-21). Перед коммитом — `python tools/art/pipeline_batch/git_lock.py
+- **`.git/index.lock`.** Приложение Codex раз в несколько секунд гоняло `git diff` по главному чекауту и дважды
+  оставило зависшую блокировку (F82, RC-21); открытое приложение Z-Code с проектом `unmached` может вести себя так же. Перед коммитом — `python tools/art/pipeline_batch/git_lock.py
   [--remove-stale]`: снимается только блокировка старше 2 мин (`--stale-sec 120`) при отсутствии живых процессов
   git; живую — ждать, чужую операцию не ломать.
 - **Тесты перед коммитом этапов 3, 6, 7:** `python -m pytest tools/tripo-pipeline/tests tools/art/visual/tests
@@ -784,8 +830,8 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 
 | Этап | Один раз на пачку | На каждую фигуру |
 |---|---|---|
-| 0 | пробы исполнителей на сессию (§6, этап 0 п.4); строка условий Tripo на журнал; место на диске (§11.5); бюджет Codex (§11.4); номера AN-NN — один писатель | `ANATOMY` по описанию фигуры, не дефолтом пачки (F1); `asset-card.yaml`, `.gitignore`, запись реестра |
-| 1 | полосы Codex 4–5 (RC-24); задания `make_tasks.py`/`make_1c.py`; приёмка листов `sheet_acceptance.py`; второй приёмщик `finish_second.py` | приёмка фронта и листа, свой цикл |
+| 0 | пробы исполнителей на сессию (§6, этап 0 п.4); строка условий Tripo на журнал; место на диске (§11.5); квоты Gemini и Z-Code (§11.4); номера AN-NN — один писатель | `ANATOMY` по описанию фигуры, не дефолтом пачки (F1); `asset-card.yaml`, `.gitignore`, запись реестра |
+| 1 | генерации Gemini по заданиям `make_tasks.py`/`make_1c.py` (полосы Codex отключены, §0); приёмка листов — Opus-путь `sheet_acceptance.py`; второй приёмщик `finish_second.py` | приёмка фронта и листа, свой цикл |
 | 1b, 2 | очередь Tripo `prep_1b.py`; одна вкладка Studio, герои конвейером; форма Studio — на пачку (F11) | строка журнала сразу после каждой операции (`tripo_log.py`); `post_1b.py`, `post_h2.py`; GLB выгружать сразу (RC-20) |
 | 3–5 | не больше 2 прогонов Blender одновременно (§11.6) | профиль, прогон, сдача модели, приёмка |
 | 6 | регистрация общих файлов — один писатель (RC-13); `clip_manifest.py build` — один сборщик за раз (F117) | спека, `h2anim_run.py`, проверки исполнителя, заготовки промптов |
@@ -795,7 +841,9 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 
 ### 11.2 Ресурсы: что параллельно, что строго по одному
 
-Таблица — по замерам пилота (`research/C-scale.md` §5) с поправками волн 1–2 исследования.
+Таблица — по замерам пилота (`research/C-scale.md` §5) с поправками волн 1–2 исследования. Строки «Codex 1a/1c» и
+«Sol-приёмщик» — история: с 2026-10-20 оба отключены (§0). Параллельность Gemini и Z-Code через Computer Use не
+измерена: один рабочий стол — одна полоса, пока первый прогон не покажет иное.
 
 | Ресурс или этап | Режим | Замер пилота | Ограничение и что изменилось |
 |---|---|---|---|
@@ -835,7 +883,10 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 | `tools/tripo-pipeline/anim/grip_check.py`, `clip_closeups.py` | 6, 7a.2 | хват, кисть, локоть; крупные планы клипа и пара шва Idle |
 | `tools/art/registration_check.py` | 7b, интеграция | полнота регистрации героя в коде и конфигах (RB-04) |
 
-### 11.4 Бюджет сессий Codex (RC-12)
+### 11.4 Бюджет сессий Codex (RC-12) — история, Codex отключён 2026-10-20 (§0)
+
+Квоты Gemini и Z-Code (тариф Z.AI coding plan) не измерены. Отказ по лимиту — пауза пачки и строка в `NOTES`.
+Ниже — прежнее правило Codex.
 
 - Квота Codex общая для генерации и приёмщика Sol. Пилот: 11–15 сессий Codex на фигуру (1a, 1c, приёмка фронта и
   листа, 1–3 приёмки модели, 6–8 приёмок клипов) и 1–3 Opus. В плане пачки — оценка «фигуры × 15 сессий»; окна

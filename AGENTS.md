@@ -24,7 +24,7 @@ Usage notes:
 
 <skill>
 <name>3d-model-pipeline</name>
-<description>Сквозной пайплайн новой 3D-фигуры Unmatched (герой, помощник, крылатое существо-бипед, проп). Этапы — концепт-лист в Codex, генерация в Tripo3D Studio, сборка H2 в Blender, приёмка с коэффициентом и доработкой, анимация с VFX/SFX и упаковка с подключением в Unreal. Триггеры — «сгенерируй 3D-модель», «новый герой / помощник / существо / проп», «новая фигура», «3D model pipeline», «модель через Tripo», «концепт-лист героя». Статический проп (бочка, фонарь, ящик) — да, до импорта в UE; его размещение в раскладке доски — нет. НЕ для окружения, задников и сцен досок и размещения пропов в EnvLayouts (Marmoreal/Sarpedon — трек ENV-MAPS) и НЕ для разовых правок существующих ассетов.</description>
+<description>Сквозной пайплайн новой 3D-фигуры Unmatched (герой, помощник, крылатое существо-бипед, проп). Этапы — концепт-лист в Gemini, генерация в Tripo3D Studio, сборка H2 в Blender, приёмка с коэффициентом и доработкой, анимация с VFX/SFX и упаковка с подключением в Unreal. Триггеры — «сгенерируй 3D-модель», «новый герой / помощник / существо / проп», «новая фигура», «3D model pipeline», «модель через Tripo», «концепт-лист героя». Статический проп (бочка, фонарь, ящик) — да, до импорта в UE; его размещение в раскладке доски — нет. НЕ для окружения, задников и сцен досок и размещения пропов в EnvLayouts (Marmoreal/Sarpedon — трек ENV-MAPS) и НЕ для разовых правок существующих ассетов.</description>
 <location>project</location>
 </skill>
 
@@ -179,6 +179,48 @@ that are no longer needed. Before stopping a process, verify its command line,
 parent, executable path, and relation to this run; never kill processes by name
 alone. Do not close the user's Unreal Editor or Codex-owned MCP services. Keep a
 shared development service running only while current work needs it.
+
+## AI tools and side models (user decision 2026-10-20, binding)
+
+The user's words on 2026-10-20: «Я отменил подписку на ChatGPT, так что если нужно генерировать ассеты, либо
+использовать какой-то побочную модель, переключись на приложение Z-Code, оно использует модель GLM5.3. С F-Max. А для
+ассетов можно использовать создание изображений в приложении Gemini. Музыку можно создавать как и в моих существующих
+подписках Syntax и вот второй сервис тоже на букву S английскую, забыл название, Steve или как-то так. Вот. Либо
+пользоваться сервисами Гугла, которые встроены в Gemini. Запиши это в основные правила проекта.» Then: «Этот код можешь
+использовать через Computer Use» (Z-Code is driven through Computer Use).
+
+This section wins over every mention of Codex, the ChatGPT app, `codex exec`, `codex_lane.py`, Sol (`gpt-6.1-sol`) and
+GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rewritten.
+
+| Need | Use now | No longer available |
+|---|---|---|
+| Side model: second opinion, text or scope review, prompt drafting, a parallel agent | **Z-Code** desktop app (`C:\Program Files\ZCode\ZCode.exe`, Start menu "ZCode"), model **GLM-5.3**, reasoning **max** (the user's «F-Max»; max is GLM-5.3's default variant), driven through Computer Use | Codex app (`ChatGPT.exe`), `codex exec`, Sol, GPT Astra |
+| A side model has to look at images (acceptance frames, blind X/Y pairs) | Z-Code with **GLM-5.3-Flash**. In the user's Z.AI coding plan GLM-5.3 takes text only; GLM-5.3-Flash takes text, image and video (`~/.zcode/v2/config.json`, checked 2026-10-20) | Sol / Astra with `-i` frames |
+| Images: concept sheets 1a/1c, references, glyph masks, texture sources | Image generation in the **Gemini** app (`com.google.gemini.windows`, `%LOCALAPPDATA%\Google\Gemini\app-*\Gemini.exe`), or the Google services built into Gemini | Codex `image_gen` |
+| Music, SFX, voice | **SYNTX** (existing subscription, MCP `syntx-ai`) and **stiva.ai** (the second «S» service, «Steve или как-то так»; it carries ElevenLabs SFX), or the Google services built into Gemini | — |
+| 3D generation | Tripo3D Studio, unchanged | — |
+
+- Never call Codex or ChatGPT: no `codex exec`, no ChatGPT app, no Sol or Astra acceptor. Tool lanes that still call
+  them are dead until ported: `tools/art/pipeline_batch/codex_lane.py`, the Sol path of `sheet_acceptance.py`, Sol in
+  `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` and `tools/art/acceptance/*`. Use their Opus paths.
+- **Z-Code through Computer Use** (main path). Claude writes the prompt to a file in the repo. Then: open Z-Code, pick
+  the project `unmached` (it is in Z-Code's recent projects), start a new task, select GLM-5.3 (or GLM-5.3-Flash for
+  images) and paste the prompt; attach images through the composer. Z-Code writes only into the folder that the
+  prompt names and never commits; Claude reviews its diff and commits. Do not close Z-Code tasks the user started.
+- **Z-Code headless** (spare path, like `codex exec`). The bundled CLI `resources\glm\zcode.cjs` has
+  `-p <prompt> --attach <file> --mode plan --json`. It only starts from a copy that has its provider file next to it:
+  `<dir>\zcode.cjs` plus `<dir>\provider\zcode-builtin.json`, copied from `resources\config\provider\`. On 2026-10-20 it
+  still stopped with «Select a model before sending a message»: the standalone CLI has no Z.AI account until the user
+  runs `zcode login zai` once. That is a browser sign-in and the user's step; an agent never signs in. Until a probe
+  passes, use the GUI path.
+- **Second acceptor and blind reviews "of another profile":** Z-Code GLM-5.3-Flash. While no scripted Z-Code lane
+  exists, use the Opus `second-acceptor` workflow in a fresh context. Write the profile actually used into the card.
+- **Gemini:** the user's Gemini app through Computer Use, or gemini.google.com in their Chrome through Claude in
+  Chrome. Prompts come from files in the repo. Outputs are saved into the folder that the skill or task names. On a
+  sign-in screen, stop and ask the user. Look for a visible watermark before an image is used.
+- Music and SFX keep the audio pipeline rules (`docs/game-design/audio`, ledger lines, licence notes). stiva.ai and the
+  Gemini services are new to the pipeline. On 2026-10-20 `tools/art/visual/ledger.py` knows only SYNTX, Tripo and
+  Codex. Until it learns Gemini and stiva.ai, write each use and the service terms as a NOTES line of the card or task.
 
 ## Unreal GPU load
 
@@ -342,8 +384,8 @@ The user's words: «добавь в проект основное правило
     source's own clean Tripo 8K materials (`import_hipoly.py`, `/HP2`).
   - **Faced so the face is visible.** The hero's own niche yaw keeps the face clear: the weapon must never cross the
     face (example: King Arthur 85° / 95°).
-  - **Accepted blind.** A blind before/after review (Opus + GPT Astra, unlabeled X/Y with swapped sides) is done before
-    it becomes the default.
+  - **Accepted blind.** A blind before/after review (unlabeled X/Y with swapped sides) is done before it becomes the
+    default. Reviewers: Opus plus Z-Code GLM-5.3-Flash; GPT Astra until 2026-10-20 ("AI tools and side models").
   - **Registered and cooked.** The path is registered in `UmShowcase::HiPolyPath` and its folder is in
     `DirectoriesToAlwaysCook`.
 - A hero without a finished showcase high-poly falls back to its H2LD figure in the niche. Treat that as an open item,
