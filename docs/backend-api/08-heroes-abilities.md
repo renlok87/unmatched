@@ -78,7 +78,7 @@
 
 ---
 
-## 2. Герои реестра (29)
+## 2. Герои реестра (32)
 
 Формат: **slug** — Имя; атака (melee/range); health; movement; сайдкики (hp/move/атака). Затем — способность как реализована в коде, затем деки.
 
@@ -104,7 +104,7 @@ Melee; 16 HP; move 3; без сайдкиков.
 
 ### 2.5. philippa — Philippa
 Range; 12 HP; move 2; сайдкик Dijkstra (6 HP, move 2, melee).
-- **«Spellbreaker»** (в коде; печатное «Two Steps Ahead»): `turn-end`, условие `always`, эффект `turn-effect` **drawToHandSize: 4** — добор до 4 карт в руке в конце хода.
+- **«Two Steps Ahead»**: `turn-end`, условие `always`, эффект `turn-effect` **drawToHandSize: 4, optional** — в конце хода игрок МОЖЕТ добрать до 4 карт: optional CHOOSE_ONE «Do not draw / Draw N» (`optionalDrawPending`, отказ — опция 0; по таймауту — отказ). Передача хода ждёт выбора (GD-018).
 - **Дека**: 30 карт, 13 уникальных: Owlform ×3 (сброс карт → +1 за карту), Lightning bolt ×3 (без манёвра — 1 урон всем в зоне), Paralyzing fetters, Spellbreaker ×3 (закончить ход), Redanian plot ×3, Regicide (против героя — значение 6), Spymaster's ruse, Backup plan (health=5 или добор 3), Blinding dust (сброс карты → урон = её BOOST), Chain lightning (1 урон всем врагам зоны), Cunning, Do my bidding, Polymorphy (телепорт).
 
 ### 2.6. t-rex — T. Rex
@@ -114,12 +114,12 @@ Melee; 27 HP; move 1; без сайдкиков.
 
 ### 2.7. bigfoot — Bigfoot
 Melee; 16 HP; move 3; сайдкик The Jackalope (6 HP, move 3, melee).
-- **«It's Just Your Imagination»**: `turn-end`, условие `no-enemy-in-own-zone` (в зоне Bigfoot нет вражеских бойцов), эффект `turn-effect` **draw: 1**.
+- **«It's Just Your Imagination»** (внутренний лейбл): `turn-end`, условие `no-enemy-in-own-zone` (в зоне Bigfoot нет вражеских бойцов), эффект `turn-effect` **draw: 1, optional** — «you may draw 1 card»: выбор «не добирать / добрать» (на пустой колоде отказ спасает от истощения).
 - **Дека**: 30 карт, 11 уникальных: Savagery ×3, It's Just Your Imagination, Feint ×3, Momentous Shift ×3, Jackalope Horns ×3, Crash Through the Trees, Hoax ×3 (движение до 5 сквозь врагов), Skirmish ×3, Disengage, Larger Than Life ×3 (атака 6), Regroup ×3.
 
 ### 2.8. chupacabra — Chupacabra
 Melee; 14 HP; move 3; без сайдкиков.
-- **«Blood Frenzy»** (печатное «The Hunger»): `after-attack`, условие `always`, эффект `turn-effect` **draw: 1** после каждой своей атаки независимо от исхода.
+- **«The Hunger»**: `after-attack`, условие `always`, эффект `turn-effect` **draw: 1, optional** — после каждой своей атаки МОЖЕТ добрать 1 карту (выбор «не добирать / добрать») независимо от исхода.
 - **Дека**: 30 карт, 11 уникальных: Ambush ×2, Wounded beast ×3 (≤7 HP — значение 5), Blood in the air ×3, Feeding ×3, Feint ×3, Natural toughness (проигрыш — вернуть в руку), Ravenous lunge ×3 (лечение 1/2), Traveler of the night ×3, The more they struggle ×3 (value = 2×value карты противника), Unsettle, Tooth and tail ×3.
 
 ### 2.9. deadpool — Deadpool
@@ -129,7 +129,7 @@ Melee; 10 HP; move 2; без сайдкиков.
 
 ### 2.10. michelangelo — Michelangelo
 Melee; 14 HP; move 3; сайдкик April O'Neil (6 HP, move 3, range).
-- **«Party Dude»**: `after-attack`, `always`, `turn-effect` **draw: 1** после своей атаки. Печатный лимит руки 3 не моделируется.
+- **«Pizza Party»**: `after-attack` и `after-scheme` (`onAfterScheme` из `executePlayScheme`), `always`, `turn-effect` **draw: 1** — после своей атаки или схемы. `startingHandSize: 3` (game-initialization) и `maxHandSize: 3` (сброс в конце хода, `advanceTurn`).
 - **Дека**: 30 карт, 12 уникальных: Heroes in a half shell, Back for seconds, Hi-yaaaaah!! ×3, Boisterous beatdown ×3, Let's go ×3, Michelangelo is a party dude!!, Cowabunga!! ×3, Nunchaku ×2, Guaranteed delivery ×3, Shell insertion, Turtle power! ×2 (BOOST), Hard-hitting investigation ×3.
 
 ### 2.11. angel — Angel
@@ -164,12 +164,12 @@ Melee; 16 HP; move 2; сайдкик Splinter (9 HP, move 2, melee).
 
 ### 2.17. dracula — Dracula
 Melee; 13 HP; move 2; сайдкики 3× The Sisters (1 HP, move 2, melee).
-- **«Children of the Night»**: `turn-start`, `always`, эффект `turn-damage` **targetScope: 'enemy-adjacent', value: 1, thenDraw: 1** — в начале хода авто-удар 1 по ПЕРВОМУ смежному врагу (порядок `state.fighters`); при попадании — добор 1. Приближение: «you may»/выбор цели не моделируется; нет цели → no-op без добора.
+- **«Children of the Night»** (внутренний лейбл): `turn-start`, `always`, эффект `pending-target-damage` **targetScope: 'any-adjacent', value: 1, thenDraw: 1** — в начале хода optional TARGET_FIGHTER: цель выбирает игрок среди ЛЮБЫХ живых бойцов, смежных с Dracula (свои Sisters тоже), можно отказаться. Урон 1, затем добор 1 (`PendingEffect.drawAfterDamage`) — только после выбора цели; отказ — без добора. Нет смежных бойцов → без выбора.
 - **Дека**: 30 карт, 13 уникальных: Prey Upon ×2, Thirst for Sustenance ×3, Beastform ×2 (сброс карт → +1 за карту), Dash ×3, Feint ×3, Exploit ×2 (добор), Mistform ×2 (телепорт + действие), Ambush ×2, Baptism of Blood ×2 (лечение + воскрешение Sister), Do My Bidding ×2, Feeding Frenzy ×2 (+1 за Sister в зоне противника), Look Into My Eyes ×2 (+BOOST карты атаки противника к защите), Ravening Seduction ×3.
 
 ### 2.18. medusa — Medusa
 Range; 16 HP; move 3; сайдкики 3× Harpies (1 HP, move 3, melee).
-- **«Petrifying Gaze»**: `turn-start`, `always`, эффект `turn-damage` **targetScope: 'enemy-in-zone', value: 1** (без thenDraw) — авто-удар 1 по первому вражескому бойцу в зоне Medusa. Приближение то же (без «you may»).
+- **Medusa turn-start damage** (provisional-лейбл): `turn-start`, `always`, эффект `pending-target-damage` **targetScope: 'enemy-in-zone', value: 1** — optional TARGET_FIGHTER (S05, GD-017): игрок выбирает врага в зоне Medusa или отказывается.
 - **Дека**: 30 карт, 11 уникальных: Second Shot ×3 (BOOST), A Momentary Glance ×2 (scheme: 2 урона в зоне), Winged Frenzy ×2, Gaze of Stone ×3 (при победе — 8 урона), Hiss and Slither ×3 (сброс у противника), Feint ×3, Regroup ×3, Snipe ×3 (добор), The Hounds of Mighty Zeus ×2, Clutching Claws ×3, Dash ×3.
 
 ### 2.19. bullseye — Bullseye
@@ -196,7 +196,7 @@ Melee; 13 HP; move 2; сайдкики 2× Honor Guard (6 HP, move 2, melee).
 Melee; 18 HP; move 2; сайдкик Patroclus (6 HP, move 2, melee). Единственный герой с ТРЕМЯ правилами:
 1. `combat-passive` + `all-own-sidekicks-defeated` → `combat-modifier` **+2 к атаке**, пока Patroclus повержен;
 2. `after-attack` + `won-combat-and-all-sidekicks-defeated` → `turn-effect` **draw: 1** (победа в бою при поверженном сайдкике);
-3. `sidekick-defeated` → `discard-random` **count: 2** — в момент гибели Patroclus сброс 2 карт из руки (через `onFighterDefeated`; «random» детерминированно — первые 2 карты руки).
+3. `sidekick-defeated` → `discard-random` **count: 2** — в момент гибели Patroclus сброс 2 СЛУЧАЙНЫХ карт из руки (через `onFighterDefeated`; `DeckManagementService.discardRandomCard`, тот же примитив, что у карт).
 - **Дека**: 30 карт, 12 уникальных: Achilles' Heel ×3, Feint ×3, Brothers In Arms ×3 (Patroclus жив — +1 действие), Under Achilles' Helm ×3, Skirmish ×3, Test For Weakness ×3, Battle Frenzy ×2 (2 урона обоим), Spear Throw ×2 (scheme: 2 урона в зоне), The Day of Your Doom ×2 (2 урона Patroclus → значение 5), Wily Fighting ×2, Battle Hardened ×2, Blessed By Hermes ×2.
 
 ### 2.24. tomoe-gozen — Tomoe Gozen
@@ -209,7 +209,7 @@ Melee; 13 HP; move 2; сайдкик The Jabberwock (8 HP, move 2, melee).
 - **«Big / Small»**: stance-герой. Стойки: `big` (default), `small`. Правила:
   - `combat-passive` + `whenStance: 'big'` → **+2 к атаке**;
   - `combat-passive` + `whenStance: 'small'` → **+1 к защите**.
-  Стойка РУЧНАЯ: выбор при размещении (setStance) и карты «Change size» (Mad as a Hatter / Drink Me / Eat Me / …). Авто-флипа нет.
+  Стойка РУЧНАЯ (`stanceChoiceAtStart`): мутация `setStance` — один раз, до первого действия своего первого хода (выбор не сделан — BIG). Дальше размер меняют только карты «Change size» (Mad as a Hatter / Drink Me / Eat Me / …) — эффект `CHANGE_SIZE` парсера v10 (`toggleHeroStance`). Авто-флипа нет.
 - **Дека**: 30 карт, 15 уникальных (4 карты «Change size»): Mad as a Hatter ×2, Drink Me ×2, Skirmish ×2, Jaws That Bite ×2, Momentous Shift ×2, Feint ×3, Regroup ×3, The Other Side of the Mushroom, Eat Me ×2, Claws That Catch ×2 (против героя — 5), I'm Late, I'm Late ×3 (движение 5 + смена), Looking Glass ×2, O Frabjous Day!, Snicker-Snack, Manxome Foe ×2.
 
 ### 2.26. muhammad-ali — Muhammad Ali (СТОЙКИ)
@@ -217,7 +217,7 @@ Melee; 16 HP; move 3; без сайдкиков.
 - **«Float Like a Butterfly / Sting Like a Bee»**: stance-герой. Стойки: `float` (default, **attackRange: 2**), `sting`. Правила:
   - `combat-passive` + `whenStance: 'sting'` → **+2 к атаке**;
   - `after-attack` + условие `won-combat` → `set-stance to: 'toggle'` — **авто-флип стойки после каждой выигранной атаки** (float ↔ sting).
-  В FLOAT герой может атаковать с 2 клеток (`canAttackAtRange` читает `stance.attackRange`), в STING — только обычная дальность 1, но +2 атака.
+  В FLOAT герой может атаковать с 2 клеток (`canAttackAtRange` читает `stance.attackRange`), в STING — только обычная дальность 1, но +2 атака. Мутация `setStance` для Ali запрещена (нет `stanceChoiceAtStart`): стойку меняет только авто-флип.
 - **Дека**: 30 карт, 13 уникальных (эффекты [Butterfly] — только в FLOAT): Jab ×2, Answer the bell ×2, Stick and move ×3, Ali Shuffle ×3, Close and clinch ×3, Momentous Shift ×2, Fancy footwork ×2, Hard to be humble ×3, Louisville lip ×2, Rope-a-dope ×2, Champion of the world ×2, Stronger than the skill ×2, The greatest ×2.
 
 ### 2.27. king-arthur — King Arthur (classic handler)
@@ -237,17 +237,31 @@ Melee; 14 HP; move 2; без сайдкиков.
   2. **Движение в начале хода**: `executeTurnStartMove(state, playerId, targetPosition)` — сдвиг на 1 клетку (`TURN_START_MOVE_BONUS = 1`), только на валидную позицию (границы 6×6, не занята бойцом; препятствия/двери — TODO). `getAvailableTurnStartPositions` возвращает 4 соседние клетки. Авто-хук `onTurnStart` зарезервирован и возвращает state без изменений — активация отдельной мутацией.
 - Контент-модуль (`backend/src/content/data/heroes/ms-marvel.ts`): дека из 5 уникальных ×3 = 15 карт: Embiggen (atk 3/б3; Ms. Marvel в большем числе зон — значение 6), Big Wind Up (atk 4/б2; нет общих зон — BOOST), Easy Peasy (atk 3/б2; добор 1, при руке ≥4 — 1 урон смежному), Feint (vers 2/б1; отмена эффектов карты противника), Groovy (def 3/б2). Полный скрап-дек — 30 карт / 11 уникальных (вкл. Fangirl, Slingshot, Friends and Family, Gyro and Fries, I'm Not Touching You, Shrink! Shrink! Shrink!, Momentous Shift) — см. doc 09.
 
+### 2.30. sherlock-holmes — Sherlock Holmes (неотменяемость)
+- `uncancellableCards: 'hero-and-sidekicks'`, `rules: []` — «Effects on HOLMES and DR. WATSON cards cannot be canceled by an opponent. Effects on ANY cards can be canceled.» `CANCEL_EFFECTS` соперника не действует на карты с банером Holmes или Dr. Watson (`isCardUncancellable`, `EffectContext.opposingCardUncancellable`).
+
+### 2.31. ciri — Ciri (неотменяемость)
+- `uncancellableCards: 'hero'` — «Effects on Ciri's cards cannot be canceled.» Квалификатор «🔵 x7» печатного текста не разобран.
+
+### 2.32. winter-soldier — Winter Soldier (неотменяемость)
+- `uncancellableCards: 'hero'` — «Brainwashed: Effects on Winter Soldier's cards cannot be canceled.»
+
+Карточная неотменяемость (Beowulf «The Ancient Heirloom», Blackbeard, Cloak & Dagger, Jill Trent, Eredin, Houdini, Loki, Sun Wukong, Yennefer & Triss «Incinerate»): печатное «This card's effect(s) cannot be canceled» в `Card.text` — `isUncancellableCardText` (парсер v10), проверяется в момент отмены, БД не меняется. Частичная форма «(This effect cannot be canceled.)» в поле тайминга помечает эффекты этого поля `uncancellable` — они исполняются и на отменённой карте.
+
 ---
 
 ## 3. Замечания о приближениях (задокументированы в коде)
 
-1. **«you may» не моделируется** для `turn-damage` (Dracula, Medusa) — авто-удар по первому кандидату.
-2. **«random» discard** (Achilles) — детерминированный сброс первых N карт.
+1. ~~«you may» не моделируется~~ — закрыто 2026-10-20 (разбор DE, RULE-02): Dracula, Medusa — optional TARGET_FIGHTER; Bigfoot, Philippa, Chupacabra — optional CHOOSE_ONE добора; карты «You may draw N cards» — optional DRAW_CARD.
+2. ~~«random» discard (Achilles)~~ — закрыто 2026-10-20: случайный сброс через `discardRandomCard`. Реакция на гибель Patroclus по-прежнему только из резолва боя (гибель от схемы/истощения сброс не вызывает), добор при победе — только в атаке.
 3. **Движение чужих бойцов** не поддержано моделью PendingEffect (Leonardo — только свои).
 4. **Eredin**: ENRAGED «move value 3» и **Ancient Leshen**: «Wolves move 3» — статы сайдкиков не моделируются в способности.
-5. **Michelangelo**: лимит руки 3 не моделируется.
+5. ~~Michelangelo: лимит руки 3 и «or scheme»~~ — закрыто 2026-10-20.
 6. **`after-defense`-инфра** готова (defenderPlayerId в AfterCombatContext), но героя-пользователя нет; Spider-Sense (info-reveal) — COMPLEX-механика, намеренно не реализована.
 7. **T. Rex**: «large fighter» моделируется только атакой с 2 клеток; большая база/хвост — нет.
+8. **Alice**: размер выбирается мутацией `setStance` в начале СВОЕГО первого хода, а не при размещении: если соперник ходит первым, его первая атака застаёт Alice в BIG. Выбора на старте в UE нет (Alice нет в UE-ростере).
+9. **Yennefer & Triss**: способность героя (выбор героини, BOOST Yennefer с частичной неотменяемостью) не реализована; неотменяема только карта Incinerate.
+10. **Luke Cage**: «takes 2 less combat damage» смоделирован как +2 к защите — меняет исход боя (открыто, разбор DE MISSED).
 
 ---
 
@@ -266,7 +280,7 @@ Melee; 14 HP; move 2; без сайдкиков.
 | bigfoot | | | ✓ | | | | | | | | |
 | chupacabra | | | | ✓ | | | | | | | |
 | deadpool | | | | ✓ | | | | | | | |
-| michelangelo | | | | ✓ | | | | | | | |
+| michelangelo | | | | ✓ (+after-scheme) | | | | | | | |
 | angel | | | | ✓ | | | | | | | |
 | golden-bat | ✓ | | | | | | | | | | |
 | ancient-leshen | ✓ | | | | | | | | | | |
@@ -283,6 +297,7 @@ Melee; 14 HP; move 2; без сайдкиков.
 | tomoe-gozen | | | | | | ✓ | | | | | |
 | alice | ✓ | | | | | | | | | ✓ | |
 | muhammad-ali | ✓ | | | ✓ | | | ✓(stance) | | | ✓ | |
+| sherlock-holmes / ciri / winter-soldier | (uncancellableCards — без правил) | | | | | | | | | | |
 | king-arthur | | | | | | | | | | | ✓ |
 | daredevil | (onCombat*, отдельная мутация Blind Boost) | | | | | | | | | | |
 | ms-marvel | (onCombat — no-op) | (onTurnStart — no-op, движение отдельной мутацией) | | | | | ✓(2) | | | | |
@@ -290,6 +305,6 @@ Melee; 14 HP; move 2; без сайдкиков.
 \* Daredevil использует `canTrigger`/`executeBlindBoost`/`getCombatModifiers` своего handler'а (int-механика BOOST из верха колоды), вызываемые из combat-пути executor'а; его `onCombat` — no-op-заглушка.
 
 ### Сводка
-- **Всего героев в реестре: 29** (26 из `ABILITY_CONFIGS` + daredevil + ms-marvel + king-arthur).
-- **Всего описанных механик (правил способностей): 33** — 31 правило в `ABILITY_CONFIGS` (26 героев; у Achilles 3 правила, у Muhammad Ali 2) + Blind Boost (daredevil) + Stretchy (ms-marvel) + Holy Avenger/allowsAttackBoost (king-arthur).
+- **Всего героев в реестре: 32** (29 из `ABILITY_CONFIGS` + daredevil + ms-marvel + king-arthur).
+- **Всего описанных механик (правил способностей): 34** — 32 правила в `ABILITY_CONFIGS` (29 героев; у Achilles 3 правила, у Muhammad Ali и Michelangelo по 2, у Holmes, Ciri и Winter Soldier правил нет — только `uncancellableCards`) + Blind Boost (daredevil) + Stretchy (ms-marvel) + Holy Avenger/allowsAttackBoost (king-arthur).
 - Деки: все по 30 карт (Deadpool — 30 уникальных ×1; Daredevil — 15 в контент-модуле / 22 в скрапе; Ms. Marvel — 15 в контент-модуле / 30 в скрапе).

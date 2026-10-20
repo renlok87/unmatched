@@ -208,6 +208,101 @@ describe('CardEffectExecutorService (A3)', () => {
     });
   });
 
+  describe('RULE-01: неотменяемые карты', () => {
+    const feint = () => card('def', [
+      eff({ type: EffectType.CANCEL_EFFECTS, timing: EffectTiming.ON_REVEAL }),
+    ], { cardType: CardType.DEFENSE });
+    const withHeroes = (attacker: { name: string; heroSlug: string }, sidekick?: string): GameState => {
+      const base = makeState();
+      return {
+        ...base,
+        fighters: [
+          { ...base.fighters[0], name: attacker.name, heroSlug: attacker.heroSlug },
+          base.fighters[1],
+          ...(sidekick
+            ? [{ ...base.fighters[0], id: 'f1-sk', name: sidekick, type: FighterType.MINION, heroSlug: attacker.heroSlug }]
+            : []),
+        ],
+      } as GameState;
+    };
+
+    it("«This card's effects cannot be canceled» в тексте карты — Feint не отменяет", async () => {
+      const atk = card('atk', [eff({ type: EffectType.DRAW_CARD, timing: EffectTiming.AFTER_COMBAT, value: 1 })], {
+        text: "This card's effects cannot be canceled.",
+      });
+      const reveal = await service.executeRevealEffects(makeState(), atk, feint(), combat);
+      expect(reveal.attackerCardCancelled).toBe(false);
+    });
+
+    it('Holmes: карты с банером Holmes и Dr. Watson не отменяются, карта Any — отменяется', async () => {
+      const state = withHeroes({ name: 'Sherlock Holmes', heroSlug: 'sherlock-holmes' }, 'Dr. Watson');
+      for (const bannerName of ['Holmes', 'Dr. Watson']) {
+        const atk = card('atk', [], { bannerName });
+        const reveal = await service.executeRevealEffects(state, atk, feint(), combat);
+        expect(reveal.attackerCardCancelled).toBe(false);
+      }
+      const any = await service.executeRevealEffects(state, card('atk', [], { bannerName: 'Any' }), feint(), combat);
+      expect(any.attackerCardCancelled).toBe(true);
+    });
+
+    it('Winter Soldier: защищены только его карты; у обычного героя Feint отменяет', async () => {
+      const ws = withHeroes({ name: 'Winter Soldier', heroSlug: 'winter-soldier' });
+      const own = await service.executeRevealEffects(ws, card('atk', [], { bannerName: 'Winter Soldier' }), feint(), combat);
+      expect(own.attackerCardCancelled).toBe(false);
+      const plain = withHeroes({ name: 'King Arthur', heroSlug: 'king-arthur' });
+      const arthur = await service.executeRevealEffects(plain, card('atk', [], { bannerName: 'Arthur' }), feint(), combat);
+      expect(arthur.attackerCardCancelled).toBe(true);
+    });
+
+    it('«(This effect cannot be canceled.)» — эффект исполняется и на отменённой карте', async () => {
+      const atk = card('atk', [
+        eff({ type: EffectType.DRAW_CARD, timing: EffectTiming.AFTER_COMBAT, value: 1, uncancellable: true }),
+        eff({ type: EffectType.DRAW_CARD, timing: EffectTiming.AFTER_COMBAT, value: 1 }),
+      ]);
+      const after = await service.executeAfterCombatEffects(
+        makeState(), atk, null, combat,
+        { attackerWon: true, attackerDamage: 0, defenderDamage: 2 },
+        { attacker: true, defender: false },
+      );
+      expect(after.state.handZones.p1.cards).toHaveLength(1); // только неотменяемый добор
+    });
+  });
+
+  describe('RULE-02 / RULE-03: «you may draw» и «Change size»', () => {
+    it('optional DRAW_CARD не добирает, а открывает выбор «не добирать / добрать» (отказ — опция 0)', async () => {
+      const scheme = card('scheme', [
+        eff({ type: EffectType.DRAW_CARD, timing: EffectTiming.ON_PLAY, value: 2, optional: true }),
+      ], { cardType: CardType.SCHEME });
+      const played = await service.executeOnPlayEffects(makeState(), scheme, 'p1');
+      expect(played.state.handZones.p1.cards).toHaveLength(0);
+      const pending = played.state.metadata.pendingEffects![0];
+      expect(pending).toMatchObject({ type: 'CHOOSE_ONE', playerId: 'p1', optional: true });
+      expect(pending.options!.map((o) => o.label)).toEqual(['Do not draw', 'Draw 2 cards']);
+      const drew = await service.executeChosenEffects(
+        { ...played.state, metadata: { ...played.state.metadata, pendingEffects: [] } },
+        pending.optionEffects![1], 'p1', pending.card,
+      );
+      expect(drew.state.handZones.p1.cards).toHaveLength(2);
+    });
+
+    it('CHANGE_SIZE переключает Alice BIG → SMALL → BIG; у героя без стоек — no-op', async () => {
+      const base = makeState();
+      const alice = {
+        ...base,
+        fighters: [{ ...base.fighters[0], name: 'Alice', heroSlug: 'alice' }, base.fighters[1]],
+      } as GameState;
+      const scheme = card('drink-me', [
+        eff({ type: EffectType.CHANGE_SIZE, timing: EffectTiming.ON_PLAY }),
+      ], { cardType: CardType.SCHEME });
+      const small = await service.executeOnPlayEffects(alice, scheme, 'p1');
+      expect(small.state.metadata.heroStances).toEqual({ p1: 'small' });
+      const big = await service.executeOnPlayEffects(small.state, scheme, 'p1');
+      expect(big.state.metadata.heroStances).toEqual({ p1: 'big' });
+      const plain = await service.executeOnPlayEffects(base, scheme, 'p1');
+      expect(plain.state.metadata.heroStances).toBeUndefined();
+    });
+  });
+
   describe('S02 defender-first and terminal resolution', () => {
     const result = { attackerWon: false, attackerDamage: 0, defenderDamage: 0 };
 

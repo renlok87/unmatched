@@ -571,21 +571,16 @@ export class GameRulesValidator {
     card: { bannerName?: string; name?: string },
     fighter: Fighter,
   ): ValidationResult {
-    const banner = card.bannerName?.trim();
-    if (!banner || banner.toLowerCase() === 'any') return { valid: true };
-
-    if (bannerAllows(banner, fighter)) return { valid: true };
-
-    // Банер вообще известен в этой игре? (опечатки/грязные данные → разрешить)
-    const known = state.fighters.some((f) => bannerAllows(banner, f));
-    if (!known) {
+    const verdict = bannerVerdict(state.fighters, card.bannerName, fighter);
+    if (verdict === 'unknown') {
       this.logger.warn(
-        `bannerName «${banner}» не матчит ни одного бойца игры — карта разрешена (грязные данные?)`,
+        `bannerName «${card.bannerName}» не матчит ни одного бойца игры — карта разрешена (грязные данные?)`,
         { card: card.name },
       );
-      return { valid: true };
     }
+    if (verdict !== 'denied') return { valid: true };
 
+    const banner = card.bannerName!.trim();
     return {
       valid: false,
       error: `Карту с банером «${banner}» может играть только этот боец (играет ${fighter.name})`,
@@ -595,19 +590,64 @@ export class GameRulesValidator {
 }
 
 /**
- * Матчит ли банер карты бойца: «Harpy» = «Harpy 2» (срез числового суффикса),
- * «Arthur» = «King Arthur» (банер — слово в полном имени),
- * «Harpy» = «Harpies» (нормализация числа: банеры в единственном,
- * сайдкики в БД — во множественном). Регистронезависимо.
+ * Банеры форм героя, у которого нет отдельного бойца на каждую форму.
+ * Jekyll & Hyde — один боец «Jekyll & Hyde», а карты подписаны формой
+ * («Dr. Jekyll» / «Mr. Hyde»). Пока трансформации нет, обе формы играет этот
+ * боец. Ключ и значения — в нормализованном виде (normalizeBannerWords).
+ */
+export const BANNER_FORM_ALIASES: Readonly<Record<string, readonly string[]>> = {
+  'dr jekyll': ['jekyll hyde'],
+  'mr hyde': ['jekyll hyde'],
+};
+
+/** Регистр, пунктуация и пробелы → слова через один пробел («T. Rex» → «t rex»). */
+export function normalizeBannerWords(name: string): string {
+  return name.trim().toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+}
+
+/**
+ * Матчит ли банер карты бойца. Регистронезависимо, без учёта пунктуации:
+ *  - «Harpy» = «Harpy 2» (срез числового суффикса);
+ *  - «Harpy» = «Harpies» (банеры в единственном, сайдкики в БД — во множественном);
+ *  - «Arthur» = «King Arthur», «Jill Trent» = «Dr. Jill Trent» (банер — подряд
+ *    идущие слова полного имени);
+ *  - «T-Rex» = «T. Rex», «Spider Man» = «Spiderman», «Sea dog» = «Seadog»
+ *    (сравнение без пробелов);
+ *  - формы из BANNER_FORM_ALIASES («Mr. Hyde» играет «Jekyll & Hyde»).
  */
 export function bannerAllows(banner: string, fighter: { name: string }): boolean {
   // нормализация множественного числа: harpies → harpy, wolves → wolf, dogs → dog
   const sing = (w: string) =>
     w.replace(/ies$/, 'y').replace(/ves$/, 'f').replace(/([^s])s$/, '$1');
-  const b = sing(banner.trim().toLowerCase());
-  const full = fighter.name.trim().toLowerCase();
+  const words = (s: string) => s.split(' ').filter(Boolean).map(sing);
+  const bannerWords = words(normalizeBannerWords(banner));
+  if (bannerWords.length === 0) return false;
+  const full = normalizeBannerWords(fighter.name);
   const base = full.replace(/\s+\d+$/, '');
-  if (b === sing(full) || b === sing(base)) return true;
-  // банер как целое слово внутри имени ('arthur' в 'king arthur')
-  return base.split(/\s+/).some((w) => sing(w) === b);
+  const nameWords = words(base);
+  const compact = bannerWords.join('');
+  if (compact === nameWords.join('') || compact === words(full).join('')) return true;
+  // банер — подряд идущие целые слова имени ('arthur' в 'king arthur')
+  for (let i = 0; i + bannerWords.length <= nameWords.length; i++) {
+    if (bannerWords.every((w, j) => nameWords[i + j] === w)) return true;
+  }
+  return (BANNER_FORM_ALIASES[normalizeBannerWords(banner)] ?? []).includes(base);
+}
+
+/**
+ * Общее правило банера для человека (validateBanner) и ИИ:
+ *  - 'allowed' — 'Any'/пусто или банер матчит этого бойца;
+ *  - 'unknown' — банер не матчит НИ ОДНОГО бойца игры (грязные данные): карту
+ *    разрешаем, чтобы опечатка в БД не блокировала колоду;
+ *  - 'denied'  — банер принадлежит другому бойцу игры.
+ */
+export function bannerVerdict(
+  fighters: readonly { name: string }[],
+  bannerName: string | undefined,
+  fighter: { name: string },
+): 'allowed' | 'unknown' | 'denied' {
+  const banner = bannerName?.trim();
+  if (!banner || banner.toLowerCase() === 'any') return 'allowed';
+  if (bannerAllows(banner, fighter)) return 'allowed';
+  return fighters.some((f) => bannerAllows(banner, f)) ? 'denied' : 'unknown';
 }

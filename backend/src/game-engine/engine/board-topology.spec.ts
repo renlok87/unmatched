@@ -716,7 +716,7 @@ describe('card effects and hero abilities on a topology board', () => {
     expect(healthOf(longLink.state, 'b')).toBe(9);
   });
 
-  it("generic turn-damage 'enemy-adjacent' (Dracula) uses links", async () => {
+  it("generic pending-target-damage 'any-adjacent' (Dracula) uses links", async () => {
     const config = ABILITY_CONFIGS.find((c) => c.heroId === 'dracula')!;
     const deck = { drawCards: jest.fn(async (s: GameState) => s) };
     const handler = new GenericHeroAbilityHandler(config, { deck, zone: new AdjacencyService() });
@@ -730,7 +730,11 @@ describe('card effects and hero abilities on a topology board', () => {
     const unlinked = state('G');
     expect(await handler.onTurnStart(unlinked, 'a')).toBe(unlinked);
     const next = await handler.onTurnStart(state('B'), 'a');
-    expect(healthOf(next, 'b')).toBe(9);
+    // RULE-02: урон — после выбора игрока; цель — боец, связанный линией
+    expect(healthOf(next, 'b')).toBe(10);
+    expect(next.metadata.pendingEffects?.[0]).toMatchObject({
+      type: 'TARGET_FIGHTER', optional: true, targetFighterIds: ['b'],
+    });
   });
 
   it('Ms. Marvel legacy handler measures range and turn-start step on the graph', async () => {

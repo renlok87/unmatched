@@ -923,13 +923,18 @@ describe('GameActionExecutorService', () => {
     const stubStances = () => {
       const registry = (service as any).abilityRegistry as { getStances: jest.Mock };
       registry.getStances.mockImplementation((slug: string) =>
-        slug === 'alice' ? ['big', 'small'] : [],
+        slug === 'alice' ? ['big', 'small'] : slug === 'muhammad-ali' ? ['float', 'sting'] : [],
       );
     };
+    const ctxOf = (state: GameState, userId = 'player1'): ActionContext => ({
+      userId,
+      gameId: 'test-game-1',
+      currentState: state,
+    });
 
     it('ставит metadata.heroStances[userId] и бампит seq на 1', async () => {
       stubStances();
-      const state = aliceState('big');
+      const state = aliceState();
       const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'small' };
       const context: ActionContext = {
         userId: 'player1',
@@ -947,7 +952,7 @@ describe('GameActionExecutorService', () => {
 
     it('НЕ тратит действие (actionsRemaining без изменений)', async () => {
       stubStances();
-      const state = aliceState('big');
+      const state = aliceState();
       const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'small' };
       const context: ActionContext = {
         userId: 'player1',
@@ -986,6 +991,46 @@ describe('GameActionExecutorService', () => {
 
       const result = await service.executeSetStance(dto, context);
       expect(result.success).toBe(false);
+    });
+
+    // RULE-03: не бесплатный переключатель — выбор один раз в начале игры
+    it('отклоняет повторный выбор: стойка уже выбрана', async () => {
+      stubStances();
+      const result = await service.executeSetStance(
+        { gameId: 'test-game-1', stanceId: 'small' },
+        ctxOf(aliceState('big')),
+      );
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/уже выбрана/);
+    });
+
+    it('отклоняет выбор после первого действия хода', async () => {
+      stubStances();
+      const state = aliceState();
+      const spent = { ...state, metadata: { ...state.metadata, actionsRemaining: 1 } };
+      const result = await service.executeSetStance({ gameId: 'test-game-1', stanceId: 'small' }, ctxOf(spent));
+      expect(result.success).toBe(false);
+    });
+
+    it('отклоняет выбор после первого хода игрока', async () => {
+      stubStances();
+      const late = { ...aliceState(), turnCount: 3 };
+      const result = await service.executeSetStance({ gameId: 'test-game-1', stanceId: 'small' }, ctxOf(late));
+      expect(result.success).toBe(false);
+    });
+
+    it('Muhammad Ali: стойку меняет только авто-флип — setStance запрещён (Sting перед атакой)', async () => {
+      stubStances();
+      const state = aliceState();
+      const ali = {
+        ...state,
+        fighters: state.fighters.map((f) =>
+          f.id === 'fighter1' ? { ...f, heroId: 'muhammad-ali', heroSlug: 'muhammad-ali', name: 'Muhammad Ali' } : f,
+        ),
+      };
+      const result = await service.executeSetStance({ gameId: 'test-game-1', stanceId: 'sting' }, ctxOf(ali));
+      expect(result.success).toBe(false);
+      expect(result.gameState).toBeUndefined();
     });
   });
 

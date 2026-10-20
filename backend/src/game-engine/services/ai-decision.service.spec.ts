@@ -279,6 +279,82 @@ describe('AiDecisionService', () => {
     expect(svc.decide(st, AI)).toEqual({ kind: 'resolveChoose', effectId: 'pe1', optionIndex: 1 });
   });
 
+  // RULE-02: «you may draw» — отказ (опция 0) лучше истощения на короткой колоде
+  describe('optional draw (CHOOSE_ONE «не добирать / добрать»)', () => {
+    const drawChoice = (deckCards: number) => makeState({
+      decks: { [AI]: { cards: [], drawPile: Array.from({ length: deckCards }, (_, i) => card(`d${i}`, CardType.ATTACK)) } } as any,
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{
+          id: 'pd', type: 'CHOOSE_ONE', playerId: AI, chooseCount: 1, optional: true,
+          options: [{ index: 0, label: 'Do not draw' }, { index: 1, label: 'Draw 1 card' }],
+          optionEffects: [[], [{ type: 'DRAW_CARD', value: 1 }]],
+        }],
+      } as any,
+    });
+
+    it('колода есть → добирает', () => {
+      expect(svc.decide(drawChoice(3), AI)).toEqual({ kind: 'resolveChoose', effectId: 'pd', optionIndex: 1 });
+    });
+
+    it('колода пуста → отказ, без истощения', () => {
+      expect(svc.decide(drawChoice(0), AI)).toEqual({ kind: 'resolveChoose', effectId: 'pd', optionIndex: 0 });
+    });
+  });
+
+  describe('Dracula: optional TARGET_FIGHTER среди любых смежных бойцов', () => {
+    const bite = (targets: string[], deckCards = 3) => makeState({
+      fighters: [
+        fighter('h1', HUMAN, 0, 0, { health: 6 }),
+        fighter('a1', AI, 1, 0),
+        fighter('sister', AI, 0, 1, { type: FighterType.MINION, health: 2 }),
+      ],
+      decks: { [AI]: { cards: [], drawPile: Array.from({ length: deckCards }, (_, i) => card(`d${i}`, CardType.ATTACK)) } } as any,
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pb', type: 'TARGET_FIGHTER', playerId: AI, optional: true,
+          targetFighterIds: targets, damage: 1, drawAfterDamage: 1 }],
+      } as any,
+    });
+
+    it('бьёт врага, а не свою Sister (хотя у неё меньше HP)', () => {
+      expect(svc.decide(bite(['h1', 'sister']), AI)).toEqual({ kind: 'resolveTarget', effectId: 'pb', fighterId: 'h1' });
+    });
+
+    it('рядом только свои → отказ', () => {
+      expect(svc.decide(bite(['sister']), AI)).toEqual({ kind: 'declinePending', effectId: 'pb' });
+    });
+
+    it('колода пуста (добор после урона = истощение) → отказ', () => {
+      expect(svc.decide(bite(['h1', 'sister'], 0), AI)).toEqual({ kind: 'declinePending', effectId: 'pb' });
+    });
+  });
+
+  // DATA-01/02: ИИ проверяет банер тем же правилом, что человек (bannerVerdict)
+  describe('банеры карт бота', () => {
+    const attackWith = (heroName: string, bannerName: string) => makeState({
+      fighters: [fighter('h1', HUMAN, 0, 0), fighter('a1', AI, 1, 0, { name: heroName, attackType: 'melee' })],
+      handZones: {
+        [AI]: { cards: [card('atk', CardType.ATTACK, { attackValue: 4, bannerName })], maxSize: 7 },
+        [HUMAN]: { cards: [], maxSize: 7 },
+      },
+    });
+
+    it('T. Rex играет карты с банером «T-Rex», Spiderman — «Spider Man»', () => {
+      expect(svc.decide(attackWith('T. Rex', 'T-Rex'), AI)).toMatchObject({ kind: 'attack', cardId: 'atk' });
+      expect(svc.decide(attackWith('Spiderman', 'Spider Man'), AI)).toMatchObject({ kind: 'attack', cardId: 'atk' });
+    });
+
+    it('неизвестный банер (опечатка данных) не отнимает у бота карту — как у человека', () => {
+      expect(svc.decide(attackWith('Alice', 'Allice'), AI)).toMatchObject({ kind: 'attack', cardId: 'atk' });
+    });
+
+    it('банер другого бойца игры — карту не играет', () => {
+      const st = attackWith('Alice', 'h1');
+      expect(svc.decide(st, AI)).not.toMatchObject({ kind: 'attack' });
+    });
+  });
+
   it('MOVE pending бота → resolveMove клеткой ближе к врагу (в пределах value)', () => {
     const st = makeState({
       fighters: [fighter('h1', HUMAN, 0, 0), fighter('a1', AI, 5, 5)],

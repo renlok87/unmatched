@@ -4,7 +4,7 @@
  * только гарпия; банер 'Arthur' матчит бойца 'King Arthur'.
  */
 
-import { GameRulesValidator, bannerAllows } from './game-rules.validator';
+import { GameRulesValidator, bannerAllows, bannerVerdict } from './game-rules.validator';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { FighterType, GamePhase } from '../models';
 import type { Fighter, GameState } from '../models';
@@ -58,6 +58,46 @@ describe('bannerAllows', () => {
 
   it('регистронезависимо', () => {
     expect(bannerAllows('medusa', fighter('f1', 'Medusa'))).toBe(true);
+  });
+
+  // DATA-02: написание банера в источнике расходится с именем бойца в БД
+  it('пунктуация и пробелы: T-Rex = T. Rex, Spider Man = Spiderman, Sea dog = Seadog', () => {
+    expect(bannerAllows('T-Rex', fighter('f1', 'T. Rex'))).toBe(true);
+    expect(bannerAllows('Spider Man', fighter('f1', 'Spiderman'))).toBe(true);
+    expect(bannerAllows('Sea dog', fighter('f1', 'Seadog 2'))).toBe(true);
+    expect(bannerAllows('Dr. Watson', fighter('f1', 'Dr Watson'))).toBe(true);
+  });
+
+  it('банер из нескольких слов — подряд идущие слова имени: Jill Trent = Dr. Jill Trent, но не Daisy', () => {
+    expect(bannerAllows('Jill Trent', fighter('f1', 'Dr. Jill Trent'))).toBe(true);
+    expect(bannerAllows('Jill Trent', fighter('f1', 'Daisy'))).toBe(false);
+    expect(bannerAllows('Trent Jill', fighter('f1', 'Dr. Jill Trent'))).toBe(false);
+  });
+
+  it('формы Jekyll & Hyde (BANNER_FORM_ALIASES): Dr. Jekyll и Mr. Hyde играет боец «Jekyll & Hyde»', () => {
+    expect(bannerAllows('Dr. Jekyll', fighter('f1', 'Jekyll & Hyde'))).toBe(true);
+    expect(bannerAllows('Mr. Hyde', fighter('f1', 'Jekyll & Hyde'))).toBe(true);
+    expect(bannerAllows('Mr. Hyde', fighter('f1', 'Invisible Man'))).toBe(false);
+  });
+
+  it('опечатки данных нормализация НЕ прощает (их правит BANNER_FIXES)', () => {
+    expect(bannerAllows('Allice', fighter('f1', 'Alice'))).toBe(false);
+    expect(bannerAllows('The Potter', fighter('f1', 'The Porter'))).toBe(false);
+  });
+});
+
+describe('bannerVerdict (общее правило человека и ИИ)', () => {
+  const fighters = [fighter('f1', 'Alice'), fighter('f2', 'The Jabberwock'), fighter('f3', 'Medusa', 'p2')];
+
+  it("'Any'/пусто и свой банер — allowed; чужой банер бойца игры — denied", () => {
+    expect(bannerVerdict(fighters, 'Any', fighters[1])).toBe('allowed');
+    expect(bannerVerdict(fighters, undefined, fighters[1])).toBe('allowed');
+    expect(bannerVerdict(fighters, 'Alice', fighters[0])).toBe('allowed');
+    expect(bannerVerdict(fighters, 'Alice', fighters[1])).toBe('denied');
+  });
+
+  it('банер не матчит ни одного бойца игры — unknown (карта разрешена, как у validateBanner)', () => {
+    expect(bannerVerdict(fighters, 'Allice', fighters[1])).toBe('unknown');
   });
 });
 

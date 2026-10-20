@@ -24,7 +24,11 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 9;
+// v10 (2026-10-20, разбор DE): «you may draw» → optional DRAW_CARD, «Change size»
+// → CHANGE_SIZE, «(This effect cannot be canceled.)» → uncancellable у эффектов
+// поля, «This card's effects cannot be canceled» распознаётся (карта целиком —
+// isUncancellableCardText).
+export const PARSER_VERSION = 10;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -133,8 +137,34 @@ export function parseCardEffectTexts(texts: CardEffectTexts, cardId: string): Pa
   return { effects, unsupported };
 }
 
+/**
+ * RULE-01: печатная неотменяемость ВСЕЙ карты — «This card's effect(s) cannot
+ * be canceled». На картах она стоит в общем тексте (Card.text), а не в полях
+ * таймингов, поэтому проверяется по тексту карты (isCardUncancellable).
+ */
+export function isUncancellableCardText(text: string | null | undefined): boolean {
+  return !!text && UNCANCELLABLE_CARD_RE.test(text);
+}
+
+const UNCANCELLABLE_CARD_RE = /\bthis card'?s effects? cannot be cancell?ed\b/i;
+/** «(This effect cannot be canceled.)» — неотменяем только эффект этого поля */
+const UNCANCELLABLE_EFFECT_RE = /\(\s*this effect cannot be cancell?ed\.?\s*\)/i;
+
 /** Разобрать текст одного поля (с известным таймингом) */
 export function parseFieldText(
+  raw: string,
+  timing: EffectTiming,
+): { drafts: Array<{ draft: Draft; text: string }>; unsupported: string[] } {
+  const parsed = parseFieldTextDrafts(raw, timing);
+  // clean() режет скобки, поэтому частичную неотменяемость смотрим в сыром тексте
+  if (!UNCANCELLABLE_EFFECT_RE.test(raw)) return parsed;
+  return {
+    ...parsed,
+    drafts: parsed.drafts.map((d) => ({ ...d, draft: { ...d.draft, uncancellable: true } })),
+  };
+}
+
+function parseFieldTextDrafts(
   raw: string,
   timing: EffectTiming,
 ): { drafts: Array<{ draft: Draft; text: string }>; unsupported: string[] } {
@@ -472,9 +502,22 @@ function parseSentence(sentence: string): Draft[] | null {
     return [{ type: EffectType.CANCEL_EFFECTS }];
   }
 
-  // DRAW
-  const draw = /^draw (\d+|one|two|three) cards?$/i.exec(s);
-  if (draw) return [{ type: EffectType.DRAW_CARD, value: toNumber(draw[1]) }];
+  // «This card's effects cannot be canceled» — свойство карты целиком
+  // (isUncancellableCardText), отдельного эффекта нет
+  if (UNCANCELLABLE_CARD_RE.test(s)) return [];
+
+  // «Change size» (Alice) — смена стойки BIG ↔ SMALL
+  if (/^change size$/i.test(s)) return [{ type: EffectType.CHANGE_SIZE }];
+
+  // DRAW; «You may draw …» — необязательный добор (выбор «не добирать / добрать»)
+  const draw = /^(you may )?draw (\d+|one|two|three) cards?$/i.exec(s);
+  if (draw) {
+    return [{
+      type: EffectType.DRAW_CARD,
+      value: toNumber(draw[2]),
+      ...(draw[1] ? { optional: true } : {}),
+    }];
+  }
 
   // DAMAGE
   const dmg = /^deal (\d+) damage to (.+)$/i.exec(s);

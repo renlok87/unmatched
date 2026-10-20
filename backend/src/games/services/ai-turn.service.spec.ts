@@ -9,7 +9,7 @@ import { AdjacencyService } from '../../game-engine/engine/adjacency.service';
 import { ValueModifierService } from '../../game-engine/engine/value-modifier.service';
 import { HeroAbilityRegistry } from '../../game-engine/abilities/hero-ability-registry';
 import { HandCard, CardType, FighterType, GamePhase, GameState, createEmptyBoardState, DEFENSE_TIMEOUT_SECONDS } from '../../game-engine/models';
-import { ABILITY_CONFIGS } from '../../game-engine/abilities/ability-config';
+import { ABILITY_CONFIGS, AbilityConfig } from '../../game-engine/abilities/ability-config';
 import { GenericHeroAbilityHandler } from '../../game-engine/abilities/generic-hero-ability.handler';
 
 const card = (id: string): HandCard => ({ id, cardId: 'defense', name: id, nameEn: id, nameRu: id,
@@ -46,7 +46,7 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
   record?: (dto: { gameId: string; sequenceNumber: number; type: string; playerId: string; metadata: any }) => Promise<string>;
   /** AI-03: подменить эвристику (расхождение с валидатором, null на своём выборе). */
   decide?: (state: GameState, aiUserId: string) => AiAction | null;
-} = {}, opts: { withAbilityConfigs?: boolean } = {}) {
+} = {}, opts: { withAbilityConfigs?: boolean; extraAbilityConfigs?: readonly AbilityConfig[] } = {}) {
   let saved = initial;
   const snapshots: GameState[] = [];
   const events: string[] = [];
@@ -76,6 +76,9 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
     for (const config of ABILITY_CONFIGS) {
       registry.registerExtended(new GenericHeroAbilityHandler(config, { deck: decks, zone: adjacency }));
     }
+  }
+  for (const config of opts.extraAbilityConfigs ?? []) {
+    registry.registerExtended(new GenericHeroAbilityHandler(config, { deck: decks, zone: adjacency }));
   }
   const executor = new GameActionExecutorService(new GameRulesValidator(adjacency),
     new CombatResolverService(registry, metrics), undefined as any, values, adjacency, metrics,
@@ -247,15 +250,21 @@ describe('AiTurnService GD-039 review: терминал не глотается 
     expect(game.journal[0].sequenceNumber).toBe(game.state().sequenceNumber);
   });
 
-  it('терминальный endTurn бота (turn-start урон Dracula добивает героя бота): журнал TURN_ENDED + GAME_ENDED', async () => {
+  it('терминальный endTurn бота (авто turn-start урон смежному добивает героя бота): журнал TURN_ENDED + GAME_ENDED', async () => {
+    // Dracula с RULE-02 бьёт только по выбору игрока — автоматический
+    // turn-start урон даёт тестовый конфиг turn-damage
+    const biter: AbilityConfig = {
+      heroId: 'test-biter', abilityName: 'Test bite', description: 'turn-start: 1 урон смежному врагу',
+      rules: [{ trigger: 'turn-start', effect: { kind: 'turn-damage', targetScope: 'enemy-adjacent', value: 1 } }],
+    };
     const initial = fixture();
     const game = harness({ ...initial,
       metadata: { ...initial.metadata, actionsRemaining: 0 } as any,
       fighters: [
         { ...initial.fighters[0], health: 1, position: { x: 4, y: 0 } },
-        { ...initial.fighters[1], heroSlug: 'dracula', position: { x: 5, y: 0 } },
+        { ...initial.fighters[1], heroSlug: 'test-biter', position: { x: 5, y: 0 } },
       ],
-    } as GameState, 'ai', {}, { withAbilityConfigs: true });
+    } as GameState, 'ai', {}, { extraAbilityConfigs: [biter] });
     await game.run();
     expect(game.state().phase).toBe(GamePhase.GAME_OVER);
     expect(game.state().metadata.winnerId).toBe('human');

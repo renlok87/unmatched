@@ -4,7 +4,7 @@ import { CardType, GamePhase, getActionsRemaining, getFighterMovement } from '..
 import { AdjacencyService } from '../engine/adjacency.service';
 import { distanceField, isAdjacent, posKey } from '../engine/board-topology';
 import { isCellPassable } from '../movement/traversal';
-import { bannerAllows } from '../validators/game-rules.validator';
+import { bannerAllows, bannerVerdict } from '../validators/game-rules.validator';
 import { fighterNameMatches } from '../effects/card-effect-executor.service';
 
 /**
@@ -119,11 +119,18 @@ export class AiDecisionService {
     if (p.type === 'CHOOSE_ONE') {
       const opts = p.options ?? [];
       if (opts.length === 0) return null;
-      // выгодная опция: HEAL > DRAW_CARD > GAIN_ACTION > первая
+      // выгодная опция: HEAL > DRAW_CARD > GAIN_ACTION > первая.
+      // Добор, которого не хватает колоде, — истощение (2 урона каждому своему
+      // бойцу за карту): хуже отказа (опция без эффектов, «You may draw»).
+      const deckLeft = state.decks[aiUserId]?.drawPile?.length ?? 0;
       const rank = (i: number): number => {
         const effs = p.optionEffects?.[i] ?? [];
+        const draws = effs
+          .filter((e) => e.type === 'DRAW_CARD')
+          .reduce((sum, e) => sum + (e.value || 1), 0);
+        if (draws > deckLeft) return -1;
         if (effs.some((e) => e.type === 'HEAL')) return 3;
-        if (effs.some((e) => e.type === 'DRAW_CARD')) return 2;
+        if (draws > 0) return 2;
         if (effs.some((e) => e.type === 'GAIN_ACTION')) return 1;
         return 0;
       };
@@ -139,8 +146,16 @@ export class AiDecisionService {
       const alive = (p.targetFighterIds ?? [])
         .map((id) => state.fighters.find((f) => f.id === id))
         .filter((f): f is Fighter => !!f && f.health > 0 && !f.isDefeated);
-      if (alive.length === 0) return null;
-      const target = alive.reduce((a, b) => (a.health <= b.health ? a : b));
+      // Цели могут включать своих (Dracula: любой смежный боец) — optional-выбор
+      // бьёт только врага, а добор после урона с пустой колоды (истощение) не берёт
+      const enemies = alive.filter((f) => f.ownerId !== aiUserId);
+      if (p.optional) {
+        const deckLeft = state.decks[aiUserId]?.drawPile?.length ?? 0;
+        if (enemies.length === 0 || (p.drawAfterDamage ?? 0) > deckLeft) return null;
+      }
+      const pool = enemies.length > 0 ? enemies : alive;
+      if (pool.length === 0) return null;
+      const target = pool.reduce((a, b) => (a.health <= b.health ? a : b));
       return { kind: 'resolveTarget', effectId: p.id, fighterId: target.id };
     }
 
@@ -278,14 +293,15 @@ export class AiDecisionService {
     return state.handZones[uid]?.cards ?? [];
   }
 
-  private bannerOk(card: Card, fighter: Fighter): boolean {
-    if (!card.bannerName || card.bannerName === 'Any') return true;
-    return bannerAllows(card.bannerName, fighter);
+  /** То же правило банера, что у человека (validateBanner): неизвестный банер
+   *  (опечатка в данных) не запрещает карту, иначе бот теряет всю колоду. */
+  private bannerOk(state: GameState, card: Card, fighter: Fighter): boolean {
+    return bannerVerdict(state.fighters, card.bannerName, fighter) !== 'denied';
   }
 
   private bestAttackCard(state: GameState, uid: string, fighter: Fighter): Card | null {
     const cards = this.hand(state, uid).filter(
-      (c) => (c.cardType === CardType.ATTACK || c.cardType === CardType.VERSATILE) && this.bannerOk(c, fighter),
+      (c) => (c.cardType === CardType.ATTACK || c.cardType === CardType.VERSATILE) && this.bannerOk(state, c, fighter),
     );
     // При равном attackValue предпочитаем ATTACK над VERSATILE — не тратим
     // универсальную карту, когда есть чистая атака той же силы.
@@ -309,7 +325,7 @@ export class AiDecisionService {
       (c) =>
         (c.cardType === CardType.DEFENSE || c.cardType === CardType.VERSATILE) &&
         (c.defenseValue ?? 0) > 0 &&
-        (!fighter || this.bannerOk(c, fighter)),
+        (!fighter || this.bannerOk(state, c, fighter)),
     );
     // При равном defenseValue предпочитаем DEFENSE над VERSATILE — не тратим
     // универсальную карту, когда есть чистая защита той же силы.
