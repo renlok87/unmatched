@@ -64,3 +64,20 @@ concept-sheet §11 (Opus `card-2.json` 8,1: S 2, C 1,5, Q 1,5, P 1,5). Вход�
 - Приёмщики: первый «Opus xhigh», второй (полоса 8,0–8,4) «Opus high»; Z-Code баллов не ставит.
 - Волна A (Bruce Lee, Sherlock Holmes, Dr. Watson) — этапы 3–7b, витринная хайполи со слепым ревью двух независимых Opus; 7a — один скрытый редактор, один герой за раз; одна упаковка после 7b всех фигур волны и повторная проверка полными матчами на обеих досках (`docs/game-design/evidence/PLAYTEST-2026-10-21-night/README.md`).
 - Затем ростер по сетам `docs/art-pipeline/ROSTER-SETS-PLAN-2026-10-21.md`: волна B — Muhammad Ali, Sinbad + The Porter; не больше 3–4 фигур одновременно.
+
+## Бэкенд: способности и карты волны A (проверка 2026-10-21, код, без живой БД)
+
+- Способности героев есть в `backend/src/game-engine/abilities/ability-config.ts` (`ABILITY_CONFIGS`):
+  Bruce Lee — `:796-812` (turn-end, pending-move own-hero 1, можно отказаться; тест
+  `ability-configs.integration.spec.ts:866-900`); Sherlock Holmes — `:980-990` (`uncancellableCards:
+  hero-and-sidekicks`; тесты `ability-rules.spec.ts:26-34`, `card-effect-executor.service.spec.ts:237-247`).
+  Dr. Watson — запись `Hero.sidekicks` у Holmes (8 HP, ход 2, range), своей способности нет.
+- Эффекты карт — парсер текста (`effect-text-parser.ts`, v10): нераспознанное = `UNSUPPORTED` → `manualEffects`, игра не
+  блокируется. Bruce Lee: полностью 8 из 17 разных карт (16 из 30 копий); не работают Be Like Water ×4, Taste of Blood,
+  One-Inch Punch; частично Downward Side Kick, Little Dragon, «HOO! WHAAAAAA!», Bring It On, Short Lead Hook, Nunchaku.
+  Holmes/Watson: полностью 3 из 13 (The Game is Afoot, Feint, Service Revolver), Administer Aid частично (нет «Place Dr.
+  Watson adjacent»), 9 карт не работают. Карточных спек нет ни у кого из троих.
+- Ростер комнаты: `unreal/Unmatched/Source/Unmatched/S08/S08FlowGameModeUmRoom.cpp:102`
+  `UmRmRoster[] = {"King Arthur", "Medusa"}` и запасной вариант `:760`. Добавление — после фигуры, витрины и плейтеста,
+  и только по слову пользователя (задание оркестратора); правка — эти две строки.
+- Вывод: «способности на бэкенде есть» выполнено; эффекты карт — отдельная задача трека правил (не этого скилла).
