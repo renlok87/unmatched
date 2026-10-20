@@ -25,14 +25,16 @@ K, AID = "test-hero", "ASSET-TEST-HERO-001"
 
 
 def test_sol_and_zcode_paths_stop_with_a_reason(tmp_path, capsys):
-    """2026-10-20: accept / all / probe и --acceptor sol — Sol отключён; --acceptor zcode — заглушка; codex не ищется."""
+    """2026-10-20: accept / all / probe и --acceptor sol — Sol отключён; 2026-10-21: --acceptor zcode — Z-Code снят с
+    приёмки (калибровка не пройдена); codex не ищется."""
     work = ["--work", str(tmp_path / "w"), "--repo", str(tmp_path)]
     for argv in (["accept", K, "1"], ["all"], ["probe"], ["prepare", K, "1", "--acceptor", "sol"]):
         assert S.main(argv + work) == 2
     err = capsys.readouterr().err
     assert err.count("Sol отключён 2026-10-20") == 4 and "AI tools and side models" in err and "acceptor-args.json" in err
     assert S.main(["prepare", K, "1", "--acceptor", "zcode", *work]) == 2
-    assert "zcode login zai" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "снят с приёмки 2026-10-21" in err and "zcode-calibration/RESULT.md" in err and "«Opus high»" in err
     assert not (tmp_path / "w").exists()
     for gone in ("base_args", "run_cli", "default_exe", "env_failures"):
         assert not hasattr(S, gone), gone
@@ -126,6 +128,7 @@ def test_prepare_builds_prompt_without_codex(tmp_path, capsys):
     wa = json.loads(raw)
     assert wa["kind"] == "concept" and "Sol 6.1 xhigh" not in wa["schema"]["properties"]["acceptor"]["properties"][
         "profile"]["enum"]
+    assert wa["profile"] == "Opus xhigh" and wa["effort"] == "xhigh"  # первый приёмщик
     assert wa["items"] == [{"asset": AID, "evidence": out["evidence"], "label": "acceptor-ASSET-TEST-HERO-001-r1",
                             "prompt": out["evidence"] + "/acceptor-prompt.md"}]
     assert json.loads((work / "acceptor-args-20261014.json").read_text(encoding="ascii"))["items"] == wa["items"]
@@ -235,8 +238,9 @@ def test_limit_line_only_when_limit_reached(tmp_path):
 
 
 def test_prepare_second_writes_opus_prompt_and_ascii_args(tmp_path, capsys):
-    """C10/C34: промпт второго приёмщика того же листа (профиль Opus, session workflow:…, изображения — Read) и
-    ASCII-аргументы workflow second-acceptor со схемой concept; без первой карточки и при изменённом пакете — отказ."""
+    """C10/C34: промпт второго приёмщика того же листа (профиль «Opus high» — решение пользователя 2026-10-21, session
+    workflow:…, изображения — Read) и ASCII-аргументы workflow second-acceptor со схемой concept и effort high; без
+    первой карточки и при изменённом пакете — отказ."""
     repo = make_repo(tmp_path)
     work = tmp_path / "work"
     row = {"asset_id": AID, "key": K, "package": f"art/imagegen/concept-{K}-codex"}
@@ -249,16 +253,19 @@ def test_prepare_second_writes_opus_prompt_and_ascii_args(tmp_path, capsys):
     out = json.loads(capsys.readouterr().out)
     p2 = (e / "acceptor-prompt-2.md").read_text(encoding="utf-8")
     assert (e / "acceptor-prompt.md").read_text(encoding="utf-8") == first  # промпт первого приёмщика не тронут
-    assert "«Opus xhigh»" in p2 and "workflow:acceptor2-ASSET-TEST-HERO-001-r1" in p2 and "инструментом Read" in p2
+    assert "«Opus high»" in p2 and "«Opus xhigh»" not in p2 and "workflow:acceptor2-ASSET-TEST-HERO-001-r1" in p2
+    assert "второй независимый приёмщик" in p2 and "инструментом Read" in p2
     assert "отдельными -i" not in p2 and "codex:pending" not in p2
     c1 = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
     c2 = json.loads((e / "launcher-inputs-2.json").read_text(encoding="utf-8"))["constants"]
     assert c2["frames"] == c1["frames"] and c2["accepted_object"] == c1["accepted_object"]
-    assert c2["acceptor"] == {"profile": "Opus xhigh", "session_id": "workflow:acceptor2-ASSET-TEST-HERO-001-r1"}
+    assert c2["acceptor"] == {"profile": "Opus high", "session_id": "workflow:acceptor2-ASSET-TEST-HERO-001-r1"}
+    assert c1["acceptor"]["profile"] == "Opus xhigh"  # пара — два профиля, без --same-profile-ok
     raw = (e / "second-acceptor-args.json").read_bytes()
     assert raw.isascii()
     wa = json.loads(raw)
     assert wa["kind"] == "concept" and wa["schema"]["properties"]["kind"]["enum"] == ["concept"]
+    assert wa["profile"] == "Opus high" and wa["effort"] == "high"
     assert "description" not in json.dumps(wa["schema"]) and "title" not in wa["schema"]
     assert wa["items"] == [{"asset": AID, "evidence": s.rel(e), "label": "acceptor2-ASSET-TEST-HERO-001-r1",
                             "prompt": s.rel(e / "acceptor-prompt-2.md")}]

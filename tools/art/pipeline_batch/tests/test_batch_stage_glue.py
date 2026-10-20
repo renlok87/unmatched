@@ -72,6 +72,29 @@ def test_finish_second_main(tmp_path, monkeypatch, capsys):
     assert finish_second.main([str(tmp_path / "missing.json")]) == 2
 
 
+def test_finish_second_opus_high_pair_without_same_profile_flag(tmp_path, monkeypatch, capsys):
+    """2026-10-21: второй приёмщик «Opus high» при первом «Opus xhigh» — два профиля, --same-profile-ok не ставится;
+    старая пара одного профиля — как раньше, с флагом и строкой NOTE."""
+    ev = tmp_path / "art/x/evidence/acceptance/r1"
+    wj(ev / "card.json", {"score": 8.1, "acceptor": {"profile": "Opus xhigh", "session_id": "workflow:acceptor-X-r1"}})
+    calls = []
+
+    def fake_run(args, cwd):
+        calls.append(args)
+        wj(ev / "final.json", {"score": 8.1, "verdict": "pass"})
+        return type("R", (), {"returncode": 0, "stdout": "pass\n", "stderr": ""})()
+
+    monkeypatch.setattr(b, "run", fake_run)
+    for profile in ("Opus high", "Opus xhigh"):
+        res = wj(tmp_path / "wf.json", [{"asset": "ASSET-X-001", "evidence": "art/x/evidence/acceptance/r1",
+                                         "card": {"score": 8.4, "verdict": "pass", "acceptor": {
+                                             "profile": profile, "session_id": "workflow:acceptor2-X-r1"}}}])
+        assert finish_second.main([str(res), "--repo", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "--same-profile-ok" not in calls[0] and "--same-profile-ok" in calls[1]
+    assert out.count("NOTE:") == 1 and "оба приёмщика «Opus xhigh»" in out and "«Opus high»" in out
+
+
 def test_finish_second_accepts_bare_list_and_other_shapes(tmp_path, monkeypatch):
     """C35: возврат workflow / журнал — голый список; уведомление — {"result": [...]} или строка JSON в result."""
     item = {"asset": "ASSET-X-001", "evidence": "art/x/evidence/acceptance/r1",
@@ -101,18 +124,22 @@ HARNESS = r"""
 import { readFileSync } from 'node:fs'
 const code = readFileSync(process.argv[2], 'utf8').replace(/^export const meta/m, 'const meta')
 const args = JSON.parse(readFileSync(process.argv[3], 'utf8'))
+const nullFirst = process.argv[4] === 'null-first'  // agent() returns null on the first call of each card
 const calls = []
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 const run = new AsyncFunction('args', 'phase', 'parallel', 'agent', code)
 try {
   const res = await run(args, () => {}, async fs => Promise.all(fs.map(f => f())),
-                        async (prompt, opts) => { calls.push({ prompt, opts }); return { kind: 'card' } })
+                        async (prompt, opts) => {
+                          calls.push({ prompt, opts })
+                          return nullFirst && !opts.label.endsWith('-retry') ? null : { kind: 'card' }
+                        })
   console.log(JSON.stringify({ res, calls }))
 } catch (e) { console.log(JSON.stringify({ error: String(e.message) })) }
 """
 
 
-def run_workflow(tmp_path: Path, args: dict) -> dict:
+def run_workflow(tmp_path: Path, args: dict, mode: str = "") -> dict:
     import shutil
     import subprocess
 
@@ -123,8 +150,8 @@ def run_workflow(tmp_path: Path, args: dict) -> dict:
     h, a = tmp_path / "harness.mjs", tmp_path / "args.json"
     h.write_text(HARNESS, encoding="utf-8")
     a.write_text(json.dumps(args), encoding="utf-8")
-    r = subprocess.run([node, str(h), str(SECOND_ACCEPTOR_JS), str(a)], capture_output=True, text=True,
-                       encoding="utf-8", timeout=60)
+    r = subprocess.run([node, str(h), str(SECOND_ACCEPTOR_JS), str(a)] + ([mode] if mode else []),
+                       capture_output=True, text=True, encoding="utf-8", timeout=60)
     assert r.returncode == 0, r.stderr
     return json.loads(r.stdout.strip().splitlines()[-1])
 
@@ -152,6 +179,35 @@ def test_second_acceptor_workflow_prompt_per_card_kind(tmp_path):
     bad = run_workflow(tmp_path, {"kind": "concept", "items": [{"asset": "A", "evidence": "e", "label": "l"}],
                                   "schema": osch.build("model")})
     assert "does not match" in bad["error"]
+
+
+def test_second_acceptor_workflow_effort_from_args(tmp_path):
+    """Решение пользователя 2026-10-21 («Хорошо, использую Opus High вместо Z-код для приемщика.»): аргументы второго
+    приёмщика несут effort high и профиль «Opus high» — агент и его повтор идут с effort high; первый (--first) и
+    старые аргументы без effort — xhigh / «Opus xhigh»."""
+    sys.path.insert(0, str(b.REPO / "tools/art/acceptance"))
+    import _output_schema as osch
+
+    item = [{"asset": "ASSET-X-001", "evidence": "art/x/evidence/acc/20261021-r1"}]
+    second = osch.workflow_args("model", item)
+    assert second["effort"] == "high" and second["profile"] == "Opus high"
+    out = run_workflow(tmp_path, second, "null-first")
+    assert [c["opts"]["label"] for c in out["calls"]] == ["acceptor2-ASSET-X-001-r1", "acceptor2-ASSET-X-001-r1-retry"]
+    assert [c["opts"]["effort"] for c in out["calls"]] == ["high", "high"]  # и на повторе
+    assert all(c["opts"]["model"] == "opus" for c in out["calls"])
+    assert 'acceptor.profile = "Opus high"' in out["calls"][0]["prompt"] and out["res"][0]["effort"] == "high"
+    first = run_workflow(tmp_path, osch.workflow_args("model", item, first=True), "null-first")
+    assert [c["opts"]["effort"] for c in first["calls"]] == ["xhigh", "xhigh"]
+    assert 'acceptor.profile = "Opus xhigh"' in first["calls"][0]["prompt"]
+    old = dict(second)
+    old.pop("effort"), old.pop("profile")  # аргументы до 2026-10-21
+    out = run_workflow(tmp_path, old)
+    assert out["calls"][0]["opts"]["effort"] == "xhigh" and 'acceptor.profile = "Opus xhigh"' in out["calls"][0]["prompt"]
+    only_profile = dict(old, profile="Opus high")
+    assert run_workflow(tmp_path, only_profile)["calls"][0]["opts"]["effort"] == "high"
+    assert "does not match" in run_workflow(tmp_path, dict(old, profile="Opus high", effort="xhigh"))["error"]
+    assert "unknown args.effort" in run_workflow(tmp_path, dict(old, effort="max"))["error"]
+    assert "unknown args.profile" in run_workflow(tmp_path, dict(old, profile="Z-Code GLM-5.3-Flash"))["error"]
 
 
 # --------------------------------------------------------------------------------------------------------- rebg

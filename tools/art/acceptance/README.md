@@ -12,8 +12,8 @@
 | `_tone.py` | тон классов против концепта из `measure-report.json` look-dev → `frames/tone.json` и потолок T |
 | `validate_card.py` | проверка карточки по схеме, пересчёт score, детерминированный вердикт |
 | `asset-acceptance-2.schema.json` | JSON Schema (Draft 2020-12) карточек `kind`: `concept` \| `model` \| `anim` |
-| `asset-acceptance-2.output-{model,concept,anim}.schema.json`, `_output_schema.py` | строгие схемы вывода приёмщика — структурный вывод Workflow «Opus xhigh» (производные от полной; `--write` пересобирает, `--check` — код 1 при устаревших; `--workflow-args [--first]` — аргументы workflow `second-acceptor`) |
-| `side_models.py` | профили приёмщиков и отключённые модели (AGENTS.md «AI tools and side models», 2026-10-20): сообщения «Codex/Sol отключён», дата отключения Sol для `validate_card.py`, заглушка полосы Z-Code (`zcode-probe` — код 2, пока нет `zcode login zai`) |
+| `asset-acceptance-2.output-{model,concept,anim}.schema.json`, `_output_schema.py` | строгие схемы вывода приёмщика — структурный вывод Workflow «Opus xhigh» / «Opus high» (производные от полной; `--write` пересобирает, `--check` — код 1 при устаревших; `--workflow-args [--first]` — аргументы workflow `second-acceptor`: без `--first` — второй приёмщик, effort high) |
+| `side_models.py` | профили приёмщиков и отключённые модели (AGENTS.md «AI tools and side models», 2026-10-20 и 2026-10-21): «Opus xhigh» (первый), «Opus high» (второй) и их effort, сообщения «Codex/Sol отключён» и «Z-Code снят с приёмки», даты отключения Sol и Z-Code для `validate_card.py`, заглушка полосы Z-Code (`zcode-probe` — код 2, пока нет `zcode login zai`) |
 | `tests/` | pytest: правила вердикта, сверки полей, встроенный валидатор = jsonschema, помощники кадров |
 
 ## 1. Кадры приёмки модели
@@ -170,14 +170,16 @@ python tools/art/acceptance/validate_card.py <card.json> --second <card-2.json> 
   `previous_card`, `accepted_object`, `frames`, `executor_session_id` и статусы гейтов; профили и `session_id`
   разные). Итог: score — минимум двух; вердикт — карточки с меньшим score (при равенстве — более строгий), но если у
   другой карточки маршрут строже (возврат, FAIL-гейт, вето), побеждает он; маршрут и `rework_fix_list` берутся из
-  `source_card`. `--same-profile-ok` — только когда второй профиль не запустился после пробы (в `final.json`
-  `same_profile_fallback: true`). `--final-json` пишет `unmatched.acceptance-final/1`.
-- **Профили приёмщика** (`acceptor.profile`, `side_models.py`): «Opus xhigh» — по умолчанию (Workflow
-  `.claude/workflows/second-acceptor.js`); «Z-Code GLM-5.3-Flash» — второй профиль, видит кадры, пока только GUI через
-  Computer Use (скриптовая полоса — заглушка до `zcode login zai` пользователя); «Sol 6.1 xhigh» — **отключён
-  2026-10-20**: карточки по 2026-10-20 включительно валидны, позже — ошибка. В схемах вывода Sol нет. Пока полосы
-  Z-Code нет, второй приёмщик — Opus в свежем контексте, пара — `--same-profile-ok` (`finish_second.py` ставит его сам
-  при одинаковом профиле).
+  `source_card`. Пара «Opus xhigh» + «Opus high» — два профиля. `--same-profile-ok` — только когда второй профиль не
+  запустился после пробы, и для старых пар одного профиля (в `final.json` `same_profile_fallback: true`).
+  `--final-json` пишет `unmatched.acceptance-final/1`.
+- **Профили приёмщика** (`acceptor.profile`, `side_models.py`): «Opus xhigh» — первый, по умолчанию (Workflow
+  `.claude/workflows/second-acceptor.js`, effort xhigh); «Opus high» — второй «другим профилем» (тот же workflow с
+  effort high в свежем контексте; решение пользователя 2026-10-21: «Хорошо, использую Opus High вместо Z-код для
+  приемщика.»). «Sol 6.1 xhigh» — **отключён 2026-10-20**, «Z-Code GLM-5.3-Flash» — **снят с приёмки 2026-10-21**
+  (калибровка визуального приёмщика не пройдена): их карточки по дню отключения включительно валидны, позже —
+  ошибка. В схемах вывода их нет. `finish_second.py` ставит `--same-profile-ok` сам только при одинаковом профиле
+  обеих карточек (старые пары, оба «Opus xhigh»).
 - Пакет `jsonschema` есть — проверка им (Draft 2020-12); нет — встроенной проверкой того же подмножества ключевых слов
   (`--no-jsonschema` включает её принудительно; тесты сверяют оба пути).
 - Строгий вывод приёмщика. Схемы построены для `codex exec --output-schema` приёмщика «Sol 6.1 xhigh» (отключён

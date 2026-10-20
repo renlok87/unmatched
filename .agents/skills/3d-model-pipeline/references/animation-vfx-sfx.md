@@ -1,8 +1,9 @@
 # Этап 6: анимация, VFX и SFX — глобальный стандарт, производство, приёмка клипов (шаг 7a.2)
 
-> **С 2026-10-20 (SKILL.md §0):** приёмщик клипов Sol отключён: Opus-путь `run_clip_acceptors.py`, второй профиль —
-> Z-Code GLM-5.3-Flash или Opus `second-acceptor`. Звук и музыка: SYNTX, stiva.ai или сервисы Google в Gemini;
-> траты stiva.ai и Gemini — строкой в `NOTES`, пока `ledger.py` их не знает. Codex для генерации больше не используется.
+> **С 2026-10-20 (SKILL.md §0):** приёмщик клипов Sol отключён: Opus-путь `run_clip_acceptors.py`, второй профиль с
+> 2026-10-21 — «Opus high» (`run_clip_acceptors.py --second`, workflow `second-acceptor` с effort high). Звук и
+> музыка: SYNTX, stiva.ai или сервисы Google в Gemini; траты stiva.ai и Gemini — строкой в `NOTES`, пока `ledger.py`
+> их не знает. Codex для генерации больше не используется.
 
 Документ решает две задачи. Часть A — глобальный стандарт скелетной анимации, VFX и SFX проекта (требование №4); он
 действует для всех фигур. Часть B — производство этапа 6 для нового ассета и приёмка клипов с коэффициентом (`kind=anim`).
@@ -976,12 +977,14 @@ r ≥ 2 приёмщик получает пункты прежней карто
 **Устойчивый pass клипа** (решение оркестратора по калибровке 2026-10-09, раунд 3; то же правило, что у модели,
 `references/acceptance-and-blender.md` §6, §8.5, §13). `pass` со `score` 8,0–8,4 одной карточкой не окончателен:
 `validate_card.py` даёт код **3** и печатает `needs_second_acceptor`. Порядок:
-1. Второй приёмщик — **другой профиль** («Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт, те же
-   кадры `frames/` клипа, новый контекст; первую карточку он не видит. Ответ — `<Clip>/card-2.json` (для Sol —
+1. Второй приёмщик — **другой профиль**: с 2026-10-21 «Opus high» при первом «Opus xhigh» (решение пользователя;
+   прежде — «Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт, те же кадры `frames/` клипа, новый
+   контекст; первую карточку он не видит. Ответ — `<Clip>/card-2.json` (для Sol —
    `--output-schema tools/art/acceptance/asset-acceptance-2.output-anim.schema.json -o <E>/<Clip>/card-2.json`, остальное —
-   команда `references/acceptance-and-blender.md` §8.4 с `windows.sandbox="unelevated"`; для Opus — сохранённый
-   workflow `second-acceptor` со схемой `…output-anim…` и label `acceptor2-<ASSET_ID>-<Clip>-r<N>`, затем
-   `finish_second.py`, там же §8.3).
+   команда `references/acceptance-and-blender.md` §8.4 с `windows.sandbox="unelevated"`; для «Opus high» —
+   `run_clip_acceptors.py --evidence <E> --second --clips <Clip>`: `acceptor-prompt-2.md` и
+   `<E>/second-acceptor-args.json` для сохранённого workflow `second-acceptor` с effort high, схемой `…output-anim…` и
+   label `acceptor2-<ASSET_ID>-<Clip>-r<N>`, затем `finish_second.py`, там же §8.3).
 2. Итог пары: `python tools/art/acceptance/validate_card.py <E>/<Clip>/card.json --second <E>/<Clip>/card-2.json
    --final-json <E>/<Clip>/final.json --print-verdict --check-files`. `score` — минимум двух; вердикт — карточки с
    меньшим `score` (при равенстве — более строгий), строгий маршрут другой карточки (`rework_blender` по гейту или вето)
@@ -996,7 +999,8 @@ r ≥ 2 приёмщик получает пункты прежней карто
 FAIL-гейт и каждое измерение < 1,0 (схема и `validate_card.py`). Пункты списка (`item`, `frame`, `fix`, `tool`)
 ссылаются только на измерения ниже 2 и на FAIL-гейты. При pass в `status_note` пишется «художественно принято, по
 делегированию» со ссылкой на `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`.
-`acceptor.profile`: «Opus xhigh» или «Sol 6.1 xhigh» — профиль фактического запуска (RA-17, F119). Сессия
+`acceptor.profile`: «Opus xhigh», у второго приёмщика «Opus high» («Sol 6.1 xhigh» — история) — профиль фактического
+запуска (RA-17, F119). Сессия
 приёмщика ≠ `executor_session_id`.
 
 **Известные пределы фигуры** (F141, F156; правило скилла). Пределы, которые клипом не чинятся (HANDBOOK §4.5 п.4:

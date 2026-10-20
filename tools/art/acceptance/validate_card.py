@@ -31,8 +31,9 @@
    frames.files; rework_fix_list ссылается только на измерения < 2 и FAIL-гейты (S у модели — никогда: в Blender не
    правится); при rework_blender список покрывает каждый FAIL-гейт, каждое вето-измерение, а у модели при score < 8,0 —
    каждое из F/T/D ниже 2,0; previous_card у r2+; сессии приёмщика и исполнителя различаются; при pass по делегированию
-   status_note содержит «по делегированию». Профиль приёмщика (side_models.py): «Opus xhigh», «Z-Code GLM-5.3-Flash»
-   или «Sol 6.1 xhigh» — последний отключён 2026-10-20, его карточки с датой позже — ошибка, старые валидны.
+   status_note содержит «по делегированию». Профиль приёмщика (side_models.py): «Opus xhigh» (первый), «Opus high»
+   (второй, с 2026-10-21), «Sol 6.1 xhigh» (отключён 2026-10-20) или «Z-Code GLM-5.3-Flash» (снят с приёмки 2026-10-21:
+   калибровка не пройдена); карточки отключённого профиля с датой позже дня отключения — ошибка, старые валидны.
 5. `--check-files`: файлы accepted_object существуют и sha256 совпадает; frames.dir/<files>, reports и пути-источники
    гейтов существуют (пути от корня репо). У модели frames.dir/frames.json и tone.json читаются всегда, а не только
    когда приёмщик перечислил их в frames.files (пилот 2026-10-13, RB-16): frames.json обязателен, frames.files =
@@ -45,9 +46,11 @@
    _tone.py; гейты не пересчитаны (проп, нет ld-fbx-report — форк) или пересчитаны не целиком (нет заявки).
 6. Устойчивый pass (любой kind, решение скилла — защита от разброса приёмщиков ±0,5): pass со score 8,0–8,4 одной
    карточкой не окончателен — код 3 и вердикт `needs_second_acceptor`. Второй приёмщик другим профилем на тех же кадрах
-   даёт card-2.json; `--second` проверяет обе карточки и пару (asset_id, cycle, accepted_object, frames, гейты равны;
-   профили и сессии разные) и печатает итог: score = минимум двух, вердикт — карточки с меньшим score (при равенстве —
-   более строгий), а если у другой карточки маршрут строже (возврат, гейт, вето) — он. `--final-json` пишет итог.
+   (с 2026-10-21 — «Opus high», workflow second-acceptor с effort high) даёт card-2.json; `--second` проверяет обе
+   карточки и пару (asset_id, cycle, accepted_object, frames, гейты равны; профили и сессии разные; тот же профиль —
+   только с `--same-profile-ok`) и печатает итог: score = минимум двух, вердикт — карточки с меньшим score (при
+   равенстве — более строгий), а если у другой карточки маршрут строже (возврат, гейт, вето) — он. `--final-json`
+   пишет итог.
 
 `--print-verdict` печатает в stdout вычисленный вердикт одной строкой (`pass`, `rework_blender`,
 `return_to_stage_1|return_to_stage_2` — если правило оставляет выбор, `needs_second_acceptor` — п.6), даже если
@@ -961,9 +964,10 @@ def needs_second(card, allowed, score):
 
 
 def pair_errors(a, b, same_profile_ok=False):
-    """Сверка двух карточек одной приёмки (первый и второй приёмщик). same_profile_ok — запасной путь, когда второй
-    профиль не запустился после пробы или его полосы нет (Z-Code GLM-5.3-Flash до `zcode login zai`, side_models.py):
-    второй приёмщик того же профиля, но в новом контексте."""
+    """Сверка двух карточек одной приёмки (первый и второй приёмщик). Профили обязаны различаться: с 2026-10-21 это
+    «Opus xhigh» + «Opus high» (side_models.FIRST / SECOND). same_profile_ok — запасной путь, когда второй профиль не
+    запустился после пробы, и старые пары 2026-10-20 — 2026-10-21 (оба «Opus xhigh»): второй приёмщик того же профиля,
+    но в новом контексте."""
     errs = []
     for k in ("schema", "kind", "asset_id", "cycle", "previous_card", "accepted_object", "frames",
               "executor_session_id"):
@@ -1003,7 +1007,8 @@ def main(argv=None):
                          "и пересчитать машинные гейты модели по отчётам")
     ap.add_argument("--repo-root", default=str(REPO), help=argparse.SUPPRESS)
     ap.add_argument("--no-jsonschema", action="store_true", help="принудительно встроенная проверка схемы")
-    ap.add_argument("--second", help="card-2.json второго приёмщика (другой профиль, те же кадры): итог по минимуму")
+    ap.add_argument("--second", help="card-2.json второго приёмщика (другой профиль — «Opus high» при первом «Opus "
+                                     "xhigh», те же кадры): итог по минимуму")
     ap.add_argument("--same-profile-ok", action="store_true",
                     help="с --second: второй приёмщик того же профиля (другой профиль не запустился после пробы)")
     ap.add_argument("--final-json", help="с --second: записать итог пары (unmatched.acceptance-final/1)")
@@ -1046,8 +1051,9 @@ def main(argv=None):
         if errs:
             return 1
         if unstable:
-            print("NEED-SECOND: score %s в полосе 8,0–8,4 — pass неустойчив; второй приёмщик другим профилем на тех же "
-                  "кадрах → card-2.json, затем --second" % score, file=sys.stderr)
+            print("NEED-SECOND: score %s в полосе 8,0–8,4 — pass неустойчив; второй приёмщик другим профилем («%s», "
+                  "workflow second-acceptor с effort high) на тех же кадрах → card-2.json, затем --second"
+                  % (score, side_models.SECOND), file=sys.stderr)
             return EXIT_NEEDS_SECOND
         print("OK: %s kind=%s cycle=%s score=%s verdict=%s" % (a.card, card["kind"], card["cycle"], score,
                                                               card["verdict"]), file=sys.stderr)

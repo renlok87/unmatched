@@ -24,7 +24,7 @@ Astra в SKILL.md и в `references/`, пока те не переписаны.
 |---|---|---|
 | Codex `image_gen`: 1a дизайн-front, 1c виды поверх орто | генерация изображений **Gemini** (приложение Gemini через Computer Use или gemini.google.com в Chrome пользователя через Claude in Chrome), либо сервисы Google внутри Gemini. Вход 1a — промпт и `QUALITY_REFERENCE`; вход 1c — `ortho_<view>` и утверждённый front | §2 этап 1, §6 этап 1, `references/concept-sheet.md` |
 | Codex как исполнитель пакета: сам гонял `check_concept_views.py`, писал `verification.json` | Gemini только рисует. Файлы в папку пакета сохраняет запускающий агент, он же гоняет автопроверки и пишет `verification.json` | `references/concept-sheet.md` §5 |
-| приёмщик «Sol 6.1 xhigh», второй приёмщик «другим профилем» | **Opus `second-acceptor`** в свежем контексте (§4); факт пишется в `ACCEPTOR_PROFILE` и карточку. Z-Code GLM-5.3-Flash 2026-10-21 калибровку визуального приёмщика не прошёл: лист Leshen он оценил в 10,0 против 8,1 у Opus и Sol, в слепой паре выбрал противоположного победителя, строгий JSON не держит (`docs/art-pipeline/evidence/skill-batch-2026-10-20/zcode-calibration/RESULT.md`). Баллы он не ставит, пока новая калибровка не пройдёт; его роли — текст и описание кадров | §4, §6 этап 4, §7, `references/acceptance-and-blender.md` §8.4–8.5, `references/animation-vfx-sfx.md` §10 |
+| приёмщик «Sol 6.1 xhigh», второй приёмщик «другим профилем» | **Opus `second-acceptor`** в свежем контексте (§4): первый приёмщик — «Opus xhigh» (effort xhigh), второй «другим профилем» — **«Opus high»** (тот же workflow, effort high). Пользователь, 2026-10-21: «Хорошо, использую Opus High вместо Z-код для приемщика. Вот, и продолжай без меня, делай все сам.» Факт пишется в `ACCEPTOR_PROFILE` и карточку; пара «Opus xhigh» + «Opus high» — два профиля, `--same-profile-ok` ей не нужен. Z-Code GLM-5.3-Flash 2026-10-21 калибровку визуального приёмщика не прошёл: лист Leshen он оценил в 10,0 против 8,1 у Opus и Sol, в слепой паре выбрал противоположного победителя, строгий JSON не держит (`docs/art-pipeline/evidence/skill-batch-2026-10-20/zcode-calibration/RESULT.md`). Он снят с приёмки: его карточки позже 2026-10-21 `validate_card.py` отвергает. Баллы он не ставит, пока новая калибровка не пройдёт; его роли — текст и описание кадров | §4, §6 этап 4, §7, `references/acceptance-and-blender.md` §8.4–8.5, `references/animation-vfx-sfx.md` §10 |
 | побочная модель для текста: ревью промпта, scope, второе мнение | **Z-Code GLM-5.3**, рассуждение max, через Computer Use | весь скилл |
 | звук и музыка этапа 6 | **SYNTX** (MCP `syntx-ai`, журнал как раньше), **stiva.ai** (там же звуки ElevenLabs) или сервисы Google в Gemini | §6 этап 6, `references/animation-vfx-sfx.md` |
 
@@ -43,18 +43,24 @@ Astra в SKILL.md и в `references/`, пока те не переписаны.
     «Opus xhigh», `workflow:acceptor-<ASSET_ID>-r<N>`, изображения — инструментом Read) и `acceptor-args.json`
     (пачка — `<work>/acceptor-args-<YYYYMMDD>.json`) → `Workflow({name: "second-acceptor", args: <файл>})` → вывод в
     файл → `finish <вывод>`: `card.json`, `validate_card --check-files`, сверка констант и хэшей пакета, журнал.
-    `accept`, `all`, `probe` и `--acceptor sol` — код 2 «Sol отключён»; `--acceptor zcode` — заглушка.
+    `accept`, `all`, `probe` и `--acceptor sol` — код 2 «Sol отключён»; `--acceptor zcode` — код 2 «снят с приёмки».
   - `ue7a/run_clip_acceptors.py` (клипы 7a.2) — без `--finish` переписывает константы промпта (acceptor «Opus xhigh» /
     `workflow:acceptor-<ASSET_ID>-<Clip>-r<N>`, executor), дописывает блок «Изображения приёмщику» и пишет
-    `<цикл>/acceptor-args.json`; затем `--finish <вывод workflow>` → `card.json` и `validate_card`.
-  - Второй приёмщик — `prepare-second` / `_output_schema.py --workflow-args`, тот же workflow в свежем контексте;
-    `finish_second.py` при одном профиле обеих карточек сам ставит `--same-profile-ok` (строка NOTE,
-    `final.json#same_profile_fallback`).
-  - `tools/art/acceptance/*`: профиль «Z-Code GLM-5.3-Flash» есть в схеме; «Sol 6.1 xhigh» валиден только на
-    карточках по 2026-10-20 включительно (позже — ошибка `validate_card.py`), в схемах вывода его нет;
-    `_output_schema.py --workflow-args <kind> --first` — аргументы первого приёмщика.
-  - Полоса Z-Code — заглушка: `python tools/art/acceptance/side_models.py zcode-probe` (код 2), `--acceptor zcode`
-    обоих приёмщиков — код 2 до `zcode login zai` пользователя.
+    `<цикл>/acceptor-args.json`; затем `--finish <вывод workflow>` → `card.json` и `validate_card`. Код 3 —
+    `--second --clips <клип>`: `acceptor-prompt-2.md` («Opus high», `workflow:acceptor2-…`) и
+    `<цикл>/second-acceptor-args.json` с effort high, вывод — `finish_second.py`.
+  - Второй приёмщик «Opus high» — `prepare-second` (лист), `run_clip_acceptors.py --second` (клип) или
+    `_output_schema.py --workflow-args <kind>` без `--first` (модель): аргументы несут `"profile": "Opus high"` и
+    `"effort": "high"`, тот же workflow в свежем контексте. `finish_second.py` считает пару «Opus xhigh» + «Opus high»
+    без флага; при одном профиле обеих карточек (старые пары 2026-10-20 — 2026-10-21, оба «Opus xhigh») сам ставит
+    `--same-profile-ok` (строка NOTE, `final.json#same_profile_fallback`).
+  - `tools/art/acceptance/*`: действующие профили — «Opus xhigh» и «Opus high». «Sol 6.1 xhigh» валиден только на
+    карточках по 2026-10-20 включительно, «Z-Code GLM-5.3-Flash» — по 2026-10-21 включительно (позже — ошибка
+    `validate_card.py`), в схемах вывода их нет; `_output_schema.py --workflow-args <kind> --first` — аргументы
+    первого приёмщика («Opus xhigh», effort xhigh).
+  - `--acceptor zcode` обеих полос приёмки — код 2: Z-Code снят с приёмки 2026-10-21. Скриптовая полоса Z-Code для
+    текста — заглушка: `python tools/art/acceptance/side_models.py zcode-probe` (код 2 до `zcode login zai`
+    пользователя).
   - `codex_lane.py` не запускает Codex: без явной команды генератора (`--exe` и `--codex-args-json`) и с `codex.exe` —
     код 2. 1a/1c рисует Gemini через Computer Use, пачкой это не скриптуется.
 - **Журнал трат.** `tools/art/visual/ledger.py` знает Gemini и stiva.ai (подписки, как Codex: `quoted`, `cost` и
@@ -64,11 +70,11 @@ Astra в SKILL.md и в `references/`, пока те не переписаны.
   отвергается, старые строки Codex остаются.
 - **Пробы этапа 0** (вместо пробы `codex exec`):
   - Gemini — открыт под учёткой пользователя и предлагает генерацию изображений; экран входа — гейт §5 п.2;
-  - Z-Code — в проекте `unmached` выбрана нужная модель, на «Ответь OK» пришёл ответ OK; для приёмки GLM-5.3-Flash
-    описывает приложенный кадр.
-- **Не проверено вживую.** Путь Gemini для 1a/1c и приёмщик Z-Code ещё ни разу не шли боевым прогоном. Первый прогон
-  проверяет их и пишет находки строками F в `NOTES`: сетку и аспект видов, фон, водяной знак, держит ли Gemini силуэт
-  орто в 1c.
+  - Z-Code (текст и описание кадров, не приёмка) — в проекте `unmached` выбрана нужная модель, на «Ответь OK» пришёл
+    ответ OK.
+- **Не проверено вживую.** Путь Gemini для 1a/1c и второй приёмщик «Opus high» ещё ни разу не шли боевым
+  прогоном. Первый прогон проверяет их и пишет находки строками F в `NOTES`: сетку и аспект видов, фон, водяной знак,
+  держит ли Gemini силуэт орто в 1c.
 
 ## 1. Когда использовать
 
@@ -129,15 +135,16 @@ Astra в SKILL.md и в `references/`, пока те не переписаны.
 | Роль | Как вызвать | Правила |
 |---|---|---|
 | Gemini (этап 1, с 2026-10-20) | Приложение Gemini через Computer Use или gemini.google.com в Chrome пользователя (Claude in Chrome); промпт — из промпт-файла, входные картинки прикладываются; результат запускающий агент сохраняет в `art/imagegen/concept-<key>-codex/` (§0) | Промпт-файл пишет Claude (прежнее имя `<ASSET_ID>-concept.codex.md`). Выход Gemini не правится; автопроверки и `verification.json` — запускающий агент. Вживую не проверено (§0) |
-| Z-Code (побочная модель, второй приёмщик, с 2026-10-20) | Приложение Z-Code через Computer Use: проект `unmached`, новая задача, GLM-5.3 (текст) или GLM-5.3-Flash (кадры); headless `zcode.cjs` — после `zcode login zai` пользователя (AGENTS.md «AI tools and side models») | Пишет только в папку из промпта, не коммитит. Пока скриптовой полосы нет — второй приёмщик Opus `second-acceptor`, факт в карточке |
+| Z-Code (побочная модель для текста, с 2026-10-20; не приёмщик с 2026-10-21) | Приложение Z-Code через Computer Use: проект `unmached`, новая задача, GLM-5.3 (текст) или GLM-5.3-Flash (описание кадров); headless `zcode.cjs` — после `zcode login zai` пользователя (AGENTS.md «AI tools and side models») | Пишет только в папку из промпта, не коммитит. Баллов приёмки не ставит: калибровка 2026-10-21 не пройдена (§0); второй приёмщик — «Opus high» |
 | ~~Codex (этап 1)~~ — **отключён 2026-10-20 (§0)**, строка — история | `codex.exe exec` после пробы exec (выбор exe, команда, кодировки — `references/concept-sheet.md` §5.2): exe приложения из `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/` — только глобом, хэш и версию не закреплять (F37); флаг `-c 'windows.sandbox="unelevated"'` обязателен (без него песочница при открытом приложении не запускает команд, а код выхода 0). Exec не работает — приложение ChatGPT через управление рабочим столом (concept-sheet §5.3). Приложение пользователя не закрывать; npm-`codex` не работает. Пачка — полосы `codex_lane.py` (§11.3) | Промпт-файл пишет Claude: `docs/game-design/visual/06-tasks/prompts/<ASSET_ID>-concept.codex.md`. Codex пишет только в `art/imagegen/concept-<key>-codex/` и не коммитит |
-| Приёмщик «Opus xhigh» (по умолчанию) | Агент Workflow `agent(prompt, {model: 'opus', effort: 'xhigh', schema: <строгая выходная схема своего вида>, label})`, свежий контекст (скрипт и промпт — `references/acceptance-and-blender.md` §8.2–8.3). Схема — `tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json`, как у Sol: с полной схемой Workflow возвращал строки `"null"` (F6, F102, RA-11). Второй приёмщик Opus — сохранённый workflow `.claude/workflows/second-acceptor.js` (`Workflow({name: "second-acceptor", args: {kind, items, schema}})`; ASCII-аргументы — `python tools/art/acceptance/_output_schema.py --workflow-args <kind> --item <ASSET_ID>=<evidence>`, лист концепта — `sheet_acceptance.py prepare-second`), затем `finish_second.py` (там же §8.3). На вход — только кадры, отчёты, концепт и рубрика | Не правит. Его сессия отлична от сессии исполнителя. `session_id` обоих пишутся в карточку |
+| Приёмщик «Opus xhigh» (по умолчанию, первый) | Агент Workflow `agent(prompt, {model: 'opus', effort: 'xhigh', schema: <строгая выходная схема своего вида>, label})`, свежий контекст (скрипт и промпт — `references/acceptance-and-blender.md` §8.2–8.3). Схема — `tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json`, как у Sol: с полной схемой Workflow возвращал строки `"null"` (F6, F102, RA-11). Сохранённый workflow `.claude/workflows/second-acceptor.js` с аргументами первого приёмщика (`effort: "xhigh"`): `python tools/art/acceptance/_output_schema.py --workflow-args <kind> --first --item <ASSET_ID>=<evidence>`, лист — `sheet_acceptance.py prepare`, клип — `run_clip_acceptors.py`. На вход — только кадры, отчёты, концепт и рубрика | Не правит. Его сессия отлична от сессии исполнителя. `session_id` обоих пишутся в карточку |
+| Второй приёмщик «Opus high» (код 3, с 2026-10-21) | Тот же workflow `second-acceptor` с effort high в свежем контексте: `Workflow({name: "second-acceptor", args: {kind, profile: "Opus high", effort: "high", items, schema}})`; ASCII-аргументы — `python tools/art/acceptance/_output_schema.py --workflow-args <kind> --item <ASSET_ID>=<evidence>` (без `--first`), лист концепта — `sheet_acceptance.py prepare-second`, клип — `run_clip_acceptors.py --second`; затем `finish_second.py` (`references/acceptance-and-blender.md` §8.3, §8.5) | Первую карточку не видит. Пара «Opus xhigh» + «Opus high» — два профиля (решение пользователя 2026-10-21, §0), итог — минимум двух |
 | ~~Приёмщик «Sol 6.1 xhigh»~~ — **отключён 2026-10-20 (§0)**, строка — история | Тот же `$exe`, прошедший пробу exec (GUI-путь приёмщику не подходит — нужны `--output-schema` и `-o`). Обязательно: `--ignore-user-config -m gpt-6.1-sol -c 'model_reasoning_effort="xhigh"' -c 'windows.sandbox="unelevated"' -s read-only`, строгая схема своего вида `…output-<kind>.schema.json` (не полная — её строгий режим отвергает), каждый кадр отдельным `-i`, `--` перед `-`; затем `validate_card.py`. Полная команда, отказ схемы и разбор событий — `references/acceptance-and-blender.md` §8.4. Промпт несёт блок чтения кириллицы (OEM, `cmd /c type`) и строку «рубрика — только этот файл» дословно по `references/concept-sheet.md` §11 (RA-03; без них Sol читал рубрику кракозябрами при коде 0 и открывал SKILL.md, F36, F75). Сбой песочницы (код 0, карточка-заглушка) или карточка «СБОЙ ОКРУЖЕНИЯ» — сбой окружения, не попытка: цикл не тратится. Пилот: модель 10–14,5 мин, клип ≈ 5 мин | Только по явному выбору запускающего; второй приёмщик пары «другим профилем» — почти всегда Sol (в пилоте 13 из 16 карточек). Повторная приёмка — тем же профилем |
 | Доработка «Opus xhigh» (этапы 5, 6) | Агент Workflow `{model: 'opus', effort: 'xhigh'}` с брифом доработки (модель — `references/acceptance-and-blender.md` §10, клип — `references/animation-vfx-sfx.md` §10.6), работает headless-скриптами. Фактический механизм и effort записываются (RA-21): блок этапа в заявке (`STAGE5[]`, `STAGE6.executor`, §7.2) и `executor_session_id` следующей карточки (субагент — `claude-code:<uuid>/agent:<name>`, F40) | Делает лично, не делегирует, свою работу не принимает |
 | Tripo Studio (шаги 1b и 2) | Запускающий агент через Claude in Chrome в своей вкладке; расширение не подключено, а Studio открыта и залогинена в Chrome пользователя — клики Windows-MCP в этой вкладке (`references/tripo3d-stages.md` §2, F9). Разрешение трат — сама заявка пользователя (§1), в лимите и сроке журнала; отдельно не спрашивать. Если клик блокирует классификатор прав сессии (живая проверка 2026-10-09: Real-World Transactions) или пользователь — гейт §5 п.2: пользователь проходит чек-лист `references/tripo3d-stages.md` §8 сам, агент проверяет результат | Цена — с кнопки до клика. Строка журнала — после каждой операции |
 
-Требование заказчика №3 исполняется буквально. Коэффициент ставит «Opus xhigh» или «Sol 6.1 xhigh» (Sol с 2026-10-20
-отключён; второй профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor`, §0). Ниже порога
+Требование заказчика №3 исполняется буквально. Коэффициент ставит «Opus xhigh» (Sol с 2026-10-20 отключён, §0); pass
+8,0–8,4 перепроверяет второй приёмщик «Opus high» (решение пользователя 2026-10-21), итог — минимум двух. Ниже порога
 дорабатывает лично «Opus xhigh». Затем повторная приёмка — новым агентом-приёмщиком, а не тем же контекстом.
 Запускающий агент не принимает свою работу и не подменяет внешнего исполнителя. В каждый промпт агента Workflow
 дословно цитируйте делегирование пользователя и разрешение на траты. Иначе агент примет за границу полномочий
@@ -230,8 +237,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 4. Пробный вызов исполнителей §4 — каждый с командой и критерием; не прошёл после повтора — гейт §5 п.2. В пачке
    пробы — один раз на сессию пачки, а не на фигуру (§11; пилот откладывал пробы до первой платной операции).
    - **Gemini и Z-Code** (с 2026-10-20 вместо пробы Codex, §0): Gemini открыт под учёткой пользователя и предлагает
-     генерацию изображений; Z-Code в проекте `unmached` ответил OK, GLM-5.3-Flash описал приложенный кадр. Экран входа
-     или нет приложения — гейт §5 п.2. Проба Codex ниже — история.
+     генерацию изображений; Z-Code в проекте `unmached` ответил OK (текст; приёмщиком он не служит с 2026-10-21, §0).
+     Экран входа или нет приложения — гейт §5 п.2. Проба Codex ниже — история.
    - ~~**Codex**~~ (отключён) — проба именно `exec` (`references/concept-sheet.md` §5.2, шаги 1–3:
      `exec … -c 'windows.sandbox="unelevated"' -s read-only --json "Run exactly one shell command: …"`). Прошла, если в
      событиях есть `command_execution` с `"exit_code":0`; `--version` и «Reply OK» не годятся — они проходят и при
@@ -245,7 +252,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
        schema: {type: 'object', properties: {ok: {type: 'boolean'}}, required: ['ok'], additionalProperties: false},
      })
      ```
-     Прошла — вернулся объект `{"ok": true}`. `null` или ошибка — один повтор. Приёмщик «Sol 6.1 xhigh» отключён
+     Прошла — вернулся объект `{"ok": true}`. `null` или ошибка — один повтор. Второй приёмщик «Opus high» — тот же
+     вызов с `effort: 'high'`, отдельной пробы не требует (решение скилла). Приёмщик «Sol 6.1 xhigh» отключён
      2026-10-20 (§0); профиль `sol-6.1-xhigh` в `ACCEPTOR_PROFILE` не выбирать.
    - **Claude in Chrome** (шаги 1b и 2). Инструменты загрузить одним `ToolSearch`
      (`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__get_page_text,mcp__claude-in-chrome__computer`).
@@ -389,13 +397,14 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 2. Гейты PASS/FAIL по отчётам: G-TOPO (по финальному FBX, `ld-fbx-report`), G-UV, G-TEX, G-RIG, G-NAMES. Баллы S/F/T/D
    0–2, `score = round(sum / (2 × n) × 10, 1)`; приёмщик возвращает только JSON, `card.json` пишет запускающий.
    Приёмщик «Sol 6.1 xhigh» (`codex exec`, `references/acceptance-and-blender.md` §8.4) отключён 2026-10-20; второй
-   профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor` (§0).
+   профиль — «Opus high» (§0, §4).
 3. `python tools/art/acceptance/validate_card.py <card.json> --print-verdict --check-files`. Код 0: `pass` → этап 6;
    `rework_blender` → этап 5; `return_to_stage_1` или `return_to_stage_2` (S < 1,5 или дефект исходника) → назад;
    после r3 без pass — `escalate_user`. Код 3 `needs_second_acceptor` (pass с `score` 8,0–8,4; правило общее для
-   модели, листа концепта и клипа): второй приёмщик другим профилем на тех же кадрах → `card-2.json`, затем
-   `validate_card.py card.json --second card-2.json --final-json final.json` — итог по минимуму и более строгому
-   маршруту (`references/acceptance-and-blender.md` §6, §8.5). Код 1 — карточка невалидна, баллы не править.
+   модели, листа концепта и клипа): второй приёмщик другим профилем («Opus high», §4) на тех же кадрах →
+   `card-2.json`, затем `validate_card.py card.json --second card-2.json --final-json final.json` — итог по минимуму
+   и более строгому маршруту (`references/acceptance-and-blender.md` §6, §8.5). Код 1 — карточка невалидна, баллы
+   не править.
    До вызова приёмщика — «Сверка входа» (`references/acceptance-and-blender.md` §3): лист того же ассета
    (`frames.json#sheet.key_match`), `accepted_object` = `frames.json#accepted_object`; S = 0 (другой персонаж) после
    верного входа — `return_to_stage_1`.
@@ -455,7 +464,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
    --light-pinned <review report>` по клипу за вызов, `closeup`, `sheet`; каталог цикла — `ue7a/prep_acceptance.py`;
    приёмщики — `ue7a/run_clip_acceptors.py --evidence <цикл> --executor-session-id <фактический id исполнителя
    клипов>` → Workflow `second-acceptor` по `<цикл>/acceptor-args.json` → `run_clip_acceptors.py … --finish <вывод>`
-   (Opus-путь §0, `validate_card` сам, C51/C55); рубрика R/C/D/L и маршруты —
+   (Opus-путь §0, `validate_card` сам, C51/C55; код 3 — `run_clip_acceptors.py … --second --clips <клип>` →
+   Workflow по `<цикл>/second-acceptor-args.json` → `finish_second.py <вывод>`); рубрика R/C/D/L и маршруты —
    `references/animation-vfx-sfx.md` §10. Выход 7a — 4 карточки клипов `pass` и блок `STAGE7A` заявки (§7.2; его
    проверяет `registration_check.py`, C57). Клип вскрыл дефект модели — поздний фикс (§5 п.4; маршрут — там же §10.5).
 4. Правки без сборки C++ (регистрация §5.4–5.5): CUE-011/013 в `cue-table.json` →
@@ -519,9 +529,9 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 
 | Точка | Дефолт | Источник |
 |---|---|---|
-| Приёмщик | «Opus xhigh»; «Sol 6.1 xhigh» — отключён 2026-10-20, второй профиль — Z-Code GLM-5.3-Flash или Opus `second-acceptor` (§0). В карточку (`acceptor.profile`) и в `ACCEPTOR_PROFILE` заявки пишется фактический профиль запуска: явный выбор запускающего важнее заявки (F76, F119, RA-17) | требование заказчика №3 |
+| Приёмщик | «Opus xhigh»; второй приёмщик «другим профилем» — «Opus high» (workflow `second-acceptor` с effort high, §0, §4). «Sol 6.1 xhigh» отключён 2026-10-20, Z-Code GLM-5.3-Flash снят с приёмки 2026-10-21. В карточку (`acceptor.profile`) и в `ACCEPTOR_PROFILE` заявки пишется фактический профиль запуска: явный выбор запускающего важнее заявки (F76, F119, RA-17) | требование заказчика №3; второй — решение пользователя 2026-10-21 |
 | Исполнитель доработки | «Opus xhigh»; механизм (Workflow или субагент), модель и effort — фактические, в блоке этапа заявки (§7.2) | требование заказчика №3; RA-21 |
-| Порог и вето | `score` ≥ 8,0; любое измерение < 1,0 → не pass; S < 1,5 → возврат на этап 1 или 2; pass модели с `score` 8,0–8,4 — второй приёмщик другим профилем, итог по минимуму | решение скилла (`references/acceptance-and-blender.md` §6, §8.5) |
+| Порог и вето | `score` ≥ 8,0; любое измерение < 1,0 → не pass; S < 1,5 → возврат на этап 1 или 2; pass модели с `score` 8,0–8,4 — второй приёмщик «Opus high», итог по минимуму | решение скилла (`references/acceptance-and-blender.md` §6, §8.5) |
 | Циклы | концепт 3, модель 2 (r1→r3), клип 2; генераций на вид ≤ 4 | решение скилла |
 | Кредиты Tripo | лимит и срок — из журнала `credits-ledger.json` (`limits.tripo.credits`, `limits.tripo.until`; решение 2026-10-13 «На триппо нет лимита» сняло потолок 3000 ВР-04); `until: null` = окно открыто; граница — свежий баланс Studio. На 2026-10-14 в журнале ещё `until` «2026-10-28»: снимает ли «нет лимита» и срок — решает пользователь, данные журнала агент не меняет (RA-04). Предпроверка — `ledger.py check --service tripo` (§5 п.3): на этапе 0 без `--balance`, с шага 1b — с `--balance <баланс Studio>` перед каждой операцией (`references/tripo3d-stages.md` §1). Ожидаемо на героя: черновик ≈ 30 + H2 95 (60 + 30 + 5); точная цена — с кнопки до клика (§3 там же) | ВР-реестр ВР-04; `references/tripo3d-stages.md` §1, §3 |
 | Описание и имя бойца | `DESCRIPTION`, `ANCHORS`, `FIGHTER_NAME` — из `scraped-data/api/heroes/<slug>.json` и эталонной БД (имя, оружие, помощники) текстом; аватар и сканы в генератор не подаются. Персонажа там нет (новый помощник, например Sir Gawain) — пишутся по заявке пользователя с `decided_by: delegated (ВР-реестр 2026-10-06)`; это не гейт стопа | `07-prompt-templates.md` §3.1, ВР-PR08; решение скилла |
@@ -665,8 +675,11 @@ CREDITS:
   tripo_limit: "лимит и срок — из журнала (решение 2026-10-13; until: null = окно открыто); граница — баланс Studio"
   planned: "<черновик ≈ 30 + 95>"   # проп: "<multi-view 60–130>" (references/tripo3d-stages.md §3)
 VISUAL_CARD_ID: "AN-<NN>"           # строка 06-tasks/anim.csv (area hero, проп — prop); --task ledger.py add (Gemini, Tripo)
-ACCEPTOR_PROFILE: "opus-xhigh"      # | sol-6.1-xhigh (отключён 2026-10-20, §0) → acceptor.profile "Opus xhigh" | "Sol 6.1 xhigh"; повторы тем же.
-                                    #   Пишется ФАКТ: запускающий выбрал другой профиль — поле переписать (RA-17, F119)
+ACCEPTOR_PROFILE: "opus-xhigh"      # профиль ПЕРВОГО приёмщика → acceptor.profile "Opus xhigh"; повторы тем же.
+                                    #   Второй (код 3, card-2.json) — всегда "Opus high", effort high (решение
+                                    #   пользователя 2026-10-21, §0). sol-6.1-xhigh отключён 2026-10-20; Z-Code — не
+                                    #   приёмщик с 2026-10-21. Пишется ФАКТ: запускающий выбрал другой профиль — поле
+                                    #   переписать (RA-17, F119)
 ASSET_DIR: "art/pipeline-candidates/<ASSET_ID>"
 NOTES:
   - "ВР-18: ростер после MVP вне объёма; основание — запрос пользователя <дата>"
@@ -891,10 +904,10 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 | `tools/art/pipeline_batch/codex_lane.py` | — | ~~полоса Codex~~: Codex отключён 2026-10-20, без явной команды генератора — код 2 (§0); механика claim/STOP/429 — для будущей полосы Z-Code |
 | `tools/art/pipeline_batch/rebg.py` | 1a | ровный серый фон фронта лицензионной фигуры (F7) |
 | `tools/art/pipeline_batch/make_1c.py` | 1c | задания 1c по орто 1b |
-| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой, Opus-путь (§0): `prepare` → Workflow `second-acceptor` по `acceptor-args` → `finish`; второй — `prepare-second`; Sol (`accept`/`all`/`probe`) — код 2 |
-| `tools/art/acceptance/side_models.py` | 1, 4, 7a.2 | профили приёмщиков, причины «Codex/Sol отключён», заглушка полосы Z-Code (`zcode-probe`) |
-| `.claude/workflows/second-acceptor.js` | 1, 4, 7a.2 | приёмщик «Opus xhigh» со строгой выходной схемой — с 2026-10-20 и первый (`--first`, label `acceptor-…`), и второй (`references/acceptance-and-blender.md` §8.3) |
-| `tools/art/pipeline_batch/finish_second.py` | 1, 4, 7a.2 | вывод `second-acceptor` (список, `{"result": …}` или один элемент) → `card-2.json` и пара `validate_card --second --check-files`; один профиль у обеих карточек → `--same-profile-ok` |
+| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой, Opus-путь (§0): `prepare` → Workflow `second-acceptor` по `acceptor-args` → `finish`; второй «Opus high» — `prepare-second`; Sol (`accept`/`all`/`probe`) — код 2 |
+| `tools/art/acceptance/side_models.py` | 1, 4, 7a.2 | профили приёмщиков («Opus xhigh», второй «Opus high», effort профиля), причины «Codex/Sol отключён» и «Z-Code снят с приёмки», заглушка полосы Z-Code (`zcode-probe`) |
+| `.claude/workflows/second-acceptor.js` | 1, 4, 7a.2 | приёмщик Opus со строгой выходной схемой: первый «Opus xhigh» (effort xhigh, `--first`, label `acceptor-…`) и второй «Opus high» (`args.effort: "high"`, label `acceptor2-…`), effort и на повторе (`references/acceptance-and-blender.md` §8.3) |
+| `tools/art/pipeline_batch/finish_second.py` | 1, 4, 7a.2 | вывод `second-acceptor` (список, `{"result": …}` или один элемент) → `card-2.json` и пара `validate_card --second --check-files`; пара «Opus xhigh» + «Opus high» — без флага; один профиль у обеих карточек (старые пары) → `--same-profile-ok` |
 | `tools/art/pipeline_batch/prep_1b.py`, `tripo_log.py`, `post_1b.py` | 1b | очередь Tripo, строка журнала, приём GLB и орто |
 | `tools/art/pipeline_batch/post_h2.py` | 2 | source-spec, превью, рамки частей по вершинам (F10) |
 | `tools/art/pipeline_batch/git_lock.py` | коммит | зависший `.git/index.lock` (F82) |
@@ -902,7 +915,7 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 | `tools/tripo-pipeline/ue7a/delete_prev.py`, `refresh_carrier.py` | 7a, переимпорт | ассеты прежнего импорта; меш превью клипов после новой модели (F145) |
 | `tools/tripo-pipeline/ue7a/discard_master.py` | 7a | сброс грязного `M_UM_Figure_v2` без сохранения (F92) |
 | `tools/tripo-pipeline/ue7a/prep_acceptance.py` | 7a.2 | каталог цикла приёмки клипов: кадры, промпт из заготовки, сверка sha |
-| `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` | 7a.2 | Opus-путь (§0): константы промпта, список изображений, `acceptor-args.json`; `--finish` → карточки и `validate_card`; Sol — код 2 |
+| `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` | 7a.2 | Opus-путь (§0): константы промпта, список изображений, `acceptor-args.json`; `--finish` → карточки и `validate_card`; `--second` — второй приёмщик «Opus high» (`second-acceptor-args.json` → `finish_second.py`); Sol — код 2 |
 | `tools/tripo-pipeline/anim/grip_check.py`, `clip_closeups.py` | 6, 7a.2 | хват, кисть, локоть; крупные планы клипа и пара шва Idle |
 | `tools/art/registration_check.py` | 7b, интеграция | полнота регистрации героя в коде и конфигах (RB-04) |
 

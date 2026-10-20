@@ -30,7 +30,8 @@ def utf8_streams() -> None:
 
 
 def side_models():
-    """tools/art/acceptance/side_models.py: профили приёмщиков, «Codex/Sol отключён 2026-10-20», заглушка Z-Code."""
+    """tools/art/acceptance/side_models.py: профили приёмщиков («Opus xhigh», второй «Opus high»), «Codex/Sol отключён
+    2026-10-20», Z-Code снят с приёмки 2026-10-21 (ZCODE_GONE), заглушка полосы Z-Code."""
     if str(ACCEPTANCE) not in sys.path:
         sys.path.insert(0, str(ACCEPTANCE))
     import side_models as sm  # noqa: PLC0415

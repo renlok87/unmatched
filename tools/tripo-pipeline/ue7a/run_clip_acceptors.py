@@ -1,9 +1,10 @@
-"""Шаг 7a.2: приёмщики клипов «Opus xhigh» (Workflow second-acceptor) по каталогу цикла prep_acceptance.py + validate_card.
+"""Шаг 7a.2: приёмщики клипов «Opus xhigh» и второй «Opus high» (Workflow second-acceptor) по каталогу цикла prep_acceptance.py + validate_card.
 
 С 2026-10-20 Sol и Codex отключены (пользователь отменил подписку ChatGPT; AGENTS.md «AI tools and side models»):
 `codex exec` больше не запускается, `--acceptor sol` падает с кодом 2 и причиной; `--acceptor zcode`
-(«Z-Code GLM-5.3-Flash») — заглушка до `zcode login zai` пользователя (tools/art/acceptance/side_models.py).
-По умолчанию — Opus-путь в два шага: подготовка (без --finish) и приём карточек (--finish).
+(«Z-Code GLM-5.3-Flash») — тоже код 2: снят с приёмки 2026-10-21, калибровка не пройдена
+(tools/art/acceptance/side_models.py, ZCODE_GONE). По умолчанию — Opus-путь в два шага: подготовка (без --finish) и
+приём карточек (--finish).
 
 Замена run-acceptor.ps1, который этап 6 должен был оставить рядом с заготовками, а исполнитель 7a писал руками
 (находка C51 фигуры-проверки Beowulf 2026-10-14). Вход — каталог цикла <E> = <asset-dir>/evidence/acceptance-anim/
@@ -24,8 +25,12 @@
   4. --finish <вывод workflow> (голый список, {"result": [...]} или один элемент): card<tag>.json без строк "null";
      acceptor карточки = константе промпта, executor_session_id = константе промпта;
   5. validate_card.py <card> --print-verdict --check-files → validator-output.txt; код 0 — карточка верна, 3 — pass
-     8,0–8,4: нужен второй приёмщик (.claude/workflows/second-acceptor.js в свежем контексте, acceptance-and-blender.md
-     §8.5; пара — finish_second.py), 1 — нет.
+     8,0–8,4: нужен второй приёмщик (шаг 6), 1 — нет;
+  6. --second (код 3 у клипа; acceptance-and-blender.md §8.5) — второй приёмщик «Opus high» (решение пользователя
+     2026-10-21): из acceptor-prompt.md клипа — acceptor-prompt-2.md с константой acceptor «Opus high» /
+     «workflow:acceptor2-<ASSET_ID>-<Clip>-r<N>» и тем же блоком изображений, затем <E>/second-acceptor-args.json —
+     аргументы того же workflow с effort high (свежий контекст). Нужна первая карточка card.json клипа; вывод workflow
+     → tools/art/pipeline_batch/finish_second.py (card-2.json и пара validate_card --second без --same-profile-ok).
 Итог --finish и --validate-only — <E>/acceptors-run<tag>.json и таблица в stdout.
 
     python tools/tripo-pipeline/ue7a/run_clip_acceptors.py --evidence <asset-dir>/evidence/acceptance-anim/20261014-r1 \\
@@ -33,11 +38,12 @@
     … --finish <вывод workflow.json>  # карточки первого приёмщика → card.json + validate_card
     … --validate-only                 # только validate_card по готовым карточкам
     … --tag=-b [--force]              # повтор: card-b.json и т. д.; --force — перезаписать карточку
+    … --second --clips Idle           # второй приёмщик «Opus high» → second-acceptor-args.json → finish_second.py
 
-Траты: нет — приёмщик «Opus xhigh» не тратит квот сервисов (строки журнала трат нет).
+Траты: нет — приёмщики «Opus xhigh» и «Opus high» не тратят квот сервисов (строки журнала трат нет).
 Код выхода: 0 — подготовка сделана / все карточки верны (validate 0 или 3), 1 — есть неверная карточка / нет карточки
 клипа в выводе workflow / чужой acceptor или executor_session_id, 2 — ошибка входа (нет каталога, промпта, кадров;
-карточка уже есть; отключённый приёмщик Sol или Z-Code).
+карточка уже есть; у --second нет первой карточки; отключённый приёмщик Sol или Z-Code).
 """
 from __future__ import annotations
 
@@ -152,27 +158,33 @@ def asset_of(e: Path) -> str:
 
 
 def plan_clip(e: Path, clip: str, a, repo: Path) -> dict:
+    """План клипа. a.second — второй приёмщик «Opus high»: промпт-источник тот же (acceptor-prompt.md), пишется
+    acceptor-prompt-2.md, карточка — card-2.json (finish_second.py)."""
     cdir = e / clip
+    second = bool(getattr(a, "second", False))
     pp = prompt_path(cdir, a.tag)
     if not pp.is_file():
         raise InputError(f"{clip}: нет промпта {pp} (prep_acceptance.py)")
     text = pp.read_text(encoding="utf-8-sig")
     nl = "\r\n" if b"\r\n" in pp.read_bytes() else "\n"  # переписанный промпт — с концами строк файла
     label = _output_schema.default_label(asset_of(e), c.rel(cdir, repo) if cdir.resolve().is_relative_to(
-        repo.resolve()) else cdir.as_posix(), "acceptor") + a.tag
-    want = {"profile": sm.OPUS, "session_id": "workflow:" + label}
+        repo.resolve()) else cdir.as_posix(), "acceptor2" if second else "acceptor") + a.tag
+    want = {"profile": sm.SECOND if second else sm.FIRST, "session_id": "workflow:" + label}
     text, acc_rec = acceptor_fix(text, want)
     left = sorted(set(re.findall(r"\{\{[A-Z_0-9]+\}\}", text)))
     if left:
         raise InputError(f"{clip}: в промпте не заполнены {left} (prep_acceptance.py)")
     text, exe_rec = executor_fix(text, a.executor_session_id)
-    card = cdir / f"card{a.tag}.json"
-    plan = {"clip": clip, "dir": cdir, "prompt": pp, "text": text, "executor": exe_rec, "acceptor": acc_rec,
-            "label": label, "card": card, "images": [], "nl": nl}
+    card = cdir / ("card-2.json" if second else f"card{a.tag}.json")
+    plan = {"clip": clip, "dir": cdir, "prompt": pp, "out_prompt": cdir / "acceptor-prompt-2.md" if second else pp,
+            "text": text, "executor": exe_rec, "acceptor": acc_rec, "label": label, "card": card, "images": [],
+            "nl": nl}
     if a.validate_only:
         if not card.is_file():
             raise InputError(f"{clip}: --validate-only, а карточки {card.name} нет")
         return plan
+    if second and not (cdir / "card.json").is_file():
+        raise InputError(f"{clip}: --second, а первой карточки card.json нет — второй приёмщик идёт после неё")
     if card.exists() and not a.force:
         raise InputError(f"{clip}: карточка {card.name} уже есть — --tag <суффикс> для нового запуска или --force")
     fdir = cdir / "frames"
@@ -249,8 +261,11 @@ def main(argv=None) -> int:
     ap.add_argument("--image", action="append", default=[], help="ещё изображение приёмщику (повторяемый)")
     ap.add_argument("--no-prompt-images", action="store_true", help="только frames/, без изображений из промпта")
     ap.add_argument("--acceptor", default="opus", choices=("opus", "zcode", "sol"),
-                    help="приёмщик: opus — «Opus xhigh» через Workflow (по умолчанию); zcode — заглушка до "
-                         "`zcode login zai`; sol — отключён 2026-10-20")
+                    help="приёмщик: opus — «Opus xhigh» через Workflow (по умолчанию; --second — «Opus high»); "
+                         "zcode — снят с приёмки 2026-10-21; sol — отключён 2026-10-20")
+    ap.add_argument("--second", action="store_true",
+                    help="второй приёмщик «Opus high» (код 3): acceptor-prompt-2.md и <E>/second-acceptor-args.json "
+                         "(effort high); вывод workflow — finish_second.py")
     ap.add_argument("--finish", default=None, help="вывод Workflow second-acceptor: карточки → card<tag>.json")
     ap.add_argument("--tag", default="", help="суффикс файлов повтора: card<tag>.json, acceptor-args<tag>.json …")
     ap.add_argument("--force", action="store_true", help="перезаписать существующую карточку")
@@ -266,11 +281,13 @@ def main(argv=None) -> int:
               "(<E>/acceptor-args.json), затем --finish <вывод workflow>.", file=sys.stderr)
         return 2
     if a.acceptor == "zcode":
-        try:
-            sm.zcode_headless()
-        except sm.SideModelUnavailable as exc:
-            print(f"ERROR: {exc}", file=sys.stderr)
-            return 2
+        print(f"ERROR: {sm.ZCODE_GONE}.", file=sys.stderr)
+        return 2
+    if a.second and (a.finish or a.validate_only or a.tag):
+        print("ERROR: --second — только подготовка второго приёмщика, без --finish, --validate-only и --tag: вывод "
+              "workflow принимает tools/art/pipeline_batch/finish_second.py (card-2.json и пара --second)",
+              file=sys.stderr)
+        return 2
     repo = Path(a.repo)
     e = c.resolve(a.evidence, repo)
     try:
@@ -298,7 +315,8 @@ def main(argv=None) -> int:
             print(f"WARNING: {p['clip']}: executor_session_id из промпта {p['executor']['prompt']!r} — проверь, что это "
                   "фактический id исполнителя клипов (C32/C55), иначе --executor-session-id", file=sys.stderr)
     if a.dry_run:
-        print(json.dumps({"dry_run": True, "evidence": e.as_posix(), "acceptor": sm.OPUS,
+        acceptor = sm.SECOND if a.second else sm.FIRST
+        print(json.dumps({"dry_run": True, "evidence": e.as_posix(), "acceptor": acceptor,
                           "clips": {p["clip"]: {"prompt": p["prompt"].name, "executor_session_id": p["executor"],
                                                 "acceptor": p["acceptor"], "label": p["label"],
                                                 "card": p["card"].name,
@@ -308,17 +326,19 @@ def main(argv=None) -> int:
     if not a.validate_only and results is None:  # подготовка Opus-пути: промпты и аргументы workflow
         items = []
         for p in plans:
-            if p["text"] != p["prompt"].read_text(encoding="utf-8-sig"):
-                p["prompt"].write_text(p["text"], encoding="utf-8", newline=p["nl"])
+            out = p["out_prompt"]
+            if not out.is_file() or p["text"] != out.read_text(encoding="utf-8-sig"):
+                out.write_text(p["text"], encoding="utf-8", newline=p["nl"])
             items.append({"asset": asset_of(e), "evidence": c.rel(p["dir"], repo), "label": p["label"],
-                          "prompt": c.rel(p["prompt"], repo)})
-        args_file = e / f"acceptor-args{a.tag}.json"
-        args_file.write_text(json.dumps(_output_schema.workflow_args("anim", items, first=True), ensure_ascii=True,
-                                        indent=2) + "\n", encoding="ascii", newline="\n")
+                          "prompt": c.rel(out, repo)})
+        args_file = e / ("second-acceptor-args.json" if a.second else f"acceptor-args{a.tag}.json")
+        args_file.write_text(json.dumps(_output_schema.workflow_args("anim", items, first=not a.second),
+                                        ensure_ascii=True, indent=2) + "\n", encoding="ascii", newline="\n")
         for p in plans:
             print("%-12s %-40s images %d" % (p["clip"], p["label"], len(p["images"])))
+        then = "tools/art/pipeline_batch/finish_second.py <файл>" if a.second else "--finish <файл>"
         print(f"NEXT: Workflow({{name: \"second-acceptor\", args: <{c.rel(args_file, repo)}>}}) → вывод в файл → "
-              f"--finish <файл>")
+              f"{then}")
         return 0
     started = now()
     if a.validate_only:
@@ -328,14 +348,16 @@ def main(argv=None) -> int:
         res = [finish_clip(p, by_dir.get(p["dir"].resolve()), a.finish, repo) for p in plans]
     summary = {"schema": "unmatched.clip-acceptors-run/2", "evidence": e.as_posix(), "started": started,
                "finished": now(), "mode": "validate-only" if a.validate_only else "workflow",
-               "acceptor": sm.OPUS, "workflow_output": a.finish, "tag": a.tag,
+               "acceptor": sm.FIRST, "workflow_output": a.finish, "tag": a.tag,
                "executor_session_id": a.executor_session_id, "clips": {r["clip"]: r for r in res}}
     write_json(e / f"acceptors-run{a.tag}.json", summary)
     for r in res:
         print("%-12s %-22s score %-5s verdict %-16s validate %s" % (
             r["clip"], r["status"], r.get("score"), r.get("verdict"), r.get("validate_exit")))
-    if any(r["status"] == "needs_second_acceptor" for r in res):
-        print(f"NEED-SECOND: pass 8,0–8,4 — второй приёмщик Opus xhigh в свежем контексте: {SECOND}")
+    need = [r["clip"] for r in res if r["status"] == "needs_second_acceptor"]
+    if need:
+        print(f"NEED-SECOND: pass 8,0–8,4 — второй приёмщик «{sm.SECOND}» (effort high, свежий контекст): "
+              f"--second --clips {','.join(need)} → {SECOND} по <E>/second-acceptor-args.json → finish_second.py")
     return 0 if all(r["status"] in ("valid", "needs_second_acceptor") for r in res) else 1
 
 

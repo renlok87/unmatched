@@ -195,7 +195,7 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
 | Need | Use now | No longer available |
 |---|---|---|
 | Side model: second opinion, text or scope review, prompt drafting, a parallel agent | **Z-Code** desktop app (`C:\Program Files\ZCode\ZCode.exe`, Start menu "ZCode"), model **GLM-5.3**, reasoning **max** (the user's «F-Max»; max is GLM-5.3's default variant), driven through Computer Use | Codex app (`ChatGPT.exe`), `codex exec`, Sol, GPT Astra |
-| A side model has to look at images (acceptance frames, blind X/Y pairs) | Z-Code with **GLM-5.3-Flash**. In the user's Z.AI coding plan GLM-5.3 takes text only; GLM-5.3-Flash takes text, image and video (`~/.zcode/v2/config.json`, checked 2026-10-20) | Sol / Astra with `-i` frames |
+| A side model has to look at images (describing frames, no scores) | Z-Code with **GLM-5.3-Flash**. In the user's Z.AI coding plan GLM-5.3 takes text only; GLM-5.3-Flash takes text, image and video (`~/.zcode/v2/config.json`, checked 2026-10-20). Acceptance scores and blind X/Y pairs: «Opus xhigh» and «Opus high» (below) | Sol / Astra with `-i` frames |
 | Images: concept sheets 1a/1c, references, glyph masks, texture sources | Image generation in the **Gemini** app (`com.google.gemini.windows`, `%LOCALAPPDATA%\Google\Gemini\app-*\Gemini.exe`), or the Google services built into Gemini | Codex `image_gen` |
 | Music, SFX, voice | **SYNTX** (existing subscription, MCP `syntx-ai`) and **stiva.ai** (the second «S» service, «Steve или как-то так»; it carries ElevenLabs SFX), or the Google services built into Gemini | — |
 | 3D generation | Tripo3D Studio, unchanged | — |
@@ -214,14 +214,27 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
   still stopped with «Select a model before sending a message»: the standalone CLI has no Z.AI account until the user
   runs `zcode login zai` once. That is a browser sign-in and the user's step; an agent never signs in. Until a probe
   passes, use the GUI path.
-- **Second acceptor and blind reviews "of another profile":** the Opus `second-acceptor` workflow in a fresh context.
-  Write the profile actually used into the card. Z-Code GLM-5.3-Flash failed its calibration as a visual acceptor on
-  2026-10-21 (`docs/art-pipeline/evidence/skill-batch-2026-10-20/zcode-calibration/RESULT.md`):
+- **Second acceptor and blind reviews "of another profile": «Opus high».** The user's words on 2026-10-21: «Хорошо,
+  использую Opus High вместо Z-код для приемщика. Вот, и продолжай без меня, делай все сам.»
+  - The first acceptor stays «Opus xhigh»: the `second-acceptor` workflow with effort xhigh.
+  - The second acceptor is the same workflow with effort high in a fresh context; the card carries the profile
+    «Opus high». Its arguments come from `sheet_acceptance.py prepare-second`, `run_clip_acceptors.py --second` or
+    `_output_schema.py --workflow-args <kind>` without `--first` (`"effort": "high"`), then `finish_second.py`.
+  - The pair «Opus xhigh» + «Opus high» counts as two profiles: `validate_card.py --second` takes it without
+    `--same-profile-ok`. Older pairs where both cards are «Opus xhigh» (2026-10-20 to 2026-10-21) stay valid with
+    the flag.
+  - Blind X/Y reviews use the same two profiles: one «Opus xhigh» and one «Opus high» agent, each in a fresh context.
+  - Write the profile actually used into the card.
+
+  Z-Code GLM-5.3-Flash failed its calibration as a visual acceptor on 2026-10-21
+  (`docs/art-pipeline/evidence/skill-batch-2026-10-20/zcode-calibration/RESULT.md`):
   - it scored the Leshen sheet 10.0, while Opus and Sol both gave 8.1;
   - it picked the opposite winner in the blind showcase pair;
   - it did not keep the strict card JSON.
-  So Z-Code gives no acceptance scores. Use it for text work (prompt review, second opinion) and for describing frames
-  without a score. A new calibration that passes is required before it scores again.
+  So Z-Code is no acceptance profile and gives no acceptance scores. `validate_card.py` refuses its cards dated after
+  2026-10-21, and `--acceptor zcode` of the acceptance lanes stops with code 2. Use it for text work (prompt review,
+  second opinion) and for describing frames without a score. A new calibration that passes is required before it
+  scores again.
 - **Gemini:** the user's Gemini app through Computer Use, or gemini.google.com in their Chrome through Claude in
   Chrome. Prompts come from files in the repo. Outputs are saved into the folder that the skill or task names. On a
   sign-in screen, stop and ask the user. Look for a visible watermark before an image is used.
@@ -401,8 +414,9 @@ The user's words: «добавь в проект основное правило
   - **Faced so the face is visible.** The hero's own niche yaw keeps the face clear: the weapon must never cross the
     face (example: King Arthur 85° / 95°).
   - **Accepted blind.** A blind before/after review (unlabeled X/Y with swapped sides) is done before it becomes the
-    default. Reviewers: two independent Opus agents in fresh contexts. GPT Astra served until 2026-10-20. Z-Code failed
-    calibration on 2026-10-21 ("AI tools and side models").
+    default. Reviewers: two independent Opus agents in fresh contexts, «Opus xhigh» and «Opus high» (user decision
+    2026-10-21). GPT Astra served until 2026-10-20. Z-Code failed calibration on 2026-10-21 ("AI tools and side
+    models").
   - **Registered and cooked.** The path is registered in `UmShowcase::HiPolyPath` and its folder is in
     `DirectoriesToAlwaysCook`.
 - A hero without a finished showcase high-poly falls back to its H2LD figure in the niche. Treat that as an open item,

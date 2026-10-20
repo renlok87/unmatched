@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Строгие схемы вывода приёмщика (структурный вывод Workflow-агента «Opus xhigh», этапы 1, 4, 6).
+"""Строгие схемы вывода приёмщика (структурный вывод Workflow-агента «Opus xhigh» / «Opus high», этапы 1, 4, 6).
 
 Схема вывода строится по правилам strict json_schema: так её принимал `codex exec --output-schema` приёмщика
 «Sol 6.1 xhigh» (отключён 2026-10-20, side_models.py), и так структурный вывод Workflow возвращает пустые поля
@@ -23,15 +23,17 @@ gates.*.source_defect): null = поля нет (`validate_card.strip_output_null
     python tools/art/acceptance/_output_schema.py --workflow-args <model|concept|anim> \
         [--item <ASSET_ID>=<каталог приёмки>[=<label>]]… [--out <args.json>]
 
-Профиль acceptor.profile в схеме вывода — только действующие профили: отключённый «Sol 6.1 xhigh» остаётся в полной
-схеме (старые карточки валидны), но новую карточку им не подписать.
+Профиль acceptor.profile в схеме вывода — только действующие профили («Opus xhigh», «Opus high»): отключённые
+«Sol 6.1 xhigh» (2026-10-20) и «Z-Code GLM-5.3-Flash» (2026-10-21, калибровка не пройдена) остаются в полной схеме
+(старые карточки валидны), но новую карточку ими не подписать (side_models.RETIRED_PROFILES).
 
 --workflow-args — аргументы workflow `second-acceptor` (acceptance-and-blender.md §8.3) одним ASCII-JSON:
-{"kind", "items": [{asset, evidence, label, prompt}], "schema"}; схема — та же строгая выходная схема вида, но без
-`description`/`title` (кириллица описаний ломалась при печати через cp1251, C34 проверочного прогона 2026-10-14;
-модели они не нужны — поля и enum те же). label по умолчанию — acceptor2-<ASSET_ID>-r<N> (клип —
-acceptor2-<ASSET_ID>-<Clip>-r<N>) по имени каталога; prompt — <каталог>/acceptor-prompt-2.md. Без --out — в stdout.
---first — те же аргументы для первого приёмщика «Opus xhigh» (тот же workflow вместо Sol, 2026-10-20): label
+{"kind", "profile", "effort", "items": [{asset, evidence, label, prompt}], "schema"}; схема — та же строгая выходная
+схема вида, но без `description`/`title` (кириллица описаний ломалась при печати через cp1251, C34 проверочного прогона
+2026-10-14; модели они не нужны — поля и enum те же). Без --first — второй приёмщик «Opus high» (effort high, решение
+пользователя 2026-10-21): label по умолчанию — acceptor2-<ASSET_ID>-r<N> (клип — acceptor2-<ASSET_ID>-<Clip>-r<N>) по
+имени каталога, prompt — <каталог>/acceptor-prompt-2.md, вывод — card-2.json (finish_second.py). Без --out — в stdout.
+--first — первый приёмщик «Opus xhigh» (effort xhigh; тот же workflow вместо Sol, 2026-10-20): label
 acceptor-<ASSET_ID>[-<Clip>]-r<N>, prompt <каталог>/acceptor-prompt.md, вывод — card.json.
 """
 from __future__ import annotations
@@ -210,8 +212,10 @@ def default_label(asset: str, evidence: str, prefix: str = "acceptor2") -> str:
 
 
 def workflow_args(kind: str, items: list | None = None, first: bool = False) -> dict:
-    """{"kind", "items", "schema"} для workflow second-acceptor; ASCII-безопасно (json.dumps(ensure_ascii=True)).
-    first — первый приёмщик: label acceptor-…, prompt acceptor-prompt.md (вместо acceptor2-… и acceptor-prompt-2.md)."""
+    """{"kind", "profile", "effort", "items", "schema"} для workflow second-acceptor; ASCII-безопасно
+    (json.dumps(ensure_ascii=True)). first — первый приёмщик «Opus xhigh» (effort xhigh): label acceptor-…, prompt
+    acceptor-prompt.md; иначе второй «Opus high» (effort high): label acceptor2-…, prompt acceptor-prompt-2.md."""
+    profile = side_models.FIRST if first else side_models.SECOND
     items = [dict(it) for it in (items or [])]
     for it in items:
         if not it.get("asset") or not it.get("evidence"):
@@ -219,7 +223,8 @@ def workflow_args(kind: str, items: list | None = None, first: bool = False) -> 
         it["evidence"] = str(it["evidence"]).replace("\\", "/").rstrip("/")
         it.setdefault("label", default_label(it["asset"], it["evidence"], "acceptor" if first else "acceptor2"))
         it.setdefault("prompt", it["evidence"] + ("/acceptor-prompt.md" if first else "/acceptor-prompt-2.md"))
-    return {"kind": kind, "items": items, "schema": ascii_schema(build(kind))}
+    return {"kind": kind, "profile": profile, "effort": side_models.effort_of(profile), "items": items,
+            "schema": ascii_schema(build(kind))}
 
 
 def parse_item(text: str) -> dict:
@@ -241,7 +246,8 @@ def main(argv=None) -> int:
                    help="ASCII-аргументы workflow second-acceptor для вида карточки (model, concept, anim)")
     ap.add_argument("--item", action="append", default=[], help="<ASSET_ID>=<каталог приёмки>[=<label>] (повторяется)")
     ap.add_argument("--first", action="store_true",
-                    help="с --workflow-args: первый приёмщик (label acceptor-…, prompt acceptor-prompt.md)")
+                    help="с --workflow-args: первый приёмщик «Opus xhigh», effort xhigh (label acceptor-…, prompt "
+                         "acceptor-prompt.md); без него — второй «Opus high», effort high")
     ap.add_argument("--out", default=None, help="файл аргументов (по умолчанию stdout)")
     a = ap.parse_args(argv)
     if a.workflow_args:

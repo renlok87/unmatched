@@ -1,11 +1,11 @@
-"""Приёмка листов 1c пачкой (приёмщик «Opus xhigh» через Workflow): предпроверка пакета, промпт по рубрике §11, аргументы workflow, приём карточки validate_card.
+"""Приёмка листов 1c пачкой (приёмщик «Opus xhigh», второй — «Opus high», через Workflow): предпроверка пакета, промпт по рубрике §11, аргументы workflow, приём карточки validate_card.
 
 С 2026-10-20 Sol и Codex отключены (пользователь отменил подписку ChatGPT; AGENTS.md «AI tools and side models»):
 `codex exec` больше не запускается. Команды прежней полосы Sol (accept, all, probe) и `--acceptor sol` падают с кодом 2
-и причиной; `--acceptor zcode` («Z-Code GLM-5.3-Flash») — заглушка, пока пользователь не выполнит `zcode login zai`
-(tools/art/acceptance/side_models.py). По умолчанию — Opus-путь.
+и причиной; `--acceptor zcode` («Z-Code GLM-5.3-Flash») — тоже код 2: снят с приёмки 2026-10-21, калибровка не
+пройдена (tools/art/acceptance/side_models.py, ZCODE_GONE). По умолчанию — Opus-путь.
 
-concept-sheet.md §11 (рубрика 1c), acceptance-and-blender.md §8.3 (вызов «Opus xhigh»). На фигуру из списка «своих»
+concept-sheet.md §11 (рубрика 1c), acceptance-and-blender.md §8.3 (вызов Opus). На фигуру из списка «своих»
 (--owned, по умолчанию <work>/sheet-acceptance-owned.json: JSON-список [{"asset_id": "ASSET-BEOWULF-001", "key":
 "beowulf", "package": "art/imagegen/concept-beowulf-codex", "status": "claimed"}, …]; берутся только строки
 status "claimed"; без файла prepare/prepare-second одной фигуры строят такую строку из <key> сами, C8) в
@@ -21,10 +21,11 @@ status "claimed"; без файла prepare/prepare-second одной фигур
      (0 или 3 = нужен второй приёмщик), сверка acceptor, G-CHECKS, accepted_object/frames с константами и хэшей пакета
      с prepare, запись в журнал --log. Невалидная карточка уходит в card-invalid-<k>.json: повтор — новый запуск
      workflow по тем же аргументам;
-  5. prepare-second (код 3, C10) — промпт второго приёмщика «Opus xhigh» acceptor-prompt-2.md (те же константы и
-     файлы, свежий контекст), ASCII-аргументы workflow second-acceptor: <каталог приёмки>/second-acceptor-args.json и
-     сводный <work>/second-acceptor-args-<YYYYMMDD>.json (C34); пакет не изменился с первой приёмки. Вывод workflow →
-     finish_second.py (тот же профиль: пара — validate_card --same-profile-ok, пока полосы Z-Code нет).
+  5. prepare-second (код 3, C10) — промпт второго приёмщика «Opus high» acceptor-prompt-2.md (те же константы и
+     файлы, свежий контекст; профиль «Opus high», session_id workflow:acceptor2-<ASSET_ID>-r<N>), ASCII-аргументы
+     workflow second-acceptor с effort high: <каталог приёмки>/second-acceptor-args.json и сводный
+     <work>/second-acceptor-args-<YYYYMMDD>.json (C34); пакет не изменился с первой приёмки. Вывод workflow →
+     finish_second.py (пара «Opus xhigh» + «Opus high» — два профиля, решение пользователя 2026-10-21).
 Пакет во время приёмки не меняется (хэши prepare и finish). Был C:/tmp/concept-wave/sheet_acceptance.py.
 
     python tools/art/pipeline_batch/sheet_acceptance.py prepare <key> <cycle> --work <dir> --date YYYY-MM-DD
@@ -35,9 +36,10 @@ status "claimed"; без файла prepare/prepare-second одной фигур
 
 --executor-session-id — фактическая сессия запускающего (concept-sheet.md §11, F40, C9: субагент —
 claude-code:<uuid>/agent:<name>); без флага — прежнее launcher:stage-1c-sheet-<YYYYMMDD> и предупреждение.
-Траты: нет — приёмщик «Opus xhigh» не тратит квот сервисов, строки журнала трат нет (07-prompt-templates.md §3.4).
+Траты: нет — приёмщики «Opus xhigh» и «Opus high» не тратят квот сервисов, строки журнала трат нет
+(07-prompt-templates.md §3.4).
 Код выхода: 0 — команда выполнена (итог каждой фигуры — в журнале), 1 — finish: хотя бы одна карточка не принята,
-2 — ошибка входа или отключённый приёмщик (Sol, Z-Code).
+2 — ошибка входа или отключённый приёмщик (Sol 2026-10-20, Z-Code 2026-10-21).
 """
 from __future__ import annotations
 
@@ -217,9 +219,10 @@ class Sheet:
 
     # ------------------------------------------------------------------------------------------------- 2. prompt
     def prepare(self, row: dict, cycle: int, second: bool = False):
-        """Промпт приёмщика «Opus xhigh» (изображения — инструментом Read) и аргументы workflow second-acceptor.
-        second=False — первый приёмщик (acceptor-prompt.md, acceptor-args.json); second=True — второй, после первой
-        карточки (acceptor-prompt-2.md, second-acceptor-args.json; C10)."""
+        """Промпт приёмщика (изображения — инструментом Read) и аргументы workflow second-acceptor.
+        second=False — первый приёмщик «Opus xhigh» (acceptor-prompt.md, acceptor-args.json, effort xhigh);
+        second=True — второй «Opus high», после первой карточки (acceptor-prompt-2.md, second-acceptor-args.json,
+        effort high; C10)."""
         if second:
             e0 = self.ev_dir(row["asset_id"], cycle)
             if not (e0 / "card.json").is_file():
@@ -239,7 +242,8 @@ class Sheet:
         if missing:
             raise RuntimeError(f"нет изображений {missing}")
         prev = (self.rel(e.parent / f"{self.d8}-sheet-r{cycle - 1}" / "card.json") if cycle > 1 else None)
-        profile = b.side_models().OPUS
+        sm = b.side_models()
+        profile = sm.SECOND if second else sm.FIRST
         label = second_label(aid, cycle) if second else first_label(aid, cycle)
         session = "workflow:" + label
         if second:
@@ -352,8 +356,8 @@ score half-up: sum(S,C,Q,P)/8*10. Гейт FAIL, любое значение <1 
                 raise RuntimeError("гейт G-CHECKS противоречит отчёту")
             notes = ""
             if val.returncode == 3:
-                notes = ("нужен второй приёмщик: prepare-second → Workflow second-acceptor (Opus xhigh, свежий "
-                         "контекст; Z-Code GLM-5.3-Flash — после его полосы) → finish_second.py")
+                notes = ("нужен второй приёмщик: prepare-second → Workflow second-acceptor (Opus high, effort high, "
+                         "свежий контекст) → finish_second.py")
                 write(e / "note.md", notes + "\n")
             elif obj["verdict"] == "return_to_stage_1" and (p / "README.md").is_file() \
                     and "unstability.ai" in read(p / "README.md").lower():
@@ -385,8 +389,8 @@ def main(argv=None) -> int:
     ap.add_argument("--log", default=None, help="журнал приёмок (по умолчанию <work>/acceptance-log-1c.jsonl)")
     ap.add_argument("--date", default=dt.date.today().isoformat(), help="дата цикла YYYY-MM-DD (<YYYYMMDD>-sheet-rN)")
     ap.add_argument("--acceptor", default="opus", choices=("opus", "zcode", "sol"),
-                    help="приёмщик: opus — «Opus xhigh» через Workflow (по умолчанию); zcode — заглушка до "
-                         "`zcode login zai`; sol — отключён 2026-10-20")
+                    help="приёмщик: opus — «Opus xhigh» через Workflow (по умолчанию; prepare-second — «Opus "
+                         "high»); zcode — снят с приёмки 2026-10-21; sol — отключён 2026-10-20")
     ap.add_argument("--executor-session-id", default=None,
                     help="фактическая сессия запускающего для executor_session_id карточки (§11, F40; "
                          "субагент — claude-code:<uuid>/agent:<name>)")
@@ -402,11 +406,8 @@ def main(argv=None) -> int:
               "<каталог приёмки>/acceptor-args.json → finish <вывод workflow>.", file=sys.stderr)
         return 2
     if a.acceptor == "zcode":
-        try:
-            sm.zcode_headless()
-        except sm.SideModelUnavailable as exc:
-            print(f"ERROR: {exc}", file=sys.stderr)
-            return 2
+        print(f"ERROR: {a.command}: {sm.ZCODE_GONE}.", file=sys.stderr)
+        return 2
     s = Sheet(a)
     if a.command == "finish":
         if not a.key:

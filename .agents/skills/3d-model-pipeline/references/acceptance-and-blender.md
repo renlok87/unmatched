@@ -1,8 +1,10 @@
 # Этапы 4–5: приёмка модели с коэффициентом и доработка в Blender
 
-> **С 2026-10-20 (SKILL.md §0): приёмщик «Sol 6.1 xhigh» (`codex exec`, §8.4) отключён.** Второй приёмщик «другим
-> профилем» — Z-Code GLM-5.3-Flash через Computer Use, пока скриптовой полосы нет — Opus `second-acceptor` (§8.3) с
-> фактом в карточке. Рубрика, баллы, формула, вердикт и `validate_card.py` не меняются.
+> **С 2026-10-20 (SKILL.md §0): приёмщик «Sol 6.1 xhigh» (`codex exec`, §8.4) отключён.** Первый приёмщик —
+> «Opus xhigh», второй «другим профилем» с 2026-10-21 — **«Opus high»**: тот же workflow `second-acceptor` (§8.3) с
+> effort high (пользователь: «Хорошо, использую Opus High вместо Z-код для приемщика.»). Z-Code GLM-5.3-Flash
+> калибровку визуального приёмщика не прошёл и снят с приёмки. Рубрика, баллы, формула, вердикт и `validate_card.py`
+> не меняются.
 
 Норма производства — `docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md` (далее HANDBOOK). Он главнее этого файла: числа
 гейтов здесь даны ссылками на его разделы, а не копией. Этот файл добавляет только то, чего в хендбуке нет: объект и
@@ -26,8 +28,8 @@
 | Роль | Кто | Что делает | Чего не делает |
 |---|---|---|---|
 | Запускающий | сессия, которая ведёт ассет | снимает кадры (§3), вызывает приёмщика (§8), **записывает** возвращённый JSON в `card.json`, прогоняет `validate_card.py`, при коде 3 вызывает второго приёмщика (§8.5), ведёт маршрут | не ставит баллы и не правит карточку приёмщика |
-| Приёмщик | «Opus xhigh» (по умолчанию) или «Sol 6.1 xhigh» (по явному выбору запускающего) | гейты по отчётам, баллы S/F/T/D по кадрам; **возвращает только JSON карточки** (ответом агента или через `-o` CLI, §8.4) | не пишет файлы, не запускает скрипты и `validate_card.py`, не правит модель, не видит рассказов исполнителя |
-| Второй приёмщик | другой профиль, чем у первого (обычно «Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот) | то же, что приёмщик, на тех же кадрах и том же промпте; только при неустойчивом pass (§6, §8.5) | не видит карточку первого приёмщика |
+| Приёмщик | «Opus xhigh» (по умолчанию); «Sol 6.1 xhigh» (по явному выбору запускающего) — отключён 2026-10-20 | гейты по отчётам, баллы S/F/T/D по кадрам; **возвращает только JSON карточки** (ответом агента или через `-o` CLI, §8.4) | не пишет файлы, не запускает скрипты и `validate_card.py`, не правит модель, не видит рассказов исполнителя |
+| Второй приёмщик | другой профиль, чем у первого: с 2026-10-21 — «Opus high» (workflow `second-acceptor` с effort high, §8.3, §8.5) при первом «Opus xhigh», решение пользователя; до 2026-10-20 — обычно «Sol 6.1 xhigh» | то же, что приёмщик, на тех же кадрах и том же промпте; только при неустойчивом pass (§6, §8.5) | не видит карточку первого приёмщика |
 | Исполнитель доработки | всегда лично «Opus xhigh», агент Workflow; фактические механизм, модель, effort и id сессии — в `STAGE5[]` заявки (SKILL.md §7.2, RA-21) | этап 5 по брифу §10 | не делегирует и не принимает свою работу |
 
 Правила независимости:
@@ -737,7 +739,7 @@ pass на этой границе (8,1 и 8,3) требует второго п�
 | `verdict_reason` | обязателен при любом `verdict`, кроме `pass` (§6); у `pass` поле не пишется |
 | `rework_fix_list` | только F, T, D ниже 2 и FAIL-гейты (S никогда: в Blender не правится, валидатор отвергает); пункт = `{item, frame, fix, tool}`, других ключей нет; `item` — `F`, `T`, `D` или id гейта (`G-UV`). При `rework_blender` — не пустой и покрывает каждый FAIL-гейт, каждое измерение < 1,0, а при `score` < 8,0 — каждое из F, T, D ниже 2,0 (`validate_card.py`). При `pass` и при возврате по S (правило 1) — пустой массив. У ассета, собранного форком (`h2_bake_arthur` и т. п.), `tool` указывает ключ **генерического** bake-профиля: доработка форка — новая сборка этапа 3 генерическим `h2_bake` (§9.1) |
 | `known_issues` | необязательный массив `{item, frame, note}` (других ключей нет): замечания, которые вердикт не меняют, но должны дойти до доработки и этапа 7 — мелочи на крупных планах при pass, классы `floor` из `tone.json`, справочные числа гейтов (почти вырожденные треугольники), касание оружия в позах проб (`pose_checks.*_contact`), тон без `tone.json`, а при возврате по S — замечания F, T, D ниже 2,0; `item` — измерение или гейт, `frame` — из `frames.files` |
-| `acceptor` | `{profile: "Opus xhigh" \| "Sol 6.1 xhigh", session_id}` — профиль **фактического** запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, а заявку запускающий правит на факт (F76, F119: в пилоте заявки держали `opus-xhigh` при приёмках Sol); соответствие поля заявки (SKILL.md §7.2): `opus-xhigh` → `"Opus xhigh"`, `sol-6.1-xhigh` → `"Sol 6.1 xhigh"`. У `card-2.json` второго приёмщика — другой профиль (§8.5) |
+| `acceptor` | `{profile: "Opus xhigh" \| "Opus high" \| "Sol 6.1 xhigh", session_id}` — профиль **фактического** запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, а заявку запускающий правит на факт (F76, F119: в пилоте заявки держали `opus-xhigh` при приёмках Sol); соответствие поля заявки (SKILL.md §7.2): `opus-xhigh` → `"Opus xhigh"`, `sol-6.1-xhigh` → `"Sol 6.1 xhigh"`. У `card-2.json` второго приёмщика — другой профиль, с 2026-10-21 «Opus high» (§8.5). «Sol 6.1 xhigh» после 2026-10-20 и «Z-Code GLM-5.3-Flash» после 2026-10-21 `validate_card.py` отвергает |
 | `executor_session_id` | id сессии исполнителя (§1 п.2; субагент — `claude-code:<uuid>/agent:<name>`, F40), ≠ `acceptor.session_id` |
 | `decided_by` | `"delegated (ВР-реестр 2026-10-06)"` |
 | `status_note` | при `pass` — «художественно принято, по делегированию» со ссылкой на `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md` (валидатор ищет подстроку «по делегированию»); иначе — пустая строка или короткая пометка |
@@ -937,16 +939,17 @@ rework_blender`).
    `needs_second_acceptor` — карточка валидна, но `pass` неустойчив: шаг 5а. Код 1 — запускающий баллы **не правит**.
    Он один раз вызывает нового приёмщика с тем же промптом и выводом валидатора (`FAIL: …`) в конце. Второй код 1
    подряд — гейт стопа SKILL.md §5 п.2: приёмщик не выдал валидную карточку после двух попыток.
-   5а. **Второй приёмщик** (§6 «Устойчивый pass», §8.5): тот же `$E/acceptor-prompt.md` с другим
-   `{{ACCEPTOR_PROFILE}}`/`{{ACCEPTOR_SESSION_ID}}` → `$E/acceptor-prompt-2.md`, ответ — в `$E/card-2.json`, затем
+   5а. **Второй приёмщик** (§6 «Устойчивый pass», §8.5): тот же `$E/acceptor-prompt.md` с `{{ACCEPTOR_PROFILE}}` =
+   `Opus high` и `{{ACCEPTOR_SESSION_ID}}` = `workflow:acceptor2-<ASSET_ID>-r<N>` → `$E/acceptor-prompt-2.md`, вызов —
+   workflow `second-acceptor` с effort high (§8.3), ответ — в `$E/card-2.json`, затем
    ```bash
    python tools/art/acceptance/validate_card.py $E/card.json --second $E/card-2.json \
        --final-json $E/final.json --print-verdict --check-files
    ```
    Код 0 — дальше по итоговому вердикту из `final.json` (карточка `source_card`). Код 1 у `card-2.json` — тот же один
-   повтор, что в п.5. Другой профиль не запускается после пробы (§8.4) — второй приёмщик того же профиля в новом
-   контексте и флаг `--same-profile-ok` (в `final.json` будет `same_profile_fallback: true`, причина — в отчёт
-   запускающего).
+   повтор, что в п.5. Пара «Opus xhigh» + «Opus high» — два профиля, флаг не нужен. Второй профиль не запустился (§8.5
+   п.4) — второй приёмщик того же профиля в новом контексте и флаг `--same-profile-ok` (в `final.json` будет
+   `same_profile_fallback: true`, причина — в отчёт запускающего).
 6. Сверка гейтов — работа `--check-files` (п.5): расхождение статуса с пересчётом — код 1 и тот же один повтор.
    Вручную (каждая ссылка `файл#ключ` из `gates.<G>.note`: ключ есть, значение совпадает со статусом) — только при WARN
    «гейты не пересчитаны» (проп, форк) или «пересчитаны не целиком» (нет заявки). Расхождение — тот же повтор, что в п.5.
@@ -1079,7 +1082,7 @@ Sol читал рубрику кракозябрами при коде 0 (F36, A
 `art/pipeline-candidates/ASSET-ACHILLES-001/evidence/acceptance/20261014-r2/acceptor-prompt.md:9-20`. Приёмщику Opus
 (Workflow) блок не мешает: он читает файлы своими инструментами.
 
-### 8.3 Вызов «Opus xhigh» (по умолчанию)
+### 8.3 Вызов «Opus xhigh» (по умолчанию) и второго «Opus high»
 
 Агент Workflow с новым контекстом. В скрипте Workflow нет доступа к файлам, поэтому запускающий передаёт через `args`
 текст промпта §8.2 и содержимое файла схемы (разобранный JSON):
@@ -1090,7 +1093,7 @@ export const meta = {
   description: 'Приёмка модели (этап 4 3d-model-pipeline): гейты, баллы S/F/T/D, вердикт',
 }
 const card = await agent(args.prompt, {
-  model: 'opus', effort: 'xhigh', schema: args.schema, label: args.label,
+  model: 'opus', effort: 'xhigh', schema: args.schema, label: args.label,  // второй приёмщик — effort: 'high'
 })
 return card
 ```
@@ -1105,12 +1108,19 @@ label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"accepto
 изменений. Если `agent()` вернул `null`, вызов повторяется один раз. Второй `null` —
 гейт стопа SKILL.md §5 п.2.
 
-**Второй приёмщик «Opus xhigh» — сохранённый workflow** `.claude/workflows/second-acceptor.js` (dfb4e81d; перенесён
-из сессии пилота, RA-11, F102):
-`Workflow({name: "second-acceptor", args: {kind?, items: [{asset, evidence, label, prompt?}], schema: <JSON …output-<kind>.schema.json>}})`.
+**Сохранённый workflow** `.claude/workflows/second-acceptor.js` (dfb4e81d; перенесён из сессии пилота, RA-11, F102) —
+и первый приёмщик «Opus xhigh», и второй «Opus high»:
+`Workflow({name: "second-acceptor", args: {kind?, effort?, profile?, items: [{asset, evidence, label, prompt?}], schema: <JSON …output-<kind>.schema.json>}})`.
 Элемент — одна карточка (в пачке их несколько, агенты идут параллельно); `prompt` по умолчанию —
 `<evidence>/acceptor-prompt-2.md`, `label` — `acceptor2-<ASSET_ID>-r<N>` (клип — `acceptor2-<ASSET_ID>-<Clip>-r<N>`),
 `acceptor.session_id = "workflow:" + label`, при `null` — один повтор внутри workflow.
+
+- **Профиль и effort** (решение пользователя 2026-10-21: «Хорошо, использую Opus High вместо Z-код для
+  приемщика.»): `effort: "high"` или `profile: "Opus high"` — второй приёмщик «другим профилем», агент и его повтор
+  идут с effort high, в карточку — `acceptor.profile = "Opus high"`. Без них — `xhigh` / «Opus xhigh» (первый
+  приёмщик и аргументы до 2026-10-21). Другие значения и `profile`, расходящийся с `effort`, — ошибка. Пара
+  «Opus xhigh» + «Opus high» — два профиля: `validate_card.py --second` и `finish_second.py` считают её без
+  `--same-profile-ok`.
 
 - **Вид карточки** (C10, проверочный прогон 2026-10-14): `kind` — `model` | `concept` | `anim`; без него берётся из
   `enum` поля `kind` схемы, без схемы вида — `model` (прежние вызовы не меняются); `kind`, расходящийся со схемой, —
@@ -1127,8 +1137,10 @@ label: "acceptor-<ASSET_ID>-r<N>"}` (второй приёмщик — `"accepto
   python tools/art/acceptance/_output_schema.py --workflow-args <model|concept|anim> \
       --item <ASSET_ID>=<каталог приёмки от корня>[=<label>] [--item …] --out $E/second-acceptor-args.json
   ```
-  Файл — `{"kind", "items", "schema"}`: схема вида без `description`/`title` (поля, `required` и `enum` те же),
-  `label` и `prompt` по умолчанию — как выше; содержимое файла целиком — `args` вызова.
+  Файл — `{"kind", "profile", "effort", "items", "schema"}`: без `--first` — второй приёмщик (`"Opus high"`,
+  `"high"`), с `--first` — первый (`"Opus xhigh"`, `"xhigh"`, label `acceptor-…`, prompt `acceptor-prompt.md`); схема
+  вида без `description`/`title` (поля, `required` и `enum` те же), `label` и `prompt` по умолчанию — как выше;
+  содержимое файла целиком — `args` вызова.
 - **Вход `finish_second.py`** (C35): возврат workflow — голый список `[{asset, evidence, card}, …]` (так его отдаёт и
   журнал); уведомление — `{"result": [...]}` (`result` бывает и JSON-строкой). Принимаются обе формы и один объект
   `{asset, evidence, card}`; BOM (файл из PowerShell `Out-File`) не мешает. Иначе — код 2.
@@ -1248,20 +1260,22 @@ WebSocket, вызов продолжается и завершается (кал
 ### 8.5 Второй приёмщик (код 3, `needs_second_acceptor`)
 
 Когда: `validate_card.py` вернул код 3 — карточка (модели, листа концепта или клипа) валидна, вердикт `pass`,
-`score` 8,0–8,4 (§6 «Устойчивый pass»). У листа и клипа вызов тот же, меняются схема вывода Sol
+`score` 8,0–8,4 (§6 «Устойчивый pass»). У листа и клипа вызов тот же, меняются схема вывода
 (`asset-acceptance-2.output-concept.schema.json` / `…-output-anim…`), промпт своего файла и путь карточки. Решение скилла по калибровке 2026-10-09: разброс двух приёмщиков на полушаг в одном измерении переворачивает
 такой pass.
 
 | Первый приёмщик | Второй | Вызов | Файлы |
 |---|---|---|---|
-| «Opus xhigh» (§8.3) | «Sol 6.1 xhigh» | §8.4 с `--output-schema …output-model.schema.json` и `-o "$E/card-2.json"`, события в `$E/acceptor-events-2.jsonl`; отказ схемы — запасной вызов §8.4 без `--output-schema` | `acceptor-prompt-2.md`, `card-2.json` |
-| «Sol 6.1 xhigh» (§8.4) | «Opus xhigh» | сохранённый workflow `second-acceptor` (§8.3) с `label: "acceptor2-<ASSET_ID>-r<N>"`, затем `finish_second.py` и `validate_card.py --second … --check-files` | `acceptor-prompt-2.md`, `card-2.json` |
+| «Opus xhigh» (§8.3) | **«Opus high»** (с 2026-10-21, решение пользователя) | сохранённый workflow `second-acceptor` (§8.3) с effort high: аргументы `python tools/art/acceptance/_output_schema.py --workflow-args <kind> --item <ASSET_ID>=$E` без `--first` (лист — `sheet_acceptance.py prepare-second`, клип — `run_clip_acceptors.py --second`), `label: "acceptor2-<ASSET_ID>-r<N>"`; затем `finish_second.py` и `validate_card.py --second … --check-files` без `--same-profile-ok` | `acceptor-prompt-2.md`, `card-2.json` |
+| ~~«Opus xhigh» (§8.3)~~ — история, Sol отключён 2026-10-20 | «Sol 6.1 xhigh» | §8.4 с `--output-schema …output-model.schema.json` и `-o "$E/card-2.json"`, события в `$E/acceptor-events-2.jsonl`; отказ схемы — запасной вызов §8.4 без `--output-schema` | `acceptor-prompt-2.md`, `card-2.json` |
+| ~~«Sol 6.1 xhigh» (§8.4)~~ — история | «Opus xhigh» | сохранённый workflow `second-acceptor` (§8.3) с `label: "acceptor2-<ASSET_ID>-r<N>"`, затем `finish_second.py` и `validate_card.py --second … --check-files` | `acceptor-prompt-2.md`, `card-2.json` |
 
 Правила:
 
-1. Промпт тот же (§8.2), меняются только `{{ACCEPTOR_PROFILE}}` и `{{ACCEPTOR_SESSION_ID}}`. Первую карточку второй
-   приёмщик не получает: это не ревью первой оценки, а независимая оценка тех же кадров. **Повторная приёмка** (r ≥ 2;
-   F151, RC-19): в `acceptor-prompt-2.md` перед «Порядком» запускающий добавляет строку «Кадры, изменённые с rN-1:
+1. Промпт тот же (§8.2), меняются только `{{ACCEPTOR_PROFILE}}` (`Opus high`) и `{{ACCEPTOR_SESSION_ID}}`. Первую
+   карточку второй приёмщик не получает: это не ревью первой оценки, а независимая оценка тех же кадров.
+   **Повторная приёмка** (r ≥ 2; F151, RC-19): в `acceptor-prompt-2.md` перед «Порядком» запускающий добавляет
+   строку «Кадры, изменённые с rN-1:
    <`frames.json#changed_vs_previous.changed`>; остальные совпадают с кадрами rN-1 в пределах шума». Пункты фикса
    `{{PREV_FIX_LIST}}` в промпте уже есть. Второй приёмщик сначала проверяет пункты фикса на изменённых кадрах, баллы
    ставит по всем кадрам, как обычно (§2.3 п.5). Причина: на r3 Achilles кадры совпали с r2, кроме `pose-02` (доработка
@@ -1269,8 +1283,10 @@ WebSocket, вызов продолжается и завершается (кал
 2. Кадры не переснимаются: `frames` у обеих карточек совпадает до имени, иначе `--second` даёт код 1.
 3. Статусы гейтов обязаны совпасть (гейты — из тех же отчётов). Расхождение — сверка §8.1 п.6 и повтор той карточки,
    где ссылка `файл#ключ` не подтвердилась.
-4. Другой профиль не запускается после пробы (Sol: проба `exec` по `references/concept-sheet.md` §5.2) — второй
-   приёмщик того же профиля в новом контексте, проверка с `--same-profile-ok`. Это запасной путь, а не стоп.
+4. Второй профиль не запустился (у «Opus high» `agent()` дважды вернул `null`; прежде — проба `exec` Sol по
+   `references/concept-sheet.md` §5.2) — второй приёмщик того же профиля в новом контексте, проверка с
+   `--same-profile-ok`. Это запасной путь, а не стоп. Пары 2026-10-20 — 2026-10-21, где оба приёмщика были
+   «Opus xhigh», валидны так же — с флагом.
 5. Итог (`final.json`): `score` — минимум; вердикт — по карточке `source_card` (§6). Если итог `rework_blender`, бриф
    §10 берёт `rework_fix_list` из `source_card`.
 6. Строки `"null"` вместо `null` (`"clip": "null"`, `"verdict_reason": "null"`; пилот 2026-10-13, 13 карточек из 13)

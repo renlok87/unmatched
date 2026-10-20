@@ -2,9 +2,10 @@
 
 > **С 2026-10-20 (SKILL.md §0, AGENTS.md «AI tools and side models»): Codex отключён.** Изображения 1a/1c делает
 > Gemini (приложение через Computer Use или gemini.google.com в Chrome пользователя). Сохранение в папку пакета,
-> автопроверки и `verification.json` — запускающий агент. Приёмщик Sol отключён, второй профиль — Z-Code GLM-5.3-Flash
-> или Opus `second-acceptor`. Шаги `codex exec`, приложения ChatGPT, `codex_lane.py`, блоки OEM для Sol и строки
-> `ledger.py --service Codex` ниже — история. Правила сетки, видов, допусков, рубрики и циклов действуют без изменений;
+> автопроверки и `verification.json` — запускающий агент. Приёмщик Sol отключён; первый приёмщик — «Opus xhigh»,
+> второй профиль с 2026-10-21 — «Opus high» (workflow `second-acceptor` с effort high; Z-Code снят с приёмки). Шаги
+> `codex exec`, приложения ChatGPT, `codex_lane.py`, блоки OEM для Sol и строки `ledger.py --service Codex` ниже —
+> история. Правила сетки, видов, допусков, рубрики и циклов действуют без изменений;
 > имена `concept-<key>-codex/` и `*.codex.md` сохраняются. Путь Gemini вживую ещё не проверен.
 
 > Справочник скилла `3d-model-pipeline`. Этапы (номера только эти): 0 заявка → **1 концепт-лист (этот файл)** →
@@ -541,11 +542,12 @@ python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-r
 - **`executor_session_id`** карточки (§11, F40, C9) — `--executor-session-id`: фактическая сессия запускающего
   (субагент — `claude-code:<uuid>/agent:<name>`). Без флага — прежнее `launcher:stage-1c-sheet-<YYYYMMDD>` и WARN.
 - **Второй приёмщик листа** (код 3, §11 «Устойчивый pass»; C10). `prepare-second` пишет рядом с `card.json`
-  `acceptor-prompt-2.md` (те же константы `frames`/`accepted_object`, профиль «Opus xhigh», `session_id`
+  `acceptor-prompt-2.md` (те же константы `frames`/`accepted_object`, профиль «Opus high», `session_id`
   `workflow:acceptor2-<ASSET_ID>-r<N>`, изображения — инструментом Read, напоминание «`item` — только S, C, Q, P,
   G-CHECKS; пустое поле — JSON null»), `launcher-inputs-2.json`, `second-acceptor-args.json` и сводный
-  `$W/second-acceptor-args-<YYYYMMDD>.json` (все фигуры пачки одним вызовом). Аргументы — ASCII, схема `…output-concept…`
-  без `description`/`title` (C34: кириллица описаний ломалась в печати cp1251). Пакет с первой приёмки изменился — отказ.
+  `$W/second-acceptor-args-<YYYYMMDD>.json` (все фигуры пачки одним вызовом). Аргументы — ASCII, `"effort": "high"`,
+  схема `…output-concept…` без `description`/`title` (C34: кириллица описаний ломалась в печати cp1251). Пакет с первой
+  приёмки изменился — отказ.
 - **Квота Codex общая** для генерации и приёмщика Sol (RC-12): пилот — 11–15 сессий Codex на фигуру (1a, 1c, приёмки
   листа, модели и клипов). Перед волной — остаток лимита; строка журнала `ledger.py add --service Codex` на каждый
   пакет-запуск (5.5 п.4) и на каждую приёмку Sol — шаблон `T-CODEX-ACCEPT` (07 §3.4, команда выше; C11). Квоты не
@@ -987,11 +989,13 @@ concept-sheet.md §11» и `frames: ["<key>-front.png"]`; в `rework_fix_list` C
 `validate_card.py` даёт код **3** и печатает `needs_second_acceptor`. На 1a это любой pass с `S + Q + P` = 5,0 (C = 1,5
 фиксировано), то есть 8,1. Порядок:
 
-1. Второй приёмщик — **другой профиль** («Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт ниже, те
-   же файлы, новый контекст; первую карточку он не видит. Ответ — `card-2.json` рядом с `card.json` (для Sol —
+1. Второй приёмщик — **другой профиль**: с 2026-10-21 «Opus high» при первом «Opus xhigh» (решение пользователя;
+   прежде — «Sol 6.1 xhigh» при первом «Opus xhigh» и наоборот), тот же промпт ниже, те же файлы, новый контекст;
+   первую карточку он не видит. Ответ — `card-2.json` рядом с `card.json` (для Sol —
    `--output-schema tools/art/acceptance/asset-acceptance-2.output-concept.schema.json -o <каталог>/card-2.json`;
-   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`). Opus — сохранённый
-   workflow `second-acceptor` (там же §8.3) со схемой `…output-concept…`; его ответ (страховка от строк `"null"`, F6/F102) — через
+   остальное — команда `references/acceptance-and-blender.md` §8.4, с `windows.sandbox="unelevated"`). «Opus high» —
+   сохранённый workflow `second-acceptor` с effort high (там же §8.3; аргументы — `prepare-second`) со схемой
+   `…output-concept…`; его ответ (страховка от строк `"null"`, F6/F102) — через
    `python tools/art/pipeline_batch/finish_second.py <workflow-output.json>`: он чистит карточку, пишет `card-2.json` и
    сразу считает пару (п.2).
 2. Итог пары:
@@ -1022,7 +1026,7 @@ concept-sheet.md §11» и `frames: ["<key>-front.png"]`; в `rework_fix_list` C
 | `score`, `verdict` | по формуле и правилам выше |
 | `verdict_reason` | обязательно при `verdict` ≠ `pass` (≥ 10 символов): какое правило сработало |
 | `rework_fix_list` | `[{item, frame, fix, tool}]`: `item` — измерение < 2 или `G-CHECKS` при FAIL; `frame` — вид/файл; `fix` — одна английская строка, пригодная для CORRECTION; `tool` — `Codex 1c CORRECTION` \| `Tripo 1b черновик` \| `Codex 1a` |
-| `acceptor` | `{profile: "Opus xhigh"\|"Sol 6.1 xhigh", session_id}` — профиль фактического запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, в карточку пишется то, что запущено (F76, F119) |
+| `acceptor` | `{profile: "Opus xhigh"\|"Opus high"\|"Sol 6.1 xhigh", session_id}` — профиль фактического запуска: явный выбор запускающего важнее `ACCEPTOR_PROFILE` заявки, в карточку пишется то, что запущено (F76, F119) |
 | `executor_session_id` | сессия запускающего агента (≠ `acceptor.session_id`); исполнитель-субагент — `claude-code:<uuid>/agent:<name>` (F40) |
 | `decided_by` | `"delegated (ВР-реестр 2026-10-06)"` или `"user"` |
 | `status_note` | при pass по делегированию — содержит «по делегированию» (`docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`) |

@@ -580,6 +580,38 @@ def test_run_clip_acceptors_finish_writes_cards_and_validates(tmp_path, fake_val
     assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--validate-only", "--executor-session-id", REAL]) == 0
 
 
+def test_run_clip_acceptors_second_prepares_opus_high_workflow_args(tmp_path, monkeypatch, capsys):
+    """Второй приёмщик клипа (код 3, решение пользователя 2026-10-21): «Opus high» — acceptor-prompt-2.md и
+    <E>/second-acceptor-args.json с effort high, промпт первого не меняется; без первой карточки, с --finish, --tag или
+    --validate-only — код 2."""
+    e = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    args = ["--evidence", str(e), "--repo", str(tmp_path), "--executor-session-id", REAL]
+    assert rca.main(args) == 0
+    assert rca.main(args + ["--second"]) == 2                                  # первой карточки ещё нет
+    assert "первой карточки card.json нет" in capsys.readouterr().err
+    monkeypatch.setattr(rca, "run_validate", lambda card, repo: (3, "needs_second_acceptor\n", "NEED-SECOND\n"))
+    assert rca.main(args + ["--finish", str(workflow_output(tmp_path, e, clips=("Idle",), score=8.1))]) == 0
+    assert "NEED-SECOND" in (out := capsys.readouterr().out) and "«Opus high»" in out and "--second --clips Idle" in out
+    first = (e / "Idle/acceptor-prompt.md").read_bytes()
+    assert rca.main(args + ["--second"]) == 0
+    assert (e / "Idle/acceptor-prompt.md").read_bytes() == first
+    p2 = (e / "Idle/acceptor-prompt-2.md").read_text(encoding="utf-8")
+    assert 'acceptor {"profile": "Opus high", "session_id": "workflow:acceptor2-ASSET-TESTO-001-Idle-r1"}' in p2
+    assert f'executor_session_id "{REAL}"' in p2 and "Opus xhigh" not in p2
+    assert p2.count("## Изображения приёмщику") == 1 and "ARTH-Idle/contact-sheet-2fps.png" in p2
+    wa = json.loads((e / "second-acceptor-args.json").read_bytes().decode("ascii"))
+    assert wa["kind"] == "anim" and wa["effort"] == "high" and wa["profile"] == "Opus high"
+    assert wa["items"] == [{"asset": "ASSET-TESTO-001", "evidence": c.rel(e / "Idle", tmp_path),
+                            "label": "acceptor2-ASSET-TESTO-001-Idle-r1",
+                            "prompt": c.rel(e / "Idle/acceptor-prompt-2.md", tmp_path)}]
+    assert "finish_second.py" in capsys.readouterr().out and not (e / "Idle/card-2.json").exists()
+    assert json.loads((e / "acceptor-args.json").read_bytes().decode("ascii"))["effort"] == "xhigh"  # первый
+    for extra in (["--finish", "wf.json"], ["--tag=-b"], ["--validate-only"]):
+        assert rca.main(args + ["--second", *extra]) == 2
+    (e / "Idle/card-2.json").write_text("{}", encoding="utf-8")
+    assert rca.main(args + ["--second"]) == 2                                  # card-2.json уже есть, без --force
+
+
 def test_run_clip_acceptors_finish_flags_wrong_executor_acceptor_and_missing_card(tmp_path, fake_validate, capsys):
     e = make_acceptor_cycle(tmp_path, clips=("Idle", "HitReact"))
     base = ["--evidence", str(e), "--repo", str(tmp_path)]
@@ -608,7 +640,7 @@ def test_run_clip_acceptors_input_errors(tmp_path, capsys):
     assert rca.main(base + ["--acceptor", "zcode"]) == 2
     assert rca.main(base + ["--exe", "codex.exe"]) == 2                        # флага codex больше нет
     err = capsys.readouterr().err
-    assert "Sol отключён 2026-10-20" in err and "zcode login zai" in err
+    assert "Sol отключён 2026-10-20" in err and "снят с приёмки 2026-10-21" in err
     p = e / "Idle/acceptor-prompt.md"
     p.write_text(p.read_text(encoding="utf-8") + "{{KNOWN_LIMITS}}\n", encoding="utf-8")
     assert rca.main(base) == 2
