@@ -45,7 +45,7 @@ def root(tmp_path):
         w.writerow({"id": "EN-03", "title": "Плита ×2", "tool": "SYNTX"})
         w.writerow({"id": "IC-36", "title": "Эскизы", "tool": "Codex"})
     (r / "docs/game-design/visual/07-prompt-templates.md").write_text(
-        "T-SYNTX-UPSCALE T-SYNTX-IMG-BANANA T-CODEX-2D\n", encoding="utf-8")
+        "T-SYNTX-UPSCALE T-SYNTX-IMG-BANANA T-CODEX-2D T-GEMINI-IMG T-STIVA-AUDIO\n", encoding="utf-8")
     (r / "docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt").write_text("x", encoding="utf-8")
     (r / LEDGER_REL).write_text(json.dumps(synthetic_ledger(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return r
@@ -92,7 +92,8 @@ def test_add_syntx_row_and_totals(root, capsys):
     assert list(e) == list(ledger.ENTRY_KEYS)
     assert e["cost"] == 12 and e["quoted"] == 12 and e["balance_before"] == 173.771 and e["seed"] is None
     assert e["status"] == "ok" and e["note"] == ""
-    assert d["totals"] == {"syntx_spent": 12, "tripo_spent": 0, "codex_packages": 0}
+    assert d["totals"] == {"syntx_spent": 12, "tripo_spent": 0, "codex_packages": 0, "gemini_generations": 0,
+                           "stiva_generations": 0}
     assert d["status"].startswith("ведётся")
     raw = (root / LEDGER_REL).read_text(encoding="utf-8")
     assert "Журнал трат" in raw and "\\u" not in raw          # ensure_ascii False
@@ -111,15 +112,105 @@ def test_cost_vs_quoted_goes_to_note(root):
     assert e["cost"] == 13 and "differs from quoted 12" in e["note"]
 
 
-def test_codex_row_keeps_nulls(root):
+def codex_row(date="2026-10-15T12:27:20+05:00", **over):
+    """An old Codex package row as the ledger holds it (written before Codex was switched off on 2026-10-20)."""
+    row = {"date": date, "service": "Codex", "model": "Codex app", "template": "T-CODEX-2D", "task_id": "IC-36",
+           "units": "пакет, 8 генераций image_gen", "quoted": None, "cost": None, "balance_before": None,
+           "balance_after": None, "service_task_id": None, "seed": None, "prompt_file": "",
+           "result_path": "art/imagegen/hud-icons-vr44-codex/", "status": "ok", "note": ""}
+    row.update(over)
+    return row
+
+
+def put_rows(root, *rows):
+    d = data(root)
+    d["entries"] += list(rows)
+    d["totals"] = ledger.compute_totals(d["entries"])
+    (root / LEDGER_REL).write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+GEMINI_TERMS = ["terms", "--service", "gemini", "--model", "Gemini app image generation", "--url",
+                "https://example.invalid/gemini-terms", "--checked", "2026-10-20"]
+GEMINI_ADD = ["add", "--task", "IC-36", "--template", "T-GEMINI-IMG", "--service", "Gemini", "--model",
+              "Gemini app image generation", "--generations", "4", "--result", "art/imagegen/hud-icons-vr44-codex/",
+              "--date", "2026-10-21T10:00:00+05:00"]
+STIVA_TERMS = ["terms", "--service", "stiva", "--model", "ElevenLabs SFX (stiva.ai)", "--url",
+               "https://example.invalid/stiva-terms", "--checked", "2026-10-20"]
+STIVA_ADD = ["add", "--task", "EN-03", "--template", "T-STIVA-AUDIO", "--service", "stiva.ai", "--model",
+             "ElevenLabs SFX (stiva.ai)", "--generations", "3", "--result", "C:/tmp/audio-src/en-03/",
+             "--date", "2026-10-21T11:00:00+05:00"]
+
+
+def test_codex_add_is_refused_and_old_rows_stay_valid(root, capsys):
     assert run(root, "add", "--task", "IC-36", "--template", "T-CODEX-2D", "--service", "codex", "--model",
-               "Codex app", "--image-gen", "8", "--result", "art/imagegen/hud-icons-vr44-codex/") == 0
-    e = data(root)["entries"][0]
-    assert e["service"] == "Codex" and e["units"] == "пакет, 8 генераций image_gen"
-    assert e["cost"] is None and e["balance_before"] is None and e["quoted"] is None
-    assert data(root)["totals"]["codex_packages"] == 1
-    assert run(root, "add", "--task", "IC-36", "--template", "T-CODEX-2D", "--service", "Codex", "--model", "x",
-               "--units", "пакет", "--before", "10") == 2
+               "Codex app", "--units", "пакет, 8 генераций image_gen") == 2
+    err = capsys.readouterr().err
+    assert "Codex was switched off on 2026-10-20" in err and "AI tools and side models" in err
+    assert run(root, "terms", "--service", "Codex", "--model", "x", "--url", "https://example.invalid") == 2
+    assert data(root)["entries"] == [] and data(root)["providerTerms"] == []
+    put_rows(root, codex_row(), codex_row(date="2026-10-20T23:00:00+05:00"))
+    assert run(root, "check") == 0                     # old Codex rows: subscription nulls, no terms needed
+    out = capsys.readouterr().out
+    assert "codex_packages=2 (switched off 2026-10-20)" in out and "check OK" in out
+    put_rows(root, codex_row(date="2026-10-21T09:00:00+05:00"))
+    assert run(root, "check") == 1
+    assert "Codex was switched off on 2026-10-20" in capsys.readouterr().out
+
+
+def test_codex_row_keeps_nulls_in_check(root, capsys):
+    put_rows(root, codex_row(cost=3))
+    assert run(root, "check") == 1
+    assert "Codex rows keep cost null" in capsys.readouterr().out
+
+
+def test_gemini_and_stiva_rows_count_generations(root, capsys):
+    assert run(root, *GEMINI_TERMS) == 0 and run(root, *STIVA_TERMS) == 0
+    assert [t["service"] for t in data(root)["providerTerms"]] == ["Gemini", "stiva.ai"]
+    assert run(root, *GEMINI_ADD) == 0
+    assert run(root, *STIVA_ADD) == 0
+    second = list(GEMINI_ADD)
+    second[second.index("--generations") + 1] = "2"
+    assert run(root, *second) == 0
+    d = data(root)
+    g, s = d["entries"][0], d["entries"][1]
+    assert g["service"] == "Gemini" and g["units"] == "4 генераций" and list(g) == list(ledger.ENTRY_KEYS)
+    assert s["service"] == "stiva.ai" and s["units"] == "3 генераций"
+    for e in (g, s):
+        assert e["quoted"] is None and e["cost"] is None and e["balance_before"] is None and e["balance_after"] is None
+    assert d["totals"] == {"syntx_spent": 0, "tripo_spent": 0, "codex_packages": 0, "gemini_generations": 6,
+                           "stiva_generations": 3}
+    capsys.readouterr()
+    assert run(root, "check") == 0
+    assert "gemini_generations=6; stiva_generations=3" in capsys.readouterr().out
+
+
+def test_subscription_rows_need_generations_no_balances_and_terms(root, capsys):
+    no_count = [a for a in GEMINI_ADD]
+    i = no_count.index("--generations")
+    del no_count[i:i + 2]
+    assert run(root, *no_count) == 2
+    assert run(root, *no_count, "--units", "пакет") == 2
+    assert run(root, *GEMINI_ADD, "--units", "4 генераций") == 2          # both
+    assert run(root, *GEMINI_ADD, "--before", "10") == 2
+    err = capsys.readouterr().err
+    assert "needs --generations N" in err and "not both" in err and "keep quoted, cost and balances null" in err
+    assert data(root)["entries"] == []
+    assert run(root, *GEMINI_ADD) == 0                                     # the use is recorded anyway ...
+    assert "no providerTerms row for Gemini" in capsys.readouterr().err
+    assert run(root, "check") == 1                                         # ... and check wants the terms row
+    assert "ВР-05: before the first use" in capsys.readouterr().out
+    run(root, *GEMINI_TERMS)
+    assert run(root, "check") == 0
+
+
+def test_totals_written_before_the_new_services_still_check(root):
+    run(root, *TERMS)
+    run(root, *SYNTX_ADD)
+    d = data(root)
+    for k in ("gemini_generations", "stiva_generations"):
+        del d["totals"][k]                             # a ledger written before 2026-10-20
+    (root / LEDGER_REL).write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+    assert run(root, "check") == 0
 
 
 def test_refuses_spend_without_card_or_balances(root, capsys):
@@ -259,7 +350,7 @@ def test_check_service_argument_errors(root, capsys):
     assert run(root, "check", "--model", "Tripo Studio H3.1", "--balance", "100", "--next-cost", "3") == 2
     assert run(root, "check", "--service", "syntx", "--next-cost", "3") == 2    # SYNTX still needs both
     err = capsys.readouterr().err
-    assert "needs --next-cost" in err and "--next-kind is a SYNTX" in err and "Codex is a subscription" in err
+    assert "needs --next-cost" in err and "--next-kind is a SYNTX" in err and "Codex are subscriptions" in err
     assert "only by the Tripo pre-flight" in err and "both --balance and --next-cost" in err
     # explicit --service syntx is the old default
     assert run(root, "check", "--service", "SYNTX", "--balance", "100", "--next-cost", "55") == 1

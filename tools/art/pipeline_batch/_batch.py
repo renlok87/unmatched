@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+ACCEPTANCE = Path(__file__).resolve().parents[1] / "acceptance"
 SKILL = Path(".agents/skills/3d-model-pipeline/references/concept-sheet.md")
 PLACEHOLDER = re.compile(r"\{\{([A-Z0-9_]+)\}\}")
 
@@ -26,6 +27,14 @@ def utf8_streams() -> None:
                 stream.reconfigure(encoding="utf-8", errors="replace")
             except (OSError, ValueError):
                 pass
+
+
+def side_models():
+    """tools/art/acceptance/side_models.py: профили приёмщиков, «Codex/Sol отключён 2026-10-20», заглушка Z-Code."""
+    if str(ACCEPTANCE) not in sys.path:
+        sys.path.insert(0, str(ACCEPTANCE))
+    import side_models as sm  # noqa: PLC0415
+    return sm
 
 
 def utf8_env() -> dict:

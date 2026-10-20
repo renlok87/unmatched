@@ -200,9 +200,10 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
 | Music, SFX, voice | **SYNTX** (existing subscription, MCP `syntx-ai`) and **stiva.ai** (the second «S» service, «Steve или как-то так»; it carries ElevenLabs SFX), or the Google services built into Gemini | — |
 | 3D generation | Tripo3D Studio, unchanged | — |
 
-- Never call Codex or ChatGPT: no `codex exec`, no ChatGPT app, no Sol or Astra acceptor. Tool lanes that still call
-  them are dead until ported: `tools/art/pipeline_batch/codex_lane.py`, the Sol path of `sheet_acceptance.py`, Sol in
-  `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` and `tools/art/acceptance/*`. Use their Opus paths.
+- Never call Codex or ChatGPT: no `codex exec`, no ChatGPT app, no Sol or Astra acceptor. The tool lanes were ported
+  on 2026-10-20: `sheet_acceptance.py` and `ue7a/run_clip_acceptors.py` default to the Opus path (prepare → Workflow
+  `second-acceptor` → finish), their Sol path and `codex_lane.py` without an explicit generator command stop with
+  "Codex/Sol отключён"; `tools/art/acceptance/side_models.py` holds the profiles and the Z-Code stub (skill §0).
 - **Z-Code through Computer Use** (main path). Claude writes the prompt to a file in the repo. Then: open Z-Code, pick
   the project `unmached` (it is in Z-Code's recent projects), start a new task, select GLM-5.3 (or GLM-5.3-Flash for
   images) and paste the prompt; attach images through the composer. Z-Code writes only into the folder that the
@@ -219,8 +220,9 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
   Chrome. Prompts come from files in the repo. Outputs are saved into the folder that the skill or task names. On a
   sign-in screen, stop and ask the user. Look for a visible watermark before an image is used.
 - Music and SFX keep the audio pipeline rules (`docs/game-design/audio`, ledger lines, licence notes). stiva.ai and the
-  Gemini services are new to the pipeline. On 2026-10-20 `tools/art/visual/ledger.py` knows only SYNTX, Tripo and
-  Codex. Until it learns Gemini and stiva.ai, write each use and the service terms as a NOTES line of the card or task.
+  Gemini services are new to the pipeline. `tools/art/visual/ledger.py` knows them as subscriptions: a `terms` row
+  before the first use of a model, then `add --service Gemini|stiva.ai --generations N` (templates T-GEMINI-IMG,
+  T-GEMINI-AUDIO, T-STIVA-AUDIO); `add --service Codex` is refused.
 
 ## Unreal GPU load
 

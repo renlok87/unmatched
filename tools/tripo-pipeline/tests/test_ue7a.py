@@ -486,28 +486,14 @@ def test_write_review_config_carries_base_scalars(tmp_path):
 
 
 # ------------------------------------------------------------------------------ приёмщики клипов (C51, C32/C55)
-FAKE_CODEX = r"""
-import json, os, re, sys
-argv = sys.argv[1:]
-card = argv[argv.index("-o") + 1]
-images = [argv[i + 1] for i, x in enumerate(argv) if x == "-i"]
-prompt = sys.stdin.buffer.read().decode("utf-8")
-ex = os.environ.get("FAKE_EXECUTOR") or re.search(r'executor_session_id "([^"]*)"', prompt).group(1)
-clip = re.search(r"AM_Testo_(\w+)", prompt).group(1)
-print(json.dumps({"type": "thread.started", "thread_id": "t-" + clip}))
-if os.environ.get("FAKE_ENV_FAIL"):
-    print(json.dumps({"type": "item.completed", "item": {"type": "command_execution", "status": "failed",
-                                                         "aggregated_output": "helper_unknown_error"}}))
-with open(card, "w", encoding="utf-8") as f:
-    json.dump({"kind": "anim", "clip": clip, "score": 9.4, "verdict": "pass", "executor_session_id": ex,
-               "acceptor": {"profile": "Sol 6.1 xhigh", "session_id": "codex:pending"}, "images": len(images)}, f)
-"""
 PROMPT = """# Приёмка клипа AM_Testo_{clip}, цикл r1
 - Кадры: {e}/{clip}/frames/
 - Референс: art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-{clip}/contact-sheet-2fps.png; лист
   art/pipeline-candidates/ASSET-TESTO-001/evidence/acceptance/20261014-r1/frames/sheet.png, нет файла art/x/missing.png.
+   acceptor {{"profile": "Sol 6.1 xhigh", "session_id": "codex:pending"}},
    executor_session_id "claude-code:s/agent:stage6-testo",
 """
+REAL = "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:beowulf-stage6"
 
 
 def make_acceptor_cycle(root: Path, clips=("Idle", "HitReact")):
@@ -519,9 +505,21 @@ def make_acceptor_cycle(root: Path, clips=("Idle", "HitReact")):
         jpg(e / cl / "frames" / f"Testo-{cl}-f00-front-ue-editor.jpg")
         jpg(root / f"art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-{cl}/contact-sheet-2fps.png")
     jpg(root / "art/pipeline-candidates/ASSET-TESTO-001/evidence/acceptance/20261014-r1/frames/sheet.png")
-    exe = root / "fake_codex.py"
-    exe.write_text(FAKE_CODEX, encoding="utf-8")
-    return e, exe
+    return e
+
+
+def workflow_output(root: Path, e: Path, clips=("Idle", "HitReact"), executor=REAL, **over):
+    """Вывод Workflow second-acceptor (first): по карточке на клип со строкой "null" (снимается) и константами."""
+    out = []
+    for cl in clips:
+        card = {"kind": "anim", "clip": cl, "score": 9.4, "verdict": "pass", "verdict_reason": "null",
+                "executor_session_id": executor,
+                "acceptor": {"profile": "Opus xhigh", "session_id": f"workflow:acceptor-ASSET-TESTO-001-{cl}-r1"}}
+        card.update(over)
+        out.append({"asset": "ASSET-TESTO-001", "evidence": c.rel(e / cl, root), "card": card})
+    f = root / "wf-out.json"
+    f.write_text(json.dumps({"result": out}, ensure_ascii=False), encoding="utf-8")
+    return f
 
 
 @pytest.fixture
@@ -535,73 +533,111 @@ def fake_validate(monkeypatch):
     return calls
 
 
-def test_run_clip_acceptors_runs_in_parallel_and_writes_the_actual_executor(tmp_path, fake_validate, capsys):
-    e, exe = make_acceptor_cycle(tmp_path)
+def test_run_clip_acceptors_prepares_opus_workflow_args(tmp_path, fake_validate, capsys):
+    """Opus-путь, шаг 1–3: константы промпта (executor, acceptor Sol → Opus/workflow), блок изображений, ASCII-аргументы."""
+    e = make_acceptor_cycle(tmp_path)
     hr = e / "HitReact/acceptor-prompt.md"
     hr.write_bytes(hr.read_bytes().replace(b"\n", b"\r\n"))                  # промпт с CRLF
-    real = "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:beowulf-stage6"
-    args = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path), "--executor-session-id", real]
+    args = ["--evidence", str(e), "--repo", str(tmp_path), "--executor-session-id", REAL]
     assert rca.main(args) == 0
     raw = hr.read_bytes()
     assert raw.count(b"\r\n") == raw.count(b"\n") > 0                       # переписан с концами строк файла
     for cl in ("Idle", "HitReact"):
         prompt = (e / cl / "acceptor-prompt.md").read_text(encoding="utf-8")
-        assert f'executor_session_id "{real}"' in prompt and "agent:stage6-testo" not in prompt
+        assert f'executor_session_id "{REAL}"' in prompt and "agent:stage6-testo" not in prompt
+        assert (f'acceptor {{"profile": "Opus xhigh", "session_id": "workflow:acceptor-ASSET-TESTO-001-{cl}-r1"}}'
+                in prompt) and "Sol 6.1" not in prompt and "codex:pending" not in prompt
+        block = prompt[prompt.index("## Изображения приёмщику"):]
+        assert block.count("\n- ") == 4 and "missing.png" not in block       # 2 кадра + образец + лист модели
+        assert f"ARTH-{cl}/contact-sheet-2fps.png" in block and not (e / cl / "card.json").exists()
+    wa = json.loads((e / "acceptor-args.json").read_bytes().decode("ascii"))
+    assert wa["kind"] == "anim" and "Sol 6.1 xhigh" not in json.dumps(wa["schema"])
+    assert [i["label"] for i in wa["items"]] == ["acceptor-ASSET-TESTO-001-HitReact-r1", "acceptor-ASSET-TESTO-001-Idle-r1"]
+    assert wa["items"][0]["prompt"].endswith("HitReact/acceptor-prompt.md") and not fake_validate
+    assert "NEXT: Workflow" in capsys.readouterr().out
+    assert rca.main(args) == 0                                                 # повтор: блок изображений не дублируется
+    assert (e / "Idle/acceptor-prompt.md").read_text(encoding="utf-8").count("## Изображения приёмщику") == 1
+
+
+def test_run_clip_acceptors_finish_writes_cards_and_validates(tmp_path, fake_validate, capsys):
+    e = make_acceptor_cycle(tmp_path)
+    args = ["--evidence", str(e), "--repo", str(tmp_path), "--executor-session-id", REAL]
+    assert rca.main(args) == 0
+    wf = workflow_output(tmp_path, e)
+    assert rca.main(args + ["--finish", str(wf)]) == 0
+    for cl in ("Idle", "HitReact"):
         card = json.loads((e / cl / "card.json").read_text(encoding="utf-8"))
-        assert card["executor_session_id"] == real
-        assert card["acceptor"]["session_id"] == f"codex:t-{cl}"            # thread.started, не codex:pending
-        assert card["images"] == 4                                           # 2 кадра + образец + лист модели
+        assert card["executor_session_id"] == REAL and "verdict_reason" not in card    # строка "null" снята
         launch = json.loads((e / cl / "acceptor-launch.json").read_text(encoding="utf-8"))
-        assert launch["executor_session_id"]["rewritten"] and launch["exit_code"] == 0
-        assert not any("missing.png" in i for i in launch["images"])
+        assert launch["acceptor"]["used"]["profile"] == "Opus xhigh" and launch["executor_session_id"]["used"] == REAL
         assert (e / cl / "validator-output.txt").read_text(encoding="utf-8") == "OK: card\npass\n"
     run = json.loads((e / "acceptors-run.json").read_text(encoding="utf-8"))
     assert {k: v["status"] for k, v in run["clips"].items()} == {"Idle": "valid", "HitReact": "valid"}
-    assert sorted(fake_validate) == ["card.json", "card.json"]
-    # карточка уже есть: без --force и без --tag — отказ до запуска
-    assert rca.main(args) == 2
-    # validate-only по готовым карточкам, без Codex
-    assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--validate-only", "--executor-session-id", real]) == 0
+    assert run["acceptor"] == "Opus xhigh" and sorted(fake_validate) == ["card.json", "card.json"]
+    # карточка уже есть: без --force и без --tag — отказ до записи
+    assert rca.main(args + ["--finish", str(wf)]) == 2
+    # validate-only по готовым карточкам
+    assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--validate-only", "--executor-session-id", REAL]) == 0
 
 
-def test_run_clip_acceptors_flags_a_wrong_executor_and_env_failure(tmp_path, fake_validate, monkeypatch, capsys):
-    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
-    base = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path)]
-    monkeypatch.setenv("FAKE_EXECUTOR", "claude-code:other/agent:x")
-    assert rca.main(base) == 1                                               # карточка с чужим id исполнителя
-    assert "WARNING" in capsys.readouterr().err                              # id не дан — предупреждение (C55)
+def test_run_clip_acceptors_finish_flags_wrong_executor_acceptor_and_missing_card(tmp_path, fake_validate, capsys):
+    e = make_acceptor_cycle(tmp_path, clips=("Idle", "HitReact"))
+    base = ["--evidence", str(e), "--repo", str(tmp_path)]
+    assert rca.main(base) == 0
+    assert "WARNING" in capsys.readouterr().err                                # id не дан — предупреждение (C55)
+    wf = workflow_output(tmp_path, e, clips=("Idle",), executor="claude-code:other/agent:x")
+    assert rca.main(base + ["--finish", str(wf)]) == 1
     run = json.loads((e / "acceptors-run.json").read_text(encoding="utf-8"))
-    assert run["clips"]["Idle"]["status"] == "executor_mismatch" and not fake_validate
-    monkeypatch.delenv("FAKE_EXECUTOR")
-    monkeypatch.setenv("FAKE_ENV_FAIL", "1")
-    assert rca.main(base + ["--tag=-b"]) == 1
-    assert (e / "Idle/environment-failure-b.json").is_file() and not (e / "Idle/card-b.json").exists()
-    assert (e / "Idle/card-environment-failure-b.json").is_file()
+    assert run["clips"]["Idle"]["status"] == "executor_mismatch" and run["clips"]["HitReact"]["status"] == "no_card"
+    assert not fake_validate
+    wf = workflow_output(tmp_path, e, clips=("Idle",), executor="claude-code:s/agent:stage6-testo",
+                         acceptor={"profile": "Sol 6.1 xhigh", "session_id": "codex:t"})
+    assert rca.main(base + ["--clips", "Idle", "--tag=-b", "--finish", str(wf)]) == 1
     assert json.loads((e / "acceptors-run-b.json").read_text(encoding="utf-8"))["clips"]["Idle"]["status"] == \
-        "environment_failure"
+        "acceptor_mismatch"
+    assert not (e / "Idle/card-b.json").exists()
 
 
 def test_run_clip_acceptors_input_errors(tmp_path, capsys):
-    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
-    base = ["--evidence", str(e), "--exe", str(exe), "--repo", str(tmp_path)]
+    e = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    base = ["--evidence", str(e), "--repo", str(tmp_path)]
     assert rca.main(base + ["--executor-session-id", "codex:pending"]) == 2
     assert rca.main(base + ["--executor-session-id", "beowulf-stage6"]) == 2  # не id вида <механизм>:<…>
     assert rca.main(["--evidence", str(tmp_path / "nope"), "--repo", str(tmp_path)]) == 2
-    assert rca.main(base + ["--exe", str(tmp_path / "no-codex.exe")]) == 2
+    assert rca.main(base + ["--acceptor", "sol"]) == 2
+    assert rca.main(base + ["--acceptor", "zcode"]) == 2
+    assert rca.main(base + ["--exe", "codex.exe"]) == 2                        # флага codex больше нет
+    err = capsys.readouterr().err
+    assert "Sol отключён 2026-10-20" in err and "zcode login zai" in err
     p = e / "Idle/acceptor-prompt.md"
     p.write_text(p.read_text(encoding="utf-8") + "{{KNOWN_LIMITS}}\n", encoding="utf-8")
     assert rca.main(base) == 2
     assert "KNOWN_LIMITS" in capsys.readouterr().err
 
 
+def test_run_clip_acceptors_fills_acceptor_placeholders(tmp_path):
+    """Заготовка с плейсхолдерами {{ACCEPTOR_PROFILE}} / {{ACCEPTOR_SESSION_ID}} (§8.2) заполняется, а не падает."""
+    e = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    p = e / "Idle/acceptor-prompt.md"
+    p.write_text(p.read_text(encoding="utf-8").replace('"Sol 6.1 xhigh", "session_id": "codex:pending"',
+                                                       '"{{ACCEPTOR_PROFILE}}", "session_id": "{{ACCEPTOR_SESSION_ID}}"'),
+                 encoding="utf-8")
+    assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--executor-session-id", REAL]) == 0
+    assert '"profile": "Opus xhigh", "session_id": "workflow:acceptor-ASSET-TESTO-001-Idle-r1"' in \
+        p.read_text(encoding="utf-8")
+
+
 def test_run_clip_acceptors_dry_run_lists_images_without_running(tmp_path, capsys):
-    e, exe = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    e = make_acceptor_cycle(tmp_path, clips=("Idle",))
+    before = (e / "Idle/acceptor-prompt.md").read_bytes()
     assert rca.main(["--evidence", str(e), "--repo", str(tmp_path), "--dry-run", "--image",
                      "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/contact-sheet-2fps.png"]) == 0
     plan = json.loads(capsys.readouterr().out)
     imgs = plan["clips"]["Idle"]["images"]
     assert len(imgs) == 4 and len(set(imgs)) == 4                            # --image уже из промпта — без дубля
+    assert plan["clips"]["Idle"]["label"] == "acceptor-ASSET-TESTO-001-Idle-r1"
     assert not (e / "Idle/card.json").exists() and not (e / "acceptors-run.json").exists()
+    assert not (e / "acceptor-args.json").exists() and (e / "Idle/acceptor-prompt.md").read_bytes() == before
 
 
 def test_run_clip_acceptors_validate_only_on_a_committed_card(tmp_path):

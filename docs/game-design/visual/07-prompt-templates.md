@@ -34,8 +34,15 @@
 | T-SYNTX-UPSCALE | SYNTX | `env.csv` | ×2 только своей сгенерированной плиты (ВР-48) |
 | T-CODEX-HEROVIEWS, T-TRIPO-PART, T-BLENDER-FIG | Codex, Tripo, Blender | `anim.csv` (`hero`) | только после MVP (ВР-18) |
 | T-CODEX-ACCEPT | Codex (приёмщик «Sol 6.1 xhigh») | `anim.csv` (`hero`, строка `VISUAL_CARD_ID` фигуры) | приёмка листа концепта, модели или клипа скиллом 3d-model-pipeline: строка журнала трат на каждую приёмку (§3.4) |
+| T-GEMINI-IMG | Gemini (генерация изображений) | любая карточка с изображением: `anim.csv` (`hero`), `icons.csv`, `env.csv`, `vfx.csv` | концепт-листы 1a/1c, референсы, глиф-маски, исходники текстур; промпт — файл карточки (прежнее имя `<id>.codex.md`), строка журнала на пакет (§4.2) |
+| T-GEMINI-AUDIO | Gemini (сервисы Google для музыки и звука) | карточка звука | музыка, SFX, голос; правила аудио-пайплайна (`docs/game-design/audio`) |
+| T-STIVA-AUDIO | stiva.ai (ElevenLabs SFX и др.) | карточка звука | SFX, музыка, голос; правила аудио-пайплайна (`docs/game-design/audio`) |
 
 Если карточке нужен шаблон, которого нет, — сначала строка в этом документе, потом генерация.
+
+**С 2026-10-20 Codex отключён** (пользователь отменил подписку ChatGPT; AGENTS.md «AI tools and side models»).
+Шаблоны T-CODEX-* остаются описанием задач и историей строк журнала. Изображения по ним делает Gemini (строка
+журнала — T-GEMINI-IMG), приёмку — «Opus xhigh» (строки нет), `ledger.py add --service Codex` отвергается.
 
 ### 0.2 Переменные
 
@@ -606,7 +613,10 @@ Tripo Studio, DCC Bridge, «из нескольких видов в модель
 TeamAccent; слоты материала ≤ 3; 4 клипа D-11 24 fps с notify `Contact`, длины ±0,05 с, RM ≈ 0; сокеты `Weapon`,
 `Head`, `Root`, `Base` ([PIPELINE.md](../../art-pipeline/PIPELINE.md)); проверка `mesh_report.py`.
 
-### 3.4 T-CODEX-ACCEPT — приёмка Sol (codex exec, только чтение)
+### 3.4 T-CODEX-ACCEPT — приёмка Sol (codex exec, только чтение) — история, Sol отключён 2026-10-20
+
+Раздел — история строк журнала до 2026-10-20. Приёмщик по умолчанию теперь «Opus xhigh» (Workflow, квоты Codex нет,
+строки нет); `ledger.py add --service Codex` отвергается.
 
 Строка журнала трат на каждую приёмку приёмщиком «Sol 6.1 xhigh» скилла 3d-model-pipeline: лист концепта 1a/1c,
 модель (этап 4), клип (7a.2). Квота Codex общая с генерацией (RC-12), поэтому приёмка пишется так же, как пакет
@@ -677,7 +687,12 @@ python tools/art/visual/ledger.py add --task <VISUAL_CARD_ID> --template T-CODEX
 - Пути — от корня репозитория или `C:/tmp/...`. `status` — `ok`, `failed`, `refunded`; неудача тоже пишется.
 
 У Codex строка пишется на пакет: `units` — «пакет, N генераций image_gen», `cost` и балансы — `null`. Приёмка Sol —
-тоже строка Codex, шаблон T-CODEX-ACCEPT (§3.4).
+тоже строка Codex, шаблон T-CODEX-ACCEPT (§3.4). Codex отключён 2026-10-20: его строки остаются, новые не пишутся.
+
+Gemini и stiva.ai — подписки пользователя, как Codex: строка на пакет генераций, `quoted`, `cost` и балансы — `null`,
+`units` — «N генераций» (`ledger.py add --service Gemini|stiva.ai --generations N`). До первой генерации модели —
+строка `providerTerms` (`ledger.py terms --service Gemini|stiva.ai --model … --url …`, ВР-05); без неё `check`
+падает. Итоги — `totals.gemini_generations` и `totals.stiva_generations`.
 
 ### 4.3 Скрипт
 

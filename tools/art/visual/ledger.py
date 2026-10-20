@@ -5,17 +5,24 @@
       [--service-task-id ID] [--seed N] --prompt-file docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt
       --result scraped-data/derived/env-u16-marmoreal-codex/marmoreal-extended-2x.png [--status ok|failed|refunded]
       [--note TEXT] [--date ISO]
-  python tools/art/visual/ledger.py add --task IC-36 --template T-CODEX-2D --service Codex --model "Codex app"
-      --image-gen 8 --prompt-file docs/game-design/visual/06-tasks/prompts/IC-36.codex.md
-      --result art/imagegen/hud-icons-vr44-codex/
+  python tools/art/visual/ledger.py add --task IC-36 --template T-GEMINI-IMG --service Gemini
+      --model "Gemini app image generation" --generations 4
+      --prompt-file docs/game-design/visual/06-tasks/prompts/IC-36.codex.md --result art/imagegen/hud-icons-vr44-codex/
+  python tools/art/visual/ledger.py add --task AU-07 --template T-STIVA-AUDIO --service stiva.ai
+      --model "ElevenLabs SFX (stiva.ai)" --generations 3 --result C:/tmp/audio-src/au-07/
   python tools/art/visual/ledger.py terms --service SYNTX --model "Magnific Precision v2" --url URL [--checked DATE]
+  python tools/art/visual/ledger.py terms --service Gemini --model "Gemini app image generation" --url URL
   python tools/art/visual/ledger.py check [--balance B --next-cost X --next-kind image|video|upscale]
   python tools/art/visual/ledger.py check --service tripo --next-cost N [--balance B] [--model M]
 
 Rules (07 4.1-4.3, 05 5.1-5.3): a row right after every spend, before the next one; no spend without a task card;
 balance_before is always a fresh get-balance (a gap to the previous balance_after is somebody else's spend, e.g. the
 audio chat - not ours, not written); cost = balance_before - balance_after; a difference to quoted above 0.5 goes to
-note; Codex: one row per package, units "пакет, N генераций image_gen", cost and balances null. Writes happen under
+note. Subscriptions (Gemini, stiva.ai; Codex in old rows): quoted, cost and balances null, units = the number of
+generations ("N генераций", --generations N; Codex: "пакет, N генераций image_gen"), and a providerTerms row of the
+service and model before the first use (ВР-05). Codex was switched off on 2026-10-20 (the user cancelled ChatGPT,
+AGENTS.md "AI tools and side models"): its old rows stay readable, `add --service Codex` is refused and a Codex row
+dated after 2026-10-20 is a check error. Writes happen under
 a lock file, through a temp file and os.replace, JSON indent 2, ensure_ascii False; totals are recomputed on every
 write.
 
@@ -55,7 +62,13 @@ from visual_common import (  # noqa: E402
 )
 
 SCHEMA = "unmatched.visual-credits-ledger/1"
-SERVICES = {"syntx": "SYNTX", "tripo": "Tripo", "codex": "Codex"}
+SERVICES = {"syntx": "SYNTX", "tripo": "Tripo", "codex": "Codex", "gemini": "Gemini", "stiva.ai": "stiva.ai"}
+SERVICE_ALIASES = {"stiva": "stiva.ai", "stivaai": "stiva.ai"}
+SUBSCRIPTIONS = ("Codex", "Gemini", "stiva.ai")   # no balances: quoted, cost and balances stay null
+RETIRED = {"Codex": "2026-10-20"}                  # service -> the last day it was used (old rows stay valid)
+RETIRED_WHY = ("the user cancelled the ChatGPT subscription; AGENTS.md \"AI tools and side models\": images go to "
+               "Gemini (--service Gemini), music and SFX to SYNTX or stiva.ai")
+GENERATIONS_RE = re.compile(r"^(\d+) генерац")
 STATUSES = ("ok", "failed", "refunded")
 ENTRY_KEYS = ("date", "service", "model", "template", "task_id", "units", "quoted", "cost", "balance_before",
               "balance_after", "service_task_id", "seed", "prompt_file", "result_path", "status", "note")
@@ -158,8 +171,25 @@ def compute_totals(entries: list[dict]) -> dict:
     def spent(service):
         return round(sum(e["cost"] for e in entries if e.get("service") == service
                          and isinstance(e.get("cost"), (int, float))), 3)
+    def generations(service):
+        return sum(int(m.group(1)) for e in entries if e.get("service") == service
+                   for m in [GENERATIONS_RE.match(str(e.get("units") or ""))] if m)
     return {"syntx_spent": spent("SYNTX"), "tripo_spent": spent("Tripo"),
-            "codex_packages": sum(1 for e in entries if e.get("service") == "Codex")}
+            "codex_packages": sum(1 for e in entries if e.get("service") == "Codex"),
+            "gemini_generations": generations("Gemini"), "stiva_generations": generations("stiva.ai")}
+
+
+OPTIONAL_TOTALS = {"gemini_generations": 0, "stiva_generations": 0}  # absent in ledgers written before 2026-10-20
+
+
+def service_of(name: str | None) -> str | None:
+    """Canonical service name of --service (case-insensitive; stiva / stiva.ai), None when unknown."""
+    key = (name or "").strip().lower()
+    return SERVICES.get(SERVICE_ALIASES.get(key, key))
+
+
+def services_text() -> str:
+    return ", ".join(s for s in SERVICES.values() if s not in RETIRED)
 
 
 def run_kind(template: str) -> str | None:
@@ -238,12 +268,20 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
             seen_ids.add(e["service_task_id"])
         if e["seed"] is not None and not isinstance(e["seed"], int):
             errors.append(f"{tag}: seed must be an integer or null")
-        if svc == "Codex":
+        if svc in RETIRED and _date_part(e["date"]) > RETIRED[svc]:
+            errors.append(f"{tag}: {svc} was switched off on {RETIRED[svc]} ({RETIRED_WHY})")
+        if svc in SUBSCRIPTIONS:
             for k in ("quoted", "cost", "balance_before", "balance_after"):
                 if e[k] is not None:
-                    errors.append(f"{tag}: Codex rows keep {k} null (subscription, 07 4.2)")
-            if not re.search(r"пакет", e["units"] or ""):
-                warnings.append(f"{tag}: Codex units should read 'пакет, N генераций image_gen'")
+                    errors.append(f"{tag}: {svc} rows keep {k} null (subscription, 07 4.2)")
+            if svc == "Codex":
+                if not re.search(r"пакет", e["units"] or ""):
+                    warnings.append(f"{tag}: Codex units should read 'пакет, N генераций image_gen'")
+                continue
+            if not GENERATIONS_RE.match(str(e["units"] or "")):
+                errors.append(f"{tag}: {svc} units must read 'N генераций' (the number of generations, 07 4.2)")
+            if not terms_cover(terms, svc, e["model"]):
+                errors.append(f"{tag}: no providerTerms row for {svc} {e['model']!r} (ВР-05: before the first use)")
             continue
         if svc not in ("SYNTX", "Tripo"):
             continue
@@ -275,7 +313,7 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
     totals = compute_totals(entries)
     stored = data.get("totals") or {}
     for k, v in totals.items():
-        if stored.get(k) != v:
+        if stored.get(k, OPTIONAL_TOTALS.get(k)) != v:
             errors.append(f"totals.{k} = {stored.get(k)!r}, rows give {v!r}")
 
     sx_window = round(sum(e["cost"] for e in entries if e.get("service") == "SYNTX"
@@ -370,9 +408,12 @@ def _repo_path(root: Path, s: str | None) -> str:
 
 
 def make_entry(a, root: Path) -> dict:
-    svc = SERVICES.get((a.service or "").strip().lower())
+    svc = service_of(a.service)
     if not svc:
-        raise VisualError(f"--service must be one of {', '.join(SERVICES.values())}")
+        raise VisualError(f"--service must be one of {services_text()}")
+    if svc in RETIRED:
+        raise VisualError(f"{svc} was switched off on {RETIRED[svc]}: no new {svc} rows ({RETIRED_WHY}); "
+                          "its old rows stay in the ledger")
     if a.status not in STATUSES:
         raise VisualError(f"--status must be one of {STATUSES}")
     if not TEMPLATE_ID_RE.match(a.template or ""):
@@ -380,13 +421,17 @@ def make_entry(a, root: Path) -> dict:
     quoted, before, after = _num(a.quoted), _num(a.before), _num(a.after)
     units = a.units
     note = a.note or ""
-    if svc == "Codex":
+    if svc in SUBSCRIPTIONS:
         if any(v is not None for v in (quoted, before, after)):
-            raise VisualError("Codex rows keep quoted, cost and balances null (subscription, 07 4.2)")
-        if not units:
-            if a.image_gen is None:
-                raise VisualError("Codex row needs --units or --image-gen N (units 'пакет, N генераций image_gen')")
-            units = f"пакет, {a.image_gen} генераций image_gen"
+            raise VisualError(f"{svc} rows keep quoted, cost and balances null (subscription, 07 4.2)")
+        if a.generations is not None:
+            if a.generations < 0:
+                raise VisualError("--generations must be 0 or more")
+            if units:
+                raise VisualError("give --units or --generations, not both")
+            units = f"{a.generations} генераций"
+        if not units or not GENERATIONS_RE.match(units):
+            raise VisualError(f"{svc} row needs --generations N (units 'N генераций': the number of generations)")
         cost = None
     else:
         if before is None or after is None:
@@ -441,15 +486,18 @@ def cmd_add(a, root: Path) -> int:
     for w in warnings + errors:  # the spend is recorded anyway: a spend is never hidden
         print(f"ledger: WARNING after add: {w}", file=sys.stderr)
     t = data["totals"]
-    print(f"ledger: added {entry['service']} {entry['task_id']} cost={entry['cost']}; totals syntx_spent="
-          f"{t['syntx_spent']} tripo_spent={t['tripo_spent']} codex_packages={t['codex_packages']}")
+    print(f"ledger: added {entry['service']} {entry['task_id']} cost={entry['cost']} units={entry['units']!r}; totals "
+          f"syntx_spent={t['syntx_spent']} tripo_spent={t['tripo_spent']} codex_packages={t['codex_packages']} "
+          f"gemini_generations={t['gemini_generations']} stiva_generations={t['stiva_generations']}")
     return 0
 
 
 def cmd_terms(a, root: Path) -> int:
-    svc = SERVICES.get((a.service or "").strip().lower())
+    svc = service_of(a.service)
     if not svc:
-        raise VisualError(f"--service must be one of {', '.join(SERVICES.values())}")
+        raise VisualError(f"--service must be one of {services_text()}")
+    if svc in RETIRED:
+        raise VisualError(f"{svc} was switched off on {RETIRED[svc]}: no new terms rows ({RETIRED_WHY})")
     row = {"service": svc, "model": a.model, "url": a.url, "checked": a.checked or dt.date.today().isoformat()}
     if a.ledger_model:
         row["ledgerModel"] = a.ledger_model
@@ -470,9 +518,10 @@ def cmd_check(a, root: Path) -> int:
     cards = load_cards(root)
     md = (root / TEMPLATES_REL).read_text(encoding="utf-8") if (root / TEMPLATES_REL).is_file() else None
     pre = None
-    svc = SERVICES.get((a.service or "syntx").strip().lower())
+    svc = service_of(a.service or "syntx")
     if svc not in ("SYNTX", "Tripo"):
-        raise VisualError("check --service must be SYNTX or Tripo (Codex is a subscription: no pre-flight)")
+        raise VisualError("check --service must be SYNTX or Tripo (Gemini, stiva.ai and Codex are subscriptions: "
+                          "no pre-flight)")
     if svc == "Tripo":
         if a.next_cost is None:
             raise VisualError("Tripo pre-flight needs --next-cost (price of the next Tripo operation or chain)")
@@ -495,7 +544,9 @@ def cmd_check(a, root: Path) -> int:
     lim = limits_of(data)
     print(f"ledger: {len(data.get('entries') or [])} rows; syntx_spent={t['syntx_spent']} of visual cap "
           f"{lim['visual_cap']} (ВР-PL10) and {lim['syntx_tokens']} {_until_text(lim['syntx_until'])} (ВР-04); "
-          f"tripo_spent={t['tripo_spent']} of {lim['tripo_credits']}; codex_packages={t['codex_packages']}")
+          f"tripo_spent={t['tripo_spent']} of {lim['tripo_credits']}; gemini_generations={t['gemini_generations']}; "
+          f"stiva_generations={t['stiva_generations']}; codex_packages={t['codex_packages']} (switched off "
+          f"{RETIRED['Codex']})")
     if pre and pre["service"] == "Tripo":
         rem = round(lim["tripo_credits"] - t["tripo_spent"], 3)
         print(f"ledger: Tripo pre-flight: price {pre['next_cost']}; ВР-04 remainder {rem} of {lim['tripo_credits']} "
@@ -522,10 +573,10 @@ def main(argv: list[str] | None = None) -> int:
     ad = sub.add_parser("add", help="append one spend row")
     ad.add_argument("--task", required=True, help="card id from 06-tasks")
     ad.add_argument("--template", required=True, help="template id of 07, e.g. T-SYNTX-UPSCALE")
-    ad.add_argument("--service", required=True, help="SYNTX, Tripo or Codex")
+    ad.add_argument("--service", required=True, help="SYNTX, Tripo, Gemini or stiva.ai (Codex: switched off 2026-10-20)")
     ad.add_argument("--model", required=True)
     ad.add_argument("--units")
-    ad.add_argument("--image-gen", type=int, help="Codex: number of image_gen generations in the package")
+    ad.add_argument("--generations", type=int, help="Gemini / stiva.ai: number of generations (units 'N генераций')")
     ad.add_argument("--quoted", help="price before the run")
     ad.add_argument("--before", help="fresh balance before the run")
     ad.add_argument("--after", help="fresh balance after the run")
@@ -538,7 +589,7 @@ def main(argv: list[str] | None = None) -> int:
     ad.add_argument("--date", help="ISO timestamp (default now, local offset)")
 
     te = sub.add_parser("terms", help="append a providerTerms row (ВР-05)")
-    te.add_argument("--service", required=True)
+    te.add_argument("--service", required=True, help="SYNTX, Tripo, Gemini or stiva.ai")
     te.add_argument("--model", required=True)
     te.add_argument("--url", required=True)
     te.add_argument("--checked", help="ISO date (default today)")

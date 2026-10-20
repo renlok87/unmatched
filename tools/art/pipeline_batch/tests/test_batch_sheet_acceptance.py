@@ -1,5 +1,5 @@
-"""sheet_acceptance.py без Codex: аргументы приёмщика, разбор событий, сбой песочницы, и полная подготовка приёмки
-(preflight пакета + промпт §11) на синтетическом чекауте с настоящим check_concept_views.py.
+"""sheet_acceptance.py: Opus-путь (preflight пакета + промпт §11 + аргументы workflow, приём карточки finish) на
+синтетическом чекауте с настоящим check_concept_views.py; полоса Sol (codex exec) отключена 2026-10-20 — код 2.
 
     python -m pytest tools/art/pipeline_batch/tests/test_batch_sheet_acceptance.py -q
 """
@@ -24,18 +24,18 @@ from batch_fixtures import SKILL_MD  # noqa: E402
 K, AID = "test-hero", "ASSET-TEST-HERO-001"
 
 
-def test_base_args_psq_events(tmp_path):
-    a = S.base_args(Path("R"), Path("o.json"), [Path("a.png"), Path("b.png")], "gpt-6.1-sol", "xhigh")
-    assert a[:2] == ["exec", "--ignore-user-config"] and a[-2:] == ["--", "-"]
-    assert a.count("-i") == 2 and "--output-schema" in a and 'model_reasoning_effort="xhigh"' in a
-    assert "--output-schema" not in S.base_args(Path("R"), Path("o"), [], "m", "low", schema=False)
-    assert S.psq("it's") == "'it''s'"
-    ev = tmp_path / "e.jsonl"
-    ev.write_text('{"type": "thread.started", "thread_id": "t1"}\nnot json\n{"item": {"type": "command_execution", '
-                  '"status": "failed", "aggregated_output": "helper_unknown_error"}}\n', encoding="utf-8")
-    evs = S.events(ev)
-    assert len(evs) == 2 and len(S.env_failures(evs)) == 1
-    assert S.events(tmp_path / "missing") == []
+def test_sol_and_zcode_paths_stop_with_a_reason(tmp_path, capsys):
+    """2026-10-20: accept / all / probe и --acceptor sol — Sol отключён; --acceptor zcode — заглушка; codex не ищется."""
+    work = ["--work", str(tmp_path / "w"), "--repo", str(tmp_path)]
+    for argv in (["accept", K, "1"], ["all"], ["probe"], ["prepare", K, "1", "--acceptor", "sol"]):
+        assert S.main(argv + work) == 2
+    err = capsys.readouterr().err
+    assert err.count("Sol отключён 2026-10-20") == 4 and "AI tools and side models" in err and "acceptor-args.json" in err
+    assert S.main(["prepare", K, "1", "--acceptor", "zcode", *work]) == 2
+    assert "zcode login zai" in capsys.readouterr().err
+    assert not (tmp_path / "w").exists()
+    for gone in ("base_args", "run_cli", "default_exe", "env_failures"):
+        assert not hasattr(S, gone), gone
 
 
 def view_png(p: Path):
@@ -97,7 +97,7 @@ def make_repo(tmp_path: Path) -> Path:
 
 
 def args(repo: Path, work: Path, *extra):
-    return ["--work", str(work), "--repo", str(repo), "--date", "2026-10-14", "--exe", "codex-not-used", *extra]
+    return ["--work", str(work), "--repo", str(repo), "--date", "2026-10-14", *extra]
 
 
 def test_prepare_builds_prompt_without_codex(tmp_path, capsys):
@@ -113,10 +113,22 @@ def test_prepare_builds_prompt_without_codex(tmp_path, capsys):
     assert out["images"] == 3 + 2 + 3 + 1  # виды, лист и дизайн, три орто, эталон качества
     prompt = (e / "acceptor-prompt.md").read_text(encoding="utf-8")
     assert "RUBRIC 1C TEXT" in prompt and "«проверь пачку»" in prompt and "Не знаю. Делай сам" in prompt
+    assert "«Opus xhigh»" in prompt and "workflow:acceptor-ASSET-TEST-HERO-001-r1" in prompt and "инструментом Read" in prompt
+    for gone in ("codex", "Codex", "отдельными -i", "OEM", "Sol"):
+        assert gone not in prompt.replace(f"concept-{K}-codex", ""), gone
     const = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
     assert const["cycle"] == "r1" and const["date"] == "2026-10-14" and const["previous_card"] is None
     assert const["executor_session_id"] == "launcher:stage-1c-sheet-20261014"
+    assert const["acceptor"] == {"profile": "Opus xhigh", "session_id": "workflow:acceptor-ASSET-TEST-HERO-001-r1"}
     assert json.loads((e / "launcher-preflight.json").read_text(encoding="utf-8"))["recheck_same"] is True
+    raw = (e / "acceptor-args.json").read_bytes()
+    assert raw.isascii() and out["args"].endswith("/acceptor-args.json")
+    wa = json.loads(raw)
+    assert wa["kind"] == "concept" and "Sol 6.1 xhigh" not in wa["schema"]["properties"]["acceptor"]["properties"][
+        "profile"]["enum"]
+    assert wa["items"] == [{"asset": AID, "evidence": out["evidence"], "label": "acceptor-ASSET-TEST-HERO-001-r1",
+                            "prompt": out["evidence"] + "/acceptor-prompt.md"}]
+    assert json.loads((work / "acceptor-args-20261014.json").read_text(encoding="ascii"))["items"] == wa["items"]
 
 
 def test_prepare_refuses_changed_package(tmp_path, capsys):
@@ -134,7 +146,7 @@ def test_prepare_refuses_changed_package(tmp_path, capsys):
 
 def sheet(repo: Path, work: Path, **extra):
     return S.Sheet(type("A", (), {"repo": str(repo), "work": str(work), "date": "2026-10-14", "log": None,
-                                  "exe": "codex-not-used", "model": "m", "effort": "low", "user_quote": [], **extra})())
+                                  "user_quote": [], **extra})())
 
 
 @pytest.mark.parametrize("manifest_form", ["mapping", "list"])
@@ -200,7 +212,7 @@ def test_prepare_without_owned_file_and_executor_id(tmp_path, capsys):
     assert "исчерпал генерации" not in prompt and sid in prompt
     assert S.main(["prepare", K, "1", *args(repo, work)]) == 0
     assert "WARN: --executor-session-id" in capsys.readouterr().err
-    assert S.main(["all", *args(repo, work)]) == 2  # пачке нужен файл своих фигур
+    assert S.main(["prepare", "nobody", "1", "--owned", str(work / "missing.json"), *args(repo, work)]) == 2
     assert S.main(["prepare", "Bad_Key", "1", *args(repo, work)]) == 2
 
 
@@ -208,7 +220,7 @@ def test_limit_line_only_when_limit_reached(tmp_path):
     assert S.limit_line([]) == "" and S.limit_line(None) == ""
     line = S.limit_line([{"view": "back", "failed_items": ["weapon side", "framing"]}, {"view": "side",
                                                                                      "failed_items": "pose"}])
-    assert line.startswith("Codex исчерпал генерации запуска; проваленные пункты CHECKLIST: back: weapon side, framing; "
+    assert line.startswith("Генератор исчерпал генерации запуска; проваленные пункты CHECKLIST: back: weapon side, framing; "
                            "side: pose; оцени их по рубрике")
     repo = make_repo(tmp_path)
     p = repo / f"art/imagegen/concept-{K}-codex"
@@ -236,7 +248,7 @@ def test_prepare_second_writes_opus_prompt_and_ascii_args(tmp_path, capsys):
     assert S.main(["prepare-second", K, "1", *args(repo, work)]) == 0
     out = json.loads(capsys.readouterr().out)
     p2 = (e / "acceptor-prompt-2.md").read_text(encoding="utf-8")
-    assert (e / "acceptor-prompt.md").read_text(encoding="utf-8") == first  # промпт Sol не тронут
+    assert (e / "acceptor-prompt.md").read_text(encoding="utf-8") == first  # промпт первого приёмщика не тронут
     assert "«Opus xhigh»" in p2 and "workflow:acceptor2-ASSET-TEST-HERO-001-r1" in p2 and "инструментом Read" in p2
     assert "отдельными -i" not in p2 and "codex:pending" not in p2
     c1 = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
@@ -264,8 +276,9 @@ def test_prepare_second_writes_opus_prompt_and_ascii_args(tmp_path, capsys):
         s.prepare(row, 1, second=True)
 
 
-def test_codex_accept_ledger_template_is_described(tmp_path):
-    """C11: строка журнала приёмки Sol — ledger.py add --template T-CODEX-ACCEPT по живому 07-prompt-templates.md."""
+def test_ledger_templates_after_codex_switch_off(tmp_path):
+    """C11 — история: T-CODEX-ACCEPT остаётся в живом 07-prompt-templates.md (старые строки), но строка Codex больше не
+    пишется (Sol и Codex отключены 2026-10-20); генерации Gemini пишутся шаблоном T-GEMINI-IMG."""
     sys.path.insert(0, str(b.REPO / "tools/art/visual"))
     import ledger
 
@@ -276,11 +289,70 @@ def test_codex_accept_ledger_template_is_described(tmp_path):
                  root / "docs/game-design/visual/07-prompt-templates.md")
     led = root / "ledger.json"
     led.write_text(json.dumps({"schema": ledger.SCHEMA, "entries": [], "totals": {}}), encoding="utf-8")
-    rc = ledger.main(["--root", str(root), "--ledger", str(led), "add", "--task", "AN-145", "--template",
-                      "T-CODEX-ACCEPT", "--service", "Codex", "--model", "codex exec gpt-6.1-sol xhigh", "--units",
-                      "пакет приёмки Sol, 0 генераций image_gen", "--result", "art/x/card.json"])
-    assert rc == 0
+    common = ["--root", str(root), "--ledger", str(led), "add", "--task", "AN-145"]
+    assert ledger.main(common + ["--template", "T-CODEX-ACCEPT", "--service", "Codex", "--model",
+                                 "codex exec gpt-6.1-sol xhigh", "--units", "пакет приёмки Sol, 0 генераций image_gen",
+                                 "--result", "art/x/card.json"]) == 2
+    assert json.loads(led.read_text(encoding="utf-8"))["entries"] == []
+    assert ledger.main(common + ["--template", "T-GEMINI-IMG", "--service", "Gemini", "--model", "Gemini app",
+                                 "--generations", "3", "--result", "art/imagegen/concept-x-codex/"]) == 0
     e = json.loads(led.read_text(encoding="utf-8"))["entries"][-1]
-    assert e["template"] == "T-CODEX-ACCEPT" and e["cost"] is None
-    assert ledger.main(["--root", str(root), "--ledger", str(led), "add", "--task", "AN-145", "--template",
-                        "T-CODEX-NOPE", "--service", "Codex", "--model", "m", "--image-gen", "0"]) != 0
+    assert e["template"] == "T-GEMINI-IMG" and e["units"] == "3 генераций" and e["cost"] is None
+    assert ledger.main(common + ["--template", "T-GEMINI-NOPE", "--service", "Gemini", "--model", "m",
+                                 "--generations", "1"]) == 2
+
+
+def prepared(tmp_path, monkeypatch, validate_code=0):
+    """prepare r1 на синтетике, фальшивый validate_card (код validate_code) и карточка «Opus xhigh» по константам."""
+    repo = make_repo(tmp_path)
+    work = tmp_path / "work"
+    assert S.main(["prepare", K, "1", *args(repo, work)]) == 0
+    e = repo / f"art/pipeline-candidates/{AID}/evidence/acceptance-concept/20261014-sheet-r1"
+    const = json.loads((e / "launcher-inputs.json").read_text(encoding="utf-8"))["constants"]
+    card = dict(const, gates={"G-CHECKS": {"status": "PASS", "source": const["reports"][0], "note": None,
+                                           "source_defect": None}},
+                scores={d: {"value": 2, "rationale": "r", "frames": [f"{K}-front.png"]} for d in "SCQP"},
+                score=10.0, verdict="pass", verdict_reason="null", rework_fix_list=[], known_issues=None,
+                status_note="художественно принято, по делегированию")
+    real_run, calls = b.run, []
+
+    def fake_run(argv, cwd):
+        if "validate_card.py" not in " ".join(map(str, argv)):
+            return real_run(argv, cwd)
+        calls.append(argv)
+        return type("R", (), {"returncode": validate_code, "stdout": "pass\n" if validate_code == 0 else "",
+                              "stderr": "" if validate_code == 0 else "FAIL: verdict\n"})()
+
+    monkeypatch.setattr(b, "run", fake_run)
+    wf = tmp_path / "wf.json"
+    wf.write_text(json.dumps({"result": [{"asset": AID, "evidence": b.rel(e, repo), "card": card}]},
+                             ensure_ascii=False), encoding="utf-8")
+    return repo, work, e, wf, card, calls
+
+
+def test_finish_writes_first_card_and_logs(tmp_path, monkeypatch, capsys):
+    repo, work, e, wf, card, calls = prepared(tmp_path, monkeypatch)
+    capsys.readouterr()
+    assert S.main(["finish", str(wf), *args(repo, work)]) == 0
+    saved = json.loads((e / "card.json").read_text(encoding="utf-8"))
+    assert saved["acceptor"]["profile"] == "Opus xhigh" and "verdict_reason" not in saved and "known_issues" not in saved
+    assert len(calls) == 1 and "--check-files" in calls[0]
+    rec = json.loads((work / "acceptance-log-1c.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+    assert rec["verdict"] == "pass" and rec["validate_exit"] == 0 and rec["card_path"].endswith("card.json")
+    assert "DONE" in capsys.readouterr().out
+    assert S.main(["finish", str(wf), *args(repo, work)]) == 1  # карточка уже есть
+    assert S.main(["finish", str(tmp_path / "missing.json"), *args(repo, work)]) == 2
+
+
+def test_finish_rejects_wrong_acceptor_and_keeps_invalid_card(tmp_path, monkeypatch, capsys):
+    repo, work, e, wf, card, _calls = prepared(tmp_path, monkeypatch, validate_code=1)
+    bad = dict(card, acceptor={"profile": "Sol 6.1 xhigh", "session_id": "codex:pending"})
+    wb = tmp_path / "wb.json"
+    wb.write_text(json.dumps([{"asset": AID, "evidence": b.rel(e, repo), "card": bad}], ensure_ascii=False),
+                  encoding="utf-8")
+    assert S.main(["finish", str(wb), *args(repo, work)]) == 1
+    assert not (e / "card.json").exists() and "BLOCKED" in capsys.readouterr().out
+    assert S.main(["finish", str(wf), *args(repo, work)]) == 1  # validate_card 1: карточка — в card-invalid-1.json
+    assert not (e / "card.json").exists() and (e / "card-invalid-1.json").is_file()
+    rec = json.loads((work / "acceptance-log-1c.jsonl").read_text(encoding="utf-8").splitlines()[-1])
+    assert rec["verdict"] == "card_invalid" and "FAIL: verdict" in rec["notes"]

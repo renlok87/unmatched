@@ -1,6 +1,7 @@
 """codex_lane.py на заглушке вместо codex (без трат): задание закрывается по -o + «tokens used», полоса гасит своё
 дерево процессов по PID (заглушка и её дочерний процесс-«хук» живы после ответа, RC-11); обычный выход, предел
-времени, claim между полосами, STOP-файл, --dry-run.
+времени, claim между полосами, STOP-файл, --dry-run. Codex отключён 2026-10-20: без явной команды и с codex.exe —
+код 2.
 
     python -m pytest tools/art/pipeline_batch/tests/test_batch_codex_lane.py -q
 """
@@ -202,4 +203,16 @@ def test_answered_needs_both_signals(tmp_path):
     assert L.answered(last, [err])
     err.write_bytes(b"still working")
     assert not L.answered(last, [err])
-    assert L.default_codex_args(Path("R"))[:2] == ["exec", "-C"] and "--ignore-user-config" not in L.default_codex_args(Path("R"))
+
+
+def test_codex_is_switched_off(tmp_path, capsys):
+    """2026-10-20: полоса не ищет codex.exe сама и не запускает его ни с какими аргументами."""
+    lst, args = setup(tmp_path, n=1, mode="exit")
+    base = ["--tasks", str(lst), "--logs", str(tmp_path / "logs"), "--name", "x", "--once"]
+    assert L.main(base) == 2                                                     # нет команды: codex не ищется
+    assert L.main(base + ["--exe", str(tmp_path / "bin" / "codex.exe"), "--codex-args-json", "[]"]) == 2
+    assert L.main(base + ["--exe", sys.executable]) == 2                         # без аргументов генератора
+    err = capsys.readouterr().err
+    assert err.count("Codex отключён 2026-10-20") == 3 and "AI tools and side models" in err
+    assert not (tmp_path / "logs").exists()                                      # ни одного claim
+    assert not hasattr(L, "default_exe") and L.is_codex("C:/x/CODEX.EXE") and not L.is_codex(sys.executable)

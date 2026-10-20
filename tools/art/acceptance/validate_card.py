@@ -5,9 +5,10 @@
         [--second <card-2.json> [--final-json <final.json>]]
 
 Что делает:
-0. Карточка из строгого вывода приёмщика (`codex exec --output-schema asset-acceptance-2.output-<kind>.schema.json`,
-   `_output_schema.py`) несёт null в необязательных полях (clip, verdict_reason, known_issues, gates.*.note,
-   gates.*.source_defect): null = поля нет (`strip_output_nulls`, файл не меняется).
+0. Карточка из строгого вывода приёмщика (структурный вывод Workflow по `asset-acceptance-2.output-<kind>.schema.json`,
+   `_output_schema.py`; до 2026-10-20 — `codex exec --output-schema`) несёт null в необязательных полях (clip,
+   verdict_reason, known_issues, gates.*.note, gates.*.source_defect): null = поля нет (`strip_output_nulls`, файл
+   не меняется).
 1. Проверяет карточку по JSON Schema `tools/art/acceptance/asset-acceptance-2.schema.json` (kind: concept|model|anim).
    Есть пакет `jsonschema` — проверка им (Draft 2020-12); нет — встроенной проверкой того же подмножества ключевых
    слов, которое использует схема.
@@ -30,7 +31,8 @@
    frames.files; rework_fix_list ссылается только на измерения < 2 и FAIL-гейты (S у модели — никогда: в Blender не
    правится); при rework_blender список покрывает каждый FAIL-гейт, каждое вето-измерение, а у модели при score < 8,0 —
    каждое из F/T/D ниже 2,0; previous_card у r2+; сессии приёмщика и исполнителя различаются; при pass по делегированию
-   status_note содержит «по делегированию».
+   status_note содержит «по делегированию». Профиль приёмщика (side_models.py): «Opus xhigh», «Z-Code GLM-5.3-Flash»
+   или «Sol 6.1 xhigh» — последний отключён 2026-10-20, его карточки с датой позже — ошибка, старые валидны.
 5. `--check-files`: файлы accepted_object существуют и sha256 совпадает; frames.dir/<files>, reports и пути-источники
    гейтов существуют (пути от корня репо). У модели frames.dir/frames.json и tone.json читаются всегда, а не только
    когда приёмщик перечислил их в frames.files (пилот 2026-10-13, RB-16): frames.json обязателен, frames.files =
@@ -65,6 +67,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+import side_models  # noqa: E402
 SCHEMA_PATH = HERE / "asset-acceptance-2.schema.json"
 
 THRESHOLD = 8.0          # Р-6.3/Р-6.4: один порог, сравнение score >= 8.0
@@ -336,6 +341,9 @@ def consistency_errors(card):
     # независимость приёмщика (Р-4)
     if card["acceptor"]["session_id"] == card["executor_session_id"]:
         errs.append("acceptor.session_id совпадает с executor_session_id: приёмщик не принимает свою работу")
+    retired = side_models.retired_profile_error(card["acceptor"]["profile"], card.get("date"))
+    if retired:
+        errs.append(retired)
     if card["verdict"] == "pass" and "delegated" in card["decided_by"] and "по делегированию" not in card["status_note"]:
         errs.append("status_note: при pass по делегированию нужна пометка «по делегированию» "
                     "(docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)")
@@ -908,7 +916,7 @@ OUTPUT_NULLABLE_GATE = ("note", "source_defect")
 
 
 def strip_output_nulls(card):
-    """Карточка из строгого вывода `codex exec --output-schema` (_output_schema.py) заполняет необязательные поля
+    """Карточка из строгого вывода приёмщика (_output_schema.py) заполняет необязательные поля
     значением null: null = поля нет. Возвращает копию без них (файл карточки не меняется)."""
     if not isinstance(card, dict):
         return card
@@ -954,7 +962,8 @@ def needs_second(card, allowed, score):
 
 def pair_errors(a, b, same_profile_ok=False):
     """Сверка двух карточек одной приёмки (первый и второй приёмщик). same_profile_ok — запасной путь, когда второй
-    профиль не запустился после пробы: второй приёмщик того же профиля, но в новом контексте."""
+    профиль не запустился после пробы или его полосы нет (Z-Code GLM-5.3-Flash до `zcode login zai`, side_models.py):
+    второй приёмщик того же профиля, но в новом контексте."""
     errs = []
     for k in ("schema", "kind", "asset_id", "cycle", "previous_card", "accepted_object", "frames",
               "executor_session_id"):

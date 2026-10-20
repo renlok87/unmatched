@@ -36,12 +36,32 @@ Astra в SKILL.md и в `references/`, пока те не переписаны.
   `<ASSET_ID>-concept.codex.md` и `…-concept-views.codex.md` сохраняют суффикс `codex`: их ждут `make_tasks.py`,
   `make_1c.py`, `check_concept_views.py` и `capture_acceptance_set.py --sheet`. Суффикс исторический, содержимое — для
   Gemini.
-- **Мёртвые полосы до порта:** `tools/art/pipeline_batch/codex_lane.py`, Sol-путь `sheet_acceptance.py`, Sol в
-  `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` и в `tools/art/acceptance/*`. Брать их Opus-путь. Полосы пачки
-  §11.2–11.4 для Codex и Sol не действуют.
-- **Журнал трат.** `tools/art/visual/ledger.py` на 2026-10-20 знает только SYNTX, Tripo и Codex. Каждая генерация
-  Gemini и stiva.ai, а также условия сервиса пишутся строкой в `NOTES` карточки, пока `ledger.py` их не выучит.
-  Строки `--service Codex` больше не пишутся.
+- **Полосы портированы 2026-10-20** (ни один инструмент не зовёт `codex`; общий модуль
+  `tools/art/acceptance/side_models.py` — профили и причины отказа). Полосы пачки §11.2–11.4 для Codex и Sol не
+  действуют.
+  - `sheet_acceptance.py` (лист 1c) — Opus-путь по умолчанию: `prepare <key> <N>` пишет `acceptor-prompt.md` (профиль
+    «Opus xhigh», `workflow:acceptor-<ASSET_ID>-r<N>`, изображения — инструментом Read) и `acceptor-args.json`
+    (пачка — `<work>/acceptor-args-<YYYYMMDD>.json`) → `Workflow({name: "second-acceptor", args: <файл>})` → вывод в
+    файл → `finish <вывод>`: `card.json`, `validate_card --check-files`, сверка констант и хэшей пакета, журнал.
+    `accept`, `all`, `probe` и `--acceptor sol` — код 2 «Sol отключён»; `--acceptor zcode` — заглушка.
+  - `ue7a/run_clip_acceptors.py` (клипы 7a.2) — без `--finish` переписывает константы промпта (acceptor «Opus xhigh» /
+    `workflow:acceptor-<ASSET_ID>-<Clip>-r<N>`, executor), дописывает блок «Изображения приёмщику» и пишет
+    `<цикл>/acceptor-args.json`; затем `--finish <вывод workflow>` → `card.json` и `validate_card`.
+  - Второй приёмщик — `prepare-second` / `_output_schema.py --workflow-args`, тот же workflow в свежем контексте;
+    `finish_second.py` при одном профиле обеих карточек сам ставит `--same-profile-ok` (строка NOTE,
+    `final.json#same_profile_fallback`).
+  - `tools/art/acceptance/*`: профиль «Z-Code GLM-5.3-Flash» есть в схеме; «Sol 6.1 xhigh» валиден только на
+    карточках по 2026-10-20 включительно (позже — ошибка `validate_card.py`), в схемах вывода его нет;
+    `_output_schema.py --workflow-args <kind> --first` — аргументы первого приёмщика.
+  - Полоса Z-Code — заглушка: `python tools/art/acceptance/side_models.py zcode-probe` (код 2), `--acceptor zcode`
+    обоих приёмщиков — код 2 до `zcode login zai` пользователя.
+  - `codex_lane.py` не запускает Codex: без явной команды генератора (`--exe` и `--codex-args-json`) и с `codex.exe` —
+    код 2. 1a/1c рисует Gemini через Computer Use, пачкой это не скриптуется.
+- **Журнал трат.** `tools/art/visual/ledger.py` знает Gemini и stiva.ai (подписки, как Codex: `quoted`, `cost` и
+  балансы — `null`): `ledger.py terms --service Gemini|stiva.ai --model … --url …` до первой генерации модели (ВР-05),
+  затем строка на пакет `ledger.py add --task <VISUAL_CARD_ID> --template T-GEMINI-IMG|T-GEMINI-AUDIO|T-STIVA-AUDIO
+  --service Gemini|stiva.ai --model … --generations N` (07-prompt-templates.md §0.1, §4.2). `add --service Codex`
+  отвергается, старые строки Codex остаются.
 - **Пробы этапа 0** (вместо пробы `codex exec`):
   - Gemini — открыт под учёткой пользователя и предлагает генерацию изображений; экран входа — гейт §5 п.2;
   - Z-Code — в проекте `unmached` выбрана нужная модель, на «Ответь OK» пришёл ответ OK; для приёмки GLM-5.3-Flash
@@ -434,7 +454,8 @@ Editor») и HANDBOOK §0.1. Запрос «разрешаете траты?» �
 3. **7a.2 UE-кадры и приёмка 4 клипов** (ДС-1; `references/ue-import-package.md` §4.5): `h2anim_ue.py frames
    --light-pinned <review report>` по клипу за вызов, `closeup`, `sheet`; каталог цикла — `ue7a/prep_acceptance.py`;
    приёмщики — `ue7a/run_clip_acceptors.py --evidence <цикл> --executor-session-id <фактический id исполнителя
-   клипов>` (параллельно, `validate_card` сам, C51/C55); рубрика R/C/D/L и маршруты —
+   клипов>` → Workflow `second-acceptor` по `<цикл>/acceptor-args.json` → `run_clip_acceptors.py … --finish <вывод>`
+   (Opus-путь §0, `validate_card` сам, C51/C55); рубрика R/C/D/L и маршруты —
    `references/animation-vfx-sfx.md` §10. Выход 7a — 4 карточки клипов `pass` и блок `STAGE7A` заявки (§7.2; его
    проверяет `registration_check.py`, C57). Клип вскрыл дефект модели — поздний фикс (§5 п.4; маршрут — там же §10.5).
 4. Правки без сборки C++ (регистрация §5.4–5.5): CUE-011/013 в `cue-table.json` →
@@ -643,7 +664,7 @@ CREDITS:
   ledger: "docs/game-design/visual/credits-ledger.json"   # tools/art/visual/ledger.py add/check
   tripo_limit: "лимит и срок — из журнала (решение 2026-10-13; until: null = окно открыто); граница — баланс Studio"
   planned: "<черновик ≈ 30 + 95>"   # проп: "<multi-view 60–130>" (references/tripo3d-stages.md §3)
-VISUAL_CARD_ID: "AN-<NN>"           # строка 06-tasks/anim.csv (area hero, проп — prop); --task ledger.py add (Codex, Tripo)
+VISUAL_CARD_ID: "AN-<NN>"           # строка 06-tasks/anim.csv (area hero, проп — prop); --task ledger.py add (Gemini, Tripo)
 ACCEPTOR_PROFILE: "opus-xhigh"      # | sol-6.1-xhigh (отключён 2026-10-20, §0) → acceptor.profile "Opus xhigh" | "Sol 6.1 xhigh"; повторы тем же.
                                     #   Пишется ФАКТ: запускающий выбрал другой профиль — поле переписать (RA-17, F119)
 ASSET_DIR: "art/pipeline-candidates/<ASSET_ID>"
@@ -867,12 +888,13 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 | Инструмент | Шаг | Что делает |
 |---|---|---|
 | `tools/art/pipeline_batch/make_tasks.py` | 0, 1a | поля этапа 1 `asset-card.yaml`, `palette.json` и задания 1a из файла ростера |
-| `tools/art/pipeline_batch/codex_lane.py` | 1a, 1c | полоса Codex по claim-файлам; задание закрывается по ответу, а не по выходу процесса |
+| `tools/art/pipeline_batch/codex_lane.py` | — | ~~полоса Codex~~: Codex отключён 2026-10-20, без явной команды генератора — код 2 (§0); механика claim/STOP/429 — для будущей полосы Z-Code |
 | `tools/art/pipeline_batch/rebg.py` | 1a | ровный серый фон фронта лицензионной фигуры (F7) |
 | `tools/art/pipeline_batch/make_1c.py` | 1c | задания 1c по орто 1b |
-| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой (Sol); промпт с блоком OEM и рубрикой (`references/concept-sheet.md` §5.6) |
-| `.claude/workflows/second-acceptor.js` | 1, 4, 7a.2 | второй приёмщик «Opus xhigh» со строгой выходной схемой (`references/acceptance-and-blender.md` §8.3) |
-| `tools/art/pipeline_batch/finish_second.py` | 1, 4, 7a.2 | вывод `second-acceptor` (список, `{"result": …}` или один элемент) → `card-2.json` и пара `validate_card --second --check-files` |
+| `tools/art/pipeline_batch/sheet_acceptance.py` | 1c | приёмка листов пачкой, Opus-путь (§0): `prepare` → Workflow `second-acceptor` по `acceptor-args` → `finish`; второй — `prepare-second`; Sol (`accept`/`all`/`probe`) — код 2 |
+| `tools/art/acceptance/side_models.py` | 1, 4, 7a.2 | профили приёмщиков, причины «Codex/Sol отключён», заглушка полосы Z-Code (`zcode-probe`) |
+| `.claude/workflows/second-acceptor.js` | 1, 4, 7a.2 | приёмщик «Opus xhigh» со строгой выходной схемой — с 2026-10-20 и первый (`--first`, label `acceptor-…`), и второй (`references/acceptance-and-blender.md` §8.3) |
+| `tools/art/pipeline_batch/finish_second.py` | 1, 4, 7a.2 | вывод `second-acceptor` (список, `{"result": …}` или один элемент) → `card-2.json` и пара `validate_card --second --check-files`; один профиль у обеих карточек → `--same-profile-ok` |
 | `tools/art/pipeline_batch/prep_1b.py`, `tripo_log.py`, `post_1b.py` | 1b | очередь Tripo, строка журнала, приём GLB и орто |
 | `tools/art/pipeline_batch/post_h2.py` | 2 | source-spec, превью, рамки частей по вершинам (F10) |
 | `tools/art/pipeline_batch/git_lock.py` | коммит | зависший `.git/index.lock` (F82) |
@@ -880,6 +902,7 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
 | `tools/tripo-pipeline/ue7a/delete_prev.py`, `refresh_carrier.py` | 7a, переимпорт | ассеты прежнего импорта; меш превью клипов после новой модели (F145) |
 | `tools/tripo-pipeline/ue7a/discard_master.py` | 7a | сброс грязного `M_UM_Figure_v2` без сохранения (F92) |
 | `tools/tripo-pipeline/ue7a/prep_acceptance.py` | 7a.2 | каталог цикла приёмки клипов: кадры, промпт из заготовки, сверка sha |
+| `tools/tripo-pipeline/ue7a/run_clip_acceptors.py` | 7a.2 | Opus-путь (§0): константы промпта, список изображений, `acceptor-args.json`; `--finish` → карточки и `validate_card`; Sol — код 2 |
 | `tools/tripo-pipeline/anim/grip_check.py`, `clip_closeups.py` | 6, 7a.2 | хват, кисть, локоть; крупные планы клипа и пара шва Idle |
 | `tools/art/registration_check.py` | 7b, интеграция | полнота регистрации героя в коде и конфигах (RB-04) |
 
@@ -892,7 +915,8 @@ PNG листов K1/K2 и бенча — только в `$W`, сырые кад
   листа, 1–3 приёмки модели, 6–8 приёмок клипов) и 1–3 Opus. В плане пачки — оценка «фигуры × 15 сессий»; окна
   лимита в файлах не видно, поэтому отказ по лимиту — пауза полос, а приёмщик Sol заменяется Opus (другая квота) с
   записью факта в `ACCEPTOR_PROFILE`.
-- Строка журнала `ledger.py add --service Codex` — на каждый пакет-запуск и на каждую приёмку Sol
+- (История, Codex отключён 2026-10-20: `add --service Codex` теперь отвергается.) Строка журнала
+  `ledger.py add --service Codex` — на каждый пакет-запуск и на каждую приёмку Sol
   (`references/concept-sheet.md` §5.5 п.4, §5.6). За 2026-10-13 и 2026-10-14 таких строк нет (`codex_packages=69`, все
   до 2026-10-08) — пачка их не пропускает.
 

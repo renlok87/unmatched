@@ -3,6 +3,9 @@
 Workflow-приёмщик со строгой схемой возвращает необязательные поля строкой "null" ("clip": "null",
 "verdict_reason": "null" — F6, F8): clean() снимает их вместе с None; у pass verdict_reason убирается. Затем
 tools/art/acceptance/validate_card.py <card.json> --second <card-2.json> --final-json <final.json> --print-verdict.
+Профиль первой карточки тот же, что у второй (с 2026-10-20 оба приёмщика — «Opus xhigh»: Sol отключён, у второго
+профиля «Z-Code GLM-5.3-Flash» нет скриптовой полосы до `zcode login zai`, AGENTS.md «AI tools and side models») —
+пара считается с --same-profile-ok (final.json#same_profile_fallback = true), строка NOTE в выводе.
 Был C:/tmp/concept-wave/finish_second.py.
 
     python tools/art/pipeline_batch/finish_second.py <workflow-output.json> [--dry-run]
@@ -38,6 +41,14 @@ def second_card(card: dict) -> dict:
     if out.get("verdict") == "pass":
         out.pop("verdict_reason", None)
     return out
+
+
+def profile_of(card_path: Path) -> str | None:
+    """acceptor.profile карточки или None (файл не JSON / поля нет)."""
+    try:
+        return (json.loads(card_path.read_text(encoding="utf-8-sig")).get("acceptor") or {}).get("profile")
+    except (OSError, ValueError, AttributeError):
+        return None
 
 
 def results_of(obj) -> list:
@@ -86,8 +97,14 @@ def main(argv=None) -> int:
             code = 1
             continue
         (ev / "card-2.json").write_text(json.dumps(card, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        v = b.run([sys.executable, "tools/art/acceptance/validate_card.py", str(ev / "card.json"), "--second",
-                   str(ev / "card-2.json"), "--final-json", str(ev / "final.json"), "--check-files", "--print-verdict"], repo)
+        cmd = [sys.executable, "tools/art/acceptance/validate_card.py", str(ev / "card.json"), "--second",
+               str(ev / "card-2.json"), "--final-json", str(ev / "final.json"), "--check-files", "--print-verdict"]
+        p1, p2 = profile_of(ev / "card.json"), (card.get("acceptor") or {}).get("profile")
+        if p1 and p1 == p2:
+            cmd.insert(-2, "--same-profile-ok")
+            print(r.get("asset"), f"NOTE: оба приёмщика «{p1}» — запасной путь того же профиля (второй профиль "
+                  "Z-Code GLM-5.3-Flash без скриптовой полосы); final.json#same_profile_fallback")
+        v = b.run(cmd, repo)
         fin = json.loads((ev / "final.json").read_text(encoding="utf-8")) if (ev / "final.json").exists() else {}
         tail = (v.stdout + v.stderr).strip().splitlines()[-1:] if v.returncode else ""
         print(r.get("asset"), "opus", card.get("score"), card.get("verdict"), "| exit", v.returncode, "| final",

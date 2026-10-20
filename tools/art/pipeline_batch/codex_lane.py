@@ -1,4 +1,11 @@
-"""Полоса пакета Codex: берёт задания из списка по claim-файлу, гоняет `codex exec` и завершает задание по ответу, а не по выходу процесса (RC-11).
+"""Полоса пакета по claim-файлам: берёт задания из списка, гоняет команду генератора и завершает задание по ответу, а не по выходу процесса (RC-11).
+
+С 2026-10-20 Codex отключён (пользователь отменил подписку ChatGPT; AGENTS.md «AI tools and side models»): полоса
+больше не ищет и не запускает codex.exe. Без явной команды (--exe и --codex-args-json) и с codex.exe в --exe она
+падает с кодом 2 и причиной. 1a/1c рисует Gemini через Computer Use (скилл 3d-model-pipeline §0) — пачкой это не
+скриптуется. Механика claim/STOP/-o/429 осталась для заглушек тестов и для будущей полосы Z-Code (headless
+`zcode.cjs` — после `zcode login zai` пользователя; до этого `tools/art/acceptance/side_models.py zcode-probe`).
+Ниже — описание механики времён Codex.
 
 Был C:/tmp/concept-wave/run-claim-loop.ps1 (полосы 1a/1c, concept-sheet.md §13). Несколько полос делят один список
 и каталог логов: задание берёт та полоса, которой удалось создать `<logs>/<id>.claim` (O_EXCL), id = имя файла
@@ -23,15 +30,15 @@
 попытки уходят в attempts/<id>/manual-<время>/, claim и .done снимаются; запущенная полоса возьмёт задание сама.
 
     python tools/art/pipeline_batch/codex_lane.py --tasks <tasks.txt> --name d1 --logs <dir> [--stop-file <path>] \
-        [--exe <codex.exe>] [--codex-home <dir>] [--grace 10] [--poll 2] [--idle-sleep 60] [--timeout 0] [--once] \
+        --exe <генератор> --codex-args-json '[...]' [--grace 10] [--poll 2] [--idle-sleep 60] [--timeout 0] [--once] \
         [--retry-429 3] [--retry-pause 120]
     python tools/art/pipeline_batch/codex_lane.py --tasks t.txt --name d1 --logs L --dry-run   # команды, без claim
     python tools/art/pipeline_batch/codex_lane.py --tasks t.txt --name d1 --logs L --release <id>   # снять claim
 
-Команда: <exe> exec -C <repo> -s workspace-write -c windows.sandbox="unelevated" --skip-git-repo-check -o <last> -
-(stdin — файл задания); свои аргументы вместо `exec …` — --codex-args-json '[...]' (заглушка в тестах). Генератору
---ignore-user-config ставить нельзя (concept-sheet.md §5.2); отдельный CODEX_HOME без хуков — --codex-home (RC-11,
-перед боевой волной проверить пробой, что image_gen работает). Код выхода: 0 — полоса остановлена, 2 — ошибка входа.
+Команда: <exe> <--codex-args-json…> -o <last> - (stdin — файл задания). До 2026-10-20 по умолчанию шёл
+`codex.exe exec -C <repo> -s workspace-write -c windows.sandbox="unelevated" --skip-git-repo-check`; этой команды больше
+нет. --codex-home задаёт CODEX_HOME процесса (наследие RC-11). Код выхода: 0 — полоса остановлена, 2 — ошибка входа
+(в том числе Codex: отключён).
 """
 from __future__ import annotations
 
@@ -58,16 +65,9 @@ RATE_LIMIT_RE = re.compile(r"exceeded retry limit|429 Too Many Requests|status:?
 ATTEMPT_SUFFIXES = (".out", ".err", "-last.txt", ".done")
 
 
-def default_exe() -> str | None:
-    """Свежий codex.exe приложения Codex (как exec-проба concept-sheet.md §5.2)."""
-    base = Path(os.environ.get("LOCALAPPDATA", "")) / "OpenAI" / "Codex" / "bin"
-    exes = sorted(base.glob("*/codex.exe"), key=lambda p: p.stat().st_mtime, reverse=True) if base.is_dir() else []
-    return str(exes[0]) if exes else None
-
-
-def default_codex_args(repo: Path) -> list[str]:
-    return ["exec", "-C", str(repo), "-s", "workspace-write", "-c", 'windows.sandbox="unelevated"',
-            "--skip-git-repo-check"]
+def is_codex(exe: str | None) -> bool:
+    """codex.exe / codex (CLI Codex) — отключён 2026-10-20."""
+    return bool(exe) and Path(exe).stem.lower() == "codex"
 
 
 def task_ids(tasks_file: Path) -> list[tuple[str, Path]]:
@@ -178,7 +178,9 @@ class Lane:
         self.logs = Path(a.logs)
         self.stop = Path(a.stop_file) if a.stop_file else self.logs / "STOP"
         self.journal = self.logs / f"{a.name}.log"
-        self.args = json.loads(a.codex_args_json) if a.codex_args_json else default_codex_args(self.repo)
+        self.args = json.loads(a.codex_args_json)
+        if not isinstance(self.args, list):
+            raise ValueError("ожидается JSON-список аргументов")
 
     def log(self, line: str) -> None:
         with open(self.journal, "a", encoding="utf-8") as fh:
@@ -299,9 +301,9 @@ def main(argv=None) -> int:
     ap.add_argument("--name", required=True, help="имя полосы (журнал <logs>/<name>.log)")
     ap.add_argument("--logs", required=True, help="каталог логов и claim-файлов (общий у полос одной волны)")
     ap.add_argument("--stop-file", default=None, help="STOP-файл (по умолчанию <logs>/STOP)")
-    ap.add_argument("--repo", default=str(b.REPO), help="рабочий каталог codex (-C)")
-    ap.add_argument("--exe", default=None, help="codex.exe (по умолчанию свежий из %%LOCALAPPDATA%%/OpenAI/Codex/bin)")
-    ap.add_argument("--codex-args-json", default=None, help="аргументы вместо exec … (JSON-список; -o и - добавляются)")
+    ap.add_argument("--repo", default=str(b.REPO), help="рабочий каталог процесса генератора")
+    ap.add_argument("--exe", default=None, help="исполняемый файл генератора (codex.exe отключён 2026-10-20)")
+    ap.add_argument("--codex-args-json", default=None, help="аргументы генератора (JSON-список; -o и - добавляются)")
     ap.add_argument("--codex-home", default=None, help="CODEX_HOME процесса (профиль без hooks/plugins, RC-11)")
     ap.add_argument("--grace", type=float, default=10.0, help="с после ответа до гашения дерева (10)")
     ap.add_argument("--poll", type=float, default=2.0, help="опрос процесса и файлов, с (2)")
@@ -323,13 +325,13 @@ def main(argv=None) -> int:
         for task_id in (x.strip() for x in a.release.split(",") if x.strip()):
             print(json.dumps(release(logs, task_id), ensure_ascii=False))
         return 0
-    a.exe = a.exe or default_exe()
+    if is_codex(a.exe) or not (a.exe and a.codex_args_json):
+        print(f"ERROR: {b.side_models().CODEX_GONE}. Полоса без явной команды генератора (--exe и "
+              "--codex-args-json) не запускается.", file=sys.stderr)
+        return 2
     tasks = Path(a.tasks)
     if not tasks.is_file():
         print(f"ERROR: нет списка заданий {tasks}", file=sys.stderr)
-        return 2
-    if not a.exe:
-        print("ERROR: нет codex.exe (--exe)", file=sys.stderr)
         return 2
     try:
         lane = Lane(a)

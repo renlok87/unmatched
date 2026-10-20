@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Строгие схемы вывода приёмщика для `codex exec --output-schema` (профиль «Sol 6.1 xhigh», этапы 1, 4, 6).
+"""Строгие схемы вывода приёмщика (структурный вывод Workflow-агента «Opus xhigh», этапы 1, 4, 6).
 
-`codex exec --output-schema` передаёт схему модели как strict json_schema. Строгий режим требует: у каждого объекта
+Схема вывода строится по правилам strict json_schema: так её принимал `codex exec --output-schema` приёмщика
+«Sol 6.1 xhigh» (отключён 2026-10-20, side_models.py), и так структурный вывод Workflow возвращает пустые поля
+JSON null, а не строкой "null" (F6, F102). Строгий режим требует: у каждого объекта
 `additionalProperties: false` и все свойства в `required` (необязательное поле — тип с `null`); нет `allOf`/`if`/`then`,
 `propertyNames`, `minProperties`, `uniqueItems`, `minLength`, `minItems`, `minimum`/`maximum`/`multipleOf` и
 просмотров вперёд в `pattern`. Полная схема карточки `asset-acceptance-2.schema.json` всё это использует, поэтому
@@ -21,11 +23,16 @@ gates.*.source_defect): null = поля нет (`validate_card.strip_output_null
     python tools/art/acceptance/_output_schema.py --workflow-args <model|concept|anim> \
         [--item <ASSET_ID>=<каталог приёмки>[=<label>]]… [--out <args.json>]
 
+Профиль acceptor.profile в схеме вывода — только действующие профили: отключённый «Sol 6.1 xhigh» остаётся в полной
+схеме (старые карточки валидны), но новую карточку им не подписать.
+
 --workflow-args — аргументы workflow `second-acceptor` (acceptance-and-blender.md §8.3) одним ASCII-JSON:
 {"kind", "items": [{asset, evidence, label, prompt}], "schema"}; схема — та же строгая выходная схема вида, но без
 `description`/`title` (кириллица описаний ломалась при печати через cp1251, C34 проверочного прогона 2026-10-14;
 модели они не нужны — поля и enum те же). label по умолчанию — acceptor2-<ASSET_ID>-r<N> (клип —
 acceptor2-<ASSET_ID>-<Clip>-r<N>) по имени каталога; prompt — <каталог>/acceptor-prompt-2.md. Без --out — в stdout.
+--first — те же аргументы для первого приёмщика «Opus xhigh» (тот же workflow вместо Sol, 2026-10-20): label
+acceptor-<ASSET_ID>[-<Clip>]-r<N>, prompt <каталог>/acceptor-prompt.md, вывод — card.json.
 """
 from __future__ import annotations
 
@@ -36,6 +43,10 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+import side_models  # noqa: E402
+
 FULL = HERE / "asset-acceptance-2.schema.json"
 KINDS = ("model", "concept", "anim")
 SCHEMA_ID = {"model": "unmatched.asset-acceptance/2", "concept": "unmatched.concept-acceptance/1",
@@ -117,7 +128,8 @@ def build(kind: str, full: dict | None = None) -> dict:
         "rework_fix_list": arr(obj({"item": s(item_pat), "frame": s(), "fix": s(), "tool": s()})),
         "known_issues": arr(obj({"item": s(item_pat), "frame": s(), "note": s()})),
         "acceptor": obj({"profile": {"type": "string",
-                                     "enum": list(P["acceptor"]["properties"]["profile"]["enum"])},
+                                     "enum": [x for x in P["acceptor"]["properties"]["profile"]["enum"]
+                                              if x not in side_models.RETIRED_PROFILES]},
                          "session_id": s()}),
         "executor_session_id": s(),
         "decided_by": s(),
@@ -126,7 +138,7 @@ def build(kind: str, full: dict | None = None) -> dict:
     missing = set(P) - set(props)
     if missing:  # the full schema grew a field: the output schema must follow it
         raise ValueError("output schema misses fields of the full schema: %s" % sorted(missing))
-    out = obj(props, "Строгая схема вывода приёмщика (kind=%s) для codex exec --output-schema; производная от "
+    out = obj(props, "Строгая схема вывода приёмщика (kind=%s), структурный вывод Workflow; производная от "
                      "tools/art/acceptance/asset-acceptance-2.schema.json (_output_schema.py). Судья — "
                      "validate_card.py." % kind)
     out["title"] = "asset-acceptance-2 output (%s)" % kind
@@ -185,26 +197,28 @@ def ascii_schema(schema):
     return out
 
 
-def default_label(asset: str, evidence: str) -> str:
-    """acceptor2-<ASSET_ID>-r<N> по каталогу приёмки …/<YYYYMMDD>[-sheet|-front]-r<N>[/<Clip>] (§8.3)."""
+def default_label(asset: str, evidence: str, prefix: str = "acceptor2") -> str:
+    """<prefix>-<ASSET_ID>-r<N> по каталогу приёмки …/<YYYYMMDD>[-sheet|-front]-r<N>[/<Clip>] (§8.3); prefix —
+    acceptor2 (второй приёмщик) или acceptor (первый)."""
     parts = [p for p in str(evidence).replace("\\", "/").split("/") if p]
     for i in range(len(parts) - 1, -1, -1):
         m = re.search(r"-(r\d+)$", parts[i])
         if m:
             clip = parts[i + 1] if i + 1 < len(parts) else None
-            return "acceptor2-%s-%s%s" % (asset, clip + "-" if clip else "", m.group(1))
-    return "acceptor2-%s" % asset
+            return "%s-%s-%s%s" % (prefix, asset, clip + "-" if clip else "", m.group(1))
+    return "%s-%s" % (prefix, asset)
 
 
-def workflow_args(kind: str, items: list | None = None) -> dict:
-    """{"kind", "items", "schema"} для workflow second-acceptor; ASCII-безопасно (json.dumps(ensure_ascii=True))."""
+def workflow_args(kind: str, items: list | None = None, first: bool = False) -> dict:
+    """{"kind", "items", "schema"} для workflow second-acceptor; ASCII-безопасно (json.dumps(ensure_ascii=True)).
+    first — первый приёмщик: label acceptor-…, prompt acceptor-prompt.md (вместо acceptor2-… и acceptor-prompt-2.md)."""
     items = [dict(it) for it in (items or [])]
     for it in items:
         if not it.get("asset") or not it.get("evidence"):
             raise ValueError("item needs asset and evidence: %r" % (it,))
         it["evidence"] = str(it["evidence"]).replace("\\", "/").rstrip("/")
-        it.setdefault("label", default_label(it["asset"], it["evidence"]))
-        it.setdefault("prompt", it["evidence"] + "/acceptor-prompt-2.md")
+        it.setdefault("label", default_label(it["asset"], it["evidence"], "acceptor" if first else "acceptor2"))
+        it.setdefault("prompt", it["evidence"] + ("/acceptor-prompt.md" if first else "/acceptor-prompt-2.md"))
     return {"kind": kind, "items": items, "schema": ascii_schema(build(kind))}
 
 
@@ -226,12 +240,14 @@ def main(argv=None) -> int:
     g.add_argument("--workflow-args", choices=KINDS, metavar="KIND",
                    help="ASCII-аргументы workflow second-acceptor для вида карточки (model, concept, anim)")
     ap.add_argument("--item", action="append", default=[], help="<ASSET_ID>=<каталог приёмки>[=<label>] (повторяется)")
+    ap.add_argument("--first", action="store_true",
+                    help="с --workflow-args: первый приёмщик (label acceptor-…, prompt acceptor-prompt.md)")
     ap.add_argument("--out", default=None, help="файл аргументов (по умолчанию stdout)")
     a = ap.parse_args(argv)
     if a.workflow_args:
         try:
-            text = json.dumps(workflow_args(a.workflow_args, [parse_item(x) for x in a.item]), ensure_ascii=True,
-                              indent=2) + "\n"
+            text = json.dumps(workflow_args(a.workflow_args, [parse_item(x) for x in a.item], a.first),
+                              ensure_ascii=True, indent=2) + "\n"
         except ValueError as exc:
             print("ERROR: %s" % exc, file=sys.stderr)
             return 2

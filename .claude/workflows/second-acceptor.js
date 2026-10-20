@@ -1,7 +1,7 @@
 export const meta = {
   name: 'second-acceptor',
-  description: 'Second acceptor (Opus xhigh) for 3d-model-pipeline cards in the 8.0-8.4 band, strict output schema',
-  whenToUse: '3d-model-pipeline acceptance-and-blender.md §8.5: a model, clip or concept card scored 8.0-8.4 needs an independent acceptor of another profile. args = {kind?: model|concept|anim, items: [{asset, evidence, label, prompt?}], schema: <contents of tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json>}; ready ASCII args: python tools/art/acceptance/_output_schema.py --workflow-args <kind> --item <ASSET_ID>=<evidence> (concept sheet: sheet_acceptance.py prepare-second)',
+  description: 'Opus xhigh acceptor for 3d-model-pipeline cards (first acceptor since Sol was switched off 2026-10-20; second acceptor in the 8.0-8.4 band), strict output schema',
+  whenToUse: '3d-model-pipeline acceptance-and-blender.md §8.3/§8.5: the default acceptor of a model, clip or concept card (Sol switched off 2026-10-20, AGENTS.md "AI tools and side models"), and the independent second acceptor of a card scored 8.0-8.4. args = {kind?: model|concept|anim, items: [{asset, evidence, label, prompt?}], schema: <contents of tools/art/acceptance/asset-acceptance-2.output-<kind>.schema.json>}; ready ASCII args: python tools/art/acceptance/_output_schema.py --workflow-args <kind> [--first] --item <ASSET_ID>=<evidence> (concept sheet: sheet_acceptance.py prepare / prepare-second; clips: run_clip_acceptors.py)',
   phases: [{ title: 'Accept', detail: 'one independent Opus xhigh acceptor per card' }],
 }
 // Moved into the repo from the pilot session script (2026-10-14, research RA-11 / F102).

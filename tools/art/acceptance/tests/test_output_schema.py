@@ -1,4 +1,4 @@
-"""Строгие схемы вывода приёмщика (_output_schema.py) для `codex exec --output-schema` и их приём validate_card.py.
+"""Строгие схемы вывода приёмщика (_output_schema.py, структурный вывод Workflow) и их приём validate_card.py.
 
     python -m pytest tools/art/acceptance/tests -q
 """

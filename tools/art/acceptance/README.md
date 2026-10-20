@@ -12,7 +12,8 @@
 | `_tone.py` | тон классов против концепта из `measure-report.json` look-dev → `frames/tone.json` и потолок T |
 | `validate_card.py` | проверка карточки по схеме, пересчёт score, детерминированный вердикт |
 | `asset-acceptance-2.schema.json` | JSON Schema (Draft 2020-12) карточек `kind`: `concept` \| `model` \| `anim` |
-| `asset-acceptance-2.output-{model,concept,anim}.schema.json`, `_output_schema.py` | строгие схемы вывода приёмщика для `codex exec --output-schema` (производные от полной; `--write` пересобирает, `--check` — код 1 при устаревших) |
+| `asset-acceptance-2.output-{model,concept,anim}.schema.json`, `_output_schema.py` | строгие схемы вывода приёмщика — структурный вывод Workflow «Opus xhigh» (производные от полной; `--write` пересобирает, `--check` — код 1 при устаревших; `--workflow-args [--first]` — аргументы workflow `second-acceptor`) |
+| `side_models.py` | профили приёмщиков и отключённые модели (AGENTS.md «AI tools and side models», 2026-10-20): сообщения «Codex/Sol отключён», дата отключения Sol для `validate_card.py`, заглушка полосы Z-Code (`zcode-probe` — код 2, пока нет `zcode login zai`) |
 | `tests/` | pytest: правила вердикта, сверки полей, встроенный валидатор = jsonschema, помощники кадров |
 
 ## 1. Кадры приёмки модели
@@ -171,18 +172,25 @@ python tools/art/acceptance/validate_card.py <card.json> --second <card-2.json> 
   другой карточки маршрут строже (возврат, FAIL-гейт, вето), побеждает он; маршрут и `rework_fix_list` берутся из
   `source_card`. `--same-profile-ok` — только когда второй профиль не запустился после пробы (в `final.json`
   `same_profile_fallback: true`). `--final-json` пишет `unmatched.acceptance-final/1`.
+- **Профили приёмщика** (`acceptor.profile`, `side_models.py`): «Opus xhigh» — по умолчанию (Workflow
+  `.claude/workflows/second-acceptor.js`); «Z-Code GLM-5.3-Flash» — второй профиль, видит кадры, пока только GUI через
+  Computer Use (скриптовая полоса — заглушка до `zcode login zai` пользователя); «Sol 6.1 xhigh» — **отключён
+  2026-10-20**: карточки по 2026-10-20 включительно валидны, позже — ошибка. В схемах вывода Sol нет. Пока полосы
+  Z-Code нет, второй приёмщик — Opus в свежем контексте, пара — `--same-profile-ok` (`finish_second.py` ставит его сам
+  при одинаковом профиле).
 - Пакет `jsonschema` есть — проверка им (Draft 2020-12); нет — встроенной проверкой того же подмножества ключевых слов
   (`--no-jsonschema` включает её принудительно; тесты сверяют оба пути).
-- Строгий вывод приёмщика «Sol 6.1 xhigh»: `codex exec --output-schema` требует строгую схему (у каждого объекта
+- Строгий вывод приёмщика. Схемы построены для `codex exec --output-schema` приёмщика «Sol 6.1 xhigh» (отключён
+  2026-10-20); теперь их берёт структурный вывод Workflow «Opus xhigh» (с полной схемой Workflow писал строку `"null"`,
+  F6, F102). Строгий режим требует строгую схему (у каждого объекта
   `additionalProperties: false`, все свойства обязательны, без `allOf`/`if`/`then`, `propertyNames`,
   `minProperties`, `minLength`, `uniqueItems`). Полная схема так не может, поэтому приёмщику даётся
   `asset-acceptance-2.output-<kind>.schema.json`: kind фиксирован, гейты и измерения — фиксированные свойства,
   необязательные поля (`clip` не у клипа, `verdict_reason`, `gates.*.note`, `gates.*.source_defect`) — `null`.
   `validate_card.py` читает `null` в этих полях как «поля нет» (`strip_output_nulls`; файл не меняется) и остаётся
   судьёй: правила вердикта, `verdict_reason` при не-pass и `clip` у клипа проверяет полная схема.
-  Живой вызов 2026-10-09 (калибровка, `medusa-r1`): строгая схема модели принята, карточка прошла валидатор с
-  `--check-files`. Команда и флаги (`windows.sandbox="unelevated"`, `--ignore-user-config`, кодировки PowerShell) —
-  рубрика `references/acceptance-and-blender.md` §8.4.
+  Живой вызов 2026-10-09 (калибровка, `medusa-r1`, Sol): строгая схема модели принята, карточка прошла валидатор с
+  `--check-files`. Команда Sol (`references/acceptance-and-blender.md` §8.4) — история.
 
 Виды карточек (один файл схемы, поле `kind`):
 
