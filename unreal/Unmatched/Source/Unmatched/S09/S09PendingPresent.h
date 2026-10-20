@@ -67,9 +67,12 @@ class UNMATCHED_API FS09PendingPresenter {
 public:
   /** What makes two opens "the same trigger": type, printed text, fighter restriction and optional flag. */
   static FString Signature(const FS08PendingEffect& Head);
+  /** SEL-01: "<root>#<n>" -> "<root>" (the server's id of the next step of a multi-step choice); any other id
+   *  is its own root. */
+  static FString StepRoot(const FString& Id);
   /** Feed the viewer-owned head (call with every applied snapshot while one is open). A new head id is a new
    *  open: the presentation is decided once, from the history of the signature, and the history is updated.
-   *  Returns true for a new open. */
+   *  The next step of the open choice (same StepRoot) is not a new open. Returns true for a new open. */
   bool Observe(const FS08PendingEffect& Head, int32 TurnCount);
   /** No own head any more: the open ends (history stays). */
   void Clear();

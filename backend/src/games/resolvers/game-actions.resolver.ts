@@ -25,7 +25,6 @@ import { GameSubscriptionService } from '../game-subscription.service';
 import { DistributedLockService } from '../../common/services/distributed-lock.service';
 import { CombatTimeoutService } from '../services/combat-timeout.service';
 import { journalActionType } from '../models/game-action.model';
-import { GamePhase } from '../dto';
 import {
   BeginManeuverDto,
   ManeuverDto,
@@ -54,8 +53,8 @@ import {
 } from '../guards';
 import { GameActionExecutorService } from '../../game-engine/services/game-action-executor.service';
 import { executeGameCommand, makeCommand, type GameCommandKind } from '../../game-engine/services/game-command';
-import { DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { AiTurnService } from '../services/ai-turn.service';
+import { commitDecision } from '../services/commit-decision';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -127,7 +126,6 @@ export class GameActionsResolver {
     userId: string,
     actionName: GameCommandKind,
     eventType: string,
-    scheduleAutoResolve?: boolean,
   ): Promise<GameMutationResult> {
     const mutationResult = await this.distributedLockService.withLockOptions(
       `game:${dto.gameId}`,
@@ -144,61 +142,31 @@ export class GameActionsResolver {
             this.handleActionResult(result, actionName);
           }
 
-          // Сохраняем состояние вместе со строкой журнала (eventsSince-часть —
-          // action и input, как раньше; GAME_ENDED того же seq добавит saveState)
-          await this.gameStateService.saveState(dto.gameId, result.gameState!, {
-            journal: [{
-              type: journalActionType(eventType),
-              playerId: userId,
-              payload: { action: actionName, input: command.input },
-              command,
-            }],
-          });
-
-          // GD-026: планирование серверных дедлайнов боя.
-          if (scheduleAutoResolve) {
-            // Атака: дедлайн окна защиты персистен в combatInfo.timeoutAt —
-            // джоба дёргается ровно к нему (не process-local таймер).
-            const ci = result.gameState!.metadata.combatInfo;
-            const delayMs = ci?.timeoutAt
-              ? Math.max(0, new Date(ci.timeoutAt).getTime() - Date.now())
-              : DEFENSE_TIMEOUT_SECONDS * 1000;
-            await this.combatTimeoutService.scheduleAutoResolve(
-              dto.gameId,
-              Math.max(1, Math.ceil(delayMs / 1000)),
-              result.gameState!.sequenceNumber,
-              'DEFENSE',
-            );
-          } else if (eventType === 'DEFENSE_PLAYED') {
-            // Защита сыграна: окно ручного резолва. Оба клиента могут
-            // отключиться — сервер всё равно завершит бой (тот же
-            // idempotent-путь executeResolveCombat).
-            await this.combatTimeoutService.scheduleAutoResolve(
-              dto.gameId,
-              RESOLVE_TIMEOUT_SECONDS,
-              result.gameState!.sequenceNumber,
-              'RESOLVE',
-            );
-          } else if (eventType === 'COMBAT_RESOLVED') {
-            // Бой разрешён вручную — отмена scheduled auto-resolve
-            await this.combatTimeoutService.cancelAutoResolve(dto.gameId);
-          }
-
-          // Публикуем обновление
-          await this.gameSubscriptionService.publishGameUpdate(
-            dto.gameId,
-            eventType,
-            result.gameState!,
+          // SEL-07: сохранить → дедлайн боя → разослать. Отказ saveState —
+          // отказ команды; всё после коммита best-effort, иначе уже применённая
+          // мутация вернулась бы клиенту errors[] и UE дал бы повторить ответ.
+          // DET-2: строка журнала (eventsSince-часть — action и input, плюс
+          // команда реплея) пишется в транзакции saveState; GAME_ENDED того же
+          // seq добавит saveState.
+          await commitDecision(
+            {
+              stateService: this.gameStateService,
+              subscription: this.gameSubscriptionService,
+              combatTimeout: this.combatTimeoutService,
+              logger: this.logger,
+            },
+            {
+              gameId: dto.gameId,
+              state: result.gameState!,
+              eventType,
+              journal: [{
+                type: journalActionType(eventType),
+                playerId: userId,
+                payload: { action: actionName, input: command.input },
+                command,
+              }],
+            },
           );
-
-          if (result.gameState!.phase === GamePhase.GAME_OVER) {
-            // Публикуем GAME_ENDED для подписки gameEnded (никто иначе не публикует)
-            await this.gameSubscriptionService.publishGameUpdate(
-              dto.gameId,
-              'GAME_ENDED',
-              result.gameState!,
-            );
-          }
 
           // Фильтруем приватные данные
           const filteredState = this.gameStateService.filterPrivateData(result.gameState!, userId);
@@ -327,7 +295,6 @@ export class GameActionsResolver {
       userId,
       'attack',
       'ATTACK_INITIATED',
-      true, // scheduleAutoResolve
     );
   }
 

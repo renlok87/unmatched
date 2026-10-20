@@ -4,6 +4,7 @@
 // must query authoritative state, never resend the mutation blindly.
 //
 // S10_LISTEN_PORT=3122 S10_TARGET_PORT=3120 S10_DROP_FIELD=attack node ...
+// S10_DROP_BEFORE=1 drops the request itself instead (it never reaches the backend).
 // Local-only; no request bodies, tokens, room codes, or card ids are logged.
 const http = require('node:http');
 const net = require('node:net');
@@ -11,6 +12,9 @@ const net = require('node:net');
 const listenPort = Number(process.env.S10_LISTEN_PORT || 3122);
 const targetPort = Number(process.env.S10_TARGET_PORT || 3120);
 const dropField = process.env.S10_DROP_FIELD || '';
+// S10_DROP_BEFORE=1: drop the first matching REQUEST before it reaches the
+// backend (default: drop the reply after the backend committed it).
+const dropBefore = process.env.S10_DROP_BEFORE === '1';
 const permitted = new Set([
   'attack', 'playDefense', 'beginManeuver', 'maneuver',
   'resolvePendingEffect', 'declinePendingEffect',
@@ -64,6 +68,15 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
   downstreamReq.on('end', () => {
     const body = Buffer.concat(chunks);
     const field = operationField(body.toString('utf8'));
+    if (dropBefore && !dropped && field === dropField && !downstreamGone) {
+      // SEL-01 mode: the request never reaches the backend (HttpStatus 0 on
+      // the client while the WS stays live) - the outcome is unknown to the
+      // client, but nothing was applied.
+      dropped = true;
+      downstreamRes.destroy();
+      process.stdout.write(JSON.stringify({ event: 'request_dropped_before_server', field }) + '\n');
+      return;
+    }
     if (field) forwarded[field] = (forwarded[field] || 0) + 1;
     const upstreamReq = http.request({
       hostname: '127.0.0.1', port: targetPort,
@@ -134,7 +147,7 @@ server.on('upgrade', (request, downstream, head) => {
 
 server.listen(listenPort, '127.0.0.1', () => {
   process.stdout.write(JSON.stringify({ event: 'listening', port: listenPort,
-    targetPort, dropField }) + '\n');
+    targetPort, dropField, dropBefore }) + '\n');
 });
 
 function finish() {

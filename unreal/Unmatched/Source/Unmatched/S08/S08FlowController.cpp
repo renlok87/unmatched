@@ -645,6 +645,7 @@ void FS08FlowController::TeardownGameStateStream() {
   bGameStateOpLive = false;
   MutationRecoveryPendingChoiceId.Reset();
   bMutationRecoveryPendingChoiceIsDiscard = false;
+  MutationRecoveryGuardSeq = -1;
   Applied = FS08Snapshot();
   SeqGuard = FS08SeqGuard();
   DecksSeq = 0;
@@ -754,7 +755,7 @@ bool FS08FlowController::IsOutcomeUnknown(const TArray<FS08GraphQLError>& Errors
 
 void FS08FlowController::EnterMutationRecovery(const FString& Reason,
                                                const FString& PendingChoiceId,
-                                               bool bPendingIsDiscard) {
+                                               bool bPendingIsDiscard, int32 GuardSeq) {
   if (bMutationRecoveryActive) return;
   bMutationRecoveryActive = true;
   MutationRecoveryAttempts = 0;
@@ -768,6 +769,7 @@ void FS08FlowController::EnterMutationRecovery(const FString& Reason,
   // settled - a bare seq advance can be an unrelated event.
   MutationRecoveryPendingChoiceId = PendingChoiceId;
   bMutationRecoveryPendingChoiceIsDiscard = bPendingIsDiscard;
+  MutationRecoveryGuardSeq = PendingChoiceId.IsEmpty() ? -1 : GuardSeq;
   Trace(Reason +
         TEXT(" - outcome unknown: input locked, refetching authoritative state (no resend)"));
   AttemptMutationRecoveryRefetch();
@@ -775,12 +777,12 @@ void FS08FlowController::EnterMutationRecovery(const FString& Reason,
 
 void FS08FlowController::HandleMutationParseFailure(const FString& Tag,
                                                     const FString& PendingChoiceId,
-                                                    bool bPendingIsDiscard) {
+                                                    bool bPendingIsDiscard, int32 GuardSeq) {
   // S10 review P1(2): an HTTP 200 whose body cannot be parsed arrived AFTER
   // the server answered - the commit state is unknown. Recover through the
   // authoritative refetch; a manual resend could repeat the spend.
   EnterMutationRecovery(Tag + TEXT(" parse error: outcome unknown"), PendingChoiceId,
-                        bPendingIsDiscard);
+                        bPendingIsDiscard, GuardSeq);
 }
 
 void FS08FlowController::HandleMutationRecoveryReadFailed() {
@@ -1780,11 +1782,50 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
           bSettledProof = true;
         }
       }
+      // SEL-01 (docs/research/de-reverse-2026-10-20): every step of a
+      // multi-step choice is a new question with its own id, and a pending
+      // resolve/decline carries expectedSequenceNumber = GuardSeq. A still-
+      // open id therefore settles in two ways: the server state moved past the
+      // guard (the lost command landed or is now rejected STATE_CHANGED - it
+      // can no longer apply), or two fresh reads show it open AT the guard
+      // (the command never landed; a late copy is rejected by the guard).
+      // Before, the lock held until a WS body without the id - forever outside
+      // combat, where no server deadline closes the choice.
+      if (bStillOpen && MutationRecoveryGuardSeq >= 0) {
+        if (Snapshot.SequenceNumber > MutationRecoveryGuardSeq) {
+          bStillOpen = false;
+          bSettledProof = true;
+          Trace(FString::Printf(
+              TEXT("RECOVERY settled: pending choice %s still open at seq %d, past the command guard %d - the lost answer can no longer apply"),
+              *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber, MutationRecoveryGuardSeq));
+        } else if (bMutationRecoveryFreshRead && MutationRecoveryAttempts >= 2) {
+          bStillOpen = false;
+          bSettledProof = true;
+          Trace(FString::Printf(
+              TEXT("RECOVERY settled: pending choice %s still open at the guarded seq %d after %d reads - the lost answer did not land"),
+              *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber, MutationRecoveryAttempts));
+        }
+      }
       if (bStillOpen) {
         bFreshResult = false;
         Trace(FString::Printf(
             TEXT("RECOVERY held: pending choice %s is still open at seq %d"),
             *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber));
+        // SEL-01: a fresh read that still shows the choice open re-reads on
+        // the bounded ladder (it used to stop here and wait for a WS body).
+        if (bMutationRecoveryFreshRead && MutationRecoveryRetryCountdown < 0.0f) {
+          if (MutationRecoveryAttempts >= MaxMutationRecoveryAttempts) {
+            Trace(TEXT("STATE recovery exhausted - the choice stays open; input stays locked"));
+            OnFlowError.Broadcast(FS08GraphQLError{
+                TEXT("PROTOCOL"), TEXT("could not restore the game state after a lost response"),
+                FString()});
+          } else {
+            MutationRecoveryRetryCountdown = MutationRecoveryBackoff;
+            MutationRecoveryBackoff = FMath::Min(MutationRecoveryBackoff * 2.0f, 15.0f);
+            Trace(FString::Printf(TEXT("RECOVERY re-read in %.0fs: the choice is still open"),
+                                  MutationRecoveryRetryCountdown));
+          }
+        }
       } else if (!bSettledProof) {
         bFreshResult = false;
         Trace(FString::Printf(
@@ -1797,6 +1838,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
       MutationRecoveryRetryCountdown = -1.0f;
       MutationRecoveryPendingChoiceId.Reset();
       bMutationRecoveryPendingChoiceIsDiscard = false;
+      MutationRecoveryGuardSeq = -1;
       Trace(FString::Printf(TEXT("RECOVERY complete: authoritative state at seq %d"),
                             Snapshot.SequenceNumber));
     } else if (MutationRecoveryPendingChoiceId.IsEmpty()) {
@@ -1904,6 +1946,7 @@ void FS08FlowController::HandleRoomResponse(TSharedPtr<FJsonObject> Data, const 
         bMutationRecoveryHasBaseline = false;
         MutationRecoveryPendingChoiceId.Reset();
         bMutationRecoveryPendingChoiceIsDiscard = false;
+        MutationRecoveryGuardSeq = -1;
         EndManeuverOp(); // MS-T-06: its 10 s deadline must not re-arm the recovery
         bManeuverInFlight = false;
       } else if (Room.Status == TEXT("FINISHED") && Applied.Phase != TEXT("GAME_OVER")) {
@@ -2544,28 +2587,44 @@ static const TCHAR* ResolveCombatMutation =
     TEXT(" resolveCombat(input: { gameId: $gameId }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
 
+// SEL-01: expectedSequenceNumber = the seq the choice was shown at; the
+// server rejects an answer to a stale question with STATE_CHANGED.
 static const TCHAR* ResolvePendingEffectMutation =
     TEXT("mutation RP($gameId: String!, $effectId: String!, $fighterId: String,")
-    TEXT("             $x: Int, $y: Int, $optionIndex: Int, $cardIds: [String!]) {")
+    TEXT("             $x: Int, $y: Int, $optionIndex: Int, $cardIds: [String!],")
+    TEXT("             $expectedSequenceNumber: Int) {")
     TEXT(" resolvePendingEffect(input: { gameId: $gameId, effectId: $effectId,")
     TEXT("                        fighterId: $fighterId, x: $x, y: $y,")
-    TEXT("                        optionIndex: $optionIndex, cardIds: $cardIds }) {")
+    TEXT("                        optionIndex: $optionIndex, cardIds: $cardIds,")
+    TEXT("                        expectedSequenceNumber: $expectedSequenceNumber }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
 
 static const TCHAR* DeclinePendingEffectMutation =
-    TEXT("mutation DP($gameId: String!, $effectId: String!) {")
-    TEXT(" declinePendingEffect(input: { gameId: $gameId, effectId: $effectId }) {")
+    TEXT("mutation DP($gameId: String!, $effectId: String!, $expectedSequenceNumber: Int) {")
+    TEXT(" declinePendingEffect(input: { gameId: $gameId, effectId: $effectId,")
+    TEXT("                        expectedSequenceNumber: $expectedSequenceNumber }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
+
+/** SEL-01: the answer carries the applied seq the choice was shown at
+ *  (null before the first snapshot). Returns the guard, -1 when none. */
+static int32 SetChoiceGuard(FJsonObject& Variables, const FS08SeqGuard& Guard) {
+  if (!Guard.HasLocal) {
+    Variables.SetField(TEXT("expectedSequenceNumber"), MakeShared<FJsonValueNull>());
+    return -1;
+  }
+  Variables.SetNumberField(TEXT("expectedSequenceNumber"), Guard.Local);
+  return Guard.Local;
+}
 
 bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Field,
                                            const FString& Mutation,
                                            const TSharedRef<FJsonObject>& Variables,
-                                           const FString& PendingChoiceId) {
+                                           const FString& PendingChoiceId, int32 GuardSeq) {
   const FString GameId = Room.GameId;
   const int32 Gen = MatchGeneration;
   bManeuverInFlight = true;
   FS08GraphqlClient::FResult OnDone =
-      [this, Tag, Field, GameId, Gen, PendingChoiceId](bool bOk,
+      [this, Tag, Field, GameId, Gen, PendingChoiceId, GuardSeq](bool bOk,
                                       const TArray<FS08GraphQLError>& Errors,
                                       TSharedPtr<FJsonObject>, const FString& RawBody) {
         if (!IsSameMatchRequest(GameId, Gen)) {
@@ -2589,7 +2648,8 @@ bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
             // GD-037: the command MAY have been applied - never resend it;
             // the locked recovery refetch converges on the server truth.
             // P2(8): a pending-head resolve holds until THAT head settles.
-            EnterMutationRecovery(Tag + TEXT(" failed: outcome unknown"), PendingChoiceId);
+            EnterMutationRecovery(Tag + TEXT(" failed: outcome unknown"), PendingChoiceId,
+                                  /*bPendingIsDiscard=*/false, GuardSeq);
             return;
           }
           Trace(Tag + TEXT(" failed: ") +
@@ -2614,7 +2674,7 @@ bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
         FS08GraphQLError Error;
         if (!FS08Contracts::ParseMutationResult(RawBody, Field, Snapshot, Error)) {
           Trace(Tag + TEXT(" parse error: ") + Error.Message);
-          HandleMutationParseFailure(Tag, PendingChoiceId);
+          HandleMutationParseFailure(Tag, PendingChoiceId, /*bPendingIsDiscard=*/false, GuardSeq);
           return;
         }
         const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
@@ -2780,8 +2840,9 @@ bool FS08FlowController::ResolvePendingEffect(
     }
     Variables->SetArrayField(TEXT("cardIds"), Ids);
   }
+  const int32 GuardSeq = SetChoiceGuard(*Variables, SeqGuard);
   return RunCombatMutation(TEXT("PEND resolve"), TEXT("resolvePendingEffect"),
-                           ResolvePendingEffectMutation, Variables, EffectId);
+                           ResolvePendingEffectMutation, Variables, EffectId, GuardSeq);
 }
 
 bool FS08FlowController::DeclinePendingEffect(const FString& EffectId) {
@@ -2793,6 +2854,7 @@ bool FS08FlowController::DeclinePendingEffect(const FString& EffectId) {
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("effectId"), EffectId);
+  const int32 GuardSeq = SetChoiceGuard(*Variables, SeqGuard);
   return RunCombatMutation(TEXT("PEND decline"), TEXT("declinePendingEffect"),
-                           DeclinePendingEffectMutation, Variables, EffectId);
+                           DeclinePendingEffectMutation, Variables, EffectId, GuardSeq);
 }

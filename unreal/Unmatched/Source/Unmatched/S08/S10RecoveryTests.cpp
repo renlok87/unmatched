@@ -711,10 +711,13 @@ bool FS10StreamGateTest::RunTest(const FString&) {
   return true;
 }
 
-// ---- S10 review P2(8): a lost pending-choice resolve holds until the choice
-// is REALLY settled - an unrelated seq advance must not release the lock ------
+// ---- S10 review P2(8) + SEL-01: a lost pending-choice resolve holds until the
+// choice is REALLY settled. The answer carries expectedSequenceNumber (the
+// seq it was shown at): a same-seq body keeps the lock, a body past that guard
+// settles it even with the id still open - the lost answer can no longer
+// apply there (the server rejects it STATE_CHANGED) ---------------------------
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS10PendingChoiceFaultTest,
-    "Unmatched.S10.Recovery.pending choice lock holds through unrelated seq advances",
+    "Unmatched.S10.Recovery.pending choice lock holds until the guarded choice settles",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS10PendingChoiceFaultTest::RunTest(const FString&) {
   FS08FlowController Flow(FString(), TEXT("ws://test.invalid"), HostId);
@@ -730,32 +733,112 @@ bool FS10PendingChoiceFaultTest::RunTest(const FString&) {
 
   Flow.QueueHttpResultForTest(false, {TransportLost()}, /*bDeferDelivery=*/true);
   Flow.ResolvePendingEffect(TEXT("eff-1"), FString(), false, 0, 0, false, 0, {});
+  const TSharedPtr<FJsonObject> Sent = Flow.GetLastHttpVariablesForTest();
+  double SentGuard = -1.0;
+  TestTrue("the answer carries expectedSequenceNumber",
+           Sent.IsValid() && Sent->TryGetNumberField(TEXT("expectedSequenceNumber"), SentGuard));
+  TestEqual("guard = the seq the choice was shown at", static_cast<int32>(SentGuard), 10);
   Flow.DeliverQueuedHttpForTest(); // transport loss -> recovery armed
   TestTrue("outcome unknown -> recovery armed", Flow.IsMutationRecoveryActiveForTest());
   TestEqual("lock holds on the real pending id",
             Flow.GetMutationRecoveryPendingChoiceIdForTest(), TEXT("eff-1"));
+  TestEqual("lock remembers the command guard", Flow.GetMutationRecoveryGuardSeqForTest(), 10);
   FString Reason;
   TestFalse("combat commands locked", Flow.CanIssueCombatCommand(Reason));
 
-  // UNRELATED seq advance (11, turn passes to the guest) while eff-1 is STILL
-  // in the server queue: fresh seq alone proves nothing - the lock must hold.
+  // A same-seq WS body is the pre-command state (or its replay): it proves
+  // nothing about the lost answer - the lock holds.
+  Flow.InjectWsFrameForTest(WsNextFrame(TEXT("s08-1"), 10, TEXT("COMBAT"), HostId,
+                                        FightersProjection(2, 2, 10), PendingMeta));
+  TestTrue("same-seq body keeps the lock", Flow.IsMutationRecoveryActiveForTest());
+
+  // The seq moves past the guard while eff-1 is STILL open: the lost answer
+  // (expectedSequenceNumber 10) can no longer apply - settled, the choice is
+  // answerable again and nothing can be applied twice.
   Flow.InjectWsFrameForTest(WsNextFrame(TEXT("s08-1"), 11, TEXT("COMBAT"), GuestId,
                                         FightersProjection(2, 2, 10), PendingMeta));
-  TestEqual("unrelated advance applied", Flow.GetAppliedSnapshot().SequenceNumber, 11);
-  TestTrue("lock holds while the choice is still open",
-           Flow.IsMutationRecoveryActiveForTest());
-  TestTrue("hold traced with the pending id",
-           Cap.SawTrace(TEXT("RECOVERY held: pending choice eff-1 is still open")));
-  TestFalse("commands stay locked", Flow.CanIssueCombatCommand(Reason));
-
-  // The choice settles server-side (eff-1 gone from the queue at seq 12):
-  // authoritative outcome determined - only now the lock releases.
-  const TCHAR* SettledMeta = TEXT("{\"pendingEffects\":[]}");
-  Flow.InjectWsFrameForTest(WsNextFrame(TEXT("s08-1"), 12, TEXT("COMBAT_RESOLVE"), HostId,
-                                        FightersProjection(2, 2, 10), SettledMeta));
-  TestFalse("lock released once the choice settled",
-            Flow.IsMutationRecoveryActiveForTest());
+  TestEqual("advance applied", Flow.GetAppliedSnapshot().SequenceNumber, 11);
+  TestFalse("lock released past the command guard", Flow.IsMutationRecoveryActiveForTest());
+  TestTrue("settle traced with the guard",
+           Cap.SawTrace(TEXT("RECOVERY settled: pending choice eff-1 still open at seq 11, past the command guard 10")));
   TestTrue("commands restored", Flow.CanIssueCombatCommand(Reason));
+  return true;
+}
+
+// ---- SEL-01 (live repro 2026-10-20, Restless Spirits): the answer to stage 1
+// committed but its reply was lost; the server opened stage 2. Stage 2 is a new
+// question with a new id, so the fresh read proves stage 1 settled ------------
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS10PendingStepFaultTest,
+    "Unmatched.S10.Recovery.lost stage-1 answer of a two-step choice releases on the next step",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS10PendingStepFaultTest::RunTest(const FString&) {
+  FS08FlowController Flow(FString(), TEXT("ws://test.invalid"), HostId);
+  FRecoveryCapture Cap;
+  Cap.Bind(Flow);
+  Flow.AttachStreamHarnessForTest(TEXT("g1"));
+  const TCHAR* Stage1 =
+      TEXT("{\"pendingEffects\":[{\"id\":\"rs-0-p0\",\"playerId\":\"p-host\",")
+      TEXT("\"type\":\"CHOOSE_SPACE\",\"stage\":1}]}");
+  const TCHAR* Stage2 =
+      TEXT("{\"pendingEffects\":[{\"id\":\"rs-0-p0#2\",\"playerId\":\"p-host\",")
+      TEXT("\"type\":\"CHOOSE_SPACE\",\"stage\":2,\"anchor\":{\"x\":1,\"y\":0}}]}");
+  Flow.ApplySnapshot(StartedSnapshot(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage1));
+  ProveOpLiveForTest(Flow, TEXT("ACTION_MANEUVER"), HostId);
+
+  // [stage-1 reply lost after commit] -> [recovery read: seq 11, stage 2 open]
+  Flow.QueueHttpResultForTest(false, {TransportLost()}, /*bDeferDelivery=*/true);
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+                              GameStateBody(11, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Stage2));
+  Flow.ResolvePendingEffect(TEXT("rs-0-p0"), FString(), true, 1, 0, false, 0, {});
+  Flow.DeliverQueuedHttpForTest(); // loss -> armed, refetch 1 dispatched
+  TestTrue("outcome unknown -> recovery armed", Flow.IsMutationRecoveryActiveForTest());
+  Flow.DeliverQueuedHttpForTest(); // fresh read: stage 2 under a new id
+  TestFalse("stage 1 settled: the lock is released", Flow.IsMutationRecoveryActiveForTest());
+  TestFalse("no 'still open' hold on the old id",
+            Cap.SawTrace(TEXT("RECOVERY held: pending choice rs-0-p0 is still open")));
+  FString Reason;
+  TestTrue("stage 2 is answerable", Flow.CanIssueCombatCommand(Reason));
+  return true;
+}
+
+// ---- SEL-01: the lost answer never reached the server (HttpStatus 0 before
+// the request landed). Two fresh reads at the guarded seq with the same open
+// choice prove it did not land - the lock is released instead of waiting for
+// a body that never comes outside combat ---------------------------------------
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS10PendingNotLandedTest,
+    "Unmatched.S10.Recovery.lost answer that never landed releases after two fresh reads",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS10PendingNotLandedTest::RunTest(const FString&) {
+  FS08FlowController Flow(FString(), TEXT("ws://test.invalid"), HostId);
+  FRecoveryCapture Cap;
+  Cap.Bind(Flow);
+  Flow.AttachStreamHarnessForTest(TEXT("g1"));
+  const TCHAR* Open =
+      TEXT("{\"pendingEffects\":[{\"id\":\"mv-1\",\"playerId\":\"p-host\",")
+      TEXT("\"type\":\"MOVE\",\"optional\":false}]}");
+  Flow.ApplySnapshot(StartedSnapshot(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+  ProveOpLiveForTest(Flow, TEXT("ACTION_MANEUVER"), HostId);
+
+  Flow.QueueHttpResultForTest(false, {TransportLost()}, /*bDeferDelivery=*/true);
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+                              GameStateBody(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+                              GameStateBody(10, TEXT("ACTION_MANEUVER"), HostId, 2, 2, 10, Open));
+  Flow.ResolvePendingEffect(TEXT("mv-1"), TEXT("f1"), true, 1, 0, false, 0, {});
+  Flow.DeliverQueuedHttpForTest(); // loss -> armed, refetch 1
+  Flow.DeliverQueuedHttpForTest(); // read 1: same seq, mv-1 still open
+  TestTrue("first read holds", Flow.IsMutationRecoveryActiveForTest());
+  TestTrue("hold traced", Cap.SawTrace(TEXT("RECOVERY held: pending choice mv-1 is still open at seq 10")));
+  TestTrue("the ladder re-reads (no silent wait)",
+           Cap.SawTrace(TEXT("RECOVERY re-read in 1s: the choice is still open")));
+  Flow.TickConnectivity(1.1f);
+  TestEqual("refetch 2 dispatched", Flow.GetMutationRecoveryAttemptsForTest(), 2);
+  Flow.DeliverQueuedHttpForTest(); // read 2: still open at the guarded seq
+  TestFalse("released: the answer did not land", Flow.IsMutationRecoveryActiveForTest());
+  TestTrue("release traced",
+           Cap.SawTrace(TEXT("RECOVERY settled: pending choice mv-1 still open at the guarded seq 10 after 2 reads")));
+  FString Reason;
+  TestTrue("the choice can be answered again", Flow.CanIssueCombatCommand(Reason));
   return true;
 }
 

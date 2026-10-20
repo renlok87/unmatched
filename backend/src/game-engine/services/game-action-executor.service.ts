@@ -75,6 +75,33 @@ import {
 } from '../../games/dto/gameplay.dto';
 
 /**
+ * SEL-01 / NET-2: следующий шаг многошагового выбора (CHOOSE_SPACE stage 2,
+ * остаток CHOOSE_ONE при chooseCount > 1) — НОВЫЙ вопрос с новым id
+ * `<корень>#<n>`, n ≥ 2. Повтор ответа на прежний шаг (потерянный ответ,
+ * Game Tester) не находит свой id и отбивается STATE_CHANGED, а не
+ * применяется к следующему шагу; восстановление клиента после потерянного
+ * ответа видит, что его выбор закрыт. Корень до `#` не меняется: по нему
+ * клиент узнаёт продолжение того же открытия (S09PendingPresenter).
+ */
+export function nextChoiceStepId(id: string): string {
+  const match = /^(.*)#(\d+)$/.exec(id);
+  return match ? `${match[1]}#${Number(match[2]) + 1}` : `${id}#2`;
+}
+
+/**
+ * SEL-01: необязательный expectedSequenceNumber ответа на выбор (образец
+ * BeginManeuverDto). Ответ, данный на другом seq, — ответ на устаревший
+ * вопрос: STATE_CHANGED, ничего не применяется. Поэтому клиент может снять
+ * лок восстановления, как только seq ушёл вперёд: его потерянная команда
+ * либо уже применилась, либо будет отклонена.
+ */
+function staleChoiceAnswer(expected: number | null | undefined, state: GameState): ActionResult | null {
+  // GraphQL отдаёт пропущенное nullable-поле как undefined, явный null — как null
+  if (expected == null || expected === state.sequenceNumber) return null;
+  return { success: false, error: 'State changed; reload before answering the choice', code: 'STATE_CHANGED' };
+}
+
+/**
  * Результат выполнения игрового действия
  */
 export interface ActionResult {
@@ -591,9 +618,12 @@ export class GameActionExecutorService {
       y?: number;
       optionIndex?: number;
       cardIds?: string[];
+      expectedSequenceNumber?: number;
     },
     context: ActionContext,
   ): Promise<ActionResult> {
+    const stale = staleChoiceAnswer(dto.expectedSequenceNumber, context.currentState);
+    if (stale) return stale;
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first', code: 'PENDING_CHOICE_OPEN' };
     }
@@ -849,10 +879,12 @@ export class GameActionExecutorService {
    * (продолжение боя / отложенная передача хода).
    */
   async executeDeclinePendingEffect(
-    dto: { gameId: string; effectId: string },
+    dto: { gameId: string; effectId: string; expectedSequenceNumber?: number },
     context: ActionContext,
   ): Promise<ActionResult> {
     const { currentState, userId } = context;
+    const stale = staleChoiceAnswer(dto.expectedSequenceNumber, currentState);
+    if (stale) return stale;
     if (currentState.metadata.pendingManeuver || currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
     }
@@ -863,10 +895,14 @@ export class GameActionExecutorService {
       (p) => p.id === dto.effectId,
     );
     if (!pending) {
-      return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
+      return {
+        success: false,
+        error: 'Отложенный эффект не найден (протух или уже резолвлен)',
+        code: 'STATE_CHANGED',
+      };
     }
     if (currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
-      return { success: false, error: 'Resolve the first pending choice first' };
+      return { success: false, error: 'Resolve the first pending choice first', code: 'STATE_CHANGED' };
     }
     if (pending.playerId !== userId) {
       return { success: false, error: 'Этот выбор принадлежит другому игроку' };
@@ -1051,8 +1087,9 @@ export class GameActionExecutorService {
   /**
    * Резолв CHOOSE_ONE: исполняет эффекты выбранной опции через
    * cardEffectExecutor (вне боя). При chooseCount > 1 («choose 2 different
-   * effects») pending остаётся с оставшимися опциями (выбранная удалена —
-   * «different»). Действие НЕ тратится, seq +1.
+   * effects») остаётся pending с оставшимися опциями (выбранная удалена —
+   * «different») под новым id шага (nextChoiceStepId). Действие НЕ
+   * тратится, seq +1.
    */
   private async resolveChooseOne(
     pending: PendingEffect,
@@ -1084,6 +1121,7 @@ export class GameActionExecutorService {
         ? [
             {
               ...pending,
+              id: nextChoiceStepId(pending.id),
               chooseCount: remainingCount,
               options: options
                 .filter((_, i) => i !== optionIndex)
@@ -1441,9 +1479,11 @@ export class GameActionExecutorService {
       if (!zoneAnchor || !this.adjacencyService.isInSameZone(currentState, zoneAnchor.position, target)) {
         return { success: false, error: `Клетка должна быть в зоне «${pending.zoneFighterName}»` };
       }
-      // Замена головы очереди на stage 2 (одна мутация = +1 seq)
+      // Замена головы очереди на stage 2 (одна мутация = +1 seq) — новый
+      // вопрос под новым id шага (SEL-01, nextChoiceStepId)
       const nextPending: PendingEffect = {
         ...pending,
+        id: nextChoiceStepId(pending.id),
         stage: 2,
         anchor: target,
         zoneFighterName: undefined,

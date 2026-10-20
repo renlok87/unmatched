@@ -11,6 +11,7 @@ import { Card, CardType, FighterType, GamePhase } from '../models';
 import { normalizeCardEffects } from '../models';
 import { parseCardEffectTexts, upgradeStaleParserEffects } from '../effects/effect-text-parser';
 import { s03Engine } from '../../test/fixtures/s03-engine.fixture';
+import { nextChoiceStepId } from './game-action-executor.service';
 import { GameStateService } from '../../games/game-state.service';
 
 const { executor } = s03Engine();
@@ -764,5 +765,113 @@ describe('GD-023: прочие Arthur-записи — production runtime (compa
     // печатное значение без эффектов: урон нанесён, очередь пуста
     expect(after.metadata.pendingEffects ?? []).toHaveLength(0);
     expect(after.fighters.find((f) => f.id === 'bhero')!.health).toBeLessThan(12);
+  });
+});
+
+// SEL-01 / NET-2 (docs/research/de-reverse-2026-10-20): каждый шаг
+// многошагового выбора — новый вопрос с новым id. Живой дефект 2026-10-20:
+// ответ на stage 1 Restless Spirits потерян, сервер выставил stage 2 под ТЕМ
+// ЖЕ id, UE-восстановление держало лок, пока id в очереди, — ввод вне боя
+// блокировался до перезапуска клиента.
+describe('SEL-01: шаг многошагового выбора — новый вопрос (новый id, expectedSequenceNumber)', () => {
+  const playRestless = async (state: GameState) => {
+    const played = await executor.executePlayScheme(
+      { gameId: 's06a', cardId: state.handZones.a.cards[0].id } as any, ctx(state));
+    expect(played.success).toBe(true);
+    return played.gameState!;
+  };
+
+  it('CHOOSE_SPACE stage 2 получает новый id; повтор ответа на stage 1 отбивается STATE_CHANGED', async () => {
+    const state = inHand(arthurState({ bminAt: { x: 5, y: 1 } }), arthurCard('Restless Spirits'));
+    const cur = await playRestless(state);
+    const stage1 = head(cur);
+    expect(stage1.id).not.toContain('#');
+    const s1 = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: stage1.id, x: 5, y: 1 }, ctx(cur));
+    expect(s1.success).toBe(true);
+    const stage2 = head(s1.gameState!);
+    expect(stage2.stage).toBe(2);
+    expect(stage2.id).toBe(`${stage1.id}#2`);
+    expect(s1.gameState!.metadata.pendingEffects!.some((p) => p.id === stage1.id)).toBe(false);
+
+    // Потерянный и повторённый ответ на stage 1 не применяется к stage 2
+    const replay = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: stage1.id, x: 4, y: 1 }, ctx(s1.gameState!));
+    expect(replay.success).toBe(false);
+    expect(replay.code).toBe('STATE_CHANGED');
+
+    const s2 = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: stage2.id, x: 4, y: 1 }, ctx(s1.gameState!));
+    expect(s2.success).toBe(true);
+    expect(s2.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
+  });
+
+  it('expectedSequenceNumber: ответ на другом seq — STATE_CHANGED без изменений; на своём — применяется', async () => {
+    const state = inHand(arthurState({ bminAt: { x: 5, y: 1 } }), arthurCard('Restless Spirits'));
+    const cur = await playRestless(state);
+    const stage1 = head(cur);
+    const stale = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: stage1.id, x: 5, y: 1, expectedSequenceNumber: cur.sequenceNumber - 1 },
+      ctx(cur));
+    expect(stale.success).toBe(false);
+    expect(stale.code).toBe('STATE_CHANGED');
+    expect(stale.gameState).toBeUndefined();
+    const fresh = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: stage1.id, x: 5, y: 1, expectedSequenceNumber: cur.sequenceNumber },
+      ctx(cur));
+    expect(fresh.success).toBe(true);
+    expect(fresh.gameState!.sequenceNumber).toBe(cur.sequenceNumber + 1);
+  });
+
+  it('decline: устаревший expectedSequenceNumber и чужой/исчезнувший id — STATE_CHANGED', async () => {
+    const optional: PendingEffect = {
+      id: 'opt-1', type: 'MOVE', playerId: 'a', optional: true, value: 1, text: 'You may move', fighterIds: ['arthur'],
+    } as PendingEffect;
+    const base = arthurState();
+    const state: GameState = { ...base, metadata: { ...base.metadata, pendingEffects: [optional] } };
+    const stale = await executor.executeDeclinePendingEffect(
+      { gameId: 's06a', effectId: 'opt-1', expectedSequenceNumber: state.sequenceNumber + 1 }, ctx(state));
+    expect(stale.success).toBe(false);
+    expect(stale.code).toBe('STATE_CHANGED');
+    const gone = await executor.executeDeclinePendingEffect({ gameId: 's06a', effectId: 'opt-0' }, ctx(state));
+    expect(gone.success).toBe(false);
+    expect(gone.code).toBe('STATE_CHANGED');
+    const ok = await executor.executeDeclinePendingEffect(
+      { gameId: 's06a', effectId: 'opt-1', expectedSequenceNumber: state.sequenceNumber }, ctx(state));
+    expect(ok.success).toBe(true);
+    expect(ok.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
+  });
+
+  it('CHOOSE_ONE chooseCount 2: остаток — новый вопрос <id>#2, затем <id>#3 не появляется', async () => {
+    const heal = (id: string) => ({ id, type: 'HEAL', value: 1, target: 'SELF' });
+    const choose: PendingEffect = {
+      id: 'glass-0-p0', type: 'CHOOSE_ONE', playerId: 'a', chooseCount: 2, text: 'Choose 2 different effects',
+      options: [{ index: 0, label: 'A' }, { index: 1, label: 'B' }, { index: 2, label: 'C' }],
+      optionEffects: [[heal('h0')], [heal('h1')], [heal('h2')]],
+    } as unknown as PendingEffect;
+    const base = arthurState({ arthurHp: 8 });
+    const state: GameState = { ...base, metadata: { ...base.metadata, pendingEffects: [choose] } };
+    const first = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: 'glass-0-p0', optionIndex: 1 }, ctx(state));
+    expect(first.success).toBe(true);
+    const rest = head(first.gameState!);
+    expect(rest.id).toBe('glass-0-p0#2');
+    expect(rest.chooseCount).toBe(1);
+    expect(rest.options!.map((o) => o.label)).toEqual(['A', 'C']);
+    // повтор первого ответа (индексы опций переиндексированы!) не применяется к остатку
+    const replay = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: 'glass-0-p0', optionIndex: 1 }, ctx(first.gameState!));
+    expect(replay.success).toBe(false);
+    expect(replay.code).toBe('STATE_CHANGED');
+    const second = await executor.executeResolvePendingEffect(
+      { gameId: 's06a', effectId: rest.id, optionIndex: 0 }, ctx(first.gameState!));
+    expect(second.success).toBe(true);
+    expect(second.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
+  });
+
+  it('nextChoiceStepId: <id> → <id>#2 → <id>#3', () => {
+    expect(nextChoiceStepId('x-p0')).toBe('x-p0#2');
+    expect(nextChoiceStepId('x-p0#2')).toBe('x-p0#3');
+    expect(nextChoiceStepId('x-p0-order')).toBe('x-p0-order#2');
   });
 });
