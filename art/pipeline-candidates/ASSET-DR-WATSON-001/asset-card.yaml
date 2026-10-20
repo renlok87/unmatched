@@ -19,6 +19,7 @@ PALETTE:
   accent: {name: watch chain gold, hex: "#C9A24A"}
 QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
+  - art/imagegen/hero-quality-v1/merlin/
 ASSET_DIR: art/pipeline-candidates/ASSET-DR-WATSON-001
 decided_by: delegated (ВР-реестр 2026-10-06)
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
@@ -28,3 +29,57 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-64"
+# --- поля этапа 0 для этапов 3–7, дописаны 2026-10-20 (мини-пачка §11: Bruce Lee, Sherlock Holmes, Dr. Watson) ---
+CHARACTER: "Watson"
+FIGHTER_NAME: "Dr. Watson"
+FIGHTER_NAME_RU: "Доктор Ватсон"
+HERO_SLUG: "sherlock-holmes"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: "weapon.R"
+WEAPON_SOCKET_BONE: null
+FIGURE_HEIGHT_M: 0.45
+FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_HEIGHT_RANGE_M: [0.40, 0.48]
+IDLE_SECONDS: 2.3333
+LUNGE_CONTACT_FRAME: 8
+HIT_TYPE: "ARROW"
+CLIP_PREFIX: "WAT"
+AUDIO_KEY: "WATSON"
+MOTION_SOURCE: "library: Medusa (дальний бой, контакт к.8): выстрел из револьвера правой рукой; саквояж в левой — rigid на hand.L"
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_DrWatson_H2LD"
+  base: "SM_DrWatson_H2LD_Base"
+  materials:
+    - "MI_DrWatson_H2LD"
+    - "MI_DrWatson_H2LD_Base"
+    - "MI_DrWatson_H2LD_P1"
+    - "MI_DrWatson_H2LD_P2"
+    - "MI_DrWatson_H2LD_Base_P1"
+    - "MI_DrWatson_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton"
+  clips: "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_DrWatson_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_DrWatson_H2LD_Edge"
+    - "T_UM_MatLUT_Watson"
+  prop_name: null
+STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+ACCEPTOR_PROFILE: "opus-xhigh"     # второй приёмщик — Z-Code GLM-5.3-Flash после калибровки (SKILL §0) или Opus second-acceptor
+decided_by_stage0:
+  CHARACTER: "delegated (П3-5): имя без титула Doctor/Dr. → Watson"
+  FIGHTER_NAME: "delegated (П3-5): помощник Sherlock Holmes в scraped-data (Dr. Watson, range); имя в БД сверяет 7b"
+  FIGHTER_NAME_RU: "delegated (ВР-реестр 2026-10-06)"
+  HERO_SLUG: "delegated: помощник нового героя той же пачки — слаг владельца sherlock-holmes; OWNER_HERO_SLUG null (владелец не в Specs() до 7b)"
+  WEAPON_BONE: "delegated: револьвер в правой руке на weapon.R; саквояж в левой — П3-2 (rigid 100 % на hand.L / arm_lower.L)"
+  FIGURE_HEIGHT_M: "delegated (§7.1): помощник 0,45 м (как Merlin), 0,82 героя"
+  FIGURE_HEIGHT_RANGE_M: "delegated (§7.1): помощник — Merlin 40–48"
+  IDLE_SECONDS: "delegated (§7.1): дальний бой — Medusa 56/24"
+  LUNGE_CONTACT_FRAME: "delegated (§7.1): дальний бой к.8"
+  HIT_TYPE: "delegated (§7.1): выстрел из револьвера — ARROW (снаряд дальнего боя)"
+  CLIP_PREFIX: "delegated (§7.2): 3 заглавные от CHARACTER"
+  AUDIO_KEY: "delegated (§7.2)"
+  UE_NAMES: "delegated (§7.2)"
+  QUALITY_REFERENCE: "delegated (§7.2): помощник → merlin"
+  MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"

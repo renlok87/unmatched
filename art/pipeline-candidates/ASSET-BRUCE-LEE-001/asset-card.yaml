@@ -19,6 +19,7 @@ PALETTE:
   accent: {name: shoe black, hex: "#1E1C1C"}
 QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
+  - art/imagegen/hero-quality-v1/king-arthur/
 ASSET_DIR: art/pipeline-candidates/ASSET-BRUCE-LEE-001
 decided_by: delegated (ВР-реестр 2026-10-06)
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
@@ -28,3 +29,56 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-51"
+# --- поля этапа 0 для этапов 3–7, дописаны 2026-10-20 (мини-пачка §11: Bruce Lee, Sherlock Holmes, Dr. Watson) ---
+CHARACTER: "BruceLee"
+FIGHTER_NAME: "Bruce Lee"
+FIGHTER_NAME_RU: "Брюс Ли"
+HERO_SLUG: "bruce-lee"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: null
+WEAPON_SOCKET_BONE: "hand.R"
+FIGURE_HEIGHT_M: 0.55
+FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
+IDLE_SECONDS: 2.5
+LUNGE_CONTACT_FRAME: 7
+HIT_TYPE: "CLAW"
+CLIP_PREFIX: "BRUC"
+AUDIO_KEY: "BRUCELEE"
+MOTION_SOURCE: "library: Achilles (ближний бой, контакт к.7); удар без оружия правой стороной — образец уточняет этап 6 (tripo-preset при отсутствии образца)"
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_BruceLee_H2LD"
+  base: "SM_BruceLee_H2LD_Base"
+  materials:
+    - "MI_BruceLee_H2LD"
+    - "MI_BruceLee_H2LD_Base"
+    - "MI_BruceLee_H2LD_P1"
+    - "MI_BruceLee_H2LD_P2"
+    - "MI_BruceLee_H2LD_Base_P1"
+    - "MI_BruceLee_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton"
+  clips: "/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_BruceLee_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_BruceLee_H2LD_Edge"
+    - "T_UM_MatLUT_BruceLee"
+  prop_name: null
+STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+ACCEPTOR_PROFILE: "opus-xhigh"     # второй приёмщик — Z-Code GLM-5.3-Flash после калибровки (SKILL §0) или Opus second-acceptor
+decided_by_stage0:
+  CHARACTER: "delegated (П3-5): PascalCase имени без титула; Lee — часть имени, как RobinHood"
+  FIGHTER_NAME: "delegated (П3-5): scraped-data/api/heroes/bruce-lee.json (melee)"
+  FIGHTER_NAME_RU: "delegated (ВР-реестр 2026-10-06)"
+  WEAPON_SOCKET_BONE: "delegated (ВР-реестр 2026-10-06): удар кулаком правой кисти, как AncientLeshen (оружия нет)"
+  FIGURE_HEIGHT_M: "delegated (§7.1 Рост): бюджет героя 0,55 м по верху головы, как Arthur/Achilles; уточняет этап 3"
+  FIGURE_HEIGHT_RANGE_M: "delegated (§7.1): герой ближнего боя — Arthur 52–56"
+  IDLE_SECONDS: "delegated (§7.1): ближний бой — как Arthur/Achilles 2,5 с"
+  LUNGE_CONTACT_FRAME: "delegated (§7.1): ближний бой — к.7"
+  HIT_TYPE: "delegated (§7.1): удар без оружия в ближнем бою — CLAW (банки удара Harpy)"
+  CLIP_PREFIX: "delegated (§7.2): 4 заглавные от CHARACTER, не заняты"
+  AUDIO_KEY: "delegated (§7.2): CHARACTER заглавными"
+  UE_NAMES: "delegated (§7.2): из KEY и поколения H2"
+  QUALITY_REFERENCE: "delegated (§7.2): ближний бой → king-arthur"
+  MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"

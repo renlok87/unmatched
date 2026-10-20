@@ -19,6 +19,7 @@ PALETTE:
   accent: {name: brass lens, hex: "#C9A24A"}
 QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
+  - art/imagegen/hero-quality-v1/king-arthur/
 ASSET_DIR: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001
 decided_by: delegated (ВР-реестр 2026-10-06)
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
@@ -28,3 +29,56 @@ CREDITS:
   tripo_limit: "нет лимита (решение пользователя 2026-10-13; граница — баланс Studio)"
   planned: "черновик ≈ 30 + H2 95"
 VISUAL_CARD_ID: "AN-98"
+# --- поля этапа 0 для этапов 3–7, дописаны 2026-10-20 (мини-пачка §11: Bruce Lee, Sherlock Holmes, Dr. Watson) ---
+CHARACTER: "SherlockHolmes"
+FIGHTER_NAME: "Sherlock Holmes"
+FIGHTER_NAME_RU: "Шерлок Холмс"
+HERO_SLUG: "sherlock-holmes"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: "weapon.R"
+WEAPON_SOCKET_BONE: null
+FIGURE_HEIGHT_M: 0.55
+FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
+IDLE_SECONDS: 2.5
+LUNGE_CONTACT_FRAME: 7
+HIT_TYPE: "CLAW"
+CLIP_PREFIX: "SHER"
+AUDIO_KEY: "SHERLOCKHOLMES"
+MOTION_SOURCE: "library: KingArthur (ближний бой правой рукой, контакт к.7); удар кулаком с лупой в правой руке — уточняет этап 6"
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_SherlockHolmes_H2LD"
+  base: "SM_SherlockHolmes_H2LD_Base"
+  materials:
+    - "MI_SherlockHolmes_H2LD"
+    - "MI_SherlockHolmes_H2LD_Base"
+    - "MI_SherlockHolmes_H2LD_P1"
+    - "MI_SherlockHolmes_H2LD_P2"
+    - "MI_SherlockHolmes_H2LD_Base_P1"
+    - "MI_SherlockHolmes_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_SherlockHolmes_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/SherlockHolmes/Rig/SK_SherlockHolmes_Skeleton"
+  clips: "/Game/PipelineCandidates/SherlockHolmes/H2Anim/AM_SherlockHolmes_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_SherlockHolmes_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_SherlockHolmes_H2LD_Edge"
+    - "T_UM_MatLUT_SherlockHolmes"
+  prop_name: null
+STAGE6_SLOTS: {death: "DTH-TEMPLATE", ability_fx: "none", ability_sfx: "none", vo: "none"}
+ACCEPTOR_PROFILE: "opus-xhigh"     # второй приёмщик — Z-Code GLM-5.3-Flash после калибровки (SKILL §0) или Opus second-acceptor
+decided_by_stage0:
+  CHARACTER: "delegated (П3-5): PascalCase имени без титула, как RobinHood"
+  FIGHTER_NAME: "delegated (П3-5): scraped-data/api/heroes/sherlock-holmes.json (melee; помощник Dr. Watson, range)"
+  FIGHTER_NAME_RU: "delegated (ВР-реестр 2026-10-06)"
+  WEAPON_BONE: "delegated (ВР-реестр 2026-10-06): лупа в правой руке — отдельная часть на weapon.R (как посох Merlin); если Tripo не отделит лупу — П3-2 (rigid на hand.R), решение этапа 3"
+  FIGURE_HEIGHT_M: "delegated (§7.1): бюджет героя 0,55 м по верху кепи (прилегающий убор); уточняет этап 3"
+  FIGURE_HEIGHT_RANGE_M: "delegated (§7.1): ближний бой — Arthur 52–56"
+  IDLE_SECONDS: "delegated (§7.1): ближний бой 2,5 с"
+  LUNGE_CONTACT_FRAME: "delegated (§7.1): ближний бой к.7"
+  HIT_TYPE: "delegated (§7.1): кулачный удар (Counterpunch), без клинка — CLAW"
+  CLIP_PREFIX: "delegated (§7.2)"
+  AUDIO_KEY: "delegated (§7.2)"
+  UE_NAMES: "delegated (§7.2)"
+  QUALITY_REFERENCE: "delegated (§7.2): ближний бой → king-arthur"
+  MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"
