@@ -214,8 +214,14 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
   still stopped with «Select a model before sending a message»: the standalone CLI has no Z.AI account until the user
   runs `zcode login zai` once. That is a browser sign-in and the user's step; an agent never signs in. Until a probe
   passes, use the GUI path.
-- **Second acceptor and blind reviews "of another profile":** Z-Code GLM-5.3-Flash. While no scripted Z-Code lane
-  exists, use the Opus `second-acceptor` workflow in a fresh context. Write the profile actually used into the card.
+- **Second acceptor and blind reviews "of another profile":** the Opus `second-acceptor` workflow in a fresh context.
+  Write the profile actually used into the card. Z-Code GLM-5.3-Flash failed its calibration as a visual acceptor on
+  2026-10-21 (`docs/art-pipeline/evidence/skill-batch-2026-10-20/zcode-calibration/RESULT.md`):
+  - it scored the Leshen sheet 10.0, while Opus and Sol both gave 8.1;
+  - it picked the opposite winner in the blind showcase pair;
+  - it did not keep the strict card JSON.
+  So Z-Code gives no acceptance scores. Use it for text work (prompt review, second opinion) and for describing frames
+  without a score. A new calibration that passes is required before it scores again.
 - **Gemini:** the user's Gemini app through Computer Use, or gemini.google.com in their Chrome through Claude in
   Chrome. Prompts come from files in the repo. Outputs are saved into the folder that the skill or task names. On a
   sign-in screen, stop and ask the user. Look for a visible watermark before an image is used.
@@ -395,7 +401,8 @@ The user's words: «добавь в проект основное правило
   - **Faced so the face is visible.** The hero's own niche yaw keeps the face clear: the weapon must never cross the
     face (example: King Arthur 85° / 95°).
   - **Accepted blind.** A blind before/after review (unlabeled X/Y with swapped sides) is done before it becomes the
-    default. Reviewers: Opus plus Z-Code GLM-5.3-Flash; GPT Astra until 2026-10-20 ("AI tools and side models").
+    default. Reviewers: two independent Opus agents in fresh contexts. GPT Astra served until 2026-10-20. Z-Code failed
+    calibration on 2026-10-21 ("AI tools and side models").
   - **Registered and cooked.** The path is registered in `UmShowcase::HiPolyPath` and its folder is in
     `DirectoriesToAlwaysCook`.
 - A hero without a finished showcase high-poly falls back to its H2LD figure in the niche. Treat that as an open item,
