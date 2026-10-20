@@ -8,10 +8,13 @@ import {
   ActionContext,
 } from '../../game-engine/services/game-action-executor.service';
 import { AiDecisionService, AiAction } from '../../game-engine/services/ai-decision.service';
-import { GamePhase, DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
+import { GamePhase } from '../../game-engine/models';
+import type { GameState, PendingEffect } from '../../game-engine/models';
+import { isCellPassable, isLivingFighter } from '../../game-engine/movement/traversal';
 import { CombatTimeoutService } from './combat-timeout.service';
 import { GameActionService } from './game-action.service';
 import { GameActionType } from '../models/game-action.model';
+import { commitDecision } from './commit-decision';
 
 /**
  * Оркестрация ходов ИИ-оппонента (VS_AI). Вызывается fire-and-forget из
@@ -152,10 +155,82 @@ export async function dispatchAiAction(
   }
 }
 
+type AiStep = {
+  action: AiAction;
+  result: { success: boolean; gameState?: GameState; error?: string };
+  eventType: string;
+};
+
+/** DTO системного фолбэка (buildSystemPendingFallback) → ход бота того же типа выбора. */
+function pendingAnswer(
+  head: PendingEffect,
+  dto: { fighterId?: string; x?: number; y?: number; optionIndex?: number; cardIds?: string[] },
+): AiAction | null {
+  const effectId = head.id;
+  switch (head.type) {
+    case 'CHOOSE_ONE':
+      return dto.optionIndex === undefined ? null : { kind: 'resolveChoose', effectId, optionIndex: dto.optionIndex };
+    case 'MOVE':
+    case 'PLACE':
+      return dto.fighterId && dto.x !== undefined && dto.y !== undefined
+        ? { kind: 'resolveMove', effectId, fighterId: dto.fighterId, x: dto.x, y: dto.y }
+        : null;
+    case 'TARGET_FIGHTER':
+      return dto.fighterId ? { kind: 'resolveTarget', effectId, fighterId: dto.fighterId } : null;
+    case 'DISCARD_CARDS':
+      return dto.cardIds ? { kind: 'resolveDiscard', effectId, cardIds: dto.cardIds } : null;
+    case 'BOOST_CHOICE':
+      return dto.cardIds ? { kind: 'resolveBoost', effectId, cardIds: dto.cardIds } : null;
+    case 'CHOOSE_SPACE':
+      return dto.x !== undefined && dto.y !== undefined ? { kind: 'resolveSpace', effectId, x: dto.x, y: dto.y } : null;
+    case 'DECK_TOP_PICK':
+      return dto.cardIds ? { kind: 'resolveDeckPick', effectId, cardIds: dto.cardIds } : null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Перебор там, где системного фолбэка нет или он слишком узок: опции
+ * CHOOSE_ONE, любая проходимая клетка CHOOSE_SPACE (по правилу «any space»
+ * занятая тоже легальна), живые цели TARGET_FIGHTER, карта руки для
+ * BOOST_CHOICE (бот выбирает за себя — серверу за человека это запрещено).
+ */
+function simplePendingAnswers(
+  head: PendingEffect,
+  state: GameState,
+  hand: readonly { id: string }[],
+): AiAction[] {
+  const effectId = head.id;
+  switch (head.type) {
+    case 'CHOOSE_ONE':
+      return (head.options ?? []).map((o): AiAction => ({ kind: 'resolveChoose', effectId, optionIndex: o.index }));
+    case 'CHOOSE_SPACE': {
+      const out: AiAction[] = [];
+      for (let y = 0; y < state.boardState.height; y++) {
+        for (let x = 0; x < state.boardState.width; x++) {
+          if (isCellPassable(state.boardState.cells[y]?.[x])) out.push({ kind: 'resolveSpace', effectId, x, y });
+        }
+      }
+      return out;
+    }
+    case 'TARGET_FIGHTER':
+      return state.fighters
+        .filter((f) => isLivingFighter(f) && (!head.targetFighterIds || head.targetFighterIds.includes(f.id)))
+        .map((f): AiAction => ({ kind: 'resolveTarget', effectId, fighterId: f.id }));
+    case 'BOOST_CHOICE':
+      return hand.map((c): AiAction => ({ kind: 'resolveBoost', effectId, cardIds: [c.id] }));
+    default:
+      return [];
+  }
+}
+
 @Injectable()
 export class AiTurnService {
   private readonly logger = new Logger(AiTurnService.name);
   private static readonly MAX_STEPS = 40;
+  /** Потолок перебора запасных ответов за шаг (клетки доски, карты руки). */
+  private static readonly MAX_FALLBACK_CANDIDATES = 64;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -200,89 +275,164 @@ export class AiTurnService {
         const state = await this.stateService.loadState(gameId);
         if (state.phase === GamePhase.GAME_OVER) return false;
 
-        const action = this.decision.decide(state, aiUserId);
-        if (!action) return false;
-
         const ctx: ActionContext = { userId: aiUserId, gameId, currentState: state };
-        const { result, eventType } = await this.dispatch(action, ctx);
+        const decided = this.decision.decide(state, aiUserId);
+        const step =
+          (decided ? await this.attempt(decided, ctx, state, false) : null) ??
+          (await this.fallback(ctx, state, aiUserId, decided));
+        if (!step) return false;
 
-        if (!result.success || !result.gameState) {
-          this.logger.warn(`AI шаг «${action.kind}» не выполнен: ${result.error}`);
-          return false;
-        }
-        // Страховка от зацикливания: каждый шаг должен двигать seq
-        if (result.gameState.sequenceNumber <= state.sequenceNumber) {
-          this.logger.warn(`AI шаг «${action.kind}» без прогресса seq — стоп`);
-          return false;
-        }
+        // SEL-07: общий коммит с ручным путём. Отказ saveState пробрасывается
+        // (потеря персистентности глотать НЕЛЬЗЯ); дедлайн боя, журнал и
+        // named-CUE после коммита — best-effort: транзитный отказ Redis/PubSub
+        // не прерывает дрейн (иначе VS_AI-матч виснет), закоммиченный seq —
+        // источник истины, подписчики догонят eventsSince.
+        const committed = step.result.gameState!;
+        await commitDecision(
+          {
+            stateService: this.stateService,
+            subscription: this.subscription,
+            combatTimeout: this.combatTimeout,
+            logger: this.logger,
+          },
+          {
+            gameId,
+            state: committed,
+            eventType: step.eventType,
+            journal: (journalType) => this.recordJournal(gameId, aiUserId, journalType, step.action, committed),
+          },
+        );
 
-        await this.stateService.saveState(gameId, result.gameState);
-        await this.scheduleCombatDeadline(gameId, eventType, result.gameState);
-        await this.recordJournal(gameId, aiUserId, eventType, action, result.gameState);
-        // Named-CUE публикация — best-effort ПОСЛЕ коммита: транзитный отказ
-        // Redis/PubSub не должен прерывать дрейн (иначе VS_AI-матч виснет),
-        // закоммиченный seq — источник истины; подписчики догонят eventsSince.
-        // Отказ saveState наверху глотать НЕЛЬЗЯ — потеря персистентности.
-        // Терминальный GAME_ENDED — ОТДЕЛЬНАЯ попытка: отказ публикации
-        // самого действия не должен глотать терминальное событие.
-        try {
-          await this.subscription.publishGameUpdate(gameId, eventType, result.gameState);
-        } catch (publishError) {
-          this.logger.warn(
-            `AI publish «${eventType}» для ${gameId} не доставлен (состояние закоммичено, seq=${result.gameState.sequenceNumber}): ${publishError}`,
-          );
-        }
-        if (result.gameState.phase === GamePhase.GAME_OVER) {
-          try {
-            await this.subscription.publishGameUpdate(gameId, 'GAME_ENDED', result.gameState);
-          } catch (publishError) {
-            this.logger.warn(
-              `AI publish «GAME_ENDED» для ${gameId} не доставлен (состояние закоммичено, seq=${result.gameState.sequenceNumber}): ${publishError}`,
-            );
-          }
-        }
-
-        return result.gameState.phase !== GamePhase.GAME_OVER;
+        return committed.phase !== GamePhase.GAME_OVER;
       },
       { ttl: 10000, retryCount: 2, retryDelay: 150 },
     );
   }
 
   /**
-   * GD-039 Sol6: боевые дедлайны для бота-инициатора — тот же контракт, что у
-   * человека в game-actions.resolver. Атака бота → 30с окно защиты человека
-   * (человек может отключиться: сервер финализирует бой CombatTimeoutService);
-   * защита бота → окно ручного резолва; резолв → отмена расписаний.
-   * Best-effort: дедлайн персистен в combatInfo.timeoutAt, transient-отказ
-   * очереди чинится periodic recovery sweep — дрейн не прерываем.
+   * Исполнить ход бота production-executor'ом. null — executor отверг ход
+   * (или бросил), либо ход не сдвинул seq (страховка от зацикливания).
+   * quiet — перебор запасных кандидатов: отказ каждого не логируется.
    */
-  private async scheduleCombatDeadline(gameId: string, eventType: string, state: any): Promise<void> {
-    if (!this.combatTimeout) return;
+  private async attempt(
+    action: AiAction,
+    ctx: ActionContext,
+    state: GameState,
+    quiet: boolean,
+  ): Promise<AiStep | null> {
+    let dispatched: { result: AiStep['result']; eventType: string };
     try {
-      if (eventType === 'ATTACK_INITIATED') {
-        const ci = state.metadata.combatInfo;
-        const delayMs = ci?.timeoutAt
-          ? Math.max(0, new Date(ci.timeoutAt).getTime() - Date.now())
-          : DEFENSE_TIMEOUT_SECONDS * 1000;
-        await this.combatTimeout.scheduleAutoResolve(
-          gameId,
-          Math.max(1, Math.ceil(delayMs / 1000)),
-          state.sequenceNumber,
-          'DEFENSE',
-        );
-      } else if (eventType === 'DEFENSE_PLAYED') {
-        await this.combatTimeout.scheduleAutoResolve(
-          gameId,
-          RESOLVE_TIMEOUT_SECONDS,
-          state.sequenceNumber,
-          'RESOLVE',
-        );
-      } else if (eventType === 'COMBAT_RESOLVED') {
-        await this.combatTimeout.cancelAutoResolve(gameId);
-      }
+      dispatched = await this.dispatch(action, ctx);
     } catch (e) {
-      this.logger.warn(`AI combat deadline для ${gameId} (${eventType}) не запланирован: ${e}`);
+      if (!quiet) this.logger.warn(`AI шаг «${action.kind}» упал: ${(e as Error).message}`);
+      return null;
     }
+    const { result, eventType } = dispatched;
+    if (!result.success || !result.gameState) {
+      if (!quiet) this.logger.warn(`AI шаг «${action.kind}» не выполнен: ${result.error}`);
+      return null;
+    }
+    // Страховка от зацикливания: каждый шаг должен двигать seq
+    if (result.gameState.sequenceNumber <= state.sequenceNumber) {
+      if (!quiet) this.logger.warn(`AI шаг «${action.kind}» без прогресса seq — стоп`);
+      return null;
+    }
+    return { action, result, eventType };
+  }
+
+  /**
+   * AI-03 / SEL-04: запасной легальный ответ (аналог DefaultRandomChoice
+   * оригинала). Вне боя у VS_AI нет дедлайна: если decide вернул null на
+   * собственном обязательстве бота или executor отверг его ход, бот молча
+   * вставал, а у человека в чужой фазе легальных мутаций нет. Кандидатов
+   * проверяет production-executor, первый принятый — ход бота. Нет
+   * кандидатов — боту действительно нечего делать (ход за человеком).
+   */
+  private async fallback(
+    ctx: ActionContext,
+    state: GameState,
+    aiUserId: string,
+    failed: AiAction | null,
+  ): Promise<AiStep | null> {
+    const failedKey = failed ? JSON.stringify(failed) : '';
+    const candidates = (await this.fallbackCandidates(state, aiUserId))
+      .filter((c) => JSON.stringify(c) !== failedKey)
+      .slice(0, AiTurnService.MAX_FALLBACK_CANDIDATES);
+    const reason = failed ? `rejected:${failed.kind}` : 'no-decision';
+    const head = state.metadata.pendingEffects?.[0];
+    const where = head && head.playerId === aiUserId ? ` head=${head.type}/${head.id}` : '';
+    if (candidates.length === 0) {
+      if (failed) {
+        this.logger.error(
+          `AI_FALLBACK game=${ctx.gameId} seq=${state.sequenceNumber} reason=${reason}${where}: запасного ответа нет — бот стоит`,
+        );
+      }
+      return null;
+    }
+    for (let i = 0; i < candidates.length; i++) {
+      const step = await this.attempt(candidates[i], ctx, state, true);
+      if (step) {
+        this.logger.warn(
+          `AI_FALLBACK game=${ctx.gameId} seq=${state.sequenceNumber} reason=${reason}${where} -> ${step.action.kind} (кандидат ${i + 1}/${candidates.length})`,
+        );
+        return step;
+      }
+    }
+    this.logger.error(
+      `AI_FALLBACK game=${ctx.gameId} seq=${state.sequenceNumber} reason=${reason}${where}: executor отверг все ${candidates.length} запасных ответа — бот стоит`,
+    );
+    return null;
+  }
+
+  /**
+   * Кандидаты по обязательству бота, от безопасного к перебору: системный
+   * фолбэк таймаута (buildSystemPendingFallback), перебор опций / клеток /
+   * целей / карт руки, decline для optional. Чужое обязательство или чужой
+   * ход — пустой список.
+   */
+  private async fallbackCandidates(state: GameState, aiUserId: string): Promise<AiAction[]> {
+    const out: AiAction[] = [];
+    const hand = state.handZones[aiUserId]?.cards ?? [];
+    const discard = state.metadata.pendingHandDiscard;
+    if (discard) {
+      if (discard.playerId === aiUserId) {
+        out.push({ kind: 'discardToLimit', pendingId: discard.id, cardIds: hand.slice(0, discard.count).map((c) => c.id) });
+        out.push({ kind: 'discardToLimit', pendingId: discard.id, cardIds: hand.slice(-discard.count).map((c) => c.id) });
+      }
+      return out;
+    }
+    const maneuver = state.metadata.pendingManeuver;
+    if (maneuver) {
+      if (maneuver.playerId === aiUserId) out.push({ kind: 'maneuver', maneuverId: maneuver.id, moves: [] });
+      return out;
+    }
+    const head = state.metadata.pendingEffects?.[0];
+    if (head) {
+      if (head.playerId !== aiUserId) return out;
+      const system = await this.executor.buildSystemPendingFallback(head, state);
+      const systemAnswer = system ? pendingAnswer(head, system) : null;
+      if (systemAnswer) out.push(systemAnswer);
+      out.push(...simplePendingAnswers(head, state, hand));
+      if (head.optional) out.push({ kind: 'declinePending', effectId: head.id });
+      return out;
+    }
+    if (state.phase === GamePhase.COMBAT_RESOLVE) {
+      out.push({ kind: 'resolveCombat' });
+      return out;
+    }
+    if (state.phase === GamePhase.COMBAT) {
+      // бот-защитник: бой без карты защиты
+      if (state.metadata.combatInfo?.defenderId === aiUserId) out.push({ kind: 'resolveCombat' });
+      return out;
+    }
+    if (
+      state.currentTurnPlayerId === aiUserId &&
+      (state.phase === GamePhase.ACTION_MANEUVER || state.phase === GamePhase.ACTION_ATTACK)
+    ) {
+      out.push({ kind: 'beginManeuver', expectedSequenceNumber: state.sequenceNumber });
+      out.push({ kind: 'endTurn' });
+    }
+    return out;
   }
 
   /**
@@ -291,16 +441,16 @@ export class AiTurnService {
    * (game-actions.resolver.recordGameAction): metadata.input с instance-id
    * карт приватен боту — getEventsSince отдаёт input только владельцу
    * действия (playerId), человек получает только action. Лучший-усилие:
-   * отказ журнала не роняет дрейн. GAME_ENDED — отдельной записью с
-   * победителем, тем же seq (зеркало ручного пути), ОТДЕЛЬНОЙ best-effort
-   * попыткой: отказ записи самого действия не должен глотать терминал.
+   * отказ журнала не роняет дрейн. GAME_ENDED (commitDecision зовёт журнал
+   * второй раз) — отдельная запись с победителем, тем же seq (зеркало
+   * ручного пути): отказ записи самого действия не глотает терминал.
    */
   private async recordJournal(
     gameId: string,
     aiUserId: string,
     eventType: string,
     action: AiAction,
-    state: any,
+    state: GameState,
   ): Promise<void> {
     if (!this.gameActionService) return;
     const type = GameActionType[eventType as keyof typeof GameActionType];
@@ -311,23 +461,13 @@ export class AiTurnService {
         sequenceNumber: state.sequenceNumber,
         type,
         playerId: aiUserId,
-        metadata: { action: `ai:${action.kind}`, input: JSON.parse(JSON.stringify(action)) },
+        metadata:
+          type === GameActionType.GAME_ENDED
+            ? { action: `ai:${action.kind}`, winnerId: state.metadata?.winnerId }
+            : { action: `ai:${action.kind}`, input: JSON.parse(JSON.stringify(action)) },
       });
     } catch (e) {
       this.logger.warn(`AI journal для ${gameId} (${eventType}) не записан: ${e}`);
-    }
-    if (state.phase === GamePhase.GAME_OVER) {
-      try {
-        await this.gameActionService.recordAction({
-          gameId,
-          sequenceNumber: state.sequenceNumber,
-          type: GameActionType.GAME_ENDED,
-          playerId: aiUserId,
-          metadata: { action: `ai:${action.kind}`, winnerId: state.metadata?.winnerId },
-        });
-      } catch (e) {
-        this.logger.warn(`AI journal GAME_ENDED для ${gameId} не записан: ${e}`);
-      }
     }
   }
 

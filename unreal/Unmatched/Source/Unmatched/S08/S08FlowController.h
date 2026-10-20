@@ -437,6 +437,8 @@ public:
   const FString& GetMutationRecoveryPendingChoiceIdForTest() const {
     return MutationRecoveryPendingChoiceId;
   }
+  /** SEL-01: the expectedSequenceNumber guard of the lost command (-1 = none). */
+  int32 GetMutationRecoveryGuardSeqForTest() const { return MutationRecoveryGuardSeq; }
   int32 GetTestHttpSendCountForTest() const { return TestHttpSendCount; }
   /** Variables of the last SendHttp (harness + network) - the wire shape of a
    *  command (MS-R-44: no empty path in maneuver.moves). */
@@ -611,7 +613,7 @@ private:
    *  reveal-free). Returns true only when the mutation was dispatched. */
   bool RunCombatMutation(const FString& Tag, const TCHAR* Field, const FString& Mutation,
                          const TSharedRef<FJsonObject>& Variables,
-                         const FString& PendingChoiceId = FString());
+                         const FString& PendingChoiceId = FString(), int32 GuardSeq = -1);
   void SetStage(ES08Stage NewStage);
   /** Room-entry gate (recovery/create/join): while Stage == Started the
    *  membership and the state stream belong to the live match - replacing the
@@ -674,9 +676,13 @@ private:
    *  holds until THAT choice is provably settled (gone from the pending
    *  queue), not merely until any seq advance. bPendingIsDiscard marks a
    *  discardToLimit choice (settled through pendingHandDiscard / a complete
-   *  full state) vs a pendingEffects resolve. */
+   *  full state) vs a pendingEffects resolve. GuardSeq (>= 0) is the
+   *  expectedSequenceNumber the lost command carried (SEL-01): the server
+   *  applies it only at that seq, so a still-open choice past it is settled
+   *  (applied or rejected STATE_CHANGED) and twice the same open choice at it
+   *  means the command never landed - both release the lock. */
   void EnterMutationRecovery(const FString& Reason, const FString& PendingChoiceId,
-                             bool bPendingIsDiscard = false);
+                             bool bPendingIsDiscard = false, int32 GuardSeq = -1);
   /** One bounded refetch attempt while recovery is armed; arms the backoff
    *  timer on failure inside FetchGameState's failure path. */
   void AttemptMutationRecoveryRefetch();
@@ -688,7 +694,7 @@ private:
    *  200 body after the request reached the server is an outcome-UNKNOWN
    *  answer (the server may have committed) - recovery, never a resend. */
   void HandleMutationParseFailure(const FString& Tag, const FString& PendingChoiceId,
-                                  bool bPendingIsDiscard = false);
+                                  bool bPendingIsDiscard = false, int32 GuardSeq = -1);
   // ---- GD-038: authorization recovery (ACC-021) ----
   static bool IsAuthError(const TArray<FS08GraphQLError>& Errors);
   static bool IsRateLimited(const TArray<FS08GraphQLError>& Errors);
@@ -843,6 +849,10 @@ private:
   // omit the field once resolved); a pendingEffects resolve is settled by a
   // strictly valid pendingEffects array lacking the id.
   bool bMutationRecoveryPendingChoiceIsDiscard = false;
+  // SEL-01 (docs/research/de-reverse-2026-10-20): the expectedSequenceNumber
+  // the lost pending resolve/decline carried; -1 = the command had no guard
+  // (then a still-open choice keeps the lock, and the ladder re-reads it).
+  int32 MutationRecoveryGuardSeq = -1;
   // S10 review P1(3): a body from the HTTP gameState barrier (reconnect or
   // recovery refetch) is a reconciliation read, never a live transition -
   // its diff fires NO cues regardless of gap size (a contiguous local+1

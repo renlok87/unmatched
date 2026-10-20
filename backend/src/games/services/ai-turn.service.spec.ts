@@ -1,5 +1,5 @@
 import { AiTurnService } from './ai-turn.service';
-import { AiDecisionService } from '../../game-engine/services/ai-decision.service';
+import { AiDecisionService, AiAction } from '../../game-engine/services/ai-decision.service';
 import { GameActionExecutorService } from '../../game-engine/services/game-action-executor.service';
 import { CardEffectExecutorService } from '../../game-engine/effects/card-effect-executor.service';
 import { DeckManagementService } from '../../game-engine/services/deck-management.service';
@@ -44,6 +44,8 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
   publish?: (gameId: string, event: string, state: GameState) => Promise<void>;
   save?: (gameId: string, state: GameState) => Promise<void>;
   record?: (dto: { gameId: string; sequenceNumber: number; type: string; playerId: string; metadata: any }) => Promise<string>;
+  /** AI-03: подменить эвристику (расхождение с валидатором, null на своём выборе). */
+  decide?: (state: GameState, aiUserId: string) => AiAction | null;
 } = {}, opts: { withAbilityConfigs?: boolean } = {}) {
   let saved = initial;
   const snapshots: GameState[] = [];
@@ -91,11 +93,11 @@ function harness(initial: GameState, aiUserId = 'ai', overrides: {
       publishCalls.push({ event, seq: state.sequenceNumber });
       events.push(event);
     } } as any,
-    executor, new AiDecisionService(adjacency),
+    executor, overrides.decide ? ({ decide: overrides.decide } as any) : new AiDecisionService(adjacency),
     combatTimeout as any,
     gameActionService as any,
   );
-  return { run: () => service.maybeRunAiTurns(initial.gameId), state: () => saved, snapshots, events, publishCalls, combatTimeoutCalls, journal, executor };
+  return { run: () => service.maybeRunAiTurns(initial.gameId), state: () => saved, snapshots, events, publishCalls, combatTimeoutCalls, journal, executor, service };
 }
 
 describe('AiTurnService with the S03 production executor', () => {
@@ -509,5 +511,77 @@ describe('AiTurnService GD-039: приватность bot-журнала в eve
 
     const botOwnEntry = JSON.parse(botView.find((e) => e.sequenceNumber === 5)!.payload);
     expect(botOwnEntry.input).toEqual({ cardId: 'secret-instance-9' });
+  });
+});
+
+// AI-03 / SEL-04 (docs/research/de-reverse-2026-10-20): вне боя у VS_AI нет
+// дедлайна — если эвристика вернула null на собственном выборе бота или
+// executor отверг её ответ, бот молча вставал. Теперь — запасной легальный
+// ответ (системный фолбэк таймаута или перебор) и громкий лог AI_FALLBACK.
+describe('AiTurnService AI-03: запасной легальный ответ бота', () => {
+  const real = new AiDecisionService(new AdjacencyService());
+  const withHead = (head: Record<string, unknown>): GameState => {
+    const base = fixture();
+    return { ...base, metadata: { ...base.metadata, pendingEffects: [head] } } as unknown as GameState;
+  };
+  const spyLogs = (service: AiTurnService) => {
+    const logger = (service as any).logger;
+    return { warn: jest.spyOn(logger, 'warn').mockImplementation(() => {}),
+      error: jest.spyOn(logger, 'error').mockImplementation(() => {}) };
+  };
+  const logged = (spy: jest.SpyInstance) => spy.mock.calls.map((c) => String(c[0]));
+
+  it('executor отверг ответ эвристики на своём mandatory CHOOSE_ONE → системный фолбэк, матч идёт дальше', async () => {
+    const game = harness(
+      withHead({ id: 'ch-1', type: 'CHOOSE_ONE', playerId: 'ai', chooseCount: 1, text: 'Choose one',
+        options: [{ index: 0, label: 'A' }, { index: 1, label: 'B' }], optionEffects: [[], []] }),
+      'ai',
+      { decide: (s, ai) => s.metadata.pendingEffects?.[0]?.id === 'ch-1'
+        ? { kind: 'resolveChoose', effectId: 'ch-1', optionIndex: 99 } : real.decide(s, ai) },
+    );
+    const logs = spyLogs(game.service);
+    await game.run();
+    expect(game.snapshots[0].sequenceNumber).toBe(11);
+    expect(game.snapshots[0].metadata.pendingEffects ?? []).toHaveLength(0);
+    expect(logged(logs.warn)).toContainEqual(expect.stringContaining(
+      'AI_FALLBACK game=ai-s03 seq=10 reason=rejected:resolveChoose head=CHOOSE_ONE/ch-1 -> resolveChoose'));
+    expect(game.events[0]).toBe('CARD_PLAYED');
+    expect(game.state().currentTurnPlayerId).toBe('human');
+  });
+
+  it('эвристика вернула null на своём mandatory MOVE → нулевой шаг системного фолбэка', async () => {
+    const game = harness(
+      withHead({ id: 'mv-1', type: 'MOVE', playerId: 'ai', value: 2, text: 'Move up to 2', fighterIds: ['ai-hero'] }),
+      'ai',
+      { decide: (s, ai) => (s.metadata.pendingEffects?.[0]?.id === 'mv-1' ? null : real.decide(s, ai)) },
+    );
+    const logs = spyLogs(game.service);
+    await game.run();
+    expect(game.snapshots[0].metadata.pendingEffects ?? []).toHaveLength(0);
+    expect(game.snapshots[0].fighters.find((f) => f.id === 'ai-hero')!.position).toEqual({ x: 0, y: 0 });
+    expect(logged(logs.warn)).toContainEqual(expect.stringContaining(
+      'reason=no-decision head=MOVE/mv-1 -> resolveMove'));
+  });
+
+  it('выбор человека в голове очереди: бот ждёт без фолбэка и без шума в логе', async () => {
+    const initial = withHead({ id: 'h-1', type: 'MOVE', playerId: 'human', value: 1, text: 'Move', fighterIds: ['human-hero'] });
+    const game = harness({ ...initial, currentTurnPlayerId: 'human' });
+    const logs = spyLogs(game.service);
+    await game.run();
+    expect(game.snapshots).toHaveLength(0);
+    expect([...logged(logs.warn), ...logged(logs.error)].filter((l) => l.includes('AI_FALLBACK'))).toEqual([]);
+  });
+
+  it('запасного ответа нет: громкий AI_FALLBACK error, состояние не тронуто', async () => {
+    const game = harness(
+      withHead({ id: 'ch-0', type: 'CHOOSE_ONE', playerId: 'ai', chooseCount: 1, text: 'Choose one', options: [] }),
+      'ai',
+      { decide: () => ({ kind: 'resolveChoose', effectId: 'ch-0', optionIndex: 0 }) },
+    );
+    const logs = spyLogs(game.service);
+    await game.run();
+    expect(game.snapshots).toHaveLength(0);
+    expect(logged(logs.error)).toContainEqual(expect.stringContaining(
+      'AI_FALLBACK game=ai-s03 seq=10 reason=rejected:resolveChoose head=CHOOSE_ONE/ch-0: запасного ответа нет'));
   });
 });

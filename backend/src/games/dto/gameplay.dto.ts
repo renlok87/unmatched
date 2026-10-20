@@ -324,6 +324,17 @@ export class ResolvePendingEffectDto {
   @IsArray()
   @IsString({ each: true })
   cardIds?: string[];
+
+  /**
+   * SEL-01: seq состояния, на котором показан выбор. Ответ на другом seq
+   * отклоняется STATE_CHANGED (устаревший вопрос). Необязателен для старых
+   * клиентов, как у BeginManeuverDto.
+   */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  expectedSequenceNumber?: number;
 }
 
 /**
@@ -340,6 +351,13 @@ export class DeclinePendingEffectDto {
   @IsNotEmpty()
   @IsString()
   effectId: string;
+
+  /** SEL-01: как в ResolvePendingEffectDto — отказ на другом seq отклоняется STATE_CHANGED. */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  expectedSequenceNumber?: number;
 }
 
 /**

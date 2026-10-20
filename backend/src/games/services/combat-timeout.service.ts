@@ -561,10 +561,10 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       }
       const nextQueue = result.gameState.metadata.pendingEffects ?? [];
       // Прогресс шага = голова очереди сменилась (снята/замещена вложенным
-      // выбором) ИЛИ multi-step pending продвинулся ПРИ СОХРАНЁННОМ id:
-      // resolveChooseOne (chooseCount>1) снимает опцию за шаг, CHOOSE_SPACE
-      // stage 1→2 заменяет голову на stage 2 — id и длина очереди не меняются,
-      // продвижение видно по chooseCount/options/stage/mode/revealedCards.
+      // выбором или следующим шагом: CHOOSE_SPACE stage 2 и остаток
+      // CHOOSE_ONE получают новый id шага, SEL-01). Сравнение полей той же
+      // головы — страховка для сейвов, где шаг ещё сохранял id: продвижение
+      // видно по chooseCount/options/stage/mode/revealedCards.
       // Полное отсутствие изменений той же головы = no-op резолвера → блокер.
       const nextHead = nextQueue[0];
       if (

@@ -1303,6 +1303,38 @@ bool FS09PendingDe020PresentTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingStepIdPresentTest,
+    "Unmatched.S09.PENDING SEL-01 presentation: the next step of a choice (id root#n) is the same open",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingStepIdPresentTest::RunTest(const FString&) {
+  using namespace S09De020Test;
+  TestEqual(TEXT("root of a step id"), FS09PendingPresenter::StepRoot(TEXT("rs-0-p0#2")), FString(TEXT("rs-0-p0")));
+  TestEqual(TEXT("root of a plain id"), FS09PendingPresenter::StepRoot(TEXT("rs-0-p0")), FString(TEXT("rs-0-p0")));
+  TestEqual(TEXT("a non-digit suffix is no step"), FS09PendingPresenter::StepRoot(TEXT("a#b")), FString(TEXT("a#b")));
+  TestEqual(TEXT("a trailing # is no step"), FS09PendingPresenter::StepRoot(TEXT("a#")), FString(TEXT("a#")));
+
+  FS09PendingPresenter P;
+  // Restless Spirits: stage 1 opens as a modal; the player collapses it; stage 2 (new id, new text) continues it.
+  TestTrue(TEXT("stage 1 opens"), P.Observe(Head(TEXT("rs-0-p0"), TEXT("CHOOSE_SPACE"), false, TEXT("Choose any space")), 2));
+  TestTrue(TEXT("collapsed"), P.Collapse());
+  TestFalse(TEXT("stage 2 is not a new open"),
+            P.Observe(Head(TEXT("rs-0-p0#2"), TEXT("CHOOSE_SPACE"), false, TEXT("Choose any space - now adjacent")), 2));
+  TestEqual(TEXT("the head id follows the step"), P.HeadId, FString(TEXT("rs-0-p0#2")));
+  TestTrue(TEXT("collapse state kept"), P.bCollapsed);
+  TestFalse(TEXT("the same step again is no open"),
+            P.Observe(Head(TEXT("rs-0-p0#2"), TEXT("CHOOSE_SPACE"), false, TEXT("Choose any space - now adjacent")), 2));
+
+  // CHOOSE_ONE x 2 of an OPTIONAL trigger: the rest is not a repeat open (no toast with a stale pre-selection).
+  P.Clear();
+  TestTrue(TEXT("choose-2 opens"), P.Observe(Head(TEXT("lg-0-p0"), TEXT("CHOOSE_ONE"), true, TEXT("Choose 2")), 4));
+  TestFalse(TEXT("the rest is the same open"), P.Observe(Head(TEXT("lg-0-p0#2"), TEXT("CHOOSE_ONE"), true, TEXT("Choose 2")), 4));
+  TestEqual(TEXT("still the modal"), static_cast<int32>(P.Present), static_cast<int32>(ES09PendingPresent::Modal));
+  TestEqual(TEXT("history counted one open"), P.OpensBefore, 0);
+  // A different choice after it is a new open.
+  TestTrue(TEXT("another choice opens"), P.Observe(Head(TEXT("x-1"), TEXT("MOVE"), false, TEXT("Move")), 4));
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020StepsTest,
     "Unmatched.S09.PENDING DE-020 steps and memory: object -> target (up to N) in the opponent's turn, no-target head, remembered variant (synthesized)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)

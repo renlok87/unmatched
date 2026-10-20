@@ -96,8 +96,23 @@ FString FS09PendingPresenter::Signature(const FS08PendingEffect& Head) {
                          Head.bOptional ? 1 : 0);
 }
 
+FString FS09PendingPresenter::StepRoot(const FString& Id) {
+  // SEL-01: the server gives each next step of a multi-step choice the id "<root>#<n>" (CHOOSE_SPACE stage 2,
+  // the rest of a CHOOSE_ONE x N) - a new question for the protocol, the same open for the presentation.
+  int32 Hash = INDEX_NONE;
+  if (!Id.FindLastChar(TEXT('#'), Hash) || Hash + 1 >= Id.Len()) return Id;
+  for (int32 I = Hash + 1; I < Id.Len(); ++I) {
+    if (!FChar::IsDigit(Id[I])) return Id;
+  }
+  return Id.Left(Hash);
+}
+
 bool FS09PendingPresenter::Observe(const FS08PendingEffect& Head, int32 TurnCount) {
   if (Head.Id.IsEmpty() || Head.Id == HeadId) return false;
+  if (!HeadId.IsEmpty() && StepRoot(Head.Id) == StepRoot(HeadId)) {
+    HeadId = Head.Id;  // the next step of the open choice: presentation, collapse state and history stay
+    return false;
+  }
   HeadId = Head.Id;
   HeadSignature = Signature(Head);
   bCollapsed = false;
