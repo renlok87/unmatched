@@ -42,6 +42,12 @@ the same parts (anywhere in them, boxes do not limit the sources) that does NOT 
 (default: every non-matching texel), no farther than radius_m (<= 0.03 m). A matched texel without a source in reach
 keeps its value (counted as without_source). Optional `detail` = the luminance detail of band_repaint (own / local mean
 of the matched texels, clipped). Report rows: matched, repainted, without_source, distances, mean change.
+Optional `majority` {radius_m <= 0.012, min_source_fraction in (0.5, 1]} (Bruce Lee model acceptance r2, T 0.5: stripes
+with yellow inserts, ragged edges and specks): a matched texel is repainted only when, among the baked texels of the same
+parts within majority.radius_m of it (3D, rest position, caps excluded), the share of source texels (keep_hsv and not
+match_hsv) is >= min_source_fraction — a majority / closing filter: holes and a yellow middle inside a dark stripe fill,
+dark specks and a ragged rim outside it go, and the stripe does not widen (at its edge the share is about one half).
+Report row block majority: passed / held texels.
 
 roughness_remap (textures.roughness_remap, F12; runs after the caps and after the H2.1 metal remap, with or without
 textures.materials.metal — the cloth_roughness of materials.remap runs only inside the metal pass, so a metal-free hero
@@ -253,7 +259,9 @@ def band_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs, 
 
 # ---------------------------------------------------------------- colour repaint and roughness remap (F12, 2026-10-20 batch)
 COLOR_REPAINT_KEYS = ("name", "parts", "match_hsv", "keep_hsv", "include_boxes_m", "exclude_boxes_m", "radius_m", "k",
-                      "keys", "detail", "note")
+                      "keys", "detail", "majority", "note")
+MAJORITY_KEYS = ("radius_m", "min_source_fraction")
+COLOR_REPAINT_MAJORITY_RADIUS_MAX_M = 0.012
 ROUGHNESS_REMAP_KEYS = ("name", "parts", "lo", "hi", "hsv", "note")
 HSV_SELECT_KEYS = ("hue_deg", "s_min", "s_max", "v_min", "v_max")
 REPAINT_MAPS = ("BC", "RM", "AO")
@@ -343,7 +351,36 @@ def color_repaint_problems(cfgs, part_names):
         for key in ("include_boxes_m", "exclude_boxes_m"):
             if key in c:
                 problems += _boxes_problems("%s.%s" % (w, key), c[key])
+        if "majority" in c:
+            problems += _majority_problems(w + ".majority", c["majority"])
     return problems
+
+
+def _majority_problems(where, mj):
+    if not isinstance(mj, dict):
+        return ["%s must be {radius_m, min_source_fraction} (got %r)" % (where, mj)]
+    problems = ["%s: unknown key %s" % (where, k) for k in mj if k not in MAJORITY_KEYS]
+    r, f = mj.get("radius_m"), mj.get("min_source_fraction")
+    if not (_is_num(r) and 0.0 < r <= COLOR_REPAINT_MAJORITY_RADIUS_MAX_M):
+        problems.append("%s.radius_m must be in (0, %s] m (got %r)" % (where, COLOR_REPAINT_MAJORITY_RADIUS_MAX_M, r))
+    if not (_is_num(f) and 0.5 < f <= 1.0):
+        problems.append("%s.min_source_fraction must be in (0.5, 1] (got %r)" % (where, f))
+    return problems
+
+
+def majority_fraction(pts, counted, source, query, radius):
+    """Share of `source` points among the `counted` points within `radius` (3D ball, boundary included) of every `query`
+    point (boolean masks over pts; source must be a subset of counted). Exact counts: cKDTree.query_ball_point with
+    return_length."""
+    from scipy.spatial import cKDTree
+
+    q = pts[query]
+    if not len(q):
+        return np.zeros(0)
+    n_all = cKDTree(pts[counted]).query_ball_point(q, radius, return_length=True, workers=-1)
+    n_src = (cKDTree(pts[source]).query_ball_point(q, radius, return_length=True, workers=-1) if source.any()
+             else np.zeros(len(q), np.int64))
+    return np.asarray(n_src, np.float64) / np.maximum(np.asarray(n_all, np.float64), 1.0)
 
 
 def roughness_remap_problems(cfgs, part_names):
@@ -397,6 +434,14 @@ def color_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs,
         source = ~matched_colour & alpha["BC"][ya, xa] & hsv_select(rgb, cfg.get("keep_hsv", {}), tx)
         row = {"name": cfg["name"], "parts": list(cfg["parts"]), "radius_m": radius, "k": k,
                "part_texels": int(len(pa)), "matched_texels": int(match.sum()), "source_texels": int(source.sum())}
+        mj = cfg.get("majority")
+        if mj:  # majority / closing filter: repaint only where the sources hold the majority of the ball
+            frac = majority_fraction(pa, alpha["BC"][ya, xa], source, match, float(mj["radius_m"]))
+            passed = frac >= float(mj["min_source_fraction"])
+            row["majority"] = {"radius_m": float(mj["radius_m"]), "min_source_fraction": float(mj["min_source_fraction"]),
+                               "passed_texels": int(passed.sum()), "held_texels": int((~passed).sum())}
+            match = match.copy()
+            match[np.nonzero(match)[0][~passed]] = False
         mi, si = np.nonzero(match)[0], np.nonzero(source)[0]
         if not len(mi) or not len(si):
             rows.append(dict(row, repainted_texels=0, without_source=int(len(mi)),

@@ -28,7 +28,9 @@ repaints texels of the listed parts whose BaseColor passes match_hsv from the ne
 pass keep_hsv (within radius_m <= 0.03 m, optional boxes), right after band_repaint and before the footprints and
 caps read their rim; textures.roughness_remap (materials.roughness_remap) puts the ORM roughness of the listed parts
 into [lo, hi] by its Tripo rank after the caps and the metal remap, with or without metal (metal texels left out).
-Report blocks color_repaint / roughness_remap only with the keys.
+Report blocks color_repaint / roughness_remap only with the keys. A color_repaint entry with the optional `majority`
+{radius_m <= 0.012, min_source_fraction in (0.5, 1]} (Bruce Lee model acceptance r2) repaints a matched texel only
+where its sources hold that share of the baked texels of the same parts in the 3D ball (majority / closing filter).
 Metal-free hero (no materials.metal parts): no metal mask, no remap, the H2.1 metal checks are not run, and
 work/uv/metal_mask.npy is written all-zero (look-dev reads it). Empty team_mask.cloth_parts (no cloth): TeamMask R = 0
 and the check team_mask_cloth_share is reported as not applicable (pilot 2026-10-13, F51, F52).

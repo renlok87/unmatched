@@ -1,6 +1,7 @@
 """Opt-in textures keys of the 2026-10-20 batch, F12 (Bruce Lee model acceptance r1: T 0.5): textures.color_repaint
 (texels of the listed parts whose BaseColor passes match_hsv take the colour of the nearest texels of the same parts that
-pass keep_hsv; Tripo navy on the stripe edges, a dark band on the inner thighs) and textures.roughness_remap (ORM.G of the
+pass keep_hsv; Tripo navy on the stripe edges, a dark band on the inner thighs; optional majority filter of acceptance r2)
+and textures.roughness_remap (ORM.G of the
 listed parts by its Tripo rank into [lo, hi], with or without metal). Without the keys the textures stage writes the same
 bytes as before (pinned sha256 of a synthetic atlas, computed with the code before the keys).
 
@@ -238,6 +239,85 @@ def test_color_repaint_validation(tmp_path, bad, message):
     synthetic_run(tmp_path)
     cr = {"name": "x", "parts": ["tripo_part_0"], "match_hsv": {"v_max": 0.45}}
     cr.update(bad)
+    with pytest.raises(ValueError, match=message):
+        tx.run(tmp_path, tex_profile(color_repaint=[cr]))
+
+
+def test_majority_fraction_counts_the_ball():
+    mat = load_local("materials")
+    pts = np.stack([np.arange(10) * 0.001, np.zeros(10), np.zeros(10)], -1)  # 1 mm apart on a line
+    counted = np.ones(10, bool)
+    source = np.arange(10) < 6
+    query = np.zeros(10, bool)
+    query[[2, 6, 9]] = True
+    frac = mat.majority_fraction(pts, counted, source, query, 0.0021)  # balls of 5, 5 and 3 points
+    assert frac.tolist() == [1.0, 2 / 5, 0.0]
+    counted[[4, 5]] = False
+    source[[4, 5]] = False  # left out of the count entirely: 2 of 3 points of the ball of 6 are sources
+    assert mat.majority_fraction(pts, counted, source, query, 0.0021)[1] == pytest.approx(0.0)
+    assert mat.majority_fraction(pts, counted, source, query, 0.0031).tolist()[1] == pytest.approx(1 / 5)
+
+
+def majority_run(tmp_path):
+    """part 0 (columns 4..21 here) yellow with a 12 mm black stripe (columns 9..14), a yellow hole inside it
+    (rows 31..32, columns 11..12) and a dark speck outside it (rows 31..32, column 18); rows 31/32 survive a row flip."""
+    synthetic_run(tmp_path)
+    bc = np.load(tmp_path / "work" / "bake" / "BC.npy")
+    bc[:, 4:22] = YELLOW
+    bc[:, 9:15] = BLACK
+    bc[31:33, 11:13] = YELLOW
+    bc[31:33, 18] = BLACK
+    np.save(tmp_path / "work" / "bake" / "BC.npy", bc)
+
+
+FILL = {"name": "fill", "parts": ["tripo_part_0"], "match_hsv": {"s_min": 0.5, "v_min": 0.5}, "keep_hsv": {"v_max": 0.3},
+        "radius_m": 0.01, "majority": {"radius_m": 0.005, "min_source_fraction": 0.6}}
+TRIM = {"name": "trim", "parts": ["tripo_part_0"], "match_hsv": {"v_max": 0.3}, "keep_hsv": {"s_min": 0.5, "v_min": 0.5},
+        "radius_m": 0.01, "majority": {"radius_m": 0.005, "min_source_fraction": 0.6}}
+
+
+def test_color_repaint_majority_fills_holes_and_trims_specks_without_widening(tmp_path):
+    tx = load_local("textures")
+    majority_run(tmp_path)
+    rep = tx.run(tmp_path, tex_profile(color_repaint=[copy.deepcopy(FILL), copy.deepcopy(TRIM)]))
+    fill, trim = rep["color_repaint"]["rows"]
+    # 5 x 5 texel disk minus its corners = 21 texels in a 5 mm ball: the hole sees 17/21 black, the yellow next to the
+    # stripe 8/21 black, the speck 19/21 yellow, the stripe edge 8/21 yellow
+    assert fill["majority"] == {"radius_m": 0.005, "min_source_fraction": 0.6, "passed_texels": 4, "held_texels": 1022}
+    assert fill["repainted_texels"] == 4 and fill["matched_texels"] == 1026
+    assert trim["majority"] == {"radius_m": 0.005, "min_source_fraction": 0.6, "passed_texels": 2, "held_texels": 384}
+    from PIL import Image
+    bc = np.asarray(Image.open(tmp_path / "textures" / "T_Synth_H2_BC.png").convert("RGB")).astype(int)
+    v = bc.max(2)
+    assert (v[31:33, 9:15] < 77).all()  # the hole is black now: one solid stripe
+    assert (v[:, 15] > 128).all() and (v[:, 8] > 128).all()  # the stripe did not widen
+    assert (v[31:33, 18] > 128).all()  # the speck is yellow
+    assert (v[:, 9:15] < 77).all()  # the stripe itself kept
+
+
+def test_color_repaint_without_majority_widens_the_stripe(tmp_path):
+    tx = load_local("textures")
+    majority_run(tmp_path)
+    plain = {k: v for k, v in FILL.items() if k != "majority"}
+    rep = tx.run(tmp_path, tex_profile(color_repaint=[plain]))
+    assert "majority" not in rep["color_repaint"]["rows"][0]
+    from PIL import Image
+    v = np.asarray(Image.open(tmp_path / "textures" / "T_Synth_H2_BC.png").convert("RGB")).astype(int).max(2)
+    assert (v[:, 15] < 77).all()  # every yellow texel in reach of black turned black: the filter is what keeps the edge
+
+
+@pytest.mark.parametrize("bad, message", [
+    ({"radius_m": 0.02, "min_source_fraction": 0.6}, "majority.radius_m"),
+    ({"radius_m": 0.005, "min_source_fraction": 0.5}, "min_source_fraction"),
+    ({"radius_m": 0.005, "min_source_fraction": 1.2}, "min_source_fraction"),
+    ({"radius_m": 0.005}, "min_source_fraction"),
+    ({"radius_m": 0.005, "min_source_fraction": 0.6, "iterations": 2}, "unknown key"),
+    ([0.005, 0.6], "majority"),
+])
+def test_color_repaint_majority_validation(tmp_path, bad, message):
+    tx = load_local("textures")
+    synthetic_run(tmp_path)
+    cr = {"name": "x", "parts": ["tripo_part_0"], "match_hsv": {"v_max": 0.45}, "majority": bad}
     with pytest.raises(ValueError, match=message):
         tx.run(tmp_path, tex_profile(color_repaint=[cr]))
 
