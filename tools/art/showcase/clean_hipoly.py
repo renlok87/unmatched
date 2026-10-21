@@ -6,10 +6,14 @@ knee pad behind the thigh; 20 - the lion medallion behind the shoulder); the in-
 The Tripo base (Arthur 4, Medusa 2) goes too: the showcase stands the figure on the game pedestal with the team ring.
 Prints the feet height (min Y of the kept parts, metres) used to seat the figure on the pedestal.
 
-    python tools/art/showcase/clean_hipoly.py
+    python tools/art/showcase/clean_hipoly.py [<Key> ...]    # no key: every job
+
+Wave A of the 2026-10-20 batch (Bruce Lee, Sherlock Holmes, Dr. Watson): the H2 sources passed stage 2 without phantoms,
+only the Tripo base goes ("auto-base").
 """
 import json
 import struct
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +25,12 @@ JOBS = {
     "KingArthur": ("art/pipeline-candidates/ASSET-KING-ARTHUR-001/20261016-h2-tripo/source/king-arthur-h2-tripo-4f059621-tex8k-pbr.glb",
                    "auto-base"),
     "Medusa": ("art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb", {2}),
+    "BruceLee": ("art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-tex8k-pbr.glb",
+                 "auto-base"),
+    "SherlockHolmes": ("art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/"
+                       "sherlock-holmes-h2-tripo-734b9954-tex8k-pbr.glb", "auto-base"),
+    "DrWatson": ("art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-tex8k-pbr.glb",
+                 "auto-base"),
 }
 
 
@@ -70,4 +80,6 @@ def clean(key, rel, drop):
 
 
 for k, (r, d) in JOBS.items():
+    if len(sys.argv) > 1 and k not in sys.argv[1:]:
+        continue
     clean(k, r, d)
