@@ -138,3 +138,13 @@ concept-sheet §11 (Opus `card-2.json` 8,1: S 2, C 1,5, Q 1,5, P 1,5). Вход�
 - Bruce Lee: AN-156 Idle, AN-157 LungeAttack, AN-158 HitReact, AN-159 DeathSettle.
 - Sherlock Holmes: AN-160 Idle, AN-161 LungeAttack, AN-162 HitReact, AN-163 DeathSettle.
 - Dr. Watson: AN-164 Idle, AN-165 LungeAttack, AN-166 HitReact, AN-167 DeathSettle.
+
+## Приёмка Dr. Watson r1 (2026-10-21, «Opus xhigh», `workflow:acceptor-ASSET-DR-WATSON-001-r1`)
+
+- 6,3 `rework_blender` (S 1,5 · F 1,5 · T 0,5 · D 1,5), все гейты PASS. T 0,5: сине-фиолетовая линия в шве спинки
+  пальто (turn-135), светлое пятно на пальто за саквояжем (pose-03); крупный план — металл на пальцах, синие мазки на
+  манжетах, голубые кромки полей котелка и лацканов, оранжевый ореол у подошв. F: гранёные котелок и револьвер,
+  обломок под подставкой. D: бок пальто тянется за рукой (pose-01, pose-05). S: эспаньолка на модели, на листе
+  подбородок бритый (второстепенное отличие).
+- Решение оркестратора: доработка r2 ждёт два условия — ключи `textures.color_repaint` / `roughness_remap` (их делает
+  исполнитель Брюса, F12) и свободный слот Blender (лимит 2: идут Шерлок этап 3 и Брюс r2).

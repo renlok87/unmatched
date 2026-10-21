@@ -1,0 +1,108 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance/20261021-r1/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3",
+    "bake_run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/asset-card.yaml",
+      "sha256": "dbbfb0ae1744a86cd956c2bfbf4fe989e0ed97266c8131636a88c7e6b25182ac"
+    },
+    "previous_card": null
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_DrWatson_H2LD",
+      "base": "SM_DrWatson_H2LD_Base",
+      "materials": [
+        "MI_DrWatson_H2LD",
+        "MI_DrWatson_H2LD_Base",
+        "MI_DrWatson_H2LD_P1",
+        "MI_DrWatson_H2LD_P2",
+        "MI_DrWatson_H2LD_Base_P1",
+        "MI_DrWatson_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton",
+      "clips": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_DrWatson_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_DrWatson_H2LD_Edge",
+        "T_UM_MatLUT_Watson"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.45,
+    "FIGURE_BOUNDS_TOP_M": 0.45,
+    "texture_files": [
+      "T_DrWatson_H2LD_2K_BC.png",
+      "T_DrWatson_H2LD_2K_Edge.png",
+      "T_DrWatson_H2LD_2K_MatID.png",
+      "T_DrWatson_H2LD_2K_N.png",
+      "T_DrWatson_H2LD_2K_ORM.png",
+      "T_DrWatson_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-bake-h2.json",
+      "sha256": "f0fa62b63d9627dc0f52792d39e230d20e1209e217f9e03ac2581ea04ddd5d64",
+      "meshes": {
+        "body": "SK_DrWatson_H2_Body",
+        "weapon": "SK_DrWatson_H2_Revolver",
+        "base": "SM_DrWatson_H2_Base"
+      },
+      "materials.atlas": "M_DrWatson_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.45
+    },
+    "height": {
+      "body_mesh": "SK_DrWatson_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_DrWatson_H2_Body.bounds_m.max[2]",
+        "value": 0.45004
+      },
+      "other_meshes_top_m": {
+        "SK_DrWatson_H2_Revolver": 0.39564
+      },
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 45.004,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.45,
+      "FIGURE_BOUNDS_TOP_M": 0.45,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3",
+    "texture": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/textures/T_DrWatson_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "0718b9da9b5b6c95bb1efb1ebc98b2db92cdb5c3dfef15a09656f11ba181f7e6",
+    "output": "T_DrWatson_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+  "prev_fix_list": {
+    "cycle": null,
+    "items": []
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_DrWatson_H2LD\", \"base\": \"SM_DrWatson_H2LD_Base\", \"materials\": [\"MI_DrWatson_H2LD\", \"MI_DrWatson_H2LD_Base\", \"MI_DrWatson_H2LD_P1\", \"MI_DrWatson_H2LD_P2\", \"MI_DrWatson_H2LD_Base_P1\", \"MI_DrWatson_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton\", \"clips\": \"/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_DrWatson_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_DrWatson_H2LD_Edge\", \"T_UM_MatLUT_Watson\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_DrWatson_H2LD_2K_BC.png, T_DrWatson_H2LD_2K_Edge.png, T_DrWatson_H2LD_2K_MatID.png, T_DrWatson_H2LD_2K_N.png, T_DrWatson_H2LD_2K_ORM.png, T_DrWatson_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-bake-h2.json\", \"meshes\": {\"body\": \"SK_DrWatson_H2_Body\", \"weapon\": \"SK_DrWatson_H2_Revolver\", \"base\": \"SM_DrWatson_H2_Base\"}, \"materials.atlas\": \"M_DrWatson_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.45}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_DrWatson_H2_Body.bounds_m.max[2] = 0.45004 м против FIGURE_HEIGHT_M заявки 0.45 м ± 1 %; рост не задают другие меши (оружие): SK_DrWatson_H2_Revolver bounds_m.max[2] = 0.39564 м; art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 45.004 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_DrWatson_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3/textures/T_DrWatson_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+    "PREV_FIX_LIST": "нет (r1 или у прежней карточки пустые rework_fix_list и known_issues)"
+  }
+}
