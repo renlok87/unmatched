@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotAxeChoppingBlock.fbx",
+      "sha256": "6834fe8f063531807d74ed4866ab095dbc62a99bf0887a121d6d55e5da8b3094"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_BC.png",
+      "sha256": "bb15545941d5c5b65653a49b28c0a8cb3c646602b7d1383e70544f514a91fe49"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_N.png",
+      "sha256": "d82e29d93f1599d946420d3715b1824bcfd4a4e5ba174850be43bdd6e291b83c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_ORM.png",
+      "sha256": "c9881ea33c4db159e6bf44e146950408a9d37a6c4f58167d8f71655a51fab7a6"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-axe-chopping-block-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotAxeChoppingBlock.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "note": "4970 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "note": "UV0 islands 68, used 0.5904, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "note": "T_Env_HeorotAxeChoppingBlock_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "note": "SM_Env_HeorotAxeChoppingBlock, M_Env_HeorotAxeChoppingBlock",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет и вид sheet.png совпадают: толстая колода из вертикальных плах с расширением к основанию, кованый обруч с заклёпками, кольцо на скобе спереди, бородовидный топор с кельтской резьбой воткнут в торец, щепа на торце и у основания, снег на кромках. Пропорции главных частей как на виде: колода около 56 % высоты против около 58 % на sheet, топорище с обмоткой и навершием уходит вверх-вправо, как на виде. Лишних и пропавших частей нет, фантомных выступов и оболочек нет ни на turn-090/270, ни на wire-*. Узнаётся со всех 8 ракурсов. Деревянные торцы на обухе и над проушиной — деталь контура, на игровой дистанции (27 uu против фигуры 55 uu) не читается.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей. Тонкие элементы целы: кольцо, скоба, топорище, навершие. Лезвие входит в торец без зазора. Сетка на wire-34/front/back следует форме: обруч, заклёпки, кольцо и топор моделированы, плахи даны в основном нормалью. Отчёт: 16 открытых контуров — это дно (на столе не видно) и тыльные стороны 15 заклёпок, прижатых к обручу. 61 вывернутая грань (0,9 % площади) лежит у самого низа в щепе, в кадрах не видна. Щепа на торце на close-weapon слегка скруглена, у основания на close-base комковата под снегом, но читается как щепа и снег, а не как оплывшая масса.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: стилизованное ручное дерево с волокнами и трещинами, торец с годичной фактурой, серое кованое железо с бликами на заклёпках, кожаная обмотка, снег. Запечённого направленного света нет: освещение одинаково на всех ракурсах, тёмные только щели как стилизованная кавити. Детализация богаче эталона кита (кельтская резьба на лезвии и топорище). Дефекты видны только на крупном плане: (1) на тыльной стороне лезвия орнамент распадается в хаотичные штрихи вместо плетёнки лицевой стороны (turn-180/225); (2) текстура щепы и снега у основания мыльная (close-base, слева внизу); (3) metallic около 0, поэтому железо на крупном плане слегка меловое, хотя на игровой дистанции читается металлом.",
+      "frames": [
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 2,0 + T 1,5 = 5,5 → 9,2 ≥ 8,0; ни одно измерение не ниже 1,0; гейты PASS/n/a. Мелочи текстуры видны только на крупном плане и для фонового пропа диорамы не критичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Тыльная сторона лезвия: вместо кельтской плетёнки лицевой стороны хаотичные штрихи (генерация Tripo); видно только вблизи."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Щепа и снег у основания (слева внизу) с мыльной, размытой текстурой; только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Metallic около 0 по всему атласу (metallic_mean 0.024): железо лезвия и обруча на крупном плане слегка меловое; на игровой дистанции читается металлом."
+    },
+    {
+      "item": "G-TEX",
+      "frame": "uv-layout.png",
+      "note": "ORM.R = 1 (AO не запекался), щели BC от Tripo не дополнены (uncovered 0.41, дилатация Tripo); в кадрах не проявляется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-AXE-CHOPPING-BLOCK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп axe-chopping-block (колода с топором, Heorot) принят по делегированию: 9,2. Остались только мелочи текстуры крупного плана: тыльная сторона лезвия, мыльная щепа у основания, меловое железо."
+}

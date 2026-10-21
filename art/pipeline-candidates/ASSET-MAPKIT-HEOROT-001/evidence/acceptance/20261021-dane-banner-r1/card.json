@@ -1,0 +1,177 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotDaneBanner.fbx",
+      "sha256": "0f6e1402cfcb6143d50a7d7016221dbd1454dea7cf23ead0bb6f946c744ae54e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_BC.png",
+      "sha256": "b231e20fa6d00155b6acfdcb8fc9e3661a2a7c42241669950cda17ca31f9e039"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_N.png",
+      "sha256": "d9cf1ec00e2b13968140ac0ba78852ed7c54080ae89c769e979237668ca4364a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_ORM.png",
+      "sha256": "f45683a9dd636acec8402e63520cb3ce208fd5b91eec3122c29d3a2142add0d3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-dane-banner-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotDaneBanner.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "note": "4991 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "note": "UV0 islands 686, used 0.5981, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "note": "T_Env_HeorotDaneBanner_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "note": "SM_Env_HeorotDaneBanner, M_Env_HeorotDaneBanner",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: тканое знамя с вороном на поперечной перекладине, петли-ушки, зубчатый низ с бахромой, древко с обмоткой и острым концом. Пропорции совпадают с sheet.png: ширина полотна ~0,20 высоты, полотно ~0,68 высоты, древко ниже полотна ~0,18. Перекладина чуть длиннее (~0,33 высоты против ~0,28), это на грани допуска. Знамя узнаётся со всех ракурсов. Одно второстепенное отличие контура вверху: на sheet финиал сидит на сплошном конце древка над перекладиной. У модели древко кончается у перекладины, выше идут тонкая проволочная спираль с кольцом, затем пустой зазор и отдельно висящий финиал. Мелочь: с боков (turn-090/270) назад торчит тонкий проволочный крюк, похожий на настенный подвес. Спереди его не видно, и с одиночным фронтальным видом sheet он не спорит, поэтому вынесен в known_issues.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дефект на полном росте в одной зоне. Финиал — оторванная висящая деталь, зазор до спирали ~3 % высоты. Он виден на всех кадрах полного роста и на wire-front/wire-back/wire-34. Верх древка заменён тонкой проволочной спиралью, а не цельным стержнем. Остальное чисто: полотно — плоская ткань с крупными треугольниками, сетка следует форме, бахрома и зубцы целы. Петли вокруг перекладины без дыр. Древко, обмотка и острый конец ровные, чёрных пятен и вывернутых частей нет. Сзади на стыке древка с перекладиной стоит чашеобразная втулка, по форме это допустимо.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Шерсть читается отлично: видно плетение, есть потёртости, детализация на уровне эталона кита. Древко читается как дерево с волокнами и верёвочной обмоткой. Дефект на полном росте в одной зоне — чужой цвет. Ворон и плетёные бордюры тёмно-зелёные (teal), а заказан чёрный ворон на красном. Полотно розово-коралловое вместо тёмно-красного крапа sheet.png. Сочетание зелёного с розовым заметно даже на игровой дистанции. Мелочи: перекладина читается как полированный металл (латунь/хром с бликами), а в описании дерево. Втулка на стыке сзади несёт красную текстуру полотна (turn-180). Кончики бахромы слегка размазаны, это видно только на крупном плане. Запечённого света в цвете полотна не видно.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "rework_blender",
+  "verdict_reason": "Score 5.8 < 8.0, F = 1.0 и T = 1.0. S = 1.5, поэтому не перегенерация, а доработка. Проблем две: финиал висит в воздухе над проволочной спиралью вместо сплошного конца древка, а ворон с орнаментом тёмно-зелёные вместо чёрных на розово-коралловом вместо тёмно-красного. Гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Убрать зазор вверху: опустить финиал на кольцо спирали или продлить древко над перекладиной цельным стержнем до основания финиала, чтобы верх был одной связной деталью, как на sheet.png. Проверить на turn-000/090 и wire-front, что просвета нет.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Перекрасить в BaseColor тёмно-зелёный рисунок (ворон, плетёные бордюры, точечная кайма) в чёрный/угольный. Красное полотно сдвинуть от кораллового к тёмно-красному крапу sheet.png: светлоту ниже, насыщенность выше. Плетение и потёртости сохранить.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "С боков (turn-090/270) назад торчит тонкий проволочный крюк, похожий на настенный подвес. На фронтальном sheet его нет. Для настенного пропа он допустим, при доработке его можно оставить или срезать."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Перекладина читается как полированный металл (латунь/хром с полосами бликов), а в описании дерево. Это терпимо как кованое железо стиля кита."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Сзади на чашеобразной втулке, где древко сходится с перекладиной, лежит красная текстура полотна вместо дерева или металла."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Кончики бахромы слегка размазаны и растянуты по цвету. Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-DANE-BANNER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dane-banner (Знамя данов) отправлен на доработку, 5.8: финиал висит над древком, ворон и орнамент зелёные вместо чёрных, полотно коралловое вместо тёмно-красного."
+}

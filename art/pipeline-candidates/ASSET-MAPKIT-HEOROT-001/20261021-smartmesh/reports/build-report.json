@@ -37,10 +37,10 @@
     "memory_rule_note": "'FBX_SCALE_UNITS + import 100' (S05 memory) belongs to a profile without the UnitScaleFactor patch; with UM_FBX_v1 (lantern/barrel, RIG-CONTRACT.md) UE imports at import_uniform_scale 1.0"
   },
   "totals": {
-    "assets_built": 21,
-    "triangles": 101104,
+    "assets_built": 36,
+    "triangles": 174361,
     "triangles_max": 5584,
-    "export_bytes": 287766080,
+    "export_bytes": 502984484,
     "checks_passed": true
   },
   "findings": [
@@ -125,9 +125,409 @@
     "MK-HEO-SNOWY-PINE: isolated shells (gap > 0.5 uu) 49, off ground 48",
     "MK-HEO-IRON-BOUND-CHEST: open edges 1039 in 89 loop(s): 0 zero-width crack(s), 89 hole(s) totalling 1829.2 uu2 (largest 207.3 uu2, rim 71.8 uu, mean width 5.78 uu, at z 19 uu)",
     "MK-HEO-IRON-BOUND-CHEST: recalc winding disagreements 6 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
-    "MK-HEO-IRON-BOUND-CHEST: isolated shells (gap > 0.5 uu) 35, off ground 33"
+    "MK-HEO-IRON-BOUND-CHEST: isolated shells (gap > 0.5 uu) 35, off ground 33",
+    "MK-HEO-GRAIN-SACKS-NORSE: open edges 72 in 18 loop(s): 7 zero-width crack(s), 11 hole(s) totalling 0.7 uu2 (largest 0.1 uu2, rim 1.6 uu, mean width 0.18 uu, at z 12 uu)",
+    "MK-HEO-WOODEN-BUCKET: open edges 387 in 12 loop(s): 2 zero-width crack(s), 10 hole(s) totalling 444.8 uu2 (largest 80.1 uu2, rim 31.8 uu, mean width 5.04 uu, at z 9 uu)",
+    "MK-HEO-DANE-BANNER: open edges 683 in 34 loop(s): 3 zero-width crack(s), 31 hole(s) totalling 36.9 uu2 (largest 1.7 uu2, rim 4.7 uu, mean width 0.73 uu, at z 48 uu)",
+    "MK-HEO-DANE-BANNER: non-manifold edges 5",
+    "MK-HEO-DANE-BANNER: faces facing inward by ray escape 4 (0.0 % of area; one-sided material culls them from outside)",
+    "MK-HEO-DANE-BANNER: isolated shells (gap > 0.5 uu) 2, off ground 2",
+    "MK-HEO-ANTLER-CHANDELIER: open edges 167 in 36 loop(s): 21 zero-width crack(s), 15 hole(s) totalling 19.6 uu2 (largest 2.0 uu2, rim 5.2 uu, mean width 0.78 uu, at z 5 uu)",
+    "MK-HEO-ANTLER-CHANDELIER: non-manifold edges 24",
+    "MK-HEO-ANTLER-CHANDELIER: faces facing inward by ray escape 3 (0.0 % of area; one-sided material culls them from outside)",
+    "MK-HEO-ANTLER-CHANDELIER: recalc winding disagreements 16 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-ANTLER-CHANDELIER: isolated shells (gap > 0.5 uu) 4, off ground 4",
+    "MK-HEO-WALL-TORCH: open edges 490 in 32 loop(s): 0 zero-width crack(s), 32 hole(s) totalling 68.0 uu2 (largest 44.4 uu2, rim 60.5 uu, mean width 1.47 uu, at z 7 uu)",
+    "MK-HEO-WALL-TORCH: non-manifold edges 11",
+    "MK-HEO-WALL-TORCH: recalc winding disagreements 33 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-WALL-TORCH: isolated shells (gap > 0.5 uu) 7, off ground 7",
+    "MK-HEO-MOORING-POST: open edges 547 in 16 loop(s): 0 zero-width crack(s), 16 hole(s) totalling 673.5 uu2 (largest 142.8 uu2, rim 117.3 uu, mean width 2.43 uu, at z 28 uu)",
+    "MK-HEO-MOORING-POST: isolated shells (gap > 0.5 uu) 9, off ground 9",
+    "MK-HEO-FAERING-BOAT: open edges 495 in 46 loop(s): 5 zero-width crack(s), 41 hole(s) totalling 255.1 uu2 (largest 30.7 uu2, rim 54.8 uu, mean width 1.12 uu, at z 6 uu)",
+    "MK-HEO-FAERING-BOAT: non-manifold edges 32",
+    "MK-HEO-FAERING-BOAT: recalc winding disagreements 42 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-FAERING-BOAT: isolated shells (gap > 0.5 uu) 12, off ground 12",
+    "MK-HEO-NET-DRYING-RACK: open edges 372 in 67 loop(s): 7 zero-width crack(s), 60 hole(s) totalling 206.3 uu2 (largest 46.9 uu2, rim 59.2 uu, mean width 1.58 uu, at z 40 uu)",
+    "MK-HEO-NET-DRYING-RACK: non-manifold edges 89",
+    "MK-HEO-NET-DRYING-RACK: faces facing inward by ray escape 24 (0.1 % of area; one-sided material culls them from outside)",
+    "MK-HEO-NET-DRYING-RACK: open sheet faces seen from both sides 130 (2.9 % of area)",
+    "MK-HEO-NET-DRYING-RACK: recalc winding disagreements 63 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-NET-DRYING-RACK: isolated shells (gap > 0.5 uu) 2, off ground 2",
+    "MK-HEO-TREASURE-HOARD: open edges 408 in 19 loop(s): 1 zero-width crack(s), 18 hole(s) totalling 225.0 uu2 (largest 45.6 uu2, rim 26.9 uu, mean width 3.40 uu, at z 14 uu)",
+    "MK-HEO-TREASURE-HOARD: faces facing inward by ray escape 1 (0.0 % of area; one-sided material culls them from outside)",
+    "MK-HEO-TREASURE-HOARD: isolated shells (gap > 0.5 uu) 2, off ground 2",
+    "MK-HEO-HELMET-STAND: open edges 500 in 24 loop(s): 0 zero-width crack(s), 24 hole(s) totalling 419.1 uu2 (largest 122.8 uu2, rim 40.2 uu, mean width 6.11 uu, at z 0 uu)",
+    "MK-HEO-HELMET-STAND: faces facing inward by ray escape 17 (2.5 % of area; one-sided material culls them from outside)",
+    "MK-HEO-HELMET-STAND: open sheet faces seen from both sides 133 (3.0 % of area)",
+    "MK-HEO-HELMET-STAND: recalc winding disagreements 2 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-AXE-CHOPPING-BLOCK: open edges 252 in 17 loop(s): 1 zero-width crack(s), 16 hole(s) totalling 310.0 uu2 (largest 293.9 uu2, rim 70.8 uu, mean width 8.30 uu, at z 0 uu)",
+    "MK-HEO-AXE-CHOPPING-BLOCK: faces facing inward by ray escape 61 (0.9 % of area; one-sided material culls them from outside)",
+    "MK-HEO-AXE-CHOPPING-BLOCK: open sheet faces seen from both sides 405 (5.9 % of area)",
+    "MK-HEO-FEAST-PLATTER: open edges 702 in 62 loop(s): 2 zero-width crack(s), 60 hole(s) totalling 195.0 uu2 (largest 29.3 uu2, rim 21.1 uu, mean width 2.78 uu, at z 4 uu)",
+    "MK-HEO-FEAST-PLATTER: non-manifold edges 15",
+    "MK-HEO-FEAST-PLATTER: faces facing inward by ray escape 3 (0.2 % of area; one-sided material culls them from outside)",
+    "MK-HEO-FEAST-PLATTER: recalc winding disagreements 81 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-ICE-SHARDS: open edges 609 in 45 loop(s): 0 zero-width crack(s), 45 hole(s) totalling 1020.4 uu2 (largest 714.6 uu2, rim 116.3 uu, mean width 12.28 uu, at z 1 uu)",
+    "MK-HEO-ICE-SHARDS: faces facing inward by ray escape 281 (11.5 % of area; one-sided material culls them from outside)",
+    "MK-HEO-ICE-SHARDS: open sheet faces seen from both sides 574 (11.2 % of area)",
+    "MK-HEO-ICE-SHARDS: isolated shells (gap > 0.5 uu) 7, off ground 6",
+    "MK-HEO-WOODEN-SLED: open edges 378 in 42 loop(s): 13 zero-width crack(s), 29 hole(s) totalling 775.3 uu2 (largest 615.6 uu2, rim 142.2 uu, mean width 8.66 uu, at z 11 uu)",
+    "MK-HEO-WOODEN-SLED: non-manifold edges 22",
+    "MK-HEO-WOODEN-SLED: recalc winding disagreements 11 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-WOODEN-SLED: isolated shells (gap > 0.5 uu) 12, off ground 12",
+    "MK-HEO-SMITH-ANVIL: open edges 295 in 15 loop(s): 4 zero-width crack(s), 11 hole(s) totalling 340.2 uu2 (largest 319.2 uu2, rim 65.3 uu, mean width 9.77 uu, at z 0 uu)",
+    "MK-HEO-SMITH-ANVIL: non-manifold edges 9",
+    "MK-HEO-SMITH-ANVIL: faces facing inward by ray escape 73 (2.4 % of area; one-sided material culls them from outside)",
+    "MK-HEO-SMITH-ANVIL: open sheet faces seen from both sides 595 (15.0 % of area)",
+    "MK-HEO-SMITH-ANVIL: isolated shells (gap > 0.5 uu) 4, off ground 4"
   ],
   "assets": {
+    "MK-HEO-ANTLER-CHANDELIER": {
+      "ue": {
+        "mesh": "SM_Env_HeorotAntlerChandelier",
+        "textures": [
+          "T_Env_HeorotAntlerChandelier_BC",
+          "T_Env_HeorotAntlerChandelier_N",
+          "T_Env_HeorotAntlerChandelier_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotAntlerChandelier",
+        "fbx_material_slot": [
+          "M_Env_HeorotAntlerChandelier"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 24.0
+      },
+      "scale_factor_source_to_final": 0.281351,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotAntlerChandelier.fbx",
+        "sha256": "335864e5abeff0c8aa09c04f9bbe2ffab1e935e879f09114a59716350101f70f",
+        "bytes": 269564
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_BC.png",
+          "sha256": "c04d39c28bd04daa6e242078a8332f2e5d7fa1c513942e407a4c0ff20e10c4f8",
+          "bytes": 6384742,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_N.png",
+          "sha256": "4254fdb41eba68375a985da6f9b5ad3c769cc7d23a339ab2add3d3f628e13c7c",
+          "bytes": 3585923,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_ORM.png",
+          "sha256": "c5b3898b67bca37a9c95729962d363f654b26ffb88501cfc223ce4f0718af069",
+          "bytes": 4401397,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotAntlerChandelier.json",
+        "mesh_objects": [
+          "SM_Env_HeorotAntlerChandelier"
+        ],
+        "triangles": 5040,
+        "materials": [
+          "M_Env_HeorotAntlerChandelier"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -14.061,
+          -13.525,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          14.061,
+          13.525,
+          24.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          28.121,
+          27.05,
+          24.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 28.121,
+          "Y_width": 27.05,
+          "Z_height": 24.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 167,
+          "non_manifold_edges": 24,
+          "faces_with_inconsistent_winding": 19
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1238,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001221,
+          0.001221,
+          0.998779,
+          0.996094
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 1479,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5589,
+        "texel_density_px_per_m_at_raster": 1948.6,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 167,
+        "open_edge_loops": 36,
+        "non_manifold_edges": 24,
+        "faces_with_inconsistent_winding": 16,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 21,
+          "hole": 15
+        },
+        "hole_area_uu2_total": 19.601,
+        "shells": 54,
+        "shells_isolated": 4,
+        "shells_isolated_off_ground": 4,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.017277718,
+        "corners_pointing_into_surface": 105,
+        "ray_escape_faces": {
+          "outward": 4629,
+          "inward": 3,
+          "sheet": 2,
+          "enclosed": 406
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8857,
+          "inward": 0.0002,
+          "sheet": 0.0,
+          "enclosed": 0.1141
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "findings": [
+        "open edges 167 in 36 loop(s): 21 zero-width crack(s), 15 hole(s) totalling 19.6 uu2 (largest 2.0 uu2, rim 5.2 uu, mean width 0.78 uu, at z 5 uu)",
+        "non-manifold edges 24",
+        "faces facing inward by ray escape 3 (0.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 16 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 4, off ground 4"
+      ]
+    },
+    "MK-HEO-AXE-CHOPPING-BLOCK": {
+      "ue": {
+        "mesh": "SM_Env_HeorotAxeChoppingBlock",
+        "textures": [
+          "T_Env_HeorotAxeChoppingBlock_BC",
+          "T_Env_HeorotAxeChoppingBlock_N",
+          "T_Env_HeorotAxeChoppingBlock_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotAxeChoppingBlock",
+        "fbx_material_slot": [
+          "M_Env_HeorotAxeChoppingBlock"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 27.0
+      },
+      "scale_factor_source_to_final": 0.270132,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotAxeChoppingBlock.fbx",
+        "sha256": "6834fe8f063531807d74ed4866ab095dbc62a99bf0887a121d6d55e5da8b3094",
+        "bytes": 173052
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_BC.png",
+          "sha256": "bb15545941d5c5b65653a49b28c0a8cb3c646602b7d1383e70544f514a91fe49",
+          "bytes": 6805222,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_N.png",
+          "sha256": "d82e29d93f1599d946420d3715b1824bcfd4a4e5ba174850be43bdd6e291b83c",
+          "bytes": 4499529,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAxeChoppingBlock_ORM.png",
+          "sha256": "c9881ea33c4db159e6bf44e146950408a9d37a6c4f58167d8f71655a51fab7a6",
+          "bytes": 2788962,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotAxeChoppingBlock.json",
+        "mesh_objects": [
+          "SM_Env_HeorotAxeChoppingBlock"
+        ],
+        "triangles": 4970,
+        "materials": [
+          "M_Env_HeorotAxeChoppingBlock"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -10.216,
+          -10.875,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          10.216,
+          10.875,
+          27.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          20.431,
+          21.75,
+          27.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 20.431,
+          "Y_width": 21.75,
+          "Z_height": 27.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 252,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 68,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5904,
+        "texel_density_px_per_m_at_raster": 2092.4,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 252,
+        "open_edge_loops": 17,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 1,
+          "hole": 16
+        },
+        "hole_area_uu2_total": 309.964,
+        "shells": 16,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.177862959,
+        "corners_pointing_into_surface": 10,
+        "ray_escape_faces": {
+          "outward": 4335,
+          "inward": 61,
+          "sheet": 405,
+          "enclosed": 169
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9001,
+          "inward": 0.0087,
+          "sheet": 0.0588,
+          "enclosed": 0.0324
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAxeChoppingBlock.build.json",
+      "findings": [
+        "open edges 252 in 17 loop(s): 1 zero-width crack(s), 16 hole(s) totalling 310.0 uu2 (largest 293.9 uu2, rim 70.8 uu, mean width 8.30 uu, at z 0 uu)",
+        "faces facing inward by ray escape 61 (0.9 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 405 (5.9 % of area)"
+      ]
+    },
     "MK-HEO-CARVED-PILLAR": {
       "ue": {
         "mesh": "SM_Env_HeorotCarvedPillar",
@@ -298,6 +698,179 @@
         "open edges 791 in 41 loop(s): 0 zero-width crack(s), 41 hole(s) totalling 1667.7 uu2 (largest 883.7 uu2, rim 276.8 uu, mean width 6.39 uu, at z 62 uu)",
         "isolated shells (gap > 0.5 uu) 2, off ground 2",
         "degenerate faces 1 (UE drops them at build)"
+      ]
+    },
+    "MK-HEO-DANE-BANNER": {
+      "ue": {
+        "mesh": "SM_Env_HeorotDaneBanner",
+        "textures": [
+          "T_Env_HeorotDaneBanner_BC",
+          "T_Env_HeorotDaneBanner_N",
+          "T_Env_HeorotDaneBanner_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotDaneBanner",
+        "fbx_material_slot": [
+          "M_Env_HeorotDaneBanner"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 54.0
+      },
+      "scale_factor_source_to_final": 0.540264,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotDaneBanner.fbx",
+        "sha256": "0f6e1402cfcb6143d50a7d7016221dbd1454dea7cf23ead0bb6f946c744ae54e",
+        "bytes": 227948
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_BC.png",
+          "sha256": "b231e20fa6d00155b6acfdcb8fc9e3661a2a7c42241669950cda17ca31f9e039",
+          "bytes": 7070253,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_N.png",
+          "sha256": "d9cf1ec00e2b13968140ac0ba78852ed7c54080ae89c769e979237668ca4364a",
+          "bytes": 2930305,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDaneBanner_ORM.png",
+          "sha256": "f45683a9dd636acec8402e63520cb3ce208fd5b91eec3122c29d3a2142add0d3",
+          "bytes": 2896639,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotDaneBanner.json",
+        "mesh_objects": [
+          "SM_Env_HeorotDaneBanner"
+        ],
+        "triangles": 4991,
+        "materials": [
+          "M_Env_HeorotDaneBanner"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -1.886,
+          -8.93,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          1.886,
+          8.93,
+          54.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          3.772,
+          17.859,
+          54.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 3.772,
+          "Y_width": 17.859,
+          "Z_height": 54.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 683,
+          "non_manifold_edges": 5,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 686,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000488,
+          0.000488,
+          0.999512,
+          0.931396
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 93,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5981,
+        "texel_density_px_per_m_at_raster": 2275.1,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 683,
+        "open_edge_loops": 34,
+        "non_manifold_edges": 5,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 3,
+          "hole": 31
+        },
+        "hole_area_uu2_total": 36.898,
+        "shells": 21,
+        "shells_isolated": 2,
+        "shells_isolated_off_ground": 2,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.001640774,
+        "corners_pointing_into_surface": 85,
+        "ray_escape_faces": {
+          "outward": 3732,
+          "inward": 4,
+          "sheet": 20,
+          "enclosed": 1235
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8547,
+          "inward": 0.0001,
+          "sheet": 0.0005,
+          "enclosed": 0.1447
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDaneBanner.build.json",
+      "findings": [
+        "open edges 683 in 34 loop(s): 3 zero-width crack(s), 31 hole(s) totalling 36.9 uu2 (largest 1.7 uu2, rim 4.7 uu, mean width 0.73 uu, at z 48 uu)",
+        "non-manifold edges 5",
+        "faces facing inward by ray escape 4 (0.0 % of area; one-sided material culls them from outside)",
+        "isolated shells (gap > 0.5 uu) 2, off ground 2"
       ]
     },
     "MK-HEO-DRINKING-HORNS": {
@@ -471,6 +1044,352 @@
         "non-manifold edges 9"
       ]
     },
+    "MK-HEO-FAERING-BOAT": {
+      "ue": {
+        "mesh": "SM_Env_HeorotFaeringBoat",
+        "textures": [
+          "T_Env_HeorotFaeringBoat_BC",
+          "T_Env_HeorotFaeringBoat_N",
+          "T_Env_HeorotFaeringBoat_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotFaeringBoat",
+        "fbx_material_slot": [
+          "M_Env_HeorotFaeringBoat"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 27.0
+      },
+      "scale_factor_source_to_final": 0.568773,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFaeringBoat.fbx",
+        "sha256": "28620ba0b4e31af953bbc0d6abe6d486cdfe47376fb40fc19b54c7cffd01c37c",
+        "bytes": 243292
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_BC.png",
+          "sha256": "b7d18f5a72c4e0a97ea1b271b2adecfa96d91acc35c3d53c563ead0b83b85224",
+          "bytes": 6615367,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_N.png",
+          "sha256": "004f40bc5170942a0f0a29455661fb954f6ef341d577c674c6a29f440bf6db3b",
+          "bytes": 3163954,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_ORM.png",
+          "sha256": "93b4999029a423ba465e29e7d64037d5f34a97ea847ddf607bd04456e0880970",
+          "bytes": 4279699,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFaeringBoat.json",
+        "mesh_objects": [
+          "SM_Env_HeorotFaeringBoat"
+        ],
+        "triangles": 4705,
+        "materials": [
+          "M_Env_HeorotFaeringBoat"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -28.427,
+          -19.1,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          28.427,
+          19.1,
+          27.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          56.855,
+          38.2,
+          27.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 56.855,
+          "Y_width": 38.2,
+          "Z_height": 27.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 495,
+          "non_manifold_edges": 32,
+          "faces_with_inconsistent_winding": 41
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 821,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.999023,
+          0.997314
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 1852,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 4,
+        "uv_area_used_fraction": 0.6842,
+        "texel_density_px_per_m_at_raster": 1185.7,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 495,
+        "open_edge_loops": 46,
+        "non_manifold_edges": 32,
+        "faces_with_inconsistent_winding": 42,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 5,
+          "hole": 41
+        },
+        "hole_area_uu2_total": 255.086,
+        "shells": 47,
+        "shells_isolated": 12,
+        "shells_isolated_off_ground": 12,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.016433787,
+        "corners_pointing_into_surface": 64,
+        "ray_escape_faces": {
+          "outward": 3760,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 945
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.7929,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.2071
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "findings": [
+        "open edges 495 in 46 loop(s): 5 zero-width crack(s), 41 hole(s) totalling 255.1 uu2 (largest 30.7 uu2, rim 54.8 uu, mean width 1.12 uu, at z 6 uu)",
+        "non-manifold edges 32",
+        "recalc winding disagreements 42 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 12, off ground 12"
+      ]
+    },
+    "MK-HEO-FEAST-PLATTER": {
+      "ue": {
+        "mesh": "SM_Env_HeorotFeastPlatter",
+        "textures": [
+          "T_Env_HeorotFeastPlatter_BC",
+          "T_Env_HeorotFeastPlatter_N",
+          "T_Env_HeorotFeastPlatter_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotFeastPlatter",
+        "fbx_material_slot": [
+          "M_Env_HeorotFeastPlatter"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 6.0
+      },
+      "scale_factor_source_to_final": 0.192036,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFeastPlatter.fbx",
+        "sha256": "d8ffc49df785d2688b5bdd06fa3ee134685d790a5f2e8e64befbf323b32bb12f",
+        "bytes": 241100
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_BC.png",
+          "sha256": "bd1ff1921304616e5216ec90e310c9a5f9135c6edc88b9c9d4c4ca105653bf32",
+          "bytes": 7147621,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_N.png",
+          "sha256": "14913cc56a29770411285c2a11fdc8dbbda8078ddb5785c08c29a41728ae7d08",
+          "bytes": 4215920,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_ORM.png",
+          "sha256": "afc8d75dd5b3337dde93dd3b800ec54dd057ce6723c1e6d77049735fb52b8bae",
+          "bytes": 2836241,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFeastPlatter.json",
+        "mesh_objects": [
+          "SM_Env_HeorotFeastPlatter"
+        ],
+        "triangles": 4732,
+        "materials": [
+          "M_Env_HeorotFeastPlatter"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -8.212,
+          -9.6,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          8.212,
+          9.6,
+          6.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          16.424,
+          19.2,
+          6.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 16.424,
+          "Y_width": 19.2,
+          "Z_height": 6.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 702,
+          "non_manifold_edges": 15,
+          "faces_with_inconsistent_winding": 94
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 791,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.997559,
+          0.999023
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 739,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.7454,
+        "texel_density_px_per_m_at_raster": 2677.4,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 702,
+        "open_edge_loops": 62,
+        "non_manifold_edges": 15,
+        "faces_with_inconsistent_winding": 81,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 2,
+          "hole": 60
+        },
+        "hole_area_uu2_total": 195.004,
+        "shells": 63,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.126174327,
+        "corners_pointing_into_surface": 61,
+        "ray_escape_faces": {
+          "outward": 3664,
+          "inward": 3,
+          "sheet": 11,
+          "enclosed": 1054
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6954,
+          "inward": 0.0022,
+          "sheet": 0.0003,
+          "enclosed": 0.3021
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "findings": [
+        "open edges 702 in 62 loop(s): 2 zero-width crack(s), 60 hole(s) totalling 195.0 uu2 (largest 29.3 uu2, rim 21.1 uu, mean width 2.78 uu, at z 4 uu)",
+        "non-manifold edges 15",
+        "faces facing inward by ray escape 3 (0.2 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 81 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
+      ]
+    },
     "MK-HEO-FUR-PILE": {
       "ue": {
         "mesh": "SM_Env_HeorotFurPile",
@@ -641,6 +1560,176 @@
         "open edges 30 in 9 loop(s): 7 zero-width crack(s), 2 hole(s) totalling 2.0 uu2 (largest 1.2 uu2, rim 5.3 uu, mean width 0.45 uu, at z 4 uu)",
         "non-manifold edges 5",
         "recalc winding disagreements 2 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
+      ]
+    },
+    "MK-HEO-GRAIN-SACKS-NORSE": {
+      "ue": {
+        "mesh": "SM_Env_HeorotGrainSacksNorse",
+        "textures": [
+          "T_Env_HeorotGrainSacksNorse_BC",
+          "T_Env_HeorotGrainSacksNorse_N",
+          "T_Env_HeorotGrainSacksNorse_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotGrainSacksNorse",
+        "fbx_material_slot": [
+          "M_Env_HeorotGrainSacksNorse"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 21.0
+      },
+      "scale_factor_source_to_final": 0.258306,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotGrainSacksNorse.fbx",
+        "sha256": "2a2ac99b7ba011f197454f3e52b2087fe983bae056205748b46e6ab586212de5",
+        "bytes": 198364
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_BC.png",
+          "sha256": "8096fa92142ff188dba144f7a4377a3377621e681f8288d842a0f7540dd765e5",
+          "bytes": 6488587,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_N.png",
+          "sha256": "96daa13d3e5a223bf93176d31a35984cb5fb4fb72d122254d7b7abf5434d6d51",
+          "bytes": 3412163,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_ORM.png",
+          "sha256": "7cee66eac0d1ccb2d39387f381e7dc10b7558229777accfa35f2bc7342518987",
+          "bytes": 4274952,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotGrainSacksNorse.json",
+        "mesh_objects": [
+          "SM_Env_HeorotGrainSacksNorse"
+        ],
+        "triangles": 5464,
+        "materials": [
+          "M_Env_HeorotGrainSacksNorse"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -12.808,
+          -12.909,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          12.808,
+          12.909,
+          21.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          25.616,
+          25.818,
+          21.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 25.616,
+          "Y_width": 25.818,
+          "Z_height": 21.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 72,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 141,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6069,
+        "texel_density_px_per_m_at_raster": 1572.0,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 72,
+        "open_edge_loops": 18,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 7,
+          "hole": 11
+        },
+        "hole_area_uu2_total": 0.688,
+        "shells": 16,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.239243388,
+        "corners_pointing_into_surface": 77,
+        "ray_escape_faces": {
+          "outward": 4446,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 1018
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.7891,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.2109
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "findings": [
+        "open edges 72 in 18 loop(s): 7 zero-width crack(s), 11 hole(s) totalling 0.7 uu2 (largest 0.1 uu2, rim 1.6 uu, mean width 0.18 uu, at z 12 uu)"
       ]
     },
     "MK-HEO-GRENDEL-ARM-TROPHY": {
@@ -1160,6 +2249,179 @@
         "isolated shells (gap > 0.5 uu) 5, off ground 5"
       ]
     },
+    "MK-HEO-HELMET-STAND": {
+      "ue": {
+        "mesh": "SM_Env_HeorotHelmetStand",
+        "textures": [
+          "T_Env_HeorotHelmetStand_BC",
+          "T_Env_HeorotHelmetStand_N",
+          "T_Env_HeorotHelmetStand_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotHelmetStand",
+        "fbx_material_slot": [
+          "M_Env_HeorotHelmetStand"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 48.0
+      },
+      "scale_factor_source_to_final": 0.480234,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotHelmetStand.fbx",
+        "sha256": "a1a92e4eb07ef5b342cd08566f6fe85a5e8581d5f9f1ce3543ed339942dbb5a6",
+        "bytes": 177564
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_BC.png",
+          "sha256": "27399a2ccbeae9cc327d5efe05e67b4e7e88e0a5e668cb5e6f231cea3472b359",
+          "bytes": 7108234,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_N.png",
+          "sha256": "786b878cf80e8da6ac12e7877ebdef7eb87000ae7ad781bb5205f66ef23df07e",
+          "bytes": 3308650,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_ORM.png",
+          "sha256": "0b22e4daa7e175f219f9188416ecc3677571877e2b3eb646e6721076846ee686",
+          "bytes": 4588793,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotHelmetStand.json",
+        "mesh_objects": [
+          "SM_Env_HeorotHelmetStand"
+        ],
+        "triangles": 4958,
+        "materials": [
+          "M_Env_HeorotHelmetStand"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -8.922,
+          -7.398,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          8.922,
+          7.398,
+          48.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          17.845,
+          14.796,
+          48.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 17.845,
+          "Y_width": 14.796,
+          "Z_height": 48.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 500,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 2
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 121,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 1,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6136,
+        "texel_density_px_per_m_at_raster": 1537.9,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 500,
+        "open_edge_loops": 24,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 2,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 24
+        },
+        "hole_area_uu2_total": 419.059,
+        "shells": 16,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.024611054,
+        "corners_pointing_into_surface": 19,
+        "ray_escape_faces": {
+          "outward": 4005,
+          "inward": 17,
+          "sheet": 133,
+          "enclosed": 803
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6218,
+          "inward": 0.0254,
+          "sheet": 0.0296,
+          "enclosed": 0.3232
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "findings": [
+        "open edges 500 in 24 loop(s): 0 zero-width crack(s), 24 hole(s) totalling 419.1 uu2 (largest 122.8 uu2, rim 40.2 uu, mean width 6.11 uu, at z 0 uu)",
+        "faces facing inward by ray escape 17 (2.5 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 133 (3.0 % of area)",
+        "recalc winding disagreements 2 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
+      ]
+    },
     "MK-HEO-HIGH-SEAT-THRONE": {
       "ue": {
         "mesh": "SM_Env_HeorotHighSeatThrone",
@@ -1330,6 +2592,179 @@
         "open edges 286 in 24 loop(s): 3 zero-width crack(s), 21 hole(s) totalling 1983.7 uu2 (largest 356.6 uu2, rim 81.2 uu, mean width 8.79 uu, at z 14 uu)",
         "faces facing inward by ray escape 24 (0.2 % of area; one-sided material culls them from outside)",
         "isolated shells (gap > 0.5 uu) 2, off ground 2"
+      ]
+    },
+    "MK-HEO-ICE-SHARDS": {
+      "ue": {
+        "mesh": "SM_Env_HeorotIceShards",
+        "textures": [
+          "T_Env_HeorotIceShards_BC",
+          "T_Env_HeorotIceShards_N",
+          "T_Env_HeorotIceShards_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotIceShards",
+        "fbx_material_slot": [
+          "M_Env_HeorotIceShards"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 30.0
+      },
+      "scale_factor_source_to_final": 0.324564,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotIceShards.fbx",
+        "sha256": "9f992e0090063312cf12c31ecb6f6b3718218270b5cc46371f49cea994f96a60",
+        "bytes": 169388
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_BC.png",
+          "sha256": "3fc5674a8b20d02d2ecee50b9dacc049513fba964dd52afa79548dd74169e049",
+          "bytes": 5420771,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_N.png",
+          "sha256": "f715c1d4986593a13202bc4608d6f241045e8de0722d49c010a865fa75cdec2b",
+          "bytes": 2369860,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_ORM.png",
+          "sha256": "fd1d6192378882c7afc8bfffb79ede14e17bffca39c606884efb882564216ca0",
+          "bytes": 4600033,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotIceShards.json",
+        "mesh_objects": [
+          "SM_Env_HeorotIceShards"
+        ],
+        "triangles": 4369,
+        "materials": [
+          "M_Env_HeorotIceShards"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -16.157,
+          -16.22,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          16.157,
+          16.22,
+          30.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          32.314,
+          32.441,
+          30.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 32.314,
+          "Y_width": 32.441,
+          "Z_height": 30.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 609,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 162,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5947,
+        "texel_density_px_per_m_at_raster": 1350.8,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 609,
+        "open_edge_loops": 45,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 45
+        },
+        "hole_area_uu2_total": 1020.366,
+        "shells": 44,
+        "shells_isolated": 7,
+        "shells_isolated_off_ground": 6,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.150363966,
+        "corners_pointing_into_surface": 11,
+        "ray_escape_faces": {
+          "outward": 3155,
+          "inward": 281,
+          "sheet": 574,
+          "enclosed": 359
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6109,
+          "inward": 0.1147,
+          "sheet": 0.1117,
+          "enclosed": 0.1628
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "findings": [
+        "open edges 609 in 45 loop(s): 0 zero-width crack(s), 45 hole(s) totalling 1020.4 uu2 (largest 714.6 uu2, rim 116.3 uu, mean width 12.28 uu, at z 1 uu)",
+        "faces facing inward by ray escape 281 (11.5 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 574 (11.2 % of area)",
+        "isolated shells (gap > 0.5 uu) 7, off ground 6"
       ]
     },
     "MK-HEO-IRON-BOUND-CHEST": {
@@ -2541,6 +3976,352 @@
         "isolated shells (gap > 0.5 uu) 22, off ground 22"
       ]
     },
+    "MK-HEO-MOORING-POST": {
+      "ue": {
+        "mesh": "SM_Env_HeorotMooringPost",
+        "textures": [
+          "T_Env_HeorotMooringPost_BC",
+          "T_Env_HeorotMooringPost_N",
+          "T_Env_HeorotMooringPost_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotMooringPost",
+        "fbx_material_slot": [
+          "M_Env_HeorotMooringPost"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 42.0
+      },
+      "scale_factor_source_to_final": 0.420205,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotMooringPost.fbx",
+        "sha256": "e5cec0f75b0728f65b89cb91b264e64c1247afd3ffba9e6daca9e0dd302cc986",
+        "bytes": 163788
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_BC.png",
+          "sha256": "d9a53a532602df49d8e67c47222812039f5eb58f334f52d58b61b0f1ef18b23a",
+          "bytes": 6721489,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_N.png",
+          "sha256": "e8c74de1c82fb50f436b3548726b9d523f677cb99ae5825ff0f204ad570e02bd",
+          "bytes": 4535107,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_ORM.png",
+          "sha256": "64fbab6ba276e91e6638a4bb91aed4800606089027670b8eb12f60a7700e9a8b",
+          "bytes": 3600221,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotMooringPost.json",
+        "mesh_objects": [
+          "SM_Env_HeorotMooringPost"
+        ],
+        "triangles": 4605,
+        "materials": [
+          "M_Env_HeorotMooringPost"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -8.074,
+          -8.156,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          8.074,
+          8.156,
+          42.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          16.148,
+          16.312,
+          42.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 16.148,
+          "Y_width": 16.312,
+          "Z_height": 42.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 547,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 83,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5801,
+        "texel_density_px_per_m_at_raster": 1563.5,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 547,
+        "open_edge_loops": 16,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 16
+        },
+        "hole_area_uu2_total": 673.458,
+        "shells": 11,
+        "shells_isolated": 9,
+        "shells_isolated_off_ground": 9,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.083833017,
+        "corners_pointing_into_surface": 11,
+        "ray_escape_faces": {
+          "outward": 4508,
+          "inward": 0,
+          "sheet": 3,
+          "enclosed": 94
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.772,
+          "inward": 0.0,
+          "sheet": 0.0016,
+          "enclosed": 0.2264
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "findings": [
+        "open edges 547 in 16 loop(s): 0 zero-width crack(s), 16 hole(s) totalling 673.5 uu2 (largest 142.8 uu2, rim 117.3 uu, mean width 2.43 uu, at z 28 uu)",
+        "isolated shells (gap > 0.5 uu) 9, off ground 9"
+      ]
+    },
+    "MK-HEO-NET-DRYING-RACK": {
+      "ue": {
+        "mesh": "SM_Env_HeorotNetDryingRack",
+        "textures": [
+          "T_Env_HeorotNetDryingRack_BC",
+          "T_Env_HeorotNetDryingRack_N",
+          "T_Env_HeorotNetDryingRack_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotNetDryingRack",
+        "fbx_material_slot": [
+          "M_Env_HeorotNetDryingRack"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 54.0
+      },
+      "scale_factor_source_to_final": 0.540264,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotNetDryingRack.fbx",
+        "sha256": "48e568753cbbcdfeace9856ce5f3f16205acebbb14d0d8664cc7763377d87119",
+        "bytes": 272316
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_BC.png",
+          "sha256": "020b4fbe25243eacdd3ea5deaac267c9605f693496b90ec7761ff89618bc858e",
+          "bytes": 7044348,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_N.png",
+          "sha256": "0bcbb5e66980cf6cd1930e8246a6107b6f99c424d5b1a4d0d1ec95e04a49de8e",
+          "bytes": 3782620,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_ORM.png",
+          "sha256": "28dfdd99eae060a253e3ff5c555b43e49132988bc049283630171396a8d82d1d",
+          "bytes": 2936959,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotNetDryingRack.json",
+        "mesh_objects": [
+          "SM_Env_HeorotNetDryingRack"
+        ],
+        "triangles": 5160,
+        "materials": [
+          "M_Env_HeorotNetDryingRack"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -11.99,
+          -19.719,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          11.99,
+          19.719,
+          54.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          23.979,
+          39.438,
+          54.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 23.979,
+          "Y_width": 39.438,
+          "Z_height": 54.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 372,
+          "non_manifold_edges": 89,
+          "faces_with_inconsistent_winding": 66
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1266,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001221,
+          0.001221,
+          0.997314,
+          0.998779
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 2303,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5293,
+        "texel_density_px_per_m_at_raster": 1125.2,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 372,
+        "open_edge_loops": 67,
+        "non_manifold_edges": 89,
+        "faces_with_inconsistent_winding": 63,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 7,
+          "hole": 60
+        },
+        "hole_area_uu2_total": 206.285,
+        "shells": 21,
+        "shells_isolated": 2,
+        "shells_isolated_off_ground": 2,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.014873333,
+        "corners_pointing_into_surface": 146,
+        "ray_escape_faces": {
+          "outward": 4750,
+          "inward": 24,
+          "sheet": 130,
+          "enclosed": 256
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9243,
+          "inward": 0.0008,
+          "sheet": 0.0287,
+          "enclosed": 0.0461
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "findings": [
+        "open edges 372 in 67 loop(s): 7 zero-width crack(s), 60 hole(s) totalling 206.3 uu2 (largest 46.9 uu2, rim 59.2 uu, mean width 1.58 uu, at z 40 uu)",
+        "non-manifold edges 89",
+        "faces facing inward by ray escape 24 (0.1 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 130 (2.9 % of area)",
+        "recalc winding disagreements 63 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 2, off ground 2"
+      ]
+    },
     "MK-HEO-ROASTING-SPIT": {
       "ue": {
         "mesh": "SM_Env_HeorotRoastingSpit",
@@ -3063,6 +4844,180 @@
         "isolated shells (gap > 0.5 uu) 2, off ground 2"
       ]
     },
+    "MK-HEO-SMITH-ANVIL": {
+      "ue": {
+        "mesh": "SM_Env_HeorotSmithAnvil",
+        "textures": [
+          "T_Env_HeorotSmithAnvil_BC",
+          "T_Env_HeorotSmithAnvil_N",
+          "T_Env_HeorotSmithAnvil_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotSmithAnvil",
+        "fbx_material_slot": [
+          "M_Env_HeorotSmithAnvil"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 24.0
+      },
+      "scale_factor_source_to_final": 0.240117,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSmithAnvil.fbx",
+        "sha256": "ece274a8f9f6758742651085f3057c3a0ee14432acfcc1617bec5436e1e73984",
+        "bytes": 222924
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_BC.png",
+          "sha256": "bbe0d06bd6ea038bc4e895c83b8f8f939157225c72c68fa93abd66e924a2fa87",
+          "bytes": 6413498,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_N.png",
+          "sha256": "bfe11c62353737ae51fbfeb0c67b96edc52cde503031772d1864510cdcf9d037",
+          "bytes": 3786068,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_ORM.png",
+          "sha256": "ebf7b88b3eed3b90a11726069d40f59ec0b0942b1afc4c6accff479a432398f0",
+          "bytes": 3803286,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSmithAnvil.json",
+        "mesh_objects": [
+          "SM_Env_HeorotSmithAnvil"
+        ],
+        "triangles": 4719,
+        "materials": [
+          "M_Env_HeorotSmithAnvil"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -9.702,
+          -10.546,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          9.702,
+          10.546,
+          24.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          19.404,
+          21.092,
+          24.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 19.404,
+          "Y_width": 21.092,
+          "Z_height": 24.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 295,
+          "non_manifold_edges": 9,
+          "faces_with_inconsistent_winding": 1
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 621,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000732,
+          0.996094,
+          0.999268
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 1397,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6733,
+        "texel_density_px_per_m_at_raster": 2110.4,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 295,
+        "open_edge_loops": 15,
+        "non_manifold_edges": 9,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 4,
+          "hole": 11
+        },
+        "hole_area_uu2_total": 340.242,
+        "shells": 11,
+        "shells_isolated": 4,
+        "shells_isolated_off_ground": 4,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.240409326,
+        "corners_pointing_into_surface": 7,
+        "ray_escape_faces": {
+          "outward": 3564,
+          "inward": 73,
+          "sheet": 595,
+          "enclosed": 487
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.7396,
+          "inward": 0.0235,
+          "sheet": 0.15,
+          "enclosed": 0.0869
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "findings": [
+        "open edges 295 in 15 loop(s): 4 zero-width crack(s), 11 hole(s) totalling 340.2 uu2 (largest 319.2 uu2, rim 65.3 uu, mean width 9.77 uu, at z 0 uu)",
+        "non-manifold edges 9",
+        "faces facing inward by ray escape 73 (2.4 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 595 (15.0 % of area)",
+        "isolated shells (gap > 0.5 uu) 4, off ground 4"
+      ]
+    },
     "MK-HEO-SNOWY-PINE": {
       "ue": {
         "mesh": "SM_Env_HeorotSnowyPine",
@@ -3411,6 +5366,351 @@
         "isolated shells (gap > 0.5 uu) 1, off ground 0"
       ]
     },
+    "MK-HEO-TREASURE-HOARD": {
+      "ue": {
+        "mesh": "SM_Env_HeorotTreasureHoard",
+        "textures": [
+          "T_Env_HeorotTreasureHoard_BC",
+          "T_Env_HeorotTreasureHoard_N",
+          "T_Env_HeorotTreasureHoard_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotTreasureHoard",
+        "fbx_material_slot": [
+          "M_Env_HeorotTreasureHoard"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 18.0
+      },
+      "scale_factor_source_to_final": 0.325689,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotTreasureHoard.fbx",
+        "sha256": "f4539cc9bd6b72b38c26dd2610a0676fc9aae001773e8fa8945350badb4424e6",
+        "bytes": 175468
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_BC.png",
+          "sha256": "21ccc9d3a20d40ee8014a73c571faa8014646f5c704153dad1823a3343bcf936",
+          "bytes": 7786380,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_N.png",
+          "sha256": "331138d7e444e6d9d98b82358a5591f2af4d4b3bfd0e5765f175fcd0bace0262",
+          "bytes": 4761821,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_ORM.png",
+          "sha256": "ac50afdfb9eeba8d03385548d63a069953acb75a8a29b9b36627f5071a5b68a0",
+          "bytes": 4009409,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotTreasureHoard.json",
+        "mesh_objects": [
+          "SM_Env_HeorotTreasureHoard"
+        ],
+        "triangles": 4712,
+        "materials": [
+          "M_Env_HeorotTreasureHoard"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -14.162,
+          -16.276,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          14.162,
+          16.276,
+          18.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          28.323,
+          32.553,
+          18.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 28.323,
+          "Y_width": 32.553,
+          "Z_height": 18.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 408,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "-X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 108,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6527,
+        "texel_density_px_per_m_at_raster": 1603.5,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 408,
+        "open_edge_loops": 19,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 1,
+          "hole": 18
+        },
+        "hole_area_uu2_total": 225.007,
+        "shells": 21,
+        "shells_isolated": 2,
+        "shells_isolated_off_ground": 2,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.095754483,
+        "corners_pointing_into_surface": 20,
+        "ray_escape_faces": {
+          "outward": 4114,
+          "inward": 1,
+          "sheet": 0,
+          "enclosed": 597
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8274,
+          "inward": 0.0001,
+          "sheet": 0.0,
+          "enclosed": 0.1725
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "findings": [
+        "open edges 408 in 19 loop(s): 1 zero-width crack(s), 18 hole(s) totalling 225.0 uu2 (largest 45.6 uu2, rim 26.9 uu, mean width 3.40 uu, at z 14 uu)",
+        "faces facing inward by ray escape 1 (0.0 % of area; one-sided material culls them from outside)",
+        "isolated shells (gap > 0.5 uu) 2, off ground 2"
+      ]
+    },
+    "MK-HEO-WALL-TORCH": {
+      "ue": {
+        "mesh": "SM_Env_HeorotWallTorch",
+        "textures": [
+          "T_Env_HeorotWallTorch_BC",
+          "T_Env_HeorotWallTorch_N",
+          "T_Env_HeorotWallTorch_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotWallTorch",
+        "fbx_material_slot": [
+          "M_Env_HeorotWallTorch"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 24.0
+      },
+      "scale_factor_source_to_final": 0.240117,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWallTorch.fbx",
+        "sha256": "c4205cbe9bc2935e050f3f4531513480c30e394a28ec757a82202982192eab7a",
+        "bytes": 238860
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_BC.png",
+          "sha256": "95703b26872bea659580531c83b0f50db2eb621f92f02e7dbc48d939c66aeae7",
+          "bytes": 6445246,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_N.png",
+          "sha256": "aff376c85d01f1b8c408bcccb1924133ee9693f2fe5f5ec88d79d09af4d1ab44",
+          "bytes": 3990104,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_ORM.png",
+          "sha256": "25d0ecb69268e2741ffa7de68dc9b8d82e820cba982665848f3cd7dda6b661a3",
+          "bytes": 4627173,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWallTorch.json",
+        "mesh_objects": [
+          "SM_Env_HeorotWallTorch"
+        ],
+        "triangles": 4839,
+        "materials": [
+          "M_Env_HeorotWallTorch"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -4.965,
+          -3.828,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          4.965,
+          3.828,
+          24.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          9.931,
+          7.656,
+          24.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 9.931,
+          "Y_width": 7.656,
+          "Z_height": 24.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 490,
+          "non_manifold_edges": 11,
+          "faces_with_inconsistent_winding": 33
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 834,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.996094,
+          0.999023
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 7959,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.7289,
+        "texel_density_px_per_m_at_raster": 3308.6,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 490,
+        "open_edge_loops": 32,
+        "non_manifold_edges": 11,
+        "faces_with_inconsistent_winding": 33,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 32
+        },
+        "hole_area_uu2_total": 68.02,
+        "shells": 41,
+        "shells_isolated": 7,
+        "shells_isolated_off_ground": 7,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.012090464,
+        "corners_pointing_into_surface": 12,
+        "ray_escape_faces": {
+          "outward": 4036,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 803
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6019,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.3981
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "findings": [
+        "open edges 490 in 32 loop(s): 0 zero-width crack(s), 32 hole(s) totalling 68.0 uu2 (largest 44.4 uu2, rim 60.5 uu, mean width 1.47 uu, at z 7 uu)",
+        "non-manifold edges 11",
+        "recalc winding disagreements 33 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 7, off ground 7"
+      ]
+    },
     "MK-HEO-WARP-LOOM": {
       "ue": {
         "mesh": "SM_Env_HeorotWarpLoom",
@@ -3757,6 +6057,349 @@
         "faces facing inward by ray escape 131 (3.1 % of area; one-sided material culls them from outside)",
         "open sheet faces seen from both sides 184 (5.0 % of area)",
         "isolated shells (gap > 0.5 uu) 13, off ground 13"
+      ]
+    },
+    "MK-HEO-WOODEN-BUCKET": {
+      "ue": {
+        "mesh": "SM_Env_HeorotWoodenBucket",
+        "textures": [
+          "T_Env_HeorotWoodenBucket_BC",
+          "T_Env_HeorotWoodenBucket_N",
+          "T_Env_HeorotWoodenBucket_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotWoodenBucket",
+        "fbx_material_slot": [
+          "M_Env_HeorotWoodenBucket"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 12.0
+      },
+      "scale_factor_source_to_final": 0.123965,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWoodenBucket.fbx",
+        "sha256": "308b5498b17f37da295847af42cafc81e5d4a79ea660faa3652aa8ed78883e4e",
+        "bytes": 186076
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_BC.png",
+          "sha256": "c7ab6626def3e72903a1ecd7f4e2d57047da0b929267ec181a377a395deb548e",
+          "bytes": 6356913,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_N.png",
+          "sha256": "77307ce0e772059a25784cc82461313a55f79063b949532017b19fa026f239ac",
+          "bytes": 3096975,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_ORM.png",
+          "sha256": "1869ee7d31dfdd9d92106e623b12680f602480a3aa761b36adde04380a1976b8",
+          "bytes": 3187807,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWoodenBucket.json",
+        "mesh_objects": [
+          "SM_Env_HeorotWoodenBucket"
+        ],
+        "triangles": 4991,
+        "materials": [
+          "M_Env_HeorotWoodenBucket"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -5.497,
+          -5.723,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          5.497,
+          5.723,
+          12.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          10.993,
+          11.446,
+          12.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 10.993,
+          "Y_width": 11.446,
+          "Z_height": 12.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 387,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 155,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.4523,
+        "texel_density_px_per_m_at_raster": 2704.5,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 387,
+        "open_edge_loops": 12,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 2,
+          "hole": 10
+        },
+        "hole_area_uu2_total": 444.84,
+        "shells": 6,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.360724636,
+        "corners_pointing_into_surface": 31,
+        "ray_escape_faces": {
+          "outward": 4572,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 419
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9649,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.0351
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "findings": [
+        "open edges 387 in 12 loop(s): 2 zero-width crack(s), 10 hole(s) totalling 444.8 uu2 (largest 80.1 uu2, rim 31.8 uu, mean width 5.04 uu, at z 9 uu)"
+      ]
+    },
+    "MK-HEO-WOODEN-SLED": {
+      "ue": {
+        "mesh": "SM_Env_HeorotWoodenSled",
+        "textures": [
+          "T_Env_HeorotWoodenSled_BC",
+          "T_Env_HeorotWoodenSled_N",
+          "T_Env_HeorotWoodenSled_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotWoodenSled",
+        "fbx_material_slot": [
+          "M_Env_HeorotWoodenSled"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 24.0
+      },
+      "scale_factor_source_to_final": 0.510854,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWoodenSled.fbx",
+        "sha256": "69c7c9b463ed972e6ee98cb905579f153e960128b9675359c5afe4b40a117a60",
+        "bytes": 272492
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_BC.png",
+          "sha256": "a451c49d7e77ee2d138e4d499b7a6057aa0af0efba38065d04e7ea48b0d8ca2e",
+          "bytes": 6987748,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_N.png",
+          "sha256": "cc29c3442f83a4fcb00002b29c39d36ac8c86aa25d0a472eeb490643137f10cd",
+          "bytes": 3602840,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_ORM.png",
+          "sha256": "9fb03697be4e9e07bf707f641a9f0810e5a86e41b167cc450d7a3c74b479a55a",
+          "bytes": 3316379,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWoodenSled.json",
+        "mesh_objects": [
+          "SM_Env_HeorotWoodenSled"
+        ],
+        "triangles": 5002,
+        "materials": [
+          "M_Env_HeorotWoodenSled"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -25.49,
+          -13.595,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          25.49,
+          13.595,
+          24.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          50.98,
+          27.191,
+          24.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 50.98,
+          "Y_width": 27.191,
+          "Z_height": 24.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 378,
+          "non_manifold_edges": 22,
+          "faces_with_inconsistent_winding": 13
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1228,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.999023,
+          0.994141
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 896,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 2,
+        "uv_area_used_fraction": 0.6709,
+        "texel_density_px_per_m_at_raster": 1020.5,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 378,
+        "open_edge_loops": 42,
+        "non_manifold_edges": 22,
+        "faces_with_inconsistent_winding": 11,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 13,
+          "hole": 29
+        },
+        "hole_area_uu2_total": 775.313,
+        "shells": 21,
+        "shells_isolated": 12,
+        "shells_isolated_off_ground": 12,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.103598554,
+        "corners_pointing_into_surface": 158,
+        "ray_escape_faces": {
+          "outward": 4223,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 779
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.7886,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.2114
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "findings": [
+        "open edges 378 in 42 loop(s): 13 zero-width crack(s), 29 hole(s) totalling 775.3 uu2 (largest 615.6 uu2, rim 142.2 uu, mean width 8.66 uu, at z 11 uu)",
+        "non-manifold edges 22",
+        "recalc winding disagreements 11 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 12, off ground 12"
       ]
     }
   }

@@ -1,0 +1,410 @@
+{
+  "schema": "unmatched.env-kit.build-report/1",
+  "asset": "ASSET-ENV-KIT-001",
+  "runId": "20261021-smartmesh",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "note": "technical pipeline output; nothing here is an art decision"
+  },
+  "generated": "2026-10-21",
+  "params": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/scripts/env-kit-params.json",
+  "scripts_sha256_lf": {
+    "tools/art/env_kit/env_kit_build.py": "cf9b65c6706f2313674a6a29855ee13a8c4bbeb2e0e025cd57407dead242173f",
+    "tools/art/env_kit/orientation_check.py": "23df62cd21c6202e5dd906e315d6a36b2122060f2887d05ecf0ed92c531553fd",
+    "tools/art/env_kit/run_env_kit.py": "ce4d4ab0fd90537e642fd92cea6d99789adb250f5b0a5123c8e2464b2c5c4197",
+    "tools/tripo-pipeline/blender/check_static_prop_fbx.py": "dddb6341076e297c9cf11f9526e25d8523b5924f44f3c6892de8baefc9c6c28c",
+    "tools/tripo-pipeline/blender/static_prop_candidate.py": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "blender_version": "5.2.2 LTS",
+  "no_render_policy": "CPU only: headless Blender -b --factory-startup, no Eevee/Cycles/Workbench render, no AO bake, no viewport; orientation verified with silhouette masks (PIL) and face colour statistics against the Tripo reference views",
+  "conventions": {
+    "units": "FBX numbers are centimetres = UE uu, UnitScaleFactor patched to 1.0 (UM_FBX_v1)",
+    "forward_axis": "front (Tripo 'front' reference view) = glTF +Z = .blend -Y = UE +X (UM_FBX_v1 +90 deg Z turn; the FBX readback frame maps .blend -Y -> +X, as for SM_Decor_Barrel/Lantern)",
+    "placement_yaw": "K1 camera yaw -90 looks along -Y: actor yaw +90 turns the front (+X) to the camera",
+    "pivot": "base centre: centre of the XY bounds, min Z = 0",
+    "ue_import": "legacy FBX, import_uniform_scale 1.0, import_materials false, import_textures false, collision none (decor, not interactive), build_nanite false",
+    "textures": {
+      "BC": "sRGB, TC_Default",
+      "N": "sRGB off, TC_Normalmap, flip_green false (PNG is DirectX already)",
+      "ORM": "sRGB off, TC_Masks"
+    },
+    "orm": "R = 1.0 (no AO; Tripo gives no occlusion map and the Cycles bake is not run), G = roughness, B = metallic",
+    "normal": "DirectX (green flipped from the glTF OpenGL map), same as SM_Decor_Barrel/Lantern",
+    "base_colour": "glTF baseColorFactor 0.8 multiplied in linear light (as the lantern candidate)",
+    "memory_rule_note": "'FBX_SCALE_UNITS + import 100' (S05 memory) belongs to a profile without the UnitScaleFactor patch; with UM_FBX_v1 (lantern/barrel, RIG-CONTRACT.md) UE imports at import_uniform_scale 1.0"
+  },
+  "totals": {
+    "assets_built": 2,
+    "triangles": 9144,
+    "triangles_max": 4786,
+    "export_bytes": 31342529,
+    "checks_passed": true
+  },
+  "findings": [
+    "MK-SHW-MAJOR-OAK: open edges 575 in 37 loop(s): 4 zero-width crack(s), 33 hole(s) totalling 32414.7 uu2 (largest 16914.7 uu2, rim 2329.5 uu, mean width 14.52 uu, at z 5 uu)",
+    "MK-SHW-MAJOR-OAK: non-manifold edges 1",
+    "MK-SHW-MAJOR-OAK: faces facing inward by ray escape 83 (2.3 % of area; one-sided material culls them from outside)",
+    "MK-SHW-MAJOR-OAK: open sheet faces seen from both sides 316 (3.1 % of area)",
+    "MK-SHW-MAJOR-OAK: isolated shells (gap > 0.5 uu) 33, off ground 32",
+    "MK-SHW-FALLEN-LOG: open edges 912 in 40 loop(s): 0 zero-width crack(s), 40 hole(s) totalling 1925.4 uu2 (largest 1452.0 uu2, rim 213.2 uu, mean width 13.62 uu, at z 3 uu)",
+    "MK-SHW-FALLEN-LOG: faces facing inward by ray escape 326 (6.1 % of area; one-sided material culls them from outside)",
+    "MK-SHW-FALLEN-LOG: open sheet faces seen from both sides 789 (17.9 % of area)",
+    "MK-SHW-FALLEN-LOG: recalc winding disagreements 304 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-SHW-FALLEN-LOG: isolated shells (gap > 0.5 uu) 21, off ground 20",
+    "MK-SHW-FALLEN-LOG: UV overlap between islands 1 px at 1024"
+  ],
+  "assets": {
+    "MK-SHW-FALLEN-LOG": {
+      "ue": {
+        "mesh": "SM_Env_SherwoodFallenLog",
+        "textures": [
+          "T_Env_SherwoodFallenLog_BC",
+          "T_Env_SherwoodFallenLog_N",
+          "T_Env_SherwoodFallenLog_ORM"
+        ],
+        "material_instance": "MI_Env_SherwoodFallenLog",
+        "fbx_material_slot": [
+          "M_Env_SherwoodFallenLog"
+        ],
+        "folder": "/Game/EnvKit/Sherwood/"
+      },
+      "board": "Sherwood",
+      "target": {
+        "dimension": "height",
+        "uu": 30.0
+      },
+      "scale_factor_source_to_final": 0.786684,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFallenLog.fbx",
+        "sha256": "e8f3982d13470d46d17b122bf8a4773049f412a9e637f6c53a50f5f7e9a305fd",
+        "bytes": 164844
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_BC.png",
+          "sha256": "7a885fa7874974b21fb3693306e1108987f22d9eacd4169e1449e255f1c19140",
+          "bytes": 7570223,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_N.png",
+          "sha256": "07db195f8102bb2d1780ef394eb33fb812088fb8679548c5254d004b559036d7",
+          "bytes": 4692650,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_ORM.png",
+          "sha256": "95d8c2fa9a496078178e1cab52d8b5e2c89ddeac6afaefa9429aad4c1e0c995f",
+          "bytes": 2969999,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodFallenLog.json",
+        "mesh_objects": [
+          "SM_Env_SherwoodFallenLog"
+        ],
+        "triangles": 4358,
+        "materials": [
+          "M_Env_SherwoodFallenLog"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -19.648,
+          -39.315,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          19.648,
+          39.315,
+          30.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          39.296,
+          78.63,
+          30.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 39.296,
+          "Y_width": 78.63,
+          "Z_height": 30.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 912,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 304
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 121,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 1,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6214,
+        "texel_density_px_per_m_at_raster": 1076.6,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 912,
+        "open_edge_loops": 40,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 304,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 40
+        },
+        "hole_area_uu2_total": 1925.363,
+        "shells": 42,
+        "shells_isolated": 21,
+        "shells_isolated_off_ground": 20,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.04357703,
+        "corners_pointing_into_surface": 17,
+        "ray_escape_faces": {
+          "outward": 3115,
+          "inward": 326,
+          "sheet": 789,
+          "enclosed": 128
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.733,
+          "inward": 0.0612,
+          "sheet": 0.1791,
+          "enclosed": 0.0267
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "findings": [
+        "open edges 912 in 40 loop(s): 0 zero-width crack(s), 40 hole(s) totalling 1925.4 uu2 (largest 1452.0 uu2, rim 213.2 uu, mean width 13.62 uu, at z 3 uu)",
+        "faces facing inward by ray escape 326 (6.1 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 789 (17.9 % of area)",
+        "recalc winding disagreements 304 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 21, off ground 20",
+        "UV overlap between islands 1 px at 1024"
+      ]
+    },
+    "MK-SHW-MAJOR-OAK": {
+      "ue": {
+        "mesh": "SM_Env_SherwoodMajorOak",
+        "textures": [
+          "T_Env_SherwoodMajorOak_BC",
+          "T_Env_SherwoodMajorOak_N",
+          "T_Env_SherwoodMajorOak_ORM"
+        ],
+        "material_instance": "MI_Env_SherwoodMajorOak",
+        "fbx_material_slot": [
+          "M_Env_SherwoodMajorOak"
+        ],
+        "folder": "/Game/EnvKit/Sherwood/"
+      },
+      "board": "Sherwood",
+      "target": {
+        "dimension": "height",
+        "uu": 225.0
+      },
+      "scale_factor_source_to_final": 2.251099,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodMajorOak.fbx",
+        "sha256": "ed864c2d49ad4794638aeb5db03c7ae02197289e9404dd54b7712c80e657a7cf",
+        "bytes": 278284
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_BC.png",
+          "sha256": "b6a6a00ac54e75c41a66fd57c1fed152b8af393be8742ebefad8015ac4070d02",
+          "bytes": 7246557,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_N.png",
+          "sha256": "15bccb26d940abbb172019ec8d3e22fbc44b8a77ae139ecbcfc1eaf9e1af3fcf",
+          "bytes": 4440216,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_ORM.png",
+          "sha256": "fa0c880ae08a161c9a9eeb09b0311f1440f31c075f154b8292a4d13b04a65ff0",
+          "bytes": 3979756,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodMajorOak.json",
+        "mesh_objects": [
+          "SM_Env_SherwoodMajorOak"
+        ],
+        "triangles": 4786,
+        "materials": [
+          "M_Env_SherwoodMajorOak"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -106.564,
+          -111.511,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          106.564,
+          111.511,
+          225.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          213.129,
+          223.021,
+          225.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 213.129,
+          "Y_width": 223.021,
+          "Z_height": 225.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 575,
+          "non_manifold_edges": 1,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1551,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001465,
+          0.001465,
+          0.988525,
+          0.998535
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5196,
+        "texel_density_px_per_m_at_raster": 173.5,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 575,
+        "open_edge_loops": 37,
+        "non_manifold_edges": 1,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 4,
+          "hole": 33
+        },
+        "hole_area_uu2_total": 32414.721,
+        "shells": 33,
+        "shells_isolated": 33,
+        "shells_isolated_off_ground": 32,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.174608095,
+        "corners_pointing_into_surface": 79,
+        "ray_escape_faces": {
+          "outward": 4002,
+          "inward": 83,
+          "sheet": 316,
+          "enclosed": 385
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8468,
+          "inward": 0.0229,
+          "sheet": 0.0309,
+          "enclosed": 0.0994
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "findings": [
+        "open edges 575 in 37 loop(s): 4 zero-width crack(s), 33 hole(s) totalling 32414.7 uu2 (largest 16914.7 uu2, rim 2329.5 uu, mean width 14.52 uu, at z 5 uu)",
+        "non-manifold edges 1",
+        "faces facing inward by ray escape 83 (2.3 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 316 (3.1 % of area)",
+        "isolated shells (gap > 0.5 uu) 33, off ground 32"
+      ]
+    }
+  }
+}

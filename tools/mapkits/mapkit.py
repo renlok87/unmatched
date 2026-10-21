@@ -123,7 +123,7 @@ def prompt_short(m: str, key: str) -> str:
     tail = (" Wall-mounted: flat back, nothing behind it, no stand, no legs." if any(w_ in text for w_ in ("wall", "mounted"))
             else " Hanging item: shown alone with only a short chain or hook at the top, nothing below it, no stand."
             if any(w_ in text for w_ in ("hanging", "chandelier"))
-            and not any(w_ in text for w_ in ("tripod", "pole", "stand", "rack", "spit", "beam")) else "")
+            and not any(w_ in text for w_ in ("tripod", "pole", "stand", "rack", "spit", "beam", "crossbar", "ladder", "stake")) else "")
     s = (f"3/4 front view of ONE object, camera low at the object's mid height, centred, 10% margin, plain flat "
          f"mid-grey (#808080) background, soft even daylight, no shadows, no floor, no base, no plinth, no text or "
          f"letters. Stylized hand-painted tabletop "

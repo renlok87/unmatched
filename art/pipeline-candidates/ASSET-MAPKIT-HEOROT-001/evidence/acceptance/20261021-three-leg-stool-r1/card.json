@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotThreeLegStool.fbx",
+      "sha256": "79e0e29a26b18149d933c614619edc76a038d711cd3ac84bddfed2ef9de00360"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotThreeLegStool_BC.png",
+      "sha256": "b3469b417aeffc225d2e49de1b1f736d8e8194660fc6643e1de266a7bfd44b2f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotThreeLegStool_N.png",
+      "sha256": "f5b876900ba8d30ead2fe30cffd4564304601094661c7de345a42b6e5f3767aa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotThreeLegStool_ORM.png",
+      "sha256": "a47ea2be79af85e9be42c7ed550666595d0cd572971d7145ba675c36485e9055"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-three-leg-stool-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotThreeLegStool.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+      "note": "5098 tris (бюджет env_kit 12000, проп 1200), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+      "note": "UV0 islands 210, used 0.7015, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+      "note": "T_Env_HeorotThreeLegStool_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotThreeLegStool.build.json",
+      "note": "SM_Env_HeorotThreeLegStool, M_Env_HeorotThreeLegStool",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Заказан трёхногий табурет (на sheet.png три ноги: две передние и одна задняя по центру, её стопа выше боковых). Модель четырёхногая, ноги стоят квадратом. На close-base.jpg видны четыре стопы. Кадры turn-000/090/180/270 показывают 3 ноги: передняя по центру с самой низкой стопой закрывает заднюю. Кадры turn-045/135/225/315 показывают по 2 ноги, на turn-135/225/315 у стоп видны сдвоенные контуры: пары ног перекрываются. На uv-layout.png на диске низа сиденья четыре тёмных пятна — гнёзда ног. Лишняя главная часть меняет главный признак заказа («three-legged»), поэтому 0,5. Второстепенное отличие: обод сиденья разбит четырьмя радиальными прорезями на подушкообразные сегменты, на виде цельная круглая плаха. Материал, пропорции сиденья и ног, резьба на ногах и иней на стопах совпадают с видом. Как табурет предмет узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "wire-34.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии нет. Ноги — ровные цельные цилиндры, сетка на wire-* следует форме. Стопы закрыты, ноги стыкуются с сиденьем без зазоров. Дефект только крупного плана: радиальные прорези-складки Tripo в ободе и на верхе сиденья (wire-34 — вырез у заднего края, close-weapon — вдавленный шов между подушкообразными сегментами). На полном росте они читаются как трещины дерева.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается деревом: волокно, резное плетение на верхней половине ног как на виде, иней на стопах и на верхе сиденья. Запечённого света и теней на полном росте нет, детализация высокая. Дефекты только крупного плана: на close-head верх сиденья размыт, белые мазки инея блестят мокрым глянцем. На стопах иней с тканевой, похожей на мешковину текстурой (close-base, turn-000 — центральная стопа).",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5: Tripo сделал четырёхногий табурет вместо заказанного трёхногого (четыре стопы на close-base, сдвоенные стопы на turn-135/225/315, четыре гнезда ног на uv-layout). Единственный фронтальный вид неоднозначен: три видимые ноги подходят и треноге, и четырёхногому табурету, повёрнутому по диагонали. Перегенерировать в Tripo со вторым видом сверху или в 3/4, где три ноги явно разведены через 120°, и с явным «exactly three legs» в промпте. Score 5,8; гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Четыре ноги квадратом вместо трёх: лишняя главная часть, нужна перегенерация (этап 2)."
+    },
+    {
+      "item": "S",
+      "frame": "wire-34.jpg",
+      "note": "Обод сиденья разбит радиальными прорезями на 4 подушкообразных сегмента; на sheet.png цельная круглая плаха."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Радиальные прорези-складки в ободе и на верхе сиденья видны на крупном плане как вдавленные швы."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Верх сиденья размыт, мазки инея с мокрым глянцем на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Иней на стопах с тканевой текстурой, похожей на мешковину, на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-THREE-LEG-STOOL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп three-leg-stool (Heorot) не принят: вместо трёхногого табурета сгенерирован четырёхногий. Нужна перегенерация в Tripo (этап 2) с видом, где явно видны три ноги."
+}

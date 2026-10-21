@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWarpLoom.fbx",
+      "sha256": "857a11ea8c4129098e1028100662086c2b62c7fc2d451bbc3a3400835f6592a4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_BC.png",
+      "sha256": "8c552780727447daa040e2289bfbc2cbb8079cc3512bad561db700f576502582"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_N.png",
+      "sha256": "0fe3445fc1844f9e367d5d34dcd862a69d93a16334c49ffc4729fee6597321ed"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_ORM.png",
+      "sha256": "da209d9b38f2425805ee99e27b72d72a7560b2b1939a23d898551fce54c944ee"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-warp-loom-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWarpLoom.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "4413 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "UV0 islands 1196, used 0.6633, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "T_Env_HeorotWarpLoom_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "SM_Env_HeorotWarpLoom, M_Env_HeorotWarpLoom",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: две стойки с подкосами-ногами, верхний навой с перекинутой основой, ремизный прут, полутканое красное полотно с белой орнаментальной каймой по нижнему краю, двойной нижний брус, ряд каменных грузов в верёвочной обвязке, снег на брусьях. Пропорции совпадают с видом: ширина/высота 0,70 против ~0,67 на листе, полотно занимает 39–61 % высоты (на листе так же), блок грузов внизу ~60 % ширины рамы. Палитра того же семейства (бурое дерево, кремовая шерсть, красное полотно, серый камень). Главные части на месте, лишних нет; челнок с красной пряжей и свисающий хвост нити уместны. Узнаётся на всех 8 ракурсах; боковые 090/270 тонкие по природе предмета (стойка с А-подкосом, грузы за ней), фантомных выступов и оболочек нет (wire-front/back/34). От описания (~1,8×0,6×2 м) рама уже (0,70 против 0,9), но эталон — сгенерированный вид, и с ним совпадение в пределах 5 %.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей нет; тонкие элементы (ленты основы, прутья, челнок, шнуры грузов) целы; сетка лёгкая (4413 tris) и следует форме, брусья и грузы без оплывов. Только на крупных планах: тёмные клинья-сколы на верхнем навое там, где ленты основы перекидываются через брус (close-head); тонкая шнуровка над грузами читается спутанной сеткой линий (close-base); несколько лент основы идут наискось и перекрещиваются (close-weapon); крошечные шипы-гвозди торчат из торцов ног (wire-front, wire-back), в цвете не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокном и резной плетёнкой на стойках, камень грузов с верёвочной обвязкой, кремовая шерсть основы, красное полотно с плетением и белой каймой; снег по стилю кита лежит на верхних гранях со всех ракурсов, запечённого света и теней в цвете нет, растяжек и мыла на полном росте нет, детализация на уровне кита. Только на крупных планах: текстура лент основы смазана, бурые пятна в местах перекида через брус (close-head); красный цвет полотна протекает на нижние концы белых нитей, нарисованные на полотне белые нити не совпадают с геометрическими (close-weapon).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Дефекты видны только на крупных планах, на игровой дистанции фоновый проп читается чисто. Балл в диапазоне 8,0–8,4, поэтому нужен второй приёмщик другого профиля («Opus high»).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "тёмные клинья-сколы на верхнем навое в местах перекида лент основы через брус (изнанка или тёмная грань), только на крупном плане"
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "тонкая шнуровка над грузами читается спутанной сеткой линий"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "несколько лент основы идут наискось и перекрещиваются, на полном росте выглядит как провисшая основа"
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "крошечные шипы (кончики гвоздей) торчат из торцов опорных брусьев, в цвете не видны"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "красный цвет полотна протекает на нижние концы белых нитей основы; нарисованные на полотне нити не совпадают с геометрическими"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "текстура лент основы смазана, бурые пятна в местах перекида через брус"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-WARP-LOOM-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп warp-loom (Heorot) принят по делегированию: 8,3 (S 2,0 / F 1,5 / T 1,5), замечания только на крупных планах. Балл 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

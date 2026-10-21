@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWallTorch.fbx",
+      "sha256": "c4205cbe9bc2935e050f3f4531513480c30e394a28ec757a82202982192eab7a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_BC.png",
+      "sha256": "95703b26872bea659580531c83b0f50db2eb621f92f02e7dbc48d939c66aeae7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_N.png",
+      "sha256": "aff376c85d01f1b8c408bcccb1924133ee9693f2fe5f5ec88d79d09af4d1ab44"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_ORM.png",
+      "sha256": "25d0ecb69268e2741ffa7de68dc9b8d82e820cba982665848f3cd7dda6b661a3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-wall-torch-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWallTorch.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "4839 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "UV0 islands 834, used 0.7289, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "T_Env_HeorotWallTorch_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "SM_Env_HeorotWallTorch, M_Env_HeorotWallTorch",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот же, что на sheet.png: дубовая настенная планка с заострёнными концами и двумя клёпаными железными бандажами, клёпаная корзина-держатель, кованый S-образный завиток-кронштейн, смоляной факел с тканевой обмоткой, верёвочной перевязкой, железными кольцами на рукояти и огнём. Пропорции главных частей (планка vs факел, положение корзины и завитка) совпадают с видом; лишних частей нет. Узнаётся со всех ракурсов (turn-090/270 дают чистый профиль с завитком, без фантомных выступов; wire-34 следует форме). Резьба-плетёнка на тыльной стороне планки (turn-180) на виде не показана, но это декор, не фантом.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: тонкие языки пламени, прутья корзины, завиток и кольца рукояти целы, дыр и вывернутых частей нет, сетка на wire-34 следует форме. На крупном плане низа (close-base) нижний бандаж и железная накладка наконечника планки выглядят слоёными: ступенчатый двойной край слева от рукояти и наложение пластины на деревянный наконечник; на close-head скос верха планки с мягкой гранью. Дефекты видны только на крупном плане.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: серо-коричневый дуб с волокнами и плетёной резьбой, тёмное кованое железо с заклёпками, тёмная ткань, верёвка, оранжево-жёлтое пламя; запечённых теней в цвете на полном росте нет, уровень детализации не ниже кита Sarpedon. На крупных планах — растянутые/смазанные полосы текстуры на скосе верха планки (close-head) и мыльное, растянутое дерево на нижнем наконечнике и рукояти (close-base). Только крупный план.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 → 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; дефекты только крупного плана, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Слоёный двойной край нижнего бандажа и наложение железной накладки на деревянный наконечник планки — только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Растянутые полосы текстуры на скосе верха планки — только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Мыльное/растянутое дерево на нижнем наконечнике планки и рукояти факела — только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-WALL-TORCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wall-torch (настенный факел Heorot) принят по делегированию: 8.3, мелкие дефекты формы и текстуры низа и верха планки только на крупном плане."
+}

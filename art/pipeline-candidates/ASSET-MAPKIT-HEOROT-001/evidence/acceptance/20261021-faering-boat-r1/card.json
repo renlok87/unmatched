@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFaeringBoat.fbx",
+      "sha256": "28620ba0b4e31af953bbc0d6abe6d486cdfe47376fb40fc19b54c7cffd01c37c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_BC.png",
+      "sha256": "b7d18f5a72c4e0a97ea1b271b2adecfa96d91acc35c3d53c563ead0b83b85224"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_N.png",
+      "sha256": "004f40bc5170942a0f0a29455661fb954f6ef341d577c674c6a29f440bf6db3b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFaeringBoat_ORM.png",
+      "sha256": "93b4999029a423ba465e29e7d64037d5f34a97ea847ddf607bd04456e0880970"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-faering-boat-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFaeringBoat.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "note": "4705 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "note": "UV0 islands 821, used 0.6842, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "note": "T_Env_HeorotFaeringBoat_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFaeringBoat.build.json",
+      "note": "SM_Env_HeorotFaeringBoat, M_Env_HeorotFaeringBoat",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: малая норманнская лодка с завитыми штевнями на носу и корме, клинкерным корпусом (доски читаются текстурой), двумя вёслами в уключинах и банками; силуэт и расположение вёсел совпадают с sheet.png, лодка узнаётся со всех 8 ракурсов (с торцов — штевень, киль и вёсла), фантомных частей и оболочек нет. Одно второстепенное отличие от описания: корпус короткий и глубокий — 56.9 uu длины при 27 uu высоты (≈2.1:1), а заказанный фэринг ≈4.5×1.4×0.9 м даёт ≈5:1 и ≈135 uu длины в масштабе кита; пропорция взята с sheet.png, стилизация допустима, поэтому не ниже 1.5.",
+      "frames": [
+        "sheet.png",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте корпус, штевни с завитками, планширь и вёсла чистые: нет дыр, рваных краёв, чёрных пятен и вывернутых частей, тонкие вёсла и уключины целы, на wire-front/back/34 сетка в целом следует форме. Дефекты видны на крупном плане: в кормовой оконечности внутри корпуса смятая складчатая геометрия (wire-34 справа, close-base вверху справа — вертикальная плашка и оплывшая поверхность), открытый торец лопасти весла (тёмная щель на wire-34 и wire-back), гранёные рукояти вёсел (close-weapon). Дыры отчёта сборки (41 петля, низ банок и края кормовых площадок) с обзорных ракурсов не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-back.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Внешний корпус уверенно читается как просмолённое тёмное дерево с волокнами и кромками досок, завитки штевней прорисованы, детализация на уровне кита, запечённого света в BC не видно, развёртка без растяжек. Минусы: интерьер (днище, банки, оконечности) в ORM.G заметно глаже корпуса и на рендере даёт серебристый глянец, читается скорее как металл или лёд, чем как дерево под снегом; заказанного снега на банках нет — только светлые крапины на планшире; в кормовой оконечности размытое пятно-мыло (close-base, close-weapon). На полном росте глянец заметен лишь как светлый интерьер (turn-045/135/225), основная часть дефектов видна на крупном плане.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5, F 1.5, T 1.5; все гейты PASS/n/a). S = 1.5, значит не return_to_stage_2. Это rework_blender по пунктам F и T: глянцевый серебристый интерьер без снега на банках, смятая кормовая оконечность, открытый торец лопасти весла.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "fix": "Интерьер (днище, банки, оконечности) слишком гладкий в ORM.G и на рендере даёт серебристый металлический глянец: поднять нижнюю границу roughness до ≥0.6 (весь проп или маска интерьера), чтобы дерево читалось матовым",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Дать заказанный снег на банках: белые шапки на банках и планшире, как на sheet.png (тинт или маска BC), и убрать размытое пятно-мыло в кормовой оконечности. Если параметрами не выходит — перетекстурировать исходник",
+      "tool": "исходник Tripo: текстура"
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "fix": "Убрать смятую складчатую геометрию внутри кормовой оконечности (вертикальная плашка и оплывшая поверхность на close-base) и закрыть открытый торец лопасти весла (wire-back, wire-34)",
+      "tool": "исходник Tripo: форма"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Корпус короткий и глубокий: длина 56.9 uu при высоте 27 uu (≈2.1:1) против ≈5:1 и ≈135 uu длины по реальному размеру 1.4×4.5×0.9 м. Пропорция взята с sheet.png, стилизацию правило допускает. Учесть при размещении в раскладке: лодка длиной примерно с рост героя (55 uu)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Кадр пустой (доля переднего плана 0.000). У лодки нет центрального верха: верхние 22 % — только штевни по краям. Это ошибка кадрирования capture_acceptance_set, а не модели. Верх оценён по turn-* и close-weapon.jpg."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-FAERING-BOAT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп faering-boat: 7.5 (S 1.5 / F 1.5 / T 1.5), доработка в Blender. Интерьер — серебристый глянец, снега на банках нет, кормовая оконечность смята, торец весла открыт. В каталоге r1 не было acceptor-prompt.md и gates.json: accept.py prepare пропустил проп из-за ошибки кадра close-head. Поэтому карточка собрана по шаблону PROMPT из tools/mapkits/accept.py, гейты пересчитаны по build.json тем же правилом."
+}

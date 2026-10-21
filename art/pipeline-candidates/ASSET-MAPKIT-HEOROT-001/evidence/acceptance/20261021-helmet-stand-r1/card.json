@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotHelmetStand.fbx",
+      "sha256": "a1a92e4eb07ef5b342cd08566f6fe85a5e8581d5f9f1ce3543ed339942dbb5a6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_BC.png",
+      "sha256": "27399a2ccbeae9cc327d5efe05e67b4e7e88e0a5e668cb5e6f231cea3472b359"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_N.png",
+      "sha256": "786b878cf80e8da6ac12e7877ebdef7eb87000ae7ad781bb5205f66ef23df07e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHelmetStand_ORM.png",
+      "sha256": "0b22e4daa7e175f219f9188416ecc3677571877e2b3eb646e6721076846ee686"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-helmet-stand-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotHelmetStand.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "note": "4958 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "note": "UV0 islands 121, used 0.6136, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "note": "T_Env_HeorotHelmetStand_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHelmetStand.build.json",
+      "note": "SM_Env_HeorotHelmetStand, M_Env_HeorotHelmetStand",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: шлем с золотой маской-личиной (брови, нос, усы), нащёчниками и обручем в духе Sutton Hoo на деревянной стойке-крестовине с кольчугой и резным красным цоколем с заклёпками. Спереди (turn-000) совпадает с sheet.png на глаз: гребень над куполом ~17 % высоты (на листе ~18 %), низ маски ~0,46 высоты, верх кольчуги ~0,50, ширина кольчуги к высоте 0,30 против ~0,31; ширина/высота габарита 0,148/0,48 = 0,31, как у заказа 0,5/1,6. Лишних и пропавших частей нет, узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: гребень сделан высоким красно-чёрным веерным плюмажем греко-римского типа (turn-090/270, turn-045/135/225/315), а не низким гребнем Sutton Hoo из описания. Из-за его отмаха назад глубина габарита 0,178 м, D/H 0,37 против ≈0,25 у заказанных 0,4/1,6. Лист — превью 230 px только спереди, профиль гребня по нему не проверить, пропорции сверены на глаз. Предупреждение frames.json о несовпадении ключа листа: по виду на sheet.png тот же предмет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, чёрных пятен, вывернутых частей и оплывших масс. Рваный подол кольчуги — задуманная драпировка. Маска, нащёчники, голова барана, стойка, передняя распорка и восьмигранный цоколь целы. Сетка на wire-front/wire-back/wire-34 следует форме, на маске и голове барана она плотнее. Дефекты только на крупном плане: верхняя передняя кромка плюмажа у головы барана собрана из прямоугольных ступенчатых зубцов (close-head; тёмные зазубрины на этом месте видны и на wire-34), кромка плюмажа слегка гранёная (close-weapon).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию: железный купол с клёпками и полосами, золото/бронза маски и окантовок, дерево стойки с волокном, красная роспись цоколя с плетёнкой и латунные заклёпки (close-base), кольчуга с читаемыми кольцами. Явного запечённого света и теней в цвете нет, детализация не ниже уровня кита. Дефекты на крупном плане и в одной узкой зоне: мыльные, растянутые пряди в верхнем правом углу плюмажа (close-head, close-weapon) и размазанная мраморная красно-чёрная фактура на задней кромке гребня (turn-180 — полоса шириной ~30 px; на игровой дистанции читается как край плюмажа). UV: 121 остров, покрытие 62 %, без перекрытий (uv-layout).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg",
+        "turn-000.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 (S 1,5 + F 1,5 + T 1,5). S ≥ 1,5, поэтому перегенерация не нужна: rework_blender по пунктам F и T — ступенчатая кромка плюмажа и мыльная/размазанная фактура гребня. Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Убрать ступенчатые прямоугольные зубцы на верхней передней кромке плюмажа у головы барана (видны и на wire-34): локально сгладить кромку гребня (relax/smooth) в сборке. Если ступени заложены в исходной Smart Mesh, перевыпустить её с более плотным гребнем, не выходя из бюджета пропа 5000 tris.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Перезапечь BC задней кромки гребня: размазанная мраморная красно-чёрная фактура вместо прядей. Дать островам гребня больше texel density (покрытие UV 62 %, запас есть) или взять фактуру прядей из исходника Tripo.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать мыльные растянутые пряди в верхнем правом углу плюмажа (также close-weapon): перезапечь BC островов плюмажа с бо́льшим разрешением и без растяжки.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Гребень сделан высоким красно-чёрным веерным плюмажем греко-римского типа, а не низким гребнем Sutton Hoo из описания. Спереди совпадает с sheet.png. Отмах назад даёт глубину 0,178 м при высоте 0,48 (D/H 0,37 против ≈0,25 у заказа). Узнаваемость не ломает, перегенерация не нужна; пометка для арт-дирекции кита."
+    },
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "Лист — превью 230 px только спереди (view-thumb.png), профиль гребня и точные пропорции по нему не проверить, сверка на глаз. frames.json предупреждает о несовпадении ключа листа, но по виду это тот же предмет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-HELMET-STAND-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп helmet-stand (Heorot): доработка в Blender — сгладить ступенчатую кромку плюмажа и перезапечь мыльную/размазанную фактуру гребня; силуэт допустим, плюмаж не в стиле Sutton Hoo — в known_issues."
+}

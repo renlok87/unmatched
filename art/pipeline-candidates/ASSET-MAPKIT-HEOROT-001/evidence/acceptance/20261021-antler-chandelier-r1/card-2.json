@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotAntlerChandelier.fbx",
+      "sha256": "335864e5abeff0c8aa09c04f9bbe2ffab1e935e879f09114a59716350101f70f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_BC.png",
+      "sha256": "c04d39c28bd04daa6e242078a8332f2e5d7fa1c513942e407a4c0ff20e10c4f8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_N.png",
+      "sha256": "4254fdb41eba68375a985da6f9b5ad3c769cc7d23a339ab2add3d3f628e13c7c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_ORM.png",
+      "sha256": "c5b3898b67bca37a9c95729962d363f654b26ffb88501cfc223ce4f0718af069"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-antler-chandelier-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotAntlerChandelier.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "5040 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "UV0 islands 1238, used 0.5589, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "T_Env_HeorotAntlerChandelier_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "SM_Env_HeorotAntlerChandelier, M_Env_HeorotAntlerChandelier",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: подвесное железное кольцо с рогами на кожаных обмотках, свечи в чашках, верхний узел подвеса. Пропорции и плотность рогов соответствуют sheet.png, предмет узнаётся со всех ракурсов (на 090/270 кольцо сужается в эллипс, рога целы). Одно второстепенное отличие по контуру: на sheet четыре подвеса сделаны цепями из звеньев, а у модели это сплошные кованые витые прутья. Верх тоже другой: S-крюк плюс кольцо вместо звена цепи. Лишних главных частей нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов и вывернутых частей. Тонкие отростки рогов и фитили свечей целы. Сетка на wire-34 и wire-front следует форме: кольцо, чашки, рога. На крупных планах видна грубая фасетка крюка и кольца подвеса (close-head). Позади основного крюка торчит лишний маленький обрубок второго крюка (close-weapon). Это дефекты только крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании: тёмное кованое железо с орнаментом на ободе, костяные рога с продольной фактурой, кожаные обмотки, восковые свечи с подтёками. Детализация на полном росте не беднее эталона кита. На крупном плане видны дефекты. Кольцо и крюк подвеса размыты («мыло»), на них лежит чужой чешуйчатый узор (close-head). На витых прутьях белые глянцевые пятна, похожие на запечённые блики (close-weapon). Внутренняя сторона обода гладкая и почти без рисунка (close-base). На игровой дистанции это не мешает.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5, F 1.5, T 1.5). S ≥ 1.5, поэтому перегенерация Tripo не нужна. Все гейты PASS/n/a. Доработка F и T — дефекты крупного плана в узле подвеса и на прутьях.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Удалить лишний обрубок второго крюка позади основного S-крюка над кольцом подвеса. Сгладить грубую фасетку крюка и кольца (close-head.jpg), если бюджет треугольников позволяет.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Убрать белые глянцевые пятна (запечённые блики) на витых железных прутьях. Заменить размытый чешуйчатый узор на кольце и крюке подвеса (close-head.jpg) на чистое кованое железо в тоне прутьев.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Подвесы — сплошные витые кованые прутья вместо цепей из звеньев на sheet.png. Верх — S-крюк с кольцом вместо звена цепи. Стилизация допустима, контур отличается."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Внутренняя сторона обода гладкая, почти без орнамента. Снизу видно лишь мельком, на игровой дистанции не читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-ANTLER-CHANDELIER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп antler-chandelier (Heorot) не принят: 7.5, нужна доработка. Убрать лишний обрубок крюка и запечённые блики на прутьях, заменить размытый узор на кольце подвеса."
+}

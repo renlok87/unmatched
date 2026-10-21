@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWarpLoom.fbx",
+      "sha256": "857a11ea8c4129098e1028100662086c2b62c7fc2d451bbc3a3400835f6592a4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_BC.png",
+      "sha256": "8c552780727447daa040e2289bfbc2cbb8079cc3512bad561db700f576502582"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_N.png",
+      "sha256": "0fe3445fc1844f9e367d5d34dcd862a69d93a16334c49ffc4729fee6597321ed"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_ORM.png",
+      "sha256": "da209d9b38f2425805ee99e27b72d72a7560b2b1939a23d898551fce54c944ee"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-warp-loom-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWarpLoom.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "4413 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "UV0 islands 1196, used 0.6633, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "T_Env_HeorotWarpLoom_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWarpLoom.build.json",
+      "note": "SM_Env_HeorotWarpLoom, M_Env_HeorotWarpLoom",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Тот же предмет, что на sheet.png: вертикальный станок с двумя стойками на A-образных опорах, верхний навой, ремизная планка, наполовину сотканное красное полотно с узорной каймой, челнок, грузила-камни в обвязке (два ряда по 6). Пропорции совпадают (глубина опоры ~0,3 высоты, как 0,6/2 м), узнаётся со всех ракурсов, включая узкий профиль 090/270. Одно второстепенное отличие контура: часть нитей основы провисает и идёт по диагонали (на виде нити параллельны), а сбоку висит красная прядь с клубком, выходящая за контур стойки на turn-090/270. Фантомных оболочек нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "В полный рост дыр, рваных краёв, чёрных пятен и оплывших масс нет; тонкие перекладины, челнок и нити целы, сетка на wire-34 следует форме (стойки, валы, грузила-капли). Дефекты видны только на крупных планах: на close-head нити основы — плоские ленты, а в местах обхвата верхнего навоя торчат тёмные треугольные щепки (изнанка или зазубрины петель); на close-base полотно распадается на отдельные полосы с просветами, а над грузилами идёт ломаная тонкая нить-зигзаг.",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 2,
+      "rationale": "Материалы читаются как заказано: дерево с волокнами, резьбой-плетёнкой на стойках и снегом на торцах, красная шерсть с белым скандинавским орнаментом, серые камни грузил с верёвочной обвязкой. Запечённого света и резких бликов в цвете нет, швов и растяжек на полном росте нет; грязноватые разводы на нитях основы (close-head) читаются как фактура немытой шерсти. Детализация на уровне кита Sarpedon. UV-атлас без перекрытий, ~69 %.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S+F+T = 1,5+1,5+2,0 = 5,0 из 6 → 8,3 ≥ 8,0; ни одно измерение не ниже 1,0; гейты PASS, G-RIG n/a. Мелкие отличия контура и дефекты крупного плана на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Сбоку висит красная прядь с клубком, выходит за контур стойки (также turn-270.jpg); часть нитей основы идёт по диагонали, а на sheet.png нити параллельны."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Нити основы — плоские ленты; на обхвате верхнего навоя торчат тёмные треугольные щепки (изнанка петель). Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Полотно распадается на полосы с просветами; над грузилами ломаная тонкая нить-зигзаг. Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-WARP-LOOM-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп warp-loom (ткацкий станок) кита Heorot принят по делегированию, 8,3: дефекты крупного плана (ленточные нити основы, полосы полотна, висящая прядь с клубком) записаны в known_issues."
+}

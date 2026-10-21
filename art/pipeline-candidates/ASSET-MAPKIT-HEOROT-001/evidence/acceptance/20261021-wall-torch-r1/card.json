@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWallTorch.fbx",
+      "sha256": "c4205cbe9bc2935e050f3f4531513480c30e394a28ec757a82202982192eab7a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_BC.png",
+      "sha256": "95703b26872bea659580531c83b0f50db2eb621f92f02e7dbc48d939c66aeae7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_N.png",
+      "sha256": "aff376c85d01f1b8c408bcccb1924133ee9693f2fe5f5ec88d79d09af4d1ab44"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWallTorch_ORM.png",
+      "sha256": "25d0ecb69268e2741ffa7de68dc9b8d82e820cba982665848f3cd7dda6b661a3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-wall-torch-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWallTorch.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "4839 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "UV0 islands 834, used 0.7289, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "T_Env_HeorotWallTorch_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWallTorch.build.json",
+      "note": "SM_Env_HeorotWallTorch, M_Env_HeorotWallTorch",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и деталь в деталь повторяет sheet.png: доска с острыми концами, тремя железными полосами на заклёпках и плетёной резьбой, кованый S-завиток, трапециевидная клёпаная корзина, факел с венцом из щепы, тёмной обмоткой, верёвкой, окованной рукоятью с острым концом и пламенем. Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет. С 8 ракурсов читается как настенный факел, с turn-180/225 (со стороны стены) тоже. Одно второстепенное отличие: доска длиннее относительно факела. Пламя выступает над верхом доски примерно на 6 % высоты против примерно 15 % на листе; часть разницы может давать перспектива листа. Ещё мелочь: доска светлее и серее, чем тёмный дуб листа, хотя семейство цвета то же — дерево.",
+      "frames": [
+        "sheet.png",
+        "wire-front.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей или оплывших масс. Тонкие элементы целы: прутья корзины, завиток, языки пламени, верёвка, заклёпки. На wire-34, wire-front и wire-back сетка следует форме: доска — чистый низкополигональный брус, обмотка и пламя плотнее. На close-base кромка нижней полосы двойная (тонкий накладной ремень поверх доски) — это конструкция, на игровой дистанции не читается. Открытые контуры из отчёта (изнанка декоративной оболочки, прижатая к доске) на кадрах не видны, обращённых внутрь граней нет (ray-escape inward 0).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании. Дерево доски с резным плетением и щепа факела — дерево, кованое железо — металл с фактурой ковки и заклёпками; обмотка — ткань, верёвка — верёвка, пламя оранжево-жёлтое. Ручная стилизованная роспись в духе миниатюры, направленного запечённого света нет. Детализация высокая, не беднее кита Sarpedon. Дефекты только на крупном плане. close-base: смазанная растянутая текстура завитка, видного с ребра за рукоятью, и растяжки по острию доски. close-head: полосатая растянутая фактура на скосе верхушки доски. Пламя — глянцевое оранжевое без эмиссии; для роли animated пламя дадут VFX. Доска в целом светлее и серее заказанного dark oak.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 1,5 + F 2,0 + T 1,5 = 5,0 → round(5,0/6×10, 1) = 8,3 ≥ 8,0; ни одно измерение не ниже 1,0, гейты PASS/n/a. Оценка в полосе 8,0–8,4, поэтому нужен независимый второй приёмщик.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Доска длиннее относительно факела: пламя выступает над её верхом примерно на 6 % высоты против примерно 15 % на sheet.png (часть разницы может давать перспектива листа). Доска светлее и серее тёмного дуба листа."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Смазанная растянутая текстура на завитке, видном с ребра за рукоятью, и растяжки по нижнему острию доски. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Полосатая растянутая фактура дерева на скосе верхушки доски. Пламя — глянцевый оранжевый материал без эмиссии, свечение для роли animated ожидается от VFX в UE."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-back.jpg",
+      "note": "По отчёту сборки 32 открытых контура, крупнейший — 44 uu²: открытая изнанка декоративной оболочки, прижатая к доске. Ещё 7 мелких оболочек отстоят от соседей дальше 0,5 uu, 11 неманифолдных рёбер. На кадрах не видно, ray-escape inward/sheet 0."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-WALL-TORCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wall-torch (Heorot, настенный факел) принят по делегированию с оценкой 8,3. Мелочи крупного плана (растяжки текстуры, доска светлее тёмного дуба, пламя без эмиссии) записаны в known_issues. Оценка в полосе 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

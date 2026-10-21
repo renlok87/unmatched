@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSmithAnvil.fbx",
+      "sha256": "ece274a8f9f6758742651085f3057c3a0ee14432acfcc1617bec5436e1e73984"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_BC.png",
+      "sha256": "bbe0d06bd6ea038bc4e895c83b8f8f939157225c72c68fa93abd66e924a2fa87"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_N.png",
+      "sha256": "bfe11c62353737ae51fbfeb0c67b96edc52cde503031772d1864510cdcf9d037"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSmithAnvil_ORM.png",
+      "sha256": "ebf7b88b3eed3b90a11726069d40f59ec0b0942b1afc4c6accff479a432398f0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-smith-anvil-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSmithAnvil.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "note": "4719 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "note": "UV0 islands 621, used 0.6733, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "note": "T_Env_HeorotSmithAnvil_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSmithAnvil.build.json",
+      "note": "SM_Env_HeorotSmithAnvil, M_Env_HeorotSmithAnvil",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет полностью: наковальня с рогом влево, молот на рабочей плоскости (боёк слева, рукоять вправо с двумя кольцами), клещи прислонены справа спереди, пень с железным обручем и заклёпками, снежная юбка у основания — как на sheet.png. Соотношение наковальни и пня по ширине и высоте совпадает с видом (разница в доле пня объясняется более высокой камерой листа). Фантомных выступов и оболочек на turn-090/270 и wire-* нет; клещи на 90/135/315 читаются ребром, на 180 видны только губки над пнём, на 270 закрыты рогом — геометрически согласованно. Узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: наковальня с чёткими гранями, рог гладкий, тонкие элементы (клещи, рукоять, обруч, заклёпки) целы, дыр и вывернутых частей нет; сетка на wire-34/front/back следует форме. Только на крупном плане: в верхней плоскости пня справа за правой лапой наковальни тёмная яма/провал (close-base, слабо видна и на wire-34); мелкие мягкие переходы лап наковальни в снег (close-weapon).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кованое железо с ржавыми подтёками и сколами, дерево пня с трещинами и волокном, железный обруч, снег; запечённого освещения в цвете не видно, детализация лицевой стороны на уровне кита. Дефекты крупного плана: смазанное пятно (оранжево-синие мазки) на шейке молота между бойком и кольцом (close-head). Тыл (turn-135/180/225) мягче лица: волокно нижней части пня частое и тянущееся, наковальня сзади светлее, «в инее» — на игровой дистанции читается как стилизованное дерево и металл со снегом, не как сломанная зона.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0 (S 2.0 + F 1.5 + T 1.5), ни одно измерение < 1.0, гейты PASS/n/a; балл в полосе 8.0–8.4 — по скиллу нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Тёмная яма/провал в верхней плоскости пня справа за правой лапой наковальни; видно только на крупном плане (и слабо на wire-34), на игровой дистанции закрыто наковальней и клещами."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Смазанная текстура (оранжево-синие мазки) на шейке молота между бойком и кольцом рукояти; только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Тыльная сторона мягче лицевой: волокно нижней части пня тянущееся и частое, наковальня сзади светлее и «в инее»; читается как стилизация, для фонового пропа допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-SMITH-ANVIL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп smith-anvil (Heorot) принят по делегированию: 8.3 (S 2.0, F 1.5, T 1.5); замечания только крупного плана (яма в торце пня, мазок на шейке молота), полоса 8.0–8.4 — нужен второй приёмщик Opus high."
+}

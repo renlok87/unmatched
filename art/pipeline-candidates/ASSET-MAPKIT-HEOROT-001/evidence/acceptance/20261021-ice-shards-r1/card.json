@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotIceShards.fbx",
+      "sha256": "9f992e0090063312cf12c31ecb6f6b3718218270b5cc46371f49cea994f96a60"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_BC.png",
+      "sha256": "3fc5674a8b20d02d2ecee50b9dacc049513fba964dd52afa79548dd74169e049"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_N.png",
+      "sha256": "f715c1d4986593a13202bc4608d6f241045e8de0722d49c010a865fa75cdec2b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIceShards_ORM.png",
+      "sha256": "fd1d6192378882c7afc8bfffb79ede14e17bffca39c606884efb882564216ca0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-ice-shards-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotIceShards.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "note": "4369 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "note": "UV0 islands 162, used 0.5947, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "note": "T_Env_HeorotIceShards_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIceShards.build.json",
+      "note": "SM_Env_HeorotIceShards, M_Env_HeorotIceShards",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Предмет в целом тот: кластер синих кристаллов с высоким центральным шпилем на снежной подложке, габарит 32×32×30 uu близок к листу, узнаётся со всех 8 ракурсов. Но слева-сзади от центрального шпиля торчит фантомная плоская пластина нулевой толщины. По отчёту она в одном шелле со шпилем: shell 5, 126 граней на 597 uu². На turn-000/045 это большой плоский треугольник до ~70 % роста, на turn-090 и turn-270 — тонкая игла ребром, на wire-front/wire-34 — несколько крупных плоских треугольников. На sheet.png такой части нет, все осколки там гранёные призмы. По рубрике это фантомная оболочка на turn-090/270 и wire-*, отсюда 0,5. Вторичное: лёд заметно темнее листа (тёмно-синий против светло-голубого на sheet.png, семейство то же), мелкие кристаллы скруглённые, «пулевидные», а не тонкие гранёные.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Основные кристаллы и снежный холм целы, дыр и вывернутых частей на кадрах нет, сетка на wire-* следует форме гранёных кристаллов. Главный дефект на полном росте — та же плоская пластина. Это незамкнутый лист из нескольких огромных плоских треугольников: на turn-000 читается как бумага, сзади (turn-180/225) — тёмная плоскость, ребром (turn-090/270) — игла. В UE с односторонним материалом она пропадёт с тыла. Минор: снежная подложка — тонкая открытая пластина примерно на 0,6 uu над нулём, под ней видны тёмные обрубки кристаллов (turn-000/180/225/315). На игровой камере сверху это почти не видно. Снег на гранях кристаллов местами оплывший (close-head). Одна зона на полном росте даёт 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Есть читаемое разделение лёд/снег: белые шапки и потёки снега на синих кристаллах. Детализация BC мазковая и по уровню не беднее эталона кита Sarpedon. UV чистые: 162 острова, без перекрытий. Главная проблема материала на полном росте: ORM.B (metallic) ≈ 1 на ледяных островах (metallic_mean 0,475, 46 % текселей > 0,5, roughness ~0,3). Из-за этого светло-голубой BC рендерится тёмно-синим полированным «хромом» с зеркальными бликами, а не светлым полупрозрачным льдом листа. Это чужой тон основной зоны (turn-000/090/180). Крупный план: серое мыльное пятно на вершине главного шпиля (close-weapon), потёки снега выглядят как оплывший пластик (close-head). На фантомной пластине текстура растянута горизонтальными полосами (turn-045). Запечённых теней в BC нет, тёмные пятна в снегу — контакт кристаллов.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 4.2,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5. У центрального шпиля сгенерировалась фантомная плоская пластина нулевой толщины, она торчит слева-сзади (shell 5): видна ребром на turn-090/270 и плоскими треугольниками на wire-*, на листе её нет. По рубрике это перегенерация в Tripo (этап 2). F и T тоже ниже 2: лист-пластина и металлический лёд (ORM.B ≈ 1) вместо светлого полупрозрачного. Score (0,5+1,0+1,0)/6×10 = 4,2. При перегенерации: гранёные призмы без плоских пластин; у льда metallic 0 (параметр сборки env_kit или исходник); целевое число треугольников ≤ 4000 (сейчас 4369 при бюджете пропа 4000, гейт посчитан по бюджету env_kit 12000).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Фантомная плоская пластина нулевой толщины слева-сзади центрального шпиля (один шелл со шпилем, shell 5 в build.json). На turn-000 это плоский треугольник до ~70 % роста, на turn-090/270 игла ребром, на wire-front/wire-34 крупные плоские треугольники. На sheet.png её нет."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Та же пластина — незамкнутый лист без объёма: с тыла (turn-180/225) тёмная плоскость, в UE с односторонним материалом пропадёт с обратной стороны."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Минор: снежная подложка — тонкая открытая пластина примерно на 0,6 uu над нулём, под ней торчат тёмные обрубки кристаллов (turn-000/180/225/315). На игровой камере почти не видно; при размещении проп можно утопить на ~1 uu."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Лёд металлический: ORM.B ≈ 1 на ледяных островах (metallic_mean 0,475, 46 % текселей > 0,5). Светло-голубой BC рендерится тёмно-синим хромом с зеркальными бликами вместо светлого полупрозрачного льда листа. Для льда нужен metallic 0."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Крупный план: серое мыльное пятно на вершине главного шпиля, снежные потёки выглядят как оплывший пластик (close-head). На фантомной пластине текстура растянута полосами (turn-045)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-ICE-SHARDS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ice-shards (Heorot) не принят (4,2): у центрального шпиля фантомная плоская пластина, лёд металлический — перегенерация в Tripo (этап 2)."
+}

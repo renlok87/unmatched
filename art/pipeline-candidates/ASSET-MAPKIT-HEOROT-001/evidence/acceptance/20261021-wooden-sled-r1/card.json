@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWoodenSled.fbx",
+      "sha256": "69c7c9b463ed972e6ee98cb905579f153e960128b9675359c5afe4b40a117a60"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_BC.png",
+      "sha256": "a451c49d7e77ee2d138e4d499b7a6057aa0af0efba38065d04e7ea48b0d8ca2e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_N.png",
+      "sha256": "cc29c3442f83a4fcb00002b29c39d36ac8c86aa25d0a472eeb490643137f10cd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenSled_ORM.png",
+      "sha256": "9fb03697be4e9e07bf707f641a9f0810e5a86e41b167cc450d7a3c74b479a55a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-wooden-sled-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWoodenSled.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "note": "5002 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "note": "UV0 islands 1228, used 0.6709, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "note": "T_Env_HeorotWoodenSled_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenSled.build.json",
+      "note": "SM_Env_HeorotWoodenSled, M_Env_HeorotWoodenSled",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: норвежские грузовые сани с двумя полозьями, у которых загнуты носы и вырезана кельтская плетёнка, настил на стойках с верёвочной обвязкой и железными скобами, поперечный бочонок с втулкой, белая и бурая шкуры. Вид 3/4 спереди-слева (turn-045, close-base) почти один в один повторяет sheet.png. По боковым видам (turn-090/270) сани читаются однозначно, спереди и сзади видны носы полозьев и рама; узнаются со всех 8 ракурсов. Одно второстепенное отличие от заказа «a barrel» — задний груз. Под серым мехом лежит второй бочонок: на turn-180 он виден целиком, на turn-090/270 торчат его днища. Рядом шкура с головой и дугой-рогом, на turn-225/315 она читается как сидящее в санях животное. Габарит 0,27×0,51×0,24 м против ≈1×2×0,8: L/W 1,87 против 2, H/L 0,47 против 0,40, при грузе это допустимо. Главные части и пятна цвета совпадают с листом, фантомных оболочек на turn-090/270 и wire-* нет.",
+      "frames": [
+        "sheet.png",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, вывернутых частей и чёрных пятен нет. Тонкие элементы целы: стойки, обвязка, жердь, свисающие петли верёвки под настилом, бахрома белой шкуры. Завитки полозьев смоделированы чисто. Сетка на wire-front/34/back следует форме, бочонок даёт ровный цилиндр. Дефекты видны только на крупном плане. Верхний край обруча переднего бочонка торчит «плавником» и обрезан клином там, где через него идёт верёвка (close-weapon, close-head). На боковине висят и лежат обрывки верёвки, которые врезаются в клёпку. Втулка — грубый восьмигранник. Мех заднего груза комковат, но имеет читаемые складки.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Дерево окрашено вручную, с волокном и иневым налётом по кромкам, что подходит снегу кита. Железо скоб и обручей серое, с заклёпками. Мех белый и бурый, с прядями, верёвка — витая. Кельтская плетёнка на полозьях чёткая. Запечённых бликов на полном росте нет, а тени на ракурсах совпадают с глиной wire-* и значит дают свет рендера. По детализации проп не беднее уровня кита Sarpedon. Дефекты только крупного плана: серое покрывало сверху пикселизовано и размыто, видна ступенчатость текселей (close-head). Слева от бочонка и в днище — мыльные тёмные пятна меха (close-weapon). Развёртка дробная (1228 островов, покрытие 67 %), поэтому плотность текселей неравномерна.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1,5+1,5+1,5)/6×10, 1) = 7,5 < 8,0. Гейты PASS/n/a. S = 1,5 не ниже порога перегенерации, поэтому нужна доработка F и T в Blender (дефекты только крупного плана), а отличие заднего груза уходит в known_issues.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Передний бочонок. Срезать «плавник» верхнего края обруча, который торчит над клёпкой под верёвкой и обрезан клином (close-weapon, close-head). Убрать обрывки верёвки, которые висят с обруча и лежат на боковине, врезаясь в клёпку. Сгладить втулку (больше граней). После этого собрать env_kit заново.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Серое покрывало на верху груза и мех слева от бочонка и в днище пикселизованы и размыты на крупном плане (close-head, close-weapon). При перепаковке UV поднять плотность текселей этих островов: покрытие 67 % при 1228 островах оставляет запас. Затем перезапечь BC/N/ORM 2048 и проверить, что тёмные мыльные пятна ушли.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-315.jpg",
+      "note": "Задний груз шире заказа «a barrel». Под серым мехом лежит второй бочонок, на turn-180 он виден целиком. Рядом шкура с головой и дугой-рогом, на turn-225/315 она читается как сидящее в санях животное. На игровой дистанции сверху груз закрыт покрывалом, перегенерация не требуется."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Габарит 0,27×0,51×0,24 м: при росте 24 uu сани короче и выше заказанных ≈1×2×0,8 (H/L 0,47 против 0,40). Лист — view-thumb без checks-report (предупреждение frames.json), поэтому пропорции сверены на глаз."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-WOODEN-SLED-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wooden-sled (Сани) кита Heorot: 7,5, нужна доработка в Blender. На переднем бочонке срезать плавник обруча и обрывки верёвки, поднять плотность текселей серого покрывала и меха. Лишний задний груз записан в known_issues."
+}

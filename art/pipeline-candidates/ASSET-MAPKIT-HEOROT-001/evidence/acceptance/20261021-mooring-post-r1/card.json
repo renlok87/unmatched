@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotMooringPost.fbx",
+      "sha256": "e5cec0f75b0728f65b89cb91b264e64c1247afd3ffba9e6daca9e0dd302cc986"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_BC.png",
+      "sha256": "d9a53a532602df49d8e67c47222812039f5eb58f334f52d58b61b0f1ef18b23a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_N.png",
+      "sha256": "e8c74de1c82fb50f436b3548726b9d523f677cb99ae5825ff0f204ad570e02bd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMooringPost_ORM.png",
+      "sha256": "64fbab6ba276e91e6638a4bb91aed4800606089027670b8eb12f60a7700e9a8b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-mooring-post-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotMooringPost.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "note": "4605 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "note": "UV0 islands 83, used 0.5801, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "note": "T_Env_HeorotMooringPost_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMooringPost.build.json",
+      "note": "SM_Env_HeorotMooringPost, M_Env_HeorotMooringPost",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан и нарисован на sheet.png: толстый круглый дубовый столб с восьмигранным железным оголовком на заклёпках и куполом, верхний виток верёвки под оголовком, нижний виток с узлом справа спереди, резная плетёнка спереди над и под нижним витком, сосульки под обоими витками, иней к низу. Пропорции совпадают с листом: ширина тела к высоте около 0,32 (на листе около 0,33), оголовок около 15 % высоты (на листе около 17 %), витки стоят на тех же уровнях в пределах точности листа 230 px. Палитра того же семейства: серо-коричневое дерево, бронзово-серое железо, белый иней. Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет, столб узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Верёвка — цельные жгуты с читаемой скруткой, петли узла на wire-34 и wire-front разделены, это не оплывший ком. Сосульки — тонкие целые конусы. Сетка на wire-* следует форме: плотная на верёвке, разреженная на цилиндре столба, силуэт ровный. Огранка заклёпок (8-гранники на close-head) и гранёный край торца у низа (close-base) — упрощение умной сетки в бюджете, а не дефект формы; на игровой дистанции не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании: дерево с волокном и рельефной скандинавской плетёнкой, витая пеньковая верёвка, железный обод с заклёпками, бело-голубой лёд и иней. Запечённых бликов и направленного света нет, тёмные углубления резьбы — допустимая стилизованная полость. Детализация на 2048 не беднее кита Sarpedon. Дефекты видны только на крупном плане. Верх купола оголовка розовато-лиловый с узором трещин (close-head): на полном росте это едва заметный тёплый оттенок, его можно прочесть как крашеную резьбу или ржавчину. В текстуре железного обода и инея есть мелкий «тканевый» точечный узор (close-head, close-base). У низа столба на close-base виден вертикальный шов: рисунок инея меняется по грани.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 2,0 + T 1,5 = 5,5/6 → 9,2 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a; дефекты текстуры только крупного плана — в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Верх купола оголовка розовато-лиловый с узором трещин: оттенок чужой для железа и дуба, на полном росте едва заметен. Обод покрыт мелким «тканевым» точечным узором (артефакт текстуры Tripo), виден только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Внизу столба вертикальный шов текстуры инея: рисунок меняется по грани. В инее точечный «вязаный» узор. Оба дефекта видны только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-MOORING-POST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mooring-post (Причальный столб, Heorot) принят по делегированию с оценкой 9,2. Мелкие дефекты текстуры, видные только на крупном плане (лиловый верх купола, узор и шов в инее), записаны в known_issues."
+}

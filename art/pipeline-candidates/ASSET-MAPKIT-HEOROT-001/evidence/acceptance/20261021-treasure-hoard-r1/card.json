@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotTreasureHoard.fbx",
+      "sha256": "f4539cc9bd6b72b38c26dd2610a0676fc9aae001773e8fa8945350badb4424e6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_BC.png",
+      "sha256": "21ccc9d3a20d40ee8014a73c571faa8014646f5c704153dad1823a3343bcf936"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_N.png",
+      "sha256": "331138d7e444e6d9d98b82358a5591f2af4d4b3bfd0e5765f175fcd0bace0262"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotTreasureHoard_ORM.png",
+      "sha256": "ac50afdfb9eeba8d03385548d63a069953acb75a8a29b9b36627f5071a5b68a0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-treasure-hoard-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotTreasureHoard.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "note": "4712 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "note": "UV0 islands 108, used 0.6527, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "note": "T_Env_HeorotTreasureHoard_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotTreasureHoard.build.json",
+      "note": "SM_Env_HeorotTreasureHoard, M_Env_HeorotTreasureHoard",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Состав совпадает с листом и заказом: шлем с наносником, серебряными пластинами и самоцветами в центре, два стоящих кубка, опрокинутые кубки с горлышком, гривны с камнями, монеты, мех с фестонами; спереди и в 3/4 (000/045/315) пропорции и раскладка как на sheet.png. Но главная часть, мех-подложка, не лежит на полу. Все повороты сняты при elevation 0, а спереди видна вся верхняя плоскость меха, сзади (135/180/225, wire-back) — его изнанка. Профиль 090/270 — клин: передний край на z=0, задний верх меха поднят примерно на 0,11 м из 0,18 м (≈20°, выгнутая «тарелка»), под задней кромкой просвет около 5 см. Tripo запёк в геометрию наклон камеры вида Gemini (3/4 сверху). С тыла предмет читается как перевёрнутое блюдо, а кубки и шлем лишь выглядывают из-за кромки. Это заметно сбитые форма и положение главной части (> 10 % высоты); золото лишь выглядывает с тыла, но узнаётся не только спереди, поэтому 1,0, а не 0,5.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Спереди и в 3/4 нет дыр и рваных краёв; тонкие элементы целы: горлышки, ободки, наносник. Зубчатая кромка меха читается как ворс, сетка на wire-front/wire-34 следует форме. Дефект на полном росте в одной зоне: задняя половина меха — приподнятая полая оболочка с просветом до пола; на 090–270 и wire-back видна вывернутая к зрителю изнанка. Только на крупном плане: гранёные ободки кубков и купол шлема, шероховатый шпиль шлема (close-head), плоские участки-заливки между предметами под шлемом (wire-front).",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются верно: золото с гравировкой-плетёнкой, рубины, сапфиры и изумруды, серебристые пластины шлема, мех с прорисованным ворсом. Запечённого направленного света нет; детализация богаче эталона кита Sarpedon. Дефект на полном росте в одной зоне: изнанка меха залита тёмной проекцией монет — чужой материал вместо кожи, большое пятно на 135/180/225. Только на крупном плане: мыло и растяжки на золоте под шлемом и внутри глазниц (close-weapon), размытые пятна справа от стоящего кубка и под шлемом (close-base).",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S 1,0 < 1,5 → return_to_stage_2 по рубрике. Мех-подложка груды не лежит на полу: задняя кромка поднята примерно на 0,11 м из 0,18 м (наклон ≈20°, выгнутая «тарелка»), под ней просвет, а с тыла (135–225°) видна изнанка с проекцией монет. Tripo запёк наклон камеры вида 3/4 сверху. Отсюда же F 1,0 и T 1,0. score = round(3,0/6×10, 1) = 5,0. Гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Мех-подложка наклонён и приподнят сзади: передний край на z=0, задний верх около 0,11 м (≈20°), с тыла видна изнанка. Перегенерировать в Tripo по видам, где мех лежит горизонтально: front с малым возвышением камеры + single. Дешёвая проба до перегенерации — выровнять меш поворотом в env_kit и заново снять тыл (135–225°): нет ли там голой оболочки."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Под задней половиной меха полая оболочка и просвет до пола, видно на полном росте 090–270. Вне этой зоны сетка чистая; на крупном плане гранёные ободки кубков и купол шлема, шероховатый шпиль шлема (close-head)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Изнанка меха покрыта тёмной проекцией монет вместо кожи — большое пятно на 135/180/225."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Мыло и растяжки на золоте под шлемом и внутри глазниц; размытые пятна справа от стоящего кубка (close-base). Только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-TREASURE-HOARD-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп treasure-hoard (Heorot) не принят, возврат на этап 2: мех-подложка наклонён и приподнят сзади, с тыла видна изнанка с проекцией монет. Перегенерировать в Tripo с горизонтально лежащим мехом (или сначала пробно выровнять в env_kit)."
+}

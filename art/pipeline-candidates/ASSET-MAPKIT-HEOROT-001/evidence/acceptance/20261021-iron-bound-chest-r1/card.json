@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotIronBoundChest.fbx",
+      "sha256": "4906a3786c084864ef62acc734c4f82d4ab75e73c5b9acb2da0ca7a204d6113a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBoundChest_BC.png",
+      "sha256": "7372fee80389eb83d349f2eb0ddc3940827bd62eb4ac961926c712d5b6640c4c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBoundChest_N.png",
+      "sha256": "87ddf1c38c4f332ade00e64e49c5df25128c78c67bafa75e4c915a76ecba70d5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBoundChest_ORM.png",
+      "sha256": "54a08a1aac7779e79ad079f603c206937efb3af126e35d5e957d47551a74e2b3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-iron-bound-chest-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotIronBoundChest.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+      "note": "4107 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+      "note": "UV0 islands 328, used 0.3925, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+      "note": "T_Env_HeorotIronBoundChest_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBoundChest.build.json",
+      "note": "SM_Env_HeorotIronBoundChest, M_Env_HeorotIronBoundChest",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: дубовый сундук с полуцилиндрической крышкой, четыре железных обода по крышке, оковка рамой с заклёпками, крупный щитовидный навесной замок на пробое спереди, кольца-ручки на боках. Узнаётся со всех 8 ракурсов, фантомных выступов и оболочек на turn-090/270 и wire-* нет. Пропорции сходятся с листом: в 3/4 высота к ширине около 0.83 против около 0.9 на листе, крышка около 30 % высоты, как на листе. Одно второстепенное отличие: спину Tripo додумал. На turn-180/135/225 там вторая накладка замка с прорезью, но без дужки, пробой сверху и две лишние вертикальные полосы; на листе этого нет, и по смыслу это лишний второй замок. Габарит по bounds 0.231×0.152×0.21 м (Ш:Г:В ≈ 1:0.66:0.91) выше описания ≈1×0.6×0.7, но совпадает с листом и допустим для стилизованной миниатюры, поэтому не снижаю.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: кольца ручек, дужка и пробой замка, заклёпки. Сетка на wire-front/34/back следует форме: прямые полосы оковки, ровные ободья крышки, кольца из достаточного числа сегментов. Длинные тонкие треугольники на плоских гранях после децимации шейдинг не портят. Щель между крышкой и корпусом на боках (turn-045/315) — естественный шов, а не просвет-дефект. close-head, close-weapon и close-base чистые: края оковки и ножки ровные. Корпус замка в глине слегка комковат, но в текстуре читается чётко.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дуб в рисованной волокнистой фактуре тёплого коричневого цвета, кованое железо с потёртыми светлыми кромками и заклёпками. Это стиль hand-painted tabletop, детализация не беднее уровня кита Sarpedon. Запечённого света нет: тени под замком и кольцами — тени EEVEE от света, который вращается с камерой (frames.json render.shadows). Швов, растяжек и чужого цвета на полном росте нет. Дефекты только крупного плана. На close-head и close-weapon волокно дерева мягкое, местами мыльное: 2048 при покрытии UV 41 %. Накладка замка на спине (turn-180) вблизи с неровной размытой прорезью скважины, на её пробое лёгкая вертикальная растяжка. На игровой дистанции фонового пропа это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0 (S 1.5, F 2.0, T 1.5), гейты PASS/n/a",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Спину додумал Tripo: вторая накладка замка с прорезью, без дужки, пробой сверху и две вертикальные полосы, которых нет на листе. Сундук стоит в углах зала, спина обычно у стены."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Габарит 0.231×0.152×0.21 м (Ш:Г:В ≈ 1:0.66:0.91) выше описания ≈1×0.6×0.7, но как на листе. При раскладке учесть пятно ≈23×15 uu при высоте 21 uu."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Волокно дерева на крышке мягкое, местами мыльное, только на крупном плане (2048, покрытие UV 41 %)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "На накладке замка сзади прорезь скважины неровная и размытая, на пробое лёгкая вертикальная растяжка текстуры."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-IRON-BOUND-CHEST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп iron-bound-chest (Heorot) принят по делегированию с оценкой 8.3. Оговорки: на спине лишняя накладка замка, придуманная Tripo, и мягкое дерево на крупном плане."
+}

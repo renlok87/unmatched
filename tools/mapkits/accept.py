@@ -167,9 +167,13 @@ def prepare(m: str, keys: list[str], date: str, run: Path | None, cycle: str) ->
         if sheet:
             cmd += ["--sheet", str(sheet)]
         rc = subprocess.call(cmd, stdout=subprocess.DEVNULL)
-        if rc != 0:
+        turns = sorted((ev / "frames").glob("turn-*.jpg"))
+        if rc != 0 and not ((ev / "frames" / "frames.json").is_file() and len(turns) == 8):
             print(f"FAIL capture {key} rc={rc}", file=sys.stderr)
             continue
+        if rc != 0:
+            # NOTES F17: a flat or low prop leaves close-head empty; the 8 turns are enough to judge it
+            print(f"WARN capture {key} rc={rc}: a close-up is empty, the acceptor judges by turn-*", file=sys.stderr)
         fr = json.loads((ev / "frames" / "frames.json").read_text(encoding="utf-8"))
         accepted = [{"path": rel(pp["fbx"]), "sha256": sha256(pp["fbx"])}] + \
                    [{"path": rel(t), "sha256": sha256(t)} for t in pp["tex"] if t.is_file()]

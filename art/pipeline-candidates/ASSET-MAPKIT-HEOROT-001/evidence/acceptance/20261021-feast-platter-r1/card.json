@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFeastPlatter.fbx",
+      "sha256": "d8ffc49df785d2688b5bdd06fa3ee134685d790a5f2e8e64befbf323b32bb12f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_BC.png",
+      "sha256": "bd1ff1921304616e5216ec90e310c9a5f9135c6edc88b9c9d4c4ca105653bf32"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_N.png",
+      "sha256": "14913cc56a29770411285c2a11fdc8dbbda8078ddb5785c08c29a41728ae7d08"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFeastPlatter_ORM.png",
+      "sha256": "afc8d75dd5b3337dde93dd3b800ec54dd057ce6723c1e6d77049735fb52b8bae"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-feast-platter-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFeastPlatter.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "note": "4732 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "note": "UV0 islands 791, used 0.7454, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "note": "T_Env_HeorotFeastPlatter_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFeastPlatter.build.json",
+      "note": "SM_Env_HeorotFeastPlatter, M_Env_HeorotFeastPlatter",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: резной деревянный поднос с кельтской плетёнкой по борту, кованые скобы и два боковых кольца; сзади два хлеба (надрезанный каравай и связка булок), слева жареная птица, справа окорок со срезом, по центру нарезка мяса, по кругу яблоки и зелень. close-base почти повторяет ракурс листа: состав, расположение и пропорции совпадают, лишних и пропавших главных частей нет. На всех 8 ракурсах (turn-000…315) читается как блюдо пира, на боковых turn-090/270 фантомных выступов нет. Высота 6 uu; пятно почти круглое (16,4×19,2 uu с кольцами), как на листе, хотя в описании стоит ≈0,6×0,4 м. Светлые палочки-кости между птицей и хлебом — мелкая деталь, силуэт не меняют.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, рваных краёв, вывернутых частей и оплывших масс. Тонкие кольца и скобы целы, сетка на wire-34/front/back следует форме (Tripo Smart Mesh, 4732 tris, плотность распределена по еде и борту). Дефекты видны только на крупном плане или в мелких зонах: гранёный low-poly шейдинг булок и костей (close-head, close-weapon); односторонние листья гарнира у хлебов с тыльных ракурсов темнеют почти до чёрного (turn-180, turn-135, на wire-back тоже тёмные), но они мелкие и читаются как тёмная зелень. Открытые низы еды на контакте с подносом (60 петель в отчёте) в кадрах не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево борта с волокнами и резной плетёнкой, серое кованое железо скоб, румяная корочка птицы и окорока, розовый срез и нарезка, бледный хлеб, яблоки и зелень. Швов, растяжек и мыла на полном росте нет, детализация на уровне Tripo-кита. Мелочи: на яблоках белые штрихи от черенка, похожие на вписанный рисованный блик (turn-000, close-base, close-weapon); правое кольцо коричневатое при сером левом (turn-000, turn-090); корочка окорока пятнисто-шумная (turn-090); на крупном плане текстура еды мягкая (close-head). На игровой дистанции (проп 6 uu против героя 55 uu) всё это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Односторонние листья гарнира у хлебов с тыльных ракурсов темнеют почти до чёрного (также turn-135, wire-back); зона мелкая, читается как тёмная зелень."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане виден гранёный low-poly шейдинг булок и костей. Открытые низы еды на контакте с подносом (60 петель в отчёте сборки) в кадрах скрыты."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "На яблоках белые штрихи от черенка, похожие на вписанный блик; правое кольцо коричневатое при сером левом (также turn-090)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На крупном плане текстура еды мягкая и размытая, корочка окорока пятнисто-шумная (также turn-090)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-FEAST-PLATTER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп feast-platter (Блюдо пира) принят по делегированию: 8,3 (S 2,0 / F 1,5 / T 1,5). Мелочи в known_issues: тёмные листья с тыла, белые штрихи на яблоках, коричневатое кольцо."
+}

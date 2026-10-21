@@ -1,0 +1,145 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWoodenBucket.fbx",
+      "sha256": "308b5498b17f37da295847af42cafc81e5d4a79ea660faa3652aa8ed78883e4e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_BC.png",
+      "sha256": "c7ab6626def3e72903a1ecd7f4e2d57047da0b929267ec181a377a395deb548e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_N.png",
+      "sha256": "77307ce0e772059a25784cc82461313a55f79063b949532017b19fa026f239ac"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWoodenBucket_ORM.png",
+      "sha256": "1869ee7d31dfdd9d92106e623b12680f602480a3aa761b36adde04380a1976b8"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-wooden-bucket-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWoodenBucket.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "note": "4991 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "note": "UV0 islands 155, used 0.4523, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "note": "T_Env_HeorotWoodenBucket_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWoodenBucket.build.json",
+      "note": "SM_Env_HeorotWoodenBucket, M_Env_HeorotWoodenBucket",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: клёпочное ведро с двумя проушинами-удлинёнными клёпками с отверстиями, верхний окрашенный обод, плетёные верёвочные обручи сверху и снизу, нижний ряд торцов клёпок, верёвочная ручка дугой с узлами у проушин, вода внутри (close-weapon). Пропорции близки к виду (≈ ширина = высоте), лишних или пропавших частей нет; на turn-090/270 ручка видна ребром в перспективе как две пряди — это сама дуга, не фантом. Узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии нет; отверстия проушин чистые, верёвка ручки и обручи целы по всей длине, нижний ряд клёпок ровный. Сетка на wire-34 следует форме (плотнее на верёвке и узлах, разрежена на гладких клёпках). Мягкость кромок проушины заметна только на close-weapon и в допуске стилизации.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: дерево с волокном и сине-серой потёртой краской, верёвка с витками, вода голубая, снежные мазки по стилю кита; запечённого направленного света нет. Дефекты только крупного плана: на close-head торцы верхних клёпок размыты и растянуты с пикселизацией, на средних клёпках местами смазанное волокно; на игровой дистанции не читается.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 >= 8.0, ни одно измерение < 1.0, гейты PASS/n/a; остаток T — дефект только крупного плана (размытые торцы клёпок), для фонового пропа диорамы не критичен.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Торцы верхних клёпок обода размыты и растянуты (пикселизация) на крупном плане; на игровой дистанции не видно."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-WOODEN-BUCKET-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wooden-bucket (Heorot) принят по делегированию, 9.2; остаток — размытые торцы клёпок только на крупном плане."
+}

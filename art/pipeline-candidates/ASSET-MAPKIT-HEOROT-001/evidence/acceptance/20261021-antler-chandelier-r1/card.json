@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotAntlerChandelier.fbx",
+      "sha256": "335864e5abeff0c8aa09c04f9bbe2ffab1e935e879f09114a59716350101f70f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_BC.png",
+      "sha256": "c04d39c28bd04daa6e242078a8332f2e5d7fa1c513942e407a4c0ff20e10c4f8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_N.png",
+      "sha256": "4254fdb41eba68375a985da6f9b5ad3c769cc7d23a339ab2add3d3f628e13c7c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotAntlerChandelier_ORM.png",
+      "sha256": "c5b3898b67bca37a9c95729962d363f654b26ffb88501cfc223ce4f0718af069"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-antler-chandelier-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotAntlerChandelier.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "5040 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "UV0 islands 1238, used 0.5589, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "T_Env_HeorotAntlerChandelier_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotAntlerChandelier.build.json",
+      "note": "SM_Env_HeorotAntlerChandelier, M_Env_HeorotAntlerChandelier",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: кованый обод со свечами в розетках, оленьи рога по кругу обода (часть концов уходит вниз, как на листе), четыре тяги подвеса к верхней точке. Лист — собственный view-thumb пропа: на нём та же люстра, так что предупреждение frames.json о ключе листа формальное. Соотношение В/Ш ≈0,89 против ≈0,86 на листе. Обод, свечи и корона рогов совпадают с листом. Предмет узнаётся со всех 8 ракурсов: на turn-090/270 та же корона рогов, фантомных выступов и оболочек нет. Одно второстепенное отличие контура — подвес. На листе четыре цепи сходятся к одному звену. В модели это сплошные бугристые прутья (звенья есть только в текстуре) с восьмигранной ступицей, серьгой и S-крюком, и подвес занимает около 22 % высоты против ~12 % на листе. Габарит по описанию 1,2×1,2×0,8 м (Ш/В 1,5) не выдержан: модель 28×27×24 uu (Ш/В 1,17). Но такое же соотношение на листе, а цель масштаба (высота 24 uu вместе с крюком) задаётся параметром env_kit.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка на wire-front, wire-back и wire-34 следует форме: рога, прутья, свечи и розетки ровно протреугольнены, обод — чистое низкополигональное кольцо. Тонкие концы рогов и фитили целы. На полном росте и крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых или оплывших частей. Что в отчёте сборки: 15 малых дыр по ≈1,7–2 uu² на высоте розеток закрыты свечами и в кадрах не видны. 4 «изолированные» оболочки с зазором вершин 0,5–0,85 uu на turn-* и close-base сидят на ободе. Вывернутых граней 3 (0,02 % площади). Мелочь, которая не тянет на дефект: кончик левого прута на ~0,3 uu выходит за край ступицы (close-weapon), а силуэт крюка гранёный (close-head). Это нормальная врезка и лоуполи пропа на 5k, на игровой дистанции не видно.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: тёмное кованое железо с кельтской плетёнкой и заклёпками на ободе, кость рогов с продольной фактурой, кремовый воск с наплывами и чёрными фитилями, кожаные и бронзовые обмотки у оснований рогов. Запечённых теней в цвете нет, швов и растяжек нет. Детализация не беднее кита Sarpedon и держит стиль hand-painted. Дефекты видны только на крупном плане. Верх ступицы (close-head) и верхняя грань обода (close-base) гладкие и мягкие, без орнамента: это мыло на гранях, которых не было на видах-референсах. На прутьях блочные белые блики-сколы нарисованы прямо в BC; metallic по текстуре ≈0,02, так что металл держится на рисованных бликах. На полном росте это читается как потёртое железо.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Балл (1,5+2,0+1,5)/6×10 = 8,3, это не ниже 8,0. Ни одно измерение не ниже 1,0, гейты PASS или n/a. Балл попадает в полосу 8,0–8,4, поэтому карточке нужен независимый второй приёмщик другого профиля.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "Подвес: на листе четыре цепи сходятся к одному звену, в модели сплошные бугристые прутья (звенья только в текстуре) плюс восьмигранная ступица, серьга и S-крюк. Подвес занимает ~22 % высоты против ~12 % на листе. На читаемость не влияет."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Габарит взят по листу, а не по описанию: 28×27×24 uu (Ш/В 1,17) против 1,2×1,2×0,8 м (Ш/В 1,5). При цели «высота 24 uu вместе с крюком» обод выходит ≈28 uu, это примерно половина фигуры героя. Если в зале нужен обод крупнее, менять цель масштаба env_kit (по ширине), а не модель."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Верх ступицы и верхняя грань обода (см. close-base.jpg) — гладкое мягкое пятно без орнамента. При игровой камере сверху это самые заметные грани, но на игровой дистанции они читаются как простое железо."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Белые блочные блики-сколы на прутьях нарисованы в BC, metallic ≈0 по всей текстуре: металл держится на рисованных бликах. Для стиля hand-painted это допустимо."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Кончик левого прута на ~0,3 uu выходит за край ступицы. 15 малых дыр из отчёта закрыты свечами, 4 «изолированные» оболочки на кадрах сидят на ободе. Чинить не нужно; при перегенерации проверить."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-ANTLER-CHANDELIER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп antler-chandelier кита Heorot принят по делегированию: 8,3 (S 1,5, F 2,0, T 1,5). Подвес прутьями вместо цепей и мягкий верх обода и ступицы записаны в known_issues. Балл в полосе 8,0–8,4, нужен второй приёмщик."
+}

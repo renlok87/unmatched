@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotGrainSacksNorse.fbx",
+      "sha256": "2a2ac99b7ba011f197454f3e52b2087fe983bae056205748b46e6ab586212de5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_BC.png",
+      "sha256": "8096fa92142ff188dba144f7a4377a3377621e681f8288d842a0f7540dd765e5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_N.png",
+      "sha256": "96daa13d3e5a223bf93176d31a35984cb5fb4fb72d122254d7b7abf5434d6d51"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrainSacksNorse_ORM.png",
+      "sha256": "7cee66eac0d1ccb2d39387f381e7dc10b7558229777accfa35f2bc7342518987"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-grain-sacks-norse-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotGrainSacksNorse.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "note": "5464 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "note": "UV0 islands 141, used 0.6069, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "note": "T_Env_HeorotGrainSacksNorse_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrainSacksNorse.build.json",
+      "note": "SM_Env_HeorotGrainSacksNorse, M_Env_HeorotGrainSacksNorse",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: пирамидальная куча из 8–9 мешков, завязанных верёвкой, с пучками горловин и снегом на верхах. Силуэт (широкое основание, один мешок на вершине, пропорция ширина/высота ~1.4–1.5) совпадает с видом; основное пятно — бежевая мешковина, как на листе; верёвка с кисточками читается. Лишних и пропавших частей нет, фантомных выступов на turn-090/270 и wire-* нет; куча узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, рваных краёв, вывернутых частей и мусорной геометрии нет; мешки объёмные, не оплывшие, сетка на wire-34/wire-back ровная и следует форме, тонкие шнуры с кисточками целы. Дефекты видны только на крупном плане: гранёный низкополигональный контур собранных горловин (резкие плоские фаски на close-head и close-weapon) и узкая тёмная щель под отходящим шнуром у горловины верхнего мешка (close-head). Тёмная впадина между мешками на turn-225 читается как естественный зазор кучи.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию: грубая тканая мешковина с видимым плетением, плетёная верёвка отдельного тёплого коричневого тона, снег белыми пятнами по верхам в духе кита; швов и растяжек на полном росте нет, детализация на полном росте достаточная для фонового пропа. На крупном плане: снег и плетение на горловинах размыты и смазаны (close-head), в складках под мешками в цвете есть лёгкое затемнение, похожее на запечённую окклюзию (close-weapon, низ слева).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; замечания F и T видны только на крупном плане, на игровой дистанции (21 uu) не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёный низкополигональный контур горловин и узкая тёмная щель под шнуром у горловины верхнего мешка; только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Снег и плетение на горловинах размыты на крупном плане; лёгкое запечённое затемнение в складках между мешками (close-weapon)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-GRAIN-SACKS-NORSE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп grain-sacks-norse (Heorot) принят по делегированию: 8.3, силуэт совпадает с листом; горловины гранёные и смазанные только на крупном плане (балл 8.0–8.4: нужен второй приёмщик Opus high)."
+}

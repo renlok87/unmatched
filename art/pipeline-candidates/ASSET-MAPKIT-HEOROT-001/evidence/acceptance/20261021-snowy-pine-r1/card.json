@@ -1,0 +1,155 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSnowyPine.fbx",
+      "sha256": "f802ffbc1bd29fd58cf2b23cb7e39f46c19e415590f258ab9f5645b4cd545a74"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowyPine_BC.png",
+      "sha256": "1e2c594f28d74c8c3976f3960ae4151f20bbad08d1a27fe7f9035931074658f1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowyPine_N.png",
+      "sha256": "e1b37adfeda1d7a66c9f36b3dd10a95b2dfbda6e74449e5498970f31fbc7b732"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowyPine_ORM.png",
+      "sha256": "fd8a676efc436171bca8dd92d4b0c76b987dc547232218e8212371abce73325d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-snowy-pine-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSnowyPine.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+      "note": "3423 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+      "note": "UV0 islands 887, used 0.654, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+      "note": "T_Env_HeorotSnowyPine_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowyPine.build.json",
+      "note": "SM_Env_HeorotSnowyPine, M_Env_HeorotSnowyPine",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот же (заснеженная ель: ствол с корневым раструбом, ярусы веток под снегом, острая верхушка), узнаётся со всех 8 ракурсов, фантомных частей нет. Но главная ось сбита: на sheet.png ель стоит прямо, верхушка над стволом, а модель наклонена примерно на 22° вглубь. На turn-090/270 и turn-045/225 верхушка смещена примерно на 430 px при высоте около 1040 px, это ≈35 uu на 90 uu. Это сходится с отчётом сборки: shell 0 (ствол) Y −10.5…34.3, верхушка shell 1 на Y 29–38 при Z 76–86. Плюс ≈7° вбок на turn-000. Смещение главной части ≈39 % высоты, намного больше 10 %. Из-за наклона ствол стоит примерно в 10 uu от пивота (центр XY-габарита), а close-head.jpg не захватил верхушку. Второе отличие: на листе плотный тёмно-зелёный конус, ствол виден только у основания. В модели крона разреженная, ярусы-пластины, ствол открыт по всей высоте (turn-000, turn-315). Основное пятно — белый с бледно-бирюзовым, а не тёмно-зелёный с белыми шапками.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и оплывших масс нет. Ствол, корневой раструб и тонкая верхушка целы. Сетка на wire-front/wire-34 следует пластинам веток, треугольники ровные. Дефекты видны только на крупном плане. Внутри кластеров веток есть тёмные обратные/внутренние участки (центр wire-front, правая середина turn-315, низ close-weapon). Ветки читаются как плоские плиты со ступенчатыми фасетными краями. По отчёту: 158 внутрь смотрящих граней (4,8 % площади), 53 открытые петли на оболочках веток, 49 изолированных оболочек с зазором до ~2 uu. На полном росте зазоров не видно, но с односторонним материалом UE снизу возможны выпадения.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "turn-315.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На полном росте материалы читаются: снег — снег, кора — коричневая древесина с волокном. Видимых швов и растяжек нет при 887 островах, перекрытий нет (uv-layout). Дефекты видны на крупном плане. Текстура хвои под снегом — мыльный пятнистый фото-шум бледно-бирюзового цвета вместо тёмной еловой хвои. На нижних сторонах веток тёмно-синие кляксы, похожие на тень в цвете (turn-000 низ, close-weapon). Кора корневого раструба на close-base — чешуйчатый узор «змеиной кожи» с бело-голубыми пятнами. Палитра (бледная хвоя против тёмно-зелёной на листе) учтена в S.",
+      "frames": [
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1.0 < 1.5 → return_to_stage_2 по рубрике пропа. Tripo достроил глубину по одному фронтальному виду наклонной елью: около 22° вглубь, верхушка смещена ≈35 uu при высоте 90 uu, ствол ≈10 uu от пивота. На листе ель стоит прямо. Наклон неравномерный (изогнутый ствол, ветки свисают по-разному с двух сторон), поэтому поворот в Blender его не исправит. Нужна перегенерация в Tripo с видами прямой ели сбоку/сзади (multi-view) и более плотной тёмно-зелёной кроной. Score 6.7 (S 1.0 + F 1.5 + T 1.5 = 4.0 / 6).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Ель наклонена ≈22° вглубь (верхушка смещена ≈35 uu на 90 uu, плюс ≈7° вбок на turn-000), на листе ель прямая. Ствол ≈10 uu от пивота. Крона реже листа, ствол открыт по всей высоте, хвоя бледная вместо тёмно-зелёной. close-head.jpg из-за наклона не захватил верхушку."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Крупный план: тёмные обратные/внутренние участки в кластерах веток, плоские плиты веток со ступенчатыми краями. По отчёту 158 внутренних граней (4,8 % площади) и 53 открытые петли на оболочках веток: проверить выпадения с односторонним материалом UE."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Крупный план: чешуйчатая кора «змеиная кожа» с бело-голубыми пятнами на корневом раструбе, мыльная пятнистая хвоя, тёмно-синие кляксы на нижних сторонах веток (похоже на тень в цвете)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-SNOWY-PINE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп snowy-pine (Heorot) не принят, возврат на этап 2: ель наклонена ≈22° вглубь против прямой ели листа. Перегенерировать в Tripo с боковым видом прямой ели и более плотной тёмной кроной."
+}

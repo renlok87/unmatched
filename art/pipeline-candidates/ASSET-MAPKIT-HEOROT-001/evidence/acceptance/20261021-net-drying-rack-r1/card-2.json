@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotNetDryingRack.fbx",
+      "sha256": "48e568753cbbcdfeace9856ce5f3f16205acebbb14d0d8664cc7763377d87119"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_BC.png",
+      "sha256": "020b4fbe25243eacdd3ea5deaac267c9605f693496b90ec7761ff89618bc858e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_N.png",
+      "sha256": "0bcbb5e66980cf6cd1930e8246a6107b6f99c424d5b1a4d0d1ec95e04a49de8e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotNetDryingRack_ORM.png",
+      "sha256": "28dfdd99eae060a253e3ff5c555b43e49132988bc049283630171396a8d82d1d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-net-drying-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotNetDryingRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "note": "5160 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "note": "UV0 islands 1266, used 0.5293, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "note": "T_Env_HeorotNetDryingRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotNetDryingRack.build.json",
+      "note": "SM_Env_HeorotNetDryingRack, M_Env_HeorotNetDryingRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: деревянная A-рама с двумя перекладинами, связками верёвки, сетями и вяленой рыбой; пропорции рамы и ног, нижние боковые распорки, верхняя и средняя перекладины совпадают с sheet.png, узнаётся со всех ракурсов (на 090/270 — чистая A-рама без фантомов). Одно второстепенное отличие: сети на виде ажурные (сквозь ячейки виден фон), а в модели это сплошные пластины-карточки (wire-front/back, wire-34 — нижняя сеть одна плоская панель), поэтому силуэт сетей читается как сплошные щиты, а не сетка.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: стойки, перекладины, обвязки целы, дыр, вывернутых частей и чёрных пятен нет, сетка на wire-* следует форме. Дефекты только на крупном плане: на close-head снежная шапка верхней перекладины оплывшая и бугристая, верёвочные петли гранёные, нижние края сетей и плавники рыб — рваная бахрома из острых треугольных зубцов (close-weapon, close-head); нижняя сеть — плоская однослойная карточка.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево, верёвка, рыба и снег читаются хорошо, запечённого света нет, детализация на уровне кита. Но в ячейках всех сетей запечён светло-серый фон исходного листа: сети выглядят как серо-белые плёнки с тёмной сеткой поверх, чужой цвет виден на полном росте (turn-000 нижняя сеть, turn-180/225 все сети, close-base). Дополнительно на задней стороне средней перекладины (turn-180, turn-225) размазанная полоса текстуры сети на клапане над брусом — мелочь на игровой дистанции.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6.7 < 8.0 (S 1.5, F 1.5, T 1.0): силуэт верный, но в ячейках сетей запечён серый фон листа, сети читаются сплошными серо-белыми плёнками на полном росте; S ≥ 1.5, поэтому доработка, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Убрать запечённый серый фон из ячеек сетей: перекрасить светло-серые ячейки в BC в тёмный/прозрачный (маска по цвету на островах сетей, опционально opacity-mask в материале), чтобы сети читались ажурными как на sheet.png; заодно подчистить размазанную полосу сети на заднем клапане средней перекладины.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Сгладить оплывшую снежную шапку верхней перекладины и срезать острые треугольные зубцы бахромы на нижних краях сетей и плавниках (decimate/smooth по зонам или cleanup-параметры env_kit).",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Нижняя сеть — одна плоская однослойная карточка; на игровой дистанции допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-NET-DRYING-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп net-drying-rack (Heorot): 6.7, доработка — убрать запечённый серый фон из ячеек сетей и сгладить снежную шапку и зубчатую бахрому."
+}
