@@ -1,0 +1,155 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTreeLantern.fbx",
+      "sha256": "ef73ad18810f7f7c06e7f31a9fb221085a84cc3605356cd5fa7a07c9d9c81812"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_BC.png",
+      "sha256": "60fa8621aa3b42e9117f781895eff1e3327f8de7a45424eee12db66521804f64"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_N.png",
+      "sha256": "75c124b43d45718b622b6b9e60798e6a37d035444b00aa48576940898309c6ba"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_ORM.png",
+      "sha256": "12710ac08ece7aea5e8352271ba3c5b4b90253522637e8217d11bbab03f8bc4a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tree-lantern-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodTreeLantern.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "5178 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "UV0 islands 147, used 0.5587, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "T_Env_SherwoodTreeLantern_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "SM_Env_SherwoodTreeLantern, M_Env_SherwoodTreeLantern",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: заострённый кол с железными бандажами, короткий сук-развилка с кольцом, цепь и четырёхгранный кованый фонарь с крестовой решёткой и шипами снизу. Пропорции совпадают с видом (фонарь ~38 % высоты против ~39 % на листе, верх фонаря на ~23 % против ~26 %). Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-34 нет; узнаётся со всех ракурсов. Крупное кольцо в цепи на листе неразличимо, отличием не считаю.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, рваных краёв, чёрных пятен и оплывших масс нет, тонкие элементы (цепь, рёбра решётки, шипы-финиалы) целы, сетка на wire-34 следует форме. Дефект виден только крупным планом: тёмная щель-прорезь в скате крыши фонаря (close-weapon, слабо и на turn-000).",
+      "frames": [
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как дерево (стилизованная резная текстура волокон), железо — как кованый металл с заклёпками; уровень деталей не хуже кита Sarpedon. Дефекты только на крупном плане: стёкла молочно-белые с древесными разводами и нарисованным пламенем свечи (запечённый блик) вместо тёплого янтарного стекла листа; растяжка текстуры на срезе верха кола (close-head). На игровой дистанции стекло читается как матовое стекло фонаря.",
+      "frames": [
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 → 8.3 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a; дефекты только крупного плана, для фонового пропа диорамы несущественны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "тёмная щель-прорезь в скате крыши фонаря, видна на крупном плане"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "стёкла молочно-белые с древесными разводами и нарисованным пламенем (запечённый блик) вместо тёплого янтарного стекла листа; свечение лучше дать эмиссивом/светом в UE"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "растяжка текстуры на срезе верха кола"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-TREE-LANTERN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tree-lantern (фонарь на суку) принят по делегированию, 8.3; мелочи крупного плана (щель в крыше, молочное стекло с нарисованным пламенем) — в known_issues."
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowLogTunnel.fbx",
+      "sha256": "77253b0967585411374d1e5e98fa54cc93835b07f30adc136829933487a180fa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_BC.png",
+      "sha256": "c6677f2e2d34e458f85f687489b177581707866cb06c8fdd38852b77004b5ee1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_N.png",
+      "sha256": "80d67d2baff96b12b72043ee62fb90fe73b6c3b488301507e634d1d151363fff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_ORM.png",
+      "sha256": "a2bcaa71fe700fe5d42ea153b3a54360e7e1dd4cf897bff45739f8cdbe7dddfc"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-hollow-log-tunnel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodHollowLogTunnel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "5150 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "UV0 islands 100, used 0.5824, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "T_Env_SherwoodHollowLogTunnel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "SM_Env_SherwoodHollowLogTunnel, M_Env_SherwoodHollowLogTunnel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: полое бревно-тоннель, мох сверху, грибы внутри, обломанные сучья сверху; вид спереди (turn-000) совпадает с sheet.png по пропорциям и пятнам цвета, оба торца открыты (turn-000/180), узнаётся со всех ракурсов. Одно второстепенное отличие: на невидимой в листе задней стороне (turn-180, turn-225, turn-270, wire-back) Tripo добавил C-образный дугообразный бортик с досчатой фактурой торца и двумя обломками сучьев сверху и снизу - читается как дубль кромки отверстия или сук, обнимающий ствол; заметен в контуре на 3 из 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Ствол, отверстия и сучья целы, дыр, просветов, чёрных пятен и вывернутых частей нет, сетка на wire-34/wire-back следует форме, низ (close-base) с аккуратными опорами. Дефект: мелкий оторванный фрагмент (мусорная геометрия) висит в воздухе над задними сучьями - точка в несколько пикселей на turn-045 (~1090,335), turn-090 (~997,335), turn-225/270 (~105-200,333) и wire-34; на игровой дистанции не виден, но это отдельный летающий кусок. На close-head верхушки сучьев грубые низкополигональные срезы - допустимо для фонового пропа.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На полном росте материалы читаются как заказано: кора досчатыми пластами, мох двух тонов, рыжие грибы внутри, запечённого света не видно, швов на полном росте нет; детализация на уровне кита. На крупных планах мыло и растяжки: верхушки сучьев на close-head размыты и растянуты, кромка отверстия и мох на close-weapon мягкие, смазанные. Дефекты только крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0: S 1.5 (лишний C-образный бортик на задней стороне), F 1.5 (летающий оторванный фрагмент над сучьями), T 1.5 (мыло и растяжки на крупных планах сучьев и кромки); все гейты PASS/n/a, S не ниже 1.5, поэтому доработка в Blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "fix": "Удалить отдельный мелкий оторванный фрагмент, висящий над задними сучьями (loose part, видна точкой на turn-045/090/225/270 и wire-34): разделить меш по loose parts и выбросить острова меньше порога площади/объёма, затем пересобрать.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать мыло и растяжки на верхушках сучьев и кромке отверстия: перезапечь BC с исходника Tripo с большим texel density для мелких островов (сучья, кромки) или поднять разрешение запекания; при неуспехе - взять текстуру исходника Tripo без пересжатия.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-225.jpg",
+      "note": "На задней стороне (turn-180/225/270, wire-back) C-образный бортик с досчатой фактурой торца и двумя обломками сучьев - добавка Tripo, которой нет в листе; читается как дубль кромки отверстия. Для фонового пропа терпимо; при доработке можно сгладить в Blender, при повторной генерации - дать вид сзади."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-HOLLOW-LOG-TUNNEL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hollow-log-tunnel (Sherwood Forest) не принят, 7.5: доработать в Blender - убрать летающий фрагмент над сучьями и перезапечь мыльные текстуры сучьев и кромки; бортик сзади - известная проблема."
+}

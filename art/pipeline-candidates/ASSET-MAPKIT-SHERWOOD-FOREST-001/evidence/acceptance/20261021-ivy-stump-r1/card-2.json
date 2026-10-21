@@ -1,0 +1,153 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodIvyStump.fbx",
+      "sha256": "9012bfe6576e03b73d098501433c5ecc2998b056adf5bd787d7a3af6a0f09089"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_BC.png",
+      "sha256": "0dc59939bf56b84bc3cfded5e58a6ad3785b596cc04530f5ac43120762b5435d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_N.png",
+      "sha256": "6da76b272935a47ccfcf2a6f2338734099a9a5d762c0ff11aedd88128950c573"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_ORM.png",
+      "sha256": "e4e0a87a665512ade159486388d037144e46f1e7a47c6fce1bf0bf7ca44b067b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-ivy-stump-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodIvyStump.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "2900 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "UV0 islands 742, used 0.7621, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "T_Env_SherwoodIvyStump_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "SM_Env_SherwoodIvyStump, M_Env_SherwoodIvyStump",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: высокий сломанный пень с расщеплённой зубчатой верхушкой (высокая щепа слева и группа справа), спиральные плети плюща по стволу, расширенные корни-контрфорсы у основания. Пропорции высоты к ширине и раструб основания совпадают с видом; лишних и пропавших частей нет, читается со всех ракурсов turn-000/045/090/180/270. Кора светлее и теплее (бежево-коричневая против более тёмной серо-коричневой на листе), но в том же семействе цвета.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Ствол и корни цельные, без дыр, просветов и оплывших масс; щепы верхушки чистые, сетка на wire-34 следует форме ствола. Листья плюща — плоские карточки: часть стоит ребром к стволу и даёт тёмные тонкие «иглы» по контуру (правый край turn-090, turn-180, turn-000) и несколько листьев, отстоящих от коры в воздухе на wire-34. На игровой дистанции читается как листва; заметно на крупном плане и по краю силуэта.",
+      "frames": [
+        "wire-34.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Кора читается как дерево с мхом, плющ — как плющ с прожилками и стеблями; явного запечённого света нет, швов и растяжек на полном росте не видно. На крупном плане верхушки (close-head) текстура щеп мыльная, с размазанными полосами; на левом корне в close-base поверх коры размазан рисунок листвы (проекция плюща на кору). Дефекты только крупного плана.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; силуэт совпадает с видом, дефекты F/T только крупного плана.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Листья плюща ребром к стволу дают тонкие тёмные иглы по краю силуэта; часть листьев отстоит от коры (wire-34.jpg)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мыльная, размазанная текстура щеп верхушки на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На левом корне по коре размазан рисунок листвы плюща (проекция)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-IVY-STUMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ivy-stump (пень в плюще) принят по делегированию, 8.3; замечания крупного плана (листья ребром, мыльная верхушка) — в known_issues."
+}

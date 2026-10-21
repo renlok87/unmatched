@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodVenisonRack.fbx",
+      "sha256": "e92014bdc1709880f01b9a622e25f62f4917c332eb07d1e32ea34e40a55b3217"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_BC.png",
+      "sha256": "b180dbf3d7da620bb12c34a9fd00086af70897334dd37e29b54e6381242c0649"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_N.png",
+      "sha256": "494d941a8b1177db02865295078c84f8a6eb324fcab9fb55cbedeeb9b06f9bdc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_ORM.png",
+      "sha256": "4b28c37391ebae417ef71e6176db47a2b1e13b0dbd6fb913ec39f2a3aabb69ae"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-venison-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodVenisonRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "5026 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "UV0 islands 173, used 0.5643, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "T_Env_SherwoodVenisonRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "SM_Env_SherwoodVenisonRack, M_Env_SherwoodVenisonRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: A-образные козлы из жердей с поперечиной, связки верёвкой, распорки внизу, слева окорок дичи на верёвке, справа вяленые полоски мяса; пропорции и расположение совпадают с sheet.png, узнаётся со всех ракурсов (на 090/270 читается A-рама с окороком внутри, фантомных оболочек нет). Одно второстепенное отличие: на модели три полоски мяса, на виде их, судя по листу, четыре (деталь контура).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: тонкие верёвки-подвесы, петли и распорки целы, дыр, просветов и оплывших масс нет, сетка на wire-34/wire-front следует форме. Только на крупных планах: верёвочные петли и узлы гранёные, с острыми углами (close-head), под низом окорока торчит небольшой цилиндрический обрубок/нарост (close-base, виден и на wire-front у низа окорока).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 2,
+      "rationale": "Материалы читаются как заказано: кора и древесина с волокнами и пятнами мха (стиль кита), окорок с жировой коркой и мраморным срезом мяса, полоски вяленого мяса, верёвка с витой фактурой. Запечённого света и теней нет, швов и растяжек на полном росте нет, детализация на уровне кита; лёгкая мягкость фактуры полосок мяса на крупном плане несущественна для фонового пропа.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; замечания S и F второстепенные, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Три полоски вяленого мяса вместо четырёх на sheet.png; второстепенное отличие контура."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Под низом окорока небольшой цилиндрический обрубок/нарост; виден только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Верёвочные петли и узлы на поперечине гранёные, с острыми углами; только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-VENISON-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп venison-rack (Sherwood Forest) принят по делегированию, 8.3; мелочи крупного плана (3 полоски вместо 4, обрубок под окороком, гранёные петли) — в known_issues."
+}
