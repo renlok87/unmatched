@@ -1,0 +1,68 @@
+{
+ "asset_id": "ASSET-BRUCE-LEE-001",
+ "classes": {
+  "leather_smooth": {
+   "bc": [
+    0.0307,
+    0.0262,
+    0.0284
+   ],
+   "ymedClassHero": 0.02765,
+   "specular": 0.2,
+   "roughTypical": 0.5,
+   "roughLo": 0.45,
+   "roughHi": 0.56
+  },
+  "linen": {
+   "bc": [
+    0.6939,
+    0.3185,
+    0.0015
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.37412
+  },
+  "skin": {
+   "bc": [
+    0.4508,
+    0.1812,
+    0.063
+   ],
+   "ymedClassHero": 0.23022,
+   "cavityTintStrength": 0.1
+  },
+  "stone_base": {
+   "bc": [
+    0.0296,
+    0.0262,
+    0.0284
+   ],
+   "ymedClassHero": 0.02719
+  },
+  "wool_coarse": {
+   "bc": [
+    0.0284,
+    0.0262,
+    0.0284
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.02695
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "BruceLee",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero BruceLee --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)",
+  "note_ue_r2": "UE look-dev iteration r2 (ue_hero_lookdev.py lut)",
+  "note_ue_r3": "UE look-dev iteration r3 (ue_hero_lookdev.py lut)"
+ },
+ "note_ue_r2": "UE look-dev r2 (2026-10-21, light mode by delegation). Review r1 (measure-r1.json, linen anchor, board / reading exposure): leather_smooth (black hair and shoes) Y 4.10x / 2.89x the concept - the hair reads silver-grey in every view: library specular 0.5 at roughness 0.33-0.41 reflects the sky as a grey veil over the near-floor bake (class median Y 0.0275, luminanceMin 0.02); skin 0.81x / 0.66x, sat +0.094 / +0.157; linen sat +0.098 / +0.144. r2: leather_smooth specular 0.5 -> 0.2, roughness 0.5 [0.45, 0.56] (Achilles r2/r3 precedent: specular 0.2-0.27, roughness 0.58); skin cavityTintStrength 0.35 -> 0.2 (less red-dark cavities); MI: skin gain through the AN-32 Fix slot A and hero Saturation 0.98 (profile rev 2). bc / ymedClassHero unchanged (dielectric bc comes from the hero bake, bake-clamped)",
+ "note_ue_r3": "UE look-dev r3 (2026-10-21, the last light-mode iteration). Review r2 (measure-r2.json, linen anchor, board / reading exposure): leather_smooth Y 1.94x / 1.31x (from 4.10x / 2.89x; the hair reads black-charcoal, the bake sits on the class floor), linen within both, skin board 0.995x within, reading 0.849x with sat +0.135 (red-dark cavities darken and saturate the shadowed skin). r3: only skin cavityTintStrength 0.2 -> 0.1; MI FixGainA (skin) 1.2 -> 1.25 (profile rev 3); leather_smooth unchanged"
+}

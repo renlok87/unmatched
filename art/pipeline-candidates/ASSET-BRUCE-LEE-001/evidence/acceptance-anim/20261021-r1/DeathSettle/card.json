@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "clip": "DeathSettle",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/export/AM_BruceLee_DeathSettle.fbx",
+      "sha256": "ed8a1f226c75b44ed9ea811dd3a3bd5eb3bf1b926faf3610112980cbe82f27da"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json",
+      "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/DeathSettle/frames",
+    "files": [
+      "BruceLee-DeathSettle-blender-sheet.jpg",
+      "BruceLee-DeathSettle-f10-q34b.jpg",
+      "BruceLee-DeathSettle-f13-q34.jpg",
+      "BruceLee-DeathSettle-f15-q34bl.jpg",
+      "BruceLee-DeathSettle-f16-back.jpg",
+      "BruceLee-DeathSettle-f16-q34b.jpg",
+      "BruceLee-DeathSettle-f16-topb.jpg",
+      "BruceLee-DeathSettle-f17-front-b.jpg",
+      "BruceLee-DeathSettle-f17-front.jpg",
+      "BruceLee-DeathSettle-f17-left-b.jpg",
+      "BruceLee-DeathSettle-f17-left.jpg",
+      "BruceLee-DeathSettle-f17-top34.jpg",
+      "BruceLee-DeathSettle-f21-back.jpg",
+      "BruceLee-DeathSettle-f21-q34.jpg",
+      "BruceLee-DeathSettle-f21-q34b.jpg",
+      "BruceLee-DeathSettle-f21-q34bl.jpg",
+      "BruceLee-DeathSettle-f21-topb.jpg",
+      "BruceLee-DeathSettle-f00-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f00-q34-ue-editor.jpg",
+      "BruceLee-DeathSettle-f03-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f03-q34-ue-editor.jpg",
+      "BruceLee-DeathSettle-f08-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f08-q34-ue-editor.jpg",
+      "BruceLee-DeathSettle-f13-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f13-q34-ue-editor.jpg",
+      "BruceLee-DeathSettle-f17-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f17-q34-ue-editor.jpg",
+      "BruceLee-DeathSettle-f21-front-ue-editor.jpg",
+      "BruceLee-DeathSettle-f21-q34-ue-editor.jpg",
+      "BruceLee-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/author-DeathSettle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_DeathSettle.validation.json",
+      "note": "AM_BruceLee_DeathSettle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = ed8a1f226c75b44ed9ea811dd3a3bd5eb3bf1b926faf3610112980cbe82f27da (= accepted_object); #clip_role = terminal; #fps = 24.0; #duration_s = 0.875"
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; #fails = []; #checks.foot_slide_L.max_of_height = 0.001115, #checks.foot_slide_R.max_of_height = 0.001292 (tol 0.005); #checks.skin_stretch.status = pass (fail_edges 0); #checks.below_base_top.status = pass; #checks.limb_body_L/R.status = pass"
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#BRUC-DeathSettle.status = technically_imported; #BRUC-DeathSettle.ue.status = technically_imported; #BRUC-DeathSettle.validation.result = pass; #BRUC-DeathSettle.source.files[0].sha256 = ed8a1f226c75b44ed9ea811dd3a3bd5eb3bf1b926faf3610112980cbe82f27da = ue-import-clips.json#fbx_sha256.AM_BruceLee_DeathSettle (тот же FBX)"
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "Лист и UE front/q34. К.3: отшатывание назад, кисти-«когти» взлетают к лицу, голова откинута (f03-front/q34-ue, лист f03 left). К.8: корпус начинает складываться, руки падают (f08-q34-ue). К.13–17: поклон корпусом с лёгким креном вправо, голова упала на грудь, на f17-front-ue сверху видна макушка. Пустые руки висят, локти мягко согнуты (f17-front-ue, f17-q34-ue). Смерть-поклон читается с front и q34, спиной к камере нет (ВР-06), стойка JKD узнаётся на к.0–3. Огрехи ритма: отшатывание к.3 малой амплитуды, кисти лишь чуть выше стойки. В финале руки висят заметно впереди вертикали (f17-left), поза слегка «тянущаяся», а не безвольная. Неподвижные кисти-«когти» — известный предел модели (костей пальцев нет), балл за него не снижается.",
+      "frames": [
+        "BruceLee-DeathSettle-f03-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f03-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f08-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f13-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f17-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f17-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f17-left.jpg",
+        "BruceLee-DeathSettle-blender-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Обе стопы на всех ключах стоят на подставке в тех же точках, что в rest (f00-front-ue → f21-front-ue, f21-q34-ue; лист к.0–21). Подошвы лежат на верхе подставки без зазора и провала (f10-q34b, f21-q34b, f17-top34). Падения на колени нет (ВР-14): колени лишь подгибаются. Таз уходит назад над пятками и уравновешивает наклон корпуса, опора читается устойчивой (f17-left). Почти прямые, широко поставленные ноги — известный предел фигуры (запас цепи 0,05 см), в балл не идёт.",
+      "frames": [
+        "BruceLee-DeathSettle-f00-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f21-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f21-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f10-q34b.jpg",
+        "BruceLee-DeathSettle-f21-q34b.jpg",
+        "BruceLee-DeathSettle-f17-top34.jpg",
+        "BruceLee-DeathSettle-f17-left.jpg",
+        "BruceLee-DeathSettle-blender-sheet.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "Пик амплитуды — к.17–21. Пах и ягодицы сзади при наклоне таза (f17-left-b, @hips): складка пояса спереди и подъягодичная складка гладкие, разрывов и дыр нет. Плечи и ворот сзади сверху (f21-topb, f16-topb): тонкие тёмные щели по швам рукавов у плеча и у ворота — известный предел (кромки Tripo, видны около rest, не растут). Колено (f17-front-b), шея и дельта сзади (f21-q34bl, f15-q34bl), спина (f21-back): оболочка цела. Следы без разрывов: смятые складки с тёмными щелями на боку талии при сгибе корпуса (f21-q34b, f10-q34b); мелкая фасетка затенения у шва плеча (f16-q34b) и вверху спины у ворота (f21-topb). Левая кисть ложится на переднюю поверхность бедра (f13-q34, f21-q34), видимого прохода внутрь нет.",
+      "frames": [
+        "BruceLee-DeathSettle-f17-left-b.jpg",
+        "BruceLee-DeathSettle-f21-topb.jpg",
+        "BruceLee-DeathSettle-f16-topb.jpg",
+        "BruceLee-DeathSettle-f16-q34b.jpg",
+        "BruceLee-DeathSettle-f21-q34b.jpg",
+        "BruceLee-DeathSettle-f10-q34b.jpg",
+        "BruceLee-DeathSettle-f17-front-b.jpg",
+        "BruceLee-DeathSettle-f21-q34bl.jpg",
+        "BruceLee-DeathSettle-f21-back.jpg",
+        "BruceLee-DeathSettle-f13-q34.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Финал к.17–21 держится без дрожи. В UE к.17 и к.21 совпадают по голове, кистям и корпусу (f17-front-ue = f21-front-ue, f17-q34-ue = f21-q34-ue). Крупные планы сзади сверху к.16 и к.21 одинаковы (f16-topb, f21-topb). На листе к.17 и к.21 совпадают во всех трёх видах. Поклон доходит до финала постепенно (к.13 → к.17 на листе), без перелёта и отскока. Финальная поза соответствует роли terminal: держится до растворения.",
+      "frames": [
+        "BruceLee-DeathSettle-f17-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f21-front-ue-editor.jpg",
+        "BruceLee-DeathSettle-f17-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f21-q34-ue-editor.jpg",
+        "BruceLee-DeathSettle-f16-topb.jpg",
+        "BruceLee-DeathSettle-f21-topb.jpg",
+        "BruceLee-DeathSettle-blender-sheet.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "BruceLee-DeathSettle-f21-topb.jpg",
+      "note": "тонкие тёмные щели по швам рукавов у плеча и у ворота сзади — известный предел модели (кромки частей Tripo), видны около rest, в клипе не растут"
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-DeathSettle-f21-q34b.jpg",
+      "note": "смятие ткани с тёмными щелями на боку талии при сгибе корпуса к.10–21 (также f10-q34b), разрыва нет; проверить на листе K1/K2"
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-DeathSettle-f13-q34.jpg",
+      "note": "левая кисть лежит на передней поверхности левого бедра к.13–21 (также f21-q34), видимого прохода нет; проверить на игровом листе"
+    },
+    {
+      "item": "R",
+      "frame": "BruceLee-DeathSettle-f17-left.jpg",
+      "note": "в финале руки висят заметно впереди вертикали, кисти раскрыты «когтями» (предел модели: костей пальцев нет), поза чуть «тянущаяся»; отшатывание к.3 малой амплитуды (f03-front-ue)"
+    },
+    {
+      "item": "C",
+      "frame": "BruceLee-DeathSettle-f17-front.jpg",
+      "note": "ноги почти прямые и широко поставлены, колени подгибаются слабо — известный предел фигуры (запас цепи бедро–голень 0,05 см)"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-BRUCE-LEE-001-DeathSettle-r1"
+  },
+  "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

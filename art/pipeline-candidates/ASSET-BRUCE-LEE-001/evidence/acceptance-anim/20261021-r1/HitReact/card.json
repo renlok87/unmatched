@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "clip": "HitReact",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/export/AM_BruceLee_HitReact.fbx",
+      "sha256": "213b0686c24c2016078153f4e2e6fabfaa88c5abd995cd61437a279a3f521e2c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json",
+      "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/HitReact/frames",
+    "files": [
+      "BruceLee-HitReact-blender-sheet.jpg",
+      "BruceLee-HitReact-f02-back.jpg",
+      "BruceLee-HitReact-f02-front-b.jpg",
+      "BruceLee-HitReact-f02-front.jpg",
+      "BruceLee-HitReact-f02-left.jpg",
+      "BruceLee-HitReact-f02-q34.jpg",
+      "BruceLee-HitReact-f02-q34b-b.jpg",
+      "BruceLee-HitReact-f02-q34b.jpg",
+      "BruceLee-HitReact-f02-q34bl.jpg",
+      "BruceLee-HitReact-f02-topb.jpg",
+      "BruceLee-HitReact-f00-front-ue-editor.jpg",
+      "BruceLee-HitReact-f00-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f02-front-ue-editor.jpg",
+      "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f04-front-ue-editor.jpg",
+      "BruceLee-HitReact-f04-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f07-front-ue-editor.jpg",
+      "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f10-front-ue-editor.jpg",
+      "BruceLee-HitReact-f10-q34-ue-editor.jpg",
+      "BruceLee-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/author-HitReact.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_HitReact.validation.json",
+      "note": "AM_BruceLee_HitReact.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = 213b0686c24c2016078153f4e2e6fabfaa88c5abd995cd61437a279a3f521e2c = accepted_object; #checks.fps = 24.0; #checks.duration = 0.4167 (expected 0.4167); #checks.clip_boundary_rest = pass (first/last 2e-05 H); #checks.root_in_place = pass"
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-HitReact.json",
+      "note": "contact-HitReact.json#result = pass; #fails = []; #checks.foot_slide_L.max_of_height = 0.000756, #checks.foot_slide_R.max_of_height = 0.000658 (tol 0.005); #checks.limb_body_L/R = pass; #checks.skin_stretch = pass (fail_edges 0, warn_edges 0, max_ratio 1.678 at f2); #checks.below_base_top = pass; #checks.below_ground = pass; weapon_body/weapon_tip = info (no weapon)"
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#BRUC-HitReact.status = technically_imported; #BRUC-HitReact.ue.status = technically_imported (evidence ue-import-clips.json); #BRUC-HitReact.source.files[0].sha256 = 213b0686c24c2016078153f4e2e6fabfaa88c5abd995cd61437a279a3f521e2c = ue-import-clips.json#fbx_sha256.AM_BruceLee_HitReact; #BRUC-HitReact.validation.result = pass"
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "f00 -> f02 (front и q34 UE): силуэт резко меняется: обе кисти-«когти» взлетают к лицу и расходятся, корпус откинут назад, голова мотнулась назад и вбок. f04 держит реакцию чуть ниже, f07 уже в стойке, f10 = rest. Читается и с front, и с q34. Лицо к камере во всех кадрах, спиной к камере нет (ВР-06). Характер виден: стойка JKD с поднятыми «когтями» узнаётся и в отдаче. Мелкие огрехи ритма: пик к.2 и к.4 почти одна поза, весь возврат сжат в к.4-7. Заявленный лёгкий перехлёст вперёд на к.7 не виден (f07 ≈ f10). На q34 к.2 задняя кисть закрывает подбородок; на f02-left видно, что кисти перед лицом, проникновения нет.",
+      "frames": [
+        "BruceLee-HitReact-f00-front-ue-editor.jpg",
+        "BruceLee-HitReact-f02-front-ue-editor.jpg",
+        "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+        "BruceLee-HitReact-f04-front-ue-editor.jpg",
+        "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+        "BruceLee-HitReact-blender-sheet.jpg",
+        "BruceLee-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Реакция на удар с нужной стороны: на f02-left и f02-q34 корпус и голова уходят назад, кисти по инерции летят вперёд-вверх. На f02-front-ue-editor колени чуть подгибаются, стойка «ломается». Стопы держат подставку во всех кадрах: на f00/f02/f04/f07/f10 front и q34 подошвы на одном месте, без отрыва пятки или носка; на f02-left и f02-q34 туфли лежат плоско на диске. Кисти не проходят сквозь тело и голову. Ноги сгибаются лишь слегка; это известный предел (прямые ноги в rest), и по замыслу клипа этого достаточно.",
+      "frames": [
+        "BruceLee-HitReact-f02-left.jpg",
+        "BruceLee-HitReact-f02-q34.jpg",
+        "BruceLee-HitReact-f02-front-ue-editor.jpg",
+        "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+        "BruceLee-HitReact-f00-q34-ue-editor.jpg",
+        "BruceLee-HitReact-f10-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "Пик отдачи к.2 на крупных планах: спина и плечи (f02-back), вид сверху-сзади (f02-topb), q34b и q34bl, пах (f02-front-b), front и left. Оболочка цела: разрывов, дыр и новых заломов от клипа нет, плечи при подъёме рук гладкие, ворот сзади не рвётся. Следы есть: тонкие тёмные щели по швам рукавов у плеча и светлая щель у ворота сзади (f02-topb, f02-back, f02-q34bl), рваная изнанка манжеты при отсечении задних граней (f02-q34b). Это известные пределы модели, в клипе они не растут. Итог по якорю: «следы без разрывов».",
+      "frames": [
+        "BruceLee-HitReact-f02-back.jpg",
+        "BruceLee-HitReact-f02-topb.jpg",
+        "BruceLee-HitReact-f02-q34b.jpg",
+        "BruceLee-HitReact-f02-q34bl.jpg",
+        "BruceLee-HitReact-f02-front-b.jpg",
+        "BruceLee-HitReact-f02-front.jpg"
+      ]
+    },
+    "L": {
+      "value": 1.5,
+      "rationale": "f10-front и f10-q34 совпадают с f00: oneshot садится в rest без рывка, к.7-10 спокойно удерживают позу, переход в Idle будет без шва. Но возврат из почти пиковой позы f04 в стойку f07 занимает 3 кадра, а перехлёст вперёд на к.7 не читается (f07 ≈ f10). Посадка прямая, без мягкого добора; огрех почти незаметен.",
+      "frames": [
+        "BruceLee-HitReact-f04-q34-ue-editor.jpg",
+        "BruceLee-HitReact-f07-front-ue-editor.jpg",
+        "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+        "BruceLee-HitReact-f10-front-ue-editor.jpg",
+        "BruceLee-HitReact-f00-front-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "D",
+      "frame": "BruceLee-HitReact-f02-topb.jpg",
+      "note": "Тонкие тёмные щели по швам рукавов у плеча и светлая щель у ворота сзади видны на пике к.2. Это известный предел (кромки частей Tripo), в клипе не растёт."
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-HitReact-f02-q34b.jpg",
+      "note": "При отсечении задних граней видна рваная изнанка манжеты рукава. Это известный предел, геометрия модели."
+    },
+    {
+      "item": "L",
+      "frame": "BruceLee-HitReact-f07-front-ue-editor.jpg",
+      "note": "Заявленный лёгкий перехлёст вперёд на к.7 не виден (f07 ≈ f10): весь возврат сжат в к.4-7. Проверить посадку на игровом листе K1/K2."
+    },
+    {
+      "item": "R",
+      "frame": "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+      "note": "На q34 к.2 задняя кисть перекрывает подбородок и низ лица. По f02-left кисти перед лицом, проникновения нет. Проверить читаемость лица с игровой камеры K1/K2."
+    },
+    {
+      "item": "C",
+      "frame": "BruceLee-HitReact-f02-front-ue-editor.jpg",
+      "note": "Ноги лишь слегка подгибаются, сдвиг таза почти не виден, отдачу несут корпус, голова и руки. Это известный предел прямых ног rest."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-BRUCE-LEE-001-HitReact-r1"
+  },
+  "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

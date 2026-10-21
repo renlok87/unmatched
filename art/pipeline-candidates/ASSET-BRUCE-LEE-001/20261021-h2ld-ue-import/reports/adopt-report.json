@@ -1,0 +1,752 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_BruceLee_H2_2K_N.png",
+          "h21_sha256": "02cdfc892a946ce9bbb61a6f31e97b4bdc2cecfbb1cbe0c9c50a371ae9091c2c",
+          "passed": true,
+          "sha256": "02cdfc892a946ce9bbb61a6f31e97b4bdc2cecfbb1cbe0c9c50a371ae9091c2c"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SK_BruceLee_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SM_BruceLee_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "ce0b07fc1e100b6a8213c2f7aa9d1e7df587003e424fcefabbaba5ba02ca5686",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json",
+            "profile_id": "bruce-lee-h2-lookdev/4",
+            "sha256": "ce0b07fc1e100b6a8213c2f7aa9d1e7df587003e424fcefabbaba5ba02ca5686"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "e5217368491abd625bd5b791dfe6c1122da4174ad2045c3b6a660898b2a5a852",
+          "rig_passed": true,
+          "rig_report_fbx": "e5217368491abd625bd5b791dfe6c1122da4174ad2045c3b6a660898b2a5a852",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "ce0b07fc1e100b6a8213c2f7aa9d1e7df587003e424fcefabbaba5ba02ca5686",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json",
+    "profile_id": "bruce-lee-h2-lookdev/4",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "bruce-lee-h2-lookdev/4",
+      "measured": {
+        "build_report": "bruce-lee-h2-lookdev/4",
+        "textures_report": "bruce-lee-h2-lookdev/4"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "11bba0d85961c03826d6f9ddffaa0a4ec611bb5225d8e63b527f6791540da9a4",
+          "report": "11bba0d85961c03826d6f9ddffaa0a4ec611bb5225d8e63b527f6791540da9a4",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "a7af9667172f38782155dc487172bfe4faffab9370da05e6255dcbe9b3d10b12",
+          "report": "a7af9667172f38782155dc487172bfe4faffab9370da05e6255dcbe9b3d10b12",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96",
+          "profile": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "e22a485e15b3f7d137f67ed1b31356b97b1ac896cc1fb776201362e8a9630509",
+          "profile": "e22a485e15b3f7d137f67ed1b31356b97b1ac896cc1fb776201362e8a9630509",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_BruceLee_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_BruceLee_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 16,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 16,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          -0.055,
+          -4.201,
+          0.499
+        ],
+        "Weapon": [
+          0.171,
+          -5.456,
+          0.134
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_BruceLee_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_BruceLee_H2_Body": 39659,
+        "SM_BruceLee_H2_Base": 1413
+      },
+      "measured": {
+        "SK_BruceLee_H2_Body": 39659,
+        "SM_BruceLee_H2_Base": 1413
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/rig-report.json": "1c0a80aa9d93023bf9c88dd02d5da36aadf5eef88302bfd981722f40aee7775a",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/textures-report.json": "21e69ea74d7edc837333de7b0d0c250303d8e812b584617f26d76601c97c9a7c",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SK_BruceLee_H2LD.fbx": "a7af9667172f38782155dc487172bfe4faffab9370da05e6255dcbe9b3d10b12",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SM_BruceLee_H2LD_Base.fbx": "11bba0d85961c03826d6f9ddffaa0a4ec611bb5225d8e63b527f6791540da9a4",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-fbx-report.json": "678919f66283b590e18ed5a0e7f165de899cde8b2d3e9d52511df8c068271471",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-maps-report.json": "dbd8ab14cd5f5c22c51cc7a26c2ab43398f20a49962571b829afa4520b6d68d7",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/run-manifest.json": "5cdc39a05d7565f595242459156f89c81326f75bcca4bc911d9a794503f238ce",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_BC.png": "d78dde2348c566c00349a7e633cf5b419ee580b8d1677dfc65dcaac9b4c1f97f",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_Edge.png": "72a5def6fe69223ed0d655527a2849de95ed38ee40d54ce555de0a9702ed72dc",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_MatID.png": "a9ef86ebd2cdac178b49c1a38b762dc9eff50b27ab31a5990b05a0087118924f",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_N.png": "02cdfc892a946ce9bbb61a6f31e97b4bdc2cecfbb1cbe0c9c50a371ae9091c2c",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_ORM.png": "d123a08106b2968b7e0a3029972da2fff01a0ca1742db7d70f95127ff48cc3d4",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_TeamMask.png": "9b808b6415b88a4961baab6a3b7096e6458b38e6f4bea38e43bce150553357ee",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_TeamAccent_2K.png": "e22a485e15b3f7d137f67ed1b31356b97b1ac896cc1fb776201362e8a9630509",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_UM_MatLUT_BruceLee.dds": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json": "ce0b07fc1e100b6a8213c2f7aa9d1e7df587003e424fcefabbaba5ba02ca5686"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SM_BruceLee_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SK_BruceLee_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json",
+    "report:build": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/../20261021-h2-bake-r3/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_UM_MatLUT_BruceLee.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile bruce-lee-h2-lookdev/4); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "bruce-lee-h2ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2ld-lookdev-ue-import.json",
+    "sha256": "861d2bf90e696b132f90215f063d3d620818a4408705fb3933086cc0b43f052c"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_BruceLee_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_BruceLee_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_BruceLee_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_BruceLee_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_BruceLee_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_BruceLee_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_BruceLee_H2_Body": [
+                "M_BruceLee_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_BruceLee_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            14.992,
+            14.988,
+            5.981
+          ],
+          "min": [
+            -15.012,
+            -14.983,
+            -0.001
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            14.983,
+            15.012,
+            5.981
+          ],
+          "min": [
+            -14.988,
+            -14.992,
+            -0.001
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            11.923,
+            5.673,
+            54.999
+          ],
+          "min": [
+            -11.919,
+            -13.724,
+            5.776
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            13.724,
+            11.923,
+            54.999
+          ],
+          "min": [
+            -5.673,
+            -11.919,
+            5.776
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            13.724,
+            11.919,
+            54.999
+          ],
+          "min": [
+            -5.673,
+            -11.923,
+            5.776
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SM_BruceLee_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/export/SK_BruceLee_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55,
+        "skeletal_top_m": 0.54999,
+        "top_part": "tripo_part_2"
+      },
+      "meshes_pre_export_m": {
+        "SK_BruceLee_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 39659
+        },
+        "SM_BruceLee_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1413
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.0132,
+                0.0748,
+                0.3745
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.044,
+                0.087,
+                0.384
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                0.0351,
+                -0.0852,
+                0.3831
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.084,
+                -0.063,
+                0.396
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.031,
+                0.049,
+                0.43
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.0132,
+                0.0748,
+                0.3745
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                0.0,
+                -0.066,
+                0.435
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.0351,
+                -0.0852,
+                0.3831
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.0009,
+                0.085,
+                0.0976
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.05939,
+                0.11006,
+                0.0525
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                0.0001,
+                -0.0835,
+                0.0975
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.06029,
+                -0.10778,
+                0.05262
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.044,
+                0.087,
+                0.384
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.09935,
+                0.09514,
+                0.40353
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.084,
+                -0.063,
+                0.396
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.124,
+                -0.03685,
+                0.42369
+              ]
+            },
+            "head": {
+              "head_m": [
+                0.0,
+                -0.004,
+                0.458
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.0,
+                -0.00572,
+                0.59915
+              ]
+            },
+            "hips": {
+              "head_m": [
+                0.003,
+                0.0,
+                0.268
+              ],
+              "parent": "root",
+              "tail_m": [
+                0.003,
+                0.0,
+                0.30867
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                -0.005,
+                0.068,
+                0.175
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.0009,
+                0.085,
+                0.0976
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.003,
+                -0.069,
+                0.175
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                0.0001,
+                -0.0835,
+                0.0975
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                0.002,
+                0.04,
+                0.268
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.005,
+                0.068,
+                0.175
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                0.004,
+                -0.04,
+                0.268
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.003,
+                -0.069,
+                0.175
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.26802
+              ]
+            },
+            "spine": {
+              "head_m": [
+                0.003,
+                0.0,
+                0.31
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.00477,
+                -0.00389,
+                0.45089
+              ]
+            }
+          },
+          "meshes": {
+            "SK_BruceLee_H2_Body": {
+              "triangles": 39659,
+              "vertices": 21074
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "hand.R",
+          "location_uu_for_ue": [
+            0.171,
+            -5.456,
+            0.134
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            12.5,
+            3.8,
+            42.2
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            -0.055,
+            -4.201,
+            0.499
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            0.5,
+            0.5,
+            50.0
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

@@ -1,0 +1,366 @@
+[
+ {
+  "asset": "ASSET-BRUCE-LEE-001",
+  "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/HitReact",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-BRUCE-LEE-001",
+   "clip": "HitReact",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/export/AM_BruceLee_HitReact.fbx",
+     "sha256": "213b0686c24c2016078153f4e2e6fabfaa88c5abd995cd61437a279a3f521e2c"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json",
+     "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/HitReact/frames",
+    "files": [
+     "BruceLee-HitReact-blender-sheet.jpg",
+     "BruceLee-HitReact-f02-back.jpg",
+     "BruceLee-HitReact-f02-front-b.jpg",
+     "BruceLee-HitReact-f02-front.jpg",
+     "BruceLee-HitReact-f02-left.jpg",
+     "BruceLee-HitReact-f02-q34.jpg",
+     "BruceLee-HitReact-f02-q34b-b.jpg",
+     "BruceLee-HitReact-f02-q34b.jpg",
+     "BruceLee-HitReact-f02-q34bl.jpg",
+     "BruceLee-HitReact-f02-topb.jpg",
+     "BruceLee-HitReact-f00-front-ue-editor.jpg",
+     "BruceLee-HitReact-f00-q34-ue-editor.jpg",
+     "BruceLee-HitReact-f02-front-ue-editor.jpg",
+     "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+     "BruceLee-HitReact-f04-front-ue-editor.jpg",
+     "BruceLee-HitReact-f04-q34-ue-editor.jpg",
+     "BruceLee-HitReact-f07-front-ue-editor.jpg",
+     "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+     "BruceLee-HitReact-f10-front-ue-editor.jpg",
+     "BruceLee-HitReact-f10-q34-ue-editor.jpg",
+     "BruceLee-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/author-HitReact.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_HitReact.validation.json",
+     "note": "AM_BruceLee_HitReact.validation.json#result = pass; #clip_sha256 = 213b0686…1e2c (= accepted_object); #checks.fps = 24.0; #checks.duration = 0.4167 (expected 0.4167)",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-HitReact.json",
+     "note": "contact-HitReact.json#result = pass; #fails = []; #checks.foot_slide_L.max_of_height = 0.000756, foot_slide_R = 0.000658 (tol 0.005); #checks.skin_stretch.fail_edges = 0; #checks.limb_body_L/R.max_pairs = 0",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#clips[id=BRUC-HitReact].status = technically_imported; #ue.status = technically_imported; #validation.result = pass; #source.files[0].sha256 = 213b0686…1e2c = ue-import-clips.json#AM_BruceLee_HitReact sha256",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "Silhouette changes clearly from k0 to k2. On f02-q34-ue-editor and f02-q34 the torso is thrown back with a turn, the head is jerked back with the chin up, and both claw hands fly up in front of the chest. On f02-front-ue-editor the hands rise and spread and the head tilts. f04 still holds the reaction at lower amplitude. Bruce's character holds: claw hands, no back to the camera on any key frame (VR-06). Small rhythm flaw: f07-front/q34-ue-editor already match rest (f10), so the design's light forward overshoot at k7 is not visible. The recovery ends early and k7-k10 is a static hold. From the front the backward recoil reads mostly through the hands and head, less through depth.",
+     "frames": [
+      "BruceLee-HitReact-f00-front-ue-editor.jpg",
+      "BruceLee-HitReact-f02-front-ue-editor.jpg",
+      "BruceLee-HitReact-f02-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f02-q34.jpg",
+      "BruceLee-HitReact-f04-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f07-front-ue-editor.jpg",
+      "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+      "BruceLee-HitReact-blender-sheet.jpg"
+     ]
+    },
+    "C": {
+     "value": 2,
+     "rationale": "The reaction comes from the correct side. The hit is frontal, and on f02-left and f02-q34 the spine leans back, the head goes back and the hands fly forward and up by inertia. The stance breaks in the upper body. On the blender sheet and the UE frames f00/f02/f04/f07/f10 both shoes stay at the same spots on the stand, with no lift-off or sliding. Knees bend only slightly (f02-front); that is the figure's known limit (straight wide-set legs), not a clip flaw.",
+     "frames": [
+      "BruceLee-HitReact-f02-left.jpg",
+      "BruceLee-HitReact-f02-q34.jpg",
+      "BruceLee-HitReact-f02-front.jpg",
+      "BruceLee-HitReact-blender-sheet.jpg",
+      "BruceLee-HitReact-f02-front-ue-editor.jpg",
+      "BruceLee-HitReact-f10-front-ue-editor.jpg"
+     ]
+    },
+    "D": {
+     "value": 1.5,
+     "rationale": "At the k2 recoil peak the shell is intact: elbows, shoulders, the back and the crotch (f02-front-b) show no pinching or stretching. Back of shoulders and collar (f02-back, f02-q34b, f02-q34bl, f02-topb): thin dark slits along the sleeve seams at the shoulders and at the back of the collar. They are traces without tears, are the figure's known limit (Tripo part edges, already visible near rest) and do not grow at the peak. f02-q34b-b shows the folded sleeve cuff edge, which is model geometry. Faceted shading patches on the back (f02-back) come from the model, not from deformation.",
+     "frames": [
+      "BruceLee-HitReact-f02-back.jpg",
+      "BruceLee-HitReact-f02-q34b.jpg",
+      "BruceLee-HitReact-f02-q34bl.jpg",
+      "BruceLee-HitReact-f02-topb.jpg",
+      "BruceLee-HitReact-f02-front-b.jpg",
+      "BruceLee-HitReact-f02-q34b-b.jpg"
+     ]
+    },
+    "L": {
+     "value": 1.5,
+     "rationale": "The oneshot settles into rest: f10-front/q34-ue-editor match f00 exactly, with no jerk in the final pose. The flaw is barely noticeable: the return from the still-raised k4 pose (f04-front-ue-editor) to full rest by k7 (f07-front-ue-editor) is fast and without a visible overshoot. The last three frames hold still, so the landing is a little plain but not mechanical.",
+     "frames": [
+      "BruceLee-HitReact-f04-front-ue-editor.jpg",
+      "BruceLee-HitReact-f07-front-ue-editor.jpg",
+      "BruceLee-HitReact-f07-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f10-front-ue-editor.jpg",
+      "BruceLee-HitReact-f10-q34-ue-editor.jpg",
+      "BruceLee-HitReact-f00-front-ue-editor.jpg"
+     ]
+    }
+   },
+   "score": 8.1,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "BruceLee-HitReact-f07-front-ue-editor.jpg",
+     "note": "The design's light forward overshoot at k7 is not visible: k7 already matches rest, and k7-k10 is a static hold."
+    },
+    {
+     "item": "R",
+     "frame": "BruceLee-HitReact-f02-q34.jpg",
+     "note": "At k2 the rear left claw hand passes very close to the chin; on q34 it reads almost like a touch to the jaw (contact check shows no body intersection)."
+    },
+    {
+     "item": "C",
+     "frame": "BruceLee-HitReact-f02-front.jpg",
+     "note": "Knees barely bend and the stance breaks mainly in the upper body: the figure's known limit (straight wide-set legs, small margin in the leg chain)."
+    },
+    {
+     "item": "D",
+     "frame": "BruceLee-HitReact-f02-back.jpg",
+     "note": "Thin dark slits along the sleeve seams at the shoulders and at the back of the collar (Tripo part edges): known limit, does not grow at the peak; also visible on f02-q34b and f02-topb."
+    },
+    {
+     "item": "D",
+     "frame": "BruceLee-HitReact-f02-q34b-b.jpg",
+     "note": "Open sleeve cuff edge (model geometry): known limit."
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-ASSET-BRUCE-LEE-001-HitReact-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ },
+ {
+  "asset": "ASSET-BRUCE-LEE-001",
+  "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/LungeAttack",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-BRUCE-LEE-001",
+   "clip": "LungeAttack",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/export/AM_BruceLee_LungeAttack.fbx",
+     "sha256": "4970ae9c76aba4f0da82280f0bc248dbb3b897d329252df233bcf1ce0e511e45"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json",
+     "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/LungeAttack/frames",
+    "files": [
+     "BruceLee-LungeAttack-blender-sheet.jpg",
+     "BruceLee-LungeAttack-f03-q34.jpg",
+     "BruceLee-LungeAttack-f07-back.jpg",
+     "BruceLee-LungeAttack-f07-front.jpg",
+     "BruceLee-LungeAttack-f07-left.jpg",
+     "BruceLee-LungeAttack-f07-q34-b.jpg",
+     "BruceLee-LungeAttack-f07-q34-c.jpg",
+     "BruceLee-LungeAttack-f07-q34.jpg",
+     "BruceLee-LungeAttack-f07-q34b-b.jpg",
+     "BruceLee-LungeAttack-f07-q34b-c.jpg",
+     "BruceLee-LungeAttack-f07-q34b.jpg",
+     "BruceLee-LungeAttack-f07-top34.jpg",
+     "BruceLee-LungeAttack-f07-topb.jpg",
+     "BruceLee-LungeAttack-f08-q34bl.jpg",
+     "BruceLee-LungeAttack-f00-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f00-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f03-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f03-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f05-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f05-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f07-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f07-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f09-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f09-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f11-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f11-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f14-front-ue-editor.jpg",
+     "BruceLee-LungeAttack-f14-q34-ue-editor.jpg",
+     "BruceLee-LungeAttack-f00-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f00-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f03-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f03-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f05-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f05-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f07-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f09-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f11-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f11-q34-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f14-front-closeup-ue-editor.jpg",
+     "BruceLee-LungeAttack-f14-q34-closeup-ue-editor.jpg",
+     "BruceLee-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_LungeAttack.validation.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-LungeAttack.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/author-LungeAttack.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_LungeAttack.validation.json",
+     "note": "AM_BruceLee_LungeAttack.validation.json#result = pass",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-LungeAttack.json",
+     "note": "contact-LungeAttack.json#result = pass; #fails = []; #checks.foot_slide_L.max_of_height = 0.001085, foot_slide_R = 0.001224 (tol 0.005); #checks.skin_stretch.status = pass (visible_torn_edges 0, fail_edges 0); weapon_body/weapon_tip = info (без оружия)",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#BRUC-LungeAttack.status = technically_imported; #ue.status = technically_imported (evidence ue-import-clips.json, imported_object_paths /Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_LungeAttack); #source.files[0].sha256 = 4970ae9c… = accepted_object; #validation.result = pass",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "Ясно, мелкие огрехи ритма. Подготовка видна: к.3 обе кисти подтянуты к груди, к.5 правая кисть у подбородка (f05-front/q34 closeup); к.7 правая рука выброшена вперёд почти прямо по центральной линии, на q34 читается однозначно (f07-q34-ue-editor, f07-q34-closeup), левая кисть щитом у груди; к.11 кисть вернулась, к.14 = rest. Характер JKD сохранён: «когти», правая передняя стойка, голова держит цель, спиной к камере нет. Огрехи: на front удар идёт в камеру и сильно сокращается, на полном плане f07-front-ue-editor читается как короткий выпад кисти; на к.9 рука ещё почти выпрямлена (f09-q34-closeup) — удержание 7–9 и сжатый возврат 9–11; наклон корпуса вперёд на f07-left мал.",
+     "frames": [
+      "BruceLee-LungeAttack-f03-front-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f05-q34-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f07-q34-ue-editor.jpg",
+      "BruceLee-LungeAttack-f07-front-ue-editor.jpg",
+      "BruceLee-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f11-q34-ue-editor.jpg",
+      "BruceLee-H2Anim-ue-sheet.jpg"
+     ]
+    },
+    "C": {
+     "value": 1.5,
+     "rationale": "Пик выброса — точно к.7: кисть дальше всего вперёд на f07-q34-closeup (на к.9 уже чуть ближе), локоть почти прямой, запястье продолжает предплечье (f07-q34-c, f07-left). Корпус доворачивается влево, правое плечо выходит вперёд (f07-top34, f07-q34). Стопы стоят на месте и на подставке на всех кадрах листов. Мелкие огрехи: вес передан в основном плечом и рукой — таз вперёд-вниз и наклон корпуса на f07-left едва заметны (известный предел: прямые ноги, таз только опускается).",
+     "frames": [
+      "BruceLee-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f07-left.jpg",
+      "BruceLee-LungeAttack-f07-top34.jpg",
+      "BruceLee-LungeAttack-f07-q34-c.jpg",
+      "BruceLee-LungeAttack-blender-sheet.jpg"
+     ]
+    },
+    "D": {
+     "value": 2,
+     "rationale": "На пике (к.7–8) оболочка цела. Локоть и плечо правой руки на f07-q34b, f07-q34b-c, f07-back, f07-topb без разрывов и заломов от клипа. Запястье чистое (f07-q34-c). Колено и голень чистые (f07-front). Видимое — только известные пределы фигуры: тонкая линия шва рукава у плеча (f07-q34b) и тёмные засечки по шву рукава и у ворота сзади (f07-topb), открытая кромка манжеты. Гранёные складки рукава у локтя (f07-q34b-c) — лепка складок модели, не растяжение. Всё вынесено в known_issues.",
+     "frames": [
+      "BruceLee-LungeAttack-f07-q34b.jpg",
+      "BruceLee-LungeAttack-f07-q34b-c.jpg",
+      "BruceLee-LungeAttack-f07-back.jpg",
+      "BruceLee-LungeAttack-f07-topb.jpg",
+      "BruceLee-LungeAttack-f07-q34-c.jpg",
+      "BruceLee-LungeAttack-f07-front.jpg",
+      "BruceLee-LungeAttack-f08-q34bl.jpg"
+     ]
+    },
+    "L": {
+     "value": 1.5,
+     "rationale": "Почти незаметно. Финал садится в rest: к.14 совпадает с к.0 на front и q34 (f14-front-ue-editor = f00-front-ue-editor). Между к.11 и к.14 мягкое досаживание кистей (f11/f14 closeup). Огрех: возврат собран в 2 кадра — на к.9 рука ещё вытянута, на к.11 уже почти rest (f09-q34-closeup → f11-q34-closeup). Это «хлыст» по замыслу, но без перехлёста и с резким переходом.",
+     "frames": [
+      "BruceLee-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f11-q34-closeup-ue-editor.jpg",
+      "BruceLee-LungeAttack-f14-front-ue-editor.jpg",
+      "BruceLee-LungeAttack-f00-front-ue-editor.jpg",
+      "BruceLee-LungeAttack-f14-q34-closeup-ue-editor.jpg"
+     ]
+    }
+   },
+   "score": 8.1,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "BruceLee-LungeAttack-f07-front-ue-editor.jpg",
+     "note": "на front удар идёт в камеру и сильно сокращается; на полном плане читается слабее, чем на q34"
+    },
+    {
+     "item": "R",
+     "frame": "BruceLee-LungeAttack-f09-q34-closeup-ue-editor.jpg",
+     "note": "к.9: рука ещё почти выпрямлена (замысел — локоть 127°); удержание 7–9, возврат сжат в 9–11"
+    },
+    {
+     "item": "C",
+     "frame": "BruceLee-LungeAttack-f07-left.jpg",
+     "note": "вес удара в основном от плеча и руки: таз вперёд-вниз и наклон корпуса едва видны (известный предел: прямые ноги)"
+    },
+    {
+     "item": "C",
+     "frame": "BruceLee-LungeAttack-f07-q34-c.jpg",
+     "note": "удар раскрытой кистью-«когтем», кулак не сжимается (известный предел: костей пальцев нет)"
+    },
+    {
+     "item": "D",
+     "frame": "BruceLee-LungeAttack-f07-topb.jpg",
+     "note": "тонкие тёмные засечки по шву рукава у плеча и у ворота сзади (известный предел: кромки частей Tripo), не растут"
+    },
+    {
+     "item": "D",
+     "frame": "BruceLee-LungeAttack-f07-q34b.jpg",
+     "note": "линия шва рукава у плеча видна на пике (известный предел)"
+    },
+    {
+     "item": "D",
+     "frame": "BruceLee-LungeAttack-f07-q34b-c.jpg",
+     "note": "гранёные складки рукава у локтя и у манжеты: лепка модели, разрывов нет"
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-ASSET-BRUCE-LEE-001-LungeAttack-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ }
+]

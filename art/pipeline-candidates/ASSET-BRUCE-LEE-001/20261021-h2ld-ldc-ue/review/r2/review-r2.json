@@ -1,0 +1,1815 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SM_BruceLee_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base",
+  "extra:MI_BruceLee_H2LD_DebugClass": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+  "extra:MI_BruceLee_H2LD_Neutral": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+  "skeletal": "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_UM_MatLUT_BruceLee",
+  "texture:MatID": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "linen",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-bruce-lee-codex/bruce-lee-back.png",
+   "front": "art/imagegen/concept-bruce-lee-codex/bruce-lee-front.png",
+   "side": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/measure-report.json",
+  "hero": "BruceLee",
+  "key_zones": [
+   "linen"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "linen",
+   "skin",
+   "leather_smooth"
+  ],
+  "note": "3d-model-pipeline stage 7a (mini-batch 2026-10-20, wave A; editor slot 1): Bruce Lee H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the black side stripes, wool_coarse ribbon), teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run 20261021-h2-lookdev-r3 as is). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = linen (the yellow suit, the largest zone and the main colour, as the Blender ld_measure exposure class). Black zones (leather_smooth hair/shoes, wool_coarse stripes) sit on the albedo floor in the look-dev tone check (concept Y 0.018 is darker than any PBR albedo).",
+  "reading_bias_ev": -0.75,
+  "render_gates": null,
+  "render_gates_note": "no MatID class 0 (legacy_bake): the black hair, brows and eyes are leather_smooth (look-dev profile bruce-lee-h2-lookdev/4 rule hair_dark), so no render gate is needed",
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2ld-ue-import",
+  "side_camera": "+X",
+  "side_camera_note": "SIDE_VIEW left (asset card): camera at +X looking -X (ue_hero_lookdev.views, Medusa convention; Leshen and Achilles precedent, Angel's -X was F98)",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "linen",
+   "wool_coarse",
+   "skin",
+   "leather_smooth"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/BruceLee/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 17,
+    "clips": 4,
+    "triangles": 39659
+   },
+   "folder": "/Game/PipelineCandidates/BruceLee/H2LD",
+   "height_uu": 54.9994,
+   "height_uu_note": "skill decision (ue-import-package §3.2): top of the mesh bounds from ue-import-report.json (ue_skeletal_top_uu 54.9994 = top of the hair; nothing above the head)",
+   "hero_root": "/Game/PipelineCandidates/BruceLee",
+   "instances": {
+    "base_instance": {
+     "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+     "scalars": {
+      "SideBandWeight": 0.0,
+      "VertexMaskWeight": 1.0
+     },
+     "textures": {
+      "BaseColorTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_BC",
+      "NormalTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_N",
+      "ORMTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_ORM"
+     }
+    },
+    "extra:MI_BruceLee_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_BruceLee_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "FixClassA": 13.0,
+      "FixGainA": 1.2,
+      "FixSpecA": 0.0,
+      "Saturation": 0.98,
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 30.8642,
+      "TeamDyeGain": 29.685
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "BaseColorTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_BC",
+      "EdgeMaskTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_UM_MatLUT_BruceLee",
+      "NormalTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_N",
+      "ORMTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_ORM",
+      "TeamAccentTexture": "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "linen",
+   "wool_coarse",
+   "skin",
+   "leather_smooth"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "content": "7a-slot1-BruceLee 2026-10-21T04:53:37+00:00 ue_hero_lookdev review BruceLee r2\npid=48908 host=DESKTOP-QNDBQMU since=1792558417.429 max_hold_s=7200",
+  "heartbeats": 12,
+  "host": "DESKTOP-QNDBQMU",
+  "max_hold_exceeded": false,
+  "max_hold_s": 7200.0,
+  "owner": "7a-slot1-BruceLee",
+  "pid": 48908,
+  "stale_taken": null,
+  "stamp": "7a-slot1-BruceLee 2026-10-21T04:53:37+00:00 ue_hero_lookdev review BruceLee r2",
+  "step": "ue_hero_lookdev review BruceLee r2",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-21T04:57:54+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5272,
+    0.4168,
+    0.3912
+   ],
+   "settled": true,
+   "sha256": "99408f5fcafd8c6a274d6a89a2869bce64f33574a8f79ffc1dfd6618adb62717",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4338,
+    0.4113,
+    0.4183
+   ],
+   "settled": true,
+   "sha256": "763334d872c361f58dcbac87c0f258fb5b778b124c27e80586f34406376b07d8",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4346,
+    0.4212,
+    0.392
+   ],
+   "settled": true,
+   "sha256": "33ed2b783fa65511a13ab1af74382bdbc9955f9d13537a5bc8a663212ae17768",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4407,
+    0.4182,
+    0.3959
+   ],
+   "settled": true,
+   "sha256": "b69e7fc791523d77ad1bf111b8aa78eabbe12522c9d84683be8d4d8315cad733",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4495,
+    0.4017,
+    0.3978
+   ],
+   "settled": true,
+   "sha256": "f436884a962438a470b21ba17887c1f5caa5df4244e466f87682c0929520a932",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "brucelee-r2-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.371,
+    0.3618,
+    0.3513
+   ],
+   "settled": true,
+   "sha256": "bc0bcf36f07372e99e8d7f8b265e9c16bc756690fadbdb5549d6a149f014d611",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5549,
+    0.4338,
+    0.4447
+   ],
+   "settled": true,
+   "sha256": "1ccd9c209388f075b724ea0f1bbdc357dc4385ef168a86c3b9800a8a3a93006f",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4536,
+    0.4387,
+    0.4426
+   ],
+   "settled": true,
+   "sha256": "22b4309f88d430464750645681e80f0f34e809f6d9f93c98997791f762f620c0",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5005,
+    0.4424,
+    0.4206
+   ],
+   "settled": true,
+   "sha256": "6544fa0910fb515b9c6a9a6b9821bd3a7bfc2e5dde901a52b0f35ee5fabcb9d4",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5097,
+    0.4235,
+    0.4383
+   ],
+   "settled": true,
+   "sha256": "28f09414d62f4f226fd2602a59d259258a8428ed50f6f2d1ad71c8a45962aa5b",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4513,
+    0.4243,
+    0.399
+   ],
+   "settled": true,
+   "sha256": "e984e9e1aa5de8a1bd210935a83a4b5ccd74765484a9ef131467c2432b7aec0a",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "brucelee-r2-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3897,
+    0.4017,
+    0.3972
+   ],
+   "settled": true,
+   "sha256": "c9c59bca493c48a28454c11c792cb214e687095e91aee4b5947ebd67c8f960a4",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6786,
+    0.5384,
+    0.5582
+   ],
+   "settled": true,
+   "sha256": "57f2c2f0dfccf84e0e09c8795591353f739e64dd71b76c36dc431ee365918261",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5841,
+    0.5551,
+    0.5482
+   ],
+   "settled": true,
+   "sha256": "76b9dcb6969dc3108c6f7bc7bde25c66bd7c7e1bbb3c12ded922c8bc91009ef7",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5573,
+    0.5546,
+    0.567
+   ],
+   "settled": true,
+   "sha256": "afa54c11bcabee2c2c3b84a2094af5f44beb92b824e8ab1f6db1db6adb0ad7c5",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7184,
+    0.6555,
+    0.7278
+   ],
+   "settled": true,
+   "sha256": "fda22164da2e52c99977be5df957991550fc47fe076e86d0104480878892ed96",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6841,
+    0.6974,
+    0.6423
+   ],
+   "settled": true,
+   "sha256": "7df976d5dbca2987613c593b7563670c6b6b259f0ebfbb4c36f8f90579526395",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.722,
+    0.7018,
+    0.6984
+   ],
+   "settled": true,
+   "sha256": "122d826ad79b280361ccdef5ea4208676ad33a256198477f104bbffc25d67750",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "brucelee-r2-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6332,
+    0.5624,
+    0.5458
+   ],
+   "settled": true,
+   "sha256": "95fe43713f02be1ec63a69743659c9084b6137e2c88aa18dfc84194a63679b27",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4041,
+    0.3243,
+    0.3425
+   ],
+   "settled": true,
+   "sha256": "b1ce2311b89dd478d0c9f75a4f21973074045ed803b8453c6c72fb7b7ef179da",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3587,
+    0.3483,
+    0.3597
+   ],
+   "settled": true,
+   "sha256": "3a971a079749d6168423383b87c377944087b75ca659f5d64d4acebc538ed7d2",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3733,
+    0.3571,
+    0.3251
+   ],
+   "settled": true,
+   "sha256": "12272e1940505430e3eb750edd0a795bb9daac5e106f54a1e307671712360c5a",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3685,
+    0.3477,
+    0.3299
+   ],
+   "settled": true,
+   "sha256": "0a754f21be0f8f7c232917d81fef7faa07ee299e35fae7c5fdae1115db404ca6",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "brucelee-r2-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3133,
+    0.3121,
+    0.3084
+   ],
+   "settled": true,
+   "sha256": "7fd438d2d54d6383a54c5fff10aedbe02cbb17575d37b184217b6c3217cd9177",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "brucelee-r2-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3263,
+    0.2915,
+    0.3117
+   ],
+   "settled": true,
+   "sha256": "0404b089f3cfe03641063fb228aba989cc80dfddc5d8a0d462a0750d3b863247",
+   "subject": "BruceLee (/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "gpu_token": {
+  "lock": "C:\\tmp\\unmatched-gpu.lock",
+  "stamp": "7a-slot1-BruceLee-capture 2026-10-21T04:53:37+00:00 gpu-capture ue_hero_lookdev review BruceLee r2",
+  "taken": true,
+  "waited_s": 0.0
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_BruceLee_H2LD_DebugClass": false,
+  "extra:MI_BruceLee_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "settle": {
+  "allow_unsettled": false,
+  "max_diffs": 79,
+  "min_diffs": 39,
+  "shot_extra_grabs": 6,
+  "status": "settled",
+  "threshold": 1.0,
+  "throttle": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  },
+  "throttle_restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "unsettled_measured_shots": [],
+  "unsettled_other_shots": [],
+  "warmup_converged": true
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-21T04:53:37+00:00",
+ "tag": "r2",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  1.0769,
+  0.4544,
+  0.4304,
+  0.4215,
+  0.4248,
+  0.3884,
+  0.4706,
+  0.3901,
+  0.4617,
+  0.4278,
+  0.463,
+  0.394,
+  0.4145,
+  0.4586,
+  0.4455,
+  0.4069,
+  0.4603,
+  0.4572,
+  0.3984,
+  0.4528,
+  0.4566,
+  0.3912,
+  0.4599,
+  0.4626,
+  0.3647,
+  0.4538,
+  0.4463,
+  0.4119,
+  0.4549,
+  0.4503,
+  0.4003,
+  0.447,
+  0.4587,
+  0.401,
+  0.4677,
+  0.4397,
+  0.4074,
+  0.4589,
+  0.4339
+ ]
+}

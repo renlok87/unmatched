@@ -1,0 +1,348 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "bruce-lee-h2ld-lookdev-ue-import/1",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "3d-model-pipeline stage 7a (mini-batch 2026-10-20, wave A; editor slot 1, DS-3a 2026-10-21): UE import of the Bruce Lee look-dev run 20261021-h2-lookdev-r3 (profile bruce-lee-h2-lookdev/4: generic h2_bake H2 figure of the bake run 20261021-h2-bake-r3 + UV1 in metres, MatID, Edge, graded BC/ORM; TeamAccent ribbon on the black side stripes (wool_coarse) 7.98 % of the figure, profile bruce-lee-h2-lookdev-teamaccent-r3) through the CLI profile skeletal-adopt (normaliser h2-lookdev/1) onto the canonical skeleton /Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton. No weapon (WEAPON_HAND none, WEAPON_BONE null): 16 bones (UM_HUMANOID_17_v2 without a weapon bone), socket Weapon on hand.R (the open-hand strike, WEAPON_SOCKET_BONE of the asset card). MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (UseTeamAccent, UseUV1Metres) with the TeamAccent mask and the look-dev LUT as is (UE look-dev iteration 0); base on M_UM_BaseMarker in vertex-mask mode: two-tier Tripo stone base, the team ring by height (bake r3 textures.team_mask.base_band.height_m [0.003, 0.0285] -> vertex mask UM_Mask.R, 191 faces; VertexMaskWeight 1, SideBandWeight 0; HANDBOOK §2.9, W2-c; precedent Beowulf). Teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision 'accents + ring'). The yellow suit (linen), skin, black hair and shoes (leather_smooth) and the stone base are never dyed. At most 'technically imported'; art acceptance of the model by delegation (stage 4 r3 pass 8.8, evidence/acceptance/20261021-r3/card.json; DS-7 determinism pass, 20261021-h2-bake-r3/reports/determinism-report.json and 20261021-h2-lookdev-r3/reports/determinism-report.json).",
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3",
+    "report_format": "h2-lookdev/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev-r3.json",
+    "bake_profile_id": "bruce-lee-h2-lookdev/4",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "run_manifest": "reports/run-manifest.json",
+      "source_rig_report": "../20261021-h2-bake-r3/reports/rig-report.json",
+      "source_textures_report": "../20261021-h2-bake-r3/reports/textures-report.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_BruceLee_H2LD.fbx",
+      "base": "export/SM_BruceLee_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_BruceLee_H2LD_2K_BC.png",
+      "N": "textures/T_BruceLee_H2LD_2K_N.png",
+      "ORM": "textures/T_BruceLee_H2LD_2K_ORM.png",
+      "TeamMask": "textures/T_BruceLee_H2LD_2K_TeamMask.png",
+      "MatID": "textures/T_BruceLee_H2LD_2K_MatID.png",
+      "Edge": "textures/T_BruceLee_H2LD_2K_Edge.png"
+    },
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_UM_MatLUT_BruceLee.dds",
+        "sha256": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96",
+        "note": "r3 look-dev LUT as is (ld-maps-report lut.dds_sha256; UE look-dev iteration 0)"
+      },
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/textures/T_BruceLee_H2LD_TeamAccent_2K.png",
+        "sha256": "e22a485e15b3f7d137f67ed1b31356b97b1ac896cc1fb776201362e8a9630509",
+        "note": "TeamAccent L8 linear 2048^2 (ld-team-accent-report.json outputs): ribbon on the black side stripes of the suit and sleeves (wool_coarse) = 7.98 % of the figure"
+      }
+    },
+    "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2 DirectX map (normaliser check normal_is_the_h21_directx_map). TeamMask is pinned but not imported (team_color_mode none)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear",
+      "MatID": "index * 16 + 8",
+      "Edge": "linear"
+    },
+    "top_part": "tripo_part_2",
+    "figure_top_part": "tripo_part_2",
+    "figure_top_part_note": "pilot fix F80 (cd3ee7fe; skeletal_adopt_formats.h2_lookdev): the figure top for figure_height_as_profile = the final top of the head with neck and hair tripo_part_2 in ../20261021-h2-bake-r3/reports/prepare-report.json (0.55 m); nothing rises above the head (no weapon), so it equals the skeletal top 54.999 uu (rig-report expected_ue_bounds_uu_at_import_scale_1.skeletal)"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      [
+        "root",
+        null
+      ],
+      [
+        "hips",
+        "root"
+      ],
+      [
+        "spine",
+        "hips"
+      ],
+      [
+        "head",
+        "spine"
+      ],
+      [
+        "arm_upper.L",
+        "spine"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L"
+      ],
+      [
+        "arm_upper.R",
+        "spine"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R"
+      ],
+      [
+        "leg_upper.L",
+        "hips"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L"
+      ],
+      [
+        "leg_upper.R",
+        "hips"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R"
+      ]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2 without a weapon bone (asset card WEAPON_BONE null; WEAPON_HAND none, bare-handed). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (17 bones), '.' becomes '_'"
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_2",
+    "note": "base bottom -> top of the hair (tripo_part_2 final top 0.55 m, prepare-report) = hero budget 55 uu (asset card FIGURE_HEIGHT_M 0.55, FIGURE_BOUNDS_TOP_M 0.54999)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_BruceLee_H2_Body"
+    },
+    "base": {
+      "object": "SM_BruceLee_H2_Base",
+      "footprint_m": [
+        0.29971,
+        0.30004,
+        0.05981
+      ],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "rig-report expected_ue_bounds_uu_at_import_scale_1.base [-14.988, -14.992, -0.001] .. [14.983, 15.012, 5.981] uu (art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/reports/rig-report.json): X and Y widths, Z = base top"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "expected_ue_front_source": "UM_FBX_v1 preset (ART-001); ld_fbx measured the face normal (0.6672, -0.0299, -0.1982) along +X in the export frame (20261021-h2-lookdev-r3/reports/ld-fbx-report.json); no weapon, the weapon side is not checked; the figure is not depth-symmetric (punching arm forward: UE x -5.673 .. 13.724 uu), so front_from_best_bound_fit is not set"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "hand.R",
+      "location_uu": null,
+      "purpose": "no weapon bone: the strike point = the right hand (open-claw straight lead; asset card WEAPON_SOCKET_BONE hand.R, HIT_TYPE CLAW); location = the H2 bake's UE bone-space prediction (rig-report sockets: target (-0.038, -0.125, 0.422) m, location_uu_for_ue (0.171, -5.456, 0.134))"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX and the evidence capture (S08FlowGameMode DoesSocketExist Head); location = the H2 bake's UE bone-space prediction (rig-report sockets: head target (-0.005, -0.005, 0.5) m)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_BruceLee_H2_Body": 39659,
+      "SM_BruceLee_H2_Base": 1413
+    },
+    "bones": 16,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the look-dev read-back (ld-fbx-report triangles_as_h21); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "GD-058 final (asset-card POLY_BUDGET: figure <= 45 000 tris, base <= 2 500), FIGURE_HEIGHT_RANGE_M [0.52, 0.56]; comparison only",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      52,
+      56
+    ],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/BruceLee/H2LD",
+    "skeletal_asset": "SK_BruceLee_H2LD",
+    "target_skeleton": "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton",
+    "target_skeleton_note": "canonical hero skeleton of H2Anim (h2anim_ue.py skeleton from SK_BruceLee_H2.fbx of the spec); the clips AM_BruceLee_* are on it; the run neither creates nor deletes it",
+    "base_asset": "SM_BruceLee_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "figure on M_UM_Figure_v2 (v2.1, static switch UseTeamAccent); base on M_UM_BaseMarker v1 in vertex-mask mode (team ring by height on the lower tier of the two-tier base)",
+    "figure_instance": "MI_BruceLee_H2LD",
+    "base_instance": "MI_BruceLee_H2LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "active C-11 palette (art/um-materials/um-masters.json c11_value_split_proposal), user decision 'accents + ring'; linear only through FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_BruceLee_H2LD_{team}",
+      "base": "MI_BruceLee_H2LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: dye by TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; the yellow suit (linen, the main colour of the concept), skin, black hair and shoes (leather_smooth) and the stone base are never dyed, only the black side stripes (wool_coarse ribbon)",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 29.685,
+      "TeamDyeCeiling": 30.8642
+    },
+    "figure_parameters_note": "team-accent.md rule LDV-13, one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.02695) = 29.685, TeamDyeCeiling = 0.9 / Y_p95 (0.02916) = 30.8642 (art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3/reports/ld-team-accent-report.json team_dye_gain.accent_Y_p50_p95)",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_BruceLee_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {
+          "TeamDye": 0.0
+        },
+        "vectors": {
+          "TeamColor": {
+            "linear": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "note": "no dye (TeamColor white, TeamDye 0): the look-dev BC as baked, for the comparison with the concept"
+      },
+      {
+        "asset": "MI_BruceLee_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {
+          "DebugView": 1.0
+        },
+        "note": "MatID zone mask for the measurements (class colours in emissive, surface black)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "VertexMaskWeight": 1.0,
+        "SideBandWeight": 0.0
+      },
+      "note": "two-tier Tripo base: the team ring by height = the side wall of the lower tier (bake r3 textures.team_mask.base_band.height_m [0.003, 0.0285], vertex mask UM_Mask.R, 191 faces; uv-report base_band), VertexMaskWeight 1 / SideBandWeight 0 (HANDBOOK §2.9, W2-c; precedent Beowulf, Harpy H3LD); M_UM_BaseMarker unchanged"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "the base FBX carries UV1_m (metres); lightmap UV generation would overwrite UV1",
+    "expect_uv_channels": 2,
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_BruceLee_H2LD_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_BruceLee_H2LD_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal (byte copy of the H2 map)"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_BruceLee_H2LD_ORM",
+        "srgb": false,
+        "compression": "TC_Masks"
+      },
+      "TeamAccent": {
+        "file_key": "TeamAccent",
+        "asset": "T_BruceLee_H2LD_TeamAccent",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1"
+      },
+      "MatID": {
+        "file_key": "MatID",
+        "asset": "T_BruceLee_H2LD_MatID",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"
+      },
+      "Edge": {
+        "file_key": "Edge",
+        "asset": "T_BruceLee_H2LD_Edge",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "linear edge mask (EdgeMaskTexture)"
+      },
+      "LUT": {
+        "file_key": "LUT",
+        "asset": "T_UM_MatLUT_BruceLee",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "hero LUT 16 x 16 RGBA16F, Load only: HDR, point, no mips, not streamed"
+      }
+    },
+    "measure_skeletal_triangles": true,
+    "base_material_mode": "vertex-mask"
+  },
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2ld-lookdev-ue-import-r5.json (template; tools/tripo-pipeline/ue7a/write_import_profile.py)"
+  ]
+}

@@ -1,0 +1,432 @@
+{
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "build_profile": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2ld-lookdev-ue-import.json",
+    "export_basename": "SK_BruceLee_H2LD",
+    "primary_role": "h2-parts-glb",
+    "primary_source": "tripo-14235c8d-h2",
+    "profile": "skeletal-adopt",
+    "triangle_loss_tolerance": 0.001,
+    "ue": {
+      "asset_name": null,
+      "dimension_tolerance": 0.01,
+      "folder": "/Game/PipelineCandidates/BruceLee/H2LD",
+      "import_materials": false,
+      "import_note": "skeletal-adopt: meshes imported with import_materials=false, import_textures=false; textures are the adopted 2K runtime PNGs",
+      "import_textures": false
+    }
+  },
+  "created_at": "2026-10-21T04:42:49+00:00",
+  "exports": [],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20261021-h2ld-ue-import",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-14235c8d-h2": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/reports/tripo-run.json",
+          "sha256": "abc79c8b39150bdf401b76161c9924914d9b77626a97856cf6fe7341ca015172"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "d6a75fd83cfb16d0489d9412dbd6e130eb99a30aeddb6ae282614f4e1004911c"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 46883384,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+          "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-parts9.glb",
+          "produced_by": "generate",
+          "role": "h2-parts-glb",
+          "sha256": "a8548371e956e2dbdd154aa6cee2788711e423c0b8ba6e2d0f7f02f82955552c",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 9,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 824362
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 373116
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 193834
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 93826
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 93302
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 97961
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 86475
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 86946
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 100021
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1949843
+          }
+        },
+        {
+          "bytes": 85559624,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+          "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-tex8k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "h2-tex8k-pbr-glb",
+          "sha256": "5337f8d07ffd716730ce523e7effeed2a874732637095e842575d36bcaa8fdda",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 27,
+            "materials": 9,
+            "mesh_count": 9,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 824362
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 373116
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 193834
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 93826
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 93302
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 97961
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 86475
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 86946
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 100021
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1949843
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-back.png",
+          "present": true,
+          "sha256": "b4636cb7543337ac28a351ad066726a66a26d522d94d49a3ef87d1867599d159",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-front.png",
+          "present": true,
+          "sha256": "6f8ddd5a9d6c65deda13fd0bd294b1d4591df05352d4bd495d3fce5ed0ebd38e",
+          "view": "front"
+        },
+        {
+          "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png",
+          "present": true,
+          "sha256": "da72946b46715eaac8f930e89b794c72d0a2c1229c070904192179c23ad6d7b7",
+          "view": "left"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 95.0
+      },
+      "registered_at": "2026-10-21T04:42:50+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-BRUCE-LEE-001",
+        "date": "2026-10-21",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "h2-parts-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 9,
+            "glb_skins": 0,
+            "glb_triangles": 1949843
+          },
+          "h2-tex8k-pbr-glb": {
+            "armatures": 0,
+            "glb_images": 27,
+            "glb_materials": 9,
+            "glb_mesh_count": 9,
+            "glb_skins": 0,
+            "glb_triangles": 1949843
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 46883384,
+            "expected_sha256": "a8548371e956e2dbdd154aa6cee2788711e423c0b8ba6e2d0f7f02f82955552c",
+            "in_git": false,
+            "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+            "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-parts9.glb",
+            "produced_by": "generate",
+            "role": "h2-parts-glb"
+          },
+          {
+            "expected_bytes": 85559624,
+            "expected_sha256": "5337f8d07ffd716730ce523e7effeed2a874732637095e842575d36bcaa8fdda",
+            "in_git": false,
+            "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+            "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-tex8k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "h2-tex8k-pbr-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-bruce-lee-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "multi-view",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": true,
+            "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+            "parts_mode": "Баланс (Balanced)",
+            "pbr": true,
+            "polygon_count": 2000000,
+            "privacy": true,
+            "remove_lighting": true,
+            "seed": null,
+            "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии",
+            "texture_8k": true,
+            "topology": "Треугольник",
+            "ultra_mesh_quality": true
+          },
+          "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+          "views": {
+            "back": {
+              "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-back.png",
+              "sha256": "b4636cb7543337ac28a351ad066726a66a26d522d94d49a3ef87d1867599d159"
+            },
+            "front": {
+              "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-front.png",
+              "sha256": "6f8ddd5a9d6c65deda13fd0bd294b1d4591df05352d4bd495d3fce5ed0ebd38e"
+            },
+            "left": {
+              "path": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png",
+              "sha256": "da72946b46715eaac8f930e89b794c72d0a2c1229c070904192179c23ad6d7b7"
+            },
+            "right": null
+          }
+        },
+        "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+        "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 20065.0,
+              "balance_before": 20125.0,
+              "observed_debit": 60.0,
+              "quoted": 60,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 20035.0,
+              "balance_before": 20065.0,
+              "observed_debit": 30.0,
+              "quoted": 30,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+            "op": "texture"
+          },
+          {
+            "credits": {
+              "balance_after": 20030.0,
+              "balance_before": 20035.0,
+              "observed_debit": 5.0,
+              "quoted": 5,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "Генератор PBR после 8K",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-14235c8d-h2",
+        "task_id": "14235c8d-c891-4cc9-9492-b561d69877c8",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/14235c8d-c891-4cc9-9492-b561d69877c8"
+      },
+      "spec_sha256": "a09322788723dcddcdd7a6ad2c76eb8b3266dce1bc1459a6484485b5560ecea3"
+    }
+  },
+  "stages": {
+    "adopt": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "c47eb9154da36257c5ea9ed6e932d636594459ca9629e7dc09e00cf933b5c191",
+      "finished_at": "2026-10-21T04:42:52+00:00",
+      "outputs": {
+        "reports/adopt-report.json": {
+          "bytes": 26713,
+          "sha256": "8533c2b434f82cf079e16eb1766cf25064d20123b2adf43d8d8d5e0aa55acd15"
+        }
+      },
+      "started_at": "2026-10-21T04:42:52+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "inputs": 16,
+        "passed": true
+      },
+      "tool_version": "0.8.0"
+    },
+    "preflight": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "3596eee7ed05312673142a4c846ae1a4edf697a59a48950b06a850e75906766f",
+      "finished_at": "2026-10-21T04:42:52+00:00",
+      "outputs": {
+        "reports/preflight.json": {
+          "bytes": 3494,
+          "sha256": "45726deebb85f6b9c0170b8229185193769cd75f09b2af79aeb262e2d22e711d"
+        }
+      },
+      "started_at": "2026-10-21T04:42:52+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "sources_verified": 2
+      },
+      "tool_version": "0.8.0"
+    },
+    "ue-import": {
+      "attempts": 1,
+      "backend": "mcp",
+      "fingerprint": "6ec33f1813c0cba4514747134cbbc730f448c93e853347e26c2ec3a6ec458625",
+      "finished_at": "2026-10-21T04:43:31+00:00",
+      "outputs": {
+        "reports/ue-import-report.json": {
+          "bytes": 49721,
+          "sha256": "581778ba1f1a6685955a554f6dddff9bd33b29af4b156b57735e3fc116c8a541"
+        },
+        "reports/ue-mcp-calls.json": {
+          "bytes": 102732,
+          "sha256": "d2d4a5c4ef64bc0359deea9a1124809795e6fd0344cf2c367ee345fb536c90fd"
+        }
+      },
+      "started_at": "2026-10-21T04:42:55+00:00",
+      "status": "completed",
+      "summary": {
+        "assets": 17,
+        "failed_checks": [],
+        "kind": "skeletal-adopt",
+        "passed": true,
+        "primary_asset": "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD"
+      },
+      "tool_version": "0.8.0",
+      "ue_owned_assets": [
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P1",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Base_P2",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_DebugClass",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_Neutral",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P1",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Materials/MI_BruceLee_H2LD_P2",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SM_BruceLee_H2LD_Base",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_BC",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_Edge",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_MatID",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_N",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_ORM",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_BruceLee_H2LD_TeamAccent",
+        "/Game/PipelineCandidates/BruceLee/H2LD/Textures/T_UM_MatLUT_BruceLee"
+      ]
+    }
+  },
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

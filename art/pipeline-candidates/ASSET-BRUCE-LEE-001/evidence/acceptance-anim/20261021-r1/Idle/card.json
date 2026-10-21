@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "clip": "Idle",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/export/AM_BruceLee_Idle.fbx",
+      "sha256": "0ecc7bf681db6ce7b19230cb533ee5cfb8f0f6c5b9ff1e601e0a2297ee4e262f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json",
+      "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim/20261021-r1/Idle/frames",
+    "files": [
+      "BruceLee-Idle-blender-sheet.jpg",
+      "BruceLee-Idle-f10-front-b.jpg",
+      "BruceLee-Idle-f10-front.jpg",
+      "BruceLee-Idle-f10-q34.jpg",
+      "BruceLee-Idle-f13-back.jpg",
+      "BruceLee-Idle-f13-q34b.jpg",
+      "BruceLee-Idle-f13-topb.jpg",
+      "BruceLee-Idle-f29-q34bl.jpg",
+      "BruceLee-Idle-f30-q34.jpg",
+      "BruceLee-Idle-f30-q34b.jpg",
+      "BruceLee-Idle-f30-q34r.jpg",
+      "BruceLee-Idle-seam-f60-f00-front.jpg",
+      "BruceLee-Idle-seam-f60-f00-q34.jpg",
+      "BruceLee-Idle-f00-front-ue-editor.jpg",
+      "BruceLee-Idle-f00-q34-ue-editor.jpg",
+      "BruceLee-Idle-f10-front-ue-editor.jpg",
+      "BruceLee-Idle-f10-q34-ue-editor.jpg",
+      "BruceLee-Idle-f20-front-ue-editor.jpg",
+      "BruceLee-Idle-f20-q34-ue-editor.jpg",
+      "BruceLee-Idle-f30-front-ue-editor.jpg",
+      "BruceLee-Idle-f30-q34-ue-editor.jpg",
+      "BruceLee-Idle-f45-front-ue-editor.jpg",
+      "BruceLee-Idle-f45-q34-ue-editor.jpg",
+      "BruceLee-Idle-f50-front-ue-editor.jpg",
+      "BruceLee-Idle-f50-q34-ue-editor.jpg",
+      "BruceLee-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/author-Idle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_BruceLee_Idle.validation.json",
+      "note": "AM_BruceLee_Idle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = 0ecc7bf681db6ce7b19230cb533ee5cfb8f0f6c5b9ff1e601e0a2297ee4e262f (= accepted_object); #checks.duration = 2.5 c при 24 fps; #checks.clip_boundary_rest = pass; #checks.loop_seam.first_last_shift_of_height = 0.0; #checks.visible_pose_change.peak_max_joint_shift_of_height = 0.04944 (к.11)"
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim/reports/contact-Idle.json",
+      "note": "contact-Idle.json#result = pass; #fails = []; #checks.foot_slide_L.max_of_height = 0.001086 (к.10, tol 0.005); #checks.foot_slide_R.max_of_height = 0.001144 (к.30); #checks.skin_stretch = pass (fail_edges 0, warn_edges 0); #checks.below_base_top = pass; #checks.loop_seam = pass (position_of_height 0.0); weapon_body, weapon_tip, skin_weight_bleed = info"
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=BRUC-Idle].status = technically_imported; #clips[id=BRUC-Idle].ue.status = technically_imported (/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_Idle); #clips[id=BRUC-Idle].source.files[0].sha256 = 0ecc7bf681db6ce7b19230cb533ee5cfb8f0f6c5b9ff1e601e0a2297ee4e262f = ue-import-clips.json#fbx_sha256.AM_BruceLee_Idle; #clips[id=BRUC-Idle].validation.result = pass"
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "Боевая стойка Jeet Kune Do читается с front и q34 во всех UE-кадрах f00-f50: широкая стойка, обе кисти-«когти» подняты перед грудью, передняя правая впереди, голова держит цель, лицо открыто; совпадает с листом концепта (sheet.png, bruce-lee-front.png). Спиной к камере нет (ВР-06: q34 — три четверти спереди, f30-q34, f45-q34-ue-editor). Пружина видна на Blender-листе: колени подгибаются на низах к.10/30/50 (f10 front, f30 left), голова в UE f10 ниже, чем в f00. Мелкий огрех: финты передней кисти (малые круги) и маятник корпуса почти не читаются — кисть смещается всего на 5-10 px из 1200 между f00/f10/f20/f30/f45/f50-front-ue-editor, idle читается в основном как пружина коленей и дыхание. Малая амплитуда таза — известный предел фигуры (прямые ноги, таз только опускается), за неё балл не снижен.",
+      "frames": [
+        "BruceLee-Idle-blender-sheet.jpg",
+        "BruceLee-Idle-f00-front-ue-editor.jpg",
+        "BruceLee-Idle-f10-front-ue-editor.jpg",
+        "BruceLee-Idle-f30-front-ue-editor.jpg",
+        "BruceLee-Idle-f45-front-ue-editor.jpg",
+        "BruceLee-Idle-f00-q34-ue-editor.jpg",
+        "BruceLee-Idle-f30-q34-ue-editor.jpg",
+        "BruceLee-Idle-f30-q34.jpg",
+        "BruceLee-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Стопы стоят на подставке на одних и тех же местах во всех UE-кадрах f00, f10, f20, f30, f45, f50 (front и q34): без отрыва, проваливания и сдвига при пружине таза на к.10/30/50. На Blender-листе (front/left/q34 всех ключей) подошвы на верху подставки. Шов петли: пары seam-f60-f00 front и q34 — стопы, колени и таз совпадают, скачка нет. Огрехов опоры не видно.",
+      "frames": [
+        "BruceLee-Idle-f00-front-ue-editor.jpg",
+        "BruceLee-Idle-f10-front-ue-editor.jpg",
+        "BruceLee-Idle-f30-front-ue-editor.jpg",
+        "BruceLee-Idle-f50-front-ue-editor.jpg",
+        "BruceLee-Idle-f10-q34-ue-editor.jpg",
+        "BruceLee-Idle-f50-q34-ue-editor.jpg",
+        "BruceLee-Idle-blender-sheet.jpg",
+        "BruceLee-Idle-seam-f60-f00-front.jpg",
+        "BruceLee-Idle-seam-f60-f00-q34.jpg"
+      ]
+    },
+    "D": {
+      "value": 2,
+      "rationale": "Низы пружины на крупных планах: пах f10-front-b — складки ткани целы, без разрыва и залома; колени f10-q34 и f30-q34r — оболочка цела, гранёный рельеф идёт по линии канта лампаса (форма исходника, известный предел), а не залом от сгиба. Плечи и спина f13-back, f13-q34b, f13-topb, f29-q34bl, f30-q34b — тонкие тёмные щели по швам рукавов у плеча и у ворота сзади видны уже около rest (к.13) и к к.29-30 не растут (известный предел, кромки частей Tripo); кисти — неподвижные «когти» модели (предел). Разрывов, дыр и отрыва частей нет.",
+      "frames": [
+        "BruceLee-Idle-f10-front-b.jpg",
+        "BruceLee-Idle-f10-front.jpg",
+        "BruceLee-Idle-f10-q34.jpg",
+        "BruceLee-Idle-f30-q34r.jpg",
+        "BruceLee-Idle-f13-back.jpg",
+        "BruceLee-Idle-f13-q34b.jpg",
+        "BruceLee-Idle-f13-topb.jpg",
+        "BruceLee-Idle-f29-q34bl.jpg",
+        "BruceLee-Idle-f30-q34b.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Шов Idle невидим: seam-f60-f00-front и seam-f60-f00-q34 — последний кадр и кадр 0 совпадают (кисти, голова, колени, стопы). Движение не механическое: низы пружины к.10 и к.30 различаются позой ног и корпуса (Blender-лист f10 left против f30 left), кисти и голова идут своими фазами (UE f20 и f45 против f10/f30/f50). Рывков при возврате к rest на f20, f45 и в конце цикла нет.",
+      "frames": [
+        "BruceLee-Idle-seam-f60-f00-front.jpg",
+        "BruceLee-Idle-seam-f60-f00-q34.jpg",
+        "BruceLee-Idle-blender-sheet.jpg",
+        "BruceLee-Idle-f20-front-ue-editor.jpg",
+        "BruceLee-Idle-f45-front-ue-editor.jpg",
+        "BruceLee-Idle-f20-q34-ue-editor.jpg",
+        "BruceLee-Idle-f45-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "BruceLee-Idle-f30-front-ue-editor.jpg",
+      "note": "финты передней кисти и маятник корпуса малой амплитуды (кисть смещается на 5-10 px из 1200 между ключами): на листе K1/K2 проверить, что idle с игровой камеры читается не только как пружина коленей"
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-Idle-f13-topb.jpg",
+      "note": "тонкие тёмные щели по швам рукавов у плеча и у ворота сзади (кромки частей Tripo): известный предел модели, видны около rest и в клипе не растут; на K1/K2 проверить, что с игровой камеры их не видно"
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-Idle-f13-back.jpg",
+      "note": "тёмная треугольная грань под воротом сзади слева от шва спины: форма исходника около rest, не деформация клипа"
+    },
+    {
+      "item": "D",
+      "frame": "BruceLee-Idle-f30-q34r.jpg",
+      "note": "гранёный рельеф канта лампаса у колена на низу пружины: форма исходника (этапы 3/5), разрыва нет"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-BRUCE-LEE-001-Idle-r1"
+  },
+  "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}
