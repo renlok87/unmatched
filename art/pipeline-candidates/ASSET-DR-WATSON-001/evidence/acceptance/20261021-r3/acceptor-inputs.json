@@ -1,0 +1,200 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance/20261021-r3/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3",
+    "bake_run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/asset-card.yaml",
+      "sha256": "cb5df9274170bf273db8f9894ea73994fd6898ea35361f73ad64f7d1f660e320"
+    },
+    "previous_card": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance/20261021-r2/card.json"
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_DrWatson_H2LD",
+      "base": "SM_DrWatson_H2LD_Base",
+      "materials": [
+        "MI_DrWatson_H2LD",
+        "MI_DrWatson_H2LD_Base",
+        "MI_DrWatson_H2LD_P1",
+        "MI_DrWatson_H2LD_P2",
+        "MI_DrWatson_H2LD_Base_P1",
+        "MI_DrWatson_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton",
+      "clips": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_DrWatson_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_DrWatson_H2LD_Edge",
+        "T_UM_MatLUT_Watson"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.45,
+    "FIGURE_BOUNDS_TOP_M": 0.45,
+    "texture_files": [
+      "T_DrWatson_H2LD_2K_BC.png",
+      "T_DrWatson_H2LD_2K_Edge.png",
+      "T_DrWatson_H2LD_2K_MatID.png",
+      "T_DrWatson_H2LD_2K_N.png",
+      "T_DrWatson_H2LD_2K_ORM.png",
+      "T_DrWatson_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-bake-h2-r3.json",
+      "sha256": "cf2062b5896c62150fbae6a65006623282e2f2bbba1473e096ff4f2b0e6b5b4b",
+      "meshes": {
+        "body": "SK_DrWatson_H2_Body",
+        "weapon": "SK_DrWatson_H2_Revolver",
+        "base": "SM_DrWatson_H2_Base"
+      },
+      "materials.atlas": "M_DrWatson_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.45
+    },
+    "height": {
+      "body_mesh": "SK_DrWatson_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_DrWatson_H2_Body.bounds_m.max[2]",
+        "value": 0.45001
+      },
+      "other_meshes_top_m": {
+        "SK_DrWatson_H2_Revolver": 0.39568
+      },
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 45.001,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.45,
+      "FIGURE_BOUNDS_TOP_M": 0.45,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3",
+    "texture": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "3257637831d96d0e572c12d168b84e15450053c952fd26b31982a80bfdbb5773",
+    "output": "T_DrWatson_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+  "prev_fix_list": {
+    "cycle": "r2",
+    "items": [
+      {
+        "list": "rework_fix_list",
+        "n": 1,
+        "item": "T",
+        "frame": "pose-03.jpg",
+        "text": "размытое светлое пятно без узора сукна на пальто слева от саквояжа ниже пояса (участок, закрытый саквояжем в покое; на pose-01 тот же участок) и размытый прямоугольник на пальто под правой манжетой (close-weapon, ниже кисти) — заполнить текстурой сукна пальто того же узора"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 2,
+        "item": "T",
+        "frame": "close-hands.jpg",
+        "text": "тёмные грязные мазки по нижнему краю белой манжеты правой руки (панель R, также close-weapon) и светлый гладкий ореол вокруг подошв обеих туфель на крышке подставки (close-base) — перекрасить цветом своего класса (льняная манжета, камень крышки)"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 3,
+        "item": "F",
+        "frame": "close-weapon.jpg",
+        "text": "барабан револьвера комковатый, с хромовыми наплывами (close-weapon, close-hands панель R) при нормальной плотности сетки на wire-front — сверить форму с исходником"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 4,
+        "item": "F",
+        "frame": "close-head-back.jpg",
+        "text": "лёгкие изломы контура купола котелка на силуэте (close-head-back, close-head) — сгладить купол плотностью"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 5,
+        "item": "D",
+        "frame": "pose-05.jpg",
+        "text": "бок пальто под правой подмышкой при руке оружия вперёд: узор сглажен и вытянут вертикальными полосами внутри контура позы — перевести веса бока пальто ниже подмышки на spine, сузить переход рукав|пола"
+      },
+      {
+        "list": "known_issues",
+        "n": 1,
+        "item": "T",
+        "frame": "tone.json",
+        "text": "leather_worn status floor (y_ratio 1,368, share 0,0734, второстепенный) — концепт темнее пола альбедо, T не снижает; gold_antique вне допуска (y_ratio 0,343, 361 px, второстепенный) задаёт t_cap 1,5: цепочка часов и латунь саквояжа читаются бледно-кремовыми (close-torso, close-hands панель L)"
+      },
+      {
+        "list": "known_issues",
+        "n": 2,
+        "item": "G-TOPO",
+        "frame": "wire-front.jpg",
+        "text": "6 почти вырожденных треугольников в SK_DrWatson_H2_Body из 41570 (0,014 %), UE их отбросит"
+      },
+      {
+        "list": "known_issues",
+        "n": 3,
+        "item": "F",
+        "frame": "pose-04b.jpg",
+        "text": "светлый след подошвы на крышке подставки под поднятой левой стопой (закрытие контакта, открытое позой; засчитано как только крупный план) — этап 6: клип, уводящий стопу с контакта, проверяет крышку"
+      },
+      {
+        "list": "known_issues",
+        "n": 4,
+        "item": "T",
+        "frame": "close-legs-back.jpg",
+        "text": "узор сукна: на спинке и подоле сзади — извилистый «лабиринт», на полах и рукавах спереди — ёлочка, на листе — мелкий твид; как дефект не засчитан (сомнение: орнамент другого мотива или фактура ткани)"
+      },
+      {
+        "list": "known_issues",
+        "n": 5,
+        "item": "T",
+        "frame": "pose-03b.jpg",
+        "text": "сторона саквояжа, обращённая к телу (в покое прилегает к пальто), читается гладким клином без фактуры кожи; сомнение: пятно переноса или гладкая торцевая стенка — не засчитано, проверить вместе с пунктом T pose-03"
+      },
+      {
+        "list": "known_issues",
+        "n": 6,
+        "item": "T",
+        "frame": "close-torso.jpg",
+        "text": "на лацканах пальто — светлые прямоугольные значки-«глифы» (похоже на ложную строчку текстуры Tripo), только крупный план, учтено в T 1,5-части"
+      },
+      {
+        "list": "known_issues",
+        "n": 7,
+        "item": "T",
+        "frame": "uv-layout.png",
+        "text": "покрытие атласа 50,1 % (тело 430 островов, револьвер 390, подставка 37) — справка"
+      },
+      {
+        "list": "known_issues",
+        "n": 8,
+        "item": "S",
+        "frame": "close-head.jpg",
+        "text": "лицо модели нахмуренное и старше спокойного лица листа, под губой клок бородки, которого на листе нет; в S не входит (не контур, не якорь) — для витрины и этапа 7"
+      }
+    ]
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_DrWatson_H2LD\", \"base\": \"SM_DrWatson_H2LD_Base\", \"materials\": [\"MI_DrWatson_H2LD\", \"MI_DrWatson_H2LD_Base\", \"MI_DrWatson_H2LD_P1\", \"MI_DrWatson_H2LD_P2\", \"MI_DrWatson_H2LD_Base_P1\", \"MI_DrWatson_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton\", \"clips\": \"/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_DrWatson_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_DrWatson_H2LD_Edge\", \"T_UM_MatLUT_Watson\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_DrWatson_H2LD_2K_BC.png, T_DrWatson_H2LD_2K_Edge.png, T_DrWatson_H2LD_2K_MatID.png, T_DrWatson_H2LD_2K_N.png, T_DrWatson_H2LD_2K_ORM.png, T_DrWatson_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-bake-h2-r3.json\", \"meshes\": {\"body\": \"SK_DrWatson_H2_Body\", \"weapon\": \"SK_DrWatson_H2_Revolver\", \"base\": \"SM_DrWatson_H2_Base\"}, \"materials.atlas\": \"M_DrWatson_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.45}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_DrWatson_H2_Body.bounds_m.max[2] = 0.45001 м против FIGURE_HEIGHT_M заявки 0.45 м ± 1 %; рост не задают другие меши (оружие): SK_DrWatson_H2_Revolver bounds_m.max[2] = 0.39568 м; art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 45.001 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_DrWatson_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "revolver in the figure's own RIGHT hand; medical bag in the LEFT hand; bowler hat; thick moustache",
+    "PREV_FIX_LIST": "- r2 rework_fix_list п.1 · T · pose-03.jpg — размытое светлое пятно без узора сукна на пальто слева от саквояжа ниже пояса (участок, закрытый саквояжем в покое; на pose-01 тот же участок) и размытый прямоугольник на пальто под правой манжетой (close-weapon, ниже кисти) — заполнить текстурой сукна пальто того же узора\n- r2 rework_fix_list п.2 · T · close-hands.jpg — тёмные грязные мазки по нижнему краю белой манжеты правой руки (панель R, также close-weapon) и светлый гладкий ореол вокруг подошв обеих туфель на крышке подставки (close-base) — перекрасить цветом своего класса (льняная манжета, камень крышки)\n- r2 rework_fix_list п.3 · F · close-weapon.jpg — барабан револьвера комковатый, с хромовыми наплывами (close-weapon, close-hands панель R) при нормальной плотности сетки на wire-front — сверить форму с исходником\n- r2 rework_fix_list п.4 · F · close-head-back.jpg — лёгкие изломы контура купола котелка на силуэте (close-head-back, close-head) — сгладить купол плотностью\n- r2 rework_fix_list п.5 · D · pose-05.jpg — бок пальто под правой подмышкой при руке оружия вперёд: узор сглажен и вытянут вертикальными полосами внутри контура позы — перевести веса бока пальто ниже подмышки на spine, сузить переход рукав|пола\n- r2 known_issues п.1 · T · tone.json — leather_worn status floor (y_ratio 1,368, share 0,0734, второстепенный) — концепт темнее пола альбедо, T не снижает; gold_antique вне допуска (y_ratio 0,343, 361 px, второстепенный) задаёт t_cap 1,5: цепочка часов и латунь саквояжа читаются бледно-кремовыми (close-torso, close-hands панель L)\n- r2 known_issues п.2 · G-TOPO · wire-front.jpg — 6 почти вырожденных треугольников в SK_DrWatson_H2_Body из 41570 (0,014 %), UE их отбросит\n- r2 known_issues п.3 · F · pose-04b.jpg — светлый след подошвы на крышке подставки под поднятой левой стопой (закрытие контакта, открытое позой; засчитано как только крупный план) — этап 6: клип, уводящий стопу с контакта, проверяет крышку\n- r2 known_issues п.4 · T · close-legs-back.jpg — узор сукна: на спинке и подоле сзади — извилистый «лабиринт», на полах и рукавах спереди — ёлочка, на листе — мелкий твид; как дефект не засчитан (сомнение: орнамент другого мотива или фактура ткани)\n- r2 known_issues п.5 · T · pose-03b.jpg — сторона саквояжа, обращённая к телу (в покое прилегает к пальто), читается гладким клином без фактуры кожи; сомнение: пятно переноса или гладкая торцевая стенка — не засчитано, проверить вместе с пунктом T pose-03\n- r2 known_issues п.6 · T · close-torso.jpg — на лацканах пальто — светлые прямоугольные значки-«глифы» (похоже на ложную строчку текстуры Tripo), только крупный план, учтено в T 1,5-части\n- r2 known_issues п.7 · T · uv-layout.png — покрытие атласа 50,1 % (тело 430 островов, револьвер 390, подставка 37) — справка\n- r2 known_issues п.8 · S · close-head.jpg — лицо модели нахмуренное и старше спокойного лица листа, под губой клок бородки, которого на листе нет; в S не входит (не контур, не якорь) — для витрины и этапа 7"
+  }
+}
