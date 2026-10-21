@@ -1,0 +1,184 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance/20261021-r2/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2",
+    "bake_run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-bake-t2",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/asset-card.yaml",
+      "sha256": "3f7a4aab5e1cedc61ec469dee494905519cd8f3bb69b9eaca2932fc1ae4e04d1"
+    },
+    "previous_card": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance/20261021-r1/card.json"
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_SherlockHolmes_H2LD",
+      "base": "SM_SherlockHolmes_H2LD_Base",
+      "materials": [
+        "MI_SherlockHolmes_H2LD",
+        "MI_SherlockHolmes_H2LD_Base",
+        "MI_SherlockHolmes_H2LD_P1",
+        "MI_SherlockHolmes_H2LD_P2",
+        "MI_SherlockHolmes_H2LD_Base_P1",
+        "MI_SherlockHolmes_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_SherlockHolmes_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/SherlockHolmes/Rig/SK_SherlockHolmes_Skeleton",
+      "clips": "/Game/PipelineCandidates/SherlockHolmes/H2Anim/AM_SherlockHolmes_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_SherlockHolmes_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_SherlockHolmes_H2LD_Edge",
+        "T_UM_MatLUT_SherlockHolmes"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.55,
+    "FIGURE_BOUNDS_TOP_M": 0.5498,
+    "texture_files": [
+      "T_SherlockHolmes_H2LD_2K_BC.png",
+      "T_SherlockHolmes_H2LD_2K_Edge.png",
+      "T_SherlockHolmes_H2LD_2K_MatID.png",
+      "T_SherlockHolmes_H2LD_2K_N.png",
+      "T_SherlockHolmes_H2LD_2K_ORM.png",
+      "T_SherlockHolmes_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-bake-h2-r2-t2.json",
+      "sha256": "0aad0bca26c72126140c132d3fd124e930484b93b976312307f8af46b0a7b159",
+      "meshes": {
+        "body": "SK_SherlockHolmes_H2_Body",
+        "base": "SM_SherlockHolmes_H2_Base"
+      },
+      "materials.atlas": "M_SherlockHolmes_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.55
+    },
+    "height": {
+      "body_mesh": "SK_SherlockHolmes_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_SherlockHolmes_H2_Body.bounds_m.max[2]",
+        "value": 0.54984
+      },
+      "other_meshes_top_m": {},
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-bake-t2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 54.984,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.55,
+      "FIGURE_BOUNDS_TOP_M": 0.5498,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2",
+    "texture": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/textures/T_SherlockHolmes_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "7492ad5f90764283a651f17e4b1c27f0d216837d96781a4243bba6929a4693d1",
+    "output": "T_SherlockHolmes_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+  "prev_fix_list": {
+    "cycle": "r1",
+    "items": [
+      {
+        "list": "known_issues",
+        "n": 1,
+        "item": "S",
+        "frame": "compare-front.jpg",
+        "text": "Для новой генерации Tripo: нужна изогнутая трубка во рту (якорь, есть на front и side листа). Второстепенное: обод лупы сегментированный, линза матовая — на листе гладкое латунное кольцо со стеклом."
+      },
+      {
+        "list": "known_issues",
+        "n": 2,
+        "item": "F",
+        "frame": "close-base.jpg",
+        "text": "Тёмные зубчатые обрывки кромки выреза подставки у обеих подошв (также close-legs, close-legs-back); только крупный план."
+      },
+      {
+        "list": "known_issues",
+        "n": 3,
+        "item": "F",
+        "frame": "pose-04b.jpg",
+        "text": "Закрытие контакта, открытое позой пробы: под поднятой левой стопой виден контур выреза крышки подставки, на подошве светлое пятно крышки (также pose-04). Этап 6: клип, уводящий стопу с контакта, проверяет крышку."
+      },
+      {
+        "list": "known_issues",
+        "n": 4,
+        "item": "T",
+        "frame": "close-head-back.jpg",
+        "text": "Тёмные штрихи-пометки на коже шеи под затылком; только крупный план."
+      },
+      {
+        "list": "known_issues",
+        "n": 5,
+        "item": "T",
+        "frame": "close-head.jpg",
+        "text": "Розоватый мазок кожи на кромке воротника рубашки (также close-torso); только крупный план."
+      },
+      {
+        "list": "known_issues",
+        "n": 6,
+        "item": "T",
+        "frame": "close-weapon.jpg",
+        "text": "Линза лупы — матово-серый диск без стекла; торец рукояти пятнистый; только крупный план."
+      },
+      {
+        "list": "known_issues",
+        "n": 7,
+        "item": "T",
+        "frame": "close-base.jpg",
+        "text": "Светлые разводы и тонкая линия на крышке подставки. Классы stone_base, leather_smooth, silk — status floor в tone.json (концепт темнее пола альбедо), T не снижают; этап 7: тон по UE-съёмке."
+      },
+      {
+        "list": "known_issues",
+        "n": 8,
+        "item": "T",
+        "frame": "tone.json",
+        "text": "warnings loo_unavailable: wool_coarse (70 % пикселей, якорный класс) — яркость основного класса относительно фигуры не проверена; этап 7: тон по UE-съёмке."
+      },
+      {
+        "list": "known_issues",
+        "n": 9,
+        "item": "D",
+        "frame": "pose-01.jpg",
+        "text": "Плащ левой стороны тянется за поднятой рукой клином до бёдер, примерно 130 px за контуром покоя, фактура растянута; слабее на pose-05 и pose-02. Нужны веса плаща и стыки рука|плащ."
+      },
+      {
+        "list": "known_issues",
+        "n": 10,
+        "item": "G-TOPO",
+        "frame": "wire-front.jpg",
+        "text": "3 почти вырожденных треугольника в SK_SherlockHolmes_H2_Body (0,008 %, ld-fbx-report.json); UE их отбросит."
+      },
+      {
+        "list": "known_issues",
+        "n": 11,
+        "item": "T",
+        "frame": "uv-layout.png",
+        "text": "Справочно: покрытие атласа 47,7 %, 755 островов тела и 110 островов подставки; лицо плотнее платья в 2 раза (uv-report.json#checks.priority_face_denser_than_body: 81,6 против 40,8)."
+      }
+    ]
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_SherlockHolmes_H2LD\", \"base\": \"SM_SherlockHolmes_H2LD_Base\", \"materials\": [\"MI_SherlockHolmes_H2LD\", \"MI_SherlockHolmes_H2LD_Base\", \"MI_SherlockHolmes_H2LD_P1\", \"MI_SherlockHolmes_H2LD_P2\", \"MI_SherlockHolmes_H2LD_Base_P1\", \"MI_SherlockHolmes_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_SherlockHolmes_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/SherlockHolmes/Rig/SK_SherlockHolmes_Skeleton\", \"clips\": \"/Game/PipelineCandidates/SherlockHolmes/H2Anim/AM_SherlockHolmes_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_SherlockHolmes_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_SherlockHolmes_H2LD_Edge\", \"T_UM_MatLUT_SherlockHolmes\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_SherlockHolmes_H2LD_2K_BC.png, T_SherlockHolmes_H2LD_2K_Edge.png, T_SherlockHolmes_H2LD_2K_MatID.png, T_SherlockHolmes_H2LD_2K_N.png, T_SherlockHolmes_H2LD_2K_ORM.png, T_SherlockHolmes_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-bake-h2-r2-t2.json\", \"meshes\": {\"body\": \"SK_SherlockHolmes_H2_Body\", \"base\": \"SM_SherlockHolmes_H2_Base\"}, \"materials.atlas\": \"M_SherlockHolmes_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.55}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_SherlockHolmes_H2_Body.bounds_m.max[2] = 0.54984 м против FIGURE_HEIGHT_M заявки 0.55 м ± 1 %; art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-bake-t2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 54.984 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_SherlockHolmes_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-t2/textures/T_SherlockHolmes_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+    "PREV_FIX_LIST": "- r1 known_issues п.1 · S · compare-front.jpg — Для новой генерации Tripo: нужна изогнутая трубка во рту (якорь, есть на front и side листа). Второстепенное: обод лупы сегментированный, линза матовая — на листе гладкое латунное кольцо со стеклом.\n- r1 known_issues п.2 · F · close-base.jpg — Тёмные зубчатые обрывки кромки выреза подставки у обеих подошв (также close-legs, close-legs-back); только крупный план.\n- r1 known_issues п.3 · F · pose-04b.jpg — Закрытие контакта, открытое позой пробы: под поднятой левой стопой виден контур выреза крышки подставки, на подошве светлое пятно крышки (также pose-04). Этап 6: клип, уводящий стопу с контакта, проверяет крышку.\n- r1 known_issues п.4 · T · close-head-back.jpg — Тёмные штрихи-пометки на коже шеи под затылком; только крупный план.\n- r1 known_issues п.5 · T · close-head.jpg — Розоватый мазок кожи на кромке воротника рубашки (также close-torso); только крупный план.\n- r1 known_issues п.6 · T · close-weapon.jpg — Линза лупы — матово-серый диск без стекла; торец рукояти пятнистый; только крупный план.\n- r1 known_issues п.7 · T · close-base.jpg — Светлые разводы и тонкая линия на крышке подставки. Классы stone_base, leather_smooth, silk — status floor в tone.json (концепт темнее пола альбедо), T не снижают; этап 7: тон по UE-съёмке.\n- r1 known_issues п.8 · T · tone.json — warnings loo_unavailable: wool_coarse (70 % пикселей, якорный класс) — яркость основного класса относительно фигуры не проверена; этап 7: тон по UE-съёмке.\n- r1 known_issues п.9 · D · pose-01.jpg — Плащ левой стороны тянется за поднятой рукой клином до бёдер, примерно 130 px за контуром покоя, фактура растянута; слабее на pose-05 и pose-02. Нужны веса плаща и стыки рука|плащ.\n- r1 known_issues п.10 · G-TOPO · wire-front.jpg — 3 почти вырожденных треугольника в SK_SherlockHolmes_H2_Body (0,008 %, ld-fbx-report.json); UE их отбросит.\n- r1 known_issues п.11 · T · uv-layout.png — Справочно: покрытие атласа 47,7 %, 755 островов тела и 110 островов подставки; лицо плотнее платья в 2 раза (uv-report.json#checks.priority_face_denser_than_body: 81,6 против 40,8)."
+  }
+}
