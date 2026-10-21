@@ -119,8 +119,9 @@ netstat -ano | grep ":$((8123 + <N>)) .*LISTEN"                    # MCP ред�
      Без `-LiveCoding`: сессия Live Coding заблокировала бы сборку `UnmatchedEditor` во всех checkout (§1 п.4).
      `-unattended` гасит модальные диалоги. Запуск — `editor_slot.py start` (отсоединённый процесс, PID Windows в
      `$W/editor.pid`); вручную — PowerShell `Start-Process -PassThru`, его `.Id` (PID Windows, а не PID Git Bash)
-     пишется в `$W/editor.pid`. Готовность: порт `:8123` слушает (`netstat` из блока выше) и есть
-     `$W/drop/ready.json`. Дальше в каждой оболочке `export UE_CONSOLE_DROP=$W/drop`: консольные команды
+     пишется в `$W/editor.pid`. Готовность: порт слота `8123+N` слушает (слот 0 — `:8123`; `netstat` из блока выше)
+     и есть `$W/drop/ready.json`. Дальше в каждой оболочке окружение слота (`eval "$(editor_slot.py env <N> …)"`, в нём
+     и `UE_CONSOLE_DROP=$W/drop`; слот 0 — только `export UE_CONSOLE_DROP=$W/drop`): консольные команды
      (`ue_live.Ue.console`, `editor_python` CLI — F125, 3ed2d354) идут файлами, а не набором текста.
    - **Закрытие** — после коммита результата 7a и при 0 dirty-пакетов (грязный `M_UM_Figure_v2` — `discard_master.py`,
      §4.3): `editor_slot.py stop <N>` (сверяет PID по `-abslog` и порту, отказывает при занятой блокировке слота и
