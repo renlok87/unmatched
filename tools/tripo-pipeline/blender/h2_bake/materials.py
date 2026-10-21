@@ -29,7 +29,26 @@ band. Texels of `part` (UV raster, rest position of stage aux, caps excluded) wh
 the `near` parts is <= band_m form the band (union of include_boxes_m when given, minus exclude_boxes_m); texels at
 band_m .. band_m + ring_m that pass keep_hsv form the source ring. Every band texel takes the inverse-distance mean of
 its k nearest ring texels (3D) for each map of `keys` (default BC), times an optional luminance detail of its own BC
-(own / local mean of the band, clipped to `detail`); the last feather_m of the band blends into the original."""
+(own / local mean of the band, clipped to `detail`); the last feather_m of the band blends into the original.
+
+color_repaint (textures.color_repaint, F12 of the 2026-10-20 batch: Bruce Lee model acceptance r1, T 0.5; runs right
+after band_repaint, before the footprints and caps read their rim): a Tripo colour defect inside one part, not at a
+contact line, which band_repaint cannot select (its band needs another part within 5 cm) — navy streaks on the edges of
+the black stripes of a jumpsuit, a dark smear on the inner thighs. Texels of `parts` (UV raster, rest position of stage
+aux, caps excluded; inside include_boxes_m when given, outside exclude_boxes_m) whose BaseColor passes match_hsv
+(hue_deg [lo, hi], lo > hi wraps through 0; s_min / s_max / v_min / v_max; every given bound must hold) take the
+inverse-distance mean of their k nearest source texels (3D) for each map of `keys` (default BC): source = a baked texel of
+the same parts (anywhere in them, boxes do not limit the sources) that does NOT pass match_hsv and passes keep_hsv
+(default: every non-matching texel), no farther than radius_m (<= 0.03 m). A matched texel without a source in reach
+keeps its value (counted as without_source). Optional `detail` = the luminance detail of band_repaint (own / local mean
+of the matched texels, clipped). Report rows: matched, repainted, without_source, distances, mean change.
+
+roughness_remap (textures.roughness_remap, F12; runs after the caps and after the H2.1 metal remap, with or without
+textures.materials.metal — the cloth_roughness of materials.remap runs only inside the metal pass, so a metal-free hero
+had no way to make its cloth matte): ORM roughness (RM.G) of the valid texels of `parts` (optional `hsv` gate on the
+BaseColor, same keys as match_hsv) goes into [lo, hi] by its rank in those texels (rank01: 5th..95th percentile, the
+cloth_roughness rule). Metal texels (mask >= 0.5 of the metal pass) are left out. Without the key nothing runs and the
+cloth_roughness result of heroes with metal is unchanged."""
 
 import numpy as np
 from scipy import ndimage
@@ -228,6 +247,218 @@ def band_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs, 
             row["band_share_outside_keep_hsv"] = {"before": round(float((~before_keep).mean()), 4),
                                                   "after": round(float((~after_keep).mean()), 4),
                                                   "ring_reference": round(float(1 - ring.sum() / max(ring_all, 1)), 4)}
+        rows.append(row)
+    return rows
+
+
+# ---------------------------------------------------------------- colour repaint and roughness remap (F12, 2026-10-20 batch)
+COLOR_REPAINT_KEYS = ("name", "parts", "match_hsv", "keep_hsv", "include_boxes_m", "exclude_boxes_m", "radius_m", "k",
+                      "keys", "detail", "note")
+ROUGHNESS_REMAP_KEYS = ("name", "parts", "lo", "hi", "hsv", "note")
+HSV_SELECT_KEYS = ("hue_deg", "s_min", "s_max", "v_min", "v_max")
+REPAINT_MAPS = ("BC", "RM", "AO")
+COLOR_REPAINT_RADIUS_MAX_M = 0.03
+
+
+def _is_num(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and np.isfinite(x)
+
+
+def hsv_select(rgb, rule, tx):
+    """Boolean mask of the texels whose HSV passes every bound of `rule` (hue_deg [lo, hi] in degrees, lo > hi wraps
+    through 0; s_min, s_max, v_min, v_max in [0, 1]); an empty rule selects everything."""
+    h, s, v = tx.rgb_to_hsv(rgb)
+    ok = np.ones(h.shape, bool)
+    if "hue_deg" in rule:
+        lo, hi = rule["hue_deg"]
+        ok &= ((h >= lo) & (h <= hi)) if lo <= hi else ((h >= lo) | (h <= hi))
+    for key, cmp in (("s_min", np.greater_equal), ("s_max", np.less_equal), ("v_min", np.greater_equal),
+                     ("v_max", np.less_equal)):
+        if key in rule:
+            ok &= cmp(s if key[0] == "s" else v, rule[key])
+    return ok
+
+
+def _hsv_rule_problems(where, rule, allow_empty):
+    if not isinstance(rule, dict) or (not rule and not allow_empty):
+        return ["%s must be a non-empty object of %s (got %r)" % (where, ", ".join(HSV_SELECT_KEYS), rule)]
+    problems = ["%s: unknown key %s" % (where, k) for k in rule if k not in HSV_SELECT_KEYS]
+    for k, v in rule.items():
+        if k == "hue_deg":
+            if not (isinstance(v, list) and len(v) == 2 and all(_is_num(x) and 0.0 <= x <= 360.0 for x in v)):
+                problems.append("%s.hue_deg must be [lo, hi] in 0..360 degrees (got %r)" % (where, v))
+        elif k in HSV_SELECT_KEYS and not (_is_num(v) and 0.0 <= v <= 1.0):
+            problems.append("%s.%s must be in [0, 1] (got %r)" % (where, k, v))
+    return problems
+
+
+def _boxes_problems(where, boxes):
+    if not isinstance(boxes, list) or not boxes:
+        return ["%s must be a non-empty list of {min_m: [x, y, z], max_m: [x, y, z]}" % where]
+    for i, b in enumerate(boxes):
+        if not (isinstance(b, dict) and all(isinstance(b.get(k), list) and len(b[k]) == 3 and all(_is_num(v) for v in b[k])
+                                            for k in ("min_m", "max_m"))
+                and all(lo < hi for lo, hi in zip(b["min_m"], b["max_m"]))):
+            return ["%s[%d] must be {min_m: [x, y, z], max_m: [x, y, z]} with min < max" % (where, i)]
+    return []
+
+
+def _parts_problems(where, parts, part_names):
+    if not isinstance(parts, list) or not parts or len(set(parts)) != len(parts):
+        return ["%s must be a non-empty list of distinct parts (got %r)" % (where, parts)]
+    return ["%s: unknown part %r" % (where, p) for p in parts if p not in part_names]
+
+
+def color_repaint_problems(cfgs, part_names):
+    """Validation of textures.color_repaint (the stage raises ValueError with these problems)."""
+    if not isinstance(cfgs, list) or not cfgs:
+        return ["textures.color_repaint must be a non-empty list of repaints"]
+    problems, seen = [], set()
+    for i, c in enumerate(cfgs):
+        w = "textures.color_repaint[%d]" % i
+        if not isinstance(c, dict):
+            problems.append("%s must be an object" % w)
+            continue
+        problems += ["%s: unknown key %s" % (w, k) for k in c if k not in COLOR_REPAINT_KEYS]
+        if not isinstance(c.get("name"), str) or not c["name"] or c["name"] in seen:
+            problems.append("%s.name must be a unique non-empty string" % w)
+        seen.add(c.get("name"))
+        problems += _parts_problems(w + ".parts", c.get("parts"), part_names)
+        problems += _hsv_rule_problems(w + ".match_hsv", c.get("match_hsv"), allow_empty=False)
+        if "keep_hsv" in c:
+            problems += _hsv_rule_problems(w + ".keep_hsv", c["keep_hsv"], allow_empty=True)
+        r = c.get("radius_m", 0.01)
+        if not (_is_num(r) and 0.0 < r <= COLOR_REPAINT_RADIUS_MAX_M):
+            problems.append("%s.radius_m must be in (0, %s] m (got %r)" % (w, COLOR_REPAINT_RADIUS_MAX_M, r))
+        k = c.get("k", 8)
+        if not (isinstance(k, int) and not isinstance(k, bool) and 1 <= k <= 64):
+            problems.append("%s.k must be an integer in [1, 64] (got %r)" % (w, k))
+        keys = c.get("keys", ["BC"])
+        if not (isinstance(keys, list) and keys and all(x in REPAINT_MAPS for x in keys) and len(set(keys)) == len(keys)):
+            problems.append("%s.keys must be a non-empty subset of %s (got %r)" % (w, list(REPAINT_MAPS), keys))
+        det = c.get("detail")
+        if det is not None and not (isinstance(det, list) and len(det) == 2 and all(_is_num(x) for x in det)
+                                    and 0.0 < det[0] <= 1.0 <= det[1]):
+            problems.append("%s.detail must be [lo, hi] with 0 < lo <= 1 <= hi (got %r)" % (w, det))
+        for key in ("include_boxes_m", "exclude_boxes_m"):
+            if key in c:
+                problems += _boxes_problems("%s.%s" % (w, key), c[key])
+    return problems
+
+
+def roughness_remap_problems(cfgs, part_names):
+    """Validation of textures.roughness_remap (the stage raises ValueError with these problems)."""
+    if not isinstance(cfgs, list) or not cfgs:
+        return ["textures.roughness_remap must be a non-empty list of remaps"]
+    problems, seen = [], set()
+    for i, c in enumerate(cfgs):
+        w = "textures.roughness_remap[%d]" % i
+        if not isinstance(c, dict):
+            problems.append("%s must be an object" % w)
+            continue
+        problems += ["%s: unknown key %s" % (w, k) for k in c if k not in ROUGHNESS_REMAP_KEYS]
+        if not isinstance(c.get("name"), str) or not c["name"] or c["name"] in seen:
+            problems.append("%s.name must be a unique non-empty string" % w)
+        seen.add(c.get("name"))
+        problems += _parts_problems(w + ".parts", c.get("parts"), part_names)
+        lo, hi = c.get("lo"), c.get("hi")
+        if not (_is_num(lo) and 0.0 <= lo <= 1.0):
+            problems.append("%s.lo must be in [0, 1] (got %r)" % (w, lo))
+        if not (_is_num(hi) and 0.0 <= hi <= 1.0):
+            problems.append("%s.hi must be in [0, 1] (got %r)" % (w, hi))
+        if _is_num(lo) and _is_num(hi) and not lo < hi:
+            problems.append("%s: lo must be below hi (got %r, %r)" % (w, lo, hi))
+        if "hsv" in c:
+            problems += _hsv_rule_problems(w + ".hsv", c["hsv"], allow_empty=True)
+    return problems
+
+
+def color_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs, tx):
+    """Repaints the matched texels of textures.color_repaint in place (module docstring); returns the report rows."""
+    from scipy.spatial import cKDTree
+
+    rows = []
+    for cfg in cfgs:
+        radius = float(cfg.get("radius_m", 0.01))
+        k = int(cfg.get("k", 8))
+        keys = list(cfg.get("keys", ["BC"]))
+        idx = [part_names.index(p) for p in cfg["parts"]]
+        mine = np.isin(part_ids, idx) & pos_ok & ~exclude
+        ya, xa = np.nonzero(mine)
+        pa = pos[ya, xa].astype(np.float64)
+        rgb = maps["BC"][ya, xa]
+        matched_colour = hsv_select(rgb, cfg["match_hsv"], tx)
+        in_box = np.ones(len(pa), bool)
+        if cfg.get("include_boxes_m"):
+            in_box &= boxes_mask(pa, cfg["include_boxes_m"])
+        if cfg.get("exclude_boxes_m"):
+            in_box &= ~boxes_mask(pa, cfg["exclude_boxes_m"])
+        match = matched_colour & in_box
+        source = ~matched_colour & alpha["BC"][ya, xa] & hsv_select(rgb, cfg.get("keep_hsv", {}), tx)
+        row = {"name": cfg["name"], "parts": list(cfg["parts"]), "radius_m": radius, "k": k,
+               "part_texels": int(len(pa)), "matched_texels": int(match.sum()), "source_texels": int(source.sum())}
+        mi, si = np.nonzero(match)[0], np.nonzero(source)[0]
+        if not len(mi) or not len(si):
+            rows.append(dict(row, repainted_texels=0, without_source=int(len(mi)),
+                             note="nothing repainted (no matched texel or no source texel)"))
+            continue
+        kk = min(k, len(si))
+        dd, ii = cKDTree(pa[si]).query(pa[mi], k=kk, distance_upper_bound=radius)
+        dd, ii = dd.reshape(len(mi), -1), ii.reshape(len(mi), -1)
+        found = np.isfinite(dd)
+        has = found.any(1)
+        w = np.where(found, 1.0 / (np.where(found, dd, 1.0) + 1e-4), 0.0)
+        w = w / np.maximum(w.sum(1, keepdims=True), 1e-12)
+        ii = np.where(found, ii, 0)
+        mi_ok, w, ii = mi[has], w[has], ii[has]
+        by, bx = ya[mi_ok], xa[mi_ok]
+        stats = {}
+        for key in keys:
+            src = maps[key][ya[si], xa[si]].astype(np.float64)
+            new = (w[..., None] * src[ii]).sum(1)
+            if key == "BC" and cfg.get("detail") and len(mi_ok):
+                lo, hi = cfg["detail"]
+                own = luminance(lin(maps["BC"][by, bx].astype(np.float64)))
+                _dn, inb = cKDTree(pa[mi_ok]).query(pa[mi_ok], k=min(4 * k, len(mi_ok)))
+                inb = inb.reshape(len(mi_ok), -1)
+                ratio = np.clip(own / np.maximum(own[inb].mean(1), 1e-6), lo, hi)
+                new = srgb(np.clip(lin(new) * ratio[:, None], 0.0, 1.0))
+            old = maps[key][by, bx].astype(np.float64)
+            stats[key] = {"mean_abs_change": round(float(np.abs(new - old).mean()), 4) if len(mi_ok) else 0.0}
+            maps[key][by, bx] = new.astype(maps[key].dtype)
+        dist = dd[has][found[has]]
+        row.update(repainted_texels=int(len(mi_ok)), without_source=int((~has).sum()), maps=stats,
+                   distance_mm_p50_max=[round(float(np.median(dist) * 1000), 2), round(float(dist.max() * 1000), 2)]
+                   if len(dist) else None)
+        rows.append(row)
+    return rows
+
+
+def roughness_remap(maps, valid, part_ids, part_names, metal_m, cfgs, tx):
+    """ORM roughness (RM.G) of the listed parts into [lo, hi] by rank, in place (module docstring); returns the rows."""
+    rows = []
+    for cfg in cfgs:
+        idx = [part_names.index(p) for p in cfg["parts"]]
+        sel = np.isin(part_ids, idx) & valid
+        if cfg.get("hsv"):
+            sel &= hsv_select(maps["BC"], cfg["hsv"], tx)
+        metal_out = 0
+        if metal_m is not None:
+            metal_out = int((sel & (metal_m >= 0.5)).sum())
+            sel &= metal_m < 0.5
+        row = {"name": cfg["name"], "parts": list(cfg["parts"]), "lo": cfg["lo"], "hi": cfg["hi"],
+               "texels": int(sel.sum()), "metal_excluded_texels": metal_out}
+        if not sel.any():
+            rows.append(dict(row, note="no texel selected"))
+            continue
+        rough = maps["RM"][..., 1]
+        before = rough[sel].astype(np.float64)
+        rank, q = rank01(rough, sel)
+        rough[sel] = (cfg["lo"] + (cfg["hi"] - cfg["lo"]) * rank[sel]).astype(rough.dtype)
+        after = rough[sel].astype(np.float64)
+        row.update(tripo_roughness_q5_q95=q,
+                   roughness_before_p5_p50_p95=[round(float(x), 4) for x in np.percentile(before, [5, 50, 95])],
+                   roughness_after_p5_p50_p95=[round(float(x), 4) for x in np.percentile(after, [5, 50, 95])])
         rows.append(row)
     return rows
 

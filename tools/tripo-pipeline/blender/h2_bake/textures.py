@@ -22,6 +22,13 @@ W2-c (pilot F107): optional textures.band_repaint (materials.band_repaint) repai
 (BC by default; rest positions of stage aux, work/uv/position.npy) from the same part just outside the band, after the
 AO exclusions and before the footprints and caps take their rim samples; report block band_repaint (absent without the
 key).
+F12 of the 2026-10-20 batch (Bruce Lee model acceptance r1, T 0.5), both opt-in, validated here (ValueError on a
+malformed key) and absent = the bytes of the stage before them: textures.color_repaint (materials.color_repaint)
+repaints texels of the listed parts whose BaseColor passes match_hsv from the nearest texels of the same parts that
+pass keep_hsv (within radius_m <= 0.03 m, optional boxes), right after band_repaint and before the footprints and
+caps read their rim; textures.roughness_remap (materials.roughness_remap) puts the ORM roughness of the listed parts
+into [lo, hi] by its Tripo rank after the caps and the metal remap, with or without metal (metal texels left out).
+Report blocks color_repaint / roughness_remap only with the keys.
 Metal-free hero (no materials.metal parts): no metal mask, no remap, the H2.1 metal checks are not run, and
 work/uv/metal_mask.npy is written all-zero (look-dev reads it). Empty team_mask.cloth_parts (no cloth): TeamMask R = 0
 and the check team_mask_cloth_share is reported as not applicable (pilot 2026-10-13, F51, F52).
@@ -287,7 +294,14 @@ def run(run_dir, profile):
     cap_stats = None
     mcfg = tcfg.get("materials")
     bands = tcfg.get("band_repaint") or []
-    mat = load_sibling("materials") if (mcfg or bands) else None
+    crs = tcfg.get("color_repaint")  # F12 (2026-10-20 batch): opt-in, None = the old path
+    rrs = tcfg.get("roughness_remap")
+    mat = load_sibling("materials") if (mcfg or bands or crs is not None or rrs is not None) else None
+    if crs is not None or rrs is not None:  # validated before any work: a malformed key stops the stage
+        problems = ((mat.color_repaint_problems(crs, part_names) if crs is not None else [])
+                    + (mat.roughness_remap_problems(rrs, part_names) if rrs is not None else []))
+        if problems:
+            raise ValueError("textures profile: %s" % "; ".join(problems))
     tx = SimpleNamespace(rgb_to_hsv=rgb_to_hsv, bilinear=bilinear, dilate=dilate, blur3=blur3)
     mstats = {}
     if mcfg and mcfg.get("ao_exclusions"):
@@ -297,6 +311,12 @@ def run(run_dir, profile):
         pos = np.load(w / "uv" / "position.npy")
         pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
         band_rows = mat.band_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, bands, tx)
+        del pos, pos_ok
+    cr_rows = None
+    if crs:  # F12: right after band_repaint, before the footprints / caps read their rim
+        pos = np.load(w / "uv" / "position.npy")
+        pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
+        cr_rows = mat.color_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, crs, tx)
         del pos, pos_ok
     rim_filters = (mcfg or {}).get("rim_filters", [])
     fp_path = w / "uv" / "footprints.npz"
@@ -327,6 +347,9 @@ def run(run_dir, profile):
         del pos
         cloth_w = mat.cloth_weight(maps["BC"], part_ids, part_names, tcfg["team_mask"], tx) * (1.0 - metal_m)
         mstats["remap"] = mat.remap(maps, vb & valid_maps["RM"], metal_m, cloth_w, mcfg)
+    rr_rows = None
+    if rrs:  # F12: after the caps and the metal remap, with or without metal (metal texels left out)
+        rr_rows = mat.roughness_remap(maps, valid_maps["RM"] & uv_cov, part_ids, part_names, metal_m, rrs, tx)
     filled = {}
     for k in ("NORMAL", "AO", "BC", "RM"):
         filled[k] = fill(maps[k], valid_maps[k], edge_px)
@@ -462,6 +485,10 @@ def run(run_dir, profile):
               "outputs": outputs, "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
     if band_rows is not None:  # profiles without textures.band_repaint keep their report bytes
         report["band_repaint"] = {"config": bands, "bands": band_rows}
+    if cr_rows is not None:  # F12: only with the key
+        report["color_repaint"] = {"config": crs, "rows": cr_rows}
+    if rr_rows is not None:
+        report["roughness_remap"] = {"config": rrs, "rows": rr_rows}
     if mcfg:
         report["materials"] = {"config": mcfg, "stats": mstats,
                                "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, "
