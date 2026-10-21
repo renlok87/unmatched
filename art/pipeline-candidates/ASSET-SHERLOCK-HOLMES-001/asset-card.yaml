@@ -21,7 +21,14 @@ QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
   - art/imagegen/hero-quality-v1/king-arthur/
 ASSET_DIR: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001
-decided_by: delegated (ВР-реестр 2026-10-06)
+decided_by:                         # один ключ на файл (SKILL.md §7.2, F49); прежнее значение этапа 0 — ключ stage0
+  "stage0": "delegated (ВР-реестр 2026-10-06)"
+  "stage3.weights": "delegated (П3-2, П3-3; F11 пачки): лупа срослась с правой кистью (часть 4, одна часть Tripo) — цепочка arm_upper.R → arm_lower.R → hand.R → weapon.R, оправа выше кулака на weapon.R (голова кости у выхода ручки из кулака), новой кости нет; брюки обеими штанинами одной частью — cloth с leg_chains (голень брюк гнётся в колене, кромка = веса ботинок); пальто Инвернесс — cloth, рукава и пелерины у рук — стыки весов с предплечьями (правая 0,075, левая 0,1 м), полосы выреза пальто у жилета (0,03), воротника (0,02) и спины брюк (0,03) закреплены на их весах — подбор по seams разведки; правая подошва (лента-рамка) — rig.cloth_shell; оболочка пальто отклонена (копия выходит наружу на сгибах)"
+  "stage3.base": "delegated (W2-c, как Beowulf): подставка двухъярусная — кольцо по высоте base_band.height_m [0,003; 0,029] (боковина нижнего яруса); в профиле импорта 7a — ue.base_material_mode vertex-mask, VertexMaskWeight 1, SideBandWeight 0; дыры верха под ботинками — rebuild_retopo_caps (4), тёмный отпечаток верха у ботинков перекрашен color_repaint (bake t3)"
+  "stage3.metal": "delegated (HANDBOOK §2.4, §4.4): маска металла H2.1 — латунь оправы и горлышка лупы (часть 4 выше кулака) и цепочка часов (часть 6), target #C9A24A (brass lens палитры); look-dev класс brass, F0 из концепта этого прогона (metal_f0 self)"
+  "stage3.classes": "delegated: пальто, твид (брюки, жилет, рукава, кепи) — wool_coarse одним классом (якорь largest_class); воротник, манжеты и бант кепи — linen; галстук — silk; ботинки — leather_smooth; стекло линзы и волосы — legacy_bake; ручка лупы — wood; кожа — skin (лицо, уши, шея по тону без полуплоскости — look-dev t2)"
+  "stage3.teamaccent": "delegated (П3-4, П3-4a): ribbon — бант на макушке кепи (linen, часть 3) 0,17 % площади, area_share_range [0,0015; 0,12]; K2 5× спереди 0,40 %, сзади 0,35 % — screen_share_min 0,0035 (замер); галстук с K2 не виден (голова и козырёк), пальто/твид/рубашка — главные цвета, ботинки — кожа вещей в цвете концепта (как Watson)"
+  "stage3.textures": "delegated (F12 пачки, textures.color_repaint): светлая полоса текстуры Tripo на тыле левой кисти (есть и в high-poly) — из соседней кожи (bake t2); тёмный отпечаток верха подставки у ботинков — из соседнего камня (bake t3)"
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
 POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}
 CREDITS:
@@ -38,7 +45,7 @@ OWNER_HERO_SLUG: null
 WEAPON_BONE: "weapon.R"
 WEAPON_SOCKET_BONE: null
 FIGURE_HEIGHT_M: 0.55
-FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_BOUNDS_TOP_M: 0.55           # этап 3: rig-report.json#bounds_authored_m.skeletal[1][2] = 0.55007 (макушка кепи; лупа ниже, 0,471)
 FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
 IDLE_SECONDS: 2.5
 LUNGE_CONTACT_FRAME: 7
@@ -82,3 +89,16 @@ decided_by_stage0:
   UE_NAMES: "delegated (§7.2)"
   QUALITY_REFERENCE: "delegated (§7.2): ближний бой → king-arthur"
   MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"
+# --- блок этапа 3 (исполнитель этапа 3, 2026-10-21; RA-22) ---
+STAGE3:
+  profile_version: 2
+  bake_run: "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-bake-t3"
+  lookdev_run: "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3"
+  teamaccent_run: null              # TeamAccent записан в lookdev_run (профиль sherlock-holmes-h2-lookdev-teamaccent-t3.json)
+  profiles: ["build-profiles/sherlock-holmes-h2-bake-h2-t3.json", "build-profiles/sherlock-holmes-h2-lookdev-t3.json",
+             "build-profiles/sherlock-holmes-h2-lookdev-teamaccent-t3.json"]
+  superseded_runs: "до приёмки (суффикс -t, SKILL.md §9): bake 20261020-h2-bake (профиль sherlock-holmes-h2-bake-h2.json) → -t2 (color_repaint полосы на левой кисти; --reuse-from, пересчёт с textures) → -t3 (живой: + color_repaint тёмного отпечатка верха подставки у ботинков; --reuse-from t2); FBX всех трёх побайтно равны. Look-dev 20261020-h2-lookdev → -t2 (bake-t2, кожа головы без полуплоскости y: зубчатая граница на щеке) → -t3 (живой, bake-t3); TeamAccent — профили …-teamaccent.json, -t2, -t3 (живой, в look-dev -t3). Разведка C:/tmp/sherlock-holmes-stage3-scout (run1, run2: роли частей, сечения, петли, подбор стыков весов; look-dev ld-s1…ld-s4) удалена"
+  handover: "HANDBOOK §4.4: тон _tone.py код 0, t_cap 2,0 (out нет; floor leather_smooth, silk, stone_base; якорь wool_coarse 70 %, WARN loo_unavailable); крупные планы capture_acceptance_set осмотрены (C:/tmp/sherlock-holmes-stage3-check, 27 кадров, удалены) — найдено и исправлено: зубчатая граница кожа|волосы на правой щеке (look-dev t2), светлая полоса на тыле левой кисти (bake t2), тёмный ореол верха подставки у носков (bake t3; остался слабый светло-серый ореол у носка левого — заливка крышки дыры); base_seethrough /2 with_figure 0,00 uu², base_only 0,00; rider_gap PASS (кепи → голова 0,00 мм, воротник+галстук → пальто 0,00 мм; лупа срослась с кистью — не наездник); дым клипов (паттерн Beowulf ← Angel r2, меч в правой; лупа на weapon.R): validate 4/4 PASS, contact FAIL — foot_slide во всех клипах 0,56–1,6 % H (ключи таза Beowulf против прямых длинных ног Шерлока: в rest бедро+голень = расстояние таз–щиколотка), LungeAttack weapon_body 169 пар к.5, limb_body_R и skin_stretch 15 видимых рёбер запястья (сгиб кисти 167°, внеосевой локоть 180° — aim замаха меча на поднятом предплечье), DeathSettle limb_body_R и skin_stretch 1 ребро запястья (кисть 50°, внеосевой 34°); grip_check: лупа в кулаке 0° в обоих; крупные планы дыма: LungeAttack к.8 — правая пелерина задрана за рукой, мятые грани верха пелерины (стык весов рукава 0,075), ворот и затылок чистые во всех клипах, шов Idle 1 px; пробы 14/14 на .blend и FBX (v2, weapon_turn_weapon.R доля лупы 1,0); seams: новых дыр ≤ 5 px (arm_r_raise 5, arm_l_raise 3), петли не раскрываются; треугольники тело с лупой 36 610 (≤ 45 000; почти вырожденных 3 = 0,008 %), подставка 1 471 (почти вырожденных 0); TeamAccent 0,17 % (П3-4: диапазон 0,0015–0,12), K2 5× спереди 0,0040, сзади 0,0035 (П3-4a), dE 23,7 / 49,8, TeamDyeGain 5,5"
+  determinism: "после pass приёмки, до 7a (ДС-7) — не делался на этапе 3; FBX bake/look-dev трёх прогонов -t побайтно равны"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "не записан (агент оркестратора)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:исполнитель этапа 3 Sherlock"}
+  stage6_notes: "правое предплечье в rest поднято вперёд (локоть ≈ 90°), лупа жёстко на weapon.R — кость оружия относительно кисти не ключевать; aim-ключи меча (Beowulf/Angel/Arthur) на этой руке дают сгиб кисти 167° и разрыв запястья: держать сгиб кисти ≤ ~40°, поворот предплечья на шарнире; рукава и пелерины пальто идут за руками полосой 0,075 (правая) / 0,1 м (левая) — широкий замах руки задирает пелерину; ноги в rest прямые (длина бедра + голени = расстояние таз–щиколотка): опускать таз / сгибать колени, а не поднимать и раскачивать таз, иначе ступни скользят при ik_feet; трубки (концепт) у модели нет"

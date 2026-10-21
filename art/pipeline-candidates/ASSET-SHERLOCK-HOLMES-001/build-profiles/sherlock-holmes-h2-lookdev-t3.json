@@ -1,0 +1,588 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "sherlock-holmes-h2-lookdev/3",
+ "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+ "status": "предложено",
+ "status_note": "Look-dev этапа 3 (мини-пачка 2026-10-20) на bake-прогоне 20261020-h2-bake: классы библиотеки v1 по зонам концепта, усиления — итерации ld_measure на разведке (C:/tmp/sherlock-holmes-stage3-scout/ld-s*, якорь largest_class), F0 металла (латунь) из концепта этого прогона (metal_f0 self, v2). Не художественная приёмка. t3: bake-прогон 20261020-h2-bake-t3 (полоса левой кисти и тёмный отпечаток верха подставки у ботинков перекрашены), кожа головы без полуплоскости y (с t2).",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-bake-h2-t3.json",
+  "run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-bake-t3",
+  "prefix": "T_SherlockHolmes_H2",
+  "files": {
+   "BC": "textures/T_SherlockHolmes_H2_BC.png",
+   "ORM": "textures/T_SherlockHolmes_H2_ORM.png",
+   "TeamMask": "textures/T_SherlockHolmes_H2_TeamMask.png",
+   "N": "textures/T_SherlockHolmes_H2_N.png",
+   "N_OpenGL": "textures/T_SherlockHolmes_H2_N_OpenGL.png",
+   "2K_N": "textures/T_SherlockHolmes_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_SherlockHolmes_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_SherlockHolmes_H2_BC.png",
+   "baseline_ORM": "textures/T_SherlockHolmes_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_SherlockHolmes_H2.fbx",
+   "base_fbx": "export/SM_SherlockHolmes_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "f52daf464c2049855262fce6c7f43e19bbe957cc9ca684f22fa232fed2ebda75",
+   "ORM": "1390d8f2cc216828a40ab663d1d2ea47c0ed779163e6bdf81c3fa41f5b0436e4",
+   "TeamMask": "744d3a367639fe6ab33c33282c59a22bababdbe89f416ef29b71ee625eb51010",
+   "N": "7bb9045026c74a2e3674c188955fa7f388303529477092c3eec1bd14491b9fd9",
+   "N_OpenGL": "89c9cba19abb40f02bb0d914fbffed158858f14765d699b05e8e7f37091cbc92",
+   "2K_N": "3d42a269f459353aa06f215707a71cba8877523049f3728a83624da0500918fc",
+   "2K_N_OpenGL": "850f9dd30d51f21d20a171683a8e796b4576ee7f2674abb77fa4a6af9d2598f8",
+   "baseline_BC": "f52daf464c2049855262fce6c7f43e19bbe957cc9ca684f22fa232fed2ebda75",
+   "baseline_ORM": "1390d8f2cc216828a40ab663d1d2ea47c0ed779163e6bdf81c3fa41f5b0436e4",
+   "part_ids": "2d535928b7dccbc5e7e19c8de83c2e2dc8f8690ffc10515744f6c9e33dce15c4",
+   "metal_mask": "24220bd97c57d7f3ac7660c11237cea029a1f37d6bc3e270f86be55325a2dffa",
+   "position": "716c7fb261b4cf2095e06d041f3ae6c3a1545bfaf85283a5efac7e292a5880ad",
+   "island_ids": "bb991472862d993056d33c512257c4f1a2f53dfd1faf4d133562e8fe97eab9ec",
+   "sk_authored": "89e57ec41491bdda414a517172b34f2a6320ecfb51ee8411cf5d8ae4316787c5",
+   "skeletal_fbx": "8c8755cba4293541eed1245b2db2609bcb17ab20c38f4d9c16d51c7f57d92fff",
+   "base_fbx": "ce451ef0d87fc3905e97ef6ac832a5e8983c76887d89569fb9847d47ff5a153e"
+  }
+ },
+ "prefix": "T_SherlockHolmes_H2LD",
+ "lut_name": "T_UM_MatLUT_SherlockHolmes",
+ "lut_hero": "SherlockHolmes",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_SherlockHolmes_H2LD.fbx",
+  "base_fbx": "SM_SherlockHolmes_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [
+  "wool_coarse"
+ ],
+ "team_dye_note": "TeamMask.R (устаревшая маска W4-B: пальто по HSV стадии textures) остаётся только на классе шерсти; цвет команды героя — TeamAccent (профиль sherlock-holmes-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1: пальто Инвернесс, твидовые брюки, жилет, рукава пиджака и кепи — wool_coarse (вся шерсть одним классом: серое пальто и бурый твид различаются цветом BC Tripo, усиление общее и держит их соотношение; обе вещи — шерсть, sheen 0 по стартовым значениям F139); воротник и манжеты рубашки — linen; бант на макушке кепи — linen (лента для TeamAccent, правило cap_bow); галстук — silk; ботинки — leather_smooth; латунь оправы лупы и цепочка часов — brass (маска металла H2.1; концепт — латунь «brass lens» #C9A24A, F34: класс по отделке концепта); стекло линзы — legacy_bake (класса стекла в библиотеке нет); ручка лупы — wood; лицо и кисти — skin; волосы и глаза — legacy_bake; подставка — stone_base",
+  "part_default": {
+   "0": "wool_coarse",
+   "1": "wool_coarse",
+   "2": "stone_base",
+   "3": "wool_coarse",
+   "4": "wool_coarse",
+   "5": "legacy_bake",
+   "6": "wool_coarse",
+   "7": "leather_smooth",
+   "8": "skin",
+   "9": "wool_coarse",
+   "10": "leather_smooth",
+   "11": "linen",
+   "12": "leather_smooth",
+   "13": "silk"
+  },
+  "rules": [
+   {
+    "name": "face_skin",
+    "parts": [
+     5
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      32
+     ],
+     "s_min": 0.14,
+     "s_max": 0.6,
+     "v_min": 0.45
+    },
+    "class": "skin",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.505
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "кожа головы — лицо, уши и шея — по тону кожи ниже козырька кепи (z < 0,505; замер BC лица: h 14–25°, s 0,22–0,31, v 0,57–0,76); тёмные седые волосы (v 0,22–0,43, s 0,11–0,24) остаются legacy_bake. t2: без полуплоскости y < −0,012 профиля 1 — она рвала щёку зубчатой границей skin | legacy_bake (close-head сдачи модели)"
+   },
+   {
+    "name": "hand_r_skin",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      32
+     ],
+     "s_min": 0.14,
+     "s_max": 0.6,
+     "v_min": 0.5
+    },
+    "class": "skin",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.074,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       -1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.428
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0,
+      "keep": "lt"
+     }
+    ],
+    "note": "кулак правой руки (часть 4: y < −0,074, ниже верха кулака z 0,428; замер BC кулака: h p50 19,6°, v p50 0,73)"
+   },
+   {
+    "name": "magnifier_handle",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      45
+     ],
+     "s_min": 0.25,
+     "v_max": 0.5
+    },
+    "class": "wood",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.074,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       -1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.428
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0,
+      "keep": "lt"
+     }
+    ],
+    "note": "деревянная ручка лупы в кулаке и под ним (тёмно-бурая, v ≤ 0,5)"
+   },
+   {
+    "name": "shirt_cuff",
+    "parts": [
+     4,
+     9
+    ],
+    "hsv": {
+     "s_max": 0.2,
+     "v_min": 0.6
+    },
+    "class": "linen",
+    "note": "белые манжеты рубашки у кистей"
+   },
+   {
+    "name": "lens_glass",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "s_max": 0.25
+    },
+    "metal_max": 0.5,
+    "class": "legacy_bake",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.428
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "стекло линзы (серо-зелёное, s ≤ 0,25, вне маски металла; z ≥ 0,428) — класса стекла нет"
+   },
+   {
+    "name": "brass_rim_edges",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "hue_deg": [
+      25,
+      60
+     ],
+     "s_min": 0.35
+    },
+    "metal_max": 0.5,
+    "class": "brass",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.428
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "кромки латунной оправы вне маски металла H2.1 (жёлтые тексели у края островов) — тот же класс, металлик 0 из ORM"
+   },
+   {
+    "name": "cap_bow",
+    "parts": [
+     3
+    ],
+    "class": "linen",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.5436
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "бант на макушке кепи (z ≥ 0,5436 м над куполом; |x| ≤ 0,0125, y 0,001–0,009 по position.npy bake-прогона) — лента кепи, класс linen для TeamAccent (ribbon); твид того же тона, усиление linen ≈ 1 (ld-s3)"
+   },
+   {
+    "name": "brass",
+    "metal_min": 0.5,
+    "class": "brass",
+    "note": "маска металла H2.1: оправа и горлышко ручки лупы, цепочка часов — латунь"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [
+   "brass",
+   "linen"
+  ],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "brass": {
+    "rgb": [
+     1.5928,
+     1.7411,
+     4.4899
+    ],
+    "scout_iter1": [
+     1.5928,
+     1.7357,
+     5.5473
+    ],
+    "note": "металл: итерация 2 разведки (ld-s2) — полная подсказка после потолка канала 0,92 (metal_cap; итерация 1 — корень подсказки ld-s1)",
+    "scout_iter2": [
+     1.5928,
+     1.7411,
+     4.4899
+    ]
+   },
+   "leather_smooth": {
+    "rgb": [
+     0.6238,
+     0.6283,
+     0.6138
+    ],
+    "scout_iter1": [
+     0.6238,
+     0.6283,
+     0.6138
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "legacy_bake": {
+    "rgb": [
+     0.54,
+     0.5141,
+     0.4953
+    ],
+    "scout_iter1": [
+     0.54,
+     0.5141,
+     0.4953
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "linen": {
+    "rgb": [
+     0.9986,
+     0.9911,
+     0.949
+    ],
+    "scout_iter1": [
+     0.9986,
+     0.9911,
+     0.949
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "silk": {
+    "rgb": [
+     0.3702,
+     0.4137,
+     0.4475
+    ],
+    "scout_iter1": [
+     0.5125,
+     0.5625,
+     0.5997
+    ],
+    "note": "итерация 2 разведки ld-s2: подсказка concept / H2LD (итерация 1 — ld-s1)",
+    "scout_iter2": [
+     0.3702,
+     0.4137,
+     0.4475
+    ]
+   },
+   "skin": {
+    "rgb": [
+     1.0064,
+     0.8327,
+     0.6646
+    ],
+    "scout_iter1": [
+     1.0064,
+     0.8327,
+     0.6646
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "stone_base": {
+    "rgb": [
+     0.6663,
+     0.6377,
+     0.5799
+    ],
+    "scout_iter1": [
+     0.6663,
+     0.6377,
+     0.5799
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "wood": {
+    "rgb": [
+     0.6715,
+     0.6038,
+     0.4928
+    ],
+    "scout_iter1": [
+     0.6715,
+     0.6038,
+     0.4928
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "wool_coarse": {
+    "rgb": [
+     1.0111,
+     0.9996,
+     0.9601
+    ],
+    "scout_iter1": [
+     1.0111,
+     0.9996,
+     0.9601
+    ],
+    "note": "итерация 1 разведки C:/tmp/sherlock-holmes-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   }
+  },
+  "gains_note": "итерации ld_measure (≤ 3, разведка C:/tmp/sherlock-holmes-stage3-scout): подсказка concept / H2LD, якорь wool_coarse (largest_class); металл (латунь) — демпфированно, затем полная подсказка после потолка канала 0,92 (HANDBOOK §4.4). t_cap разведки: ld-s1 1,0 (вне: brass, leather_smooth, legacy_bake, silk, stone_base, wood, wool_coarse) → ld-s2 1,5 (вне: brass 0,63, silk 1,37) → ld-s3 2,0 (вне нет; пол: leather_smooth, silk, stone_base); ld-s4 (+ бант кепи linen) — 2,0"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png",
+  "side": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-side.png",
+  "back": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по зонам Шерлока",
+   "wool_coarse": {
+    "mask_px": -4,
+    "v_min": 0.1,
+    "render_gate": true,
+    "note": "серое пальто и бурый твид (брюки, жилет, рукава, кепи): без ворот оттенка и насыщенности — серое пальто ахроматично"
+   },
+   "linen": {
+    "mask_px": -2,
+    "s_max": 0.25,
+    "v_min": 0.55,
+    "render_gate": true,
+    "note": "белые воротник и манжеты"
+   },
+   "silk": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      5,
+      45
+     ]
+    ],
+    "s_min": 0.2,
+    "v_min": 0.08,
+    "render_gate": true,
+    "note": "тёмно-бурый галстук"
+   },
+   "leather_smooth": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      5,
+      40
+     ]
+    ],
+    "s_min": 0.25,
+    "v_min": 0.08,
+    "v_max": 0.55
+   },
+   "brass": {
+    "mask_px": 3,
+    "hue_deg": [
+     [
+      24,
+      55
+     ]
+    ],
+    "s_min": 0.4,
+    "v_min": 0.35
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      5,
+      35
+     ]
+    ],
+    "s_min": 0.15,
+    "s_max": 0.6,
+    "v_min": 0.4
+   },
+   "wood": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.25,
+    "v_min": 0.1
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.5
+   },
+   "legacy_bake": {
+    "mask_px": -2,
+    "v_max": 0.65,
+    "render_gate": true,
+    "note": "волосы (серые с проседью) и стекло линзы"
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "cap",
+   "magnifier",
+   "hand_l",
+   "waistcoat",
+   "shoe_l",
+   "coat_back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-sherlock-holmes-codex/checks-report.json",
+  "side": "left"
+ },
+ "history": {
+  "previous_profiles": [
+   "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-lookdev.json",
+   "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-lookdev-t2.json"
+  ],
+  "note": "t2: bake-t2 и правило кожи головы без полуплоскости y (зубчатая граница на щеке); t3: источник — bake-t3 (отпечаток подставки у ботинков); классы и усиления — профиля 1 (ld-s1…ld-s3); прогоны 20261020-h2-lookdev и -t2 не тронуты"
+ },
+ "metal_f0": {
+  "anchor_class": "skin",
+  "note": "F0 латуни из концепта этого прогона (concept_report self, v2, C18); якорь skin",
+  "classes": {
+   "brass": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   }
+  }
+ }
+}

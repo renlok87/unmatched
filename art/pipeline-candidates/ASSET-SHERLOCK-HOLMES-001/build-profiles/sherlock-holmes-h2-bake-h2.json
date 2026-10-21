@@ -1,0 +1,1433 @@
+{
+ "schema": "unmatched.h2-bake-profile/1",
+ "profile_id": "sherlock-holmes-h2-bake/1",
+ "profile_version": 2,
+ "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+ "status": "предложено",
+ "status_note": "Этап 3 скилла 3d-model-pipeline (мини-пачка 2026-10-20). Tripo 734b9954, 14 частей: брюки одной частью (cloth + leg_chains), пальто Инвернесс — толстая оболочка с рукавами до локтя, лупа срослась с правой кистью (П3-2, цепочка до weapon.R), подставка двухъярусная (кольцо по высоте). Трубки в концепте нет и в Tripo нет — не добавлялась (силуэт в Blender не правится). Не художественная приёмка и не бюджет.",
+ "expected_part_count": 14,
+ "sources": {
+  "source_spec": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/source-specs/tripo-734b9954-h2.json",
+  "parts_glb": {
+   "role": "h2-parts-glb",
+   "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/sherlock-holmes-h2-tripo-734b9954-parts14.glb",
+   "sha256": "97fbb345165c3aa69f80b29e5ca87b6edc04304dacd3db33d6871a4c3b8a8013",
+   "bytes": 47340980
+  },
+  "tex_glb": {
+   "role": "h2-tex8k-pbr-glb",
+   "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/sherlock-holmes-h2-tripo-734b9954-tex8k-pbr.glb",
+   "sha256": "324143c260d88ecf4061a1c6c927e6c10637af56e22a61cacae7fccfd857384a",
+   "bytes": 80769864
+  }
+ },
+ "parts": {
+  "tripo_part_0": {
+   "mesh": "body",
+   "role": "брюки: обе штанины одной частью Tripo, от пояса до ботинок; сзади выше 0,157 м открыты (кромка — по внутреннему вырезу пальто)",
+   "cloth": true
+  },
+  "tripo_part_1": {
+   "mesh": "body",
+   "role": "пальто Инвернесс: толстая оболочка, две пелерины, рукава до локтя; внутренний вырез (петля ~120 см) по брюкам, жилету и вороту, кромки рукавов — общие с предплечьями (части 4, 9)",
+   "cloth": true
+  },
+  "tripo_part_2": {
+   "mesh": "base",
+   "role": "подставка (двухъярусный тёмный камень)"
+  },
+  "tripo_part_3": {
+   "mesh": "body",
+   "role": "кепи deerstalker (охотничья шапка с бантом)"
+  },
+  "tripo_part_4": {
+   "mesh": "body",
+   "role": "правое предплечье (твидовый рукав с манжетой рубашки), кисть и лупа одной частью Tripo (лупа не отделена): П3-2 — кисть на hand.R, лупа выше кулака на weapon.R цепочкой весов, новой кости нет"
+  },
+  "tripo_part_5": {
+   "mesh": "body",
+   "role": "голова: лицо и волосы; открыта сверху (под кепи) и снизу (шея в вороте)"
+  },
+  "tripo_part_6": {
+   "mesh": "body",
+   "role": "жилет (перед, одинарный лист) с цепочкой часов",
+   "cloth": true
+  },
+  "tripo_part_7": {
+   "mesh": "body",
+   "role": "левый ботинок (+X)"
+  },
+  "tripo_part_8": {
+   "mesh": "body",
+   "role": "левая кисть (+X)"
+  },
+  "tripo_part_9": {
+   "mesh": "body",
+   "role": "левое предплечье: твидовый рукав с манжетой (+X)"
+  },
+  "tripo_part_10": {
+   "mesh": "body",
+   "role": "правый ботинок, верх (−X)"
+  },
+  "tripo_part_11": {
+   "mesh": "body",
+   "role": "воротник рубашки (одинарный лист)"
+  },
+  "tripo_part_12": {
+   "mesh": "body",
+   "role": "правый ботинок, подошва (−X)"
+  },
+  "tripo_part_13": {
+   "mesh": "body",
+   "role": "галстук (одинарный лист)"
+  }
+ },
+ "scale": {
+  "figure_top_m": 0.55,
+  "base_diameter_m": 0.3,
+  "base_height_m": 0.06,
+  "note": "верх фигуры — макушка кепи (tripo_part_3, источник 0,9787); лупа ниже (0,8363), figure_top_part не нужен (HANDBOOK §2.10)"
+ },
+ "orientation": {
+  "method": "ray-escape",
+  "samples_per_part": 4000,
+  "seed": 0,
+  "flip_below_score": -0.5,
+  "expected_inside_out_parts": [],
+  "min_score_after_fix": 0.5
+ },
+ "retopo": {
+  "method": "decimate-collapse",
+  "seed": 0,
+  "deviation_samples": 40000,
+  "target_tris": {
+   "tripo_part_0": 3600,
+   "tripo_part_1": 11000,
+   "tripo_part_2": 1200,
+   "tripo_part_3": 2400,
+   "tripo_part_4": 3800,
+   "tripo_part_5": 5000,
+   "tripo_part_6": 2200,
+   "tripo_part_7": 1300,
+   "tripo_part_8": 1500,
+   "tripo_part_9": 1300,
+   "tripo_part_10": 1100,
+   "tripo_part_11": 700,
+   "tripo_part_12": 450,
+   "tripo_part_13": 400
+  },
+  "dense_regions": [
+   {
+    "part": "tripo_part_5",
+    "name": "face",
+    "box_m": [
+     [
+      -0.022,
+      -0.04,
+      0.46
+     ],
+     [
+      0.022,
+      -0.012,
+      0.506
+     ]
+    ],
+    "target_tris": 1600,
+    "note": "лицо под кепи (глаза, нос, губы)"
+   }
+  ],
+  "cleanup": {
+   "merge_distance_m": 1e-06,
+   "degenerate_distance_m": 1e-07,
+   "tiny_island_area_m2": 2e-07,
+   "degenerate_area_m2": 1e-10
+  },
+  "target_tris_note": "пальто 11000 (двойная стенка, две пелерины), голова 5000 (лицо 1600 плотной зоной), предплечье с кистью и лупой 3800, брюки 3600 — итог тела на экспорте ≈ 36,6k с крышками и оболочкой подошвы (разведка C:/tmp/sherlock-holmes-stage3-scout run2), запас до POLY_BUDGET 45 000 ≈ 8k",
+  "caps": [
+   {
+    "part": "tripo_part_2",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "note": "верх подставки Tripo вырезан под ботинками (4 петли, z ≈ 0,059 м): плоские крышки, затем rebuild_retopo_caps"
+   }
+  ]
+ },
+ "closure": {
+  "note": "контактные крышки по инвентарю петель разведки close (C:/tmp/sherlock-holmes-stage3-scout): подошвы обоих ботинок к подставке и низ верха правого ботинка (подошва Tripo — рамка с открытым носком). Не закрываются крышками: кромки рукавов пальто ↔ предплечья (общие кромки, стык весов rig.junctions), открытая спина брюк ↔ внутренний вырез пальто (стык весов), кромка жилета и воротника ↔ вырез пальто (стыки весов), шея ↔ воротник (стык весов), запястье ↔ кисть слева и кромки брюк ↔ ботинки (одна цепочка весов), голова ↔ кепи (head)",
+  "spacing_m": 0.006,
+  "bulge_m": -0.001,
+  "ring_m": 0.008,
+  "min_perimeter_cm": 3.0,
+  "max_median_mm": 1.0,
+  "inventory_min_perimeter_cm": 1.0,
+  "degenerate_area_m2": 1e-10,
+  "texel_priority": 0.7,
+  "rest_visibility": {
+   "pitch_m": 0.001,
+   "max_covers_front_share": 0.0001,
+   "max_covers_front_blob_px": 9
+  },
+  "contact_caps": [
+   {
+    "name": "sole_l",
+    "part": "tripo_part_7",
+    "covered_by": "tripo_part_2",
+    "note": "подошва левого ботинка (две петли)",
+    "expect": 2,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "sole_r",
+    "part": "tripo_part_12",
+    "covered_by": "tripo_part_2",
+    "note": "подошва правого ботинка: петля каблука 10,1 см (носок подошвы закрыт; петля 30 см — шов с верхом ботинка, часть 10, та же цепочка весов)",
+    "expect": 1,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "sole_r_upper",
+    "part": "tripo_part_10",
+    "covered_by": "tripo_part_12",
+    "note": "низ верха правого ботинка (петля 23,9 см по шву с подошвой): подошва Tripo (часть 12) — рамка с перемычкой, носок открыт, снизу в thigh_r_flex видна изнанка верха (823 px, разведка run1) — крышка закрывает низ верха",
+    "expect": 1,
+    "max_median_mm": 1.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   }
+  ],
+  "rebuild_retopo_caps": [
+   {
+    "name": "base_hole",
+    "part": "tripo_part_2",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "expect": 4,
+    "shape": "harmonic",
+    "bulge_m": 0.0,
+    "min_perimeter_cm": 0.5,
+    "spacing_m": 0.012,
+    "note": "дыры верха подставки под ботинками: веера retopo заменены крышками по точной кромке"
+   }
+  ],
+  "rim_sample_fraction": 0.35
+ },
+ "uv": {
+  "atlas_px": 4096,
+  "runtime_px": 2048,
+  "min_gap_px": 8,
+  "pack_margin_fraction": 0.0013,
+  "max_overlap_px": 0,
+  "density_reference_part": "tripo_part_1",
+  "charts": {
+   "unwrap_method": "MINIMUM_STRETCH",
+   "normal_penalty": 3.0,
+   "max_rounds": 6,
+   "max_overlap_share": 0.0,
+   "max_stretch_log_p95": 0.5,
+   "chart_area_cm2": {
+    "default": 18,
+    "tripo_part_0": 14,
+    "tripo_part_1": 40,
+    "tripo_part_2": 180,
+    "tripo_part_5": 9
+   },
+   "regions": [
+    {
+     "part": "tripo_part_5",
+     "name": "face",
+     "box_m": [
+      [
+       -0.022,
+       -0.04,
+       0.46
+      ],
+      [
+       0.022,
+       -0.012,
+       0.506
+      ]
+     ],
+     "chart_area_cm2": 40
+    }
+   ],
+   "stretch_min_faces": 12,
+   "smooth_iterations": 4
+  },
+  "texel_priority": {
+   "default": 1.0,
+   "parts": {
+    "tripo_part_4": 1.6,
+    "tripo_part_8": 1.75,
+    "tripo_part_2": 0.45
+   },
+   "regions": [
+    {
+     "part": "tripo_part_5",
+     "name": "face",
+     "box_m": [
+      [
+       -0.022,
+       -0.04,
+       0.46
+      ],
+      [
+       0.022,
+       -0.012,
+       0.506
+      ]
+     ],
+     "factor": 2.0
+    }
+   ]
+  }
+ },
+ "bake": {
+  "device": "GPU",
+  "resolution": 4096,
+  "ao": {
+   "samples": 128,
+   "distance_m": 0.044,
+   "seed": 0,
+   "note": "0,08 × рост 0,55 м, как Medusa"
+  },
+  "normal": {
+   "space": "TANGENT",
+   "include_tripo_normal_map": true,
+   "samples": 1
+  },
+  "emission": {
+   "samples": 1
+  },
+  "cage": {
+   "extrusion_from": "retopo lo_to_hi p99 и hi_to_lo p99 части",
+   "factor": 1.5,
+   "min_m": 0.0008,
+   "max_m": 0.004,
+   "max_ray_factor": 2.5
+  },
+  "hit_check": {
+   "max_miss_share_warn": 0.01
+  },
+  "ao_exclusions": []
+ },
+ "textures": {
+  "prefix": "T_SherlockHolmes_H2",
+  "pad_fill": "8-neighbour dilation edge_extend_px, then pull-push pyramid",
+  "maps": {
+   "BC": "sRGB RGB 8 бит (BaseColor Tripo, освещение удалено Tripo)",
+   "N": "DirectX (G инвертирован) для UE",
+   "N_OpenGL": "OpenGL для Blender",
+   "ORM": "R = AO (Cycles), G = Roughness, B = Metallic (из PBR Tripo)",
+   "TeamMask": "RGBA: R = одежда (пальто), G = подставка (полоса), B = 0, A = 255 (deprecated W4-B)"
+  },
+  "ao_gate": {
+   "min_range_p1_p99": 32,
+   "min_occluded_fraction": 0.02,
+   "occluded_below": 250
+  },
+  "team_mask": {
+   "cloth_parts": [
+    "tripo_part_1"
+   ],
+   "cloth_hsv": {
+    "v_max": 0.62,
+    "s_max": 0.4,
+    "ramp": 0.04,
+    "note": "серое пальто Инвернесс (часть 1): доля 0,976 при v_max 0,62 / s_max 0,4 (разведка run1–run2); TeamMask устарел, проверка стадии осталась"
+   },
+   "base_band": {
+    "part": "tripo_part_2",
+    "normal_z_abs_max": 0.35,
+    "height_m": [
+     0.003,
+     0.029
+    ],
+    "note": "height_m — боковина нижнего яруса двухъярусной подставки (W2-c): нижний ярус r 0,149 м z 0–0,031, полка уступа z 0,032–0,035, верхний ярус r 0,140 м z 0,034–0,055, верх 0,058 (замер lp_closed разведки run2); как Beowulf"
+   },
+   "blur": 3
+  },
+  "edge_extend_px": 16,
+  "materials": {
+   "note": "проход металла H2.1 (HANDBOOK §2.4): маска металла для look-dev — латунь оправы и горлышка ручки лупы (часть 4, только выше кулака: 3D-коробка z ≥ 0,428 м) и цепочка часов на жилете (часть 6, насыщенный жёлтый); стекло линзы (серо-зелёное), кожа кисти и пуговицы — не металл; BC металла → латунь #C9A24A (акцент палитры brass lens)",
+   "ao_exclusions": [],
+   "rim_filters": [],
+   "metal": {
+    "hue_deg": [
+     20,
+     65
+    ],
+    "hue_ramp_deg": 1,
+    "ramp": 0.04,
+    "local_radius_px": 3,
+    "close_px": 2,
+    "blur": 1,
+    "parts": {
+     "tripo_part_4": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         25,
+         60
+        ],
+        "hue_ramp_deg": 2,
+        "s_min": 0.28,
+        "v_min": 0.28,
+        "name": "lens_rim_brass"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.15
+      },
+      "min_component_px": 60,
+      "boxes": [
+       {
+        "name": "magnifier",
+        "min_m": [
+         -0.12,
+         -0.13,
+         0.428
+        ],
+        "max_m": [
+         -0.05,
+         -0.05,
+         0.48
+        ]
+       }
+      ],
+      "note": "латунная оправа и горлышко ручки лупы выше кулака; стекло (серое) и кожа — не металл"
+     },
+     "tripo_part_6": {
+      "terms": [
+       {
+        "kind": "local",
+        "radius_px": 3,
+        "hue_deg": [
+         25,
+         60
+        ],
+        "hue_ramp_deg": 2,
+        "s_min": 0.4,
+        "v_min": 0.4,
+        "name": "watch_chain"
+       }
+      ],
+      "texel_floor": {
+       "v_min": 0.15
+      },
+      "min_component_px": 20,
+      "note": "цепочка часов на жилете"
+     }
+    },
+    "parts_note": "цветовое правило + 3D-коробка шлема; кольчуга и золото — классы look-dev",
+    "basecolor": {
+     "target_srgb": "#C9A24A",
+     "detail_gamma": 1.0,
+     "detail_clip": [
+      0.25,
+      1.4
+     ],
+     "note": "латунь (акцент палитры brass lens #C9A24A)"
+    },
+    "metallic": {
+     "min": 0.9,
+     "max": 1.0
+    },
+    "roughness": {
+     "min": 0.32,
+     "max": 0.45,
+     "detail_weight": 0.6,
+     "note": "как металл Medusa/Angel"
+    }
+   },
+   "cloth_roughness": {
+    "apply": false,
+    "lo": 0.8,
+    "hi": 0.9,
+    "note": "не применяется (как Medusa)"
+   },
+   "checks": {
+    "metal_core_metallic_min": 0.89,
+    "metal_core_roughness": [
+     0.3,
+     0.46
+    ],
+    "non_metal_metallic_max_8bit": 1,
+    "metal_core_bc_linear_max_channel_p50_min": 0.5
+   }
+  }
+ },
+ "rig": {
+  "skeleton": "UM_HUMANOID_17_v2",
+  "armature_object": "SKEL_UM_Humanoid",
+  "character": "SherlockHolmes",
+  "bones_note": "кости по сечениям частей Tripo в финальной рамке (разведка): тазобедренные z 0,268 (шаг ног 0,28), колени 0,168, щиколотки 0,083 (верх ботинка 0,088), носок −0,045; плечи ±0,064 z 0,428 (под пелериной, по предплечьям), локоть L по оси левого рукава (0,063; 0,004; 0,356), запястье L — общая кромка рукава и кисти (0,1035; −0,025; 0,301); правое предплечье поднято вперёд: локоть (−0,084; −0,006; 0,368), запястье у манжеты (−0,093; −0,073; 0,389); шея 0,452",
+  "max_influences": 4,
+  "clean_below": 0.01,
+  "bones": [
+   [
+    "root",
+    null,
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0.045
+    ]
+   ],
+   [
+    "hips",
+    "root",
+    [
+     0,
+     0.0,
+     0.268
+    ],
+    [
+     0,
+     0.0,
+     0.325
+    ]
+   ],
+   [
+    "spine",
+    "hips",
+    [
+     0,
+     0.0,
+     0.325
+    ],
+    [
+     0,
+     0.005,
+     0.452
+    ]
+   ],
+   [
+    "head",
+    "spine",
+    [
+     0,
+     0.006,
+     0.452
+    ],
+    [
+     0,
+     0.006,
+     0.535
+    ]
+   ],
+   [
+    "arm_upper.L",
+    "spine",
+    [
+     0.064,
+     0.006,
+     0.428
+    ],
+    [
+     0.063,
+     0.004,
+     0.356
+    ]
+   ],
+   [
+    "arm_lower.L",
+    "arm_upper.L",
+    [
+     0.063,
+     0.004,
+     0.356
+    ],
+    [
+     0.1035,
+     -0.025,
+     0.301
+    ]
+   ],
+   [
+    "hand.L",
+    "arm_lower.L",
+    [
+     0.1035,
+     -0.025,
+     0.301
+    ],
+    [
+     0.106,
+     -0.045,
+     0.274
+    ]
+   ],
+   [
+    "arm_upper.R",
+    "spine",
+    [
+     -0.064,
+     0.006,
+     0.428
+    ],
+    [
+     -0.084,
+     -0.006,
+     0.368
+    ]
+   ],
+   [
+    "arm_lower.R",
+    "arm_upper.R",
+    [
+     -0.084,
+     -0.006,
+     0.368
+    ],
+    [
+     -0.093,
+     -0.073,
+     0.389
+    ]
+   ],
+   [
+    "hand.R",
+    "arm_lower.R",
+    [
+     -0.093,
+     -0.073,
+     0.389
+    ],
+    [
+     -0.0883,
+     -0.0945,
+     0.427
+    ]
+   ],
+   [
+    "leg_upper.L",
+    "hips",
+    [
+     0.025,
+     0.0,
+     0.268
+    ],
+    [
+     0.035,
+     0.002,
+     0.168
+    ]
+   ],
+   [
+    "leg_lower.L",
+    "leg_upper.L",
+    [
+     0.035,
+     0.002,
+     0.168
+    ],
+    [
+     0.046,
+     0.009,
+     0.083
+    ]
+   ],
+   [
+    "foot.L",
+    "leg_lower.L",
+    [
+     0.046,
+     0.009,
+     0.083
+    ],
+    [
+     0.054,
+     -0.045,
+     0.064
+    ]
+   ],
+   [
+    "leg_upper.R",
+    "hips",
+    [
+     -0.025,
+     0.0,
+     0.268
+    ],
+    [
+     -0.035,
+     0.002,
+     0.168
+    ]
+   ],
+   [
+    "leg_lower.R",
+    "leg_upper.R",
+    [
+     -0.035,
+     0.002,
+     0.168
+    ],
+    [
+     -0.046,
+     0.009,
+     0.083
+    ]
+   ],
+   [
+    "foot.R",
+    "leg_lower.R",
+    [
+     -0.046,
+     0.009,
+     0.083
+    ],
+    [
+     -0.054,
+     -0.045,
+     0.064
+    ]
+   ],
+   [
+    "weapon.R",
+    "hand.R",
+    [
+     -0.0883,
+     -0.0945,
+     0.427
+    ],
+    [
+     -0.0864,
+     -0.085,
+     0.454
+    ]
+   ]
+  ],
+  "weights": {
+   "tripo_part_0": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.3,
+     0.345
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.3,
+    "leg_full_z": 0.27,
+    "leg_max": 1.0,
+    "side_band_m": 0.006,
+    "leg_chains": {
+     "L": [
+      "leg_upper.L",
+      "leg_lower.L",
+      "foot.L"
+     ],
+     "R": [
+      "leg_upper.R",
+      "leg_lower.R",
+      "foot.R"
+     ],
+     "bands_m": [
+      0.015,
+      0.012,
+      0.01
+     ]
+    },
+    "note": "брюки — обе штанины одной частью Tripo: правило cloth с leg_chains (F11 пачки, st_rig): ниже 0,27 м доля ноги своей стороны идёт по цепочке hips → бедро → голень → стопа с полосами ботинок (кромка брюк и ботинок получают одинаковые веса, голень брюк гнётся в колене); пояс выше 0,30 — hips/spine как у пальто"
+   },
+   "tripo_part_1": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.3,
+     0.345
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.26,
+    "leg_full_z": 0.13,
+    "leg_max": 0.6,
+    "side_band_m": 0.02,
+    "note": "пальто: hips, выше 0,30–0,345 м — spine; к подолу (0,127 м) плавно до 60 % на бедро своей стороны (как мантия Beowulf); рукава и пелерины у рук — стыки весов rig.junctions"
+   },
+   "tripo_part_3": {
+    "kind": "rigid",
+    "bone": "head"
+   },
+   "tripo_part_4": {
+    "kind": "chain",
+    "chain": [
+     "arm_upper.R",
+     "arm_lower.R",
+     "hand.R",
+     "weapon.R"
+    ],
+    "bands_m": [
+     0.012,
+     0.008,
+     0.003
+    ],
+    "note": "П3-2 (лупа не отделена Tripo, одна часть с рукавом и кистью): цепочка arm_upper.R → arm_lower.R → hand.R → weapon.R — рукав на arm_lower.R, кулак на hand.R, оправа и горлышко ручки выше кулака на weapon.R (410 вершин ≥ 0,95, проба weapon_turn_weapon.R 1,0 доли оружия); голова weapon.R — у выхода ручки из кулака (z 0,427): при голове в центре кулака верх кулака ушёл бы на weapon.R; новой кости нет. В клипах кость оружия не поворачивается относительно кисти — лупа жёстко в руке"
+   },
+   "tripo_part_5": {
+    "kind": "zblend",
+    "stops": [
+     [
+      "spine",
+      0.455
+     ],
+     [
+      "head",
+      0.468
+     ]
+    ],
+    "note": "голова (лицо и волосы): шея внутри воротника 0,462–0,478 — spine → head; стык с воротником (rig.junctions) держит кромку шеи на spine"
+   },
+   "tripo_part_6": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.3,
+     0.345
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.26,
+    "leg_full_z": 0.13,
+    "leg_max": 0.6,
+    "side_band_m": 0.02,
+    "note": "жилет — то же правило, что у пальто (кромка жилета лежит на внутренней стенке пальто, 0,18 мм: совпадающие точки — одинаковые веса)"
+   },
+   "tripo_part_7": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.L",
+     "leg_lower.L",
+     "foot.L"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_8": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_9": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.01,
+     0.008
+    ]
+   },
+   "tripo_part_10": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_11": {
+    "kind": "rigid",
+    "bone": "spine",
+    "note": "воротник рубашки жёстко на spine"
+   },
+   "tripo_part_12": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.01
+    ]
+   },
+   "tripo_part_13": {
+    "kind": "rigid",
+    "bone": "spine",
+    "note": "галстук жёстко на spine"
+   }
+  },
+  "seam_radius_m": 0.001,
+  "seam_pairs": [
+   [
+    "tripo_part_1",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_4"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_9"
+   ],
+   [
+    "tripo_part_9",
+    "tripo_part_8"
+   ],
+   [
+    "tripo_part_0",
+    "tripo_part_7"
+   ],
+   [
+    "tripo_part_0",
+    "tripo_part_10"
+   ],
+   [
+    "tripo_part_10",
+    "tripo_part_12"
+   ],
+   [
+    "tripo_part_5",
+    "tripo_part_3"
+   ],
+   [
+    "tripo_part_5",
+    "tripo_part_11"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_6"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_11"
+   ],
+   [
+    "tripo_part_6",
+    "tripo_part_0"
+   ],
+   [
+    "tripo_part_13",
+    "tripo_part_11"
+   ],
+   [
+    "tripo_part_13",
+    "tripo_part_6"
+   ]
+  ],
+  "continuity_radius_m": 0.0015,
+  "cloth_shell": {
+   "parts": [
+    "tripo_part_12"
+   ],
+   "offset_mm": 0.3,
+   "note": "П3-3: правая подошва Tripo (часть 12) — одинарная лента-рамка; в thigh_r_flex снизу видна её изнанка (187 px, разведка run2, после крышки sole_r_upper) — внутренняя копия 0,3 мм делает изнанку лицевой. Оболочка пальто (толстая двойная стенка) проверена и отклонена: копия выходит наружу на сгибах (arm_l_raise 238 px, thigh_r_flex 65 px против 3 и 1 px без неё)"
+  },
+  "junctions": [
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_4",
+    "band_m": 0.075,
+    "max_distance_mm": 1.0,
+    "note": "кромка правого рукава пальто — общая с предплечьем (часть 4, 0,06 мм): полоса пальто берёт веса цепочки руки, рукав пальто идёт за рукой. Подбор на разведке run2 (с закреплениями у жилета, воротника и брюк ниже): 0,052 → arm_r_raise 42 px, 0,055 → 21, 0,075 → 5, 0,1 → 3 px, но forearm_r_bend wrong_region (центроид уходит в пальто)"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_9",
+    "band_m": 0.1,
+    "max_distance_mm": 1.0,
+    "note": "кромка левого рукава пальто — общая с предплечьем (часть 9, 0,06 мм): рукав и пелерина у руки идут за рукой. Подбор run2: 0,05 → arm_l_raise 105 px, 0,06 → 61, 0,065 → 56, 0,08 → 78, 0,1 → 3 px (пробы 14/14); без закреплений ниже большая полоса тянула перед пальто и вырез у брюк (0,08 → 495 px, петли 19–42 мм)"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_6",
+    "band_m": 0.03,
+    "max_distance_mm": 1.0,
+    "note": "внутренний вырез пальто по кромке жилета (245 вершин ≤ 1 мм): после стыков рукавов полоса пальто у жилета возвращается к правилу жилета — перед пальто не тянется за рукой"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_11",
+    "band_m": 0.02,
+    "max_distance_mm": 1.0,
+    "note": "вырез пальто по воротнику рубашки (114 вершин ≤ 1 мм): полоса пальто у воротника — spine"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_0",
+    "band_m": 0.03,
+    "max_distance_mm": 1.0,
+    "note": "внутренний вырез пальто по открытой спине брюк (466 вершин ≤ 1 мм, z 0,157–0,326): после стыков рукавов полоса пальто 3 см берёт веса брюк (leg_chains) — кромки совпадают, левый рукав с полосой 0,1 не раскрывает вырез (без закрепления 0,08 → петля 15,7 мм); обратный стык брюки → пальто не нужен"
+   },
+   {
+    "part": "tripo_part_5",
+    "with": "tripo_part_11",
+    "band_m": 0.012,
+    "max_distance_mm": 2.0,
+    "note": "шея у ворота рубашки (образец — ворот Medusa/Angel)"
+   }
+  ]
+ },
+ "seams": {
+  "exposure_threshold_mm": 1.5,
+  "max_open_share": 0.05,
+  "loop_min_perimeter_cm": 1.0,
+  "raycast": {
+   "pitch_m": 0.0015,
+   "margin_m": 0.1,
+   "posed_clearance_m": 0.005
+  },
+  "frames_label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+  "note": "пробы seams по позам st_seams.TESTS; кадры — стыки Шерлока (рукава пальто и пелерины при подъёме рук, бёдра под полами, ворот, поясница)",
+  "frames": [
+   {
+    "name": "shoulder_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.07,
+     0.0,
+     0.4
+    ],
+    "dir": [
+     -1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.16
+   },
+   {
+    "name": "shoulder_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.07,
+     0.0,
+     0.4
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.16
+   },
+   {
+    "name": "sleeve_back_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.07,
+     0.03,
+     0.36
+    ],
+    "dir": [
+     0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.16
+   },
+   {
+    "name": "sleeve_back_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.07,
+     0.03,
+     0.38
+    ],
+    "dir": [
+     -0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.16
+   },
+   {
+    "name": "thigh_r",
+    "pose": "thigh_r_flex",
+    "target_m": [
+     -0.03,
+     -0.01,
+     0.22
+    ],
+    "dir": [
+     -0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "thigh_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.03,
+     -0.01,
+     0.22
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "collar_back",
+    "pose": "head_turn",
+    "target_m": [
+     0.0,
+     0.01,
+     0.47
+    ],
+    "dir": [
+     0.2,
+     1,
+     0.5
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "collar_front",
+    "pose": "head_turn",
+    "target_m": [
+     0.0,
+     -0.02,
+     0.465
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.4
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "forearm_l",
+    "pose": "forearm_l_bend",
+    "target_m": [
+     0.08,
+     -0.01,
+     0.33
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.18
+   },
+   {
+    "name": "spine_side",
+    "pose": "spine_bend_fwd",
+    "target_m": [
+     0.0,
+     0.0,
+     0.3
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.2
+    ],
+    "ortho_m": 0.62
+   },
+   {
+    "name": "waist_front",
+    "pose": "spine_bend_fwd",
+    "target_m": [
+     0.0,
+     -0.03,
+     0.32
+    ],
+    "dir": [
+     0.2,
+     -1,
+     0.3
+    ],
+    "ortho_m": 0.14
+   }
+  ],
+  "k2_frames": [
+   "arm_r_raise",
+   "arm_l_raise",
+   "head_turn",
+   "thigh_r_flex",
+   "thigh_l_flex",
+   "spine_bend_fwd"
+  ],
+  "max_new_blob_px": 8
+ },
+ "sockets": [
+  {
+   "name": "Weapon",
+   "bone": "weapon.R",
+   "target": "bone_head",
+   "location_uu": [
+    0,
+    0,
+    0
+   ]
+  },
+  {
+   "name": "Head",
+   "bone": "head",
+   "target_m": [
+    0.0,
+    0.002,
+    0.488
+   ],
+   "location_uu": null,
+   "note": "центр головы под кепи; смещение — прогноз в UE bone space (x, −y, z), живой замер — задача UE-этапа"
+  }
+ ],
+ "exports": {
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "skeletal_fbx": "SK_SherlockHolmes_H2.fbx",
+  "base_fbx": "SM_SherlockHolmes_H2_Base.fbx"
+ },
+ "meshes": {
+  "body": "SK_SherlockHolmes_H2_Body",
+  "base": "SM_SherlockHolmes_H2_Base"
+ },
+ "materials": {
+  "atlas": "M_SherlockHolmes_H2_Atlas",
+  "slots_note": "один слот на фигуре (тело с лупой) и один на подставке — тот же атлас; ≤ 2 слота"
+ },
+ "axes": {
+  "blender_front": "-Y",
+  "blender_bow_side": "-X",
+  "expected_ue_front": "+X",
+  "expected_ue_bow_side": "+Y",
+  "note": "описательные (код их не читает): правша, лупа на −X (new-character-registration.md Д-1)"
+ },
+ "preview": {
+  "concepts": {
+   "front": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png",
+   "side": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-side.png",
+   "back": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-back.png"
+  },
+  "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+  "k2": {
+   "fov_deg_horizontal": 35,
+   "pitch_deg": -55,
+   "distances_uu": {
+    "k2-5x": 386.0,
+    "k2-1p6": 1207.0
+   },
+   "focus_z_m": 0.28,
+   "resolution": [
+    1920,
+    1080
+   ],
+   "source": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/frames/p17-k2-5x-medusa-ue-editor.evidence.json, p17-k2-1p6-medusa-ue-editor.evidence.json"
+  },
+  "samples": 64,
+  "label": "blender (Cycles), не игровой свет; у H2 задние грани отсечены (как UE one-sided)",
+  "closeups": [
+   {
+    "name": "face_front",
+    "target_m": [
+     0.0,
+     -0.03,
+     0.485
+    ],
+    "dir": [
+     0,
+     -1,
+     0.05
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "face_3q",
+    "target_m": [
+     0.0,
+     -0.025,
+     0.485
+    ],
+    "dir": [
+     -0.6,
+     -0.8,
+     0.1
+    ],
+    "ortho_m": 0.1
+   },
+   {
+    "name": "cap",
+    "target_m": [
+     0.0,
+     0.0,
+     0.525
+    ],
+    "dir": [
+     0.6,
+     -0.8,
+     0.3
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "magnifier",
+    "target_m": [
+     -0.087,
+     -0.09,
+     0.43
+    ],
+    "dir": [
+     -0.3,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.11
+   },
+   {
+    "name": "hand_l",
+    "target_m": [
+     0.105,
+     -0.035,
+     0.29
+    ],
+    "dir": [
+     0.4,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.08
+   },
+   {
+    "name": "waistcoat",
+    "target_m": [
+     0.0,
+     -0.035,
+     0.38
+    ],
+    "dir": [
+     0,
+     -1,
+     0.05
+    ],
+    "ortho_m": 0.14
+   },
+   {
+    "name": "shoe_l",
+    "target_m": [
+     0.054,
+     -0.01,
+     0.08
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "coat_back",
+    "target_m": [
+     0.0,
+     0.05,
+     0.31
+    ],
+    "dir": [
+     0,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.42
+   }
+  ],
+  "backface_culling": true,
+  "pose_closeups": [],
+  "channel_views": [
+   {
+    "name": "metallic",
+    "channel": "Blue",
+    "view": "front"
+   },
+   {
+    "name": "metallic",
+    "channel": "Blue",
+    "view": "back"
+   },
+   {
+    "name": "roughness",
+    "channel": "Green",
+    "view": "front"
+   }
+  ],
+  "frame": {
+   "checks_report": "art/imagegen/concept-sherlock-holmes-codex/checks-report.json",
+   "side": "left"
+  }
+ },
+ "proposed_budget": {
+  "status": "предложено",
+  "hero_triangles": [
+   30000,
+   45000
+  ],
+  "atlas_master_px": 4096,
+  "atlas_runtime_px": 2048,
+  "material_slots_max": 2,
+  "source": "asset-card.yaml POLY_BUDGET (figure ≤ 45 000, base ≤ 2 500), HANDBOOK §2.10"
+ },
+ "history": {
+  "previous_profiles": [],
+  "note": "первый профиль героя; разведка — C:/tmp/sherlock-holmes-stage3-scout (run1, run2: части, сечения, петли, подбор стыков весов), удалена после отчёта"
+ }
+}
