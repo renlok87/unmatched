@@ -194,3 +194,103 @@ CORRECTION (fix only this; everything above still applies):
 Каждый кандидат и финальный выбранный дизайн проверены отдельным запуском скрипта: код 0, 12 PASS, 1 WARN, 0 FAIL. Верхний отступ g4 — 3,384% при требовании не менее 4%; WARN разрешён и не служит причиной повтора. Низ подставки — 93,094% вместо цели 93%, центр — 49,862% вместо 50%. Фон слегка неоднороден по тону; автоматические проверки его ровности и нейтральности пройдены. По приближённой маске диаметр подставки составляет около 0,617 высоты фигуры без подставки при словесной цели около 0,55. Эти ограничения отражены в verification.json.
 
 Использовано 2 из 2 генераций fix1; всего 4 генерации design-front с учётом предыдущего запуска. limit_reached пуст: у выбранного g4 нет непройденных пунктов CHECKLIST. Только исходный QUALITY_REFERENCE передавался как изображение; отклонённый дизайн не использовался как вход. Исходные файлы не изменены. Все PNG — побайтовые копии оригиналов image_gen, без ретуши, кадрирования или перекодирования. Статус — «предложено»; окончательную приёмку выполняет приёмщик.
+
+
+## Stage 1c (2026-10-21)
+
+Exact texts: prompts/concept-prompts.json keys 1c/<view>/g<N>; copies in docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/muhammad-ali-1c-<view>.txt.
+
+### muhammad-ali-front-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/orthos/ortho_front.png, art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, FRONT
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Muhammad Ali, the heavyweight boxing champion (Unmatched: Muhammad Ali vs Bruce Lee): tall athletic boxer in white satin trunks with a black stripe, red boxing gloves, white boxing boots, confident guard stance.
+IDENTITY ANCHORS, where visible from this side: white satin boxing trunks; red boxing gloves; white boxing boots; guard stance.
+PALETTE: trunks white #ECEAE4, gloves red #B3202A, skin dark #5A3B2A, accent stripe black #141414. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: FRONT: strict front orthographic view, the figure faces the camera, no three-quarter turn.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x16.5%-83.5%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### muhammad-ali-side-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/orthos/ortho_left.png, art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, LEFT SIDE
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Muhammad Ali, the heavyweight boxing champion (Unmatched: Muhammad Ali vs Bruce Lee): tall athletic boxer in white satin trunks with a black stripe, red boxing gloves, white boxing boots, confident guard stance.
+IDENTITY ANCHORS, where visible from this side: white satin boxing trunks; red boxing gloves; white boxing boots; guard stance.
+PALETTE: trunks white #ECEAE4, gloves red #B3202A, skin dark #5A3B2A, accent stripe black #141414. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: LEFT SIDE: strict profile, the figure's OWN left side faces the camera, its face toward the left edge of the image, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x16.6%-83.4%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### muhammad-ali-back-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/orthos/ortho_back.png, art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png, art/imagegen/concept-muhammad-ali-codex/concepts/muhammad-ali-side-g1.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, BACK
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+Image 3 is the finished side view of the SAME miniature, for continuity of colours and details only.
+SUBJECT: Muhammad Ali, the heavyweight boxing champion (Unmatched: Muhammad Ali vs Bruce Lee): tall athletic boxer in white satin trunks with a black stripe, red boxing gloves, white boxing boots, confident guard stance.
+IDENTITY ANCHORS, where visible from this side: white satin boxing trunks; red boxing gloves; white boxing boots; guard stance.
+PALETTE: trunks white #ECEAE4, gloves red #B3202A, skin dark #5A3B2A, accent stripe black #141414. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: BACK: camera directly behind, no face visible, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x16.5%-83.5%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### muhammad-ali-front-g2
+
+referenced_image_paths: art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/orthos/ortho_front.png, art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, FRONT
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Muhammad Ali, the heavyweight boxing champion (Unmatched: Muhammad Ali vs Bruce Lee): tall athletic boxer in white satin trunks with a black stripe, red boxing gloves, white boxing boots, confident guard stance.
+IDENTITY ANCHORS, where visible from this side: white satin boxing trunks; red boxing gloves; white boxing boots; guard stance.
+PALETTE: trunks white #ECEAE4, gloves red #B3202A, skin dark #5A3B2A, accent stripe black #141414. No weapon or held object.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: FRONT: strict front orthographic view, the figure faces the camera, no three-quarter turn.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x16.5%-83.5%, pedestal top y84.1%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+CORRECTION (fix only this; everything above still applies):
+- set.bg_same: the background is too light (about RGB 46,46,46) -> plain flat very dark charcoal gray, about RGB 33,33,34, darker than images 1 and 2
+```

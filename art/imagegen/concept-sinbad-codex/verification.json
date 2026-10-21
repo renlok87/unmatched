@@ -294,5 +294,82 @@
       "note": "Split into smaller Python commands; rejected command did not start."
     }
   ],
-  "history_preserved": true
+  "history_preserved": true,
+  "stage_1c": {
+    "date": "2026-10-21",
+    "generator": "Gemini app (Pro, Create images, 3:4) via gemini.google.com in Chrome (Claude in Chrome)",
+    "why_this_route": "fictional character: Gemini route per brief",
+    "inputs_unchanged": true,
+    "draft_1b": {
+      "task_id": "6e4a6849-31bf-45c8-88ed-0688f05c999f",
+      "run": "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo",
+      "orthos": "orthos/ortho_{front,left,back,right}.png"
+    },
+    "checks": [
+      {
+        "view": "front",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-sinbad-codex/checks/front-g1/checks-report.json"
+      },
+      {
+        "view": "side",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-sinbad-codex/checks/side-g1/checks-report.json"
+      },
+      {
+        "view": "back",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-sinbad-codex/checks/back-g1/checks-report.json"
+      },
+      {
+        "view": "set",
+        "generation": "final",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-sinbad-codex/checks-report.json",
+        "final": true
+      },
+      {
+        "view": "set",
+        "generation": "facing",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-sinbad-codex/checks/set-facing/checks-report.json",
+        "note": "same set with --side-ortho ortho_left.png (view.facing); main report is without --side-ortho (F9)"
+      }
+    ],
+    "selected": {
+      "front": 1,
+      "side": 1,
+      "back": 1
+    },
+    "checklist": [
+      {
+        "view": "front",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "scimitar in the figure RIGHT hand (viewer left), scabbard on the LEFT hip, turban with blue sash, blue vest and gold trim; one figure, one dark pedestal; plain dark background; no text or watermark"
+      },
+      {
+        "view": "side",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict left profile, face toward the left edge, scimitar forward, scabbard on the near (left) hip; pedestal edge-on; no text or watermark"
+      },
+      {
+        "view": "back",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict back view, no face, scimitar on the viewer right, scabbard on the viewer left hip, turban tail; no text or watermark"
+      }
+    ],
+    "executor": "launching agent (Claude, Sonnet): Claude in Chrome tab, no mouse and no desktop tools",
+    "generations_per_view": {
+      "front": 1,
+      "side": 1,
+      "back": 1
+    },
+    "limit_reached": []
+  }
 }

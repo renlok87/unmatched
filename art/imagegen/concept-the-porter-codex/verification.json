@@ -162,5 +162,82 @@
       "sha256": "b3c26cedf761730b1600ad9fbebab3315776a8a6f969b55ac15326e8d7a37f97",
       "matches_original": true
     }
-  ]
+  ],
+  "stage_1c": {
+    "date": "2026-10-21",
+    "generator": "Gemini app (Pro, Create images, 3:4) via gemini.google.com in Chrome (Claude in Chrome)",
+    "why_this_route": "fictional character: Gemini route per brief",
+    "inputs_unchanged": true,
+    "draft_1b": {
+      "task_id": "c0d0e060-5a3d-47ba-9c42-76abf7a04d51",
+      "run": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo",
+      "orthos": "orthos/ortho_{front,left,back,right}.png"
+    },
+    "checks": [
+      {
+        "view": "front",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-the-porter-codex/checks/front-g1/checks-report.json"
+      },
+      {
+        "view": "side",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-the-porter-codex/checks/side-g1/checks-report.json"
+      },
+      {
+        "view": "back",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-the-porter-codex/checks/back-g1/checks-report.json"
+      },
+      {
+        "view": "set",
+        "generation": "final",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-the-porter-codex/checks-report.json",
+        "final": true
+      },
+      {
+        "view": "set",
+        "generation": "facing",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-the-porter-codex/checks/set-facing/checks-report.json",
+        "note": "same set with --side-ortho ortho_left.png (view.facing); main report is without --side-ortho (F9)"
+      }
+    ],
+    "selected": {
+      "front": 1,
+      "side": 1,
+      "back": 1
+    },
+    "checklist": [
+      {
+        "view": "front",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "club in the figure RIGHT hand (viewer left), wicker basket bundle behind the shoulders, red headcloth, patched brown tunic; one figure, one pedestal; no text or watermark"
+      },
+      {
+        "view": "side",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict left profile, face toward the left edge, club forward, basket on the back, red headcloth; no text or watermark"
+      },
+      {
+        "view": "back",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict back view, basket hides the head except the red headcloth top (as in the draft), club on the viewer right; no text or watermark"
+      }
+    ],
+    "executor": "launching agent (Claude, Sonnet): Claude in Chrome tab, no mouse and no desktop tools",
+    "generations_per_view": {
+      "front": 1,
+      "side": 1,
+      "back": 1
+    },
+    "limit_reached": []
+  }
 }

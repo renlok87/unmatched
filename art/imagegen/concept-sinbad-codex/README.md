@@ -25,3 +25,8 @@ g3: верх маски y=4,420%, низ y=95,304% вместо 93%, центр 
 Все записи исполнителя находятся внутри пакета. Оригиналы image_gen оставлены на месте и записаны абсолютными original_path; остальные пути записей относительны корню репозитория. git, Unreal, Tripo, SYNTX и загрузки не использовались. Фоновые процессы не запускались, команды Python завершились.
 
 Точные промпты — prompts.md и prompts/concept-prompts.json. manifest-sha256.json записан последним.
+
+
+## Этап 1c (2026-10-21)
+
+Виды front/side/back нарисованы поверх ортопроекций черновика 1b (`art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/orthos`, задача Tripo 6e4a6849) через Gemini (приложение, Pro, режим изображений, 3:4). Промпты — CORE-FRONT/SIDE/BACK дословно (`prompts/concept-prompts.json`, ключи `1c/<вид>/g<N>`); входы: орто 1b и утверждённый дизайн-front (у back ещё готовый side). Gemini отдаёт JPEG 1792x2400; в пакете он конвертирован в PNG без изменения размера (`concepts/*-original.jpeg` хранятся). Генераций: по одной на вид. check_concept_views.py: 33 PASS, 0 WARN, 0 FAIL (основной отчёт без --side-ortho, проверка ракурса — `checks/set-facing/`). Статус: предложено.

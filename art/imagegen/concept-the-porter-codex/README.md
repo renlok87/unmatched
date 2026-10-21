@@ -15,3 +15,8 @@
 Входы — только эталон качества Medusa и palette.json. Их SHA-256 до и после совпадают. Оба результата скопированы побайтно в concepts/; оригиналы image_gen оставлены на месте и указаны в generation-records.json. Существовавший palette.json сохранён без изменений. Все записи пакета выполнены Python в UTF-8 без BOM. Изменений файлов репозитория за пределами пакета нет; копии, которые сохраняет сам image_gen вне репозитория, разрешены контрактом.
 
 README, точные промпты, журнал каждой генерации, все три отчёта проверок, verification.json и manifest-sha256.json включены в пакет.
+
+
+## Этап 1c (2026-10-21)
+
+Виды front/side/back нарисованы поверх ортопроекций черновика 1b (`art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/orthos`, задача Tripo c0d0e060) через Gemini (приложение, Pro, режим изображений, 3:4). Промпты — CORE-FRONT/SIDE/BACK дословно (`prompts/concept-prompts.json`, ключи `1c/<вид>/g<N>`); входы: орто 1b и утверждённый дизайн-front (у back ещё готовый side). Gemini отдаёт JPEG 1792x2400; в пакете он конвертирован в PNG без изменения размера (`concepts/*-original.jpeg` хранятся). Генераций: по одной на вид. check_concept_views.py: 33 PASS, 0 WARN, 0 FAIL (основной отчёт без --side-ortho, проверка ракурса — `checks/set-facing/`). Статус: предложено.

@@ -30,7 +30,152 @@
   },
   "run_id": "generation-request",
   "schema": "unmatched.tripo-pipeline.run/1",
-  "sources": {},
+  "sources": {
+    "tripo-6e4a6849-draft": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/reports/tripo-run.json",
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "2bef08211ef0b08a2d1e93fe398f6281a66371f962c2b4edd8ddf3af6f0b0dce"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 45212176,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, unmodified",
+          "path": "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/source/sinbad-draft-tripo-6e4a6849.glb",
+          "produced_by": "generate",
+          "role": "draft-glb",
+          "sha256": "f03fdf28a832a1cb20f096f9c933a7e42941f0e0ec98c0608bc0b8e4900fc796",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1883833
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1883833
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+          "present": true,
+          "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 30.0
+      },
+      "registered_at": "2026-10-21T06:43:37+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-SINBAD-001",
+        "date": "2026-10-13",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "draft-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1883833
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 45212176,
+            "expected_sha256": "f03fdf28a832a1cb20f096f9c933a7e42941f0e0ec98c0608bc0b8e4900fc796",
+            "in_git": false,
+            "origin": "Studio GLB export, unmodified",
+            "path": "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/source/sinbad-draft-tripo-6e4a6849.glb",
+            "produced_by": "generate",
+            "role": "draft-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-sinbad-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "single-image",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": false,
+            "output": "Геометрия и текстура (по умолчанию формы)",
+            "parts_mode": null,
+            "pbr": false,
+            "polygon_count": null,
+            "privacy": true,
+            "remove_lighting": null,
+            "seed": null,
+            "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный",
+            "texture_8k": false,
+            "topology": null,
+            "ultra_mesh_quality": null
+          },
+          "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+          "views": {
+            "back": null,
+            "front": {
+              "path": "art/imagegen/concept-sinbad-codex/design/sinbad-front.png",
+              "sha256": "7d39d358987f43d10f9613d0843ee6754356acd14c2aa707a631e062ad1c7cfe"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+        "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 13450.0,
+              "balance_before": 13480.0,
+              "observed_debit": 30.0,
+              "quoted": 30.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+            "op": "generate"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-6e4a6849-draft",
+        "task_id": "6e4a6849-31bf-45c8-88ed-0688f05c999f",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/6e4a6849-31bf-45c8-88ed-0688f05c999f"
+      },
+      "spec_sha256": "c371d2c01bc9148c4393cf7e46ddf3f0b9cc2a9e7ac0b2e5349bf587231076b1"
+    }
+  },
   "stages": {},
   "status_legend": {
     "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",

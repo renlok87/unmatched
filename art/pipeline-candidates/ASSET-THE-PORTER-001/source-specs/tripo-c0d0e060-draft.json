@@ -1,0 +1,87 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-c0d0e060-draft",
+  "asset_id": "ASSET-THE-PORTER-001",
+  "service": "tripo-studio",
+  "task_id": "c0d0e060-5a3d-47ba-9c42-76abf7a04d51",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/c0d0e060-5a3d-47ba-9c42-76abf7a04d51",
+  "date": "2026-10-13",
+  "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "single-image",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-the-porter-codex/design/the-porter-front.png",
+        "sha256": "b3c26cedf761730b1600ad9fbebab3315776a8a6f969b55ac15326e8d7a37f97"
+      },
+      "left": null,
+      "right": null,
+      "back": null
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-the-porter-codex/prompts.md",
+    "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+    "settings": {
+      "output": "Геометрия и текстура (по умолчанию формы)",
+      "generate_parts": false,
+      "parts_mode": null,
+      "ultra_mesh_quality": null,
+      "polygon_count": null,
+      "texture_8k": false,
+      "remove_lighting": null,
+      "pbr": false,
+      "privacy": true,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30.0,
+        "observed_debit": 30.0,
+        "balance_before": 13400.0,
+        "balance_after": 13370.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "draft-glb",
+      "path": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/source/the-porter-draft-tripo-c0d0e060.glb",
+      "expected_sha256": "ae01779f9f2dcdb5c53e4a77259d5ebeb617e6af5391e4bf3e9d6c28e7c37455",
+      "expected_bytes": 47492620,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+  "expectations": {
+    "draft-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1978848,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

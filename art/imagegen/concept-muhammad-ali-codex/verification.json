@@ -871,5 +871,95 @@
     "art/imagegen/concept-muhammad-ali-codex/README.md",
     "art/imagegen/concept-muhammad-ali-codex/source-hashes-before.json",
     "art/imagegen/concept-muhammad-ali-codex/verification.json"
-  ]
+  ],
+  "stage_1c": {
+    "date": "2026-10-21",
+    "generator": "Tripo Studio Image (GPT Image 2, 3:4, 1 image per run, Free quota price 0)",
+    "why_this_route": "real person: Gemini refuses (F2); Tripo Studio Image GPT Image 2 route (F8)",
+    "inputs_unchanged": true,
+    "draft_1b": {
+      "task_id": "5aa70723-1d60-47c4-89c0-33159df78346",
+      "run": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo",
+      "orthos": "orthos/ortho_{front,left,back,right}.png"
+    },
+    "checks": [
+      {
+        "view": "front",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks/front-g1/checks-report.json"
+      },
+      {
+        "view": "side",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks/side-g1/checks-report.json"
+      },
+      {
+        "view": "back",
+        "generation": 1,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks/back-g1/checks-report.json"
+      },
+      {
+        "view": "front",
+        "generation": 2,
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks/front-g2/checks-report.json"
+      },
+      {
+        "view": "set",
+        "generation": 1,
+        "exit_code": 1,
+        "report": null,
+        "note": "first set run (front g1 + side g1 + back g1): FAIL set.bg_same 14.0 > 12, WARN set.base_bottom 1.693; report overwritten by the final run, the run is described here only"
+      },
+      {
+        "view": "set",
+        "generation": "final",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+        "final": true
+      },
+      {
+        "view": "set",
+        "generation": "facing",
+        "exit_code": 0,
+        "report": "art/imagegen/concept-muhammad-ali-codex/checks/set-facing/checks-report.json",
+        "note": "same set with --side-ortho ortho_left.png (view.facing); main report is without --side-ortho (F9)"
+      }
+    ],
+    "selected": {
+      "side": 1,
+      "back": 1,
+      "front": 2
+    },
+    "checklist": [
+      {
+        "view": "front",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "guard stance with both red gloves up, white trunks with black stripe, white boots; no weapon; one figure on one pedestal; no text or watermark. g1 background RGB 46 (set.bg_same FAIL), g2 with a 1-line CORRECTION is darker and the set passes; g2 face drifted slightly from the design (accepted, identity anchors intact)"
+      },
+      {
+        "view": "side",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict left profile, face toward the left edge, near (left) glove raised; no weapon; no text or watermark"
+      },
+      {
+        "view": "back",
+        "item": "silhouette, pose and framing of the ortho kept; identity of the approved design; plain dark background; no text or watermark; weapon side",
+        "passed": true,
+        "note": "strict back view, no face; gloves seen from behind; no weapon; no text or watermark"
+      }
+    ],
+    "executor": "launching agent (Claude, Sonnet): Claude in Chrome tab, no mouse and no desktop tools",
+    "generations_per_view": {
+      "front": 2,
+      "side": 1,
+      "back": 1
+    },
+    "limit_reached": []
+  }
 }

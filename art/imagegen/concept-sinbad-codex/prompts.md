@@ -172,3 +172,78 @@ CORRECTION (fix only this; everything above still applies):
 fix1 затрагивает только design-front; межвидовое соответствие не проверялось. Совпадают якоря личности, сторона скимитара, палитра, тип одежды, нейтральная стойка и двухдисковая подставка; лицо, складки, орнамент и форма оружия менялись между независимыми генерациями. CORE неизменён. g3 получила предоставленную CORRECTION S design-front и устранила второй меч; g4 получила только коррекцию проваленного пункта CHECKLIST о подставке ребром.
 
 Выбрана g3: ножны пусты, основной дефект r1 исправлен. У g3 остаётся визуальный FAIL CHECKLIST: узкая верхняя плоскость подставки видна. У g4 подставка ребром, но второй меч вернулся. Оба кандидатных прогона и финальный прогон g3 — код 0, 13 PASS, 0 WARN, 0 FAIL. Это не заменяет визуальный CHECKLIST и не является acceptance. Лимит fix1 2/2, суммарно 4/4; непройденный пункт g3 записан в verification.json#limit_reached. Низ подставки g3 y=95,304% вместо 93%; её диаметр визуально около 0,63 высоты фигуры вместо about 0.55. PNG не изменены.
+
+
+## Stage 1c (2026-10-21)
+
+Exact texts: prompts/concept-prompts.json keys 1c/<view>/g<N>; copies in docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/sinbad-1c-<view>.txt.
+
+### sinbad-front-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/orthos/ortho_front.png, art/imagegen/concept-sinbad-codex/design/sinbad-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, FRONT
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Sinbad the Sailor: weathered adult seafarer with a short black beard, white turban with a blue sash, open sleeveless vest over a loose shirt, wide sash belt, baggy trousers, curled slippers; curved scimitar in his RIGHT hand, scabbard on his LEFT hip.
+IDENTITY ANCHORS, where visible from this side: scimitar in the figure's own RIGHT hand; white turban; wide blue sash belt; scabbard on the LEFT hip.
+PALETTE: sail white #E6DCC6, sea blue #2E5C8A, sun-bleached tan #B8935E, accent gold trim #D4A63A. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: FRONT: strict front orthographic view, the figure faces the camera, no three-quarter turn.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x15.9%-84.1%, pedestal top y85.0%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### sinbad-side-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/orthos/ortho_left.png, art/imagegen/concept-sinbad-codex/design/sinbad-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, LEFT SIDE
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: Sinbad the Sailor: weathered adult seafarer with a short black beard, white turban with a blue sash, open sleeveless vest over a loose shirt, wide sash belt, baggy trousers, curled slippers; curved scimitar in his RIGHT hand, scabbard on his LEFT hip.
+IDENTITY ANCHORS, where visible from this side: scimitar in the figure's own RIGHT hand; white turban; wide blue sash belt; scabbard on the LEFT hip.
+PALETTE: sail white #E6DCC6, sea blue #2E5C8A, sun-bleached tan #B8935E, accent gold trim #D4A63A. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: LEFT SIDE: strict profile, the figure's OWN left side faces the camera, its face toward the left edge of the image, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x16.8%-83.2%, pedestal top y85.0%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### sinbad-back-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-SINBAD-001/20261013-draft-tripo/orthos/ortho_back.png, art/imagegen/concept-sinbad-codex/design/sinbad-front.png, art/imagegen/concept-sinbad-codex/concepts/sinbad-side-g1.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, BACK
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+Image 3 is the finished side view of the SAME miniature, for continuity of colours and details only.
+SUBJECT: Sinbad the Sailor: weathered adult seafarer with a short black beard, white turban with a blue sash, open sleeveless vest over a loose shirt, wide sash belt, baggy trousers, curled slippers; curved scimitar in his RIGHT hand, scabbard on his LEFT hip.
+IDENTITY ANCHORS, where visible from this side: scimitar in the figure's own RIGHT hand; white turban; wide blue sash belt; scabbard on the LEFT hip.
+PALETTE: sail white #E6DCC6, sea blue #2E5C8A, sun-bleached tan #B8935E, accent gold trim #D4A63A. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: BACK: camera directly behind, no face visible, no three-quarter view. The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x15.9%-84.1%, pedestal top y85.0%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```

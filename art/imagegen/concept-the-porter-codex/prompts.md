@@ -92,3 +92,78 @@ CORRECTION (fix only this; everything above still applies):
 CORE одинаков. В g2 добавлена только CORRECTION из двух строк: подставка ребром без видимой верхней плоскости; ровный фон. Из-за новой генерации изменились выражение лица, детали одежды и заплат, содержимое корзины и положение дубинки. Изображения не ретушировались, не обрезались, не масштабировались и не пересохранялись.
 
 g1: скрипт PASS, визуально не выполнены требования к подставке и фону. g2: скрипт PASS и все 6 пунктов CHECKLIST выполнены. Подставка g2 шире ориентировочного отношения 0,55 из CORE (визуальная оценка около 0,67); параметры камеры из растрового изображения не доказать.
+
+
+## Stage 1c (2026-10-21)
+
+Exact texts: prompts/concept-prompts.json keys 1c/<view>/g<N>; copies in docs/art-pipeline/evidence/skill-batch-2026-10-20/gemini/the-porter-1c-<view>.txt.
+
+### the-porter-front-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/orthos/ortho_front.png, art/imagegen/concept-the-porter-codex/design/the-porter-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, FRONT
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: The Porter, Sinbad's loyal companion: sturdy middle-aged man in a patched brown tunic and headcloth, large wicker basket bundle strapped to his back, short club in his RIGHT hand.
+IDENTITY ANCHORS, where visible from this side: short wooden club in the figure's own RIGHT hand; wicker basket on the back; headcloth.
+PALETTE: patched brown #7B5B3A, wicker #B79A62, dusty cream #D8CBAF, accent red headcloth #A8382E. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: FRONT: strict front orthographic view, the figure faces the camera, no three-quarter turn.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x13.3%-86.7%, pedestal top y85.5%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### the-porter-side-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/orthos/ortho_left.png, art/imagegen/concept-the-porter-codex/design/the-porter-front.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, LEFT SIDE
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+SUBJECT: The Porter, Sinbad's loyal companion: sturdy middle-aged man in a patched brown tunic and headcloth, large wicker basket bundle strapped to his back, short club in his RIGHT hand.
+IDENTITY ANCHORS, where visible from this side: short wooden club in the figure's own RIGHT hand; wicker basket on the back; headcloth.
+PALETTE: patched brown #7B5B3A, wicker #B79A62, dusty cream #D8CBAF, accent red headcloth #A8382E. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: LEFT SIDE: strict profile, the figure's OWN left side faces the camera, its face toward the left edge of the image, no three-quarter view.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x13.2%-86.8%, pedestal top y85.5%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```
+
+### the-porter-back-g1
+
+referenced_image_paths: art/pipeline-candidates/ASSET-THE-PORTER-001/20261013-draft-tripo/orthos/ortho_back.png, art/imagegen/concept-the-porter-codex/design/the-porter-front.png, art/imagegen/concept-the-porter-codex/concepts/the-porter-side-g1.png
+
+```text
+Use case: style-transfer. Image 1 is the EDIT TARGET: the draft 3D model of this miniature, BACK
+orthographic render. Paint directly over it. Keep exactly its silhouette, pose, proportions, arm and weapon positions, hand grip, pedestal shape, scale and framing.
+Image 2 is the APPROVED FRONT DESIGN of the SAME miniature: transfer its identity, face, costume, materials, colours,
+ornament and painted detail level onto image 1. Do not copy its pose, proportions, framing or camera.
+Image 3 is the finished side view of the SAME miniature, for continuity of colours and details only.
+SUBJECT: The Porter, Sinbad's loyal companion: sturdy middle-aged man in a patched brown tunic and headcloth, large wicker basket bundle strapped to his back, short club in his RIGHT hand.
+IDENTITY ANCHORS, where visible from this side: short wooden club in the figure's own RIGHT hand; wicker basket on the back; headcloth.
+PALETTE: patched brown #7B5B3A, wicker #B79A62, dusty cream #D8CBAF, accent red headcloth #A8382E. The weapon is held in the figure's own RIGHT hand, which appears on the viewer's LEFT in the front view.
+PEDESTAL: paint it as the dark stone pedestal of the approved design (image 2), two low stacked discs with plain bevelled edges; keep the shape and size of image 1 but not its light grey draft material; no coloured ring and no metal band.
+VIEW: BACK: camera directly behind, no face visible, no three-quarter view. The weapon in the figure's own RIGHT hand appears on the viewer's RIGHT.
+FRAMING: the same portrait aspect ratio 3:4 and the same framing as image 1, uniform scale only: pedestal x13.3%-86.7%, pedestal top y85.5%, pedestal bottom y94.0%, highest point
+y4.0%. The whole subject and the whole pedestal visible.
+BACKGROUND AND LIGHT: plain flat neutral dark charcoal gray background like image 1, no gradient, no vignette, no cast
+shadow on the background; soft even studio lighting like image 2, no strong rim light.
+Surface detail only, inside the existing silhouette: no new silhouette elements, no added anatomy, do not create a new
+weapon; keep thin parts readable.
+No perspective, text, labels, watermark, cropping, collage or extra objects. Output one single image.
+```

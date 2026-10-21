@@ -1,0 +1,278 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-10-21T07:12:23+00:00",
+  "set": "art/imagegen/concept-muhammad-ali-codex",
+  "key": "muhammad-ali",
+  "role": "hero",
+  "views": [
+    "side"
+  ],
+  "inputs": [
+    {
+      "view": "side",
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+      "sha256": "3a9330fab24eb07b80dd000d9dfb01cac682cef3242a1b5e7ffea6dbdbbcb10f",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1152,
+        1536
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "measurements": {
+    "side": {
+      "size": [
+        1152,
+        1536
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 23,
+        "median_rgb": [
+          33.0,
+          33.0,
+          34.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 5.0,
+        "neutral_delta": 1.0,
+        "luma": 33.1
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.08,
+          0.98,
+          1.04
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 17.76,
+        "filled_area_pct": 17.76,
+        "components_kept": 1,
+        "main_component_pct": 17.76,
+        "other_components_pct": [
+          0.002,
+          0.002,
+          0.001
+        ],
+        "bbox_px": [
+          190,
+          58,
+          955,
+          1455
+        ],
+        "top_pct": 3.776,
+        "bottom_pct": 94.727,
+        "left_pct": 16.493,
+        "right_pct": 82.899,
+        "height_pct": 90.951,
+        "base_center_x_pct": 49.696,
+        "base_width_pct": 66.406,
+        "base_top_pct_est": 84.505
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "side": [
+            1152,
+            1536
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "side": [
+          1152,
+          1536
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 5.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        33.0,
+        33.0,
+        34.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 33.1,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 17.76,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 3.776,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 94.727,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 16.493,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        0.002,
+        0.002,
+        0.001
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    }
+  ],
+  "summary": {
+    "PASS": 12,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-muhammad-ali-codex/palette.json",
+    "asset_id": null,
+    "swatches": [
+      {
+        "name": "trunks white",
+        "hex": "#ECEAE4",
+        "role": "main",
+        "figure_share_within_40_pct": 7.5
+      },
+      {
+        "name": "gloves red",
+        "hex": "#B3202A",
+        "role": "main",
+        "figure_share_within_40_pct": 2.07
+      },
+      {
+        "name": "skin dark",
+        "hex": "#5A3B2A",
+        "role": "main",
+        "figure_share_within_40_pct": 32.02
+      },
+      {
+        "name": "stripe black",
+        "hex": "#141414",
+        "role": "accent",
+        "figure_share_within_40_pct": 14.71
+      }
+    ]
+  },
+  "sheet": null
+}

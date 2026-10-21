@@ -30,7 +30,152 @@
   },
   "run_id": "generation-request",
   "schema": "unmatched.tripo-pipeline.run/1",
-  "sources": {},
+  "sources": {
+    "tripo-5aa70723-draft": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/reports/tripo-run.json",
+          "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "path": "docs/game-design/visual/credits-ledger.json",
+          "sha256": "f99b85a23654fb63b798e8b89ebdd1a5aee9ece12c63fcb312607730baae0bf0"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 46617520,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, unmodified",
+          "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/source/muhammad-ali-draft-tripo-5aa70723.glb",
+          "produced_by": "generate",
+          "role": "draft-glb",
+          "sha256": "3da0d98caa5dd52250c43b59ed7765e3943556037c8fe9231439e6525f057b02",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1942349
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1942349
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png",
+          "present": true,
+          "sha256": "4a0710192b7366e7bb71e5c3555eee5a4e90ab259b60b758fb23fa29f9ce1bea",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 30.0
+      },
+      "registered_at": "2026-10-21T06:48:19+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-MUHAMMAD-ALI-001",
+        "date": "2026-10-13",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/reports/tripo-run.json",
+          "docs/game-design/visual/credits-ledger.json"
+        ],
+        "expectations": {
+          "draft-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1942349
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 46617520,
+            "expected_sha256": "3da0d98caa5dd52250c43b59ed7765e3943556037c8fe9231439e6525f057b02",
+            "in_git": false,
+            "origin": "Studio GLB export, unmodified",
+            "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/source/muhammad-ali-draft-tripo-5aa70723.glb",
+            "produced_by": "generate",
+            "role": "draft-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/concept-muhammad-ali-codex/prompts.md",
+          "input_manifest": null,
+          "mode": "single-image",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": false,
+            "output": "Геометрия и текстура (по умолчанию формы)",
+            "parts_mode": null,
+            "pbr": false,
+            "polygon_count": null,
+            "privacy": true,
+            "remove_lighting": null,
+            "seed": null,
+            "settings_note": "форма HD модель по умолчанию, по частям выкл., 8K выкл., Приватный",
+            "texture_8k": false,
+            "topology": null,
+            "ultra_mesh_quality": null
+          },
+          "slot_note": "черновик: один дизайн-front (tripo3d-stages.md §5.2)",
+          "views": {
+            "back": null,
+            "front": {
+              "path": "art/imagegen/concept-muhammad-ali-codex/design/muhammad-ali-front.png",
+              "sha256": "4a0710192b7366e7bb71e5c3555eee5a4e90ab259b60b758fb23fa29f9ce1bea"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "git_policy": "черновик не идёт в этап 3, GLB не коммитится (tripo3d-stages.md §5.2 п.10); восстанавливается по task_url",
+        "iteration": "этап 1b 3d-model-pipeline: черновик для ортопроекций",
+        "model_version": {
+          "backend": null,
+          "note": "подпись UI формы",
+          "ui_label": "H3.1 - Макс.кач."
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 13120.0,
+              "balance_before": 13150.0,
+              "observed_debit": 30.0,
+              "quoted": 30.0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261013-draft-tripo/reports/tripo-run.json",
+            "history_time": null,
+            "mode": "HD модель, одно изображение, H3.1 Макс.кач.",
+            "op": "generate"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-5aa70723-draft",
+        "task_id": "5aa70723-1d60-47c4-89c0-33159df78346",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/5aa70723-1d60-47c4-89c0-33159df78346"
+      },
+      "spec_sha256": "e2560ee09997dce71f08fb4d42c596c5d76edab44a6593b58ccdea2fc16e4251"
+    }
+  },
   "stages": {},
   "status_legend": {
     "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
