@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWindowFlowerbox.fbx",
+      "sha256": "68be33c7a7b7e5c7b34ac565e3981319d5aed7938fb2b2cc49f5e05bbb29ab64"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_BC.png",
+      "sha256": "a0c9f39a9087ad1990e318331b7d376a9b34c2f60525df23125ce9486f5cdc67"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_N.png",
+      "sha256": "504ed31dce2a98aad4f25e03449b9df31059749f36e2516580a5d579650aece2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_ORM.png",
+      "sha256": "20b69abffb14ce3e4124b9d67993c9fc31d37f1083009a1fcfd34dfc4bc0190c"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-window-flowerbox-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWindowFlowerbox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "4038 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "UV0 islands 1009, used 0.7679, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "T_Env_SohoWindowFlowerbox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "SM_Env_SohoWindowFlowerbox, M_Env_SohoWindowFlowerbox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет: деревянный ящик из досок, сужающийся книзу, с красными геранями и двумя коваными кронштейнами с завитками, как на sheet.png. Пропорции ящика, высота цветов и кронштейнов совпадают с видом; лишних или пропавших частей нет. Предмет узнаётся со всех ракурсов (turn-045 и 090/270 показывают профиль кронштейна: стенная планка, полка и завиток).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, вывернутых частей и разрушенной сетки нет. Тонкие стебли и завитки кронштейнов целы, сетка на wire-34 следует форме. Два мягких дефекта: (1) на лицевой стороне доски расколоты тёмными клиновидными щелями сквозь стенку (turn-000, close-base, wire-34). Это читается как стилизованный износ, но на крупном плане выглядит как рваные края; (2) на задней стенке есть складка — треугольная грань-заслонка (wire-back, turn-180). Задняя стенка прилегает к фасаду и в диораме не видна, поэтому для фонового пропа ставлю 1,5, а не 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: выветренное дерево с волокнами, тёмный металл кронштейнов, красные цветы и зелёные листья, земля. Запечённого света почти нет. Дефекты: на задней стенке (turn-180) треугольное пятно другого тона и растяжка, повторяющие складку геометрии. Цветы и листья на close-head мягкие, местами мыльные, но это допустимо для стилизации. Детализация на игровой дистанции на уровне кита.",
+      "frames": [
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Сумма S+F+T = 5,0 из 6, score 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Оставшиеся дефекты (складка задней стенки, щели в досках, мягкие цветы) не видны или малозаметны на игровой дистанции фонового пропа фасада.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Задняя стенка с треугольной складкой-заслонкой; сторона прилегает к фасаду, в сцене не видна."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Клиновидные чёрные щели в лицевых досках сквозь стенку: читаются как трещины износа, на крупном плане — как рваные края."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Треугольное пятно другого тона и растяжка на задней стенке по складке геометрии."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Текстура цветов и листьев мягкая, местами мыльная на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-WINDOW-FLOWERBOX-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп window-flowerbox принят по делегированию (8,3). В known_issues: складка задней стенки и щели в лицевых досках."
+}

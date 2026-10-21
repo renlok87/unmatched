@@ -1,10 +1,10 @@
 {
   "schema": "unmatched.map-kit.status/1",
   "map": "soho",
-  "updatedAt": "2026-10-21T08:49:27+05:00",
+  "updatedAt": "2026-10-21T11:21:16+05:00",
   "props": {
     "gas-street-lamp": {
-      "stage": "built",
+      "stage": "accepted",
       "views": {
         "sheet": "art/imagegen/mapkit-soho/props/gas-street-lamp/sheet.png",
         "front": "art/imagegen/mapkit-soho/props/gas-street-lamp/front.png",
@@ -48,20 +48,34 @@
       "build": {
         "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoGasStreetLamp.fbx",
         "tris": 5035
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-gas-street-lamp-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
       }
     },
     "pillar-box": {
       "stage": "tripo",
       "views": {
-        "sheet": "art/imagegen/mapkit-soho/props/pillar-box/sheet.png",
-        "front": "art/imagegen/mapkit-soho/props/pillar-box/front.png",
-        "side": "art/imagegen/mapkit-soho/props/pillar-box/side.png",
-        "slot": "left",
+        "sheet": null,
+        "front": "art/imagegen/mapkit-soho/props/pillar-box/view-thumb.png",
+        "side": null,
+        "slot": "single",
         "heightMismatchPct": 0.0,
-        "sheetJpg": "art/imagegen/mapkit-soho/props/pillar-box/sheet.jpg"
+        "sheetJpg": "art/imagegen/mapkit-soho/props/pillar-box/sheet.jpg",
+        "note": "r2: new Tripo Image + regenerate (r1 rework: source defects)",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
       },
       "tripo": {
-        "taskId": "276cf20e-1bc4-430f-bee9-a9e0942418f8",
+        "taskId": "9028d3a6-f7f9-4fa3-9f55-a8d4d51b0884",
         "ops": [
           {
             "op": "generate",
@@ -83,18 +97,57 @@
             "before": 19590.0,
             "after": 19585.0,
             "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 14900.0,
+            "after": 14800.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 14470.0,
+            "after": 14450.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14310.0,
+            "after": 14305.0,
+            "status": "ok"
           }
         ],
-        "credits": 125.0,
+        "credits": 250.0,
         "route": "smart-mesh-p2",
         "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-PILLAR-BOX.glb",
         "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
         "assetId": "MK-SOHO-PILLAR-BOX",
         "triangles": 5174
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPillarBox.fbx",
+        "tris": 5174,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pillar-box-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 2,
+          "F": 1,
+          "T": 1.5
+        }
       }
     },
     "ale-barrel": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "sheet": "art/imagegen/mapkit-soho/props/ale-barrel/sheet.png",
         "front": "art/imagegen/mapkit-soho/props/ale-barrel/front.png",
@@ -135,20 +188,43 @@
         "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
         "assetId": "MK-SOHO-ALE-BARREL",
         "triangles": 4518
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAleBarrel.fbx",
+        "tris": 4518,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-ale-barrel-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
       }
     },
     "dock-bollard": {
       "stage": "tripo",
       "views": {
-        "sheet": "art/imagegen/mapkit-soho/props/dock-bollard/sheet.png",
-        "front": "art/imagegen/mapkit-soho/props/dock-bollard/front.png",
-        "side": "art/imagegen/mapkit-soho/props/dock-bollard/side.png",
-        "slot": "left",
+        "sheet": null,
+        "front": "art/imagegen/mapkit-soho/props/dock-bollard/view-thumb.png",
+        "side": null,
+        "slot": "single",
         "heightMismatchPct": 0.7,
-        "sheetJpg": "art/imagegen/mapkit-soho/props/dock-bollard/sheet.jpg"
+        "sheetJpg": "art/imagegen/mapkit-soho/props/dock-bollard/sheet.jpg",
+        "note": "r2: new Tripo Image + regenerate (r1 rework: source defects)",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
       },
       "tripo": {
-        "taskId": "1dc7e286-27bd-4d40-a490-60e5c492532c",
+        "taskId": "d92c08a2-33f9-45b2-aa56-8ca43b5aad98",
         "ops": [
           {
             "op": "generate",
@@ -170,18 +246,57 @@
             "before": 19240.0,
             "after": 19235.0,
             "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 14700.0,
+            "after": 14600.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 14450.0,
+            "after": 14430.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14305.0,
+            "after": 14300.0,
+            "status": "ok"
           }
         ],
-        "credits": 125.0,
+        "credits": 250.0,
         "route": "smart-mesh-p2",
         "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-DOCK-BOLLARD.glb",
         "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
         "assetId": "MK-SOHO-DOCK-BOLLARD",
         "triangles": 5140
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoDockBollard.fbx",
+        "tris": 5140,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-dock-bollard-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
       }
     },
     "cargo-crate": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "sheet": "art/imagegen/mapkit-soho/props/cargo-crate/sheet.png",
         "front": "art/imagegen/mapkit-soho/props/cargo-crate/front.png",
@@ -206,13 +321,46 @@
             "before": 19235.0,
             "after": 19215.0,
             "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 19115.0,
+            "after": 19110.0,
+            "status": "ok"
           }
         ],
-        "credits": 120.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-CARGO-CRATE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-CARGO-CRATE",
+        "triangles": 4384
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCargoCrate.fbx",
+        "tris": 4384,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-cargo-crate-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
       }
     },
     "chimney-stack": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "sheet": "art/imagegen/mapkit-soho/props/chimney-stack/sheet.png",
         "front": "art/imagegen/mapkit-soho/props/chimney-stack/front.png",
@@ -230,13 +378,53 @@
             "before": 19340.0,
             "after": 19240.0,
             "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 19110.0,
+            "after": 19090.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 19090.0,
+            "after": 19085.0,
+            "status": "ok"
           }
         ],
-        "credits": 100.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-CHIMNEY-STACK.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-CHIMNEY-STACK",
+        "triangles": 5492
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoChimneyStack.fbx",
+        "tris": 5492,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-chimney-stack-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
       }
     },
     "textile-bales": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "sheet": "art/imagegen/mapkit-soho/props/textile-bales/sheet.png",
         "front": "art/imagegen/mapkit-soho/props/textile-bales/front.png",
@@ -254,22 +442,2319 @@
             "before": 19215.0,
             "after": 19115.0,
             "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 19085.0,
+            "after": 19065.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 19065.0,
+            "after": 19060.0,
+            "status": "ok"
           }
         ],
-        "credits": 100.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-TEXTILE-BALES.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-TEXTILE-BALES",
+        "triangles": 4900
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTextileBales.fbx",
+        "tris": 4900,
+        "checks": true,
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-textile-bales-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "fire-escape-ladder": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/fire-escape-ladder/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/fire-escape-ladder/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/fire-escape-ladder/front.png",
+        "side": "art/imagegen/mapkit-soho/props/fire-escape-ladder/side.png",
+        "slot": "back",
+        "heightMismatchPct": 0.9,
+        "source": "Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), 16:9 1376x768"
+      },
+      "tripo": {
+        "taskId": "303bd98e-6dcd-480e-9693-1725fb4f487a",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 19065.0,
+            "after": 18965.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 18860.0,
+            "after": 18840.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18840.0,
+            "after": 18835.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-FIRE-ESCAPE-LADDER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-FIRE-ESCAPE-LADDER",
+        "triangles": 4794
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoFireEscapeLadder.fbx",
+        "tris": 4794,
+        "checks": true,
+        "dimsUu": [
+          36.47,
+          23.236,
+          105.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-fire-escape-ladder-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "hansom-cab": {
+      "stage": "built",
+      "views": {
+        "sheet": null,
+        "sheetJpg": "art/imagegen/mapkit-soho/props/hansom-cab/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/hansom-cab/view-thumb.png",
+        "side": null,
+        "slot": "single",
+        "heightMismatchPct": 25.6,
+        "note": "r2: new Tripo Image + regenerate (r1 rejected: phantom fin)",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "a419ac71-f050-49d9-9698-25caef833566",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18960.0,
+            "after": 18860.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 18735.0,
+            "after": 18715.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18595.0,
+            "after": 18590.0,
+            "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15085.0,
+            "after": 14985.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 14920.0,
+            "after": 14900.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14475.0,
+            "after": 14470.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 250.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-HANSOM-CAB.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-HANSOM-CAB",
+        "triangles": 4657,
+        "levelled": {
+          "rx_deg": 0.0,
+          "rz_deg": 2.25,
+          "tilt_deg": 2.25,
+          "gain": 8.74
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHansomCab.fbx",
+        "tris": 4657,
+        "checks": true,
+        "dimsUu": [
+          53.967,
+          130.693,
+          78.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hansom-cab-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 4.2,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 0.5,
+          "F": 1,
+          "T": 1
+        }
+      }
+    },
+    "thames-rowboat": {
+      "stage": "tripo",
+      "views": {
+        "sheet": null,
+        "sheetJpg": "art/imagegen/mapkit-soho/props/thames-rowboat/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/thames-rowboat/view-thumb.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)",
+        "note": "r2: new Tripo Image (low camera side view) + regenerate (r1 rejected: phantom lid)"
+      },
+      "tripo": {
+        "taskId": "a289f4f6-6a23-43d6-9db4-ab4511960365",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18835.0,
+            "after": 18735.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 18615.0,
+            "after": 18595.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18470.0,
+            "after": 18465.0,
+            "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 14600.0,
+            "after": 14500.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 14430.0,
+            "after": 14410.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14300.0,
+            "after": 14295.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 250.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-THAMES-ROWBOAT.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-THAMES-ROWBOAT",
+        "triangles": 4873
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoThamesRowboat.fbx",
+        "tris": 4873,
+        "checks": true,
+        "dimsUu": [
+          73.877,
+          44.932,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-thames-rowboat-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 0.5,
+          "F": 1.5,
+          "T": 1
+        }
+      }
+    },
+    "market-stall": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/market-stall/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/market-stall/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/market-stall/front.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), one 3/4 view"
+      },
+      "tripo": {
+        "taskId": "2c28203a-92fa-4786-a071-bd45e20c5599",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18715.0,
+            "after": 18615.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 18490.0,
+            "after": 18470.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18365.0,
+            "after": 18360.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-MARKET-STALL.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-MARKET-STALL",
+        "triangles": 4739
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMarketStall.fbx",
+        "tris": 4739,
+        "checks": true,
+        "dimsUu": [
+          55.117,
+          70.171,
+          72.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-market-stall-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "wharf-crane": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/wharf-crane/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/wharf-crane/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/wharf-crane/front.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), one 3/4 view"
+      },
+      "tripo": {
+        "taskId": "32b13416-ceb4-4862-b225-a2384ac714cd",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18590.0,
+            "after": 18490.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 18360.0,
+            "after": 18350.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18250.0,
+            "after": 18245.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WHARF-CRANE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WHARF-CRANE",
+        "triangles": 5079
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWharfCrane.fbx",
+        "tris": 5079,
+        "checks": true,
+        "dimsUu": [
+          67.504,
+          115.247,
+          105.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wharf-crane-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "handcart": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/handcart/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/handcart/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/handcart/front.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), one 3/4 view"
+      },
+      "tripo": {
+        "taskId": "de29be57-af30-4421-8b7a-61565a033edd",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18465.0,
+            "after": 18365.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 18245.0,
+            "after": 18235.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18125.0,
+            "after": 18120.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-HANDCART.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-HANDCART",
+        "triangles": 4874
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHandcart.fbx",
+        "tris": 4874,
+        "checks": true,
+        "dimsUu": [
+          40.83,
+          52.532,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-handcart-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "street-pump": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/street-pump/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/street-pump/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/street-pump/front.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), one 3/4 view"
+      },
+      "tripo": {
+        "taskId": "a22348fb-d2ab-476e-ac57-eebab9ba41f5",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18350.0,
+            "after": 18250.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 18135.0,
+            "after": 18125.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 18010.0,
+            "after": 18005.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-STREET-PUMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-STREET-PUMP",
+        "triangles": 4860
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoStreetPump.fbx",
+        "tris": 4860,
+        "checks": true,
+        "dimsUu": [
+          26.578,
+          26.226,
+          45.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-street-pump-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "horse-trough": {
+      "stage": "accepted",
+      "views": {
+        "sheet": "art/imagegen/mapkit-soho/props/horse-trough/sheet.png",
+        "sheetJpg": "art/imagegen/mapkit-soho/props/horse-trough/sheet.jpg",
+        "front": "art/imagegen/mapkit-soho/props/horse-trough/front.png",
+        "side": null,
+        "slot": "single",
+        "source": "Tripo Image, Nano Banana Pro 4K, one 3/4 view"
+      },
+      "tripo": {
+        "taskId": "7222cff2-97df-429b-979a-08e2248307ff",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18005.0,
+            "after": 17905.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17785.0,
+            "after": 17775.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17475.0,
+            "after": 17470.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-HORSE-TROUGH.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-HORSE-TROUGH",
+        "triangles": 4895
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHorseTrough.fbx",
+        "tris": 4895,
+        "checks": true,
+        "dimsUu": [
+          22.955,
+          59.405,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-horse-trough-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "area-railings": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/area-railings/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro 4K -> Generate 3D (Chrome blocked image downloads, F7); local copy is a screen thumbnail"
+      },
+      "tripo": {
+        "taskId": "1c507041-841f-47a8-a698-26b5ccfd6b52",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18235.0,
+            "after": 18135.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 18020.0,
+            "after": 18010.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17895.0,
+            "after": 17890.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-AREA-RAILINGS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-AREA-RAILINGS",
+        "triangles": 5243
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAreaRailings.fbx",
+        "tris": 5243,
+        "checks": true,
+        "dimsUu": [
+          8.502,
+          52.898,
+          33.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-area-railings-r2/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "factory-chimney": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/factory-chimney/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro 4K -> Generate 3D; local copy is a screen thumbnail (F7)"
+      },
+      "tripo": {
+        "taskId": "d0c906f9-1ab5-4f95-ae6f-77d6f09ea727",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 18120.0,
+            "after": 18020.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17905.0,
+            "after": 17895.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17790.0,
+            "after": 17785.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-FACTORY-CHIMNEY.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-FACTORY-CHIMNEY",
+        "triangles": 4424
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoFactoryChimney.fbx",
+        "tris": 4424,
+        "checks": true,
+        "dimsUu": [
+          64.521,
+          65.84,
+          225.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-factory-chimney-r1/card.json",
+        "rc": 1,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1
+        }
+      }
+    },
+    "grain-sacks": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/grain-sacks/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro 4K -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "195c2119-cb63-457a-9394-08a59567770f",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17890.0,
+            "after": 17790.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17270.0,
+            "after": 17260.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17010.0,
+            "after": 17005.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-GRAIN-SACKS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-GRAIN-SACKS",
+        "triangles": 5154
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoGrainSacks.fbx",
+        "tris": 5154,
+        "checks": true,
+        "dimsUu": [
+          34.816,
+          39.397,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-grain-sacks-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "hanging-shop-sign": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/hanging-shop-sign/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro 4K -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "8e805039-5a42-4fed-b8ec-2abc9e075f6e",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17775.0,
+            "after": 17675.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17260.0,
+            "after": 17250.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17005.0,
+            "after": 17000.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-HANGING-SHOP-SIGN.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-HANGING-SHOP-SIGN",
+        "triangles": 5042
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHangingShopSign.fbx",
+        "tris": 5042,
+        "checks": true,
+        "dimsUu": [
+          4.973,
+          22.093,
+          27.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hanging-shop-sign-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "mooring-pilings": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/mooring-pilings/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)",
+        "sheet": null,
+        "side": null,
+        "note": "r2: new Tripo Image + regenerate (r1 rejected 6.7: 4th pile, tilt); descEn now 'cluster of four'"
+      },
+      "tripo": {
+        "taskId": "d3127e2e-b67e-4db8-9dd1-59eb8339ac89",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17675.0,
+            "after": 17575.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17250.0,
+            "after": 17240.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 17000.0,
+            "after": 16995.0,
+            "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15185.0,
+            "after": 15085.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 14930.0,
+            "after": 14920.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14480.0,
+            "after": 14475.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 230.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-MOORING-PILINGS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-MOORING-PILINGS",
+        "triangles": 4345
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMooringPilings.fbx",
+        "tris": 4345,
+        "checks": true,
+        "dimsUu": [
+          51.038,
+          48.107,
+          75.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-mooring-pilings-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 6.7,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "newspaper-stand": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/newspaper-stand/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "4bb52b0e-15bf-4256-9fb3-ad6934ad92ae",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17575.0,
+            "after": 17475.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17140.0,
+            "after": 17130.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16985.0,
+            "after": 16980.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-NEWSPAPER-STAND.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-NEWSPAPER-STAND",
+        "triangles": 4902
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoNewspaperStand.fbx",
+        "tris": 4902,
+        "checks": true,
+        "dimsUu": [
+          27.715,
+          42.625,
+          42.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoNewspaperStand.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-newspaper-stand-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "produce-crates": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/produce-crates/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)",
+        "sheet": null,
+        "side": null,
+        "note": "r2: new Tripo Image + regenerate (r1 rejected 5.0)"
+      },
+      "tripo": {
+        "taskId": "90de3a42-7e49-4255-ac4d-8943eadfd181",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17470.0,
+            "after": 17370.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17130.0,
+            "after": 17120.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16980.0,
+            "after": 16975.0,
+            "status": "ok"
+          },
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15285.0,
+            "after": 15185.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 14940.0,
+            "after": 14930.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14485.0,
+            "after": 14480.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 230.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-PRODUCE-CRATES.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-PRODUCE-CRATES",
+        "triangles": 4774,
+        "levelled": {
+          "rx_deg": -8.0,
+          "rz_deg": -4.0,
+          "tilt_deg": 8.94,
+          "gain": 88.1
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoProduceCrates.fbx",
+        "tris": 4774,
+        "checks": true,
+        "dimsUu": [
+          22.086,
+          27.873,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-produce-crates-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1,
+          "T": 1
+        }
+      }
+    },
+    "shop-awning": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/shop-awning/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "2654f9e5-3c61-4deb-8e08-7db04dfdb67f",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17370.0,
+            "after": 17270.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 17120.0,
+            "after": 17110.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16975.0,
+            "after": 16970.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-SHOP-AWNING.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-SHOP-AWNING",
+        "triangles": 5418
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoShopAwning.fbx",
+        "tris": 5418,
+        "checks": true,
+        "dimsUu": [
+          26.967,
+          41.043,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-shop-awning-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "street-bench": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/street-bench/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "7e681c5c-32c7-4128-b466-a9e19b2cab7a",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17240.0,
+            "after": 17140.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16995.0,
+            "after": 16985.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16970.0,
+            "after": 16965.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-STREET-BENCH.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-STREET-BENCH",
+        "triangles": 5469
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoStreetBench.fbx",
+        "tris": 5469,
+        "checks": true,
+        "dimsUu": [
+          21.307,
+          42.222,
+          27.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-street-bench-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1
+        }
+      }
+    },
+    "wall-carriage-lamp": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/wall-carriage-lamp/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "7389abba-a4ee-4114-a826-cd271336ebc1",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 17110.0,
+            "after": 17010.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16965.0,
+            "after": 16955.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16555.0,
+            "after": 16550.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WALL-CARRIAGE-LAMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WALL-CARRIAGE-LAMP",
+        "triangles": 5011
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWallCarriageLamp.fbx",
+        "tris": 5011,
+        "checks": true,
+        "dimsUu": [
+          10.798,
+          17.481,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wall-carriage-lamp-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "weathervane": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/weathervane/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "c3e7e9d0-583b-42d6-8dff-02bb338bcafb",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16955.0,
+            "after": 16855.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16550.0,
+            "after": 16540.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16190.0,
+            "after": 16185.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WEATHERVANE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WEATHERVANE",
+        "triangles": 5426
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWeathervane.fbx",
+        "tris": 5426,
+        "checks": true,
+        "dimsUu": [
+          31.81,
+          31.81,
+          45.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWeathervane.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-weathervane-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1.5
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "milk-churns": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/milk-churns/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "68b0e170-1cbe-455c-86d2-9c7e21f2d2c1",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16855.0,
+            "after": 16755.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16540.0,
+            "after": 16530.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 16185.0,
+            "after": 16180.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-MILK-CHURNS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-MILK-CHURNS",
+        "triangles": 4813,
+        "levelled": {
+          "rx_deg": -13.75,
+          "rz_deg": 0.25,
+          "tilt_deg": 13.75,
+          "gain": 76.04
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMilkChurns.fbx",
+        "tris": 4813,
+        "checks": true,
+        "dimsUu": [
+          33.906,
+          41.527,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-milk-churns-r2/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 2,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "rope-coil": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/rope-coil/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "e766b04b-11b8-4a09-af4c-68bb2d1ef58f",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16755.0,
+            "after": 16655.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16230.0,
+            "after": 16220.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15880.0,
+            "after": 15875.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-ROPE-COIL.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-ROPE-COIL",
+        "triangles": 5106,
+        "levelled": {
+          "rx_deg": -21.25,
+          "rz_deg": 0.0,
+          "tilt_deg": 21.25,
+          "gain": 52.04
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoRopeCoil.fbx",
+        "tris": 5106,
+        "checks": true,
+        "dimsUu": [
+          14.409,
+          25.51,
+          9.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-rope-coil-r2/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "old-anchor": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/old-anchor/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "12871a06-adc3-4456-93f3-c414f93f0a13",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16655.0,
+            "after": 16555.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16220.0,
+            "after": 16210.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15875.0,
+            "after": 15870.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-OLD-ANCHOR.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-OLD-ANCHOR",
+        "triangles": 4972
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoOldAnchor.fbx",
+        "tris": 4972,
+        "checks": true,
+        "dimsUu": [
+          32.206,
+          34.668,
+          45.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-old-anchor-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "wicker-baskets": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/wicker-baskets/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "7fd860a1-075c-46c6-9926-2fcdf056c150",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16530.0,
+            "after": 16430.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16210.0,
+            "after": 16200.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15870.0,
+            "after": 15865.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WICKER-BASKETS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WICKER-BASKETS",
+        "triangles": 4768,
+        "levelled": {
+          "rx_deg": -12.5,
+          "rz_deg": 0.25,
+          "tilt_deg": 12.5,
+          "gain": 9.05
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWickerBaskets.fbx",
+        "tris": 4768,
+        "checks": true,
+        "dimsUu": [
+          22.219,
+          21.514,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wicker-baskets-r2/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "hand-lantern": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/hand-lantern/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "3ba4846b-4254-42dd-ba0f-e315ffe677a7",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16430.0,
+            "after": 16330.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 16200.0,
+            "after": 16190.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15865.0,
+            "after": 15860.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-HAND-LANTERN.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-HAND-LANTERN",
+        "triangles": 4669
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHandLantern.fbx",
+        "tris": 4669,
+        "checks": true,
+        "dimsUu": [
+          5.808,
+          4.524,
+          9.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hand-lantern-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "tea-chest": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/tea-chest/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "fba52e82-48a2-499e-9482-409700b79718",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16330.0,
+            "after": 16230.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15860.0,
+            "after": 15850.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15430.0,
+            "after": 15425.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-TEA-CHEST.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-TEA-CHEST",
+        "triangles": 4902,
+        "levelled": {
+          "rx_deg": -9.0,
+          "rz_deg": 0.5,
+          "tilt_deg": 9.01,
+          "gain": 15.8
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTeaChest.fbx",
+        "tris": 4902,
+        "checks": true,
+        "dimsUu": [
+          17.946,
+          19.175,
+          18.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-tea-chest-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "wheelbarrow": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/wheelbarrow/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "f63becda-8d80-482d-93ba-6c09f71cd38e",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16180.0,
+            "after": 16080.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15850.0,
+            "after": 15840.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15425.0,
+            "after": 15420.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WHEELBARROW.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WHEELBARROW",
+        "triangles": 4621,
+        "levelled": {
+          "rx_deg": -21.5,
+          "rz_deg": -0.75,
+          "tilt_deg": 21.51,
+          "gain": 199.03
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWheelbarrow.fbx",
+        "tris": 4621,
+        "checks": true,
+        "dimsUu": [
+          38.627,
+          42.187,
+          21.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wheelbarrow-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1
+        }
+      }
+    },
+    "cart-wheel": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/cart-wheel/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "43d4cdcb-3e80-4285-9b34-3e58f6028fd7",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 16080.0,
+            "after": 15980.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15840.0,
+            "after": 15830.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15420.0,
+            "after": 15415.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-CART-WHEEL.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-CART-WHEEL",
+        "triangles": 5089
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCartWheel.fbx",
+        "tris": 5089,
+        "checks": true,
+        "dimsUu": [
+          18.185,
+          35.332,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCartWheel.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-cart-wheel-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "window-flowerbox": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/window-flowerbox/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "f3becfdb-6d18-46d1-a175-7c2c8c9a1da2",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15980.0,
+            "after": 15880.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15415.0,
+            "after": 15405.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14985.0,
+            "after": 14980.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-WINDOW-FLOWERBOX.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-WINDOW-FLOWERBOX",
+        "triangles": 4038
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWindowFlowerbox.fbx",
+        "tris": 4038,
+        "checks": true,
+        "dimsUu": [
+          5.631,
+          14.648,
+          12.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-window-flowerbox-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "telegraph-pole": {
+      "stage": "rejected",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/telegraph-pole/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "17360e15-74cd-4a9f-95f7-87cca740b216",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15830.0,
+            "after": 15730.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15405.0,
+            "after": 15395.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14980.0,
+            "after": 14975.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-TELEGRAPH-POLE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-TELEGRAPH-POLE",
+        "triangles": 4858
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTelegraphPole.fbx",
+        "tris": 4858,
+        "checks": true,
+        "dimsUu": [
+          80.371,
+          76.854,
+          120.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-telegraph-pole-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 6.7,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "pub-barrel-table": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/pub-barrel-table/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "571f672e-b5ae-471b-88f2-222daefdfc1b",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15730.0,
+            "after": 15630.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 15395.0,
+            "after": 15385.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14975.0,
+            "after": 14970.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-PUB-BARREL-TABLE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-PUB-BARREL-TABLE",
+        "triangles": 5160,
+        "levelled": {
+          "rx_deg": -2.25,
+          "rz_deg": 0.0,
+          "tilt_deg": 2.25,
+          "gain": 2.1
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPubBarrelTable.fbx",
+        "tris": 5160,
+        "checks": true,
+        "dimsUu": [
+          22.143,
+          21.527,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pub-barrel-table-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "cargo-net": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/cargo-net/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "0af7f913-da0c-4f48-a7f6-622d307feb29",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15630.0,
+            "after": 15530.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 14970.0,
+            "after": 14960.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14500.0,
+            "after": 14495.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-CARGO-NET.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-CARGO-NET",
+        "triangles": 4764
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCargoNet.fbx",
+        "tris": 4764,
+        "checks": true,
+        "dimsUu": [
+          29.493,
+          31.885,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json"
+      }
+    },
+    "coal-bunker": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/coal-bunker/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "ea44ddda-5117-4ddf-94ee-f80f3f7ddf05",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15530.0,
+            "after": 15430.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 14960.0,
+            "after": 14950.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14495.0,
+            "after": 14490.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-COAL-BUNKER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-COAL-BUNKER",
+        "triangles": 5056,
+        "levelled": {
+          "rx_deg": -20.25,
+          "rz_deg": -5.25,
+          "tilt_deg": 20.92,
+          "gain": 29.19
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCoalBunker.fbx",
+        "tris": 5056,
+        "checks": true,
+        "dimsUu": [
+          45.64,
+          41.554,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json"
+      }
+    },
+    "police-rattle-box": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-soho/props/police-rattle-box/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "2931bf6b-ba25-412b-9141-157199a34133",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 15385.0,
+            "after": 15285.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 14950.0,
+            "after": 14940.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 14490.0,
+            "after": 14485.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/source/MK-SOHO-POLICE-RATTLE-BOX.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh",
+        "assetId": "MK-SOHO-POLICE-RATTLE-BOX",
+        "triangles": 4559
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPoliceRattleBox.fbx",
+        "tris": 4559,
+        "checks": true,
+        "dimsUu": [
+          36.686,
+          41.54,
+          72.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json"
       }
     }
   },
   "totals": {
-    "credits": 820.0,
+    "credits": 5440.0,
     "byStage": {
       "listed": 0,
       "views": 0,
-      "tripo": 6,
-      "built": 1,
-      "accepted": 0,
-      "rework": 0,
-      "rejected": 0,
+      "tripo": 3,
+      "built": 7,
+      "accepted": 24,
+      "rework": 5,
+      "rejected": 1,
       "ue": 0
     }
   }

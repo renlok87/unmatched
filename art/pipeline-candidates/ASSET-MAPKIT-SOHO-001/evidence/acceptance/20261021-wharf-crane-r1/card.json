@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWharfCrane.fbx",
+      "sha256": "ab00c486bedcb8bdcf742f36690bb646215bc39081f506dd98c4a6c6e5e5d1fe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_BC.png",
+      "sha256": "d54d5e7987767fc0b5a62b0fcd3e32e09fcfe46519e6bb5b419b9e2a14d2d577"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_N.png",
+      "sha256": "21c181f13853a398fc7d490cce626eaa37a4ba64332dc1134a5183af4da4dc75"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_ORM.png",
+      "sha256": "c86df5af04983a60cbff12a54e1b795d80a695de0aac22991bb31b0c095117af"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wharf-crane-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWharfCrane.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "5079 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "UV0 islands 1112, used 0.6541, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "T_Env_SohoWharfCrane_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "SM_Env_SohoWharfCrane, M_Env_SohoWharfCrane",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это тот же предмет, что на sheet.png. Совпадают все главные части: стрела с брезентовой обмоткой и железными накладками, канат по верху стрелы, шкив на конце, блок с узлом и крюк, раскос с железным башмаком, две стойки, шестерня и чугунная А-стойка лебёдки с рукоятью, дощатый настил на трёх лагах с железными полосами. turn-315 почти повторяет ракурс листа. Пропорции в пределах ~5 % высоты: верх стоек 66 % роста против 69 % на листе, низ крюка 44 % против 41 %, уклон стрелы ~28° против ~30°. Фигура узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура, и оно на стороне, которую одновидовой лист не показывает: хвост стрелы раздвоен на две балки, на второй стоит гладкий диск шкива (turn-045, turn-135, close-base). К той же переработке задней лебёдки относится изогнутая задняя распорка под хвостом стрелы (turn-000, turn-180). Оба элемента — цельные части конструкции, а не фантомные оболочки, и силуэт на игровой дистанции они не меняют. Основное пятно цвета — то же коричневое дерево с железом, только дерево светлее и серее, чем на листе. В frames.json есть предупреждение о ключе листа, но содержимое sheet.png совпадает с моделью по частям, значит лист верный. Габарит 115×67,5 uu при росте 105 uu шире заказанных ≈1,5×2,5×3,5 м, но так нарисовано на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: канат по стреле, верёвка крюка с узлом, рукояти лебёдки, зубья шестерён, сам крюк. Сетка Smart Mesh (5079 tris) на wire-front, wire-back и wire-34 чистая: жёсткие грани идут по форме балок, у крюка и шестерён своя плотность. Отчёт находит 35 открытых контуров (торцы барабана под шестернями, низ А-стоек и настила), но в кадрах они не видны. Второй диск шкива на хвосте гладкий, однако это форма диска, а не оплывшая масса.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются так, как заказано: выветренное серо-коричневое дерево с волокном и торцами досок, ржавое железо полос, шестерён и А-стойки с потёртыми кромками, кручёный канат, брезент с плетением. На полном росте нет швов, растяжек, мыла и запечённого блика. Детализация атласа 2K на уровне кита Sarpedon (T_Env_CrateStack_BC), палитра закопчённее, в духе Сохо. Есть дефекты крупного плана. На close-head канат и брезент мягкие и размытые, на верхней грани балки видны растянутые полосы. На close-base боковина края настила в грубых тёмных потёках, второй диск шкива почти без деталей. Часть островов BC несёт затемнённые градиенты (возможно, запечённая окклюзия Tripo), на поворотах это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Счёт 8.3 ≥ 8.0 (S 1.5, F 2.0, T 1.5): ни одно измерение не ниже 1.0, гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Хвост стрелы раздвоен на две балки, на второй стоит гладкий диск шкива (также turn-135, close-base). На sheet.png видна одна балка и один шкив. Это переработка невидимой на листе стороны, читается как тот же кран."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Под хвостом стрелы стоит изогнутая задняя распорка (также turn-180), на листе её нет. Это цельная деталь в пределах силуэта, не фантом."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Габарит 115×67,5 uu при росте 105 uu (≈3,8×2,25 м при росте 3,5 м) шире заказанных ≈1,5×2,5×3,5 м. Так нарисовано на sheet.png. При раскладке проверить место в зоне embankment."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане верха канат и брезент мягкие и размытые, на верхней грани балки растянутые полосы (атлас 2K, 1112 островов). На полном росте не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Боковина края настила в грубых тёмных потёках, второй диск шкива почти без деталей. В части островов BC затемнённые градиенты (возможна запечённая окклюзия Tripo). Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-WHARF-CRANE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wharf-crane (причальный кран) принят по делегированию, 8.3. Счёт в полосе 8.0–8.4, нужен второй приёмщик Opus high. Известные огрехи: раздвоенный хвост стрелы, текстура мягкая на крупном плане."
+}

@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWallCarriageLamp.fbx",
+      "sha256": "201a29bc8e02b61895d14cf91044a54fe0d0270307f2b556bb3173bac2b7cac0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_BC.png",
+      "sha256": "f2da12e6064d036a3fa346d0f814b21f7c096a548f225994159b107f9697115b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_N.png",
+      "sha256": "e3fee577f9582d2f4f30ce085978afbc3ec4f0da1e1dd119ef896612c8714609"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_ORM.png",
+      "sha256": "6adc7c4da8b1cd983c64f42bab1a12374e1d029c2465dee08d753e24a097c25a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wall-carriage-lamp-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWallCarriageLamp.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "5011 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "UV0 islands 668, used 0.7001, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "T_Env_SohoWallCarriageLamp_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "SM_Env_SohoWallCarriageLamp, M_Env_SohoWallCarriageLamp",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан: викторианский настенный газовый фонарь. Части совпадают с sheet.png (миниатюра 230 px без ключа, пропорции сверены на глаз; ближе всего к ней turn-315): навершие-шишка, ступенчатая крышка, кровля с угловыми листьями-крокетами, сужающийся вниз четырёхгранный остеклённый корпус, корона из S-завитков под ним, горизонтальный кронштейн с завитковым подкосом, щиток на 4 заклёпках, кирпичный блок стены. Лишних и пропавших частей нет. Палитра та же: тёмный чугун с бронзовым износом, тёплое матовое стекло, красный кирпич. Узнаётся со всех 8 ракурсов, на turn-090 фонарь виден над блоком. На turn-090/270 и wire-* фантомных выступов нет. Без снижения: грань стены с щитком смотрит на азимут 270, а не 0; при раскладке нужен поворот по yaw.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии нет. Тонкие элементы целы: завитки подкоса, корона, стойка, крокеты, навершие. Торцы кирпичного блока сделаны зубчатыми, как выпуски кладки; это стилизация, а не рваный край. На wire-front, wire-back и wire-34 сетка следует форме: завитки плотные, стёкла и плоскости блока крупными треугольниками, как и положено плоским граням. На close-head крокет мягкий, но цельный.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как заказано: чугун тёмный с потёртой бронзой на рёбрах, кирпич с растворными швами, стекло матовое. Детализация не беднее кита Sarpedon. Дефект на полном росте в одной зоне, кирпичном блоке: на задней грани (turn-090, turn-045, turn-135, close-base) у одного ребра идёт серая «каменная» полоса шириной ≈20 % без кладки. Её граница рваная, кирпичи у неё замылены: так выглядит дорисовка невидимой стороны (чужой цвет и шов). Узкие торцы блока тоже серые, кладка на них не переходит. При монтаже на фасад задняя грань скрыта, но по рубрике это одна зона на полном росте. На крупном плане (close-weapon) в BC стекла нарисованы силуэты пламени и тёмные полосы-отражения, стекло пятнистое. На полном росте это читается как горящий фонарь, как на листе. Запечённого света сцены нет.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a. T=1.0 из-за серой полосы на задней грани кирпичного блока, которая при монтаже на фасад скрыта.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Задняя грань кирпичного блока: у одного ребра серая полоса ≈20 % ширины без кладки, граница по кирпичам рваная и замыленная; видна также на turn-045, turn-135 и close-base. Узкие торцы блока серые, без кирпича. При креплении на фасад сторона скрыта. Если блок будет виден сзади или сбоку, перекрасить по исходнику Tripo."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Стекло: в BC нарисованы силуэты пламени и тёмные полосы-отражения, на крупном плане пятна. Для роли animated (мерцание) свечение в UE давать эмиссией по маске стекла, не полагаясь на нарисованное пламя."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-WALL-CARRIAGE-LAMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wall-carriage-lamp принят по делегированию (8.3). Открытые пункты T в known_issues: серая полоса на задней грани кирпичного блока и нарисованное пламя в стекле."
+}

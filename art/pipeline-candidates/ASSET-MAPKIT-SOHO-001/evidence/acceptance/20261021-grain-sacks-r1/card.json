@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoGrainSacks.fbx",
+      "sha256": "7afa6481c135e576eca7fad82cbab53381654e613d6006100ff9c65e5cc72666"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoGrainSacks_BC.png",
+      "sha256": "476ba066bd5570042c5d28324d453d0fc345b22c6d49f9f3769b09b48821eaf3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoGrainSacks_N.png",
+      "sha256": "0cf288e7e3d9672d96de39102a1fc0c535485dd044d63d3412a347c95637f9d0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoGrainSacks_ORM.png",
+      "sha256": "ce6035d2a73171818c7579c81bf57d97381e6e4a2048f3ae747f0e114ef5e43f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-grain-sacks-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoGrainSacks.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+      "note": "5154 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+      "note": "UV0 islands 892, used 0.6882, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+      "note": "T_Env_SohoGrainSacks_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoGrainSacks.build.json",
+      "note": "SM_Env_SohoGrainSacks, M_Env_SohoGrainSacks",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет и та же раскладка, что на sheet.png: верхний горизонтальный мешок, средний с завязкой слева и свисающей верёвкой, нижний левый с завязкой справа, нижний средний и стоячий мешок справа, завязанный сверху. Отношение высоты к ширине стопки ~0,61 против ~0,67 на виде, снятом чуть сверху, то есть в допуске. Лишних и пропавших главных частей нет. Со всех ракурсов, включая turn-090/270 и 135/225/315, читается куча мешков с завязками, фантомных выступов нет. Цвет светлее листа, но того же семейства (мешковина).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, чёрных пятен и вывернутых частей нет, мешки объёмные, а не оплывшие. Тонкие верёвки на завязках целы (turn-270/315). Сетка на wire-34, wire-front и wire-back следует форме, мусорных оболочек нет. Дефекты видны только на крупном плане: мелкие прямоугольные лоскуты-«заплатки» с жёстким угловатым срезом (close-weapon, на wire-back их около шести), гранёный силуэт верхнего мешка (close-head, close-weapon) и едва заметные тёмные точки у линии пола (turn-135, turn-315).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Мешковина читается однозначно: видно плетение и есть грязевые пятна. Запечённого направленного света или бликов в цвете нет (ORM без AO), пятна неравномерные и выглядят как грязь, а не как тень. Швов и чужого цвета на полном росте нет. На крупном плане видно мыло: на верху верхнего мешка плетение размыто (close-head). Ещё на крупном плане есть горизонтальная растяжка плетения и тёмная вертикальная полоса на нижней кромке (close-weapon). Тон светлее и розоватее оливково-коричневого на sheet.png; для закопчённой пристани можно было бы темнее, но семейство то же.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 из 6, score 8,3 ≥ 8,0; ни одно измерение не ниже 1,0, гейты PASS или n/a. Дефекты F и T видны только на крупном плане и не мешают читаемости фонового пропа на игровой дистанции. Score в зоне 8,0–8,4, поэтому по §8.3 нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Мелкие прямоугольные лоскуты-«заплатки» с жёстким угловатым срезом на нескольких мешках (на wire-back.jpg их около шести) и гранёный силуэт верхнего мешка. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "note": "Едва заметные тёмные точки у линии пола, около (330,870) и (745,870); такие же есть на turn-315.jpg. Возможно, это мелкие куски геометрии под основанием или контакт мешков с полом. На игровой дистанции не видны."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мыло: на верху верхнего мешка плетение мешковины размыто в гладкое пятно."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Горизонтальная растяжка плетения и тёмная вертикальная полоса на нижней кромке верхнего мешка. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Тон мешковины светлее и розоватее оливково-коричневого на sheet.png. Для закопчённой пристани Soho можно затемнить оттенок через env_kit params; семейство цвета то же."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-GRAIN-SACKS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп grain-sacks кита Soho принят по делегированию с оценкой 8,3; дефекты крупного плана (лоскуты-заплатки, мыло и растяжка плетения, светлый тон) записаны в known_issues. Оценка в зоне 8,0–8,4, поэтому нужен второй приёмщик «Opus high»."
+}

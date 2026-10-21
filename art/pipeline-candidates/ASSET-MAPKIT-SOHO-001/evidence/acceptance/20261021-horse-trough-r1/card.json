@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHorseTrough.fbx",
+      "sha256": "747d7e58ed57819a0dd06645aae8f1f9e561dcc9186443316dd301f610281a75"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHorseTrough_BC.png",
+      "sha256": "07b9988a9dc8fbfa7a49b42039960a27be2c93639aada635b90e5aaa4effbe00"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHorseTrough_N.png",
+      "sha256": "43f506bdb4b88375a86d2e0c5e41660960c1416515794f6bb0c4c16bdf550ade"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHorseTrough_ORM.png",
+      "sha256": "f790b8118f35c21db8dff0dd959593f1c658ce2f5c3f2c45f442a081dd21b1e7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-horse-trough-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHorseTrough.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+      "note": "4895 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+      "note": "UV0 islands 93, used 0.5518, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+      "note": "T_Env_SohoHorseTrough_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHorseTrough.build.json",
+      "note": "SM_Env_SohoHorseTrough, M_Env_SohoHorseTrough",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: длинная каменная поилка из крупных блоков с водой, чугунный фланец с коленом-изливом на торцевом столбе, мешковина накинута на столб — состав и компоновка как на sheet.png. Пропорции: длина/высота 59,4/24 uu = 2,48 против 2,0/0,8 = 2,5 по описанию; столб с фланцем поднимается над бортом примерно на 0,8 высоты корыта, как на листе. Узнаётся со всех 8 ракурсов (торцы turn-090 — фланец с изливом, turn-270 — ткань на столбе), фантомных выступов и оболочек нет. Мелкие расхождения стилизации: кромки блоков мягче и менее сколоты, на фланце меньше ржавчины — в пределах допуска фонового пропа.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, рваных краёв, чёрных пятен и мусорной геометрии. Тонкие элементы целы: колено излива, болты фланца, косые опоры под фланцем видны на turn-045 и turn-135 симметрично, это деталь, а не обрыв. Ткань лежит на столбе без пробоев. Сетка на wire-* грубая, но следует форме: длинные треугольники на гранях блоков, плотная сетка на ткани и фланце. Открытые петли из отчёта сборки (низ ткани, тыл фланца, одиночный треугольник у основания фланца) закрыты блоком и тканью и ни на одном кадре не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно и на уровне кита: гранит с трещинами, швами блоков и грязью, тёмный металл фланца с бликом и рыжиной, мешковина с пятнами. Запечённого жёсткого света нет, развёртка без нахлёстов (uv-layout). Слабое место — вода: светлая молочно-голубая гладкая плоскость без ряби, а на листе вода тёмная сланцевая с бликами. На внутренних стенках над водой есть вертикальные растяжки и мыло, отчётливо на close-weapon и слабо на close-base. Тот же оттенок, но вода светлее эталона; дефект виден в основном на крупном плане.",
+      "frames": [
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 2,0 + T 1,5 = 5,5/6 → 9,2 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a — pass. Процедура: файла acceptor-prompt.md в 20261021-horse-trough-r1 нет (там только frames/; ждал ~6 мин). Поэтому рубрика, гейты и константы восстановлены по шаблону и функции gates() в tools/mapkits/accept.py, по SM_Env_SohoHorseTrough.build.json, docs/art-pipeline/map-kits/soho/props.json (horse-trough) и frames.json; sha256 accepted_object совпадают с build.json. close-head.jpg пуст (доля переднего плана 0): это ограничение съёмки низкого пропа, а не дефект ассета; верх пропа виден на turn-* и close-base. G-TOPO PASS по правилу гейта (бюджет env_kit 12000), но 4895 tris почти вдвое больше пропового trisMax 2500.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Вода светлая молочно-голубая и гладкая, без ряби; на листе она тёмная сланцевая с бликами. При настольной камере сверху это заметнее всего, при желании затемнить BC воды через env_kit params."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Вертикальные растяжки и мыло текстуры на внутренних стенках над водой, видны только на крупном плане."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-34.jpg",
+      "note": "4895 tris при trisMax пропа 2500. Гейт PASS по бюджету env_kit 12000, решимация не требовалась."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-HORSE-TROUGH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп horse-trough (Поилка) принят по делегированию, 9,2: вода светлее листа, растяжки на внутренних стенках видны только на крупном плане; промпт-файл отсутствовал, константы восстановлены по accept.py."
+}

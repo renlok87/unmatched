@@ -1,0 +1,179 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoThamesRowboat.fbx",
+      "sha256": "932b3d18fc39fa647f77cdc434dac4bdef02930daec6c619fd625ecc9cf71d24"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_BC.png",
+      "sha256": "58983c84fcb113e664821100d72ff343bad7c8035c38a7b48bf214beb6568577"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_N.png",
+      "sha256": "bd4f5e636375df88eae65deb0c79a4970cef89535dd166496796ec76f866641e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_ORM.png",
+      "sha256": "f989b14da185eca68fa6da85514ee690589524e3846ab6b6d42df7224eabfbb1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-thames-rowboat-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoThamesRowboat.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "4873 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "UV0 islands 660, used 0.5335, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "T_Env_SohoThamesRowboat_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "SM_Env_SohoThamesRowboat, M_Env_SohoThamesRowboat",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Сбоку это деревянная лодка: форштевень с рымом на носу, транец на корме, уключины и привальный брус узнаются на всех 8 ракурсах. Но открытый корпус с листа (шпангоуты, банки, слани, два весла поперёк банок, бухта каната у носа) закрыт фантомной плоской крышкой на уровне планширя примерно на 2/3 длины от носа (wire-34: большие плоские треугольники от форштевня до середины; close-base). Открыта только кормовая выемка с банкой. Из двух заказанных вёсел геометрией читается одно, вдоль правого борта, с лопастью над кормовой скулой (turn-000, turn-180, turn-090). Второе почти утоплено в крышку: из неё торчит только лопасть (turn-315, close-weapon). Бухта каната лежит плоским рисунком на крышке. При верхней игровой камере это главная видимая часть пропа: вместо пустого корпуса виден плоский настил. По рубрике это фантомная оболочка, заменившая главную часть, то есть 0,5. Кроме того, пропорция сбита больше чем на 10 %: по frames.json габарит 0,74×0,45×0,24 м, длина к ширине около 1,7–1,75 (корпус без лопасти около 0,42 м). Заказ 4×1,4×0,8 м даёт около 2,9: при высоте 0,24 м длина должна быть около 1,2 м. Корпус на листе тоже заметно стройнее. Клинкерные пояса обшивки формой не выражены.",
+      "frames": [
+        "sheet.png",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте поверхность корпуса цельная: нет дыр, просветов, вывернутых частей. Сетка Smart Mesh равномерная и следует обводам (wire-front, wire-back, wire-34). Тонкие уключины и форштевень целы. Крышку я засчитал в S. Дефекты видны на крупном плане: лопасть второго весла оплыла и вросла в крышку бесформенной массой (close-weapon, верх по центру). Нижняя кромка у киля срезана почти плоско, с рваными светлыми точками по линии днища (turn-090, turn-270). Килевой брус у кормы сливается с днищем (turn-180).",
+      "frames": [
+        "close-weapon.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-180.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются: обветренное дерево с облезлой краской, джут каната, тёмный металл уключин. Транец с досками и остатками краски хорош (turn-180). Детализация 2K не бедная. Дефект в одной зоне, во всей верхней плоскости, которую игрок видит сверху: в цвет крышки впечатаны бухта каната и полупрозрачный силуэт весла. Это видно на close-base и close-weapon, и на uv-layout в большом жёлтом острове виден завиток каната. Направления досок на крышке хаотичные, «ёлкой», со швами проекции (close-weapon). Борта покрыты очень шумной контрастной рябью со светлыми крапинками, похожей на кору. Поясов обшивки с листа на бортах не видно, и рябь далека от заказанного stylized hand-painted. Тёмная нижняя треть бортов на всех ракурсах, возможно, частично запечённая тень с листа (turn-090, turn-270). close-head размыт, но для масштаба 7 см это ожидаемо.",
+      "frames": [
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-180.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5, поэтому по рубрике нужна перегенерация в Tripo (этап 2). Внутренность корпуса примерно на 2/3 длины закрыта фантомной плоской крышкой на уровне планширя (wire-34, close-base). Банок, шпангоутов и слани с листа нет. Из двух вёсел геометрией есть одно, второе оплыло в крышку, а канат нарисован на ней. Корпус заметно короче и шире заказа: длина к ширине около 1,75 против около 2,9. Средствами env_kit это не исправить. Для перегенерации нужен вид, показывающий пустой корпус сверху или под высоким углом, с вёслами поперёк банок, и стройный корпус около 4×1,4 м. После генерации стоит проверить на wire-34, что внутренность полая. Score = (0,5 + 1,5 + 1,0) / 6 × 10 = 5,0. Все гейты PASS или n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wire-34.jpg",
+      "note": "Фантомная плоская крышка на уровне планширя закрывает примерно 2/3 корпуса от носа: банок, шпангоутов и слани с листа нет, открыта только кормовая выемка."
+    },
+    {
+      "item": "S",
+      "frame": "turn-315.jpg",
+      "note": "Из двух вёсел геометрией читается одно, вдоль правого борта, с лопастью над кормовой скулой. От второго из крышки торчит только лопасть."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Пропорция: габарит 0,74×0,45×0,24 м, длина к ширине около 1,75 против заказанных около 2,9 (4×1,4 м). Корпус короткий и пузатый, клинкерные пояса формой не выражены."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Лопасть второго весла оплыла и вросла в крышку бесформенной массой."
+    },
+    {
+      "item": "F",
+      "frame": "turn-270.jpg",
+      "note": "Днище у киля срезано почти плоско, по нижней кромке рваные светлые точки."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "В BC крышки впечатаны бухта каната и полупрозрачный силуэт весла. Направления досок на крышке хаотичные, со швами проекции."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "Борта покрыты шумной контрастной рябью со светлыми крапинками, похожей на кору. Поясов обшивки нет, нижняя треть бортов тёмная, возможно, запечённая тень с листа."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-THAMES-ROWBOAT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп thames-rowboat не принят (5,0): корпус закрыт плоской крышкой, вёсла и канат в основном нарисованы на ней, корпус слишком короткий. Нужна перегенерация в Tripo с полым корпусом и вёслами поперёк банок."
+}

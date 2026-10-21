@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHandcart.fbx",
+      "sha256": "7c7f9dca3c20b12a7fa1df949a0d64f6ffa6f448b6e23774fb2ff1ee1cdb0531"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_BC.png",
+      "sha256": "d57c8cce1c87fa7fb2404d2acf6573e762b6dc3e5ca0e987c3f1b50eda509db8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_N.png",
+      "sha256": "2dcf8c26cdac6fc6919fd1ae4d830aee1ac74931ba43f30bf571bf4819414c1f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_ORM.png",
+      "sha256": "fbfabf5d13c59d3b564b16aad4cae1e5104713c3694fce2e3c8828e011841bcb"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-handcart-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHandcart.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "4874 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "UV0 islands 1114, used 0.7157, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "T_Env_SohoHandcart_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "SM_Env_SohoHandcart, M_Env_SohoHandcart",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: двухколёсная тележка с дощатым кузовом, железными угловыми накладками и полосами, мешками под холстом с верёвочными петлями, двумя длинными ручками и опорной стойкой с подкосами. Пропорции кузова, колёс (по 14–16 спиц) и ручек совпадают с видом; лишних и пропавших частей нет, фантомных оболочек на turn-090/270 и wire-34 нет; узнаётся со всех ракурсов, включая вид сзади (turn-135) и спереди-сверху (turn-270).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и мусора нет; тонкие элементы (спицы, подкосы, верёвочные петли, обода) целы; сетка на wire-34 следует форме. На крупных планах: гранёные (низкополигональные) края мешков и холста на close-head и слегка рваный торец доски у заднего правого угла кузова на close-base — дефекты только крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: дерево с волокном и досками, кованое железо накладок и ободов, мешковина с плетением (close-weapon). Цвет в целом заметно серее и холоднее тёплого коричневого sheet.png (выветренное «закопчённое» дерево — в рамках стиля кита, но отличие от вида видно). На close-head — пикселизация/растяжка текстуры на углу холста; тёмные градиенты низа кузова в BC слегка похожи на запечённое затенение. Дефекты на уровне крупного плана, на игровой дистанции не мешают.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; замечания F/T — только крупного плана, для фонового пропа диорамы несущественны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Общий цвет серее и холоднее тёплого коричневого sheet.png (дерево и мешковина уходят в серо-бежевый); в пределах стиля «sooty, weathered», при желании поднять теплоту/насыщенность BC в env_kit params."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Пикселизация и растяжка текстуры на углу холста поверх мешков — видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёные низкополигональные края мешков и холста на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Слегка рваный торец доски у заднего правого угла кузова — только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-HANDCART-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп handcart (Soho) принят по делегированию: 8.3, силуэт совпадает с видом; мелочи крупного плана (серее цвет, гранёные мешки, пиксели на холсте) — в known_issues."
+}

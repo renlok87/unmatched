@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAleBarrel.fbx",
+      "sha256": "40a05b2ca4f39d09e5f6200a43bc5e0699d2613f3c3c8f5d4b68c9dfb4a7dd18"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_BC.png",
+      "sha256": "7b345988719004cfa432696122d3ae05ed426bb42eee5cc81b04f5b556d7675d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_N.png",
+      "sha256": "0181c6ec14a6ed9b71dcf131e64fcb120339c72034a027c83a5d67cabb2f457b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_ORM.png",
+      "sha256": "d892efdd0593f806b04d11cc5060ddfad4d042f43320af3e387fb3a181ca31f6"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-ale-barrel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoAleBarrel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "4518 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "UV0 islands 647, used 0.6687, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "T_Env_SohoAleBarrel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "SM_Env_SohoAleBarrel, M_Env_SohoAleBarrel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан: дубовая бочка на боку на деревянной подставке, 4 железных обруча, утопленное днище с кольцом блоков, кран с кольцевой ручкой на переднем днище, пробка сверху. Пропорции совпадают с видами листа в пределах ~5 %: спереди ширина подставки к ширине бочки 0,83 (лист 0,83); сбоку длина к высоте 1,08 (лист 1,10), доска основания к длине 0,84 (лист 0,88). Положение стоек и крана совпадает: на turn-270 кран справа, как на правом виде листа. Палитра того же семейства, что лист: серо-бурый выветренный дуб и ржавое железо. Лишних и пропавших частей нет, на turn-090/270 фантомов нет. Предмет узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, чёрных пятен, вывернутых частей и оплывших масс. Тонкие элементы целы: кольцо и носик крана, заклёпки обручей, пробка. Бочка лежит в ложементах, стойки стоят на брусьях основания, кран примыкает к днищу. Открытые петли из отчёта (внутренние края колец-обручей, однослойные днища) в кадрах не видны, inward 0. Сетка на wire-front/34/back следует форме: плотная на кране и обручах, длинные треугольники только на плоских днищах. Ступенчатые торцы клёпок на turn-090/270 — стилизация листа, а не дефект.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются: дуб с волокном и рисованными сколами, ржавое железо обручей с заклёпками, латунно-бурый кран. Детализация не беднее эталона кита Sarpedon. Дефект на полном росте в одной зоне: на переднем днище рядом с краном размытое мутное зелёно-бурое пятно. Это проекционный «призрак» нарисованного крана в BC: спереди на turn-000 его закрывает 3D-кран, на turn-045 он справа от крана, на turn-315 слева. Пятно привязано к поверхности, а не к свету, который вращается с камерой. На close-base оно видно отчётливо. По рубрике это «мыло/чужой цвет на полном росте» → 1,0. Только на крупном плане: смазанное волокно верхних клёпок вокруг пробки (close-head).",
+      "frames": [
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8,3 ≥ 8,0 (S 2,0 + F 2,0 + T 1,0 из 6), ни одно измерение не ниже 1,0, гейты PASS/n/a. Оценка в коридоре 8,0–8,4: по §8.5 нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "note": "На переднем днище справа от кольца крана размытое зелёно-бурое пятно: проекционный призрак нарисованного крана в BC. Спереди его скрывает 3D-кран, на 45° видно на полном росте. Исправляется закраской пятна в BC (env_kit params / ретушь BC) или перегенерацией текстуры Tripo."
+    },
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "note": "Тот же призрак крана слева от кольца ручки. Смещение по параллаксу подтверждает, что пятно в текстуре, а не тень."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На крупном плане призрак крана читается отчётливо: мутное пятно размером с кольцо ручки над носиком."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Только крупный план: волокно верхних клёпок вокруг пробки смазано и вытянуто, мыльнее остальных клёпок."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Нижняя треть бочки на боковых видах уходит почти в чёрное. Вероятно, это свет (низ обращён от key-света), но часть затемнения может быть запечена в BC: на глине wire-34 низ заметно светлее. Проверить в UE под светом доски; на листе низ тоже темнее, стилю не противоречит."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-ALE-BARREL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ale-barrel (бочка эля, Soho) принят по делегированию, 8,3 (S2 F2 T1): в текстуре переднего днища у крана остался проекционный призрак, на 45° он виден на полном росте. Оценка в коридоре 8,0–8,4, нужен второй приёмщик Opus high."
+}

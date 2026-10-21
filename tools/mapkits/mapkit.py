@@ -61,7 +61,12 @@ def save_status(m: str, st: dict) -> None:
 
 
 def side_slot(p: dict) -> str:
-    return "left" if p["symmetry"] == "axial" else "back"
+    """Second view: axial -> left; elongated (depth >= 1.5 x width: cab, boat, log) -> left, so Tripo sees the length;
+    other asymmetric -> back (skill tripo3d-stages §5.3); props.json "sideSlot" overrides."""
+    if p.get("sideSlot"):
+        return p["sideSlot"]
+    w, d, _ = p["sizeM"]
+    return "left" if p["symmetry"] == "axial" or d >= 1.5 * w else "back"
 
 
 def prompt_text(m: str, key: str) -> str:
@@ -85,15 +90,63 @@ def prompt_text(m: str, key: str) -> str:
     )
 
 
+def prompt_single(m: str, key: str) -> str:
+    """One three-quarter view for Tripo Smart Mesh + Generate Multi-Views (NOTES MK-10): Tripo draws the other views
+    itself, consistently, so the image only has to show the object clearly."""
+    kit = load_props(m)
+    p = prop(m, key)
+    w, d, h = p["sizeM"]
+    return (
+        "Production reference image for image-to-3D modelling: ONE object, three-quarter front view from slightly above "
+        "(camera 30 degrees to the left of the front, 15 degrees above), the whole object centred with 10% margin. "
+        "Plain flat seamless neutral mid-grey background (#808080), no vignette. Soft even light, no cast shadows, no "
+        "floor, no ground plane, no water, no reflections. Neutral daylight material colours, not night lighting, no "
+        "glow. No text, no letters, no labels, no watermark. "
+        f"Art style: {kit['styleEn']}. Object: {p['nameEn']} - {p['descEn']}. Materials: {p['material']}. "
+        f"Real-world size about {w:g} m wide, {d:g} m deep, {h:g} m tall; keep these proportions."
+    )
+
+
+THEME = {"baskerville-manor": "Victorian gothic manor on Dartmoor", "soho": "Victorian London street and Thames wharf",
+         "heorot": "Anglo-Saxon / Norse mead hall in snow", "sherwood-forest": "Robin Hood's Sherwood greenwood"}
+
+
+def prompt_short(m: str, key: str) -> str:
+    """Short single-view prompt for Tripo Image / Nano Banana Pro (MK-10): Tripo adds the other views itself.
+
+    Low camera (NOTES F8): Tripo turns the camera elevation of the view into a tilt of the mesh, and "tabletop
+    miniature" pulls in a base plate unless the prompt forbids it."""
+    p = prop(m, key)
+    w, d, h = p["sizeM"]
+    return (f"3/4 front view of ONE object, camera low at the object's mid height, centred, 10% margin, plain flat "
+            f"mid-grey (#808080) background, soft even daylight, no shadows, no floor, no base, no plinth, no text or "
+            f"letters. Stylized hand-painted tabletop "
+            f"miniature prop, {THEME[m]}. Object: {p['nameEn']} - {p['descEn']}. Materials: {p['material']}. "
+            f"About {w:g} x {d:g} x {h:g} m (w x d x h).")
+
+
 def _bbox_of_object(arr, x0: int, x1: int, bg_tol: float):
+    """Object box in columns [x0, x1). The background is a plane fitted to the border pixels (the 4K Tripo Image
+    upscaler and Gemini leave a light vertical gradient on the grey); rows and columns count as object only with at
+    least 0.3 % of their pixels off the plane, so stray noise does not stretch the box."""
     import numpy as np
     sub = arr[:, x0:x1].astype(np.float32)
-    bg = np.median(np.concatenate([sub[:8].reshape(-1, 3), sub[-8:].reshape(-1, 3)]), axis=0)
+    h, w = sub.shape[:2]
+    b = 6
+    ys, xs = np.mgrid[0:h, 0:w]
+    border = np.zeros((h, w), bool)
+    border[:b], border[-b:], border[:, :b], border[:, -b:] = True, True, True, True
+    A = np.stack([np.ones(border.sum()), xs[border] / w, ys[border] / h], axis=1)
+    bg = np.empty_like(sub)
+    for c in range(3):
+        coef, *_ = np.linalg.lstsq(A, sub[..., c][border], rcond=None)
+        bg[..., c] = coef[0] + coef[1] * xs / w + coef[2] * ys / h
     diff = np.abs(sub - bg).max(axis=2) > bg_tol
-    ys, xs = np.nonzero(diff)
-    if len(xs) < 50:
+    rows = np.nonzero(diff.sum(axis=1) > max(3, 0.003 * w))[0]
+    cols = np.nonzero(diff.sum(axis=0) > max(3, 0.003 * h))[0]
+    if len(rows) < 10 or len(cols) < 10:
         return None, bg
-    return (int(xs.min()) + x0, int(ys.min()), int(xs.max()) + x0 + 1, int(ys.max()) + 1), bg
+    return (int(cols.min()) + x0, int(rows.min()), int(cols.max()) + x0 + 1, int(rows.max()) + 1), bg
 
 
 def split(m: str, key: str, sheet: Path, bg_tol: float = 18.0) -> dict:
@@ -148,6 +201,67 @@ def split(m: str, key: str, sheet: Path, bg_tol: float = 18.0) -> dict:
     return res
 
 
+def pick_latest() -> Path:
+    """Newest Gemini / Tripo Image download of the last 2 minutes only: Downloads also holds the user's own files (an
+    older "image (1).png" was once taken by mistake and put back), so never pick anything older."""
+    import time
+    dl = Path.home().joinpath("Downloads")
+    pats = ("Gemini_Generated_Image_*", "image*", "upscaled_*")
+
+    def fresh():
+        now = time.time()
+        return sorted((c for pat in pats for c in dl.glob(pat)
+                       if c.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp") and now - c.stat().st_mtime < 120),
+                      key=lambda c: c.stat().st_mtime)
+    for _ in range(40):  # Gemini prepares the full-size file for a few seconds, then *.crdownload lands
+        if fresh() and not list(dl.glob("*.crdownload")):
+            break
+        time.sleep(1)
+    cands = fresh()
+    if not cands:
+        sys.exit("ERROR no Gemini / Tripo Image download of the last 2 minutes in Downloads")
+    return cands[-1]
+
+
+def archive_raw(m: str, key: str, src: Path) -> str:
+    raw = Path("C:/tmp/mapkits/gemini-raw")
+    raw.mkdir(parents=True, exist_ok=True)
+    dst = raw / f"{m}--{key}--{src.name}"
+    shutil.move(str(src), dst)
+    return str(dst)
+
+
+def single(m: str, key: str, image: Path, note: str, bg_tol: float = 28.0) -> dict:
+    """One view (3/4 or profile) -> props/<key>/front.png, centred square on #808080; Tripo adds views itself."""
+    from PIL import Image
+    import numpy as np
+    prop(m, key)
+    img = Image.open(image).convert("RGB")
+    arr = np.asarray(img)
+    box, _ = _bbox_of_object(arr, 0, arr.shape[1], bg_tol)
+    if box is None:
+        sys.exit(f"ERROR no object in {image}")
+    crop = img.crop(box)
+    side_len = int(max(crop.size) / 0.8)
+    canvas = Image.new("RGB", (side_len, side_len), (128, 128, 128))
+    canvas.paste(crop, ((side_len - crop.width) // 2, (side_len - crop.height) // 2))
+    if side_len < 1024 or side_len > 2048:  # Tripo uploads of 5 MB stall the form; 2048 is plenty for Smart Mesh
+        canvas = canvas.resize((2048, 2048) if side_len > 2048 else (1024, 1024), Image.LANCZOS)
+    out_dir = ROOT / "art" / "imagegen" / f"mapkit-{m}" / "props" / key
+    out_dir.mkdir(parents=True, exist_ok=True)
+    img.save(out_dir / "sheet.png")
+    prev = img.copy(); prev.thumbnail((1200, 1200)); prev.save(out_dir / "sheet.jpg", quality=85)
+    canvas.save(out_dir / "front.png")
+    rel = lambda q: str(q.relative_to(ROOT)).replace("\\", "/")
+    st = load_status(m)
+    e = st["props"].setdefault(key, {})
+    e["stage"] = "views" if e.get("stage") in (None, "listed") else e["stage"]
+    e["views"] = {"sheet": rel(out_dir / "sheet.png"), "sheetJpg": rel(out_dir / "sheet.jpg"),
+                  "front": rel(out_dir / "front.png"), "side": None, "slot": "single", "source": note}
+    save_status(m, st)
+    return {"front": rel(out_dir / "front.png"), "bbox": box, "px": list(crop.size)}
+
+
 def set_fields(m: str, key: str, pairs: list[str]) -> dict:
     prop(m, key)
     st = load_status(m)
@@ -167,6 +281,38 @@ def set_fields(m: str, key: str, pairs: list[str]) -> dict:
         sys.exit(f"ERROR stage {e.get('stage')!r} not in {STAGES}")
     save_status(m, st)
     return e
+
+
+def todo(m: str) -> list[tuple[str, str, str]]:
+    """Next step of every prop in flight: (key, next, task) from status.json (views/tripo ops/glb/build/acceptance)."""
+    out = []
+    order = {"P0": 0, "P1": 1, "P2": 2}
+    pr = {p["key"]: p for p in load_props(m)["props"]}
+    for key, e in sorted(load_status(m)["props"].items(), key=lambda kv: (order[pr[kv[0]]["priority"]], kv[0])):
+        t = e.get("tripo") or {}
+        ops = [o["op"] for o in t.get("ops", []) if o.get("status") == "ok"]
+        task = t.get("taskId", "")
+        st = e.get("stage")
+        if st in ("accepted", "rejected"):
+            continue
+        if st == "rework":
+            nxt = "rework (regenerate r2)"
+        elif st == "built":
+            nxt = "acceptance" if not (e.get("acceptance") or {}).get("card") else "second acceptor / finish"
+        elif t.get("glb"):
+            nxt = "env_kit build"
+        elif "pbr" in ops:
+            nxt = "export GLB"
+        elif any(o.startswith("texture") for o in ops):
+            nxt = "PBR"
+        elif "generate" in ops or "multiview" in ops:
+            nxt = "texture " + ("4K" if pr[key]["priority"] == "P0" else "2K")
+        elif (e.get("views") or {}).get("front"):
+            nxt = "Smart Mesh"
+        else:
+            nxt = "views"
+        out.append((key, nxt, task))
+    return out
 
 
 def summary(maps: list[str]) -> None:
@@ -198,39 +344,39 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     a = sub.add_parser("prompt"); a.add_argument("map"); a.add_argument("key")
+    a.add_argument("--single", action="store_true", help="one 3/4 view for Generate Multi-Views (MK-10)")
+    a.add_argument("--short", action="store_true", help="short single-view prompt (MK-10)")
     a = sub.add_parser("split"); a.add_argument("map"); a.add_argument("key"); a.add_argument("sheet", type=Path)
     a.add_argument("--bg-tol", type=float, default=18.0)
+    a = sub.add_parser("single"); a.add_argument("map"); a.add_argument("key"); a.add_argument("image", type=Path)
+    a.add_argument("--note", default="Tripo Image, Nano Banana Pro (Gemini 3 Pro Image), one 3/4 view")
     a = sub.add_parser("set"); a.add_argument("map"); a.add_argument("key"); a.add_argument("pairs", nargs="+")
     a = sub.add_parser("summary"); a.add_argument("map", nargs="?")
+    a = sub.add_parser("todo"); a.add_argument("map")
     a = sub.add_parser("next"); a.add_argument("map"); a.add_argument("--stage", default="listed")
     a.add_argument("--n", type=int, default=5)
     args = ap.parse_args()
     if args.cmd == "prompt":
-        print(prompt_text(args.map, args.key))
+        print(prompt_short(args.map, args.key) if args.short else
+              prompt_single(args.map, args.key) if args.single else prompt_text(args.map, args.key))
     elif args.cmd == "split":
         sheet = args.sheet
-        if str(sheet) == "latest":  # newest Gemini download; the raw file is moved out of Downloads after the split
-            import time
-            dl = Path.home().joinpath("Downloads")
-            for _ in range(40):  # Gemini prepares the full-size file for a few seconds, then *.crdownload lands
-                ready = [c for c in dl.glob("Gemini_Generated_Image_*") if c.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp")]
-                if ready and not list(dl.glob("*.crdownload")):
-                    break
-                time.sleep(1)
-            cands = sorted((c for c in dl.glob("Gemini_Generated_Image_*") if c.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp")),
-                           key=lambda p: p.stat().st_mtime)
-            if not cands:
-                sys.exit("ERROR no Gemini_Generated_Image_* in Downloads")
-            sheet = cands[-1]
+        sheet = pick_latest() if str(args.sheet) == "latest" else args.sheet
         res = split(args.map, args.key, sheet, args.bg_tol)
         if str(args.sheet) == "latest":
-            raw = Path("C:/tmp/mapkits/gemini-raw")
-            raw.mkdir(parents=True, exist_ok=True)
-            res["raw"] = str(raw / f"{args.map}--{args.key}--{sheet.name}")
-            shutil.move(str(sheet), res["raw"])
+            res["raw"] = archive_raw(args.map, args.key, sheet)
+        print(json.dumps(res, ensure_ascii=False))
+    elif args.cmd == "single":
+        src = pick_latest() if str(args.image) == "latest" else args.image
+        res = single(args.map, args.key, src, args.note)
+        if str(args.image) == "latest":
+            res["raw"] = archive_raw(args.map, args.key, src)
         print(json.dumps(res, ensure_ascii=False))
     elif args.cmd == "set":
         print(json.dumps(set_fields(args.map, args.key, args.pairs), ensure_ascii=False))
+    elif args.cmd == "todo":
+        for key, nxt, task in todo(args.map):
+            print(f"{key:22} {nxt:28} {task}")
     elif args.cmd == "summary":
         summary([args.map] if args.map else sorted(d.name for d in KITS.iterdir() if (d / "props.json").is_file()))
     elif args.cmd == "next":

@@ -1,0 +1,147 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHangingShopSign.fbx",
+      "sha256": "fceece20327a2d58165641ec0ab4dd5228ca28cfbcb6f8d8a803f5822129d025"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHangingShopSign_BC.png",
+      "sha256": "1f8dede89e80823fc7cede9a8f8873002b06753fe037f7cced1bb6b3e72820a0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHangingShopSign_N.png",
+      "sha256": "92ccb8fbe1432f760c12f6ed54ddd85bf42b8c46db77981fab7714a0f4cd8f26"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHangingShopSign_ORM.png",
+      "sha256": "70a6a2ce9cd6ae9306b3ab72cd01d3e6d57749225c40e7776da3bcaea50b4c87"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hanging-shop-sign-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHangingShopSign.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+      "note": "5042 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+      "note": "UV0 islands 161, used 0.5429, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+      "note": "T_Env_SohoHangingShopSign_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHangingShopSign.build.json",
+      "note": "SM_Env_SohoHangingShopSign, M_Env_SohoHangingShopSign",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет: настенная пластина с четырьмя отверстиями, кованый кронштейн с завитками и раскосом, две цепи, подвешенная доска с эмблемой чайника. Пропорции и состав совпадают с sheet.png; узнаётся со всех ракурсов (на 090/270 читается пластина, цепь и ребро доски). Фантомных частей нет; доска чуть светлее и кремовее оливково-бежевой на листе, но того же семейства цвета; на обратной стороне зеркальная эмблема — допустимо для двусторонней вывески.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии нет; тонкие элементы (звенья цепей, завитки) целы и объёмны. Доска слегка подушкообразная и с лёгким изгибом на виде сбоку — в пределах стилизованного дерева. Сетка на wire-34 следует форме: плотная на завитках и цепях, крупные треугольники только на плоских гранях доски.",
+      "frames": [
+        "turn-090.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: тёмное кованое железо и крашеное выветренное дерево с росписью чайника; запечённого направленного света нет. Дефекты только на крупном плане: контур эмблемы с лесенкой и горизонтальными мазками-смазами через тело чайника и у нижней кромки доски (close-base), на железе мелкий сетчатый рисунок «чешуи» (close-head). На полном росте не мешают.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Лесенка по контуру эмблемы чайника и горизонтальные смазы текстуры через чайник и у нижней кромки доски; видно только крупным планом."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мелкий сетчатый узор «чешуи» на кованом железе кронштейна; на игровой дистанции не читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-HANGING-SHOP-SIGN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hanging-shop-sign принят по делегированию (9.2): силуэт и форма чистые, мелкие дефекты текстуры эмблемы и железа только на крупном плане."
+}

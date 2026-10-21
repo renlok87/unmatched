@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTeaChest.fbx",
+      "sha256": "d164eb4031a97de68c87c230f7d609d0bd4d27ec243c93a3ecd589def9720bd7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTeaChest_BC.png",
+      "sha256": "98787278d8b5461b6448cabce1ccce11d1b7a82e601f54f9eaddd05ccc069831"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTeaChest_N.png",
+      "sha256": "d3343423497ac70ad35279cd18bcafa037332ab7b8492ee11b1f60f2fd6648de"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTeaChest_ORM.png",
+      "sha256": "a979cfe5b0d891ae3a4ff392428886f0283724d394eee63de61dd324a235b140"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-tea-chest-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoTeaChest.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+      "note": "4902 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+      "note": "UV0 islands 120, used 0.5285, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+      "note": "T_Env_SohoTeaChest_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTeaChest.build.json",
+      "note": "SM_Env_SohoTeaChest, M_Env_SohoTeaChest",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: куб-ящик с металлической окантовкой рёбер и утопленными филёнками, на передней грани трафарет «корона над якорем». Пропорции куба совпадают с видом, лишних и пропавших частей нет. На turn-090/270 нет фантомных выступов, со всех ракурсов узнаётся как окованный ящик. Знак есть и на передней, и на задней грани (turn-180), это допустимо для маркировки груза.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, просветов, чёрных пятен и мусорной геометрии нет. Сетка на wire-34 ровная и следует граням, филёнки и рамки чистые. Верхняя кромка рамки слегка волнистая и оплывшая: на wire-34 видна волна по верху, на turn-000 и turn-090 небольшой бугор в левом верхнем углу. На close-head по верхнему ребру тонкая складка или шов. Всё это заметно только на крупном плане и при скользящем свете, на игровой дистанции не читается.",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: светлая фанера с рисованными мазками и серо-ржавая жесть по кантам, трафарет чёткий. Запечённых теней в цвете нет. Боковые филёнки слабее: на turn-090 размытые смазанные пятна, на turn-270 почти гладкий градиент без волокна («мыло»). Для стилизованного фонового пропа на дистанции 18 uu это допустимо. Минус к оценке только за детализацию боков на крупном плане и шов на верхней кромке на close-head.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a; S=2.0, F и T по 1.5 только за дефекты крупного плана",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Верхняя кромка металлической рамки слегка волнистая, небольшой бугор в левом верхнем углу (turn-000/turn-090). Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "Боковые филёнки размыты: на turn-090 смазанные пятна, на turn-270 гладкий градиент без волокна фанеры. Тонкий шов по верхнему ребру на close-head. На игровой дистанции не читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-TEA-CHEST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tea-chest (чайный ящик, кит Soho) принят по делегированию, 8.3; в known_issues — мелкая волна верхней кромки и мыльные боковые филёнки."
+}

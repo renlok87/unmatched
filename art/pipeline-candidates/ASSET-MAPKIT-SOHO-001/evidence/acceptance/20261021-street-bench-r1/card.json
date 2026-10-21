@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoStreetBench.fbx",
+      "sha256": "cff9a1b5cafc20e99397cc91b5e53b0fc18c2e6a1e907578879942bc990bb3ed"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetBench_BC.png",
+      "sha256": "f1698721c3bbee706229378e744e51ab155280f39b48b3bfc08af8bb8c630fe8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetBench_N.png",
+      "sha256": "0293e432dedca8ea971364ec46e4cc6e8c68b975465fdd8f120d60dd24b33e8d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetBench_ORM.png",
+      "sha256": "1ed666ae62521c3a52b006040cda757f83e524a8d09906f2e64ff241f809d2b8"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-street-bench-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoStreetBench.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+      "note": "5469 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+      "note": "UV0 islands 652, used 0.6588, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+      "note": "T_Env_SohoStreetBench_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetBench.build.json",
+      "note": "SM_Env_SohoStreetBench, M_Env_SohoStreetBench",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: викторианская скамья с чугунными боковинами, лежащими крылатыми сфинксами на подлокотниках, завитком спинки, X-распоркой с медальоном и деревянными рейками (3 рейки спинки, сиденье); лишних и пропавших частей нет, на turn-090/270 и wire-* фантомов нет, узнаётся со всех 8 ракурсов. Пропорции совпадают с компактной двухместной скамьёй sheet.png. Одно второстепенное отличие контура: спинка и сиденье — сплошные панели с пазами вместо отдельных реек со сквозными тёмными щелями, как на sheet.png (wire-front/wire-34). Отклонение от описания (42.2×21.3×27 uu, длина/высота 1.56 против ≈2.0 у 1.8×0.9 м) унаследовано от sheet.png и записано в known_issues.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей; тонкие элементы (завитки спинки, крылья сфинксов, X-распорка, лапы ножек) целы; сетка на wire-* следует форме: рейки — чистые плоские полосы, боковины плотно триангулированы по рельефу. Сфинксы в сетке упрощены, но лицо, немес и крылья читаются в текстуре (turn-090, close-base) — для фонового пропа достаточно.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-090.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы в целом читаются: дерево с волокном и болтами на тыльной стороне (turn-180), окрашенный чугун с потёртостями. Но в пазах между рейками лицевой стороны спинки — светлые серо-белые полосы чужого цвета (на sheet.png там тёмные щели); они видны на полном росте на turn-000/045/315 и на close-head/close-weapon, это дефект на полном росте в одной зоне. Второстепенное: волокно дерева на крупном плане растянуто и смазано; чугун и дерево заметно светлее и холоднее почти чёрного чугуна и тёмного дерева sheet.png (тон, семейство то же).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5 + F 2.0 + T 1.0 = 4.5 из 6): T 1.0 — светлые полосы чужого цвета в пазах спинки видны на полном росте; S ≥ 1.5, поэтому доработка, а не перегенерация (return_to_stage_2); все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Затемнить в BC дно пазов между рейками лицевой стороны спинки (длинные светлые острова среди деревянных полос в левой части атласа, uv-layout.png) до тёмного тона щели или тени дерева, без светлого блика; после правки проверить turn-000/045/315 и close-weapon. Если правка BC невозможна, перетекстурировать исходник в Tripo с тёмными щелями между рейками.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wire-front.jpg",
+      "note": "Спинка и сиденье — сплошные панели с пазами (shell 2 — 72 tris, shell 3 — 28 tris) вместо отдельных реек со сквозными щелями, как на sheet.png; на игровой дистанции допустимо, если пазы станут тёмными."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Габариты 42.2×21.3×27 uu: длина/высота 1.56 и глубина/высота 0.79 против ≈2.0 и 0.67 у описания 1.8×0.6×0.9 м; компактная двухместная пропорция взята с sheet.png, не дефект генерации."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Волокно дерева на крупном плане растянуто и смазано вдоль реек (только крупный план)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Чугун серо-голубой и светлый, дерево светло-серо-коричневое — заметно светлее почти чёрного чугуна и тёмного дерева sheet.png; семейство цвета то же, при доработке можно затемнить."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-STREET-BENCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп street-bench (Soho) не принят, score 7,5: нужна доработка — затемнить светлые полосы в пазах спинки (T), форма и силуэт в порядке."
+}

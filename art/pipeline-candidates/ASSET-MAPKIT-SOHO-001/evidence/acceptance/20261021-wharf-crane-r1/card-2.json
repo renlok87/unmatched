@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWharfCrane.fbx",
+      "sha256": "ab00c486bedcb8bdcf742f36690bb646215bc39081f506dd98c4a6c6e5e5d1fe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_BC.png",
+      "sha256": "d54d5e7987767fc0b5a62b0fcd3e32e09fcfe46519e6bb5b419b9e2a14d2d577"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_N.png",
+      "sha256": "21c181f13853a398fc7d490cce626eaa37a4ba64332dc1134a5183af4da4dc75"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWharfCrane_ORM.png",
+      "sha256": "c86df5af04983a60cbff12a54e1b795d80a695de0aac22991bb31b0c095117af"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wharf-crane-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWharfCrane.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "5079 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "UV0 islands 1112, used 0.6541, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "T_Env_SohoWharfCrane_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWharfCrane.build.json",
+      "note": "SM_Env_SohoWharfCrane, M_Env_SohoWharfCrane",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: деревянный укосинный кран на дощатом основании с железными стяжками, вертикальной стойкой, наклонным подкосом, чугунной А-рамой лебёдки с шестернями, рукоятью, канатом, блоком и крюком на конце стрелы, обмоткой из парусины. Пропорции и главные части совпадают с sheet.png, кран узнаётся со всех ракурсов. Одно второстепенное отличие: на виде в sheet стрела из одного бруса, а у модели задняя часть стрелы раздваивается на два параллельных бруса (turn-045/090/135, close-base), рядом с хвостовым блоком появляется второй гладкий диск. В профиль (turn-000/180) это не читается, силуэт не ломается.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, рваных краёв и мусорной геометрии. Тонкие элементы целы: канат, крюк, рукоять, спицы колеса. Сетка на wire-34 следует форме, брусы прямые. Мелочи видны только на крупном плане: гладкий диск рядом с хвостовым блоком выглядит оплывшим и без детали, зубья шестерён скруглены и мягкие (close-base, wire-34).",
+      "frames": [
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 2,
+      "rationale": "Материалы читаются как заказано. Выветренное дерево с волокном, ржавое железо пластин, болтов, шестерён и крюка, витой канат, светлая парусина. Запечённого света и бликов в цвете нет, освещение снято равномерно. Явных швов и растяжек на брусах нет. Детализация на уровне кита пропов. Лёгкая размытость каната видна только на предельном увеличении close-head, на close-weapon канат чёткий. UV-атлас без перекрытий.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S+F+T = 5.0, score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a. Отличия второстепенные и видны только на крупном плане: раздвоенная задняя часть стрелы, гладкий диск, мягкие зубья шестерён. На игровой дистанции фонового пропа диорамы они не мешают.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Задняя часть стрелы раздвоена на два бруса, рядом с хвостовым блоком лишний гладкий диск. В sheet.png стрела из одного бруса с одним блоком."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Гладкий диск у хвостового блока выглядит оплывшим, зубья шестерён мягкие и скруглённые. Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-WHARF-CRANE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wharf-crane кита Soho принят по делегированию (8.3). Мелочи в known_issues: раздвоенная задняя часть стрелы, гладкий диск, мягкие шестерни."
+}

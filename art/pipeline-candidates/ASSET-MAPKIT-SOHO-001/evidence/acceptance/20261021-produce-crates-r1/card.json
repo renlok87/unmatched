@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoProduceCrates.fbx",
+      "sha256": "dcd41fe674f2d43117016b1859758b8cc2aecde563e3f1d1ede698f0f0cffae7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_BC.png",
+      "sha256": "4b395b1be567c876221de00579e151eb81f2a284a748492926828404f2356462"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_N.png",
+      "sha256": "3af53f2f19a30ed6c6cad2197ac2ebf1699997087a97488dca859131b5d30726"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_ORM.png",
+      "sha256": "1b2604e5ac57dae87e630d51e414246cb9961c187a363ed6eb3bf0e944671fb6"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-produce-crates-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoProduceCrates.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "5286 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "UV0 islands 919, used 0.4503, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "T_Env_SohoProduceCrates_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "SM_Env_SohoProduceCrates, M_Env_SohoProduceCrates",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан: стопка из трёх реечных ящиков, в верхнем яблоки, апельсины и турнепс, как на sheet.png. Узнаётся со всех 8 ракурсов, лишних и пропавших частей нет. Отличий два. (1) Вся стопка наклонена вперёд примерно на 6°. На turn-090 и turn-270 при ортокамере с возвышением 0° силуэт — параллелограмм: все рейки идут под 5–6°, верх смещён относительно основания примерно на 10 % высоты. На turn-135, turn-180 и turn-225 видно днище: задний край основания висит над полом примерно на 2 uu. На листе стопка стоит ровно. (2) Глубина ящиков с поправкой на наклон — примерно 0,79 ширины (габарит 27,2×24,7×30 uu) против заказанных 1×0,6×1 м: основание почти квадратное. Два отличия, наклон больше 10 % высоты → 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка в целом следует форме: рейки, угловые стойки, распорки и шары плодов на wire-front и wire-34. Волнистость реек — стилизация, допустимо. Дефекты на полном росте: (1) чёрная треугольная дыра по центру фронта под верхним бортом (turn-000, turn-045, wire-front, wire-34, close-head). В отчёте сборки 3 дыры, 14 открытых рёбер и 22 non-manifold-ребра. (2) Смятая задняя стенка верхнего ящика: косая плоскость задней рейки и угловатые осколки вместо плодов (turn-180, turn-225, wire-back). Дыра на игровой дистанции — мелочь в тёмной щели, главная зона дефекта — задний верх ящика; низ и крупные планы чистые → 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево читается деревом: расписные волокна, сучки, сколы. Плоды правильных цветов: красные яблоки, оранжевые апельсины, бело-лиловый турнепс с зеленью. Запечённого света и бликов нет, растяжек и швов не видно, детализация на уровне кита. Дефект на полном росте — чужой рисунок на рейках: кирпичная кладка, двери с окнами, вывески и афиши (Tripo перенёс в текстуру «улицу» из стиля кита). На фронте нижних ящиков он занимает до половины площади (turn-000, close-base), меньше — сзади и с боков (turn-180, turn-090). Издали это читается как красноватые пятна и наклейки. Размытые оранжево-красные полосы в щелях между рейками читаются как плоды внутри — терпимо. → 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: стопка наклонена вперёд примерно на 6° и не стоит основанием на полу; глубина ящиков около 0,79 ширины против заказанных 0,6. Кроме того, у верхнего борта дыра, задняя стенка верхнего ящика смята (F 1,0), а на рейках нарисованы кирпич, двери и окна (T 1,0). Всё это дефекты исходника Tripo; env_kit работает по политике «measured only» и геометрию не чинит. Нужна перегенерация в Tripo по прямым видам front + side без возвышения камеры: ящики из чистого дерева с простыми трафаретными метками, без фасадных мотивов.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Вся стопка наклонена вперёд примерно на 6°, задний край основания висит над полом примерно на 2 uu; днище видно на turn-135, turn-180 и turn-225. При перегенерации взять виды без возвышения камеры."
+    },
+    {
+      "item": "S",
+      "frame": "turn-270.jpg",
+      "note": "Глубина ящиков около 0,79 ширины против заказанных 1×0,6×1 м: основание почти квадратное."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Сквозная треугольная дыра (чёрный треугольник) по центру фронта под верхним бортом; та же дыра на turn-045, wire-front, wire-34 и close-head. В отчёте сборки 3 дыры, 14 открытых рёбер и 22 non-manifold-ребра."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Смятая задняя стенка верхнего ящика: косая плоскость и угловатые осколки вместо плодов, видно на turn-180 и turn-225."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "На рейках нарисованы кирпичная кладка, двери с окнами и афиши — чужой для ящиков рисунок. На фронте он занимает до половины площади нижних ящиков, повторяется сзади (turn-180) и с боков."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "В щелях между рейками размытые оранжево-красные полосы; терпимо, читаются как плоды внутри, но при перегенерации за ними стоит следить."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-PRODUCE-CRATES-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп produce-crates (Soho) не принят, 5,0. Стопка наклонена примерно на 6° и висит задним краем; у верхнего борта дыра, на рейках нарисованы кирпич и двери. Возврат на этап 2: перегенерация в Tripo по прямым видам front + side."
+}

@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHandcart.fbx",
+      "sha256": "7c7f9dca3c20b12a7fa1df949a0d64f6ffa6f448b6e23774fb2ff1ee1cdb0531"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_BC.png",
+      "sha256": "d57c8cce1c87fa7fb2404d2acf6573e762b6dc3e5ca0e987c3f1b50eda509db8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_N.png",
+      "sha256": "2dcf8c26cdac6fc6919fd1ae4d830aee1ac74931ba43f30bf571bf4819414c1f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandcart_ORM.png",
+      "sha256": "fbfabf5d13c59d3b564b16aad4cae1e5104713c3694fce2e3c8828e011841bcb"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-handcart-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHandcart.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "4874 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "UV0 islands 1114, used 0.7157, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "T_Env_SohoHandcart_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandcart.build.json",
+      "note": "SM_Env_SohoHandcart, M_Env_SohoHandcart",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет со sheet.png: двухколёсная тележка с дощатым кузовом, железными угловыми накладками и стяжками, мешки под холщовым пологом на верёвочных петлях, мешки с завязанными горловинами, длинные оглобли с двумя опорными ножками и раскосами, колёса со спицами и ступицами. Пропорции кузова, колёс и оглобель совпадают с видом; оглобли опираются у земли. Лишних или пропавших частей нет, на turn-090/270 и wire-* фантомов нет. Узнаётся со всех 8 ракурсов, включая вид сзади (задняя стенка, ось, откидной борт).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: нет дыр, просветов и вывернутых частей. Тонкие элементы целы: все спицы обоих колёс, раскосы под оглоблями, верёвочные петли, оглобли. Сетка на wire-34/front/back следует форме: доски, обода и мешки разведены по плотности. Дефекты только крупного плана: гранёные ступенчатые края полога и мешка на close-head. На wire-front передняя стенка кузова идёт тёмным градиентом сглаживания; в текстуре это читается как копоть внизу стенки.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию: дерево с волокном и потёртостями, кованое железо с заклёпками и бликом металла, мешковина с видимым плетением, холст полога. Детализация на уровне кита. Дефекты крупного плана: на close-head полог мыльный и пикселизированный (блочная лесенка у складки). Общая палитра серее и холоднее тёплого коричневого sheet.png, но в рамках «sooty / weathered» кита и того же землистого семейства. Чужих пятен, швов и растяжек на полном росте нет.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0 (S 2.0, F 1.5, T 1.5), гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Края полога и верхнего мешка гранёные, со ступенькой на складке; видно только на крупном плане при бюджете 4874 tris."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Передняя стенка кузова идёт тёмным градиентом сглаживания по большому треугольнику. В текстуре (turn-000, turn-270) это читается как копоть внизу стенки, на игровой дистанции не мешает."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Текстура полога на крупном плане мыльная, с блочной пикселизацией у складки."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Палитра заметно серее и холоднее тёплого коричневого sheet.png (дерево серо-бурое, мешковина серо-бежевая). Семейство цвета то же, стилю sooty/weathered кита не противоречит."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-HANDCART-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп handcart (ручная тележка, Soho) принят по делегированию: 8.3. Силуэт совпадает с видом, мелкие огрехи полога видны только на крупном плане, палитра серее эталона."
+}

@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoStreetPump.fbx",
+      "sha256": "669813a19a6b6e9dfdbfa68088edadfaccc121a1d1b562cd8fc380cfb70d6642"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetPump_BC.png",
+      "sha256": "1aa74378750e7e4a74143c056a7053c67a82d0a765d1d1fab3367bdfd5cbc513"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetPump_N.png",
+      "sha256": "dc99d060ffaedebed0514dc8587722326dd39048589a749320be284d82d8471e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoStreetPump_ORM.png",
+      "sha256": "27f481a49d09f97fb5f0b7bc3f0fcb9009a981a9ca641ec8c7a866b95f82732f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-street-pump-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoStreetPump.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+      "note": "4860 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+      "note": "UV0 islands 72, used 0.5881, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+      "note": "T_Env_SohoStreetPump_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoStreetPump.build.json",
+      "note": "SM_Env_SohoStreetPump, M_Env_SohoStreetPump",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот же предмет, что на sheet.png: зелёная чугунная колонка с носиком, ржавым штоком, изогнутой рукоятью с крюком на конце, рёбрами-желобом и муфтой посередине, вилкой шарнира на крышке, корпусом-головой, «кирпичной» стойкой, фланцем на болтах, круглой опорной плитой и каменным корытом слева спереди. Все главные части на месте, лишних нет. Пропорции совпадают в пределах ~5 % высоты: конец рукояти ~60 % сверху против ~56 % на виде, носик ~48 % против ~44 %. Предмет узнаётся со всех 8 ракурсов, фантомных выступов и оболочек на turn-090/270 и wire-* нет. Табличка на задней стороне основания — литая деталь, а не фантом. В корыте нет сливного отверстия — это микродеталь.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых или мусорных частей. Тонкие элементы целы: шток, рукоять с крюком, болты шарниров, фланец с болтами. Сетка на wire-34/front/back следует форме: кольца по стойке, плотная сетка на рукояти и носике, простой бокс корыта. На close-head видна лёгкая гранёность дуги рукояти и обода крышки, на close-weapon — мягкий переход вилки в крышку. Это нормальная плотность для 4,8k tris, не оплывшая масса, на игровой дистанции не читается.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: окрашенный зелёный чугун с ржавчиной на кромках, ржавый шток, выветренный камень корыта с потёками и мхом, кирпичный рисунок стойки как на виде. Запечённых бликов нет, UV-атлас без перекрытий. Мелкие дефекты: (1) зелень светлее и мятнее тёмно-бутылочного тона sheet.png, хотя семейство цвета то же; (2) мягкий размытый переход и затёк зелёного цвета на стыке торца корыта и чугунного основания (turn-090, turn-225, turn-135) — маленькая зона внизу; (3) вертикальные растяжки на внутренней стенке корыта и слегка мыльные потёки на гранях (close-base); (4) тёмное пятно под крышкой корпуса может быть частично запечённой окклюзией, но читается как копоть. Всё это видно на крупном плане или в мелкой зоне. На дистанции настольной диорамы детализация не беднее уровня кита.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0; ни одно измерение не ниже 1.0; все гейты PASS или n/a. Остаются мелкие текстурные дефекты крупного плана, на игровой дистанции фонового пропа они не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "мягкий размытый переход и затёк зелёного цвета на стыке торца корыта и чугунного основания (также turn-225.jpg, turn-135.jpg); маленькая зона внизу пропа"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "вертикальные растяжки на внутренней стенке корыта, слегка мыльные потёки на внешних гранях"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "зелёный чугун светлее и мятнее тёмно-бутылочного тона sheet.png; семейство цвета совпадает"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "тёмное пятно под крышкой корпуса может быть частично запечённой окклюзией; читается как копоть"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-STREET-PUMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "проп street-pump принят по делегированию: 9.2 (S 2.0, F 2.0, T 1.5); открыто — бледнее зелень и мыло на стыке корыта с основанием"
+}

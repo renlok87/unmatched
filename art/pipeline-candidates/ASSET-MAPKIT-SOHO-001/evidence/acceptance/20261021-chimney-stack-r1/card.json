@@ -1,0 +1,179 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoChimneyStack.fbx",
+      "sha256": "487c18e51eedfcb6d7b4653a06e3f42a3f476937508f555ca3a8d098a1eb08c1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_BC.png",
+      "sha256": "029526686daadfae4a8b1419018f1ec645143f2a88ae5f5520836f0b691ac3a5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_N.png",
+      "sha256": "0ef28e124c4fdfad09bd22ceea4fde4b69dd5ef94af7480b0f662c17825b5202"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_ORM.png",
+      "sha256": "ea3ad3e398b5abfbea9e63edb22f70ec715d2647b73c407716a31ad51262a1df"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-chimney-stack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoChimneyStack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "5492 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "UV0 islands 76, used 0.5205, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "T_Env_SohoChimneyStack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "SM_Env_SohoChimneyStack, M_Env_SohoChimneyStack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Модель изображает заказанный предмет: кирпичную дымовую трубу с четырьмя терракотовыми горшками (у каждого обод, поясок и расширение у основания). Наверху карниз из двух напускных рядов с зубчиками и обмазка раствором, внизу свинцовый фартук и шиферное седло с кирпичным фронтоном, как на обоих видах листа. Пропорции против front листа совпадают в пределах ~3 %: горшки занимают 23,6 % высоты против 22 %; ширина тела к основанию 0,59 против 0,61; карниз к основанию 0,68 против 0,69; высота к ширине ≈1,0, как на листе. Лишних и пропавших частей нет, предмет узнаётся со всех 8 ракурсов (на 135/315 виден узкий торец с фронтоном). Палитра того же семейства, шифер чуть синее и светлее листа. Сама труба тонкая: ≈33×10 uu, ≈3:1 против 1,2×0,6 в брифе. Общий след вместе с седлом ≈2:1, а лист глубину не задаёт, поэтому балл не снижаю. Широкая грань повёрнута на ≈35° от −Y (см. known_issues).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка из одного шелла без non-manifold. На wire-* сетка следует форме: плоские грани трубы, смоделированные зубчики карниза, полые горшки с ободами, ступенчатые ряды шифера. На полном росте нет дыр, рваных краёв, мусорной геометрии и оплывших масс. Дефекты только на крупном плане и у кромки. Расширения горшков сливаются с обмазкой неровным, местами зубчатым краем, ободы слегка неровные (close-head). Зубчики под карнизом оплывшие (close-weapon). На правой кромке шифера бугорки и зубцы (wire-front, wire-34). Дно открыто (по отчёту дыра на 93 ребра, ≈1393 uu²): при взгляде с уровня 0 под фронтонами видна тонкая тёмная щель (turn-090/135/270/315). Когда проп стоит на крыше, её не видно.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: кирпич с раствором и копотью, терракота с потёками сажи, синевато-серый шифер, серые обмазка и фартук. Детализация высокая (4K→2K) и на игровой дистанции не беднее кита Sarpedon. Запечённого направленного света в цвете не видно, на полном росте нет мыла, швов и растяжек, UV без перекрытий. Дефекты только на крупном плане. Внутри горшков чистая светлая терракота без сажи: с верхней камеры отверстия читаются светлыми кружками, а не тёмными дымоходами (close-head). Текстура зубчиков и нижней кромки карниза смазана (close-weapon). На тыльной грани (turn-180/225) швы раствора мягче и полосатее, чем спереди, но кирпич читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a. Замечания F/T только на крупном плане, они перенесены в known_issues. Балл в полосе 8.0–8.4: по §8.3/§8.5 нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Широкая грань трубы и конёк седла повёрнуты примерно на 35° от оси −Y. Фасад смотрит прямо на азимуте 30–45° (close-base, wire-34), а на turn-000 виден боковой торец: Tripo повторил 3/4-«front» листа. Силуэт с листом совпадает, балл не снижен. Чтобы выровнять трубу по конькам крыш, нужен поворот ≈35° в env_kit params (сейчас yaw_deg_about_plus_z_applied = 0) или поправка yaw в EnvLayouts."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Расширения горшков сливаются с обмазкой неровным, местами зубчатым краем, ободы горшков слегка неровные. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Зубчики под карнизом оплывшие, нечёткие блоки. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Дно открыто: по отчёту дыра на 93 ребра, ≈1393 uu², плюс крошечная дыра 0,18 uu² на крыше на z≈8,4 uu. С уровня 0 под кирпичными фронтонами видна тонкая тёмная щель (turn-090/135/270/315). На крыше её не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Внутри горшков чистая светлая терракота без сажи. С верхней игровой камеры отверстия читаются светлыми кружками вместо тёмных дымоходов."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Текстура зубчиков и нижней кромки карниза смазана. Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-CHIMNEY-STACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп chimney-stack принят по делегированию с баллом 8.3; это полоса 8.0–8.4, нужен второй приёмщик «Opus high». Поворот фасада ≈35° от −Y и замечания крупного плана записаны в known_issues."
+}

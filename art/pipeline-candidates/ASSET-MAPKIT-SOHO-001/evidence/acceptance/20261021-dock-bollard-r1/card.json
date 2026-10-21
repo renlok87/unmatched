@@ -1,0 +1,167 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoDockBollard.fbx",
+      "sha256": "b7fbb616137be2ebe7d70758ae98390e69ba86e53d1f199ecae2c2d798044e85"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_BC.png",
+      "sha256": "ba3018cb85986bc249899022489e786c4c245cc883e7297bfda56ce712f25193"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_N.png",
+      "sha256": "067f3b08bedc0bf30d7f748556d20432d9335fbe292eb09aea44ec094b692227"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_ORM.png",
+      "sha256": "b3d35d8a295aec30f416dfe30d8c8d786b620a360ed0bfdf4c87017abac01081"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-dock-bollard-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoDockBollard.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "5140 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "UV0 islands 980, used 0.6193, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "T_Env_SohoDockBollard_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "SM_Env_SohoDockBollard, M_Env_SohoDockBollard",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: приземистая чёрная чугунная тумба с Т-образной головой (рога по бокам, торцевая шишка на виде слева), талия, 4 витка каната, хвост с махрой и бухта на земле справа. turn-000 почти повторяет фронт листа. Пропорции в пределах 5 %: ширина по рогам к высоте 0,83 против 0,85 на листе, пояс каната на 0,35–0,63 высоты против 0,35–0,65. Узнаётся со всех 8 ракурсов, фантомных выступов и оболочек на turn-090/270 и wire-* нет. Одно второстепенное отличие контура: Tripo достроил лишние свисающие хвосты с махрами (4–5 вместо одного) и бухты по обе стороны основания. На turn-090 канат выходит за фланец слева, а на виде листа слева хвост и бухта есть только справа. Рёбра-косынки у подошвы смягчены до вмятин (turn-225/315), это уровень детали.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На кадрах нет дыр, просветов, чёрных пятен и вывернутых частей. Открытые петли из отчёта (внутренние стороны витков каната, утопленные в ствол) не видны. Сетка Smart Mesh ровная и следует форме (wire-front/34/back). Недочёты читаются при разглядывании кадра, но не на игровой дистанции (24 uu):\n- махры хвостов из толстых палочек читаются как «пальцы» (turn-135, turn-180, wire-back);\n- трубки свисающих хвостов гладкие и неровной толщины, бухта на земле комковатая (turn-045, close-base);\n- край шляпки огранён (close-head).\nСтилизация допустима, поэтому ставлю 1,5, а не 1,0.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: чугун чёрный крашеный с ржавыми точками, канат пеньковый с прорисованной круткой, цвета как на листе. Запечённого света в цвете нет: BC железа ровно тёмный, светлый верх шляпки — блик. Детализация на уровне кита Sarpedon (сравнено с T_Env_Barrel_BC эталона). Дефекты крупного плана:\n- мыльные размытые пятна ржавчины на шляпке (close-head);\n- смазанная, растянутая по длине крутка на свисающих хвостах: справа на close-weapon, на turn-045/180 хвосты полосатые, как кора;\n- железо глаже и глянцевее литья на листе.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "uv-layout.png",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 (S 1,5, F 1,5, T 1,5). Перегенерация не нужна (S ≥ 1,5), поэтому доработка по F и T. Гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Хвосты каната:\n- заменить махры-«пальцы» из толстых палочек на тонкую махру или срезать их до аккуратного торца;\n- выровнять толщину трубок хвостов и комковатую бухту на земле (turn-045);\n- оставить один свисающий хвост с бухтой справа, как на листе (заодно снимает отличие S на turn-090);\n- сгладить огранённый край шляпки (close-head).",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "На свисающих хвостах вернуть чёткую крутку прядей вместо смазанных полос, растянутых по длине хвоста. Убрать мыльные пятна ржавчины на шляпке (close-head).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Лишние свисающие хвосты с махрами (4–5 вместо одного) и бухты по обе стороны основания. На виде листа слева хвост и бухта есть только справа. Рёбра-косынки подошвы смягчены до вмятин (turn-225/315)."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-34.jpg",
+      "note": "По отчёту сборки 35 открытых петель (22 дыры, 13 трещин) и 28 неманифолдных рёбер. Крупные круглые дыры — внутренние стороны витков каната, утопленные в ствол, на кадрах они не видны. Есть одна крошечная изолированная оболочка-волокно (7 треугольников) в 0,59 uu от каната. Гейт PASS по бюджету треугольников, а не по замкнутости сетки."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-DOCK-BOLLARD-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dock-bollard (причальная тумба): 7,5 < 8,0, нужна доработка. Править хвосты каната: махры-«пальцы», лишние хвосты на боках и спине, смазанная крутка. Сама тумба совпадает с листом."
+}

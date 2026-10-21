@@ -1,0 +1,153 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPubBarrelTable.fbx",
+      "sha256": "311d8b7bac835407c0bae9bd515d8229149e731ea6581080880d7236c577f0c3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPubBarrelTable_BC.png",
+      "sha256": "7e62f1c4c5720b7f0b7cdd8c505a8f0202aa06b68d0bbce38bdb415f495184b8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPubBarrelTable_N.png",
+      "sha256": "dc5bd30e01aba831bbe6cd456c4953385b7ba7a83bb60904375860c7e37e88fb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPubBarrelTable_ORM.png",
+      "sha256": "3414c4c819e5e969c69d688bc6471895989916d4ad52394633f9f8d54b43df75"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pub-barrel-table-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoPubBarrelTable.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+      "note": "5160 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+      "note": "UV0 islands 60, used 0.6025, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+      "note": "T_Env_SohoPubBarrelTable_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPubBarrelTable.build.json",
+      "note": "SM_Env_SohoPubBarrelTable, M_Env_SohoPubBarrelTable",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: стоячая дубовая бочка с четырьмя железными обручами, заклёпанными накладками и втулкой, на крышке две оловянные кружки с ручками — как на sheet.png. Пропорции бочки (ширина/высота около 0,8) и положение кружек у края крышки совпадают с видом; лишних или пропавших частей нет, на turn-090/270 фантомных выступов нет (видны только втулка и кружки). Узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: бочка с выраженным брюхом, обручи и накладки читаются, дыр и вывернутых частей нет, сетка на wire-34 следует форме (веер на крышке, кольца по обручам). Только на крупном плане видны мелкие дефекты: волнистые, слегка неровные края венчиков кружек, оплывший край крышки бочки, слегка рваная нижняя кромка донышка у нижнего обруча.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как дерево (клёпки, волокна), обручи — как железо, кружки — как олово; запечённых теней в цвете нет, стилизация в духе кита. Дефекты видны только на крупном плане: зигзагообразные тёмные штрихи-артефакты на внутренней стенке венчиков обеих кружек, рваная светлая кромка у донышка левой кружки, местами мыльная размытость волокон в средней части клёпок (turn-180). На игровой дистанции не заметно.",
+      "frames": [
+        "close-head.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 → 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a; дефекты только крупного плана, для фонового пропа диорамы несущественны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Венчики кружек слегка волнистые, край крышки бочки оплывший — видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Зигзагообразные тёмные штрихи-артефакты на внутренней стенке венчиков кружек, рваная светлая кромка донышка левой кружки."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Местами размытые (мыльные) волокна клёпок в средней части бочки; на игровой дистанции не читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-PUB-BARREL-TABLE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп pub-barrel-table (бочка-стол Soho) принят по делегированию с оценкой 8.3; мелкие артефакты внутри кружек и оплывшие кромки — только на крупном плане."
+}

@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-area-railings-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAreaRailings.fbx",
+      "sha256": "949267002b8ae787dfcb5ab82d0759ab9f6baccba59e10b541fac36cc9d0e773"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_BC.png",
+      "sha256": "de1fff8ba75f05608ea4f2526d167c668847eb89c8693877846959f6eada4ea2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_N.png",
+      "sha256": "c24d8c38885ce1ce17d1ec6557fe75d6ff25b8b4ea4a15076de04b9dc2a5c3ec"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_ORM.png",
+      "sha256": "ea2a71a0d53e13f97e906dbd8f21c9a46bd23fe0b2bf8e101833db6af112fca3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-area-railings-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoAreaRailings.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "5243 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "UV0 islands 312, used 0.4107, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "T_Env_SohoAreaRailings_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "SM_Env_SohoAreaRailings, M_Env_SohoAreaRailings",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан и что на sheet: секция чугунной ограды с пиками-флёр-де-лис (9 промежуточных прутьев), двумя концевыми стойками с урнами-пиками, парными завитками сверху и снизу, на кирпичном цоколе с каменным покрытием, плюс доски у основания, которые есть и на sheet. Силуэт узнаётся со всех 8 ракурсов, на turn-090/270 видны стойка и торец цоколя, фантомных оболочек нет. Глубина 8,5 uu при высоте 33 (≈0,26) совпадает с заказанными ≈0,3/1,1. Одно второстепенное отличие контура: верхний и нижний поручни выступают на ~9 % ширины за одну концевую стойку, только с одной стороны (turn-000 справа, turn-180 слева, wire-34). На sheet поручни, насколько видно, упираются в стойку. Ширина 52,9 uu при высоте 33 (1,6 против ≈1,8 по описанию) укладывается в «≈», виды этому не противоречат.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, чёрных пятен и оплывших масс нет, тонкие прутья, поручни и завитки целы, сетка на wire-* следует форме (цоколь — короб, ковка — плотная сетка). Дефекты видны только на крупном плане и в зоне основания. (1) Нижняя доска перекошена и смята там, где уходит под верхнюю (close-base, wire-34). По отчёту в зоне досок 13 вывернутых граней (2,85 % площади) и 129 нормалей углов, смотрящих внутрь поверхности: в UE с односторонним материалом там может появиться просвет. (2) Нижний поручень не прямой, на wire-front у него две ступеньки. (3) Лепестки наверший и хвосты завитков гранёные и комковатые (close-head, close-weapon); как стилизация это допустимо.",
+      "frames": [
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Железо тёмно-серое металлическое (чуть светлее «black iron», но того же семейства), с лёгким износом. Цоколь — закопчённый серый кирпич с потёками раствора, доски — выветренное дерево. Крупных запечённых теней и растяжек на полном росте нет. На крупном плане: (1) мелово-белые запечённые блики-пятна на внутренних сторонах лепестков флёр-де-лис (close-head, close-weapon), на turn-135/turn-180 они видны светлыми точками на ряду наверший; (2) дымные размытые пятна у основания пик (close-head); (3) верх покрытия цоколя мягкий и размытый (close-base). Торцы цоколя с крупными «подушками» камня другого масштаба (turn-270) — терпимо.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1,5+1,5+1,5)/6×10, 1) = 7,5 < 8,0. S = 1,5 (не ниже 1,5), поэтому не return_to_stage_2, а rework_blender по пунктам F и T. Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Доски у основания: нижняя доска перекошена и смята под верхней (close-base, wire-34), по отчёту в этой зоне 13 вывернутых граней (2,85 % площади). Убрать доски-мусор (их нет в описании) или исправить геометрию и нормали, чтобы в UE с односторонним материалом не было просвета.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "fix": "Выпрямить нижний поручень: на wire-front и turn-000 у него две ступеньки и лёгкий прогиб посередине.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать запечённые мелово-белые блики на лепестках флёр-де-лис и дымные размытые пятна у основания пик (close-head, close-weapon; на turn-135/180 видны светлыми точками): затемнить BC наверший до тона железа или перетекстурировать. Заодно подтянуть резкость покрытия цоколя (close-base).",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Верхний и нижний поручни выступают на ~9 % ширины за одну концевую стойку, только с одной стороны (turn-000 справа, turn-180 слева, wire-34); на sheet поручни упираются в стойку. Ширина 52,9 uu при высоте 33 (1,6 против ≈1,8 по описанию) — в пределах «≈»."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёные, комковатые лепестки наверший и хвосты завитков на крупном плане. Как стилизация на игровой дистанции допустимо, отдельной доработки не требует."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-AREA-RAILINGS-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп area-railings (Soho), r2: 7,5 — доработка. Нужно поправить доски у основания и нижний поручень (F) и убрать запечённые блики на навершиях (T). Силуэт узнаётся со всех ракурсов, гейты PASS."
+}

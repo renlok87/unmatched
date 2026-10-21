@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-milk-churns-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMilkChurns.fbx",
+      "sha256": "8cd9330d8176f39d31eeeae66716004023df2531636e81fcb9ff94218297eaba"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_BC.png",
+      "sha256": "ea420e455ff1d8ab50d7129b8a61658c7c4b749e5ee040da3931ab4ddf52505c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_N.png",
+      "sha256": "2af6c15edd9194716c0e2885a3a5572107017dcb45e6bbb45f0be16b9dba165b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_ORM.png",
+      "sha256": "cd5f9c9227d8eec62d7342292e9bcaaea35fc40baee4dd554f5481204aca2269"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-milk-churns-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMilkChurns.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "4813 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "UV0 islands 704, used 0.6733, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "T_Env_SohoMilkChurns_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "SM_Env_SohoMilkChurns, M_Env_SohoMilkChurns",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: три стальных бидона с крышками (планка-ручка на крышке), горлом, плечиками, бандажами и боковыми ручками. Расстановка треугольником и подставка с брусчаткой, досками и тумбами совпадают с sheet.png (ракурс close-base почти повторяет лист). Пропорции корпуса, плеч и горла совпадают с видами. Лишних и пропавших главных частей нет, предмет узнаётся со всех 8 ракурсов. Лёгкий наклон бидонов на 3–5° и пятно подставки шире заказанного (34×41,5 uu при высоте 24 uu) остаются в пределах листа, по которому генерировали.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка следует форме (wire-front, wire-34, wire-back). Ручки, планки крышек, тумбы и столбики целы, оплывших масс и вывернутых частей нет. Дефект: в верхней грани подставки, в зоне досок между тумбами справа, сквозная щель-дыра. Это открытая петля из 3 рёбер в shell 0, ≈9,9×0,9 uu, центр (12,74; 0,18; 7,08) uu (build.json shells_and_holes). Тёмный клин отчётливо виден на полноразмерных кадрах close-base и wire-34, то есть с ракурса игровой камеры сверху. Подставка полая с открытым дном, поэтому в UE с односторонним материалом через щель будет видно поле под ней. Это дефект на полном росте в одной зоне, отсюда 1,0. Мелочи крупного плана: гранёные кромки крышек (close-weapon), тонкая тёмная полоска под донцами бидонов на кадрах с нулевым возвышением.",
+      "frames": [
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Корпуса выглядят как чеканная сталь с сажей и ржавыми поясками, металл даёт блик. Подставка читается как брусчатка и доски. Явного запечённого света и теней в цвете нет, детализация в целом на уровне кита Sarpedon. Минусы: крупные размытые чёрные пятна сажи на передних бидонах читаются кляксами (turn-000, close-base). Боковые стенки подставки — гладкий серый смаз без рисунка камня (turn-270). Крышки бледные, с пунктирными следами шва вдоль ручки (close-head). На игровой дистанции сверху проп читается; дефекты — мягкость текстуры, а не поломка.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0. F 1,0: сквозная щель в верхней грани подставки видна на полноразмерных кадрах close-base и wire-34. S 2,0 ≥ 1,5, поэтому доработка в Blender, а не перегенерация в Tripo. Все гейты PASS или n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Закрыть сквозную щель в верхней грани подставки. Это открытая петля из 3 рёбер в shell 0: центр ≈ (12,74; 0,18; 7,08) uu, периметр 19,77 uu, площадь 4,42 uu². Заполнить треугольник fill-ом по петле, не трогая открытое дно подставки и донца бидонов. Затем пересчитать shells_and_holes и заново снять close-base и wire-34.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "fix": "Подтянуть мыло текстуры: боковые стенки подставки (серый смаз без рисунка камня и досок), размытые чёрные кляксы сажи на корпусах передних бидонов (turn-000, close-base), пунктирные следы шва вдоль ручек крышек (close-head). Сделать это локальной правкой BC или перетекстурированием того же исходника Tripo без смены формы.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Подставка из листа (брусчатка, доски, тумбы) даёт пятно 34×41,5 uu при высоте 24 uu, это ≈1,1×1,4 м против заказанных 0,8×0,8 м. Бидоны слегка наклонены (3–5°). Всё в пределах листа и стилизации."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Тонкая тёмная полоска между донцами бидонов и подставкой на кадрах с нулевым возвышением: донца открыты, видно внутрь. С игровой камеры сверху не видна."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Гранёные (многоугольные) кромки крышек видны только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Пунктирные тёмные следы шва вдоль планки-ручки крышки видны только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-MILK-CHURNS-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп milk-churns (7,5) идёт на доработку в Blender. Нужно закрыть щель-дыру в верхней грани подставки (F 1,0) и подтянуть мыло текстуры (T 1,5). Силуэт совпадает с листом (S 2,0)."
+}

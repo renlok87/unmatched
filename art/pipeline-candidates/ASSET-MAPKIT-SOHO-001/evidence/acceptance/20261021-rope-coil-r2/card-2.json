@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-rope-coil-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoRopeCoil.fbx",
+      "sha256": "04486e50f4916e23ddb70fe5bfbeb3911b4de76fa08974e4d792ea66280802c9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_BC.png",
+      "sha256": "521c5099349990a0cfb26320298f1d523e0700419435dbaac3bdac3b7f06a841"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_N.png",
+      "sha256": "b853284a5e2a11d799ee7953abc7fe81ef6e573523baf6498b062f2dc29d7d7b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_ORM.png",
+      "sha256": "d3c887afc782ab050b258b4d9deb6cf061dbad035c95de61fd0ac47fd456f342"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-rope-coil-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoRopeCoil.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "5106 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "UV0 islands 108, used 0.5454, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "T_Env_SohoRopeCoil_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "SM_Env_SohoRopeCoil, M_Env_SohoRopeCoil",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это заказанный предмет, как на sheet.png: толстая пеньковая бухта из двух лопастей, перехваченная в середине несколькими витками, свободный конец спереди слева, под ней дощатый настил на двух брусьях-полозьях. Пропорции бухты и настила совпадают с видом 3/4 (close-base.jpg почти повторяет ракурс листа). Лишних и пропавших частей нет. Предмет узнаётся со всех ракурсов, в том числе сбоку (turn-090/270): стопка витков и арка перехвата. Верёвка светлее, чем на листе (светлый беж против тёпло-коричневого), но это та же цветовая семья.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Спереди и в 3/4 витки чёткие, конец верёвки цел, доски и брусья настила чистые, дыр, чёрных пятен и вывернутых частей нет. Сетка на wire-34 следует форме. Сзади (turn-180, wire-back) левая лопасть мягче: витки частично сливаются в гладкую плиту, у верхних витков есть небольшая прямоугольная ступенька. Форма главной части при этом сохраняется и на игровой дистанции не читается. На close-head видны гранёные плоские участки на изгибе перехвата.",
+      "frames": [
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Скрутка пеньки читается на каждом витке, настил читается как светлое выветренное дерево с волокном и сколами по торцам. Запечённого света и теней в цвете нет, чужих цветов и растяжек на полном росте нет. Остались дефекты крупного плана: на close-head текстура перехвата размыта, видны мыльные пятна и границы граней. На задней лопасти (turn-180), где витки сливаются, рисунок скрутки слабее. Детализация на полном росте на уровне кита пропов.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "turn-045.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0, score = 5.0/6×10 = 8.3 ≥ 8.0. Ни одно измерение не ниже 1.0, гейты PASS, G-RIG n/a. Остальное (слитые витки сзади, мыло на крупном плане) — дефекты крупного плана и тыльной стороны фонового пропа, на игровой дистанции они не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Тыльная сторона, левая лопасть: витки частично сливаются в гладкую массу, у верхних витков небольшая прямоугольная ступенька; видно и на wire-back.jpg."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёные плоские участки на изгибе перехвата на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Текстура перехвата на крупном плане размыта: мыльные пятна, видны границы граней."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "На слитых витках сзади рисунок скрутки слабее, чем спереди."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-ROPE-COIL-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп rope-coil (бухта каната) принят по делегированию, r2, 8.3: силуэт совпадает с листом. Слитые витки сзади и мыло на крупном плане записаны в known issues."
+}

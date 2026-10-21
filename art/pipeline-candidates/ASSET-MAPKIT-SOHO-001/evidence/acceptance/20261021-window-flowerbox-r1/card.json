@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWindowFlowerbox.fbx",
+      "sha256": "68be33c7a7b7e5c7b34ac565e3981319d5aed7938fb2b2cc49f5e05bbb29ab64"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_BC.png",
+      "sha256": "a0c9f39a9087ad1990e318331b7d376a9b34c2f60525df23125ce9486f5cdc67"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_N.png",
+      "sha256": "504ed31dce2a98aad4f25e03449b9df31059749f36e2516580a5d579650aece2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWindowFlowerbox_ORM.png",
+      "sha256": "20b69abffb14ce3e4124b9d67993c9fc31d37f1083009a1fcfd34dfc4bc0190c"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-window-flowerbox-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWindowFlowerbox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "4038 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "UV0 islands 1009, used 0.7679, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "T_Env_SohoWindowFlowerbox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWindowFlowerbox.build.json",
+      "note": "SM_Env_SohoWindowFlowerbox, M_Env_SohoWindowFlowerbox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот же, что на sheet.png. Деревянный ящик-трапеция из трёх досок с красными геранями стоит на двух чугунных кронштейнах. У кронштейнов завитки, настенные стойки, уходящие ниже ящика, и передние крюки-хомуты на фасаде ящика. Пропорции ящика к кронштейнам и цветам совпадают с листом. Лишних и пропавших главных частей нет, предмет узнаётся со всех 8 ракурсов (на 090/270 видны торец ящика и L-кронштейн с завитком). Отличия есть только в тоне, контур они не меняют: дерево светлее и серее тёплого коричневого на листе, цветы коралловые, а не чисто красные. Семейство цвета то же.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Спереди, сбоку и в 3/4 модель на полном росте чистая: стебли, листья и завитки кронштейнов целы, дыр, рваных краёв и оплывших масс нет, сетка на wire-34/wire-front следует форме. Клиновидные трещины в досках фасада — смоделированные углублённые щели (wire-front, close-base). Они читаются как стилизованное рассохшееся дерево, дефектом их не считаю. Дефекты: (1) задняя настенная доска между стойками согнута по диагонали, большой треугольный излом виден на turn-135/180/225 и wire-back. Эта сторона прижата к стене фасада и в игре не видна, поэтому оценку до 1,0 не снижаю. (2) Зазор в нижней доске торцов (turn-090/270) и комковатые грани цветочных шапок (close-head) видны только на крупном плане.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Дерево с нарисованными волокнами и потёртыми кромками, чугун тёмный с лёгкой ржавчиной, герани красно-коралловые, листья зелёные с пятнистостью. Запечённого света и бликов в цвете нет (turn-000/045/315), детализация на уровне стилизованного кита. Дефекты: (1) на задней доске со стороны стены размытые серые мазки там, где на дерево спроецированы верхушки стоек, и перепад тона по линии излома (turn-180, turn-135). (2) Растянутые штрихи на нижней доске фасада и мягкие пятна на цветах заметны только на крупном плане (close-base, close-head).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Балл 8,3 ≥ 8,0, все измерения ≥ 1,0, гейты PASS или n/a. Балл в полосе 8,0–8,4, поэтому нужен независимый второй приёмщик (§8.3/8.5).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Задняя настенная доска согнута по диагонали: треугольный излом виден также на turn-135/225 и wire-back. Это сторона у стены, в игре она не видна. Если будет доработка — выровнять плоскость доски."
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Зазор в нижней доске торца ящика (также turn-270), виден только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Клиновидные трещины досок фасада с тёмной глубиной принял как стилизацию рассохшегося дерева. На игровой дистанции они читаются как щели между досками."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Размытые серые мазки верхушек стоек на задней деревянной доске и перепад тона по линии излома (сторона стены)."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Растянутые штрихи текстуры на нижней доске фасада и мягкие пятна на цветочных шапках (close-head), только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-WINDOW-FLOWERBOX-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп window-flowerbox (Soho) принят по делегированию: 8,3 (S 2,0 / F 1,5 / T 1,5). Излом и мазки только на задней стороне у стены. Балл в полосе 8,0–8,4, нужен второй приёмщик Opus high."
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCargoCrate.fbx",
+      "sha256": "3570296f934d9cfa12a5aac9fa990e610c4a5249a3b52a4038a86e8bee86bfa0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_BC.png",
+      "sha256": "cab2f77a65346cbb74f8b3ad86cd21e383fd63a0522c093c2cc35c36c73cf94d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_N.png",
+      "sha256": "102d7cf0e2b8011b9881fc1b3b6c6adbc07797d1ff3f815cee6bb4f3a4b82fea"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_ORM.png",
+      "sha256": "6445d7c13a562c6338d541f9022ba14441449d12a22265cb526bb2105a34a318"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-cargo-crate-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoCargoCrate.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "4384 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "UV0 islands 1269, used 0.8166, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "T_Env_SohoCargoCrate_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "SM_Env_SohoCargoCrate, M_Env_SohoCargoCrate",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Ящик тот, что на листе: рама из брусьев, утопленные филёнки из горизонтальных досок, ржавые угловые накладки с заклёпками, верёвочные ручки на боках; спереди и сзади (turn-000/180) силуэт совпадает с видами листа почти один в один, кубическая пропорция держится (0.31×0.26×0.27 м, без перекосов >5 %). Ручки сбоку оформлены U-петлёй между двумя крюками в центре боковой филёнки (turn-090/270); спереди они читаются так же, как кольца с висящими концами на листе. Лишних частей и оболочек на turn-090/270 и wire-* нет, узнаётся со всех 8 ракурсов. Трафаретной маркировки из описания нет, но на листе её тоже нет; это деталь текстуры, а не контура.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-045.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка чистая, грани ящика плоские, рамы и накладки с объёмом, болты целы; на полном росте нет дыр, просветов, вывернутых частей и мусора (wire-front/back/34 — крупные треугольники по плоскостям, плотность сосредоточена на верёвке и болтах). Мелкие дефекты на крупном плане: нижний пролёт верёвочной петли тоньше вертикалей и сплющен в ленту, конец верёвки уходит плоским шипом (wire-34, close-base, turn-090).",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: выветренное дерево в стилизованной ручной покраске, ржавое железо накладок с бликом на кромках, пеньковая верёвка; уровень детализации хороший, грязные потёки и дырки от гвоздей как на листе спереди. Дефекты на крупном плане: на крышке волокна дерева растянуты и смазаны (close-head); на боковых филёнках слабый светлый «призрак» верёвки, впечатанный в цвет рядом с настоящей петлёй (turn-135, turn-315, close-weapon). Задняя филёнка беднее листа (нет сучка и трещины, они ушли на бок, turn-090). На игровой дистанции фонового пропа это не читается.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a; дефекты F/T только крупного плана, для фонового пропа диорамы не критичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "нижний пролёт верёвочной петли тонкий и сплющен в ленту, конец — плоский шип; виден только на крупном плане"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "на крышке растянутые смазанные волокна дерева (крупный план)"
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "слабый светлый призрак верёвки впечатан в BC боковой филёнки рядом с петлёй"
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "трафаретной маркировки из описания нет (на листе её тоже нет)"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-CARGO-CRATE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп cargo-crate (Soho) принят по делегированию с оценкой 8.3. Мелочи крупного плана записаны в known_issues: тонкий нижний пролёт верёвки, растяжка на крышке, призрак верёвки в текстуре."
+}

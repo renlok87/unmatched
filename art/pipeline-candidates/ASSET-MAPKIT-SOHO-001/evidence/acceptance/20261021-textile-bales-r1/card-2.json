@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTextileBales.fbx",
+      "sha256": "5a3c6e2fc9f140f8f01d7c048f7699e05ef50073b58778c0f0285f822f8c3644"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTextileBales_BC.png",
+      "sha256": "706194cf795e50966fb2602d69cfad96aba587f382c068555cefb00e37ea6704"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTextileBales_N.png",
+      "sha256": "e67035146e74ec0debb32a2e718f28a40d21adf84c4b341c0b0e766aab8dde0e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTextileBales_ORM.png",
+      "sha256": "7a1119afb118891ff55416e79cebe7bd6e4122d8ca7b61b64ba90215099ea8d2"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-textile-bales-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoTextileBales.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+      "note": "4900 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+      "note": "UV0 islands 763, used 0.578, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+      "note": "T_Env_SohoTextileBales_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTextileBales.build.json",
+      "note": "SM_Env_SohoTextileBales, M_Env_SohoTextileBales",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: три обвязанных верёвкой парусиновых тюка (два внизу, один длинный сверху), у верхнего разрыв с пёстрой стопкой ткани (розовый, синий, оранжевый с орнаментом) — как на front листа; сзади целый верхний тюк с двумя поясами верёвки и узлами по бокам, нижние с крестовой обвязкой и узлом — как на back. Пропорции стопки и верхнего тюка совпадают с видами, фантомных частей нет, предмет узнаётся со всех 8 ракурсов. Отогнутые клапаны разрыва на боковых видах выступают за контур тюка — это объёмное прочтение отогнутого клапана с листа, не лишняя часть.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: мягкие тюки с заломами, верёвки и узлы с хвостами целы, дыр и мусора нет, сетка на wire-* следует форме. На крупном плане: края разрыва — однослойные пилообразные плоскости с зубцами, полость за разрывом тёмная и гранёная, верёвка на верхней кромке заметно гранёная (низкий поли). На игровой дистанции читается как истрёпанная парусина.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: парусина с плетением, пятнами и маркировкой, верёвка с витьём, яркая ткань внутри; запечённого направленного света нет, цвет ровный со всех сторон. На крупном плане: растяжка/мыло на клапанах разрыва и на правом краю стопки ткани (синее пятно), размытые штрихи маркировки. На полном росте дефектов нет.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, все измерения ≥ 1.5, гейты PASS/n/a; дефекты F/T видны только на крупном плане.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Края разрыва — пилообразные однослойные плоскости, полость за разрывом тёмная и гранёная; видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Верёвка на верхней кромке тюка гранёная (мало сегментов по окружности); на полном росте не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Растяжка/мыло текстуры на клапанах разрыва и синее размытое пятно на правом краю стопки ткани; только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-TEXTILE-BALES-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп textile-bales принят по делегированию (8.3): силуэт и материалы как на листе, дефекты разрыва и верёвки только на крупном плане."
+}

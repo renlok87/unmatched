@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWheelbarrow.fbx",
+      "sha256": "638c0b15812cf69a67205fcc79fd0adb9f1ce0dc6ba4b4d7bca90fa34a2239af"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWheelbarrow_BC.png",
+      "sha256": "81e5b12922b8cc10a06e6ef4753ff1969fde6724314b2fc80aa1dbd6bc694e6c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWheelbarrow_N.png",
+      "sha256": "1eadd3d7d489de0ba1627ff57aa55db6fd3dd7b5e13440ec922f7f33518a3123"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWheelbarrow_ORM.png",
+      "sha256": "911bda38483a09e8879e7e3df1c1ac1f40cd883886250955ac8d99e409a99b4d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wheelbarrow-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWheelbarrow.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+      "note": "4621 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+      "note": "UV0 islands 561, used 0.6958, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+      "note": "T_Env_SohoWheelbarrow_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWheelbarrow.build.json",
+      "note": "SM_Env_SohoWheelbarrow, M_Env_SohoWheelbarrow",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: деревянная тачка с одним спицевым колесом в железном ободе, наклонным кузовом из досок с накладками и заклёпками, двумя ногами с перекладиной и изогнутыми ручками. По частям и пропорциям совпадает с видом sheet.png (колесо около 0,3 длины, высокий передний борт у колеса, ручки с лёгким подъёмом на концах), узнаётся со всех 8 ракурсов, лишних и пропавших главных частей нет. Одно второстепенное отличие: груз на листе почти чёрный уголь, на модели светло-серые камни/гравий (палитра второстепенной части). Основное пятно (дерево) того же семейства, хотя светлее и серее листа. Открытый задний торец кузова (turn-135) на одновидовом листе не проверяется.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии на полном росте нет. Тонкие элементы целы: спицы, ручки, перекладина ног, заклёпки, обод. Сетка на wire-* следует форме: плотная на колесе и ручках, крупные треугольники на плоских досках (4621 tris). Дефекты крупного плана: комья угля оплывшие и мягкие (close-weapon, close-head), верхняя кромка борта гранёная (close-head). У открытого заднего торца груз срезан плоской малополигональной гранью (wire-back, turn-135). Это упрощение без дыр, а на полном росте его выдаёт прежде всего текстура (см. T).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево читается деревом (доски с волокнами, сучками и трещинами в рисованном стиле), заклёпки и обод колеса читаются металлом, швов и растяжек на дереве не видно, запечённого света сверх рисованного стиля нет. Дефект на полном росте в одной зоне, груз кузова. Вместо угля светло-серые камни с белыми бликами (turn-000, turn-045, turn-225, close-weapon), тогда как на листе почти чёрный уголь: чужой цвет, груз не читается углём ни с одного ракурса, а сверху (игровая камера) это самое крупное пятно пропа. В той же зоне у открытого заднего торца внутренняя грань под кучей размазана вертикальными полосами (turn-180), даёт шумно-серую трапецию (turn-135) и тёмно-коричневый клин (turn-090).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "S 1,5 + F 1,5 + T 1,0 = 4,0 из 6 → 6,7 < 8,0. Все гейты PASS или n/a, ни одно измерение не ниже 1,0, S ≥ 1,5, поэтому rework_blender, а не перегенерация. Главная причина: груз читается светло-серым гравием, а не углём, и у открытого заднего торца кузова размазана текстура. В env-kit-params.json у пропа есть только target и yaw, параметра тонирования нет, поэтому правка идёт через исходник Tripo (ретекстур груза, задний борт).",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Груз должен быть углём, а не серым гравием. Перетекстурировать кучу в кузове в почти чёрный антрацит с холодным сине-серым бликом на гранях, как на sheet.png. Сейчас BC груза светло-серый с белыми бликами и читается камнями на всех 8 ракурсах. Ретекстур исходника в Tripo с явным «black coal lumps» в промпте или замена BC на островах груза.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Задний открытый торец кузова: под кучей видна плоская наклонная грань с размазанной вертикальными полосами серой текстурой (turn-180), шумно-серая трапеция (turn-135) и тёмно-коричневый клин (turn-090). Закрыть задний борт доской с деревянной текстурой или затекстурировать эту грань углём или деревом без растяжек.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "fix": "Груз у открытого заднего торца срезан плоской малополигональной гранью (wire-back, turn-135). Дать куче естественный скат к полу кузова или поставить задний борт. Заодно при той же переделке собрать комья угля чётче (сейчас оплывшие, close-weapon) и смягчить гранёную кромку борта (close-head).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Длинная ось тачки лежит по диагонали (bounds 0,42×0,39 м, чистый профиль на turn-045, чистый тыл на turn-135), yaw_deg 0 в env-kit-params.json. На оценку не влияет; при доработке можно выставить yaw около ±45°, чтобы ось совпала с осью ассета."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Дерево светлее и серее листа: бледный беж вместо тёплого среднего коричневого. Укладывается в «weathered wood» стиля кита, отдельно не снижает."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-WHEELBARROW-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wheelbarrow (Soho) на доработку, 6,7 < 8,0: груз светло-серый и читается гравием, а не углём; у открытого заднего торца кузова размазана текстура."
+}

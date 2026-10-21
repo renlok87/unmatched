@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMooringPilings.fbx",
+      "sha256": "6457b3a77c8b0993613f7f51bb66f55e181ce768c2247de444a956b2854235f2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_BC.png",
+      "sha256": "b2045ef34817b327d086781fa6029b9086e0c864c695f98aa74d24341d75ecda"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_N.png",
+      "sha256": "fadf3ab0f3f9c33fd231827821f2c6f81182b5c5b902e63b95ca5c2d0250dc3e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_ORM.png",
+      "sha256": "fa0441e87996f0dde0f41dac99d04fd24c43f62b957ee9503f104564c0082c44"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-mooring-pilings-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMooringPilings.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "4378 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "UV0 islands 1035, used 0.5919, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "T_Env_SohoMooringPilings_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "SM_Env_SohoMooringPilings, M_Env_SohoMooringPilings",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот же: связка смолёных свай с витым канатом и узлом, ржавыми железными бандажами с заклёпками и балянусами у основания. Спереди turn-000 почти точно совпадает с sheet.png. Верхушки ниже самой высокой сваи на ≈13 % и ≈32 % роста (на листе ≈14 % и ≈31 %). Канат на ≈44 % (на листе ≈45 %), нижний ряд бандажей на ≈61 % (на листе ≈60 %), узел с висящими концами слева. Предупреждение frames.json о ключе листа ни на что не влияет: по содержанию это тот же предмет. Отличий два. (1) Лишняя четвёртая свая сзади. В отчёте сборки это shell 4: z 4,7–61,2 uu, y до +21,8 uu. Спереди её закрывают другие сваи, но она видна на turn-090/135/180/225/270/315, wire-back и wire-34: при орто-камере с возвышением 0 её верхушка на 0,61 м, а у трёх заказанных 0,51/0,65/0,75 м. Заказано «cluster of three», на листе тоже три. Её низ висит на 4,7 uu (≈6 % роста) над землёй. (2) Вся связка завалена вперёд на ≈8–11°: на turn-090/270 силуэт — параллелограмм. На turn-000 при возвышении 0° видны верхние торцы, на turn-180 — нижние. Возвышение камеры листа запеклось в геометрию. Предмет узнаётся со всех 8 ракурсов, фантомных оболочек нет. Два отличия → 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей нет. Канат с узлом и висящими концами, бандажи и заклёпки целы. Сетка на wire-front, wire-34 и wire-back ровно идёт по цилиндрам свай и колец. Дефекты только крупного плана: кромки торцов слегка оплывшие, с бугром, и контур гранёный (close-head); балянусы — гранёные комки (close-base). 90 открытых петель из отчёта сборки — внутренние стороны бандажей и каната, прижатые к сваям; на кадрах они не видны. → 1,5.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Дерево с волокнами, трещинами и выбеленными торцами. Ржавое железо с заклёпками, витой канат, внизу тёмная мокрая смола с зеленью, бледные балянусы. Детализация на уровне кита Sarpedon (BC бочки ASSET-ENV-KIT-001). Направленного запечённого света нет: turn-000 и turn-180 одной яркости. UV без растяжек. Верх свай светлее и серее, чем «tarred» на листе, но это то же цветовое семейство. Дефекты крупного плана: мыльная размазанная BC на торцах (close-head) и нарисованные в BC белые мокрые блики-крапины в нижней зоне (close-base, мелко видны на turn-000). Ещё есть маленькое ржавое пятно, похожее на бандаж, у верха лишней задней сваи без геометрии (turn-090, turn-135). → 1,5.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: два отличия от листа и описания. Первое — лишняя четвёртая свая сзади, а заказано «cluster of three»; её низ висит на 4,7 uu над землёй. Второе — вся связка завалена вперёд на ≈8–11°. По рубрике это return_to_stage_2: перегенерация в Tripo, rework_fix_list пуст. F 1,5 и T 1,5 (дефекты только крупного плана) записаны в known_issues. Все гейты PASS/n/a. Score = (1,0 + 1,5 + 1,5) / 6 × 10 = 6,7.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Лишняя четвёртая свая сзади: shell 4 отчёта сборки, верх 61,2 uu, низ висит на 4,7 uu над землёй. Видна на turn-090/135/180/225/270/315, а заказано и на листе три сваи. При перегенерации явно задать «exactly three pilings» и дать вид сзади или сбоку с тремя сваями."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Связка завалена вперёд на ≈8–11°: силуэт-параллелограмм на turn-090/270, на turn-000 при камере 0° видны верхние торцы. Возвышение камеры входного вида запеклось в наклон. Нужен вид строго с горизонта и вертикальные сваи."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Кромки торцов свай слегка оплывшие, с бугром, контур гранёный; видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Балянусы — гранёные комки; видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мыльная размазанная BC на торцах свай на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Нарисованные в BC белые мокрые блики-крапины в нижней смоляной зоне; мелко видны и на turn-000."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Ржавое пятно, похожее на бандаж, без геометрии у верха лишней задней сваи (видно и на turn-135)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-MOORING-PILINGS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mooring-pilings не принят (6,7): перегенерировать в Tripo — ровно три вертикальные сваи без лишней задней и без завала вперёд. Форма и текстуры в остальном годные."
+}

@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoTelegraphPole.fbx",
+      "sha256": "1eb0514600956c754762b000d02bb67afb35239eb1af483395ef31ebd6669fe4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTelegraphPole_BC.png",
+      "sha256": "bcfa000701999cf5ca3f02cdfde9ab303fbb4beeaa8f1d17ebec1492490e72f3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTelegraphPole_N.png",
+      "sha256": "074b035d82fbf77c228150a8eaaab677f4cccf42237cd4db9eca5d66749f8e85"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoTelegraphPole_ORM.png",
+      "sha256": "5d7209c3c4d6fb07cf2acb898081c99fc0d4c80fb9354be938a9be79d58e40c7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-telegraph-pole-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoTelegraphPole.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+      "note": "4858 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+      "note": "UV0 islands 232, used 0.4325, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+      "note": "T_Env_SohoTelegraphPole_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoTelegraphPole.build.json",
+      "note": "SM_Env_SohoTelegraphPole, M_Env_SohoTelegraphPole",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Сама мачта узнаётся со всех 8 ракурсов и совпадает с sheet.png: столб, две траверсы, деревянные V-подкосы, 8 белых изоляторов, свисающие обрывки проводов. Описание заказывает одиночную мачту на крыше ≈1,2×0,3×4 м, а модель вышла виньеткой: вместе с мачтой запечён крупный постамент. Он состоит из каменной плиты с брусчаткой и деревянного причала с 4 швартовыми тумбами, на нём 5 ящиков, 2 бочки и ящик у основания столба. Габарит по отчёту 80,4×76,9×120 uu, заказано ≈36×9×120 uu: ширина ×2,2, глубина ×8,5. Постамент забирает около 10 % высоты, сама мачта ниже, а причал не подходит для зоны rooftops. Третье отличие: плоская серая асимметричная пластина-перепонка между верхними подкосами и нижней траверсой. Её видно на turn-000/090/180/270 и wire-front, в конструкции мачты её нет. Отличий два и больше, пропорция главного габарита сбита сильно больше 10 %, отсюда 1,0. Постамент уже есть в sheet.png, поэтому повтор по тем же видам даст то же самое.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка Smart Mesh чистая и следует форме (wire-34, wire-front). Столб, траверсы, подкосы, изоляторы и тонкие провода целы. Рваных краёв, чёрных пятен, вывернутых и оплывших масс на полном росте нет. Дефекты видны только на крупном плане. Под стопкой ящиков в настиле причала тёмная щель-дыра (close-base). Колпачки изоляторов мягкие, слегка оплывшие (close-head). По отчёту дыры только в невидимых днищах плиты и ящиков, 107 inward-граней лежат в зоне настила (z≈6–7 uu), на кадрах их не видно. Пластину между подкосами я учёл в S. Итог 1,5.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На полном росте материалы читаются как заказано: дерево выветренное, с волокном, изоляторы белые керамические, провода тёмные; брусчатка и ящики тоже читаются. Запечённого света и теней, швов и растяжек нет. На крупном плане текстура мыльная: волокно траверс размыто, изоляторы в грязно-серых пятнах. Боковины каменной плиты залиты ровным серо-синим цветом без детали, это видно и на turn-090/180, но плита сама лишняя часть. Дефекты только крупного плана, итог 1,5.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0, это меньше 1,5, поэтому по рубрике пропа return_to_stage_2. Вместо одиночной мачты ≈1,2×0,3×4 м сгенерирована виньетка 80×77×120 uu на постаменте: каменная плита, причал, ящики, бочки, швартовые тумбы. Причал противоречит зоне rooftops. Между подкосами есть лишняя пластина-перепонка. Постамент уже нарисован в sheet.png, поэтому для перегенерации в Tripo нужны новые виды front + single. На них должна быть одна мачта на небольшой пятке без постамента, след ≈1,2×0,3 м, с симметричными деревянными V-подкосами без пластины. Score 6,7.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Запечён постамент: каменная плита и причал с 4 тумбами, 5 ящиков, 2 бочки. Габарит 80,4×76,9 uu вместо ≈36×9 uu, мачта ниже примерно на 10 %, причал не подходит для зоны rooftops. Постамент есть уже в sheet.png."
+    },
+    {
+      "item": "S",
+      "frame": "close-weapon.jpg",
+      "note": "Плоская асимметричная серая пластина-перепонка между верхними V-подкосами и нижней траверсой. В конструкции мачты её нет."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Тёмная щель-дыра в настиле причала под стопкой ящиков (крупный план)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Колпачки изоляторов мягкие, оплывшие (крупный план)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мыло на крупном плане: волокно траверс размыто, изоляторы в грязно-серых пятнах. Боковины плиты залиты ровным цветом без детали."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-TELEGRAPH-POLE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп telegraph-pole не принят (6,7). Вместо одиночной мачты на крыше вышла виньетка на постаменте с причалом, ящиками и бочками, 80×77 uu. Нужна перегенерация Tripo по новым видам без основания."
+}

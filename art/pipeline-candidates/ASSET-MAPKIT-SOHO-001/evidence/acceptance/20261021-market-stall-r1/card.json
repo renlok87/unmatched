@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMarketStall.fbx",
+      "sha256": "e73add20688d5d465ac6f491dde2c94dfe07e94650882ff5bb868e2e5c8c88ba"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_BC.png",
+      "sha256": "51bed6244e53bd5c2d4081103391fa7b179637dc07948dc6dacff5df838d642c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_N.png",
+      "sha256": "6fcff2b23318b858ef4c5712f5215163d8ac45ca1711a20b6c5666137098d7fe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_ORM.png",
+      "sha256": "1f424506a326f9d7c48aa7107298b542162c08209f22f63e807670bbe3eed84e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-market-stall-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMarketStall.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "4739 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "UV0 islands 1483, used 0.6315, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "T_Env_SohoMarketStall_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "SM_Env_SohoMarketStall, M_Env_SohoMarketStall",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png по всем главным частям. Есть двускатный тент в полоску с рваной фестончатой кромкой и прорехой, четыре стойки, чугунные завитые кронштейны с кольцом и короткая стойка под конёк на торце. Прилавок из досок, на нём лотки с капустой, зелёными и красными яблоками, стопка мешковины со свисающей тканью и ящик с яблоками справа. Перед прилавком стопка ящиков с зелёными яблоками, мешок и ящик с красными яблоками. Доли по высоте сходятся с листом: прилавок к просвету до кромки тента около 0,70 против 0,76, крыша к прилавку 0,84 против 0,82. Лишних или фантомных частей на turn-090/270 нет: тент сбоку читается тонким скатом с открытым фронтоном, как на листе. Лоток узнаётся со всех 8 ракурсов, сзади видна ряд ящиков на прилавке. Габарит 70×55×72 uu шире и глубже заказанных 2×1,2×2,4 м за счёт свеса тента и ящиков на земле, лист это допускает.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, чёрных пятен, вывернутых частей и мусорной геометрии. Рваная кромка и прореха тента взяты из листа. Тонкие элементы целы: стойки, балки, кронштейны, рейки ящиков. Сетка на wire-34 следует форме: тент разбит крупно, фестоны собраны веером, у фруктов low-poly сферы. Дефекты видны только на крупном плане. Яблоки гранёные и многоугольные (close-base, верхний ряд на turn-000/180), сливаясь в бруски. В переднем правом ящике фрукты утоплены в плоскую сплавленную массу. В отчёте сборки 132 грани смотрят внутрь (2,6 % площади) у основания спереди и 107 открытых петель. В кадрах EEVEE это не видно.",
+      "frames": [
+        "wire-34.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании. Дерево серое, выветренное, с волокном и щелями досок. Тент — холст с плетением и грязевыми затёками. Капуста, красные и зелёные яблоки читаются, мешковина тоже. Стойки и кронштейны — металл с бликом. Запечённых бликов и теней в цвете на полном росте нет. Швов и растяжек нет, UV без перекрытий (uv-layout). Детализация на уровне Tripo-кита 2048. Мелочи крупного плана: текстура фруктов мягкая и мыльная, в переднем правом ящике зелёное размытое пятно, холст местами слегка мягкий (close-head, close-weapon). Полосы тента пыльно-розовые, светлее кирпично-красных на листе. Стойки светлее тёмного чугуна листа. Семейство цвета то же.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "uv-layout.png",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 → round(5,0/6×10, 1) = 8,3 ≥ 8,0. Ни одно измерение не ниже 1,0, гейты G-TOPO, G-UV, G-TEX и G-NAMES PASS, G-RIG n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Яблоки low-poly и гранёные, местами слились в брусок. В переднем правом ящике фрукты утоплены в плоскую сплавленную массу. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Отчёт сборки: 132 грани смотрят внутрь (2,6 % площади) у основания мешка и ящика спереди, 107 открытых петель, 21 неманифолдное ребро. В кадрах EEVEE это не видно. В UE с односторонним материалом проверить, нет ли просвета у основания."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Текстура фруктов мягкая и мыльная, в переднем правом ящике зелёное размытое пятно. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Полосы тента пыльно-розовые, светлее кирпично-красных на листе. Стойки светло-серые, а на листе тёмный чугун. Семейство цвета то же, при необходимости подтянуть тоном материала в UE."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-MARKET-STALL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп market-stall (рыночный лоток, Soho) принят по делегированию с оценкой 8,3. На крупном плане остались гранёные и мыльные фрукты в переднем ящике. Полосы тента бледнее листа."
+}

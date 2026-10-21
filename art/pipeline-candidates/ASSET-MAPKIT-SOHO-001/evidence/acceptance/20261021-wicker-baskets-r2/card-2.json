@@ -1,0 +1,153 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wicker-baskets-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWickerBaskets.fbx",
+      "sha256": "4e810aa64c57e0b28f37687d52d89483ad0b3fd58e9dc1b0fd5855fc82299276"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWickerBaskets_BC.png",
+      "sha256": "106754b47a25f5e9a730db80ffe331985471d6eb2dd03cd15fd55a74cfb90225"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWickerBaskets_N.png",
+      "sha256": "973d2a21a1571fed19717165b54d332bfdb4cf4164cd1208bd112e345f3d3211"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWickerBaskets_ORM.png",
+      "sha256": "48a8aab022bea8eece4f2fc3ef122393359e8ce2094e91a2701899f6f35bf3aa"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wicker-baskets-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWickerBaskets.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+      "note": "4768 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+      "note": "UV0 islands 525, used 0.6802, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+      "note": "T_Env_SohoWickerBaskets_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWickerBaskets.build.json",
+      "note": "SM_Env_SohoWickerBaskets, M_Env_SohoWickerBaskets",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: стопка из трёх овальных плетёных корзин с крышкой на верхней, у каждой корзины плетёные ручки по краям обода. Пропорции стопки и главных частей совпадают с видом; верхние корзины чуть сильнее сужаются книзу, но в пределах допуска. Лишних или пропавших частей нет, предмет узнаётся со всех ракурсов. Тонкие «штыри» ручек на turn-090/270 — это петли, видимые с ребра (на turn-045/135 и wire-34 они цельные), а не фантомы.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, вывернутых частей и оплывших масс. Ручки и ободья как тонкие элементы целы. Сетка на wire-34 следует форме: веер на крышке, кольца ободов, ручки. Два маленьких язычка-защёлки на ободе крышки (close-head, close-weapon) читаются как деталь застёжки, а не как мусорная геометрия.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Бока читаются как плетёная лоза, ободья и ручки — как скрученный прут. Цвет один: тёплый тон соломы. Швов и растяжек на полном росте нет, раскладка UV плотная, без перекрытий. Дефекты крупного плана: (1) внутри ободов нижней и средней корзин белёсые пятна без текстуры (close-base, правый край close-weapon; на turn-000 видны как крошечные блики); (2) на крупном плане плетение размыто, а крышка выглядит скорее как волокна дерева, чем как лоза. Мягкое затемнение нижней части верхних корзин читается как естественная окклюзия в стопке, а не как запечённый жёсткий свет. Для фона диорамы на игровой дистанции читаемость не страдает.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0; ни одно измерение не ниже 1.0; все гейты PASS или n/a. Оставшиеся замечания по текстуре видны только на крупном плане.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Внутри ободов нижней и средней корзин белёсые пятна без текстуры; на полном росте (turn-000) едва заметны как блики у правых краёв ободов."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На крупном плане плетение размыто, а крышка читается скорее как волокна дерева, чем как лоза; на игровой дистанции не мешает."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-WICKER-BASKETS-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wicker-baskets (плетёные корзины, Soho) принят по делегированию: 9.2. Белёсые пятна внутри ободов и размытое плетение видны только на крупном плане и записаны в known_issues."
+}

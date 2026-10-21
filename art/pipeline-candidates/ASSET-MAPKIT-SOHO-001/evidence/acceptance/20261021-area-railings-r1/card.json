@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAreaRailings.fbx",
+      "sha256": "949267002b8ae787dfcb5ab82d0759ab9f6baccba59e10b541fac36cc9d0e773"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_BC.png",
+      "sha256": "de1fff8ba75f05608ea4f2526d167c668847eb89c8693877846959f6eada4ea2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_N.png",
+      "sha256": "c24d8c38885ce1ce17d1ec6557fe75d6ff25b8b4ea4a15076de04b9dc2a5c3ec"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAreaRailings_ORM.png",
+      "sha256": "ea2a71a0d53e13f97e906dbd8f21c9a46bd23fe0b2bf8e101833db6af112fca3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-area-railings-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoAreaRailings.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "5243 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "UV0 islands 312, used 0.4107, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "T_Env_SohoAreaRailings_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAreaRailings.build.json",
+      "note": "SM_Env_SohoAreaRailings, M_Env_SohoAreaRailings",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: секция чёрной чугунной ограды приямка с навершиями-лилиями, завитками в два яруса, двумя торцевыми столбами с урновидными навершиями на бордюре из закопчённого кирпича с каменной крышкой. В каталоге кадров нет frames/sheet.png (frames.json: «нет --sheet»), поэтому силуэт сверен с референсом Tripo art/imagegen/mapkit-soho/props/area-railings/view-thumb.png (tripo-run.json refs.front) и с описанием. Главные части и их соотношение совпадают с референсом: высота бордюра около 22 % роста, число стоек и навершия те же, доски у основания тоже есть на референсе. Узнаётся на всех 8 ракурсах; бока turn-090/270 честно показывают торец (столб на блоке), фантомных оболочек нет. Одно второстепенное отличие контура: верхняя и нижняя перекладины выступают за правый торцевой столб примерно на 8 % ширины, только с одной стороны (turn-000/180/045). Это читается как стык модульной секции, но в описании этого нет. Ширина к высоте 1,60 против ≈1,82 по описанию; этот размер приблизительный, а с референсом пропорция согласуется.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей или мусорной геометрии. Все тонкие элементы целы: стойки, пики, лилии, завитки, перекладины. На wire-front/back/34 сетка идёт по форме: плотная на кованых деталях, редкая на прямом бордюре; длинные треугольники на плоских гранях бордюра форму не ломают. Лепестки лилий и концы завитков на крупном плане (close-head, close-weapon) слегка гранёные и неровные, это в рамках ручной ковки и стилизации. Нижняя перекладина чуть волнистая (≈1 % роста, wire-front): на игровой дистанции этого не видно, к дефектам не отношу. Доски у бордюра лежат правдоподобно, без пересечения насквозь (close-base, wire-34).",
+      "frames": [
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на референсе: тёмный чугун с лёгким металлическим отливом и потёртостями, закопчённая кирпичная кладка с известковыми подтёками раствора и светлой каменной крышкой, серое выветренное дерево досок. На полном росте нет запечённого света, швов, растяжек или чужого цвета. Детализация не беднее эталона кита Sarpedon (T_Env_Balustrade_BC). Дефекты видны только на крупном плане. На лепестках лилий одинаковые белёсые пятна, похожие на запечённый блик, а у основания пики мыльный ореол (close-head, close-weapon). На каменной крышке бордюра проступает штриховка-сетка (close-base, turn-090/270). Торцы досок несут текстуру камня или кирпича вместо торца дерева (turn-090/270). UV без перекрытий, покрытие 43 %.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8,3 ≥ 8,0, ни одно измерение не ниже 1,0 (S 1,5, F 2,0, T 1,5), все гейты PASS или n/a. Карточка в полосе 8,0–8,4, поэтому нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "frames/sheet.png не скопирован (frames.json warnings: «нет --sheet»). S сверен с референсом Tripo art/imagegen/mapkit-soho/props/area-railings/view-thumb.png и с описанием; validate_card может потребовать лист в frames.files."
+    },
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Верхняя и нижняя перекладины выступают за один торцевой столб примерно на 8 % ширины, с другой стороны выступа нет. Читается как стык секции, на игровой дистанции не мешает."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Белёсые пятна-блики на лепестках лилий наверший и мыльный ореол у основания пики; видно только на крупном плане (также close-weapon.jpg)."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Штриховка-сетка на каменной крышке бордюра (видна и на turn-090/270), а торцы досок с текстурой камня вместо дерева; только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-AREA-RAILINGS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп area-railings (ограда приямка) принят по делегированию, 8,3. Мелочи крупного плана: блики на лилиях, штриховка на крышке бордюра, выступ перекладин с одной стороны. sheet.png не попал в кадры. Нужен второй приёмщик «Opus high» (полоса 8,0–8,4)."
+}

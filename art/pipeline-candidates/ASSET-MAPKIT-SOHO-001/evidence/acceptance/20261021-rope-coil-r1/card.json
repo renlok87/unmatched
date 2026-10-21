@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoRopeCoil.fbx",
+      "sha256": "0340e51d9cc346057bc97d324e44ee56f32d7f083164426594639496945d6dfa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_BC.png",
+      "sha256": "521c5099349990a0cfb26320298f1d523e0700419435dbaac3bdac3b7f06a841"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_N.png",
+      "sha256": "b853284a5e2a11d799ee7953abc7fe81ef6e573523baf6498b062f2dc29d7d7b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoRopeCoil_ORM.png",
+      "sha256": "d3c887afc782ab050b258b4d9deb6cf061dbad035c95de61fd0ac47fd456f342"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-rope-coil-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoRopeCoil.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "5106 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "UV0 islands 108, used 0.5454, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "T_Env_SohoRopeCoil_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoRopeCoil.build.json",
+      "note": "SM_Env_SohoRopeCoil, M_Env_SohoRopeCoil",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот же, что на листе: бухта толстого пенькового каната восьмёркой, перехваченная по центру 2–3 витками, свободный конец лежит на настиле, дощатый настил на двух полозьях. Лишних и пропавших частей нет, соотношение бухты и настила как на листе, узнаётся со всех 8 ракурсов. Одно отличие от листа: там настил стоит ровно, а у модели весь проп наклонён вперёд примерно на 18–20°. Поэтому в turn-090/270 настил идёт косой полосой, бухта с торца читается как скошенный купол, а в turn-135/180/225 видна нижняя сторона настила. Контакт с землёй оценён в F. Это трансформ, а не форма, поэтому перегенерация в Tripo не нужна. Второстепенно: канат светлее и розовее, настил заметно светлее тёмно-коричневого настила листа, контраст каната и досок слабее (частично это свет рендера).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка цела. Один шелл, в кадрах нет дыр, рваных краёв и чёрных пятен. Канат — непрерывные трубки, хвост и перехват целы, сетка на wire-front/wire-34 следует виткам. Есть дефект на полном росте в одной зоне — посадка и контакт с землёй. Меш наклонён вперёд примерно на 18–20° вокруг оси ширины (.blend X). При elevation 0 в turn-000/wire-front видна верхняя плоскость настила, в turn-180/wire-back — его низ, в turn-090/270 настил идёт косой полосой. На z=0 стоят только передние концы полозьев. Задний край настила и задние концы полозьев висят примерно на 2,5–3,5 uu над землёй при высоте 9 uu, так что на доске проп ляжет «трамплином» с просветом снизу. Только на крупном плане: гранёные силуэты и мелкие заломы на стыках витков (close-head, close-weapon), два сгустка мелких треугольников на правом лепестке (wire-34). Задние витки — неглубокий рельеф, местами слитый в оболочку (wire-back). Открытая петля из отчёта (48 рёбер) лежит под бухтой и в кадрах не видна.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются. Пенька со скруткой прядей (BC + normal), дерево с волокном, щелями и торцами досок. Запечённых бликов и чужих цветовых пятен нет. Швов и растяжек на полном росте не видно, хотя острова UV рваные (108 островов, overlap 0). Детализация достаточна для фонового пропа. Дефекты только на крупном плане: мыльная, размазанная скрутка каната в close-head и размытое пятно на переднем брусе настила в close-base. Тёмные мазки в бороздах витков — рисованная полость, для стиля допустимо.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "Score 6.7 < 8.0 и F = 1.0: весь проп наклонён вперёд примерно на 18–20°, задний край настила и задние концы полозьев висят над землёй на 2,5–3,5 uu. S = 1.5: форма и части совпадают с листом, поэтому перегенерация не нужна — нужно выравнивание в env_kit и повторная съёмка.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Выровнять проп: повернуть меш вокруг оси ширины (.blend X) примерно на 18–20° назад, чтобы нижние грани обоих полозьев легли в плоскость z=0 по всей глубине. Затем заново base_at_zero и centred_xy, пересчитать масштаб к высоте 9 uu уже после выравнивания, экспортировать и переснять кадры. Проверка: в turn-090/270 настил горизонтален, в turn-180/wire-back при elevation 0 низ настила не виден, а в turn-000 не видна его верхняя плоскость.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Крупный план: мыльная скрутка каната и размытое пятно на переднем брусе настила (close-base). При доработке дать BC лёгкую резкость и локальный контраст и затемнить настил к тёмно-коричневому тону листа, чтобы канат отделялся от досок. Для фонового пропа это не блокер; если не правится, при повторной приёмке перенести в known_issues.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Тон: канат светлее и розовее листа, настил светлее тёмно-коричневого настила листа, контраст каната и досок слабее (частично это свет рендера)."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Крупный план: два сгустка мелких треугольников на правом лепестке бухты, гранёные силуэты и мелкие заломы на стыках витков (close-head, close-weapon). На полном росте не читаются."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Задние витки бухты — неглубокий рельеф, местами слитый в оболочку. С текстурой в turn-180 читаются как канат."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "close-base.jpg",
+      "note": "Отчёт сборки: одна открытая петля из 48 рёбер (около 113 uu², центр примерно (0.5, -1.0, 3.1) uu) под бухтой на настиле. В кадрах не видна; после выравнивания проверить, что снизу она не открывается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-ROPE-COIL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп rope-coil (бухта каната, Soho) отправлен на доработку в Blender: убрать наклон вперёд примерно на 18–20°, чтобы настил лёг на землю, переснять кадры и принять повторно."
+}

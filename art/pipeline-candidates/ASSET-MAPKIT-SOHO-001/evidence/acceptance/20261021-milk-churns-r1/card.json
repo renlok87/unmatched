@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMilkChurns.fbx",
+      "sha256": "dbd291502d028ee76c867bb842f9bb1f5d7454440d21f7d5d6586a25b4b6c3dd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_BC.png",
+      "sha256": "ea420e455ff1d8ab50d7129b8a61658c7c4b749e5ee040da3931ab4ddf52505c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_N.png",
+      "sha256": "2af6c15edd9194716c0e2885a3a5572107017dcb45e6bbb45f0be16b9dba165b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMilkChurns_ORM.png",
+      "sha256": "cd5f9c9227d8eec62d7342292e9bcaaea35fc40baee4dd554f5481204aca2269"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-milk-churns-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMilkChurns.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "4813 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "UV0 islands 704, used 0.6733, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "T_Env_SohoMilkChurns_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMilkChurns.build.json",
+      "note": "SM_Env_SohoMilkChurns, M_Env_SohoMilkChurns",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: три стальных бидона с крышками-«пробками» и парными ручками на подставке из брусчатки и досок с тумбами и столбиками. Все части на месте, со всех 8 ракурсов узнаётся. Одно отличие, зато крупное: вся сетка наклонена примерно на 15–20° вокруг боковой оси, задний край подставки поднят. Кадры сняты с elevation 0, но на turn-000 и wire-front видна верхняя плоскость подставки, а на turn-180 и wire-back — её полое дно. На turn-090, turn-270 и turn-315 бидоны заметно кренятся. По отчёту сборки донья бидонов стоят на высоте 4,6 / 4,9 / 6,9 uu вместо одной высоты. На листе подставка ровная. Форма частей и пропорции не искажены, это ошибка ориентации, её выправляет поворот в env_kit, перегенерация не нужна. Но в таком виде проп нельзя ставить на поле: задний край висит в воздухе примерно на треть высоты.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "В правых досках подставки есть сквозная треугольная щель: в отчёте это открытая петля из 3 рёбер на оболочке 0, центр около (10.7, −1.25, 5.75) uu, длина 16.6 uu. Через неё видна тёмная полость. Щель заметна на полном росте (turn-000, wire-front, wire-34, close-base), то есть это дефект на полном росте в одной зоне. Из-за наклона снизу и сзади открыто полое дно подставки без крышки (петля 126 рёбер, около 789 uu²; turn-180, wire-back); после выравнивания с игровой камеры его видно не будет. В остальном форма цела: ручки и тумбы целые, вывернутых и оплывших масс нет, сетка на wire-* повторяет форму. Огранка ободков крышек видна только на крупном плане (close-head).",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как заказано: олово и сталь бидонов с ржавыми поясками, брусчатка и доски подставки. Но на передних сторонах корпусов бидонов крупные размытые тёмные пятна со светлыми проплешинами — это отражение с исходной картинки, перенесённое в BC (turn-000, turn-045, turn-315, close-base). Задние стороны чистые (turn-180), значит это не задуманная копоть, а запечённое отражение: дефект на полном росте в основной зоне. Боковая кромка подставки блёклая, «мыльная», с белыми разводами (turn-090, turn-270). Доски бледно-серые. По насыщенности и чёткости рисунка текстура беднее эталона кита Sarpedon (T_Env_Barrel_BC).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "rework_blender",
+  "verdict_reason": "Сумма S+F+T = 3.5 из 6, score 5.8 < 8.0. S = 1.5, поэтому перегенерация не требуется. Главный дефект — наклон всей сетки на 15–20°: подставка не лежит на земле, бидоны кренятся. Это ошибка ориентации, её выправляют параметры env_kit. Ещё есть сквозная щель в досках (F) и запечённое отражение на корпусах бидонов (T). Все гейты PASS или n/a.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "fix": "Выровнять сетку. Найти плоскость дна подставки (по нижнему кольцу оболочки 0 или по точкам контакта бидонов) и повернуть меш вокруг боковой оси .blend X примерно на 15–20° так, чтобы задний край (+Y .blend) опустился и дно легло в Z=0. Затем заново поставить pivot в центр основания на min Z=0, пересчитать масштаб до высоты 24 uu и переснять turn-000/090/180/270: на elevation 0 подставка должна быть видна ребром, бидоны — стоять вертикально.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Закрыть сквозную треугольную щель в правых досках подставки: открытая петля из 3 рёбер на оболочке 0, центр около (10.7, −1.25, 5.75) uu в prescale-кадре. После выравнивания проверить с игровой высоты камеры, что полое дно подставки (петля 126 рёбер) не видно; если видно — закрыть дно крышкой. Если env_kit не умеет чинить сетку, перегенерировать форму в Tripo.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Убрать из BC запечённое отражение: размытые тёмные пятна со светлыми проплешинами на передних сторонах корпусов бидонов (turn-000, turn-045, turn-315). Корпуса должны быть ровным матовым оловом с лёгкой копотью, как задние стороны на turn-180. Заодно поправить блёклую «мыльную» кромку подставки с белыми разводами (turn-090, turn-270) и бледные доски. Путь: ретекстура исходника в Tripo по виду без бликов.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Ободки крышек и плечи бидонов гранёные, силуэт многоугольный; видно только на крупном плане, для 4.8k tris на игровой дистанции допустимо."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "По отчёту сборки 4 маленькие оболочки (тумбы или столбики, shells 10/11/13/14) отстоят от подставки на 0.68–0.92 uu. На кадрах зазор не виден; проверить после выравнивания."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-MILK-CHURNS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп milk-churns отправлен на доработку в Blender (5.8). Главное — выровнять наклонённую на 15–20° сетку, чтобы подставка легла на землю. Ещё закрыть щель в досках и убрать запечённое отражение с корпусов бидонов."
+}

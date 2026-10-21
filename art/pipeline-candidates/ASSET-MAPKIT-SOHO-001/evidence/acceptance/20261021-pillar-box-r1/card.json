@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPillarBox.fbx",
+      "sha256": "8cbf989820ba4471f2a093b91e2da4939d7c44435ae430a9da71bf32fa5c467c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_BC.png",
+      "sha256": "e7b97b008d866d217c0c2c66d96c0488e886ee45f92547a9058b1a34df712bbe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_N.png",
+      "sha256": "60ac47781f1bd87c67738b4e5fee537db6dfed5ef2f0e7d35e5d093e8bb9aa8b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_ORM.png",
+      "sha256": "e41740a02a79ec5c77bc8cc2f1bbca84173e6c4dee93471f7998568d54794b6e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pillar-box-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoPillarBox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "5174 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "UV0 islands 775, used 0.5137, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "T_Env_SohoPillarBox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "SM_Env_SohoPillarBox, M_Env_SohoPillarBox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и точно повторяет оба вида листа. Это красная викторианская тумба с куполом и короной-навершием, корона хорошо читается. Купол с рёбрами, листовыми угловыми накладками и волновым фризом. На фризе POST OFFICE, щель с козырьком, монограммы VR с коронами на соседних гранях. Табличка, дверца с петлями справа и скважиной слева, филёнки на гранях, ступенчатый цоколь. Пропорции по высоте в пределах ~3 % от листа: купол 0–0,22 против 0,20, фриз 0,24–0,38 против 0,22–0,35, тело до 0,86 против 0,84. Ширина купола к высоте 0,445 против 0,447, тела 0,35 против 0,355. На turn-090 козырёк щели выступает слева, а VR стоит на левой грани, как на левом виде листа. Лишних и пропавших частей нет. Тумба узнаётся со всех 8 ракурсов, сзади тоже: по куполу, короне и красному цвету. Основное пятно — красное, того же семейства, что на листе; на рендере чуть светлее и розовее. План — квадрат со срезанными углами, восемь граней, а не шестигранник из описания; лист сам такой же, см. known_issues.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дефект на полном росте в одной зоне — дверца на главной, передней грани. Вершина у замочной скважины утянута внутрь, и панель двери сложена в воронку или пирамиду. На turn-000, turn-045 и turn-315 через всю дверцу идёт светлый диагональный клин с тёмным сектором справа. На wire-front виден веер треугольников, сходящихся к скважине, со светотенью складки на глине. На close-base дверь выглядит смятой. На листе дверь плоская. Остальное чисто: силуэт ровный, грани, филёнки, карнизы и цоколь чёткие, тонкие козырёк и петли целы, сетка на wire-* следует форме. Дыр, рваных краёв и чёрных пятен на кадрах нет. Мелочи только крупного плана: навершие-корона и рёбра купола на close-head чуть комковатые. Дыра из отчёта (16 рёбер, оболочка таблички) прижата к телу и на кадрах не видна; 7 non-manifold рёбер и 2 вывернутые грани тоже не видны.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На полном росте материал читается как в описании и на листе: крашеный чугун с отбитой краской, потёртостями кромок и копотью внизу тела и на цоколе. POST OFFICE и VR с коронами чёткие, табличка читается как бумажное объявление. Швов, растяжек и мыла на полном росте нет, детализация богаче уровня кита Sarpedon. Дефекты только крупного плана. На копоти цоколя на close-base пятна правильного точечного растра, похожие на полутон, а не на копоть; еле заметны на цоколе turn-000 и turn-090. Фактура рёбер купола и короны на close-head мыльная, вдоль рёбер тёмные линии полостей. Текст таблички — псевдобуквы, как и на листе.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((2,0 + 1,0 + 1,5) / 6 × 10, 1) = 7,5 < 8,0. Гейты PASS/n/a, S = 2,0 (не < 1,5), поэтому вердикт rework_blender, а не перегенерация. Главная причина — вмятая воронкой дверца на передней грани, видна на полном росте (F 1,0). Для пропа с ролью hero и приоритетом P0 это заметно. Вторая — точечный растр в копоти цоколя на крупном плане (T 1,5).",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Выровнять панель дверцы на передней грани. Вершины у замочной скважины утянуты внутрь, панель сложена в воронку (веер треугольников на wire-front, световой клин на turn-000/045/315). Спроецировать вершины островка двери в плоскость её рамки; скважину оставить текстурой BC. После правки пересчитать нормали двери: custom normals там тянут складку. Если правка исходника невозможна — перегенерировать дверь или проп с плоской дверью.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Отретушировать BC цоколя: пятна правильного точечного растра в копоти на верхней ступени и боковых гранях цоколя заменить сплошной мягкой копотью того же тона. Попутно, по возможности, подчистить мыльную фактуру рёбер купола и короны-навершия (close-head).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-weapon.jpg",
+      "note": "Описание заказывает шестигранную тумбу. На листе и в модели план — квадрат со срезанными углами (8 граней), и модель повторяет лист. На игровой дистанции силуэт тумбы с куполом и короной читается так же, поэтому это не дефект модели относительно листа."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Корона-навершие и рёбра купола на крупном плане чуть комковатые. В отчёте сборки есть ещё: дыра 29 uu² в оболочке таблички (тыльная сторона, прижата к телу), 2 трещины-щели, 7 non-manifold рёбер и 2 вывернутые грани. На кадрах ничего из этого не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На табличке псевдотекст, как и на листе. На игровой дистанции читается как объявление."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-PILLAR-BOX-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп pillar-box (Soho) не принят, 7,5, нужна доработка. Выровнять вмятую воронкой дверцу на передней грани (F 1,0) и убрать точечный растр в копоти цоколя (T 1,5). Силуэт по листу полный (S 2,0)."
+}

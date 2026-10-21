@@ -98,9 +98,10 @@ PROMPT = """# Приёмка пропа кита карты (этап 4 скил
 - Генерация: Tripo «Умная сетка» P2.0 по двум видам Gemini/Tripo Image (front + {slot}); сборка tools/art/env_kit.
 
 ## Входы (открой каждый Read-ом целиком)
-- Кадры: `{frames_dir}/` — все файлы из `frames.json#files`: turn-000…315 (8 ракурсов, 45°), wire-front/34/back,
-  close-head (верх 22 %), close-weapon (верхняя часть), close-base (низ 22 %), uv-layout.png, sheet.png (виды, по
-  которым генерировали: слева front, справа {slot}).
+- Кадры (каталог `{frames_dir}/`), открыть обязательно эти 10: sheet.png (картинка, по которой генерировали),
+  turn-000.jpg, turn-045.jpg, turn-090.jpg, turn-180.jpg, turn-270.jpg, wire-34.jpg, close-head.jpg (верх 22 %),
+  close-base.jpg (низ 22 %), uv-layout.png. Остальные кадры `frames.json#files` (turn-135/225/315, wire-front/back,
+  close-weapon) — только если нужны для решения.
 - Отчёт сборки: `{build}` (числа топологии, UV, текстур — для гейтов уже посчитаны ниже).
 
 ## Гейты (посчитаны по отчёту, перенеси как есть)
@@ -128,7 +129,8 @@ PROMPT = """# Приёмка пропа кита карты (этап 4 скил
 - Это фоновый проп настольной диорамы: читаемость на игровой дистанции важнее микродеталей; стилизация допустима.
 
 ## Константы карточки (перенеси дословно)
-- schema `unmatched.asset-acceptance/2`, kind `model`, asset_id `{asset_id}`, clip null, cycle `{cycle}`, date `{date}`,
+- schema `unmatched.asset-acceptance/2`, kind `model`, asset_id `{asset_id}` (кит карты; проп `{key}` назови в
+  status_note), clip null, cycle `{cycle}`, date `{date}`,
   previous_card {previous}.
 - accepted_object: {accepted_json}
 - frames: {{"dir": "{frames_dir}", "files": {files_json}}}
@@ -153,7 +155,9 @@ def prepare(m: str, keys: list[str], date: str, run: Path | None, cycle: str) ->
             print(f"SKIP {key}: no build ({pp['fbx']})", file=sys.stderr)
             continue
         views = e.get("views") or {}
-        sheet = ROOT / views["sheet"] if views.get("sheet") else None
+        # props made through Generate 3D only have the screen thumbnail (NOTES F7): it is the sheet then
+        src = views.get("sheet") or views.get("front")
+        sheet = ROOT / src if src else None
         ev = kit_root(m) / "evidence" / "acceptance" / f"{date}-{key}-{cycle}"
         if ev.exists():
             sys.exit(f"ERROR {ev} exists: a new acceptance is a new cycle")
@@ -178,7 +182,7 @@ def prepare(m: str, keys: list[str], date: str, run: Path | None, cycle: str) ->
             role=p["role"], zone=p["zone"], priority=p["priority"], desc_en=p["descEn"], material=p["material"],
             size=f"{w:g}×{d:g}×{h:g}", game_h=ti.target_uu(p), style=kit["styleEn"],
             slot=views.get("slot", mapkit.side_slot(p)), frames_dir=rel(ev / "frames"), build=rel(pp["build"]),
-            gates_json=json.dumps(g, ensure_ascii=False, indent=1), asset_id=ti.asset_id(m, key), cycle=cycle,
+            gates_json=json.dumps(g, ensure_ascii=False, indent=1), asset_id=f"ASSET-MAPKIT-{m.upper()}-001", cycle=cycle,
             date=dt.date.today().isoformat(), previous=json.dumps(prev), accepted_json=json.dumps(accepted),
             files_json=json.dumps(fr["files"]), reports_json=json.dumps(reports),
             executor="claude-code:mapkits-session/env_kit")

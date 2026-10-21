@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoShopAwning.fbx",
+      "sha256": "51d3d36dec88dcbc54a11445904305f6a9555508c534e670aa46eb90fe837247"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_BC.png",
+      "sha256": "3865c0a7298d97824ed86bade1ed9ace9bb69a86e25067ce0a0c6ab26ad9fa5b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_N.png",
+      "sha256": "31efc76b0bb0a7dcebbdc0ec9d308034bd6d290361d4437770153a7b5eb7abe8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_ORM.png",
+      "sha256": "3e373e72817c460dee0ea62fcbdff55f0f40d5e84311f90bbd63c979486b989b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-shop-awning-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoShopAwning.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "5418 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "UV0 islands 246, used 0.4572, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "T_Env_SohoShopAwning_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "SM_Env_SohoShopAwning, M_Env_SohoShopAwning",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: полосатая красно-белая маркиза с фестонным краем на деревянной балке, железный прут-штанга и два кованых кронштейна с завитком и кольцом. Главные части и их соотношение совпадают с видом, лишних или пропавших частей нет. На turn-090 и turn-270 профиль кронштейна и провисающее полотно читаются без фантомных выступов, на turn-180 сзади видны балка и стойки. Узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, вывернутых частей и мусорной геометрии. Тонкие прутья и завитки кронштейнов целы, фестоны чистые, сетка на wire-34 следует форме полотна и балки. Дефекты видны только на крупном плане: на close-head у штанги рваный треугольный залом и шов на верхней кромке полотна, торец балки бугристый с двойными рёбрами (wire-34, turn-090).",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "turn-090.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются так, как заказано: выцветший холст в красно-кремовую полоску, стилизованное дерево балки с трещинами, тёмный кованый металл с ржавчиной. Запечённого света на полном росте нет, на полном росте уровень сопоставим с китом пропов. Дефекты только на крупном плане: на close-head дерево балки и штанга смазаны горизонтальными растяжками, на кромке полотна светлое пятно-шов; на close-base края полос размыты, на светлых фестонах буроватые пятна с древесным рисунком (на turn-000 едва заметны).",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a; дефекты F и T видны только на крупном плане и для фонового пропа диорамы некритичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "На верхней кромке полотна у штанги рваный треугольный залом и шов; торец балки бугристый с двойными рёбрами (wire-34.jpg). Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Дерево балки и железная штанга смазаны горизонтальными растяжками, на кромке полотна светлое пятно. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Края полос размыты, на светлых фестонах буроватые пятна с древесным рисунком; на turn-000.jpg едва заметны."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-SHOP-AWNING-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп shop-awning (маркиза Soho) принят по делегированию, 8.3: форма и силуэт совпадают с видом. Есть мелкие дефекты крупного плана: залом и шов полотна у штанги, растяжки текстуры на балке и штанге, пятна на фестонах."
+}

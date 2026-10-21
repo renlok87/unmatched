@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoShopAwning.fbx",
+      "sha256": "51d3d36dec88dcbc54a11445904305f6a9555508c534e670aa46eb90fe837247"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_BC.png",
+      "sha256": "3865c0a7298d97824ed86bade1ed9ace9bb69a86e25067ce0a0c6ab26ad9fa5b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_N.png",
+      "sha256": "31efc76b0bb0a7dcebbdc0ec9d308034bd6d290361d4437770153a7b5eb7abe8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoShopAwning_ORM.png",
+      "sha256": "3e373e72817c460dee0ea62fcbdff55f0f40d5e84311f90bbd63c979486b989b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-shop-awning-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoShopAwning.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "5418 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "UV0 islands 246, used 0.4572, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "T_Env_SohoShopAwning_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoShopAwning.build.json",
+      "note": "SM_Env_SohoShopAwning, M_Env_SohoShopAwning",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот же предмет, что на sheet.png: тёсаная деревянная балка, на ней штанга на двух хомутах, полосатое красно-кремовое полотно с 11 фестонами, по обеим сторонам чугунные кронштейны с завитком и кольцом. Лишних и пропавших частей нет. Узнаётся со всех 8 ракурсов, на turn-090/270 — по скосу полотна и силуэту кронштейна. Палитра совпадает с листом. Отчёта checks-report нет, поэтому пропорции против листа сверены на глаз: в норме. Расхождение габарита с описанием — вопрос масштаба при раскладке (см. known_issues), а не формы.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка Tripo Smart Mesh следует форме (wire-34, wire-front, wire-back): фестоны ровные, тонкие завитки кронштейнов и штанга целы. На полном росте у полотна нет дыр, просветов и вывернутых частей. Дефекты есть только на крупном плане. На стыке полотна со штангой виден светлый рваный мазок (close-head); по отчёту сборки там щель-трещина длиной 67 uu и шириной 0,09 uu и 8 вывернутых граней (0,6 % площади). Ещё две дырочки по 0,26 uu² в колпачках хомутов, в кадрах их не видно.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: дерево балки с волокнами и трещинами, серый чугун с налётом ржавчины, полосатый холст. Запечённого света в цвете не видно (ORM.R=1, тени дают лампы рендера). Дефекты только крупного плана: (1) растяжка-мыло горизонтальными полосами на верхней грани балки и на штанге (close-head, close-weapon); (2) шов UV на полотне у штанги — бледный треугольник и строчка (close-head); (3) коричневые разводы, похожие на древесные волокна, на кремовых фестонах и белёсая дымка на крайней красной панели (close-base). На полном росте всё это читается как потёртость холста.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Score 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS или n/a. Оценка попала в полосу 8,0–8,4, поэтому по §8.3 нужен второй приёмщик другого профиля («Opus high»).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "На стыке полотна со штангой (центр по ширине) виден светлый рваный мазок. По отчёту сборки там щель-трещина 67 uu (ширина 0,09 uu) и 8 вывернутых граней (0,6 % площади). Ещё две дырочки по 0,26 uu² в колпачках хомутов. На полном росте не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Растяжка текстуры (горизонтальное мыло) на верхней грани балки и на штанге. Шов UV на полотне у штанги: бледный треугольник с рваным краем и строчка. Только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На кремовых фестонах коричневые разводы, похожие на древесные волокна; на turn-000 и turn-045 они слабо видны как загрязнение. На крайней красной панели белёсая дымка. Читается как потёртость холста."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "Правый торец балки бежевый и мятый, читается скорее как холст, чем как дерево; левый торец на turn-090 деревянный. Зона мелкая."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Габарит 41×27×24 uu, модель подогнана по высоте 24 uu, а ножки кронштейнов уходят примерно на 7,5 uu ниже фестонов. По описанию (2,5×1,2×0,8 м при фигуре героя 55 uu) ширина была бы около 75 uu. При раскладке на фасаде масштаб подгонять по ширине проёма: это вопрос размещения, не формы."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-SHOP-AWNING-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп shop-awning (маркиза Soho) принят по делегированию: 8,3, S 2 / F 1,5 / T 1,5. Дефекты только крупного плана: щель и шов у штанги, мыло на балке. Оценка в полосе 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

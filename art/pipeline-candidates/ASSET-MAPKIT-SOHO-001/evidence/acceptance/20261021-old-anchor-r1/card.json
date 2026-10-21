@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoOldAnchor.fbx",
+      "sha256": "10e60d3399c15c2731b31fc610540e83acf67305a2549a0feaaefcd4c3aa6724"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoOldAnchor_BC.png",
+      "sha256": "1c2e635988aed0161453e49163eecb042c556d91521cb729ae632f46a1c193c1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoOldAnchor_N.png",
+      "sha256": "9db1b0428362bf1d230764c1d14b8b8b9e51b58478891831ab5a788eac6cb01a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoOldAnchor_ORM.png",
+      "sha256": "4e3c03e37b0e400f3fe8a4455c78dc9bd0e7b1d4f868ad4f44fd5488e57859e2"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-old-anchor-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoOldAnchor.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+      "note": "4972 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+      "note": "UV0 islands 996, used 0.6174, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+      "note": "T_Env_SohoOldAnchor_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoOldAnchor.build.json",
+      "note": "SM_Env_SohoOldAnchor, M_Env_SohoOldAnchor",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Модель совпадает с sheet.png: якорь со скобой-кольцом, штоком с бандажами, веретеном, двумя изогнутыми лапами с лопастями, цепь от кольца вниз и бухта цепи у основания; пропорции главных частей в пределах допуска, предмет узнаётся со всех 8 ракурсов (turn-090/270 — узкий профиль якоря с лапами и цепью). Одно второстепенное отличие от описания: заказан якорь, прислонённый к ящику, а в виде (и в модели) ящика нет, якорь стоит прямо в бухте цепи; из-за бухты пятно основания круглое (~0,7 высоты в глубину) вместо 1×0,4 м. Отличие пришло из листа, а не из сборки.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Шток, кольцо, лапы и бухта цепи чистые, сетка на wire-* следует форме. Дефект на полном росте в одной зоне: висячая цепь от кольца к бухте собрана не из сцепленных звеньев, а из отдельных плоских «таблеток», нанизанных на тонкую ленту-перемычку (wire-front, wire-back, turn-000, turn-180). На turn-090/270 у этих пластин видны рваные грани, просветы и вывернутые тёмные треугольники; на turn-045 и wire-34 в звеньях тёмные разрывы. На игровой дистанции цепь ещё читается, но дефект виден без крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материал читается как ржавое железо: рыже-коричневая основа с более светлыми серыми пятнами окалины (close-head, close-weapon), запечённого света и швов на полном росте нет, детализация для фонового пропа достаточна. Мелкие дефекты: тон светлее и розовее тёмной ржавчины sheet.png, на крупном плане текстура мягкая (close-base); на пластинах висячей цепи на turn-180 полосатая растяжка, похожая на древесное волокно. Она привязана к дефектной геометрии этой зоны.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1.5+1.0+1.5)/6*10, 1) = 6.7 < 8.0, F = 1.0: висячая цепь из отдельных пластин на тонкой ленте с рваными гранями видна на полном росте. S = 1.5, поэтому не return_to_stage_2. Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "fix": "Висячую цепь от кольца к бухте пересобрать: удалить тонкую ленту-перемычку и рваные пластины с вывернутыми гранями и заменить их цельными сцепленными звеньями (кольца/овалы, повёрнутые через одно на 90°) того же размера, что звенья у кольца. Проверить turn-090/270 и wire-* на отсутствие просветов.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "После пересборки висячей цепи перезапечь BC новых звеньев без полосатой растяжки. Общий тон BC сдвинуть к более тёмной ржавчине sheet.png: меньше розового, больше контраста окалины.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "В описании якорь прислонён к ящику, но в листе ящика нет и якорь стоит в бухте цепи; модель повторяет лист. Пятно основания круглое (~0,7 высоты в глубину) вместо 1×0,4 м. Для фонового пропа причала допустимо, при расстановке учесть больший footprint."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-OLD-ANCHOR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп old-anchor (Soho) — на доработку в Blender: пересобрать висячую цепь (пластины на тонкой ленте с рваными гранями) и подтянуть тон ржавчины к листу; 6.7."
+}

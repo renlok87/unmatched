@@ -1,0 +1,167 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCargoCrate.fbx",
+      "sha256": "3570296f934d9cfa12a5aac9fa990e610c4a5249a3b52a4038a86e8bee86bfa0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_BC.png",
+      "sha256": "cab2f77a65346cbb74f8b3ad86cd21e383fd63a0522c093c2cc35c36c73cf94d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_N.png",
+      "sha256": "102d7cf0e2b8011b9881fc1b3b6c6adbc07797d1ff3f815cee6bb4f3a4b82fea"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoCrate_ORM.png",
+      "sha256": "6445d7c13a562c6338d541f9022ba14441449d12a22265cb526bb2105a34a318"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-cargo-crate-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoCargoCrate.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "4384 tris (бюджет env_kit 12000, проп 1500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "UV0 islands 1269, used 0.8166, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "T_Env_SohoCargoCrate_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoCrate.build.json",
+      "note": "SM_Env_SohoCargoCrate, M_Env_SohoCargoCrate",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Ящик тот же, что на sheet.png. Корпус почти кубический (по кадру около 0,26×0,26×0,27 м, это ящик 0,9 м в масштабе 27 uu). Совпадают главные части: рамка из досок с утопленной филёнкой, ржавые угловые уголки с заклёпками, верёвочные ручки на кольцах по бокам с узлом внизу. Вид спереди совпадает с листом в пределах 5 % высоты. Лишних и пропавших частей нет. На 45° уголки огибают ребро Т-образно, как и должно быть. Силуэт читается со всех 8 ракурсов. Два мелких отличия не снижают балл. Хвосты верёвок завязаны в узлы на обоих видах, а на виде сзади листа они растрёпаны (сам лист противоречит себе для одних и тех же верёвок). Трафаретной маркировки из описания нет и на листе, это декаль, а не часть контура.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, чёрных пятен, вывернутых и оплывших частей. Кромки уголков и заклёпок чёткие (close-head, close-weapon, close-base). Тонкие элементы целы: верёвки, кольца и узлы. Нижний пролёт верёвки чуть тоньше вертикальных, но не порван. Сетка на wire-* лёгкая и следует форме: рамка, филёнка, уголки. Доски филёнки сделаны картой нормалей на плоских гранях, для фонового пропа это уместно. В отчёте сборки у оболочек уголков есть открытые петли и 4 non-manifold ребра, но ни на одном кадре они не видны.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются верно: выветренное рисованное дерево, ржавое железо с заклёпками, пеньковая верёвка. Детализация заметно выше эталона кита Sarpedon (T_Env_CrateStack_BC). Запечённых бликов нет, грязные потёки спереди взяты с листа. Есть один дефект на полном росте в одной зоне: на боковых филёнках за обеими верёвочными ручками размытое пятно и бледный двойник верёвки, вписанный в BC (Tripo спроецировал заслонённый участок). На 45° двойник отходит от настоящей верёвки и виден на turn-045, 135, 225 и 315. Обе филёнки — один и тот же элемент, отражённый на две стороны, поэтому считаю это одной зоной. Только на крупном плане видна растяжка: крышка покрыта длинными горизонтальными смазанными штрихами (close-head). Задняя филёнка беднее передней: ровные полосы волокон без грязи. Сучок и трещина с заднего вида листа оказались на боковой филёнке .L (turn-090).",
+      "frames": [
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg",
+        "turn-180.jpg",
+        "turn-090.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Балл (2,0 + 2,0 + 1,0) / 6 × 10 = 8,3 ≥ 8,0, все измерения ≥ 1,0, гейты PASS или n/a. Дефект T (двойник верёвки и размытое пятно на боковых филёнках) на игровой дистанции фонового пропа не виден. Балл в полосе 8,0–8,4, поэтому по §8.3 нужен второй приёмщик Opus high.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "Боковые филёнки .L и .R: за верёвочными ручками в BC вписаны размытое пятно и бледный двойник верёвки (проекция заслонённого участка в Tripo). Хорошо видно на ракурсах 45° (turn-045, 135, 225, 315), на игровой дистанции не читается. Убрать можно только перекраской BC или перегенерацией текстуры в Tripo, параметрами env_kit это не исправить."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Крышка: дерево растянуто в длинные горизонтальные смазанные штрихи. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Задняя филёнка беднее передней и заднего вида листа: ровные полосы волокон без грязи. Сучок и трещина с заднего вида sheet.png оказались на боковой филёнке .L (turn-090)."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Трафаретной маркировки из описания (stencilled shipping marks) нет ни на модели, ни на sheet.png. Растрёпанные хвосты верёвок с заднего вида листа на модели завязаны в узлы, как на переднем виде."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-34.jpg",
+      "note": "По отчёту сборки: 72 открытые петли (в основном на обратной стороне оболочек угловых уголков, прилегающей к дереву), 4 non-manifold ребра, 27 угловых нормалей смотрят внутрь. Ни на одном кадре это не видно, гейт PASS перенесён как есть."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-CARGO-CRATE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп cargo-crate (грузовой ящик Soho) принят по делегированию с баллом 8,3: силуэт и форма чистые. Известный дефект T: двойник верёвки и размытое пятно за ручками на боковых филёнках. Балл в полосе 8,0–8,4, поэтому нужен второй приёмщик Opus high."
+}

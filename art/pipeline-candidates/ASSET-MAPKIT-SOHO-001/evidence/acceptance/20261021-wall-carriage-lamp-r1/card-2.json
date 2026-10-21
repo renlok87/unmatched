@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoWallCarriageLamp.fbx",
+      "sha256": "201a29bc8e02b61895d14cf91044a54fe0d0270307f2b556bb3173bac2b7cac0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_BC.png",
+      "sha256": "f2da12e6064d036a3fa346d0f814b21f7c096a548f225994159b107f9697115b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_N.png",
+      "sha256": "e3fee577f9582d2f4f30ce085978afbc3ec4f0da1e1dd119ef896612c8714609"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoWallCarriageLamp_ORM.png",
+      "sha256": "6adc7c4da8b1cd983c64f42bab1a12374e1d029c2465dee08d753e24a097c25a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-wall-carriage-lamp-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoWallCarriageLamp.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "5011 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "UV0 islands 668, used 0.7001, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "T_Env_SohoWallCarriageLamp_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoWallCarriageLamp.build.json",
+      "note": "SM_Env_SohoWallCarriageLamp, M_Env_SohoWallCarriageLamp",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: четырёхгранный фонарь с шпилем-финиалом и четырьмя угловыми акротериями, матовые стёкла, кронштейн с прямой штангой и завитками-волютами, крепёжная пластина на кирпичном пилоне с тёмными торцами. Пропорции фонарь/кронштейн/пилон совпадают с видом, лишних и пропавших частей нет; узнаётся со всех ракурсов (сбоку на turn-000/180 — профиль кронштейна, на turn-090 сзади, на turn-270 спереди с пластиной на четырёх заклёпках).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, рваных краёв и вывернутых частей нет; тонкие завитки кронштейна и петли под фонарём целы и круглые по сечению. Сетка на wire-34 следует форме (плотнее на волютах и шпиле, крупные треугольники на плоском пилоне), мусорной геометрии нет. На close-head угловой акротерий гладкий и цельный, на close-base стык штанги и волюты с пилоном чистый, кромка пилона стилизованно неровная — это задуманная обколотая кладка.",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: потёртое чёрное чугунное литьё с бронзовыми бликами на гранях, матовое стекло с силуэтом пламени, красный кирпич со светлыми швами, закопчённые серые торцы пилона; запечённого направленного света нет. Дефекты видны только на крупном плане: на стёклах нарисован вертикальный тёмный штрих и светлый блик, похожий на запечённое отражение (turn-000/270); на кирпиче close-base мягкие размытые тёмные пятна, серые торцы пилона немного мыльные. На игровой дистанции (24 uu) не мешает.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "на матовых стёклах нарисованы тёмный вертикальный штрих и светлый блик, похожий на запечённое отражение; виден только на крупном плане"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "мягкие размытые тёмные пятна на кирпиче, серые торцы пилона слегка мыльные; только крупный план"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-WALL-CARRIAGE-LAMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wall-carriage-lamp (настенный фонарь, Soho) принят по делегированию: 9.2. Мелкие текстурные замечания по стёклам и кирпичу заметны только на крупном плане."
+}

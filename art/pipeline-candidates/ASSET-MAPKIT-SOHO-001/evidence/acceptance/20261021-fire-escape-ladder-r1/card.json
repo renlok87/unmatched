@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoFireEscapeLadder.fbx",
+      "sha256": "520a0da27fb63531ae233176bc404cbffa11ad289070de84ecdfa2f9248f2870"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFireEscapeLadder_BC.png",
+      "sha256": "4ad300d5e735f6572874d840b3ff5a97ce7ef4c594b6798824cae89cc0438b78"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFireEscapeLadder_N.png",
+      "sha256": "162f79c142d2b37c89345e7754cffd1c4228b663077b9127854598dd9914d2f5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFireEscapeLadder_ORM.png",
+      "sha256": "846ddaf83c9267b29559a64b1512f48a5453f1077d4bdaa3ab510cf240112455"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-fire-escape-ladder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoFireEscapeLadder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+      "note": "4794 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+      "note": "UV0 islands 224, used 0.4002, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+      "note": "T_Env_SohoFireEscapeLadder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFireEscapeLadder.build.json",
+      "note": "SM_Env_SohoFireEscapeLadder, M_Env_SohoFireEscapeLadder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: лестница с клеткой (боковые рамы-«замочные скважины», третья дуга, верхняя перекладина, кольцо-пояс с тканевыми обмотками), 9 деревянных ступеней (одна внутри клетки) на тех же местах, изогнутые косынки под клеткой, 4 стеновых кронштейна на высотах 34–43 % и 78–85 % (как на листе), опорная плита, заклёпки на тетивах. Доля клетки ≈38,5 % высоты против ≈40 % на листе, отличие меньше 5 %. Основное пятно — чёрное железо, ступени — дерево, обмотки — беж, как на листе. Лишних и пропавших частей нет. Узнаётся со всех 8 ракурсов, сбоку (turn-090/270) читается профиль клетки с кронштейнами.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: прутья, дуги, ступени и тетивы целы, без просветов и оплывов, сетка на wire-34/front/back следует форме. Дефекты видны только на крупных планах. (1) Средняя дуга клетки обрывается в воздухе чуть ниже верхней перекладины и не стыкуется с ней (close-head, close-weapon). (2) Плечо нижнего левого кронштейна у внутренней стороны левой тетивы выглядит тонкой серой оболочкой с рваным краем (close-base). (3) Тканевые обмотки слегка бугристые, это допустимая стилизация.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как на листе: кованое чёрное железо с ржавыми крапинами и заклёпками, деревянные ступени с волокном, грязная беж-ткань обмоток. Запечённых теней в цвете на полном росте нет, детализация тетив и дуг на уровне кита. Недостатки крупного плана: (1) внутренние вертикальные прутья клетки и верхняя перекладина гладкие, светло-серо-голубые, без фактуры кованого железа, то есть пятно «мыла» (close-head); (2) плечо нижнего левого кронштейна — плоский серый цвет без текстуры (close-base); (3) стеновые пластины кронштейнов со стороны стены светлее железа и с пятном-бликом в центре (turn-180), но в игре эта сторона прижата к стене.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-180.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 → 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Оставшиеся дефекты видны только на крупном плане, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Средняя дуга клетки обрывается открытым концом под верхней перекладиной и не соединена с ней (видно и на close-weapon.jpg)."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Плечо нижнего левого кронштейна у внутренней стороны левой тетивы — тонкая серая оболочка с рваным краем."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Внутренние вертикальные прутья и верхняя перекладина клетки гладкие светло-серые, без фактуры кованого железа (мыло)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Стеновые пластины кронштейнов со стороны стены светлее железа, с пятном-бликом в центре; в игре сторона прижата к стене."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-FIRE-ESCAPE-LADDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп fire-escape-ladder (кит Soho) принят по делегированию с оценкой 8,3. Дефекты видны только на крупном плане: обрыв средней дуги клетки, рваное плечо кронштейна, серые прутья без фактуры. Они записаны в known_issues."
+}

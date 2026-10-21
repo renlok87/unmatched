@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoChimneyStack.fbx",
+      "sha256": "487c18e51eedfcb6d7b4653a06e3f42a3f476937508f555ca3a8d098a1eb08c1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_BC.png",
+      "sha256": "029526686daadfae4a8b1419018f1ec645143f2a88ae5f5520836f0b691ac3a5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_N.png",
+      "sha256": "0ef28e124c4fdfad09bd22ceea4fde4b69dd5ef94af7480b0f662c17825b5202"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoChimneyStack_ORM.png",
+      "sha256": "ea3ad3e398b5abfbea9e63edb22f70ec715d2647b73c407716a31ad51262a1df"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-chimney-stack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoChimneyStack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "5492 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "UV0 islands 76, used 0.5205, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "T_Env_SohoChimneyStack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoChimneyStack.build.json",
+      "note": "SM_Env_SohoChimneyStack, M_Env_SohoChimneyStack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с обоими видами sheet.png: кирпичный стволик с двухступенчатым карнизом и рядом зубчиков, четыре терракотовых колпака с валиком у горла, шиферный скат с кирпичным фронтоном слева спереди. Пропорции главных частей (колпаки ~22 % высоты, ствол, карниз, скат) в пределах допуска. Широкая и узкая грани стволика соотносятся примерно 2:1, как в описании 1,2×0,6 м. Лишних и фантомных частей нет: на turn-090/270 четыре колпака стоят в ряд, на 135/315 видна узкая грань. Предмет узнаётся со всех 8 ракурсов, пятна цвета (красный кирпич, оранжевая терракота, сине-серый шифер, сажа на горлах) того же семейства, что на листе. Широкая грань повёрнута относительно оси кадра примерно на 20–25°: на turn-000 и turn-045 она видна почти анфас. Это вопрос yaw в раскладке, а не формы.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и оплывших масс нет. Колпаки полые, с целыми ободками и валиками; карниз и зубчики читаются; сетка на wire-* следует форме (колпаки — цилиндры, ствол — плоские грани, ступени шифера). Дефекты видны только на крупном плане: рваные, неровные торцы шиферных рядов и бугристая полоса фартука у основания ствола (close-base, wire-34 справа внизу), слегка оплывшие зубчики карниза на боковой грани (close-weapon), тёмная щель под карнизом фронтона снизу (turn-135, turn-315).",
+      "frames": [
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кирпич с выкрошенным раствором и пятнами штукатурки, терракота с сажей на горлах и потёками, сине-серый шифер, бетонная оголовка. Явного запечённого блика нет, детализация лицевой грани на уровне кита Sarpedon. Дефекты заметны только вблизи или на узких гранях: на узких боковых гранях (turn-135, turn-315) кирпич смазан вертикальными растяжками проекции; тыльная грань (turn-180) мягче и мыльнее лицевой; на фартуке у основания (turn-090) мелкий артефакт, похожий на надпись; лёгкое затемнение под карнизом похоже на запечённое AO. На игровой дистанции всё это читается как кирпич и не ломает пропс.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0 (S 2.0, F 1.5, T 1.5), ни одно измерение < 1.0, гейты PASS / n/a; оставшиеся дефекты видны только на крупном плане и на узких гранях — для фонового пропа крыш допустимо.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "рваные торцы шиферных рядов и бугристый фартук у основания ствола; видно только на крупном плане"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "зубчики карниза на боковой грани слегка оплывшие"
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "на узких боковых гранях стволика (также turn-315) кирпич смазан вертикальными растяжками проекции"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "тыльная грань мягче и мыльнее лицевой; на фартуке (turn-090) мелкий артефакт, похожий на надпись"
+    },
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "широкая грань повёрнута на ~20–25° относительно оси кадра (turn-000 и turn-045 почти одинаковы) — задать yaw при размещении в раскладке"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-CHIMNEY-STACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп chimney-stack принят по делегированию (8.3): силуэт совпадает с листом. Мелкие дефекты шифера и смаз текстуры на узких гранях записаны в known_issues."
+}

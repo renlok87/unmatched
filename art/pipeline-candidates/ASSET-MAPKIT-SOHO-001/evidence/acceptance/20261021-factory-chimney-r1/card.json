@@ -1,0 +1,172 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoFactoryChimney.fbx",
+      "sha256": "205a6ecb341c5e88cba60bcd3bdb7acc1a21b78364a738ebad3e3888dd340d54"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFactoryChimney_BC.png",
+      "sha256": "6e0edf6c8b0119a95e91346a235dd0795d520336a206dc3c9940a55147f20562"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFactoryChimney_N.png",
+      "sha256": "b1457bfc9d357b5eadb8f799a72c2b868e491a67d439d041ab77140cbe6d898d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoFactoryChimney_ORM.png",
+      "sha256": "683a47e346efdde77eeec4c5f05f9d12908572866e001803ee8f46c5718069f9"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-factory-chimney-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoFactoryChimney.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+      "note": "4424 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+      "note": "UV0 islands 139, used 0.5414, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+      "note": "T_Env_SohoFactoryChimney_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoFactoryChimney.build.json",
+      "note": "SM_Env_SohoFactoryChimney, M_Env_SohoFactoryChimney",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет. sheet.png в кадрах нет, поэтому сравнивал с refs.front из tripo-run.json (art/imagegen/mapkit-soho/props/factory-chimney/view-thumb.png, единственный вид). Совпадает: восьмигранный кирпичный ствол с сужением; оголовок на консолях с открытым жерлом; 3 клёпаных пояса на стволе и пояс-рама цоколя с кронштейнами; квадратный пирамидальный постамент. Пропорции сходятся с видом примерно в пределах 5 %: ширина ствола к высоте ~0,19, оголовок ~0,22, цоколь с постаментом 24–29 % высоты. Лишних и пропавших частей нет, предмет узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: ствол наклонён примерно на 3° относительно отвесного постамента. По оболочкам из отчёта сборки центр поясов уходит с (0,2; 0,2) uu на z≈51 до (−3,0; −6,5) uu на z≈193, верх смещён на ~8–9 uu, это ~20 % ширины ствола. Наклон хорошо виден на turn-090/270/045/225, на листе труба отвесная. Основное пятно цвета того же семейства (красный кирпич), в превью светлее и розовее листа.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Заклёпки, кронштейны цоколя, рамы поясов и кольцо жерла целы. Открытые кромки из отчёта (внутри колец поясов, низ постамента, низ ствола внутри цоколя) в кадрах не видны. Сетка на wire-front/back/34 следует граням: длинные треугольники на плоских гранях ствола, плотные веера на кронштейнах. Консоли под карнизом неровного шага и размера (close-head), но это читаемая стилизованная кладка, а не оплывшая масса.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Кирпич читается кирпичом: ряды, швы, сажевые затёки под поясами, детализация на уровне кита. Однородные светлые пятна на всех гранях, направленного запечённого света нет. Чужой цвет на полном росте в зоне поясов: все четыре пояса светлые, тёплые серые, матовые (ORM metallic ~0, доля выше 0,5 равна 0) и светлее кирпича. На листе это тёмное железо, в описании iron / cast iron, поэтому пояса читаются камнем или штукатуркой, а не литым железом. Закопчённого верха из описания (soot-blackened top, на листе тёмная кромка) тоже нет: оголовок и консоли чистые розовые. На крупном плане виден вертикальный шов кладки на стволе под верхним поясом (close-head, x~500).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0. T 1.0: пояса светлые неметаллические вместо тёмного железа с листа и из описания, закопчённого верха нет. S 1.5: ствол наклонён примерно на 3°. Это не ниже 1,5, перегенерация формы не нужна, все гейты PASS/n/a, поэтому доработка текстуры.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Затемнить пояса до тёмного литого железа без новых текстур: перевести проп на M_EnvProp с записью в env-prop-look.json рана 20261021-smartmesh. Окно взять по яркости, потому что пояса заметно светлее кирпича (BC кирпича в среднем sRGB 0,325/0,246/0,237): halfWidthDeg 180, satMin 0, valMin подобрать по --check так, чтобы светлые пятна кирпича не попадали. RegionAdjust: V ×0,35–0,45, S ×0,5. Проверить env_prop_look.py --check и кадром turn-000/close-weapon.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Сделать закопчённый верх (soot-blackened top): сейчас оголовок и консоли чистые розовые. Окно look не делает маску по высоте, поэтому нужен ретекстур исходника Tripo на той же сетке (только текстура, вид front плюс текст «soot-blackened top, dark cast-iron bands»), затем пересборка env_kit. Заодно уйдёт вертикальный шов кладки под верхним поясом. Если ретекстур не делать, после затемнения поясов перенести пункт в known_issues.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Ствол наклонён примерно на 3° вперёд и вбок относительно отвесного постамента. Смещение оси ~7 uu на 142 uu между поясами z≈51 и z≈193 по оболочкам 8 и 6 из build.json, верх уходит на ~8–9 uu. С фронтальной камеры почти не заметно (turn-000 ~1,5 % ширины кадра), сбоку видно. Политика env_kit (только ориентация/масштаб/пивот) это не правит. При любой перегенерации формы проверить, что ствол отвесный."
+    },
+    {
+      "item": "S",
+      "frame": "frames.json",
+      "note": "frames/sheet.png не скопирован (warnings в frames.json: «нет --sheet»), а validate_card потребует лист в frames.files. S сравнивался с refs.front из tripo-run.json: art/imagegen/mapkit-soho/props/factory-chimney/view-thumb.png, 383 px, единственный вид, single=null."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "В превью AgX кирпич светлее и розовее тёмно-бордового листа, но средний BC тёмный и приглушённый (sRGB 0,325/0,246/0,237). Окончательный тон кирпича сверить на кадре UE, отдельной правки пока не нужно."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "В build.json 3 грани помечены inward (z≈27–28 uu), но 6,3 % площади. Две лежат внутри следа ствола, третья под рамой цоколя, в кадрах EEVEE не видны. При импорте в UE с односторонним материалом проверить верх постамента сверху."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-FACTORY-CHIMNEY-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп factory-chimney (ASSET-MAPKIT-SOHO-001) отправлен на доработку, оценка 7.5. Пояса светлые вместо тёмного железа и нет закопчённого верха (T 1.0), ствол наклонён примерно на 3° (S 1.5). Форма целая (F 2.0), гейты в порядке."
+}

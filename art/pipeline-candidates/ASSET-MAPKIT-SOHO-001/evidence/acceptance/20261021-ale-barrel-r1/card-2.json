@@ -1,0 +1,150 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoAleBarrel.fbx",
+      "sha256": "40a05b2ca4f39d09e5f6200a43bc5e0699d2613f3c3c8f5d4b68c9dfb4a7dd18"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_BC.png",
+      "sha256": "7b345988719004cfa432696122d3ae05ed426bb42eee5cc81b04f5b556d7675d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_N.png",
+      "sha256": "0181c6ec14a6ed9b71dcf131e64fcb120339c72034a027c83a5d67cabb2f457b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoAleBarrel_ORM.png",
+      "sha256": "d892efdd0593f806b04d11cc5060ddfad4d042f43320af3e387fb3a181ca31f6"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-ale-barrel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoAleBarrel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "4518 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "UV0 islands 647, used 0.6687, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "T_Env_SohoAleBarrel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoAleBarrel.build.json",
+      "note": "SM_Env_SohoAleBarrel, M_Env_SohoAleBarrel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: дубовая бочка на боку на деревянной подставке-ложементе, 4 железных обруча с заклёпками, втулка-пробка сверху, кран с кольцом на переднем днище, сегментированный утор днища, подставка с двумя стойками и брусками-упорами. Пропорции фронта (круг днища над ложементом) и бока (почти цилиндр, 4 обруча, кран сбоку) совпадают с видами листа; лишних или пропавших частей нет, фантомных оболочек на turn-090/270 и wire-* нет; узнаётся со всех 8 ракурсов. Палитра (серо-коричневое дерево, ржавое железо) того же семейства, что лист.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, рваных краёв и вывернутых частей нет ни на полном росте, ни на крупных планах. Тонкие элементы целы: кольцо и носик крана, заклёпки, втулка, края обручей. Обручи читаются как отдельные полосы с толщиной, клёпки днища и ложемент имеют чистые грани; на wire-front/34/back треугольная сетка Tripo следует форме (плотнее на кране, обручах и уторе, редко на плоском днище), мусорной геометрии нет. Контакт бочки с ложементом и ложемента с полом чистый (close-base).",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются верно и богато: дерево с волокном, трещинами и потёртостями, ржавое кованое железо обручей с синеватыми бликами и заклёпками, деревянная пробка; детализация не беднее кита Sarpedon, остров UV без растяжек. Но на переднем днище рядом с краном в BC запечён размытый «призрак» крана — мыльное тёмное пятно с повтором контура кольца справа/слева от крана; оно видно на полноростовых turn-045 и turn-315 и на close-base. Это дефект «мыло/запечённая проекция» в одной зоне на полном росте. Затемнение нижней половины на бортах (turn-090/270) совпадает с листом и читается как тень/патина, не как дефект.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0 (S 2.0, F 2.0, T 1.0), все гейты PASS или n/a; единственный дефект — размытый запечённый призрак крана на переднем днище, на игровой дистанции (24 uu) почти не читается.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "note": "В BC переднего днища рядом с краном запечён размытый призрак крана (тёмное мыльное пятно с контуром кольца); виден и на turn-315.jpg и close-base.jpg. При желании — подкрасить зону в BC (env_kit params / ретушь исходника Tripo)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-ALE-BARREL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ale-barrel (бочка эля, кит Soho) принят по делегированию с оценкой 8.3; известная мелочь — размытый запечённый призрак крана на переднем днище."
+}

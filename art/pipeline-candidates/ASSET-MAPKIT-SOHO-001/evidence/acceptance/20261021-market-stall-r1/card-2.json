@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMarketStall.fbx",
+      "sha256": "e73add20688d5d465ac6f491dde2c94dfe07e94650882ff5bb868e2e5c8c88ba"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_BC.png",
+      "sha256": "51bed6244e53bd5c2d4081103391fa7b179637dc07948dc6dacff5df838d642c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_N.png",
+      "sha256": "6fcff2b23318b858ef4c5712f5215163d8ac45ca1711a20b6c5666137098d7fe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMarketStall_ORM.png",
+      "sha256": "1f424506a326f9d7c48aa7107298b542162c08209f22f63e807670bbe3eed84e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-market-stall-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMarketStall.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "4739 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "UV0 islands 1483, used 0.6315, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "T_Env_SohoMarketStall_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMarketStall.build.json",
+      "note": "SM_Env_SohoMarketStall, M_Env_SohoMarketStall",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: деревянный прилавок с дощатой передней стенкой, двускатный полосатый красно-кремовый тент с рваной фестонной кромкой, четыре стойки с коваными завитками-кронштейнами, лотки с капустой, зелёными и красными яблоками, стопка мешковины со свисающим краем, ящики с яблоками и мешок слева у основания, ящик с красными яблоками спереди справа. Пропорции тента к прилавку и высоты частей совпадают с видом; лишних и пропавших частей нет; фантомных оболочек на turn-090/270 и wire-34 нет. Профиль двускатного тента и рама читаются сбоку, лицевой и задний виды — полосатое полотнище над прилавком; предмет узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и мусорной геометрии нет; тонкие стойки и кованые кронштейны целы, рама тента цельная, фестоны кромки тента собраны веерами треугольников, но силуэт кромки чистый; сетка на wire-34 следует форме. На крупном плане (close-base) фрукты и кочаны заметно граненые (яблоки — многогранники), содержимое переднего правого ящика оплывшее и слипшееся в массу — дефекты видны только на крупном плане, на игровой дистанции не читаются.",
+      "frames": [
+        "close-base.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: выветренное серое дерево с волокном и досками, холст тента с переплетением и полосами, мешковина, зелень капусты и красно-зелёные яблоки; запечённого направленного света и бликов в цвете на полном росте нет, швов и растяжек на ракурсах нет, детализация на уровне кита пропов. На крупных планах: полотно тента слегка мыльное (close-head), у переднего правого ящика цвет яблок и зелени размазан в пятно (close-base) — только крупный план.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 → 8.3 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; дефекты F/T только на крупном плане, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Фрукты и кочаны граненые (многогранники) на крупном плане; содержимое переднего правого ящика оплывшее, слипшееся в массу. На полном росте не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "В переднем правом ящике цвет яблок и зелени размазан в мыльное пятно; полотно тента слегка мыльное на close-head.jpg. Только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-MARKET-STALL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп market-stall (Soho) принят по делегированию, 8.3: силуэт совпадает с видом; граненые фрукты и мыльный ящик спереди справа заметны только на крупном плане."
+}

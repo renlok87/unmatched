@@ -5,6 +5,8 @@
         # op: generate | texture-2k | pbr | smart-uv | retry ; one ledger row right after each Studio operation
     python tools/mapkits/tripo_intake.py intake <map> <key> <task_uuid> <downloaded.glb> [--date YYYYMMDD] [--move]
         # GLB -> <run>/source/<ID>.glb, sha256 into reports/tripo-run.json, target into scripts/env-kit-params.json
+    python tools/mapkits/tripo_intake.py level <map> <key>... [--force]
+        # stand a tilted prop level (tools/mapkits/level_glb.py: root node rotation), re-hash it in tripo-run.json
 
 Run folder: art/pipeline-candidates/ASSET-MAPKIT-<MAP>-001/<date>-smartmesh (one per map and day), the layout
 tools/art/env_kit/run_env_kit.py reads (source/<ID>.glb, reports/tripo-run.json, scripts/env-kit-params.json). Card of
@@ -162,6 +164,25 @@ def intake(m: str, key: str, task: str, glb: Path, date: str, move: bool) -> dic
             "images": g["images"], "target_uu": target_uu(p)}
 
 
+def level(m: str, key: str, date: str, force: bool) -> dict:
+    """Stand a tilted prop level (tools/mapkits/level_glb.py) in its run source and re-hash it in tripo-run.json."""
+    import level_glb  # noqa: E402
+    aid = asset_id(m, key)
+    run = run_dir(m, date)
+    src = run / "source" / f"{aid}.glb"
+    res = level_glb.level(src, do_apply=True, min_tilt=0.0 if force else 2.0)
+    tr_path = run / "reports" / "tripo-run.json"
+    tr = _json(tr_path, {})
+    if res.get("applied") and aid in tr.get("assets", {}):
+        tr["assets"][aid].update({"sha256": sha256(src), "bytes": src.stat().st_size,
+                                  "levelled": {k: res[k] for k in ("rx_deg", "rz_deg", "tilt_deg", "gain")}})
+        _write(tr_path, tr)
+        st = mapkit.load_status(m)
+        st["props"].setdefault(key, {}).setdefault("tripo", {})["levelled"] = tr["assets"][aid]["levelled"]
+        mapkit.save_status(m, st)
+    return {"asset": aid, **res}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -177,7 +198,14 @@ def main() -> None:
         a.add_argument(n)
     a.add_argument("glb", type=Path); a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d"))
     a.add_argument("--move", action="store_true")
+    a = sub.add_parser("level")
+    a.add_argument("map"); a.add_argument("keys", nargs="+")
+    a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d")); a.add_argument("--force", action="store_true")
     args = ap.parse_args()
+    if args.cmd == "level":
+        for k in args.keys:
+            print(json.dumps(level(args.map, k, args.date, args.force), ensure_ascii=False))
+        return
     if args.cmd == "check":
         sys.exit(check(args.cost, args.balance))
     if args.cmd == "log":

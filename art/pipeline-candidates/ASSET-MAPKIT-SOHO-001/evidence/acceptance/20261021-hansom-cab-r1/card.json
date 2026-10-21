@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHansomCab.fbx",
+      "sha256": "fbc3b9754631228c088c73599129bcf38c85162334cb105bb2885d9b1fbf1395"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_BC.png",
+      "sha256": "2f14ba20b9a75f20ad152955955bed22644db29433b25517af96a2ed98c004f5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_N.png",
+      "sha256": "9b2d0518e890f11765ef364ea4f225ec717431a0b1599ee8b1ac5cd765e090ff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_ORM.png",
+      "sha256": "369c93b49b866b6b6fe08f5fd299567fe6501ca9d710a5a1522c9d0a8e00f84c"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hansom-cab-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHansomCab.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "7536 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "UV0 islands 1151, used 0.6142, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "T_Env_SohoHansomCab_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "SM_Env_SohoHansomCab, M_Env_SohoHansomCab",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Кузов кэба, окно, вензель на боковой панели, сиденье кучера с поручнем и набалдашником, загнутый передний щиток, высокая спинка, подножка и два спицованных колеса совпадают с обоими видами sheet.png, предмет узнаётся со всех 8 ракурсов. Но у одной оглобли есть фантомная оболочка. Это плоский треугольный плавник-перепонка: он идёт от рамы под колесом до конца оглобли и заполняет пустое на листе место между рамой, колесом и оглоблей. На wire-front и wire-back он виден как сплошной треугольник, на turn-000 и turn-180 как толстый клин вместо тонкого шеста, на turn-045, turn-135, turn-315 и wire-34 как широкая вертикальная пластина. Вторая оглобля тонкая, как на листе. По рубрике фантомная часть даёт 0,5.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Почти вся форма чистая. Колёса и спицы целые и просвечивают, поручни и прутья не порваны, оконный проём открыт, на wire-* сетка следует форме кузова и щитка, дыр и чёрных пятен нет, подушки на close-head слегка комковаты. Но плавник на оглобле — это мусорная плоская геометрия в одной зоне, и он виден на полном росте: turn-000, turn-180, wire-front, wire-34, close-base. Это даёт 1,0.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как в описании: чёрный лак с потёртыми рёбрами, под которыми видно коричневое дерево, серое железо поручней и ступицы, тёмная кожа крыши и сидений. Запечённого света не видно, детализация на уровне кита. Дефект на полном росте в одной зоне: плавник оглобли покрыт бледно-серой размытой растянутой текстурой, которая выбивается из чёрного лака (turn-000, turn-045, close-base), а его нижняя часть на turn-180 почти чёрная. Ещё мелкие замечания: внутренняя поверхность круглого выреза под сиденьем кучера бежево-светлая на turn-225 и turn-315 (возможно, это свет на вогнутой поверхности), подушки на close-head пёстро-шумные, на кузове есть синие точки (turn-000, close-base).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 4.2,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S 0,5 < 1,5. У одной оглобли фантомная оболочка: плоский треугольный плавник-перепонка от рамы под колесом до конца оглобли (wire-front, wire-back, wire-34, turn-000, turn-180). На листе здесь тонкий шест и пустое место. По рубрике нужна перегенерация в Tripo, rework_fix_list пуст, F 1,0 и T 1,0 записаны в known_issues. Все гейты PASS или n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wire-front.jpg",
+      "note": "У одной оглобли фантомный треугольный плавник-перепонка от рамы под колесом до конца оглобли, на листе на этом месте тонкий шест. При перегенерации в Tripo нужно, чтобы обе оглобли были тонкими шестами, а между рамой и оглоблей оставалось пустое место (проверить wire-front, wire-back, turn-000, turn-180)."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Плавник — мусорная плоская геометрия, видна на полном росте (turn-000, turn-180, close-base). В остальном форма чистая: колёса, спицы, поручни и проём окна целы."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На плавнике оглобли бледно-серая, размытая, растянутая текстура, которая выбивается из чёрного лака (turn-000, turn-045), а снизу на turn-180 он почти чёрный."
+    },
+    {
+      "item": "T",
+      "frame": "turn-225.jpg",
+      "note": "Внутренняя поверхность круглого выреза под сиденьем кучера бежево-светлая (turn-225, turn-315), хотя на листе она тёмная. Проверить после перегенерации."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Подушки сидений и кант крыши на крупном плане пёстро-шумные и не похожи на кожу. На кузове есть синие точки (turn-000, close-base). Это дефекты только крупного плана."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-HANSOM-CAB-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hansom-cab (кэб) не принят, его нужно перегенерировать в Tripo: у одной оглобли фантомный треугольный плавник-перепонка с бледной размытой текстурой. Кузов, колёса и сиденья совпадают с листом."
+}

@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHandLantern.fbx",
+      "sha256": "479fa7c4e1fd57ac1e9dfd9fb9884663d49dff648b66662dd45cca63350c7975"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandLantern_BC.png",
+      "sha256": "16c17e35212150b8cad00ac29176744faa366a317a8668d68795c9ef0b7d101c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandLantern_N.png",
+      "sha256": "9e91b19d670f6709cafd1a5c2c859fd7f1d8c545f25af5bd5a7d899f01c42ffd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHandLantern_ORM.png",
+      "sha256": "da368568c66ee7e83bacee11f81bd12b40b84014e40aa1a993d3a9e6ad874495"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hand-lantern-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHandLantern.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+      "note": "4669 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+      "note": "UV0 islands 364, used 0.6344, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+      "note": "T_Env_SohoHandLantern_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHandLantern.build.json",
+      "note": "SM_Env_SohoHandLantern, M_Env_SohoHandLantern",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: викторианский фонарь-«бычий глаз» с латунным ободом линзы. Части совпадают с листом (миниатюра 230 px, вид 3/4): квадратный жестяной корпус с бортиками, линза в латунном раструбе на всю ширину передней грани, боковая рамка-окно, полуцилиндрический колпак и проволочная ручка на кольцах. Деление по высоте как на листе: корпус около 63 %, колпак с ручкой около 37 %. Сзади дверца со щеколдой; на листе задней стороны нет, но это реальная деталь фонаря, а не фантом. Фонарь узнаётся со всех 8 ракурсов. Цвет: серо-бурая жесть и латунь, то же семейство, что на листе; модель только чуть светлее.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полных ракурсах, ни на крупных планах нет дыр, просветов, рваных краёв и вывернутых частей. Тонкая ручка и её кольца целы, бортики и петли чёткие, раструб и купол линзы гладкие. Задние окна утоплены в корпус, сквозных дыр нет. Сетка на wire-* повторяет форму: линза и ручка плотные, плоские грани редкие. Лёгкая неровность прутка ручки читается как стилизация кованой проволоки, а не как оплывание.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: жесть серо-бурая с закопчёнными и ржавыми потёками, обод линзы латунный. Стёкла окон матовые: за ними нарисован силуэт горелки, задние окна тёмные с бликом. На полном росте швов, растяжек и чужого цвета нет, нарисованные блики на стекле — приём стилизованного стекла. Дефекты видны только крупным планом. На колпаке мутные пятна и мыло (close-head, close-weapon). На стекле бока +X грубая вертикальная штриховка-грязь (close-base, заметна и на turn-090). Купол линзы с нарисованным бликом читается скорее как полированный металл, чем как стекло. Детализации для фонового пропа высотой 9 uu достаточно.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a; замечания T только крупного плана.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Колпак: мутные пятна и мыло на полуцилиндре, видно только крупным планом."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Стекло бокового окна +X: грубая вертикальная штриховка-грязь с тёмным пятном, на полном росте (turn-090) читается как закопчённое стекло."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "На стекле задней дверцы и на куполе линзы нарисованы блики в BC (стилизация стекла). Купол линзы ближе к полированному металлу, чем к стеклу."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-HAND-LANTERN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hand-lantern принят по делегированию: 9.2. Силуэт и форма чистые; к текстуре только замечания крупного плана (мыло на колпаке, штриховка на стекле +X)."
+}
