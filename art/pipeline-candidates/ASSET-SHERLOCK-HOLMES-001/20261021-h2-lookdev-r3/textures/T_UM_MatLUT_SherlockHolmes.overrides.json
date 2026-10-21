@@ -1,0 +1,88 @@
+{
+ "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+ "classes": {
+  "brass": {
+   "bc": [
+    0.23,
+    0.1222,
+    0.0481
+   ],
+   "wornBC": [
+    0.585,
+    0.3033,
+    0.1133
+   ],
+   "ymedClassHero": 0.6597
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0437,
+    0.0242,
+    0.0152
+   ],
+   "ymedClassHero": 0.02742
+  },
+  "linen": {
+   "bc": [
+    0.6445,
+    0.5395,
+    0.4125
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.55408
+  },
+  "silk": {
+   "bc": [
+    0.0369,
+    0.0242,
+    0.0203
+   ],
+   "ymedClassHero": 0.02655
+  },
+  "skin": {
+   "bc": [
+    0.4851,
+    0.2307,
+    0.1384
+   ],
+   "ymedClassHero": 0.2807
+  },
+  "stone_base": {
+   "bc": [
+    0.0307,
+    0.0252,
+    0.0252
+   ],
+   "ymedClassHero": 0.0268
+  },
+  "wood": {
+   "bc": [
+    0.0497,
+    0.0222,
+    0.013
+   ],
+   "ymedClassHero": 0.02684
+  },
+  "wool_coarse": {
+   "bc": [
+    0.0704,
+    0.0595,
+    0.0529
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.06125
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "SherlockHolmes",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero SherlockHolmes --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}
