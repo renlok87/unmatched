@@ -2,7 +2,10 @@ param(
   [string]$Log = (Join-Path ([System.IO.Path]::GetTempPath()) 's08-uat.log'),
   # Cook+stage the already built game binary. Use when an editor with Live
   # Coding blocks the UnmatchedEditor build step of BuildCookRun -build.
-  [switch]$SkipBuild
+  [switch]$SkipBuild,
+  # UAT builds the game target with -ubtargs=-NoXGE by default (local executor, as build-editor.cjs -NoXGE): the night
+  # packages of 2026-10-20/21 ran UBT through the unlicensed XGE (IncrediBuild standalone) executor. -AllowXGE restores it.
+  [switch]$AllowXGE
 )
 # Hidden RunUAT package (Development, cook+stage+pak).
 $ErrorActionPreference = 'Stop'
@@ -61,9 +64,19 @@ $argList = @(
   '-unattended', '-nosplash',
   '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False'
 )
-$p = Start-Process -FilePath $Uat -ArgumentList $argList -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput $Log -RedirectStandardError "$Log.err"
-Write-Output "UAT_EXIT=$($p.ExitCode)"
-if ($p.ExitCode -ne 0) { throw "RunUAT failed with exit code $($p.ExitCode); see $Log" }
+if (-not $SkipBuild -and -not $AllowXGE) { $argList += '-ubtargs=-NoXGE' }
+# Wait for RunUAT itself, not for its whole process tree: `Start-Process -Wait` (PowerShell 5.1) also waits for every
+# descendant, and a UBT child that outlived UAT kept the night packages of 2026-10-20/21 waiting ~14 min after
+# "AutomationTool exiting ... Success" (process-wait.ps1).
+. (Join-Path $PSScriptRoot 'process-wait.ps1')
+$uat = Invoke-HiddenProcessWait -FilePath $Uat -ArgumentList $argList -StdOut $Log -StdErr "$Log.err"
+Write-Output "UAT_EXIT=$($uat.ExitCode) UAT_SECONDS=$($uat.Seconds)"
+if ($uat.Survivors.Count -gt 0) {
+  # diagnostic only (never killed here): which process would have held `Start-Process -Wait`
+  $names = ($uat.Survivors | ForEach-Object { "$($_.Name)($($_.ProcessId))" }) -join ' '
+  Write-Output "UAT_SURVIVORS=$($uat.Survivors.Count) $names"
+}
+if ($uat.ExitCode -ne 0) { throw "RunUAT failed with exit code $($uat.ExitCode); see $Log" }
 
 # Stamp the staged build with the source hash it was packaged from: tools/s08/sync-staged-build.ps1 copies it into
 # another checkout only when that checkout's sources hash the same (AGENTS.md "Iteration speed": one package per change).
