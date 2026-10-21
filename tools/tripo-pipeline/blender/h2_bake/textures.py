@@ -31,6 +31,11 @@ into [lo, hi] by its Tripo rank after the caps and the metal remap, with or with
 Report blocks color_repaint / roughness_remap only with the keys. A color_repaint entry with the optional `majority`
 {radius_m <= 0.012, min_source_fraction in (0.5, 1]} (Bruce Lee model acceptance r2) repaints a matched texel only
 where its sources hold that share of the baked texels of the same parts in the 3D ball (majority / closing filter).
+Optional textures.clone_repaint (materials.clone_repaint, F15: Dr. Watson model acceptance r2) copies, texel by
+texel without averaging, the pattern of the same parts from rest position + offset_m (or the mirror across
+x = mirror_x) into the texels selected by boxes (and match_hsv), right after color_repaint (the cap texels
+of entries with caps: true right after the caps fill); validated with the F12 keys before any work, report
+block clone_repaint only with the key, absent = the bytes before it.
 Metal-free hero (no materials.metal parts): no metal mask, no remap, the H2.1 metal checks are not run, and
 work/uv/metal_mask.npy is written all-zero (look-dev reads it). Empty team_mask.cloth_parts (no cloth): TeamMask R = 0
 and the check team_mask_cloth_share is reported as not applicable (pilot 2026-10-13, F51, F52).
@@ -298,10 +303,12 @@ def run(run_dir, profile):
     bands = tcfg.get("band_repaint") or []
     crs = tcfg.get("color_repaint")  # F12 (2026-10-20 batch): opt-in, None = the old path
     rrs = tcfg.get("roughness_remap")
-    mat = load_sibling("materials") if (mcfg or bands or crs is not None or rrs is not None) else None
-    if crs is not None or rrs is not None:  # validated before any work: a malformed key stops the stage
+    cls = tcfg.get("clone_repaint")  # F15 (Dr. Watson model acceptance r2): opt-in, None = the old path
+    mat = load_sibling("materials") if (mcfg or bands or crs is not None or rrs is not None or cls is not None) else None
+    if crs is not None or rrs is not None or cls is not None:  # validated before any work: a malformed key stops the stage
         problems = ((mat.color_repaint_problems(crs, part_names) if crs is not None else [])
-                    + (mat.roughness_remap_problems(rrs, part_names) if rrs is not None else []))
+                    + (mat.roughness_remap_problems(rrs, part_names) if rrs is not None else [])
+                    + (mat.clone_repaint_problems(cls, part_names) if cls is not None else []))
         if problems:
             raise ValueError("textures profile: %s" % "; ".join(problems))
     tx = SimpleNamespace(rgb_to_hsv=rgb_to_hsv, bilinear=bilinear, dilate=dilate, blur3=blur3)
@@ -319,6 +326,12 @@ def run(run_dir, profile):
         pos = np.load(w / "uv" / "position.npy")
         pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
         cr_rows = mat.color_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, crs, tx)
+        del pos, pos_ok
+    cl_rows = None
+    if cls:  # F15: right after color_repaint (copies its result), before the footprints / caps read their rim
+        pos = np.load(w / "uv" / "position.npy")
+        pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
+        cl_rows = mat.clone_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, cls, tx)
         del pos, pos_ok
     rim_filters = (mcfg or {}).get("rim_filters", [])
     fp_path = w / "uv" / "footprints.npz"
@@ -341,6 +354,11 @@ def run(run_dir, profile):
                 [f["keep_hsv"] for f in rim_filters], tx)
         valid_maps, cap_stats = cap_fill(maps, alpha, caps, cap_mask, edge_px)
     stats["caps"] = cap_stats
+    if cls and any(c.get("caps") for c in cls):  # F15: cap texels of the caps: true entries, after the caps fill
+        pos = np.load(w / "uv" / "position.npy")
+        pos_ok = np.load(w / "uv" / "position_alpha.npy") > 0
+        cl_rows += mat.clone_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, cls, tx, caps_pass=True)
+        del pos, pos_ok
     metal_m = None
     if metal_pass(mcfg):
         pos = np.load(w / "uv" / "position.npy")
@@ -489,6 +507,8 @@ def run(run_dir, profile):
         report["band_repaint"] = {"config": bands, "bands": band_rows}
     if cr_rows is not None:  # F12: only with the key
         report["color_repaint"] = {"config": crs, "rows": cr_rows}
+    if cl_rows is not None:  # F15: only with the key
+        report["clone_repaint"] = {"config": cls, "rows": cl_rows}
     if rr_rows is not None:
         report["roughness_remap"] = {"config": rrs, "rows": rr_rows}
     if mcfg:

@@ -54,7 +54,22 @@ textures.materials.metal — the cloth_roughness of materials.remap runs only in
 had no way to make its cloth matte): ORM roughness (RM.G) of the valid texels of `parts` (optional `hsv` gate on the
 BaseColor, same keys as match_hsv) goes into [lo, hi] by its rank in those texels (rank01: 5th..95th percentile, the
 cloth_roughness rule). Metal texels (mask >= 0.5 of the metal pass) are left out. Without the key nothing runs and the
-cloth_roughness result of heroes with metal is unchanged."""
+cloth_roughness result of heroes with metal is unchanged.
+
+clone_repaint (textures.clone_repaint, F15: Dr. Watson model acceptance r2, T 1.0; runs right after color_repaint, before
+the footprints and caps read their rim): a smear without the cloth pattern on a surface hidden at rest (the coat behind
+the bag and under the arm) — band_repaint and color_repaint average their sources and leave it patternless. Texels of
+`parts` (UV raster, rest position of stage aux, caps excluded) inside include_boxes_m, outside exclude_boxes_m and, when
+given, passing match_hsv are selected; every selected texel copies, with k = 1 and no averaging, the value of the
+nearest source texel to its rest position + source.offset_m, or to its mirror across x = source.mirror_x, for each map
+of `keys` (default BC). Sources: baked texels of the same parts that the entry does not select (it never copies its own
+defect); entries run in order, so a later entry may copy what an earlier one cloned. A selected texel whose source lies
+farther than max_dist_m (<= 0.01 m) keeps its value and is counted (without_source). Optional feather_m (<= 0.02 m)
+blends the copy into the original over the last feather_m inside the include boxes (smoothstep of the depth in the
+box). Contact caps are left out of that pass (the caps fill paints every cap from its rim afterwards); an entry with
+caps: true also clones the cap texels of its parts in its boxes in a second pass right after the caps fill, from the
+same sources (Watson: the coat_bag cap, a flat rim-coloured patch where the bag pressed into the coat at rest). Report
+rows (pass main / caps): box, selected, repainted, without_source and feathered texels, source distances, mean change."""
 
 import numpy as np
 from scipy import ndimage
@@ -473,6 +488,145 @@ def color_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, exclude, cfgs,
             maps[key][by, bx] = new.astype(maps[key].dtype)
         dist = dd[has][found[has]]
         row.update(repainted_texels=int(len(mi_ok)), without_source=int((~has).sum()), maps=stats,
+                   distance_mm_p50_max=[round(float(np.median(dist) * 1000), 2), round(float(dist.max() * 1000), 2)]
+                   if len(dist) else None)
+        rows.append(row)
+    return rows
+
+
+# ---------------------------------------------------------------- clone repaint (F15, Dr. Watson model acceptance r2)
+CLONE_REPAINT_KEYS = ("name", "parts", "include_boxes_m", "exclude_boxes_m", "source", "max_dist_m", "match_hsv", "keys",
+                      "feather_m", "caps", "note")
+CLONE_SOURCE_KEYS = ("offset_m", "mirror_x")
+CLONE_MAX_DIST_MAX_M = 0.01
+CLONE_FEATHER_MAX_M = 0.02
+
+
+def clone_repaint_problems(cfgs, part_names):
+    """Validation of textures.clone_repaint (the stage raises ValueError with these problems)."""
+    if not isinstance(cfgs, list) or not cfgs:
+        return ["textures.clone_repaint must be a non-empty list of clones"]
+    problems, seen = [], set()
+    for i, c in enumerate(cfgs):
+        w = "textures.clone_repaint[%d]" % i
+        if not isinstance(c, dict):
+            problems.append("%s must be an object" % w)
+            continue
+        problems += ["%s: unknown key %s" % (w, k) for k in c if k not in CLONE_REPAINT_KEYS]
+        if not isinstance(c.get("name"), str) or not c["name"] or c["name"] in seen:
+            problems.append("%s.name must be a unique non-empty string" % w)
+        seen.add(c.get("name"))
+        problems += _parts_problems(w + ".parts", c.get("parts"), part_names)
+        problems += _boxes_problems(w + ".include_boxes_m", c.get("include_boxes_m"))
+        if "exclude_boxes_m" in c:
+            problems += _boxes_problems(w + ".exclude_boxes_m", c["exclude_boxes_m"])
+        src = c.get("source")
+        if not (isinstance(src, dict) and len(src) == 1 and next(iter(src)) in CLONE_SOURCE_KEYS):
+            problems.append("%s.source must be {offset_m: [x, y, z]} or {mirror_x: c} (got %r)" % (w, src))
+        elif "offset_m" in src:
+            o = src["offset_m"]
+            if not (isinstance(o, list) and len(o) == 3 and all(_is_num(v) for v in o) and any(v != 0 for v in o)):
+                problems.append("%s.source.offset_m must be three numbers, not all zero (got %r)" % (w, o))
+        elif not _is_num(src["mirror_x"]):
+            problems.append("%s.source.mirror_x must be a number (got %r)" % (w, src["mirror_x"]))
+        md = c.get("max_dist_m")
+        if not (_is_num(md) and 0.0 < md <= CLONE_MAX_DIST_MAX_M):
+            problems.append("%s.max_dist_m must be in (0, %s] m (got %r)" % (w, CLONE_MAX_DIST_MAX_M, md))
+        if "match_hsv" in c:
+            problems += _hsv_rule_problems(w + ".match_hsv", c["match_hsv"], allow_empty=False)
+        keys = c.get("keys", ["BC"])
+        if not (isinstance(keys, list) and keys and all(x in REPAINT_MAPS for x in keys) and len(set(keys)) == len(keys)):
+            problems.append("%s.keys must be a non-empty subset of %s (got %r)" % (w, list(REPAINT_MAPS), keys))
+        f = c.get("feather_m", 0.0)
+        if not (_is_num(f) and 0.0 <= f <= CLONE_FEATHER_MAX_M):
+            problems.append("%s.feather_m must be in [0, %s] m (got %r)" % (w, CLONE_FEATHER_MAX_M, f))
+        if "caps" in c and not isinstance(c["caps"], bool):
+            problems.append("%s.caps must be true or false (got %r)" % (w, c["caps"]))
+    return problems
+
+
+def box_depth(pts, boxes):
+    """Depth of every point in the union of `boxes`: the largest, over the boxes holding it, of its distance to the
+    nearest face of that box (0 outside every box)."""
+    depth = np.zeros(len(pts))
+    for b in boxes:
+        lo, hi = np.array(b["min_m"]), np.array(b["max_m"])
+        d = np.minimum(pts - lo, hi - pts).min(1)
+        depth = np.maximum(depth, np.where(d >= 0.0, d, 0.0))
+    return depth
+
+
+def clone_repaint(maps, alpha, part_ids, part_names, pos, pos_ok, cap_mask, cfgs, tx, caps_pass=False):
+    """Clones the selected texels of textures.clone_repaint in place (module docstring); returns the report rows.
+    caps_pass=False: the texels of the parts outside the contact caps (right after color_repaint). caps_pass=True: the
+    cap texels of the entries with caps: true (after the caps fill, which paints every cap from its rim); the sources are
+    the same in both passes (baked non-cap texels of the parts that the entry does not select)."""
+    from scipy.spatial import cKDTree
+
+    rows = []
+    for cfg in cfgs:
+        if caps_pass and not cfg.get("caps"):
+            continue
+        max_dist = float(cfg["max_dist_m"])
+        keys = list(cfg.get("keys", ["BC"]))
+        feather = float(cfg.get("feather_m", 0.0))
+        idx = [part_names.index(p) for p in cfg["parts"]]
+        parts_ok = np.isin(part_ids, idx) & pos_ok
+        mine = parts_ok & ~cap_mask
+        ya, xa = np.nonzero(mine)
+        pa = pos[ya, xa].astype(np.float64)
+
+        def select(p, rgb):
+            box = boxes_mask(p, cfg["include_boxes_m"])
+            if cfg.get("exclude_boxes_m"):
+                box &= ~boxes_mask(p, cfg["exclude_boxes_m"])
+            sel = box.copy()
+            if cfg.get("match_hsv"):
+                sel &= hsv_select(rgb, cfg["match_hsv"], tx)
+            return box, sel
+
+        in_box, sel = select(pa, maps["BC"][ya, xa])
+        # sources: baked non-cap texels of the same parts that this entry does not repaint (never its own defect)
+        source = alpha["BC"][ya, xa] & ~sel
+        if caps_pass:  # targets: the cap texels of the parts in the boxes
+            cy, cx = np.nonzero(parts_ok & cap_mask)
+            ty, tx_, tp = cy, cx, pos[cy, cx].astype(np.float64)
+            in_box, tsel = select(tp, maps["BC"][cy, cx])
+        else:
+            ty, tx_, tp, tsel = ya, xa, pa, sel
+        src = cfg["source"]
+        row = {"name": cfg["name"], "parts": list(cfg["parts"]), "source": dict(src), "max_dist_m": max_dist,
+               "pass": "caps" if caps_pass else "main", "part_texels": int(len(tp)), "box_texels": int(in_box.sum()),
+               "selected_texels": int(tsel.sum()), "source_texels": int(source.sum())}
+        si, mi = np.nonzero(source)[0], np.nonzero(tsel)[0]
+        if not len(mi) or not len(si):
+            rows.append(dict(row, repainted_texels=0, without_source=int(len(mi)),
+                             note="nothing repainted (no selected texel or no source texel)"))
+            continue
+        target = tp[mi].copy()
+        if "offset_m" in src:
+            target += np.array(src["offset_m"], np.float64)
+        else:
+            target[:, 0] = 2.0 * float(src["mirror_x"]) - target[:, 0]
+        dd, ii = cKDTree(pa[si]).query(target, k=1, distance_upper_bound=max_dist)
+        has = np.isfinite(dd)
+        mi_ok, ii_ok = mi[has], ii[has]
+        by, bx = ty[mi_ok], tx_[mi_ok]
+        sy, sx = ya[si[ii_ok]], xa[si[ii_ok]]
+        f = np.ones(len(mi_ok))
+        if feather > 0.0:
+            f = np.clip(box_depth(tp[mi_ok], cfg["include_boxes_m"]) / feather, 0.0, 1.0)
+            f = f * f * (3.0 - 2.0 * f)
+        stats = {}
+        for key in keys:  # sources are never selected, so no entry reads a texel it has already written
+            old = maps[key][by, bx].astype(np.float64)
+            new = maps[key][sy, sx].astype(np.float64)
+            out = old * (1.0 - f[:, None]) + new * f[:, None]
+            stats[key] = {"mean_abs_change": round(float(np.abs(out - old).mean()), 4) if len(mi_ok) else 0.0}
+            maps[key][by, bx] = out.astype(maps[key].dtype)
+        dist = dd[has]
+        row.update(repainted_texels=int(len(mi_ok)), without_source=int((~has).sum()), maps=stats,
+                   feathered_texels=int((f < 1.0).sum()),
                    distance_mm_p50_max=[round(float(np.median(dist) * 1000), 2), round(float(dist.max() * 1000), 2)]
                    if len(dist) else None)
         rows.append(row)
