@@ -1,0 +1,735 @@
+[
+ {
+  "asset": "ASSET-DR-WATSON-001",
+  "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/HitReact",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "HitReact",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_HitReact.fbx",
+     "sha256": "8e647d26bff91ba3d1bf4796af67436f1777440d31eec662f4c08649109aa7ec"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+     "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/HitReact/frames",
+    "files": [
+     "DrWatson-HitReact-blender-sheet.jpg",
+     "DrWatson-HitReact-f02-back.jpg",
+     "DrWatson-HitReact-f02-q34-b.jpg",
+     "DrWatson-HitReact-f02-q34.jpg",
+     "DrWatson-HitReact-f02-q34b-b.jpg",
+     "DrWatson-HitReact-f02-q34b.jpg",
+     "DrWatson-HitReact-f02-q34bl.jpg",
+     "DrWatson-HitReact-f02-q34l.jpg",
+     "DrWatson-HitReact-f02-q34r.jpg",
+     "DrWatson-HitReact-f02-topb.jpg",
+     "DrWatson-HitReact-f00-front-ue-editor.jpg",
+     "DrWatson-HitReact-f00-q34-ue-editor.jpg",
+     "DrWatson-HitReact-f02-front-ue-editor.jpg",
+     "DrWatson-HitReact-f02-q34-ue-editor.jpg",
+     "DrWatson-HitReact-f04-front-ue-editor.jpg",
+     "DrWatson-HitReact-f04-q34-ue-editor.jpg",
+     "DrWatson-HitReact-f07-front-ue-editor.jpg",
+     "DrWatson-HitReact-f07-q34-ue-editor.jpg",
+     "DrWatson-HitReact-f10-front-ue-editor.jpg",
+     "DrWatson-HitReact-f10-q34-ue-editor.jpg",
+     "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-HitReact.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_HitReact.validation.json",
+     "note": "AM_DrWatson_HitReact.validation.json#result = pass; #fails = []; #warnings = []; #root_bone.end_delta_of_height = 0.0",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-HitReact.json",
+     "note": "contact-HitReact.json#result = pass; #fails = []; #checks.foot_slide_L/R = pass (max 1.6e-05 / 3.1e-05 of height, tol 0.005); #checks.weapon_body max_pairs = 324 = rest_pairs (hips, саквояж), violating_frames = 0; #checks.skin_stretch visible_torn_edges = 0, warn_edges = 0, max_ratio 1.967 (к.2); #checks.hem_below_base_top = pass",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#WAT-HitReact.status = technically_imported; #WAT-HitReact.ue.status = technically_imported; #WAT-HitReact.validation.result = pass; #WAT-HitReact.source.files[0].sha256 = 8e647d26bff91ba3d1bf4796af67436f1777440d31eec662f4c08649109aa7ec = ue-import-clips.json#fbx_sha256.AM_DrWatson_HitReact = accepted_object[0].sha256",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "Удар спереди читается. На Blender-листе (f02 left) корпус и голова откинуты назад. На DrWatson-HitReact-f02-q34-ue-editor против f00-q34 верх корпуса и котелок уходят назад, а револьвер вздрагивает вверх почти вертикально (в rest около 55°). На крупном плане f02-q34-b подбородок задран: голова мотнулась назад. На f02-front-ue-editor голова кренится к левому плечу фигуры, ствол встаёт вертикально, саквояж уходит наружу от полы. Тайминг верный: пик на к.2, на к.4 полпути (f04-front/q34), к.10 = rest. Характер сдержанного джентльмена сохранён: револьвер жёстко в кулаке, без приседа; спиной к камере нет (ВР-06). Мелкие огрехи ритма: с front отдача корпуса назад почти не видна и читается только по крену головы и стволу; перелёт вперёд на к.7 едва заметен (f07-front почти совпадает с f10-front, на f07-q34 ствол лишь чуть наклонён вперёд). Поэтому 1,5, а не 2.",
+     "frames": [
+      "DrWatson-HitReact-blender-sheet.jpg",
+      "DrWatson-HitReact-f00-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f02-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f00-front-ue-editor.jpg",
+      "DrWatson-HitReact-f02-front-ue-editor.jpg",
+      "DrWatson-HitReact-f02-q34-b.jpg",
+      "DrWatson-HitReact-f07-front-ue-editor.jpg",
+      "DrWatson-HitReact-f07-q34-ue-editor.jpg"
+     ]
+    },
+    "C": {
+     "value": 2,
+     "rationale": "Реакция с нужной стороны: удар спереди, корпус уходит назад, от удара (Blender-лист f02 left и f04 left; f02-q34-ue-editor). Стопы на всех кадрах стоят на подставке на тех же местах: на f00, f02, f04 и f10 front-ue-editor ботинки не сдвигаются, на Blender-листе в видах left и q34 стопы неподвижны. Таз отклоняется без приседа, колени прямые. Пола пальто держится над подставкой и в неё не уходит (f02-q34b-b, f02-q34). Отдача резкая, с весом корпуса. Для HitReact кадр контакта не задаётся.",
+     "frames": [
+      "DrWatson-HitReact-blender-sheet.jpg",
+      "DrWatson-HitReact-f00-front-ue-editor.jpg",
+      "DrWatson-HitReact-f02-front-ue-editor.jpg",
+      "DrWatson-HitReact-f02-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f02-q34b-b.jpg",
+      "DrWatson-HitReact-f02-q34.jpg"
+     ]
+    },
+    "D": {
+     "value": 1.5,
+     "rationale": "На пике (к.2) оболочка цела, разрывов и дыр на крупных планах нет. Револьвер не входит ни в поля котелка, ни в лицо. На f02-q34 ствол стоит заметно левее и ниже полей, на f02-q34b-b и f02-q34bl виден свободный зазор между револьвером и головой. На f02-q34r кулак плотно держит рукоять, ствол не проворачивается. Саквояж отходит от полы, а не в неё: на f02-q34b-b между саквояжем и пальто зазор, на f02-q34l край саквояжа только примыкает к поле, это состояние rest (предел П3-2). Сзади ворот и затылок закрыты, провала нет (f02-back, f02-topb). Видны следы без разрывов, поэтому не 2: на f02-q34b угловатые заломы и фасетки рукава от плеча до локтя правой руки; на f02-q34r и f02-q34l тонкая светлая щель по краю манжеты у запястья (натяжение рукава и манжеты в пределах известного skin_stretch, рваных рёбер нет).",
+     "frames": [
+      "DrWatson-HitReact-f02-q34.jpg",
+      "DrWatson-HitReact-f02-q34-b.jpg",
+      "DrWatson-HitReact-f02-q34b.jpg",
+      "DrWatson-HitReact-f02-q34b-b.jpg",
+      "DrWatson-HitReact-f02-q34bl.jpg",
+      "DrWatson-HitReact-f02-q34l.jpg",
+      "DrWatson-HitReact-f02-q34r.jpg",
+      "DrWatson-HitReact-f02-back.jpg",
+      "DrWatson-HitReact-f02-topb.jpg"
+     ]
+    },
+    "L": {
+     "value": 2,
+     "rationale": "Oneshot мягко садится в rest. На к.4 амплитуда спадает примерно вдвое (f04-front/q34-ue-editor). К.7 даёт малый перелёт вперёд и почти rest (f07-front/q34). К.10 по позе совпадает с к.0: f10-front против f00-front и f10-q34 против f00-q34, то же видно на Blender-листе f10 и в строке HitReact UE-листа. Рывка на возврате и в финале нет: револьвер, голова и саквояж плавно возвращаются на свои места.",
+     "frames": [
+      "DrWatson-HitReact-f04-front-ue-editor.jpg",
+      "DrWatson-HitReact-f04-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f07-front-ue-editor.jpg",
+      "DrWatson-HitReact-f07-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f10-front-ue-editor.jpg",
+      "DrWatson-HitReact-f10-q34-ue-editor.jpg",
+      "DrWatson-HitReact-f00-front-ue-editor.jpg",
+      "DrWatson-HitReact-blender-sheet.jpg",
+      "DrWatson-H2Anim-ue-sheet.jpg"
+     ]
+    }
+   },
+   "score": 8.8,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "DrWatson-HitReact-f02-q34-ue-editor.jpg",
+     "note": "В UE-виде q34 на к.2 ствол револьвера проецируется вплотную к левому краю полей котелка, силуэты сливаются. Проникновения нет: зазор виден на f02-q34 и f02-q34b-b. Проверить читаемость на листе K1/K2."
+    },
+    {
+     "item": "R",
+     "frame": "DrWatson-HitReact-f07-front-ue-editor.jpg",
+     "note": "Перелёт вперёд на к.7 почти не отличается от rest, с front отдача корпуса назад слабая; удар читается в основном по голове и стволу."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-HitReact-f02-q34b.jpg",
+     "note": "Угловатые заломы и фасетки рукава правой руки от плеча до локтя на пике; разрывов нет."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-HitReact-f02-q34r.jpg",
+     "note": "Тонкая светлая щель по краю манжеты у запястья руки с револьвером: натяжение рукава в пределах известного skin_stretch, рваных рёбер нет."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-HitReact-f02-q34l.jpg",
+     "note": "Край саквояжа примыкает к левой поле пальто: состояние rest (П3-2, 324 пары). На пике к.2 саквояж отходит наружу (f02-q34b-b)."
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-HitReact-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ },
+ {
+  "asset": "ASSET-DR-WATSON-001",
+  "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/Idle",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "Idle",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_Idle.fbx",
+     "sha256": "48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+     "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/Idle/frames",
+    "files": [
+     "DrWatson-Idle-blender-sheet.jpg",
+     "DrWatson-Idle-f28-q34.jpg",
+     "DrWatson-Idle-f28-q34b.jpg",
+     "DrWatson-Idle-f28-q34bl.jpg",
+     "DrWatson-Idle-f28-q34l.jpg",
+     "DrWatson-Idle-f42-back.jpg",
+     "DrWatson-Idle-f42-q34b.jpg",
+     "DrWatson-Idle-f42-q34r.jpg",
+     "DrWatson-Idle-f42-topb.jpg",
+     "DrWatson-Idle-seam-f56-f00-front.jpg",
+     "DrWatson-Idle-seam-f56-f00-q34.jpg",
+     "DrWatson-Idle-f00-front-ue-editor.jpg",
+     "DrWatson-Idle-f00-q34-ue-editor.jpg",
+     "DrWatson-Idle-f14-front-ue-editor.jpg",
+     "DrWatson-Idle-f14-q34-ue-editor.jpg",
+     "DrWatson-Idle-f28-front-ue-editor.jpg",
+     "DrWatson-Idle-f28-q34-ue-editor.jpg",
+     "DrWatson-Idle-f42-front-ue-editor.jpg",
+     "DrWatson-Idle-f42-q34-ue-editor.jpg",
+     "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-Idle.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_Idle.validation.json",
+     "note": "AM_DrWatson_Idle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7 (= accepted_object); #checks.loop_seam = pass (first_last_shift_of_height 0.0); #checks.clip_boundary_rest = pass; #checks.root_in_place = pass; #checks.duration = 2.3333 s, fps 24",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-Idle.json",
+     "note": "contact-Idle.json#result = pass; #fails = []; #checks.foot_slide_L/foot_slide_R = pass (max_of_height 2e-06); #checks.weapon_body = pass (max_pairs 324 = rest_pairs 324, violations []); #checks.skin_stretch = pass (visible_torn_edges 0, warn_edges 0); #checks.hem_below_base_top = pass; #checks.loop_seam = pass",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#WAT-Idle.status = technically_imported; #WAT-Idle.ue.status = technically_imported; #WAT-Idle.validation.result = pass; #WAT-Idle.source.files[0].sha256 = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7; ue-import-clips.json#fbx_sha256.AM_DrWatson_Idle = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7 (тот же sha256)",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "f00/f14/f28/f42-front-ue-editor и -q34-ue-editor: спокойная стойка как на листе концепта: револьвер поднят у плеча стволом вверх, саквояж у левого бока, котелок, усы. От f00 к f28 револьвер чуть поднимается и отклоняется наружу, на f28 саквояж отходит от полы, к f14/f42 голова коротко поворачивается (blender-sheet front). Это живая поза, не статика. На всех кадрах фигура лицом к камере, спиной нет (ВР-06). Мелкий огрех ритма: подъём груди и плеч на вдохе на игровой дистанции (UE q34) почти не читается, движение несут рука и голова.",
+     "frames": [
+      "DrWatson-Idle-f00-front-ue-editor.jpg",
+      "DrWatson-Idle-f28-front-ue-editor.jpg",
+      "DrWatson-Idle-f42-front-ue-editor.jpg",
+      "DrWatson-Idle-f00-q34-ue-editor.jpg",
+      "DrWatson-Idle-f28-q34-ue-editor.jpg",
+      "DrWatson-Idle-blender-sheet.jpg",
+      "DrWatson-H2Anim-ue-sheet.jpg"
+     ]
+    },
+    "C": {
+     "value": 2,
+     "rationale": "На всех UE-кадрах f00–f42 (front и q34) стопы стоят на одних и тех же пикселях подставки, при повороте таза не скользят. Подол пальто держится и не уходит в подставку (f42-front-ue-editor, f42-q34-ue-editor). Саквояж висит у бока: касание полы как в rest, глубже в полу не входит (f28-q34, f28-q34l).",
+     "frames": [
+      "DrWatson-Idle-f00-front-ue-editor.jpg",
+      "DrWatson-Idle-f14-front-ue-editor.jpg",
+      "DrWatson-Idle-f28-front-ue-editor.jpg",
+      "DrWatson-Idle-f42-front-ue-editor.jpg",
+      "DrWatson-Idle-f42-q34-ue-editor.jpg",
+      "DrWatson-Idle-f28-q34.jpg",
+      "DrWatson-Idle-f28-q34l.jpg"
+     ]
+    },
+    "D": {
+     "value": 1.5,
+     "rationale": "Пик f28/f42: оболочка цела, разрывов и дыр нет. Кромки рукавов у пройм целы (f28-q34bl, f42-q34b, f42-back). Правая манжета и кулак с револьвером чистые, револьвер в кулаке не провёрнут (f42-q34r). Левая манжета и саквояж не пересекаются с полой (f28-q34l). Следы без разрывов: тонкие светлые штрихи вдоль швов пройм на f42-back и точка на рукаве на f42-q34b. Тёмная линия между затылком и воротом на f42-topb и f28-q34b — известный предел, он есть уже в rest.",
+     "frames": [
+      "DrWatson-Idle-f42-back.jpg",
+      "DrWatson-Idle-f42-q34b.jpg",
+      "DrWatson-Idle-f28-q34bl.jpg",
+      "DrWatson-Idle-f42-q34r.jpg",
+      "DrWatson-Idle-f28-q34l.jpg",
+      "DrWatson-Idle-f42-topb.jpg",
+      "DrWatson-Idle-f28-q34b.jpg"
+     ]
+    },
+    "L": {
+     "value": 2,
+     "rationale": "seam-f56-f00-front и seam-f56-f00-q34: последний и первый кадры совпадают. Поза головы, револьвера и саквояжа, полы пальто и стопы одинаковы, скачка нет — шов петли невидим.",
+     "frames": [
+      "DrWatson-Idle-seam-f56-f00-front.jpg",
+      "DrWatson-Idle-seam-f56-f00-q34.jpg"
+     ]
+    }
+   },
+   "score": 8.8,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "DrWatson-Idle-f28-q34-ue-editor.jpg",
+     "note": "Амплитуда дыхания мала: на игровой дистанции q34 подъём груди и плеч почти не виден, читаются только рука с револьвером и голова. Проверить на листе K1/K2."
+    },
+    {
+     "item": "R",
+     "frame": "DrWatson-Idle-f00-q34-ue-editor.jpg",
+     "note": "На q34 поднятый ствол револьвера стоит у усов и нижней части лица. Это поза rest модели, клип её не меняет."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-Idle-f42-back.jpg",
+     "note": "Тонкие светлые штрихи вдоль швов пройм (стык весов рукав←пола), без раскрытия. Похоже на состояние модели."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-Idle-f42-topb.jpg",
+     "note": "Тёмная полоса между затылком и воротом сзади — известный предел neck_bottom (этап 3). Есть в rest, клипом не раскрывается."
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-Idle-f42-q34r.jpg",
+     "note": "Низ рукояти (часть меша тела на weapon.R, П3-1) гранёный там, где его обхватывают пальцы. Револьвер в кулаке не проворачивается."
+    },
+    {
+     "item": "C",
+     "frame": "DrWatson-Idle-f28-q34.jpg",
+     "note": "Саквояж касается левой полы пальто как в rest (известный предел П3-2). Нового пересечения в клипе нет."
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-Idle-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ },
+ {
+  "asset": "ASSET-DR-WATSON-001",
+  "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/DeathSettle",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "DeathSettle",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_DeathSettle.fbx",
+     "sha256": "c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+     "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/DeathSettle/frames",
+    "files": [
+     "DrWatson-DeathSettle-blender-sheet.jpg",
+     "DrWatson-DeathSettle-f10-q34b.jpg",
+     "DrWatson-DeathSettle-f14-back.jpg",
+     "DrWatson-DeathSettle-f14-q34b.jpg",
+     "DrWatson-DeathSettle-f14-q34r.jpg",
+     "DrWatson-DeathSettle-f14-topb.jpg",
+     "DrWatson-DeathSettle-f16-q34bl.jpg",
+     "DrWatson-DeathSettle-f16-q34l.jpg",
+     "DrWatson-DeathSettle-f16-q34r.jpg",
+     "DrWatson-DeathSettle-f16-right.jpg",
+     "DrWatson-DeathSettle-f21-back.jpg",
+     "DrWatson-DeathSettle-f21-left.jpg",
+     "DrWatson-DeathSettle-f21-q34.jpg",
+     "DrWatson-DeathSettle-f21-q34b.jpg",
+     "DrWatson-DeathSettle-f21-q34bl.jpg",
+     "DrWatson-DeathSettle-f21-topb.jpg",
+     "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f00-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f03-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f03-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f06-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f06-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f09-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f09-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f12-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f16-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f16-q34-ue-editor.jpg",
+     "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+     "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+     "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-DeathSettle.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_DeathSettle.validation.json",
+     "note": "AM_DrWatson_DeathSettle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c (= accepted_object); #clip_role = terminal; #fps = 24.0; #duration_s = 0.875",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-DeathSettle.json",
+     "note": "contact-DeathSettle.json#result = pass; #fails = []; #checks.foot_slide_L/foot_slide_R = pass (max 1.7e-05 / 2.9e-05 H, tol 0.005); #checks.weapon_body = pass (max_pairs 324 = rest_pairs 324); #checks.below_base_top = pass; #checks.hem_below_base_top = pass; #checks.skin_stretch = warn (warn_edges 8, max_ratio 5.234, visible_torn_edges 0, fail_edges 0)",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#clips[id=WAT-DeathSettle].status = technically_imported; #clips[id=WAT-DeathSettle].ue.status = technically_imported; #clips[id=WAT-DeathSettle].source.files[0].sha256 = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c; #clips[id=WAT-DeathSettle].validation.result = pass; ue-import-clips.json#fbx_sha256.AM_DrWatson_DeathSettle = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c (тот же sha256)",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "Смерть читается поклоном стоя без падения на колени (ВР-14): f00 rest с револьвером у плеча → f03 отшатывание (голова мотнулась назад, котелок задрался, револьвер вздрогнул вверх — видно с front и q34) → f06–f12 рука с револьвером опускается, корпус клонится вперёд и чуть вправо, голова уходит вниз вместе с корпусом → f16–f21 финал: лицо под полями котелка, плечи осели, револьвер опущен стволом вперёд-вниз, саквояж у бедра. Характер (доктор с саквояжем и револьвером) сохранён, спиной к камере нет. Огрехи: амплитуда отшатывания на f03 небольшая; поклон с front читается в основном опусканием головы; рука согнута в локте почти под прямым углом (предел локтя ≤ 108°), поэтому с q34 (f21-q34-ue-editor) финал отчасти похож на взгляд вниз на револьвер у пояса, а не на безвольно повисшую руку.",
+     "frames": [
+      "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f03-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f03-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f09-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-blender-sheet.jpg"
+     ]
+    },
+    "C": {
+     "value": 2,
+     "rationale": "Опора: обе стопы стоят на подставке на одном месте во всех UE-кадрах f00–f21 (front и q34), без скольжения и отрыва; на f21-q34 и f21-left подошвы плоско на верхе подставки, ноги почти прямые, таз только наклоняется — поза поклона устойчива, центр тяжести над стопами. Подол пальто висит над подставкой и в неё не входит (f21-left, f21-q34b). Удара нет (terminal), огрехов опоры не видно.",
+     "frames": [
+      "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f12-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-q34.jpg",
+      "DrWatson-DeathSettle-f21-left.jpg",
+      "DrWatson-DeathSettle-f21-q34b.jpg"
+     ]
+    },
+    "D": {
+     "value": 1.5,
+     "rationale": "На пике (f14–f21) оболочка цела, разрывов и дыр нет. Правая кисть с револьвером (f14-q34r, f16-q34r): манжета и запястье чистые, револьвер перед полой пальто и не входит в неё и в бедро (также f21-q34, f21-left). Саквояж у бедра снаружи полы, кисть на ручке чистая (f16-q34l, f21-q34). Следы без разрывов: на сгибе правого локтя и предплечье рукава видны гранёные растянутые треугольники (f16-right, зона skin_stretch WARN arm_lower.R|arm_upper.R); на topb (f14-topb, f21-topb) — тонкая тёмная полоса между затылком и воротом сзади (известный предел шеи при наклоне головы ≤ 4,5°, провала нет); светлые рваные пятна на поле пальто под правой рукой и сзади у правого кармана (f14-q34r, f16-q34r, f10-q34b, f21-q34b) — похоже на внутренний слой одежды сквозь пальто, без дыр. Кромка котелка сзади сверху цела.",
+     "frames": [
+      "DrWatson-DeathSettle-f14-q34r.jpg",
+      "DrWatson-DeathSettle-f16-q34r.jpg",
+      "DrWatson-DeathSettle-f16-right.jpg",
+      "DrWatson-DeathSettle-f16-q34l.jpg",
+      "DrWatson-DeathSettle-f14-topb.jpg",
+      "DrWatson-DeathSettle-f21-topb.jpg",
+      "DrWatson-DeathSettle-f21-q34.jpg",
+      "DrWatson-DeathSettle-f21-left.jpg",
+      "DrWatson-DeathSettle-f10-q34b.jpg",
+      "DrWatson-DeathSettle-f21-q34b.jpg"
+     ]
+    },
+    "L": {
+     "value": 2,
+     "rationale": "Оседание постепенное: f09 рука на полпути, f12 револьвер уже внизу и голова склонена, f16 корпус доклонился — без рывка. Финал держится без дрожи: f16 и f21 совпадают и на front, и на q34 UE-кадрах, и на крупных планах сзади сверху (f14-topb и f21-topb одинаковы); на Blender-листе f16 и f21 (front/left/q34) одна поза. Финал соответствует роли terminal: смерть стоя поклоном корпуса (ВР-14).",
+     "frames": [
+      "DrWatson-DeathSettle-f09-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f16-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f16-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f14-topb.jpg",
+      "DrWatson-DeathSettle-f21-topb.jpg",
+      "DrWatson-DeathSettle-blender-sheet.jpg"
+     ]
+    }
+   },
+   "score": 8.8,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+     "note": "с q34 финальная поза отчасти читается как взгляд вниз на револьвер у пояса: локоть согнут почти под прямым углом (предел локтя ≤ 108°, известный предел скина правой руки), рука не повисает безвольно; на листе K1/K2 этапа 7 проверить, что смерть читается с игровой камеры"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-DeathSettle-f16-right.jpg",
+     "note": "гранёные растянутые треугольники рукава на сгибе правого локтя и предплечье (skin_stretch WARN arm_lower.R|arm_upper.R, видимых рваных рёбер 0) — натяжение рукава, известный предел; проверить на K1/K2 с look-dev материалами"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-DeathSettle-f21-topb.jpg",
+     "note": "тонкая тёмная полоса между затылком и воротом пальто сзади сверху (на f14-topb так же) — известный предел шеи (наклон головы ≤ 4,5°), провала нет"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-DeathSettle-f14-q34r.jpg",
+     "note": "светлые пятна с рваным краем на поле пальто под правой рукой (и сзади у правого кармана на f10-q34b, f21-q34b) — похоже на внутренний слой одежды сквозь пальто; вероятно состояние модели, на сером меше без материалов не отличить; проверить на K1/K2 с look-dev материалами"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-DeathSettle-f21-left.jpg",
+     "note": "саквояж держится у полы пальто вплотную — известный предел (в rest врезан в полу), видимого нового входа в полу нет"
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-DeathSettle-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ },
+ {
+  "asset": "ASSET-DR-WATSON-001",
+  "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/LungeAttack",
+  "card": {
+   "schema": "unmatched.anim-acceptance/1",
+   "kind": "anim",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "LungeAttack",
+   "cycle": "r1",
+   "date": "2026-10-21",
+   "previous_card": null,
+   "accepted_object": [
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_LungeAttack.fbx",
+     "sha256": "2c7f69353e352f278815094c503b907f31c333dedeacdf5c5822b325667f0c81"
+    },
+    {
+     "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+     "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+   ],
+   "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/LungeAttack/frames",
+    "files": [
+     "DrWatson-LungeAttack-blender-sheet.jpg",
+     "DrWatson-LungeAttack-f04-back.jpg",
+     "DrWatson-LungeAttack-f04-q34.jpg",
+     "DrWatson-LungeAttack-f04-q34b-b.jpg",
+     "DrWatson-LungeAttack-f04-q34b.jpg",
+     "DrWatson-LungeAttack-f04-q34r.jpg",
+     "DrWatson-LungeAttack-f04-topb.jpg",
+     "DrWatson-LungeAttack-f07-left.jpg",
+     "DrWatson-LungeAttack-f07-q34.jpg",
+     "DrWatson-LungeAttack-f07-q34r.jpg",
+     "DrWatson-LungeAttack-f07-right.jpg",
+     "DrWatson-LungeAttack-f08-q34bl.jpg",
+     "DrWatson-LungeAttack-f08-q34l.jpg",
+     "DrWatson-LungeAttack-f08-q34r.jpg",
+     "DrWatson-LungeAttack-f00-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f00-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f02-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f02-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f04-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f04-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f07-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f07-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f08-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f08-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f10-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f10-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f12-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f12-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f14-front-ue-editor.jpg",
+     "DrWatson-LungeAttack-f14-q34-ue-editor.jpg",
+     "DrWatson-LungeAttack-f00-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f00-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f02-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f02-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f04-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f04-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f07-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f08-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f08-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f10-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f10-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f12-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f12-q34-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f14-front-closeup-ue-editor.jpg",
+     "DrWatson-LungeAttack-f14-q34-closeup-ue-editor.jpg",
+     "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+   },
+   "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_LungeAttack.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-LungeAttack.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-LungeAttack.json"
+   ],
+   "gates": {
+    "G-VALIDATE": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_LungeAttack.validation.json",
+     "note": "AM_DrWatson_LungeAttack.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = 2c7f69353e352f278815094c503b907f31c333dedeacdf5c5822b325667f0c81 (= accepted_object); #checks.clip_boundary_rest first/last_vs_rest_of_height = 0.0; #checks.root_in_place = pass",
+     "source_defect": null
+    },
+    "G-CONTACT": {
+     "status": "PASS",
+     "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-LungeAttack.json",
+     "note": "contact-LungeAttack.json#result = pass; #fails = []; #checks.foot_slide_L/R = pass (max 6e-06 / 2e-06 H); #checks.weapon_body max_pairs 324 = rest_pairs 324; #checks.skin_stretch.status = warn (warn_edges 6, arm_lower.R|hand.R, max_ratio 4.284, visible_torn_edges 0, fail_edges 0)",
+     "source_defect": null
+    },
+    "G-MANIFEST": {
+     "status": "PASS",
+     "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+     "note": "clip-manifest.json#WAT-LungeAttack.status = technically_imported; #WAT-LungeAttack.ue.status = technically_imported; #WAT-LungeAttack.source.files[0].sha256 = 2c7f69353e352f278815094c503b907f31c333dedeacdf5c5822b325667f0c81 = ue-import-clips.json#fbx_sha256.AM_DrWatson_LungeAttack; #WAT-LungeAttack.validation.result = pass",
+     "source_defect": null
+    }
+   },
+   "scores": {
+    "R": {
+     "value": 1.5,
+     "rationale": "q34 и лист Blender: револьвер из положения «стволом вверх» у плеча (f00-q34) наклоняется вперёд (f02-q34) и к к.4 ложится почти горизонтально в линию прицела на уровне груди (f04-q34); прицел держится к.7 (f07-q34, f07-left: ствол горизонтален, лицо смотрит на цель); к.8 ствол подброшен вверх примерно на 25°, голова отходит назад (f08-q34); к.10 ствол снова в линии (f10-q34); к.12–14 возврат к плечу. Характер собранный и точный: суровое лицо, лишних движений нет. Спиной к камере фигура не стоит. Не 2: с front прицел читается слабее — ствол смотрит в камеру, на к.4–7 он виден только в ракурсе у кулака (f04-front, f07-front), а выстрел с front узнаётся лишь по короткому вертикальному стволу на к.8 (f08-front). Поворот корпуса правым плечом к цели почти не виден. Прицел у груди с согнутым локтем — предел скина правой руки (известные пределы), записан в known_issues.",
+     "frames": [
+      "DrWatson-LungeAttack-blender-sheet.jpg",
+      "DrWatson-LungeAttack-f00-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f02-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f04-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f07-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f07-left.jpg",
+      "DrWatson-LungeAttack-f08-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f10-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f04-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f07-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f08-front-ue-editor.jpg"
+     ]
+    },
+    "C": {
+     "value": 2,
+     "rationale": "Выстрел ровно на к.8. На к.7 ствол горизонтален (f07-q34-closeup). На к.8 кисть резко подбрасывает ствол вверх, предплечье вздрагивает, голова с котелком откидываются назад, от цели (f08-q34-closeup, f08-q34; на front виден вертикальный ствол — f08-front-closeup). На к.10 ствол возвращается в линию (f10-q34-closeup). Отдача с весом, один чёткий пик точно в кадре контакта. Стопы неподвижно стоят на подставке (f00/f14 front и q34, лист Blender), полы пальто и саквояж держатся у подставки без проходов сквозь тело, револьвер в кулаке не проворачивается ни на одном кадре.",
+     "frames": [
+      "DrWatson-LungeAttack-f07-q34-closeup-ue-editor.jpg",
+      "DrWatson-LungeAttack-f08-q34-closeup-ue-editor.jpg",
+      "DrWatson-LungeAttack-f08-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f08-front-closeup-ue-editor.jpg",
+      "DrWatson-LungeAttack-f10-q34-closeup-ue-editor.jpg",
+      "DrWatson-LungeAttack-f00-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f14-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-blender-sheet.jpg"
+     ]
+    },
+    "D": {
+     "value": 1.5,
+     "rationale": "Запястье на прицеле и отдаче (f04-q34r, f07-q34r, f08-q34r): кисть цела в манжете, револьвер жёстко в кулаке, разрывов и дыр нет. Под кулаком у края манжеты виден тонкий плоский язычок — растянутая кромка без разрыва (зона skin_stretch WARN arm_lower.R|hand.R). Низ рукояти смят: это часть меша тела на weapon.R (П3-1). На сгибе правого локтя (f07-right) — небольшой залом с внутренней стороны и гранёные треугольники рукава, без разрыва. Пройма справа-сзади (f04-q34b, f04-q34b-b, f08-q34bl): верх рукава идёт за корпусом (жёсткий скин пальто, предел), складки гранёные, оболочка цела. На затылке (f04-topb, f04-back) — тонкая тёмная щель между волосами и воротом, она есть уже в rest (предел). Саквояж у полы без новых врезаний (f07-left, f08-q34l). Итог: следы без разрывов, поэтому 1,5; пределы перечислены в known_issues.",
+     "frames": [
+      "DrWatson-LungeAttack-f04-q34r.jpg",
+      "DrWatson-LungeAttack-f07-q34r.jpg",
+      "DrWatson-LungeAttack-f08-q34r.jpg",
+      "DrWatson-LungeAttack-f07-right.jpg",
+      "DrWatson-LungeAttack-f04-q34b.jpg",
+      "DrWatson-LungeAttack-f04-q34b-b.jpg",
+      "DrWatson-LungeAttack-f08-q34bl.jpg",
+      "DrWatson-LungeAttack-f04-topb.jpg",
+      "DrWatson-LungeAttack-f04-back.jpg",
+      "DrWatson-LungeAttack-f07-left.jpg",
+      "DrWatson-LungeAttack-f08-q34l.jpg"
+     ]
+    },
+    "L": {
+     "value": 2,
+     "rationale": "Возврат мягкий. На к.10 ствол в линии прицела (f10-q34), на к.12 револьвер уже почти у плеча (f12-q34, f12-q34-closeup), на к.14 — точно rest: кадр совпадает с к.0 (f14-q34 и f00-q34, f14-front и f00-front, f14-q34-closeup). Основная часть пути пройдена к к.12, последние кадры доводят малым шагом — замедление в rest без рывка и перелёта. Финал соответствует роли oneshot, на UE-листе ряд LungeAttack замыкается позой rest.",
+     "frames": [
+      "DrWatson-LungeAttack-f10-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f12-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f12-q34-closeup-ue-editor.jpg",
+      "DrWatson-LungeAttack-f14-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f00-q34-ue-editor.jpg",
+      "DrWatson-LungeAttack-f12-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f14-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f00-front-ue-editor.jpg",
+      "DrWatson-LungeAttack-f14-q34-closeup-ue-editor.jpg",
+      "DrWatson-H2Anim-ue-sheet.jpg"
+     ]
+    }
+   },
+   "score": 8.8,
+   "verdict": "pass",
+   "verdict_reason": null,
+   "rework_fix_list": [],
+   "known_issues": [
+    {
+     "item": "R",
+     "frame": "DrWatson-LungeAttack-f07-front-ue-editor.jpg",
+     "note": "прицел у груди с согнутым локтем (предел скина правой руки: локоть ≤ 108°, сгиб кисти ≤ 27°); с front ствол на к.4–7 виден только в ракурсе у кулака — проверить читаемость выстрела на игровом листе K1/K2 этапа 7"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-LungeAttack-f04-q34r.jpg",
+     "note": "под кулаком у края манжеты тонкий плоский язычок (растянутая кромка без разрыва, зона skin_stretch WARN arm_lower.R|hand.R, до 4,3×); низ рукояти смят — часть меша тела на weapon.R (П3-1); то же на f07-q34r и f08-q34r"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-LungeAttack-f07-right.jpg",
+     "note": "небольшой залом на внутренней стороне сгиба правого локтя и гранёные треугольники рукава на прицеле, без разрыва"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-LungeAttack-f04-q34b.jpg",
+     "note": "верх правого рукава у проймы идёт за корпусом (жёсткий скин пальто, стык весов рукав←пола), складки гранёные, оболочка цела — известный предел"
+    },
+    {
+     "item": "D",
+     "frame": "DrWatson-LungeAttack-f04-topb.jpg",
+     "note": "тонкая тёмная щель между волосами на затылке и воротом пальто — есть уже в rest (этап 3, neck_bottom), клипом не меняется"
+    }
+   ],
+   "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-LungeAttack-r1"
+   },
+   "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+   "decided_by": "delegated (ВР-реестр 2026-10-06)",
+   "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+  }
+ }
+]

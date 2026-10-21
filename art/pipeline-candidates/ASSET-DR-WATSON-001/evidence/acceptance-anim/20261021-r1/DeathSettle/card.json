@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "clip": "DeathSettle",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_DeathSettle.fbx",
+      "sha256": "c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+      "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/DeathSettle/frames",
+    "files": [
+      "DrWatson-DeathSettle-blender-sheet.jpg",
+      "DrWatson-DeathSettle-f10-q34b.jpg",
+      "DrWatson-DeathSettle-f14-back.jpg",
+      "DrWatson-DeathSettle-f14-q34b.jpg",
+      "DrWatson-DeathSettle-f14-q34r.jpg",
+      "DrWatson-DeathSettle-f14-topb.jpg",
+      "DrWatson-DeathSettle-f16-q34bl.jpg",
+      "DrWatson-DeathSettle-f16-q34l.jpg",
+      "DrWatson-DeathSettle-f16-q34r.jpg",
+      "DrWatson-DeathSettle-f16-right.jpg",
+      "DrWatson-DeathSettle-f21-back.jpg",
+      "DrWatson-DeathSettle-f21-left.jpg",
+      "DrWatson-DeathSettle-f21-q34.jpg",
+      "DrWatson-DeathSettle-f21-q34b.jpg",
+      "DrWatson-DeathSettle-f21-q34bl.jpg",
+      "DrWatson-DeathSettle-f21-topb.jpg",
+      "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f00-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f03-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f03-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f06-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f06-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f09-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f09-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f12-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f16-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f16-q34-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+      "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+      "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_DeathSettle.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-DeathSettle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-DeathSettle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_DeathSettle.validation.json",
+      "note": "AM_DrWatson_DeathSettle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c (= accepted_object); #clip_role = terminal; #fps = 24.0; #duration_s = 0.875"
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-DeathSettle.json",
+      "note": "contact-DeathSettle.json#result = pass; #fails = []; #checks.foot_slide_L/foot_slide_R = pass (max 1.7e-05 / 2.9e-05 H, tol 0.005); #checks.weapon_body = pass (max_pairs 324 = rest_pairs 324); #checks.below_base_top = pass; #checks.hem_below_base_top = pass; #checks.skin_stretch = warn (warn_edges 8, max_ratio 5.234, visible_torn_edges 0, fail_edges 0)"
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=WAT-DeathSettle].status = technically_imported; #clips[id=WAT-DeathSettle].ue.status = technically_imported; #clips[id=WAT-DeathSettle].source.files[0].sha256 = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c; #clips[id=WAT-DeathSettle].validation.result = pass; ue-import-clips.json#fbx_sha256.AM_DrWatson_DeathSettle = c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c (тот же sha256)"
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "Смерть читается поклоном стоя без падения на колени (ВР-14): f00 rest с револьвером у плеча → f03 отшатывание (голова мотнулась назад, котелок задрался, револьвер вздрогнул вверх — видно с front и q34) → f06–f12 рука с револьвером опускается, корпус клонится вперёд и чуть вправо, голова уходит вниз вместе с корпусом → f16–f21 финал: лицо под полями котелка, плечи осели, револьвер опущен стволом вперёд-вниз, саквояж у бедра. Характер (доктор с саквояжем и револьвером) сохранён, спиной к камере нет. Огрехи: амплитуда отшатывания на f03 небольшая; поклон с front читается в основном опусканием головы; рука согнута в локте почти под прямым углом (предел локтя ≤ 108°), поэтому с q34 (f21-q34-ue-editor) финал отчасти похож на взгляд вниз на револьвер у пояса, а не на безвольно повисшую руку.",
+      "frames": [
+        "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f03-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f03-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f09-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-blender-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Опора: обе стопы стоят на подставке на одном месте во всех UE-кадрах f00–f21 (front и q34), без скольжения и отрыва; на f21-q34 и f21-left подошвы плоско на верхе подставки, ноги почти прямые, таз только наклоняется — поза поклона устойчива, центр тяжести над стопами. Подол пальто висит над подставкой и в неё не входит (f21-left, f21-q34b). Удара нет (terminal), огрехов опоры не видно.",
+      "frames": [
+        "DrWatson-DeathSettle-f00-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f12-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-q34.jpg",
+        "DrWatson-DeathSettle-f21-left.jpg",
+        "DrWatson-DeathSettle-f21-q34b.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "На пике (f14–f21) оболочка цела, разрывов и дыр нет. Правая кисть с револьвером (f14-q34r, f16-q34r): манжета и запястье чистые, револьвер перед полой пальто и не входит в неё и в бедро (также f21-q34, f21-left). Саквояж у бедра снаружи полы, кисть на ручке чистая (f16-q34l, f21-q34). Следы без разрывов: на сгибе правого локтя и предплечье рукава видны гранёные растянутые треугольники (f16-right, зона skin_stretch WARN arm_lower.R|arm_upper.R); на topb (f14-topb, f21-topb) — тонкая тёмная полоса между затылком и воротом сзади (известный предел шеи при наклоне головы ≤ 4,5°, провала нет); светлые рваные пятна на поле пальто под правой рукой и сзади у правого кармана (f14-q34r, f16-q34r, f10-q34b, f21-q34b) — похоже на внутренний слой одежды сквозь пальто, без дыр. Кромка котелка сзади сверху цела.",
+      "frames": [
+        "DrWatson-DeathSettle-f14-q34r.jpg",
+        "DrWatson-DeathSettle-f16-q34r.jpg",
+        "DrWatson-DeathSettle-f16-right.jpg",
+        "DrWatson-DeathSettle-f16-q34l.jpg",
+        "DrWatson-DeathSettle-f14-topb.jpg",
+        "DrWatson-DeathSettle-f21-topb.jpg",
+        "DrWatson-DeathSettle-f21-q34.jpg",
+        "DrWatson-DeathSettle-f21-left.jpg",
+        "DrWatson-DeathSettle-f10-q34b.jpg",
+        "DrWatson-DeathSettle-f21-q34b.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Оседание постепенное: f09 рука на полпути, f12 револьвер уже внизу и голова склонена, f16 корпус доклонился — без рывка. Финал держится без дрожи: f16 и f21 совпадают и на front, и на q34 UE-кадрах, и на крупных планах сзади сверху (f14-topb и f21-topb одинаковы); на Blender-листе f16 и f21 (front/left/q34) одна поза. Финал соответствует роли terminal: смерть стоя поклоном корпуса (ВР-14).",
+      "frames": [
+        "DrWatson-DeathSettle-f09-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f12-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f16-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-front-ue-editor.jpg",
+        "DrWatson-DeathSettle-f16-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+        "DrWatson-DeathSettle-f14-topb.jpg",
+        "DrWatson-DeathSettle-f21-topb.jpg",
+        "DrWatson-DeathSettle-blender-sheet.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "DrWatson-DeathSettle-f21-q34-ue-editor.jpg",
+      "note": "с q34 финальная поза отчасти читается как взгляд вниз на револьвер у пояса: локоть согнут почти под прямым углом (предел локтя ≤ 108°, известный предел скина правой руки), рука не повисает безвольно; на листе K1/K2 этапа 7 проверить, что смерть читается с игровой камеры"
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-DeathSettle-f16-right.jpg",
+      "note": "гранёные растянутые треугольники рукава на сгибе правого локтя и предплечье (skin_stretch WARN arm_lower.R|arm_upper.R, видимых рваных рёбер 0) — натяжение рукава, известный предел; проверить на K1/K2 с look-dev материалами"
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-DeathSettle-f21-topb.jpg",
+      "note": "тонкая тёмная полоса между затылком и воротом пальто сзади сверху (на f14-topb так же) — известный предел шеи (наклон головы ≤ 4,5°), провала нет"
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-DeathSettle-f14-q34r.jpg",
+      "note": "светлые пятна с рваным краем на поле пальто под правой рукой (и сзади у правого кармана на f10-q34b, f21-q34b) — похоже на внутренний слой одежды сквозь пальто; вероятно состояние модели, на сером меше без материалов не отличить; проверить на K1/K2 с look-dev материалами"
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-DeathSettle-f21-left.jpg",
+      "note": "саквояж держится у полы пальто вплотную — известный предел (в rest врезан в полу), видимого нового входа в полу нет"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-DeathSettle-r1"
+  },
+  "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

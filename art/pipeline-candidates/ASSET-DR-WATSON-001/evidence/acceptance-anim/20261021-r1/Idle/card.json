@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "clip": "Idle",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_Idle.fbx",
+      "sha256": "48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+      "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance-anim/20261021-r1/Idle/frames",
+    "files": [
+      "DrWatson-Idle-blender-sheet.jpg",
+      "DrWatson-Idle-f28-q34.jpg",
+      "DrWatson-Idle-f28-q34b.jpg",
+      "DrWatson-Idle-f28-q34bl.jpg",
+      "DrWatson-Idle-f28-q34l.jpg",
+      "DrWatson-Idle-f42-back.jpg",
+      "DrWatson-Idle-f42-q34b.jpg",
+      "DrWatson-Idle-f42-q34r.jpg",
+      "DrWatson-Idle-f42-topb.jpg",
+      "DrWatson-Idle-seam-f56-f00-front.jpg",
+      "DrWatson-Idle-seam-f56-f00-q34.jpg",
+      "DrWatson-Idle-f00-front-ue-editor.jpg",
+      "DrWatson-Idle-f00-q34-ue-editor.jpg",
+      "DrWatson-Idle-f14-front-ue-editor.jpg",
+      "DrWatson-Idle-f14-q34-ue-editor.jpg",
+      "DrWatson-Idle-f28-front-ue-editor.jpg",
+      "DrWatson-Idle-f28-q34-ue-editor.jpg",
+      "DrWatson-Idle-f42-front-ue-editor.jpg",
+      "DrWatson-Idle-f42-q34-ue-editor.jpg",
+      "DrWatson-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/grip-Idle.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_Idle.validation.json",
+      "note": "AM_DrWatson_Idle.validation.json#result = pass; #fails = []; #warnings = []; #clip_sha256 = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7 (= accepted_object); #checks.loop_seam = pass (first_last_shift_of_height 0.0); #checks.clip_boundary_rest = pass; #checks.root_in_place = pass; #checks.duration = 2.3333 s, fps 24"
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/contact-Idle.json",
+      "note": "contact-Idle.json#result = pass; #fails = []; #checks.foot_slide_L/foot_slide_R = pass (max_of_height 2e-06); #checks.weapon_body = pass (max_pairs 324 = rest_pairs 324, violations []); #checks.skin_stretch = pass (visible_torn_edges 0, warn_edges 0); #checks.hem_below_base_top = pass; #checks.loop_seam = pass"
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#WAT-Idle.status = technically_imported; #WAT-Idle.ue.status = technically_imported; #WAT-Idle.validation.result = pass; #WAT-Idle.source.files[0].sha256 = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7; ue-import-clips.json#fbx_sha256.AM_DrWatson_Idle = 48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7 (тот же sha256)"
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "f00/f14/f28/f42-front-ue-editor и -q34-ue-editor: спокойная стойка как на листе концепта: револьвер поднят у плеча стволом вверх, саквояж у левого бока, котелок, усы. От f00 к f28 револьвер чуть поднимается и отклоняется наружу, на f28 саквояж отходит от полы, к f14/f42 голова коротко поворачивается (blender-sheet front). Это живая поза, не статика. На всех кадрах фигура лицом к камере, спиной нет (ВР-06). Мелкий огрех ритма: подъём груди и плеч на вдохе на игровой дистанции (UE q34) почти не читается, движение несут рука и голова.",
+      "frames": [
+        "DrWatson-Idle-f00-front-ue-editor.jpg",
+        "DrWatson-Idle-f28-front-ue-editor.jpg",
+        "DrWatson-Idle-f42-front-ue-editor.jpg",
+        "DrWatson-Idle-f00-q34-ue-editor.jpg",
+        "DrWatson-Idle-f28-q34-ue-editor.jpg",
+        "DrWatson-Idle-blender-sheet.jpg",
+        "DrWatson-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На всех UE-кадрах f00–f42 (front и q34) стопы стоят на одних и тех же пикселях подставки, при повороте таза не скользят. Подол пальто держится и не уходит в подставку (f42-front-ue-editor, f42-q34-ue-editor). Саквояж висит у бока: касание полы как в rest, глубже в полу не входит (f28-q34, f28-q34l).",
+      "frames": [
+        "DrWatson-Idle-f00-front-ue-editor.jpg",
+        "DrWatson-Idle-f14-front-ue-editor.jpg",
+        "DrWatson-Idle-f28-front-ue-editor.jpg",
+        "DrWatson-Idle-f42-front-ue-editor.jpg",
+        "DrWatson-Idle-f42-q34-ue-editor.jpg",
+        "DrWatson-Idle-f28-q34.jpg",
+        "DrWatson-Idle-f28-q34l.jpg"
+      ]
+    },
+    "D": {
+      "value": 1.5,
+      "rationale": "Пик f28/f42: оболочка цела, разрывов и дыр нет. Кромки рукавов у пройм целы (f28-q34bl, f42-q34b, f42-back). Правая манжета и кулак с револьвером чистые, револьвер в кулаке не провёрнут (f42-q34r). Левая манжета и саквояж не пересекаются с полой (f28-q34l). Следы без разрывов: тонкие светлые штрихи вдоль швов пройм на f42-back и точка на рукаве на f42-q34b. Тёмная линия между затылком и воротом на f42-topb и f28-q34b — известный предел, он есть уже в rest.",
+      "frames": [
+        "DrWatson-Idle-f42-back.jpg",
+        "DrWatson-Idle-f42-q34b.jpg",
+        "DrWatson-Idle-f28-q34bl.jpg",
+        "DrWatson-Idle-f42-q34r.jpg",
+        "DrWatson-Idle-f28-q34l.jpg",
+        "DrWatson-Idle-f42-topb.jpg",
+        "DrWatson-Idle-f28-q34b.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "seam-f56-f00-front и seam-f56-f00-q34: последний и первый кадры совпадают. Поза головы, револьвера и саквояжа, полы пальто и стопы одинаковы, скачка нет — шов петли невидим.",
+      "frames": [
+        "DrWatson-Idle-seam-f56-f00-front.jpg",
+        "DrWatson-Idle-seam-f56-f00-q34.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "DrWatson-Idle-f28-q34-ue-editor.jpg",
+      "note": "Амплитуда дыхания мала: на игровой дистанции q34 подъём груди и плеч почти не виден, читаются только рука с револьвером и голова. Проверить на листе K1/K2."
+    },
+    {
+      "item": "R",
+      "frame": "DrWatson-Idle-f00-q34-ue-editor.jpg",
+      "note": "На q34 поднятый ствол револьвера стоит у усов и нижней части лица. Это поза rest модели, клип её не меняет."
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-Idle-f42-back.jpg",
+      "note": "Тонкие светлые штрихи вдоль швов пройм (стык весов рукав←пола), без раскрытия. Похоже на состояние модели."
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-Idle-f42-topb.jpg",
+      "note": "Тёмная полоса между затылком и воротом сзади — известный предел neck_bottom (этап 3). Есть в rest, клипом не раскрывается."
+    },
+    {
+      "item": "D",
+      "frame": "DrWatson-Idle-f42-q34r.jpg",
+      "note": "Низ рукояти (часть меша тела на weapon.R, П3-1) гранёный там, где его обхватывают пальцы. Револьвер в кулаке не проворачивается."
+    },
+    {
+      "item": "C",
+      "frame": "DrWatson-Idle-f28-q34.jpg",
+      "note": "Саквояж касается левой полы пальто как в rest (известный предел П3-2). Нового пересечения в клипе нет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-DR-WATSON-001-Idle-r1"
+  },
+  "executor_session_id": "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-watson",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

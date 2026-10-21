@@ -1,0 +1,372 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "dr-watson-h2ld-lookdev-ue-import/3",
+  "asset_id": "ASSET-DR-WATSON-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "3d-model-pipeline stage 7a (mini-batch 2026-10-20, wave A; editor slot 1, DS-3a 2026-10-21): UE import of the Dr. Watson look-dev run 20261020-h2-lookdev-r3 (profile dr-watson-h2-lookdev/r3: generic h2_bake H2 figure of the bake run 20261020-h2-bake-r3 + UV1 in metres, MatID, Edge, graded BC/ORM; TeamAccent ribbon = the bowler hat band (silk) 0.55 % of the figure, profile dr-watson-h2-lookdev-teamaccent-r3) through the CLI profile skeletal-adopt (normaliser h2-lookdev/1) onto the canonical skeleton /Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton. Revolver in the right hand on weapon.R (UM_HUMANOID_17_v2, 17 bones), the medical bag rigid on hand.L without an own bone (P3-2). MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (UseTeamAccent, UseUV1Metres) with the TeamAccent mask and the look-dev LUT T_UM_MatLUT_Watson as is (UE look-dev iteration 0); base on M_UM_BaseMarker in vertex-mask mode: two-tier sidekick base (0.24 x 0.05 m), the team ring by height (bake r3 textures.team_mask.base_band.height_m [0.003, 0.028] -> vertex mask UM_Mask.R; VertexMaskWeight 1, SideBandWeight 0; HANDBOOK §2.9, W2-c; precedent Beowulf). Teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision 'accents + ring'). The brown coat, waistcoat, bowler felt, skin, bag, revolver and the stone base are never dyed. At most 'technically imported'; art acceptance of the model by delegation (stage 4 r3 pass 8.8, evidence/acceptance/20261021-r3/card.json; DS-7 determinism pass, 20261020-h2-bake-r3/reports/determinism-report.json and 20261020-h2-lookdev-r3/reports/determinism-report.json). Rev 2 (UE look-dev r2, 2026-10-21): LUT T_UM_MatLUT_Watson_UE_r2 (silk specular 0.25 / sheen 0.05, leather specular 0.25 / roughness 0.5, skin cavityTintStrength 0.1) applied with ue_hero_lookdev.py apply-mi without re-import (RC-10). Rev 3 (UE look-dev r3, 2026-10-21): LUT T_UM_MatLUT_Watson_UE_r3 (silk bc x0.75, leather_smooth specular 0.35, skin bc x1.2) applied with apply-mi without re-import.",
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3",
+    "report_format": "h2-lookdev/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json",
+    "bake_profile_id": "dr-watson-h2-lookdev/5",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "run_manifest": "reports/run-manifest.json",
+      "source_rig_report": "../20261020-h2-bake-r3/reports/rig-report.json",
+      "source_textures_report": "../20261020-h2-bake-r3/reports/textures-report.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_DrWatson_H2LD.fbx",
+      "base": "export/SM_DrWatson_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_DrWatson_H2LD_2K_BC.png",
+      "N": "textures/T_DrWatson_H2LD_2K_N.png",
+      "ORM": "textures/T_DrWatson_H2LD_2K_ORM.png",
+      "TeamMask": "textures/T_DrWatson_H2LD_2K_TeamMask.png",
+      "MatID": "textures/T_DrWatson_H2LD_2K_MatID.png",
+      "Edge": "textures/T_DrWatson_H2LD_2K_Edge.png"
+    },
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2ld-ldc-ue/lut/T_UM_MatLUT_Watson_UE_r3.dds",
+        "sha256": "d5dd2c0825de5b24950d04d6b10cb73690135ba1ce66688cbee5f15df159563a",
+        "note": "UE look-dev iteration r3 (ue_hero_lookdev.py lut --overrides 20261021-h2ld-ldc-ue/lut/T_UM_MatLUT_Watson_UE_r3.overrides.json)"
+      },
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_TeamAccent_2K.png",
+        "sha256": "3257637831d96d0e572c12d168b84e15450053c952fd26b31982a80bfdbb5773",
+        "note": "TeamAccent L8 linear 2048^2 of the TeamAccent profile dr-watson-h2-lookdev-teamaccent-r3 written into the look-dev run r3: ribbon = the bowler hat band (silk) 0.55 % of the figure (P3-4)"
+      }
+    },
+    "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2 DirectX map (normaliser check normal_is_the_h21_directx_map). TeamMask is pinned but not imported (team_color_mode none)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear",
+      "MatID": "index * 16 + 8",
+      "Edge": "linear"
+    },
+    "top_part": "tripo_part_9",
+    "figure_top_part": "tripo_part_9",
+    "figure_top_part_note": "pilot fix F80: the figure top for figure_height_as_profile = the final top of the bowler hat tripo_part_9 in ../20261020-h2-bake-r3/reports/prepare-report.json (0.45 m); the revolver is lower (asset card FIGURE_BOUNDS_TOP_M note: 0.396 m), the key only pins the top part explicitly"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      [
+        "root",
+        null
+      ],
+      [
+        "hips",
+        "root"
+      ],
+      [
+        "spine",
+        "hips"
+      ],
+      [
+        "head",
+        "spine"
+      ],
+      [
+        "arm_upper.L",
+        "spine"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L"
+      ],
+      [
+        "arm_upper.R",
+        "spine"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R"
+      ],
+      [
+        "leg_upper.L",
+        "hips"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L"
+      ],
+      [
+        "leg_upper.R",
+        "hips"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R"
+      ],
+      [
+        "weapon.R",
+        "hand.R"
+      ]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 body bones + weapon.R (revolver, right hand; asset card WEAPON_BONE weapon.R); the medical bag is rigid on hand.L without an own bone (P3-2). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (18 bones), '.' becomes '_' (weapon_R)"
+  },
+  "scale": {
+    "figure_height_m": 0.45,
+    "top_part": "tripo_part_9",
+    "note": "base bottom -> top of the bowler hat (tripo_part_9 final top 0.45 m, prepare-report of 20261020-h2-bake-r3) = sidekick budget 45 uu (asset card FIGURE_HEIGHT_M 0.45, FIGURE_BOUNDS_TOP_M 0.45); the revolver is lower (HANDBOOK §2.10)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_DrWatson_H2_Body"
+    },
+    "weapon": {
+      "object": "SK_DrWatson_H2_Revolver",
+      "bone": "weapon.R"
+    },
+    "base": {
+      "object": "SM_DrWatson_H2_Base",
+      "footprint_m": [
+        0.24016,
+        0.23991,
+        0.05004
+      ],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "rig-report expected_ue_bounds_uu_at_import_scale_1.base [-12.008, -11.988, 0.0] .. [12.008, 12.003, 5.004] uu (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/reports/rig-report.json): X and Y widths, Z = base top"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "UM_FBX_v1 preset (ART-001); ld_fbx measured the face normal (0.6398, 0.0167, -0.1373) along +X in the export frame (20261020-h2-lookdev-r3/reports/ld-fbx-report.json); right-handed revolver on Blender -X -> UE +Y as King Arthur and Beowulf"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [
+        0,
+        0,
+        0
+      ],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the revolver grip in the right fist (rig-report sockets: target_ue_component_uu (5.4, 9.0, 34.3))"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX and the evidence capture (S08FlowGameMode DoesSocketExist Head); location = the H2 bake's UE bone-space prediction (rig-report sockets: head target (0, 0, 0.4) m)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_DrWatson_H2_Body": 41870,
+      "SK_DrWatson_H2_Revolver": 2299,
+      "SM_DrWatson_H2_Base": 1384
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the look-dev read-back (ld-fbx-report triangles_as_h21); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "GD-058 final (asset-card POLY_BUDGET: figure <= 45 000 tris, base <= 2 500), FIGURE_HEIGHT_RANGE_M [0.40, 0.48] (sidekick); comparison only",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      40,
+      48
+    ],
+    "base_diameter_uu": 24,
+    "base_height_uu": 5
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/DrWatson/H2LD",
+    "skeletal_asset": "SK_DrWatson_H2LD",
+    "target_skeleton": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton",
+    "target_skeleton_note": "canonical hero skeleton of H2Anim (h2anim_ue.py skeleton from SK_DrWatson_H2.fbx of the spec); the clips AM_DrWatson_* are on it; the run neither creates nor deletes it",
+    "base_asset": "SM_DrWatson_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "figure on M_UM_Figure_v2 (v2.1, static switch UseTeamAccent); base on M_UM_BaseMarker v1 in vertex-mask mode (team ring by height on the lower tier of the two-tier base)",
+    "figure_instance": "MI_DrWatson_H2LD",
+    "base_instance": "MI_DrWatson_H2LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "active C-11 palette (art/um-materials/um-masters.json c11_value_split_proposal), user decision 'accents + ring'; linear only through FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_DrWatson_H2LD_{team}",
+      "base": "MI_DrWatson_H2LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: dye by TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; only the bowler hat band (silk ribbon) is dyed; the brown coat, the tan waistcoat and tie, the bowler felt, skin, bag, revolver, boots and the stone base are never dyed",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 32.013,
+      "TeamDyeCeiling": 26.455
+    },
+    "figure_parameters_note": "team-accent.md rule LDV-13, one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.02499) = 32.013, TeamDyeCeiling = 0.9 / Y_p95 (0.03402) = 26.4550 (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-team-accent-report.json team_dye_gain.accent_Y_p50_p95)",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_DrWatson_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {
+          "TeamDye": 0.0
+        },
+        "vectors": {
+          "TeamColor": {
+            "linear": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "note": "no dye (TeamColor white, TeamDye 0): the look-dev BC as baked, for the comparison with the concept"
+      },
+      {
+        "asset": "MI_DrWatson_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {
+          "DebugView": 1.0
+        },
+        "note": "MatID zone mask for the measurements (class colours in emissive, surface black)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "VertexMaskWeight": 1.0,
+        "SideBandWeight": 0.0
+      },
+      "note": "two-tier sidekick base (0.24 x 0.05 m): the team ring by height = the side wall of the lower tier (bake r3 textures.team_mask.base_band.height_m [0.003, 0.028], vertex mask UM_Mask.R), VertexMaskWeight 1 / SideBandWeight 0 (HANDBOOK §2.9, W2-c; asset card decided_by stage3.base; precedent Beowulf, Harpy H3LD); M_UM_BaseMarker unchanged"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "the base FBX carries UV1_m (metres); lightmap UV generation would overwrite UV1",
+    "expect_uv_channels": 2,
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_DrWatson_H2LD_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_DrWatson_H2LD_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal (byte copy of the H2 map)"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_DrWatson_H2LD_ORM",
+        "srgb": false,
+        "compression": "TC_Masks"
+      },
+      "TeamAccent": {
+        "file_key": "TeamAccent",
+        "asset": "T_DrWatson_H2LD_TeamAccent",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1"
+      },
+      "MatID": {
+        "file_key": "MatID",
+        "asset": "T_DrWatson_H2LD_MatID",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"
+      },
+      "Edge": {
+        "file_key": "Edge",
+        "asset": "T_DrWatson_H2LD_Edge",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "linear edge mask (EdgeMaskTexture)"
+      },
+      "LUT": {
+        "file_key": "LUT",
+        "asset": "T_UM_MatLUT_Watson",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "hero LUT 16 x 16 RGBA16F, Load only: HDR, point, no mips, not streamed"
+      }
+    },
+    "measure_skeletal_triangles": true,
+    "base_material_mode": "vertex-mask"
+  },
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2ld-lookdev-ue-import-r2.json (template; tools/tripo-pipeline/ue7a/write_import_profile.py)",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2ld-lookdev-ue-import.json (template; tools/tripo-pipeline/ue7a/write_import_profile.py)",
+    "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2ld-lookdev-ue-import-r3.json (template; tools/tripo-pipeline/ue7a/write_import_profile.py)"
+  ],
+  "history": {
+    "previous": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2ld-lookdev-ue-import-r2.json",
+      "sha256": "7cbd6ac5852522dc82a042d21e9d22d51ae6911ec27905198a1fafb98632b253",
+      "run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2ld-ue-import"
+    }
+  }
+}

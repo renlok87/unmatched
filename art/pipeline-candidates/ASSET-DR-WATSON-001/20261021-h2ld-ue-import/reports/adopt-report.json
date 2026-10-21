@@ -1,0 +1,775 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_from_concept": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_DrWatson_H2_2K_N.png",
+          "h21_sha256": "1f76e67f345630eb6cf7bb186a46861015de50f9e60f43f72aeafb87d453e4d7",
+          "passed": true,
+          "sha256": "1f76e67f345630eb6cf7bb186a46861015de50f9e60f43f72aeafb87d453e4d7"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SK_DrWatson_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SM_DrWatson_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "32fd7071d47528d4d7ff483dbdda0d9a0795e92efa13aa89ef75b8100d514e23",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json",
+            "profile_id": "dr-watson-h2-lookdev/5",
+            "sha256": "32fd7071d47528d4d7ff483dbdda0d9a0795e92efa13aa89ef75b8100d514e23"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "cb8e5b6f8fb8a31edcac1a5297593bb4f4655024d072025f59faf9a0c5e562f9",
+          "rig_passed": true,
+          "rig_report_fbx": "cb8e5b6f8fb8a31edcac1a5297593bb4f4655024d072025f59faf9a0c5e562f9",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "32fd7071d47528d4d7ff483dbdda0d9a0795e92efa13aa89ef75b8100d514e23",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json",
+    "profile_id": "dr-watson-h2-lookdev/5",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "dr-watson-h2-lookdev/5",
+      "measured": {
+        "build_report": "dr-watson-h2-lookdev/5",
+        "textures_report": "dr-watson-h2-lookdev/5"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "c1a346272144010562cb386612f3149fa832e94b4dd5f75c5cc0bf2814d53d48",
+          "report": "c1a346272144010562cb386612f3149fa832e94b4dd5f75c5cc0bf2814d53d48",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "7a78a7b9b63d78671544ae6f7016756daf5d72689acad32d731d126207714e9c",
+          "report": "7a78a7b9b63d78671544ae6f7016756daf5d72689acad32d731d126207714e9c",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "f6ba87b9d83cf0f97ae3adde94f4b7a8c96898a3122d2ff7f8a0e1920787e0cd",
+          "profile": "f6ba87b9d83cf0f97ae3adde94f4b7a8c96898a3122d2ff7f8a0e1920787e0cd",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "3257637831d96d0e572c12d168b84e15450053c952fd26b31982a80bfdbb5773",
+          "profile": "3257637831d96d0e572c12d168b84e15450053c952fd26b31982a80bfdbb5773",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_DrWatson_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_DrWatson_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -2.106,
+          0.118
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_DrWatson_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_DrWatson_H2_Body": 41870,
+        "SK_DrWatson_H2_Revolver": 2299,
+        "SM_DrWatson_H2_Base": 1384
+      },
+      "measured": {
+        "SK_DrWatson_H2_Body": 41870,
+        "SK_DrWatson_H2_Revolver": 2299,
+        "SM_DrWatson_H2_Base": 1384
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/rig-report.json": "c14c04ec7678b21b8dc3b8e8e57209e58c3f61e5cc95d4d27d0358ed870ba2dd",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/textures-report.json": "00c1a124a6a034db0f0fad3f6bbdcb43e29da5e72347ac9807a6afa7fd9bda0a",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SK_DrWatson_H2LD.fbx": "7a78a7b9b63d78671544ae6f7016756daf5d72689acad32d731d126207714e9c",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SM_DrWatson_H2LD_Base.fbx": "c1a346272144010562cb386612f3149fa832e94b4dd5f75c5cc0bf2814d53d48",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json": "587b3c1d5143dd004162a543e07310552a424ccbd4dd8ab4e7873d6606f40d50",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-maps-report.json": "f5e249905f11df14bb14ac0b48299511702db8f2850d95a1a078267b94f08029",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/run-manifest.json": "f50faf5f5394f70db38ee687a48bda8c0a16d414d0bd4f263706f7a070b36c9a",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_BC.png": "3d12c180e8bb6e212ebddaaf8af8472fbe61604c276294962a1125bbab4d9628",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_Edge.png": "3724894d25c477056a18d9e2db4571fa4a4efe493c8afdd989cfe3786faa4934",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_MatID.png": "f0ecb3a73dab09e08d0bd2b6685cb097b6361d9d87ede8363783f5fc10623724",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_N.png": "1f76e67f345630eb6cf7bb186a46861015de50f9e60f43f72aeafb87d453e4d7",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_ORM.png": "6865369b393b28b8e5b9b8cebc95e312f380b146332bde36bfe98b6a2b059d96",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_TeamMask.png": "1833d42a272a95ebb983b8e0f6282c58f30b5d138ef1ed0f166d5b14ef71fead",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_TeamAccent_2K.png": "3257637831d96d0e572c12d168b84e15450053c952fd26b31982a80bfdbb5773",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_UM_MatLUT_Watson.dds": "f6ba87b9d83cf0f97ae3adde94f4b7a8c96898a3122d2ff7f8a0e1920787e0cd",
+    "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json": "32fd7071d47528d4d7ff483dbdda0d9a0795e92efa13aa89ef75b8100d514e23"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SM_DrWatson_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SK_DrWatson_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev-r3.json",
+    "report:build": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/../20261020-h2-bake-r3/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_UM_MatLUT_Watson.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/textures/T_DrWatson_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile dr-watson-h2-lookdev/5); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "dr-watson-h2ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2ld-lookdev-ue-import.json",
+    "sha256": "62cc8c290b0bcc962765c380db6a4c979e49e386d8a76fe0770f7a97c1b31fab"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_DrWatson_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_DrWatson_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_DrWatson_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_DrWatson_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_DrWatson_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_DrWatson_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_DrWatson_H2_Body": [
+                "M_DrWatson_H2_Atlas"
+              ],
+              "SK_DrWatson_H2_Revolver": [
+                "M_DrWatson_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_DrWatson_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            11.988,
+            12.008,
+            5.004
+          ],
+          "min": [
+            -12.003,
+            -12.008,
+            0.0
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            12.008,
+            12.003,
+            5.004
+          ],
+          "min": [
+            -12.008,
+            -11.988,
+            0.0
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            13.264,
+            6.109,
+            45.001
+          ],
+          "min": [
+            -10.525,
+            -8.561,
+            4.805
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            8.561,
+            13.264,
+            45.001
+          ],
+          "min": [
+            -6.109,
+            -10.525,
+            4.805
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            8.561,
+            10.525,
+            45.001
+          ],
+          "min": [
+            -6.109,
+            -13.264,
+            4.805
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SM_DrWatson_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/export/SK_DrWatson_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.45,
+        "figure_top_m": 0.45,
+        "skeletal_top_m": 0.45001,
+        "top_part": "tripo_part_9"
+      },
+      "meshes_pre_export_m": {
+        "SK_DrWatson_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 6,
+          "triangles": 41870
+        },
+        "SK_DrWatson_H2_Revolver": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 2299
+        },
+        "SM_DrWatson_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1384
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.021,
+                0.066,
+                0.295
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                -0.01,
+                0.088,
+                0.248
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.006,
+                -0.081,
+                0.306
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.045,
+                -0.091,
+                0.321
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.017,
+                0.046,
+                0.348
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.021,
+                0.066,
+                0.295
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.014,
+                -0.049,
+                0.35
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.006,
+                -0.081,
+                0.306
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.01,
+                0.046,
+                0.071
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.06402,
+                0.05916,
+                0.04304
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.01,
+                -0.047,
+                0.075
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.05859,
+                -0.05767,
+                0.04299
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                -0.01,
+                0.088,
+                0.248
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.00893,
+                0.09368,
+                0.19877
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.045,
+                -0.091,
+                0.321
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.05397,
+                -0.09018,
+                0.34302
+              ]
+            },
+            "head": {
+              "head_m": [
+                -0.002,
+                -0.0,
+                0.379
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.00171,
+                0.0,
+                0.47363
+              ]
+            },
+            "hips": {
+              "head_m": [
+                -0.004,
+                -0.0,
+                0.232
+              ],
+              "parent": "root",
+              "tail_m": [
+                -0.004,
+                -0.0,
+                0.26
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                -0.003,
+                0.034,
+                0.15
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.01,
+                0.046,
+                0.071
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.003,
+                -0.034,
+                0.15
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.01,
+                -0.047,
+                0.075
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                -0.004,
+                0.021,
+                0.232
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.003,
+                0.034,
+                0.15
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.004,
+                -0.021,
+                0.232
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.003,
+                -0.034,
+                0.15
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.23203
+              ]
+            },
+            "spine": {
+              "head_m": [
+                -0.004,
+                -0.0,
+                0.274
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.00307,
+                -0.0,
+                0.36869
+              ]
+            },
+            "weapon.R": {
+              "head_m": [
+                0.054,
+                -0.09,
+                0.343
+              ],
+              "parent": "hand.R",
+              "tail_m": [
+                0.07188,
+                -0.09453,
+                0.35802
+              ]
+            }
+          },
+          "meshes": {
+            "SK_DrWatson_H2_Body": {
+              "triangles": 41870,
+              "vertices": 22947
+            },
+            "SK_DrWatson_H2_Revolver": {
+              "triangles": 2299,
+              "vertices": 1271
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            5.4,
+            9.0,
+            34.3
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -2.106,
+            0.118
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            -0.0,
+            -0.0,
+            40.0
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

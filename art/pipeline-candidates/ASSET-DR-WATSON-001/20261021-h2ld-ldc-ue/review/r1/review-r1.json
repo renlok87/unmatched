@@ -1,0 +1,1832 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SM_DrWatson_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base",
+  "extra:MI_DrWatson_H2LD_DebugClass": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_DebugClass",
+  "extra:MI_DrWatson_H2LD_Neutral": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD",
+  "skeletal": "/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_UM_MatLUT_Watson",
+  "texture:MatID": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "wool_coarse",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png",
+   "front": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+   "side": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-r3/reports/measure-report.json",
+  "hero": "DrWatson",
+  "key_zones": [
+   "wool_coarse",
+   "silk"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "wool_coarse",
+   "linen",
+   "leather_worn",
+   "leather_smooth",
+   "gold_antique",
+   "steel_blued",
+   "skin",
+   "wood",
+   "legacy_bake"
+  ],
+  "note": "3d-model-pipeline stage 7a (mini-batch 2026-10-20, wave A; editor slot 1): Dr. Watson H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent (dye only on the bowler hat band, silk ribbon 0.55 %), teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run 20261020-h2-lookdev-r3 as is); base M_UM_BaseMarker vertex-mask (team ring by height on the lower tier, VertexMaskWeight 1, SideBandWeight 0). Frames: P1.7 control level, pinned cobble-probe light (rev 5, Harpy b3.2 report), High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = wool_coarse (the brown coat, the largest zone and the main colour, as the Blender ld_measure exposure class). The linen class also holds the black bowler felt (look-dev t3), measured only on its light pixels by the concept gate.",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.2
+   }
+  },
+  "render_gates_note": "legacy_bake = the brown hair and moustache and the eyes (MatID 0, the dark catch-all); gate = the look-dev concept gate of legacy_bake (dr-watson-h2-lookdev-r3 measure.concept_gates: hue 10-40, s >= 0.2); reported, not in tolerance_zones (class 0 decode is unreliable against the black backdrop, F90/F131). silk is partly dyed (the bowler band ribbon), so it is not in never_dye_zones; the waistcoat and tie (silk) are not dyed",
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2ld-ue-import",
+  "side_camera": "+X",
+  "side_camera_note": "SIDE_VIEW left (asset card): camera at +X looking -X (ue_hero_lookdev.views, Medusa convention; Leshen, Achilles, Beowulf precedent, Angel's -X was F98)",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "wool_coarse",
+   "silk",
+   "linen",
+   "leather_worn",
+   "leather_smooth",
+   "gold_antique",
+   "steel_blued",
+   "skin",
+   "wood"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/DrWatson/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "weapon_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 44169
+   },
+   "folder": "/Game/PipelineCandidates/DrWatson/H2LD",
+   "height_uu": 45.0007,
+   "height_uu_note": "skill decision (ue-import-package §3.2): top of the mesh bounds from ue-import-report.json (ue_skeletal_top_uu 45.0007 = top of the bowler hat; the revolver is lower)",
+   "hero_root": "/Game/PipelineCandidates/DrWatson",
+   "instances": {
+    "base_instance": {
+     "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+     "scalars": {
+      "SideBandWeight": 0.0,
+      "VertexMaskWeight": 1.0
+     }
+    },
+    "extra:MI_DrWatson_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_DrWatson_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 26.455,
+      "TeamDyeGain": 32.013
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_UM_MatLUT_Watson",
+      "TeamAccentTexture": "/Game/PipelineCandidates/DrWatson/H2LD/Textures/T_DrWatson_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "wool_coarse",
+   "silk",
+   "linen",
+   "leather_worn",
+   "leather_smooth",
+   "gold_antique",
+   "steel_blued",
+   "skin",
+   "wood",
+   "legacy_bake"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "content": "7a-slot1-DrWatson 2026-10-21T05:53:54+00:00 ue_hero_lookdev review DrWatson r1\npid=47712 host=DESKTOP-QNDBQMU since=1792562034.138 max_hold_s=7200",
+  "heartbeats": 11,
+  "host": "DESKTOP-QNDBQMU",
+  "max_hold_exceeded": false,
+  "max_hold_s": 7200.0,
+  "owner": "7a-slot1-DrWatson",
+  "pid": 47712,
+  "stale_taken": null,
+  "stamp": "7a-slot1-DrWatson 2026-10-21T05:53:54+00:00 ue_hero_lookdev review DrWatson r1",
+  "step": "ue_hero_lookdev review DrWatson r1",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-21T05:57:45+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4122,
+    0.3934,
+    0.3942
+   ],
+   "settled": true,
+   "sha256": "bb16b98969ad98264c60b3bbf8c72154597a3d8d7a1731267559273c8e9832f1",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.427,
+    0.3847,
+    0.4246
+   ],
+   "settled": true,
+   "sha256": "63ba851f6dd42b6b6cbc7f7d5651f0f9b650aea3112d2c5b09afa1edca581c6b",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4457,
+    0.4101,
+    0.3976
+   ],
+   "settled": true,
+   "sha256": "b045c4a6ac2d4ed46403c0ad65a192615a16109db20d3bd4b687ab85feed7c10",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4382,
+    0.4177,
+    0.4264
+   ],
+   "settled": true,
+   "sha256": "0a79ccd4fe7693ad10e90469c12a94842d22750378ef7a8bbb0163d8341ec849",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4243,
+    0.3808,
+    0.4144
+   ],
+   "settled": true,
+   "sha256": "4f69994b169e41dade4de45134f00f374c0c4d00e28418d9f4e2a1de26e05ba8",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "drwatson-r1-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3857,
+    0.3447,
+    0.3477
+   ],
+   "settled": true,
+   "sha256": "3b3ddde9f6f766ba43b1893691d536fbe20c61db51ab96f9a5d285286b316d0b",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4393,
+    0.4175,
+    0.3861
+   ],
+   "settled": true,
+   "sha256": "0aba95aa734abd1dc52ee25ed8c5f5b391139738f5da13ac874ac11cd050657a",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.422,
+    0.4041,
+    0.3997
+   ],
+   "settled": true,
+   "sha256": "718516fc74d327709bd81ce767924273d05be59ef65d3781a4e56577c974cad9",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4589,
+    0.4226,
+    0.4204
+   ],
+   "settled": true,
+   "sha256": "5ac6310e17648c6b31ec1df095fbbc6f95f6258cc64f65739e18f02a4685ba68",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4918,
+    0.4155,
+    0.433
+   ],
+   "settled": true,
+   "sha256": "79495436bc0ae4ff40ff34aa6ae9a003ff00fd19f4f45afdaf7d77c549bf5ad6",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4292,
+    0.4167,
+    0.3974
+   ],
+   "settled": true,
+   "sha256": "5a6b460d882c9a8c46afa646f145616dbb029be71a3402e20c141afb2fe8f663",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "drwatson-r1-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3962,
+    0.3524,
+    0.3659
+   ],
+   "settled": true,
+   "sha256": "661e5f7e12c247e5582a788f6a48634b863db00c1d56362da948047eb3cc1cd0",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6005,
+    0.5626,
+    0.5467
+   ],
+   "settled": true,
+   "sha256": "771c122ecd1499f53191345c954244cfe43f760b741346e6661ccd83bfdefc69",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5927,
+    0.5546,
+    0.5355
+   ],
+   "settled": true,
+   "sha256": "7ebb40da0ba61cbbb7b17d77f7238e5be9643712e9c2cf736a552d361b7e5e70",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5523,
+    0.5515,
+    0.5455
+   ],
+   "settled": true,
+   "sha256": "f1799bda898e21332ab4804f2da5073c455f6c3c88f580bca52d4ae4fd60302e",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7346,
+    0.7045,
+    0.696
+   ],
+   "settled": true,
+   "sha256": "8ef77f002fa2fd1b51201b8d38c87e9cf79ba6d51b63c28720fd9a93791470f7",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6734,
+    0.7009,
+    0.6407
+   ],
+   "settled": true,
+   "sha256": "85cd55d716ea7a40cc9a8e004b2afd864b5476e30de3d17a6970632f1e49cc71",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6516,
+    0.6903,
+    0.7035
+   ],
+   "settled": true,
+   "sha256": "f66c1b87460b35151a20fd6ad4af471ee0142abfc2a32fc7e14caed0a9491d71",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "drwatson-r1-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5854,
+    0.5476,
+    0.5377
+   ],
+   "settled": true,
+   "sha256": "d6bca46f89e95ab6f740913c13af4f35458f9fcb4d5b1a1d84188ca18b9ce954",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3229,
+    0.3281,
+    0.3173
+   ],
+   "settled": true,
+   "sha256": "74f4e063295e5c960b42608044a28c56bbd96bd3b662a749afb71b199132b380",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3621,
+    0.3285,
+    0.3054
+   ],
+   "settled": true,
+   "sha256": "527d1a4655dd77d06c719db95aa6af86d19a7f7308b197bfb535fcbf19b394f3",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3562,
+    0.3347,
+    0.338
+   ],
+   "settled": true,
+   "sha256": "010c66865b1bfa6418a26f522e2601561bc679ce6f7488eb17e792c225c1b48f",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3652,
+    0.3468,
+    0.3141
+   ],
+   "settled": true,
+   "sha256": "b1d403850c7c56f8a21e4da827b47a9fe4536790775afd2b31db8055e16d9c96",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "file": "drwatson-r1-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3267,
+    0.3226,
+    0.3105
+   ],
+   "settled": true,
+   "sha256": "d5e034c5457c4859caa5c3f33085315ab7fe649b022320a9ab0e8f081adbf109",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    34,
+    2028,
+    1175
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "drwatson-r1-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/DrWatson/H2LD/Materials/MI_DrWatson_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3194,
+    0.2746,
+    0.2933
+   ],
+   "settled": true,
+   "sha256": "750622553b3c4274588c370eb85fd85d8037b508674d93b9b9d7b4da165300a0",
+   "subject": "DrWatson (/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2028,
+    1210
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "gpu_token": {
+  "lock": "C:\\tmp\\unmatched-gpu.lock",
+  "stamp": "7a-slot1-DrWatson-capture 2026-10-21T05:53:54+00:00 gpu-capture ue_hero_lookdev review DrWatson r1",
+  "taken": true,
+  "waited_s": 0.0
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_DrWatson_H2LD_DebugClass": false,
+  "extra:MI_DrWatson_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "settle": {
+  "allow_unsettled": false,
+  "max_diffs": 79,
+  "min_diffs": 39,
+  "shot_extra_grabs": 6,
+  "status": "settled",
+  "threshold": 1.0,
+  "throttle": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  },
+  "throttle_restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "unsettled_measured_shots": [],
+  "unsettled_other_shots": [],
+  "warmup_converged": true
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-21T05:53:54+00:00",
+ "tag": "r1",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.8094,
+  0.4364,
+  0.4534,
+  0.4493,
+  0.4293,
+  0.4318,
+  0.454,
+  0.4528,
+  0.4364,
+  0.4347,
+  0.4557,
+  0.4572,
+  0.4315,
+  0.4502,
+  0.4358,
+  0.4343,
+  0.4532,
+  0.4538,
+  0.4322,
+  0.4565,
+  0.4311,
+  0.4356,
+  0.46,
+  0.4574,
+  0.4572,
+  0.4333,
+  0.4309,
+  0.4527,
+  0.4494,
+  0.4545,
+  0.4631,
+  0.4569,
+  0.457,
+  0.4499,
+  0.4559,
+  0.4592,
+  0.4291,
+  0.458,
+  0.4527
+ ]
+}
