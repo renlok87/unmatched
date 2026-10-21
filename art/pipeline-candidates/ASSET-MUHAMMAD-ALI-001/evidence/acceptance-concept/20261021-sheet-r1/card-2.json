@@ -1,0 +1,117 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+      "sha256": "4dd1804e89b6221312d3a8b639486d1f9b92f7a12856799d7f69cf0bdd6fcd1e"
+    },
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+      "sha256": "3a9330fab24eb07b80dd000d9dfb01cac682cef3242a1b5e7ffea6dbdbbcb10f"
+    },
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png",
+      "sha256": "889a20fceff2504312af2975c0f0a893d2099375f72f4b545b29ab16bc911c8e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-muhammad-ali-codex",
+    "files": [
+      "sheet-muhammad-ali.png",
+      "muhammad-ali-front.png",
+      "muhammad-ali-side.png",
+      "muhammad-ali-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+    "art/imagegen/concept-muhammad-ali-codex/generation-records.json",
+    "art/imagegen/concept-muhammad-ali-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+      "note": "check_concept_views.py summary PASS 33 / WARN 0 / FAIL 0 on the selected front-g2, side-g1, back-g1; set.bg_same 12.0 sits exactly at its limit 12 (front bg luma 44 vs side 33 / back 32), set.height 0.93 %, set.base_center 0.13 %, set.base_bottom 0.78 %."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "One figure, one head, two arms, no extra parts; boxing guard (not T/A) as in the approved design and ortho_front. muhammad-ali-front.png and muhammad-ali-back.png give a clear wide-stance silhouette with a visible gap between forearms and torso, but by the nature of the guard the arms stay close to the body and the elbows nearly touch the flanks; in muhammad-ali-back.png the red gloves almost disappear behind the torso (only cuff edges visible). muhammad-ali-side.png reads cleanly: glove forward at chin height, single leg column, laced boot. Rubric 1.5: readable on all views, arms close to the torso.",
+      "frames": [
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png",
+        "sheet-muhammad-ali.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "Pose, proportions, base and anchors agree across views and with design/muhammad-ali-front.png and the 1b orthos: wide lateral stance (legs overlap in profile, as in ortho_left), gloves raised at chin, elastic waistband, black outer stripe with white piping on the trunks (side shows it as one vertical band, back shows it at the outer seams), laced white boots, two-tier dark plinth. Profile faces image-left like ortho_left (SIDE_VIEW left). Sheet measurements match (height 90.1/91.0/90.8 %, base centre 49.6/49.7/49.7 %), WARN 0. Minor drift: in muhammad-ali-side.png the face reads narrower and older with a more aquiline nose and the hair mass is taller/fuller than on the front; the near glove in profile sits slightly lower and further forward than the front suggests. Level of accepted hero-quality-v1 sets, not strict identity.",
+      "frames": [
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png",
+        "sheet-muhammad-ali.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "Painted collectible-miniature rendering, not flat or photographic: defined musculature, satin sheen and folds on the trunks, stitched gloves with white cuffs, boot laces and eyelets, textured plinth. Below the medusa-quality-reference density in places: the costume is simple by design, and the skin on back, legs and arms (muhammad-ali-back.png, muhammad-ali-side.png) carries a fine crackled/mottled noise texture that reads as a generation artefact rather than paint; the plinth is a plain two-step stone without the reference's finish. Close to reference, some zones poorer.",
+      "frames": [
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Sheet swatches #ECEAE4 trunks white, #B3202A gloves red, #5A3B2A skin dark, #141414 stripe black match the figure: off-white satin trunks and boots, saturated red gloves, dark brown skin (lit areas warmer and lighter than the swatch, shadows on it), black side stripes and waistband ends. All ANCHORS_EN present where visible: white satin boxing trunks, red boxing gloves, white boxing boots, guard stance (sheet-muhammad-ali.png, all three views).",
+      "frames": [
+        "sheet-muhammad-ali.png",
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "muhammad-ali-side.png",
+      "note": "Profile face reads narrower and older (aquiline nose) and hair mass taller than on the front view; stage 3/4 should take the face and hair volume from muhammad-ali-front.png / design front."
+    },
+    {
+      "item": "Q",
+      "frame": "muhammad-ali-back.png",
+      "note": "Fine crackled/mottled noise texture on skin (back, legs, arms) is a generation artefact; do not bake it into skin albedo/normal in stage 3-4, paint smooth skin."
+    },
+    {
+      "item": "S",
+      "frame": "muhammad-ali-back.png",
+      "note": "Guard keeps arms close to the torso and the gloves almost hidden in the back view; keep a forearm-torso gap in the H2 build so the gloves stay separate meshes for rigging."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "set.bg_same 12.0 passes exactly at its limit 12 (front background luma 44 vs side 33 / back 32)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-ASSET-MUHAMMAD-ALI-001-r1"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261021",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c sheet r1, second acceptor Opus high: S 1.5 + C 1.5 + Q 1.5 + P 2 = 6.5/8 -> 8.1, G-CHECKS PASS; художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)."
+}

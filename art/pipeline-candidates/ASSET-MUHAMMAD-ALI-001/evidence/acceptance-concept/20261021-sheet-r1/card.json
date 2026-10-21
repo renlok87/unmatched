@@ -1,0 +1,123 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+      "sha256": "4dd1804e89b6221312d3a8b639486d1f9b92f7a12856799d7f69cf0bdd6fcd1e"
+    },
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+      "sha256": "3a9330fab24eb07b80dd000d9dfb01cac682cef3242a1b5e7ffea6dbdbbcb10f"
+    },
+    {
+      "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png",
+      "sha256": "889a20fceff2504312af2975c0f0a893d2099375f72f4b545b29ab16bc911c8e"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-muhammad-ali-codex",
+    "files": [
+      "sheet-muhammad-ali.png",
+      "muhammad-ali-front.png",
+      "muhammad-ali-side.png",
+      "muhammad-ali-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+    "art/imagegen/concept-muhammad-ali-codex/generation-records.json",
+    "art/imagegen/concept-muhammad-ali-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 33 / WARN 0 / FAIL 0, verdict PASS. set.height 0.931 %, set.base_bottom 0.782 %, set.base_center 0.13 %. set.bg_same 12.0 при лимите 12: проходит, но на самой границе (фон front светлее, luma 44 против 33 и 32)."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На всех видах тот же персонаж: молодой Али в белых сатиновых шортах с чёрными лампасами, красных перчатках и белых боксёрках, в защитной стойке; поза не T и не A. Силуэт ясный на muhammad-ali-front.png, muhammad-ali-side.png и muhammad-ali-back.png: перчатки читаются отдельными красными массами, ноги разведены и отделены друг от друга. До 2 не дотягивает по рукам: в стойке плечи прижаты к широчайшим, предплечья лежат поверх груди, просветы есть только у локтей (front, back), а на side ближняя рука целиком на корпусе. Это и есть «руки близко к корпусу», уровень 1,5. Пометка для этапов 3–4: подмышки и стык предплечья с грудью требуют внимания при скиннинге; шнуровка боксёрок — только текстура.",
+      "frames": [
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png",
+        "sheet-muhammad-ali.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "Совпадают поза, пропорции, рост (set.height 0,93 %), линия земли и центр подставки; в checks-report.json WARN 0. side — строгий левый профиль по SIDE_VIEW left: лицо к левому краю, как на ortho_left. back — строгий вид сзади без лица, шнуровка только спереди. Лампасы по бокам шорт, манжеты перчаток, боксёрки и двухдисковая подставка одинаковы на всех видах. Мелкие расхождения есть. На muhammad-ali-side.png лицо уже и угловатее, чем на muhammad-ali-front.png и в утверждённом дизайне, кожа светлее и теплее. На muhammad-ali-front.png лицо немного ушло от дизайна (исполнитель это отметил). На muhammad-ali-back.png красные края перчаток выглядывают из-за предплечий, а ortho_back их прячет. Чёрные концы лампасов на поясе видны только на front. Отсюда уровень 1,5.",
+      "frames": [
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png",
+        "sheet-muhammad-ali.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 1.5,
+      "rationale": "Фигура читается как расписанная коллекционная статуэтка на каменной подставке и близка к medusa-quality-reference.png. Проработаны сатиновый блеск и складки шорт с резинкой пояса, прошитые кожаные перчатки с манжетами, шнуровка и подошва боксёрок, мускулатура и курчавые волосы. Беднее эталона отдельные зоны. По коже спины, бёдер и икр (muhammad-ali-back.png, muhammad-ali-side.png, местами muhammad-ali-front.png) идёт пятнистая чеканная микротекстура, похожая на кожу рептилии: это артефакт генерации, и Tripo может запечь его шумом в текстуры. Подставка — гладкий камень без деталей. В самом костюме почти нет орнамента, но это свойство дизайна, а не дефект.",
+      "frames": [
+        "muhammad-ali-back.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-front.png",
+        "sheet-muhammad-ali.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Свотчи sheet-muhammad-ali.png совпадают с PALETTE и с фигурой. #ECEAE4 — шорты и боксёрки, кремово-белые с серыми тенями. #B3202A — перчатки. #5A3B2A — кожа в средних тонах, на свету блики светлее. #141414 — лампасы. Все четыре якоря на месте там, где их видно: белые сатиновые шорты с чёрной полосой, красные перчатки, белые боксёрки, защитная стойка. Чужих и командных цветов нет, кольца на подставке нет. Кожа на side чуть теплее — это освещение, а не другой тон.",
+      "frames": [
+        "sheet-muhammad-ali.png",
+        "muhammad-ali-front.png",
+        "muhammad-ali-side.png",
+        "muhammad-ali-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "muhammad-ali-front.png",
+      "note": "В защитной стойке плечи прижаты к широчайшим, а предплечья перекрывают грудь; просветы есть только у локтей на front и back, на side рука целиком на корпусе. Этапам 3–4: проверить подмышки и стык предплечья с грудью при генерации и скиннинге."
+    },
+    {
+      "item": "C",
+      "frame": "muhammad-ali-side.png",
+      "note": "Лицо в профиле уже и угловатее, чем на front и в утверждённом дизайне, кожа светлее и теплее. Для мультивида Tripo это риск смешанного лица; на этапе 2 лицо сверять с design/muhammad-ali-front.png."
+    },
+    {
+      "item": "C",
+      "frame": "muhammad-ali-back.png",
+      "note": "Красные края перчаток выглядывают из-за предплечий на высоте плеч, а на ortho_back перчатки скрыты. Чёрные концы лампасов на поясе видны только на front. Расхождения мелкие."
+    },
+    {
+      "item": "Q",
+      "frame": "muhammad-ali-back.png",
+      "note": "Пятнистая чеканная микротекстура кожи на спине, бёдрах и икрах (видна и на side): артефакт генерации, который может запечься шумом в текстуры Tripo. На этапе 4 проверить карту цвета кожи."
+    },
+    {
+      "item": "G-CHECKS",
+      "frame": "checks-report.json",
+      "note": "set.bg_same = 12.0 при лимите 12: проходит на самой границе. Фон front (luma 44) светлее, чем у side и back (33 и 32), после CORRECTION front g2."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-MUHAMMAD-ALI-001-r1"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261021",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Score 8,1 попадает в полосу 8,0–8,4: по concept-sheet.md §11 («Устойчивый pass листа») нужен второй приёмщик «Opus high» в новом контексте."
+}

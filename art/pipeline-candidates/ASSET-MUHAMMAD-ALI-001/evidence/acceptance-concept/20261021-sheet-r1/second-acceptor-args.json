@@ -1,0 +1,374 @@
+{
+  "kind": "concept",
+  "profile": "Opus high",
+  "effort": "high",
+  "items": [
+    {
+      "asset": "ASSET-MUHAMMAD-ALI-001",
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/evidence/acceptance-concept/20261021-sheet-r1",
+      "label": "acceptor2-ASSET-MUHAMMAD-ALI-001-r1",
+      "prompt": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/evidence/acceptance-concept/20261021-sheet-r1/acceptor-prompt-2.md"
+    }
+  ],
+  "schema": {
+    "type": "object",
+    "properties": {
+      "schema": {
+        "type": "string",
+        "enum": [
+          "unmatched.concept-acceptance/1"
+        ]
+      },
+      "kind": {
+        "type": "string",
+        "enum": [
+          "concept"
+        ]
+      },
+      "asset_id": {
+        "type": "string",
+        "pattern": "^ASSET-[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$"
+      },
+      "clip": {
+        "type": "null"
+      },
+      "cycle": {
+        "type": "string",
+        "enum": [
+          "r1",
+          "r2",
+          "r3",
+          "r4"
+        ]
+      },
+      "date": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      },
+      "previous_card": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "accepted_object": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "frames": {
+        "type": "object",
+        "properties": {
+          "dir": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._-]+\\.(jpg|png|json)$"
+            }
+          }
+        },
+        "required": [
+          "dir",
+          "files"
+        ],
+        "additionalProperties": false
+      },
+      "reports": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "gates": {
+        "type": "object",
+        "properties": {
+          "G-CHECKS": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "n/a"
+                ]
+              },
+              "source": {
+                "type": "string"
+              },
+              "note": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_defect": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "source",
+              "note",
+              "source_defect"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "G-CHECKS"
+        ],
+        "additionalProperties": false
+      },
+      "scores": {
+        "type": "object",
+        "properties": {
+          "S": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "value",
+              "rationale",
+              "frames"
+            ],
+            "additionalProperties": false
+          },
+          "C": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "value",
+              "rationale",
+              "frames"
+            ],
+            "additionalProperties": false
+          },
+          "Q": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "value",
+              "rationale",
+              "frames"
+            ],
+            "additionalProperties": false
+          },
+          "P": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "frames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "value",
+              "rationale",
+              "frames"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "S",
+          "C",
+          "Q",
+          "P"
+        ],
+        "additionalProperties": false
+      },
+      "score": {
+        "type": "number"
+      },
+      "verdict": {
+        "type": "string",
+        "enum": [
+          "pass",
+          "rework_blender",
+          "return_to_stage_1",
+          "return_to_stage_2",
+          "escalate_user"
+        ]
+      },
+      "verdict_reason": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "rework_fix_list": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "string",
+              "pattern": "^([SFTDCQPRL]|G-[A-Z]+)$"
+            },
+            "frame": {
+              "type": "string"
+            },
+            "fix": {
+              "type": "string"
+            },
+            "tool": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "item",
+            "frame",
+            "fix",
+            "tool"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "known_issues": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "item": {
+              "type": "string",
+              "pattern": "^([SFTDCQPRL]|G-[A-Z]+)$"
+            },
+            "frame": {
+              "type": "string"
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "item",
+            "frame",
+            "note"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "acceptor": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "Opus xhigh",
+              "Opus high"
+            ]
+          },
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile",
+          "session_id"
+        ],
+        "additionalProperties": false
+      },
+      "executor_session_id": {
+        "type": "string"
+      },
+      "decided_by": {
+        "type": "string"
+      },
+      "status_note": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "schema",
+      "kind",
+      "asset_id",
+      "clip",
+      "cycle",
+      "date",
+      "previous_card",
+      "accepted_object",
+      "frames",
+      "reports",
+      "gates",
+      "scores",
+      "score",
+      "verdict",
+      "verdict_reason",
+      "rework_fix_list",
+      "known_issues",
+      "acceptor",
+      "executor_session_id",
+      "decided_by",
+      "status_note"
+    ],
+    "additionalProperties": false
+  }
+}
