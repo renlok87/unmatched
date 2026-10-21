@@ -38,7 +38,7 @@ OWNER_HERO_SLUG: null
 WEAPON_BONE: null
 WEAPON_SOCKET_BONE: "hand.R"
 FIGURE_HEIGHT_M: 0.55
-FIGURE_BOUNDS_TOP_M: 0.54999        # этап 3: 20261021-h2-bake-t2/reports/rig-report.json#bounds_authored_m.skeletal[1][2] (верх волос; деталей выше головы нет)
+FIGURE_BOUNDS_TOP_M: 0.54999        # этап 5 r2: 20261021-h2-bake-r2/reports/rig-report.json#bounds_authored_m.skeletal[1][2] (верх волос; деталей выше головы нет)
 FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
 IDLE_SECONDS: 2.5
 LUNGE_CONTACT_FRAME: 7
@@ -101,3 +101,32 @@ STAGE3:
     "stage3.team_accent": "delegated: акцент — чёрные лампасы (кант костюма, wool_coarse), жёлтая ткань — главный цвет, не красится"
   open: "1) колено: голень штанины гнётся по всей длине (стык с туфлей полосой 10 см, глубже — вес чужой ноги), при сгибе > 40° видна мягкая «резиновая» голень — предложение оркестратору: опция cloth-правила с цепочками ног (st_rig.py rule_weights cloth, profile.rule_bones), прототип C:/tmp/bruce-lee-stage3-scout/knee-proto*; 2) жёлтая засветка Tripo на кончиках ногтей правой кисти (≈ 4,7 тыс. текселей 4K) — средствами профиля не убирается; 3) кадры приёмки берут roughness из ORM Tripo (костюм 0,43 — глянец), в UE класс linen/wool_coarse берёт rTyp 0,85 из LUT; 4) этапу 6: ноги в покое прямые — таз только вниз/вперёд со сгибом колен, подъём таза IK не достаёт"
   executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage3 Bruce Lee"}
+  superseded_by: "STAGE5 (цикл r2): прогоны 20261021-h2-bake-t2 / 20261021-h2-lookdev-t2 и профили *-t2 заменены r2 — в этап 4 идут только r2"
+
+# --- блок этапа 5, доработка r2 (исполнитель этапа 3, 2026-10-21) ---
+STAGE5:
+  cycle: "r2"
+  source_card: "docs/art-pipeline/evidence/acceptance/20261021-r1/card.json"   # r1 7,5 rework_blender
+  profile_version: 3
+  bake_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2"
+  lookdev_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2"
+  teamaccent_run: null              # TeamAccent записан в каталог look-dev r2
+  profiles: ["build-profiles/bruce-lee-h2-bake-h2-r2.json", "build-profiles/bruce-lee-h2-lookdev-r2.json",
+             "build-profiles/bruce-lee-h2-lookdev-teamaccent-r2.json"]
+  reuse_from: "20261021-h2-bake-t2"   # prepare взят из t2, первая пересчитанная стадия retopo; textures → manifest перезапущены после уточнения коробок
+  late_fix: false
+  superseded_runs: ["20261021-h2-bake-t2", "20261021-h2-lookdev-t2", "20261021-h2-bake", "20261021-h2-lookdev"]
+  tool_changes: "textures.color_repaint и textures.roughness_remap (materials.py, textures.py, tests/test_color_repaint_roughness_remap.py, HANDBOOK §4.2; одобрено координатором: опции A/B, F12 партии 2026-10-20) — без ключей байт-в-байт как раньше (пины sha256); F11 leg_chains — st_rig.py aa4de7aff"
+  fixes:
+    "1 G-TOPO": "retopo.cleanup.merge_distance_m 2,5e-5 → подставка 1 413 tris, почти вырожденных 0 (r1: 4/1 420); тело 1/39 659 (0,003 %, без изменений)"
+    "2 лампасы": "color_repaint stripe_navy — 168 530 текселей тёмно-синих кромок → чёрный соседа (без источника 0, расстояние p50 1,1 мм); stripe_split_r — середина правого лампаса штанины и рукава (жёлтая полоса между двумя тёмными линиями) 41 192 текселя в 104 коробках 2,5 мм; shoe_blue — синие пятна на полосках туфель 15 143 текселя"
+    "3 внутренняя сторона бёдер": "color_repaint inner_thigh + inner_thigh_olive + inner_thigh_dim (24 коробки 1 см) — 48 522 + 24 679 + 27 631 текселей тёмной рваной полосы с синей каймой → жёлтый соседей"
+    "4 глянец": "roughness_remap suit_matte (части 0/5/8): ORM.G p5/p50/p95 0,410/0,428/0,447 → 0,78/0,849/0,92 (3,98 млн текселей); кадры — матовый хлопок, лампасы без хрома; UE берёт roughTypical 0,85 из LUT"
+    "5 крышка подставки": "частично: color_repaint base_blue — синие линии на верхе подставки 5 467 текселей; rim_filters base_hole_1/2 (keep s ≤ 0,2, v ≤ 0,4); зерна камня в крышке нет — плоская заливка и плоская нормаль заплатки, инструмент не синтезирует; зерно в UE даёт detail-тайл stone_base"
+    "6 рельеф лампасов": "не закрыт: бугристый кант — форма исходника (в хайполи Tripo тот же рельеф), профилем дёшево не правится"
+  numbers: "tris тела 39 659 (≤ 45 000), подставка 1 413 (≤ 2 500); пробы 12/12 (вкл. shin_l/r_bend 40°); seams PASS; непрерывность весов на стыках max L1 0,04–0,16 (кромка штанины/туфля 0,079/0,083); верх 0,54999 м; тон t_cap 2,0; TeamAccent PASS — 7,77 % (ribbon), TeamDyeGain 23,0, dE акцент/ткань 24,7, P1/P2 47,8, видимость K2 5× 0,097/0,090; base_seethrough with_figure 0,00 uu² (PASS)"
+  knee_f11: "leg_chains L/R (leg_upper → leg_lower → foot, полосы 0,015/0,012/0,02 м), стыки лодыжек с tripo_part_6/7 сняты. kneecheck на sk_authored: lunge_r (голень 70°) max отношение рёбер ноги 2,68, присед 65° — 2,97, удар — 2,34; рёбер > 3× с ростом > 1 % H — 0, fail 0. t2: 1,68/1,73/1,91, но голень гнулась по всей длине («резина»); r2 — сгиб в колене, голень прямая. Кромка штанины и туфля без разрывов. Дым (паттерн Ancient Leshen): колено сгибается только до 17,5° (knee_min 162,5°); LungeAttack и HitReact contact PASS; Idle/DeathSettle foot_slide — недостижимый IK образца (прямые ноги в покое), не модель; 28 крупных планов дыма без разрывов"
+  handover: "кадры приёмки r2 → C:/tmp/bruce-lee-stage3-check/frames-r2 (повороты, крупные планы, позы осмотрены); плоские BC-виды bcview.py → C:/tmp/bruce-lee-stage3-check; рабочие скрипты C:/tmp/bruce-lee-stage3-scout (mkboxes.py, kneecheck.py)"
+  determinism: "после pass приёмки r2, до 7a (ДС-7); ожидаемый дрейф кода textures (новые ключи) и rig (leg_chains) против t2"
+  open: "1) жёлтая зазубрина у манжеты правого рукава (конец лампаса); 2) левая штанина — тонкая вторичная линия к спине (не в списке r1, не тронута); 3) на внутренней стороне бёдер в крупном плане видна слабая тень прежней полосы; 4) крышка подставки без зерна камня (п. 5); 5) рельеф канта (п. 6); 6) из STAGE3: засветка ногтей правой кисти, этапу 6 — прямые ноги в покое"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe"}

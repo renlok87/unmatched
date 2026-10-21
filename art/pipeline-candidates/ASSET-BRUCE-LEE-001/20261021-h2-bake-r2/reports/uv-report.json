@@ -1,0 +1,586 @@
+{
+  "atlas_px": 4096,
+  "base_band": {
+    "area_cm2": 236.912,
+    "centroid_z_mm": [
+      3.08,
+      28.49
+    ],
+    "faces": 191,
+    "faces_total": 1413,
+    "height_m": [
+      0.003,
+      0.0285
+    ],
+    "rule": "base faces with centroid z in height_m and n_z >= -0.5",
+    "team_mask_g": "the same faces (work/uv/base_band.npy)",
+    "texels_4k": 135828,
+    "vertex_mask": {
+      "attribute": "UM_Mask",
+      "band": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "domain": "CORNER",
+      "elsewhere": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "type": "BYTE_COLOR",
+      "ue": "M_UM_BaseMarker: band = VertexColor.R x VertexMaskWeight + SideBand x SideBandWeight"
+    }
+  },
+  "caps": {
+    "count": 4,
+    "note": "cap texels are filled by the textures stage from their rim (caps.npz), not baked",
+    "per_cap": [
+      {
+        "boundary_vertices": 99,
+        "cap": 1,
+        "faces": 111,
+        "label": 1001,
+        "part": "tripo_part_1",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 106
+      },
+      {
+        "boundary_vertices": 98,
+        "cap": 2,
+        "faces": 110,
+        "label": 1002,
+        "part": "tripo_part_1",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 105
+      },
+      {
+        "boundary_vertices": 169,
+        "cap": 1,
+        "faces": 281,
+        "label": 6001,
+        "part": "tripo_part_6",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ],
+        "vertices": 226
+      },
+      {
+        "boundary_vertices": 176,
+        "cap": 1,
+        "faces": 282,
+        "label": 7001,
+        "part": "tripo_part_7",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ],
+        "vertices": 230
+      }
+    ],
+    "rim_samples": 9385,
+    "texel_priority": 0.7,
+    "texels_4k": 93621
+  },
+  "checks": {
+    "island_gap_px_at_4k": {
+      "expected": ">= 8",
+      "measured": 9,
+      "note": "raster at pixel centres; None = no two islands closer than the BFS horizon",
+      "passed": true
+    },
+    "no_folded_uv_triangles": {
+      "expected": 0,
+      "measured": {
+        "tripo_part_0": 0,
+        "tripo_part_1": 0,
+        "tripo_part_2": 0,
+        "tripo_part_3": 0,
+        "tripo_part_4": 0,
+        "tripo_part_5": 0,
+        "tripo_part_6": 0,
+        "tripo_part_7": 0,
+        "tripo_part_8": 0
+      },
+      "passed": true
+    },
+    "priority_face_denser_than_body": {
+      "expected": "face >= 1.5 x dress",
+      "measured": {
+        "dress": 52.461,
+        "face": 104.921,
+        "reference_part": "tripo_part_0"
+      },
+      "passed": true
+    },
+    "raster_overlap_px": {
+      "expected": "<= 0",
+      "measured": 0,
+      "note": "pixel centres strictly inside two or more UV triangles (any islands, any parts)",
+      "passed": true
+    },
+    "uv_inside_0_1": {
+      "expected": "[0, 1]",
+      "measured": [
+        [
+          0.0013,
+          0.0013
+        ],
+        [
+          0.978809,
+          0.991632
+        ]
+      ],
+      "passed": true
+    }
+  },
+  "coverage_share": 0.508,
+  "footprints": {
+    "note": "BC/RM/AO of faces hidden at rest under the covering part, from the visible surface around them (footprints.npz); their normal map stays baked",
+    "per_contact": [],
+    "texels_4k": 0
+  },
+  "islands_total": 412,
+  "min_gap_px": 9,
+  "pack": {
+    "margin": 0.0013,
+    "margin_method": "FRACTION",
+    "rotate": "ANY",
+    "shape_method": "CONCAVE"
+  },
+  "parts": {
+    "tripo_part_0": {
+      "area_cm2": 1226.994,
+      "caps": null,
+      "islands": 67,
+      "priority_factor_default": 1.0,
+      "raster_px": 3376963,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 26.23,
+      "texel_density_px_per_cm_4k": 52.461,
+      "uv_area_px": 3376841.2
+    },
+    "tripo_part_1": {
+      "area_cm2": 1864.266,
+      "caps": {
+        "area_cm2": 43.921,
+        "texel_density_px_per_cm_4k": 23.607,
+        "uv_area_px": 24477.3
+      },
+      "islands": 101,
+      "priority_factor_default": 0.45,
+      "raster_px": 1063515,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 11.804,
+      "texel_density_px_per_cm_4k": 23.607,
+      "uv_area_px": 1038965.0
+    },
+    "tripo_part_2": {
+      "area_cm2": 206.413,
+      "caps": null,
+      "islands": 27,
+      "priority_factor_default": 1.0,
+      "raster_px": 868219,
+      "regions": [
+        "face"
+      ],
+      "texel_density_px_per_cm_2k": 32.428,
+      "texel_density_px_per_cm_4k": 64.855,
+      "uv_area_px": 868211.7
+    },
+    "tripo_part_3": {
+      "area_cm2": 120.94,
+      "caps": null,
+      "islands": 28,
+      "priority_factor_default": 1.75,
+      "raster_px": 1019309,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 45.903,
+      "texel_density_px_per_cm_4k": 91.806,
+      "uv_area_px": 1019332.1
+    },
+    "tripo_part_4": {
+      "area_cm2": 123.7,
+      "caps": null,
+      "islands": 28,
+      "priority_factor_default": 1.75,
+      "raster_px": 1042663,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 45.903,
+      "texel_density_px_per_cm_4k": 91.806,
+      "uv_area_px": 1042590.5
+    },
+    "tripo_part_5": {
+      "area_cm2": 108.985,
+      "caps": null,
+      "islands": 8,
+      "priority_factor_default": 1.0,
+      "raster_px": 299927,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 26.23,
+      "texel_density_px_per_cm_4k": 52.461,
+      "uv_area_px": 299941.4
+    },
+    "tripo_part_6": {
+      "area_cm2": 88.263,
+      "caps": {
+        "area_cm2": 25.638,
+        "texel_density_px_per_cm_4k": 36.722,
+        "uv_area_px": 34574.2
+      },
+      "islands": 123,
+      "priority_factor_default": 1.0,
+      "raster_px": 277311,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 26.23,
+      "texel_density_px_per_cm_4k": 52.461,
+      "uv_area_px": 242910.9
+    },
+    "tripo_part_7": {
+      "area_cm2": 87.277,
+      "caps": {
+        "area_cm2": 25.635,
+        "texel_density_px_per_cm_4k": 36.722,
+        "uv_area_px": 34569.2
+      },
+      "islands": 21,
+      "priority_factor_default": 1.0,
+      "raster_px": 274887,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 26.23,
+      "texel_density_px_per_cm_4k": 52.461,
+      "uv_area_px": 240196.8
+    },
+    "tripo_part_8": {
+      "area_cm2": 109.175,
+      "caps": null,
+      "islands": 9,
+      "priority_factor_default": 1.0,
+      "raster_px": 300466,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 26.23,
+      "texel_density_px_per_cm_4k": 52.461,
+      "uv_area_px": 300462.8
+    }
+  },
+  "passed": true,
+  "region_density_px_per_cm_4k": {
+    "face": 104.921
+  },
+  "stage": "uv",
+  "status": "измерено",
+  "unwrap": {
+    "charts": {
+      "tripo_part_0": {
+        "charts": 45,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 42,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 3
+          }
+        ],
+        "stretch_log_p95_max": 0.4534,
+        "stretch_log_p95_median": 0.1534
+      },
+      "tripo_part_1": {
+        "charts": 101,
+        "fallback_charts": 3,
+        "fallback_faces": 41,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 7,
+            "charts_unwrapped": 14,
+            "round": 0
+          },
+          {
+            "bad": 8,
+            "charts_unwrapped": 14,
+            "round": 1
+          },
+          {
+            "bad": 9,
+            "charts_unwrapped": 16,
+            "round": 2
+          },
+          {
+            "bad": 10,
+            "charts_unwrapped": 18,
+            "round": 3
+          },
+          {
+            "bad": 10,
+            "charts_unwrapped": 20,
+            "round": 4
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 20,
+            "round": 5
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 10,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 3.1416,
+        "stretch_log_p95_median": 0.0011
+      },
+      "tripo_part_2": {
+        "charts": 22,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 22,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.4606,
+        "stretch_log_p95_median": 0.143
+      },
+      "tripo_part_3": {
+        "charts": 27,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 5,
+            "charts_unwrapped": 16,
+            "round": 0
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 10,
+            "round": 1
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 8,
+            "round": 2
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 4,
+            "round": 3
+          }
+        ],
+        "stretch_log_p95_max": 0.4944,
+        "stretch_log_p95_median": 0.1532
+      },
+      "tripo_part_4": {
+        "charts": 24,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 5,
+            "charts_unwrapped": 16,
+            "round": 0
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 10,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 2
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 3
+          }
+        ],
+        "stretch_log_p95_max": 0.4612,
+        "stretch_log_p95_median": 0.1448
+      },
+      "tripo_part_5": {
+        "charts": 8,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 7,
+            "round": 0
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 1
+          }
+        ],
+        "stretch_log_p95_max": 0.3922,
+        "stretch_log_p95_median": 0.1893
+      },
+      "tripo_part_6": {
+        "charts": 121,
+        "fallback_charts": 1,
+        "fallback_faces": 106,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 3,
+            "charts_unwrapped": 7,
+            "round": 0
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 6,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 5
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.3525,
+        "stretch_log_p95_median": 0.0
+      },
+      "tripo_part_7": {
+        "charts": 20,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 3,
+            "charts_unwrapped": 7,
+            "round": 0
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 6,
+            "round": 1
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 6,
+            "round": 2
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 4,
+            "round": 3
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 4,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 4,
+            "round": 5
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.4966,
+        "stretch_log_p95_median": 0.2435
+      },
+      "tripo_part_8": {
+        "charts": 9,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 7,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 2
+          }
+        ],
+        "stretch_log_p95_max": 0.2864,
+        "stretch_log_p95_median": 0.1883
+      }
+    },
+    "method": "voronoi charts + MINIMUM_STRETCH (fallback: one island per face)"
+  }
+}

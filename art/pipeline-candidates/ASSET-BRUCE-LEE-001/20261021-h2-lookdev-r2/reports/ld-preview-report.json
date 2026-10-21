@@ -1,0 +1,261 @@
+{
+  "backface_culling": true,
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей",
+  "lut_exr_read_by_blender": {
+    "float_buffer": true,
+    "max_abs_diff_vs_json": 0.0,
+    "size": [
+      16,
+      16
+    ]
+  },
+  "ortho_frame": {
+    "side": "left",
+    "source": "checks_report art/imagegen/concept-bruce-lee-codex/checks-report.json",
+    "views": {
+      "back": {
+        "base_centre_x_share": 0.4987,
+        "bottom": 0.95443,
+        "ortho_height_m": 0.60257,
+        "px": [
+          1152,
+          1536
+        ],
+        "top": 0.04167
+      },
+      "front": {
+        "base_centre_x_share": 0.5006499999999999,
+        "bottom": 0.9342400000000001,
+        "ortho_height_m": 0.6144,
+        "px": [
+          1152,
+          1536
+        ],
+        "top": 0.039060000000000004
+      },
+      "side": {
+        "base_centre_x_share": 0.49826,
+        "bottom": 0.95052,
+        "ortho_height_m": 0.60559,
+        "px": [
+          1152,
+          1536
+        ],
+        "top": 0.04232
+      }
+    }
+  },
+  "samples": 64,
+  "shots": [
+    {
+      "name": "class-front",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-front-h21",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-front-ld",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "class-side",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-side-h21",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-side-ld",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "class-back",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "class",
+      "view_transform": "Raw"
+    },
+    {
+      "name": "beauty-back-h21",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "beauty-back-ld",
+      "px": [
+        1152,
+        1536
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-face_front-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-face_front-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-face_3q-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-face_3q-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_r-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_r-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_l-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-hand_l-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-side_stripe_l-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-side_stripe_l-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-shoe_l-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-shoe_l-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-back-h21",
+      "px": [
+        900,
+        900
+      ],
+      "set": "h21",
+      "view_transform": "AgX"
+    },
+    {
+      "name": "closeup-back-ld",
+      "px": [
+        900,
+        900
+      ],
+      "set": "ld",
+      "view_transform": "AgX"
+    }
+  ],
+  "stage": "ld_preview",
+  "status": "измерено"
+}
