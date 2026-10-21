@@ -18,6 +18,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Internationalization/Culture.h"
 #include "Internationalization/Internationalization.h"
+#include "Misc/PackageName.h"
 
 using namespace UmRoomUi;
 
@@ -62,6 +63,13 @@ ES08TeamSlot SelLookOfSide(int32 OwnSeat, int32 Side) {
 }
 
 UTexture2D* SelLoadTexture(const TCHAR* Path) { return LoadObject<UTexture2D>(nullptr, Path, nullptr, LOAD_NoWarn | LOAD_Quiet); }
+
+/** A texture that may be absent by design (the board preview falls back to the thumbnail): the package is looked up
+ *  first, so a missing one is not loaded at all - no LogStreaming «SkipPackage» warning (2026-10-21 recheck). */
+UTexture2D* SelLoadOptionalTexture(const FString& PackagePath) {
+  if (!FPackageName::DoesPackageExist(PackagePath)) return nullptr;
+  return SelLoadTexture(*FString::Printf(TEXT("%s.%s"), *PackagePath, *FPackageName::GetShortName(PackagePath)));
+}
 
 double SelNow() { return FPlatformTime::Seconds(); }
 }  // namespace
@@ -197,7 +205,7 @@ void UUmScreenRoom::SelBuild() {
     BoardTiles.Add(T);
     if (I < 2) {
       BoardThumbs[I] = SelLoadTexture(*FString::Printf(TEXT("/Game/S08/UI/Boards/T_BoardThumb_%s.T_BoardThumb_%s"), Keys[I], Keys[I]));
-      BoardPreviews[I] = SelLoadTexture(*FString::Printf(TEXT("/Game/S08/UI/Boards/T_BoardPreview_%s.T_BoardPreview_%s"), Keys[I], Keys[I]));
+      BoardPreviews[I] = SelLoadOptionalTexture(FString::Printf(TEXT("/Game/S08/UI/Boards/T_BoardPreview_%s"), Keys[I]));
       if (!BoardPreviews[I]) BoardPreviews[I] = BoardThumbs[I];
     }
   }
