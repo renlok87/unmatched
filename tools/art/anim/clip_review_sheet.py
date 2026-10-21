@@ -11,6 +11,18 @@ Commands
            FILE (one map) | marmoreal=FILE,sarpedon=FILE (every hero of the run)
            | <Key>:marmoreal=FILE,sarpedon=FILE;<Key2>:... (F159: per hero - several new heroes in one call, each in its
              own fixture and its own K1 launch; a part without '<Key>:' is the default of the other heroes).
+         K1 poses (2026-10-21): the AN-17 MVP union only when the launch group has an MVP hero
+         (KingArthur/Merlin/Medusa/Harpy); a group of new heroes shoots only its own card frames (Beowulf: 23 poses
+         instead of 37, 46 PNG instead of 74 per board).
+         --parallel-maps (default; --no-parallel-maps = serial): the maps run at once, one client per map
+         (-BenchFps=60 each; a frame is ~2.2 ms GPU; 2026-10-21 both clients held 60 fps, the frames of the map that
+         ran beside the other stayed inside the bench-to-bench noise): the
+         run holds the GPU token C:/tmp/unmatched-gpu.lock for its whole length and every launch takes the per-map
+         lock C:/tmp/unmatched-gpu-<map>.lock instead (render_bench / live_tune sessions keep waiting for the token).
+         --shot-delay S (default 0): -BenchShotDelay=S. The 3 s after the measurement window only waited for a
+         ProfileGPU frame, which -BenchNoProfileGPU never takes; 0 gives the same frames (2026-10-21: R1 vs R3 meanAbs
+         0.38-0.44 against the bench-to-bench 0.35-0.42, 0 px over 24 outside the bench noise) at 4.7 s instead of
+         8.0 s a PNG. A build without the flag (before 2026-10-21) ignores it; --shot-delay 3 = the old timing.
          --k1-from DIR (RC-09): no launch shoots K1; every hero shoots K2x1.6 of its own cards only, and the sheet takes
          K1 from the finished launches DIR/<map>/<Key> (checked: a K1 launch covers the hero's card poses, with the same
          fixture file and - packaged - the same staged build).
@@ -18,7 +30,7 @@ Commands
          the staged packaged client (commit, sourceHash, builtAt), views, poses and fixture; any repackage re-runs it
          (editor launches always re-run). --force re-runs everything.
            python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key>[,<Key>...] [--maps marmoreal,sarpedon]
-               [--fixture ...] [--k1-from DIR] [--force]
+               [--fixture ...] [--k1-from DIR] [--force] [--no-parallel-maps] [--shot-delay 3]
   sheet  for the clip cards given by --cards AN-..,AN-.. or --heroes <Key>,.. (REQUIRED; the four cards per hero):
          rows = the key frames of the clip (column keyframes of the card; Idle - the
          quarters of the loop), columns = Marmoreal K1 (figure crop by figrect + 25 %), Marmoreal K2x1.6, Sarpedon K1
@@ -185,8 +197,11 @@ def pose_arg(tokens: dict[str, list[str]]) -> str:
 
 def union_tokens(cards: dict | None = None, heroes: list[str] | None = None) -> dict[str, list[str]]:
     """The K1 pose list: the AN-17 union, plus (given the cards) the card frames of the given characters (default every
-    registered one). run passes the heroes of one K1 launch (RC-09: the union does not grow with the roster)."""
-    frames = {c: set(fr) for c, fr in UNION.items()}
+    registered one). run passes the heroes of one K1 launch (RC-09: the union does not grow with the roster). A group
+    without an MVP hero (heroes given, none in MVP_KEYS) skips the AN-17 union: its sheets need only its own cards
+    (2026-10-21: 28 of the 74 PNG of a new hero's K1 launch were MVP poses no sheet of it used)."""
+    mvp = heroes is None or any(h in MVP_KEYS for h in heroes)
+    frames = {c: set(fr) if mvp else set() for c, fr in UNION.items()}
     if cards is not None:
         for cid, (key, clip) in clip_cards().items():
             if heroes is not None and key not in heroes:
@@ -373,8 +388,11 @@ def cmd_run(a) -> int:
             print(f"{map_key} {hero}: K1 from {run}", flush=True)
         if build is None:
             print("WARNING: editor launches: the build of the --k1-from frames is not compared", file=sys.stderr)
-    results = []
-    for map_key in maps:
+    parallel = bool(getattr(a, "parallel_maps", False)) and len(maps) > 1
+    shot_delay = getattr(a, "shot_delay", None)
+
+    def run_map(map_key: str) -> list[dict]:
+        results = []
         k1_owner: dict[str, str] = {}  # fixture file -> the hero whose launch shoots K1 for its group
         for hero in heroes:
             fx = fixture_for(fmap, hero, map_key)
@@ -401,12 +419,17 @@ def cmd_run(a) -> int:
             cmd = [sys.executable, str(LIVE_TUNE), "bench", "--map", map_key, "--views", views, "--out", str(out),
                    f"--bench-warmup={a.warmup:g}", f"--bench-settle={a.settle:g}", f"--bench-measure={a.measure:g}",
                    f"--extra=-BenchClipPose={poses}", f"--extra=-BenchClipPoseFighter={hero}"]
+            if shot_delay is not None:
+                cmd.append(f"--extra=-BenchShotDelay={shot_delay:g}")
             if packaged:
                 cmd.append("--packaged")
             if fx:
                 cmd.append(f"--fixture={fx}")
+            if parallel:
+                cmd.append(f"--lock={map_gpu_lock(map_key)}")
             t0 = time.time()
-            print(f"[{time.strftime('%H:%M:%S')}] {map_key} {hero} views={views}", flush=True)
+            print(f"[{time.strftime('%H:%M:%S')}] {map_key} {hero} views={views}"
+                  + (f" shot-delay={shot_delay:g}" if shot_delay is not None else ""), flush=True)
             r = subprocess.run(cmd, cwd=str(REPO))
             results.append({"map": map_key, "hero": hero, "exit": r.returncode, "seconds": round(time.time() - t0)})
             out.mkdir(parents=True, exist_ok=True)
@@ -415,7 +438,43 @@ def cmd_run(a) -> int:
                                                          finished=time.strftime("%Y-%m-%dT%H:%M:%S")),
                                                     ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
             print(json.dumps(results[-1]), flush=True)
+        return results
+
+    if not parallel:
+        results = [r for m in maps for r in run_map(m)]
+        return 0 if all(r["exit"] == 0 for r in results) else 1
+    from concurrent.futures import ThreadPoolExecutor  # noqa: PLC0415
+
+    lt = live_tune_module()
+    token = lt.GPU_LOCK
+    t0 = time.time()
+    lt.lock_acquire(token, f"an18 parallel-maps {','.join(maps)} heroes={','.join(heroes)}",
+                    timeout=float(getattr(a, "lock_timeout", 3600.0) or 3600.0))
+    try:
+        with ThreadPoolExecutor(max_workers=len(maps)) as pool:
+            futs = []
+            for i, m in enumerate(maps):
+                if i:
+                    time.sleep(float(getattr(a, "stagger", 10.0) or 0.0))  # the start-up spikes apart
+                futs.append(pool.submit(run_map, m))
+            results = [r for f in futs for r in f.result()]
+    finally:
+        lt.lock_release(token)
+    print(json.dumps({"parallel_maps": maps, "seconds": round(time.time() - t0), "launches": len(results)}), flush=True)
     return 0 if all(r["exit"] == 0 for r in results) else 1
+
+
+def map_gpu_lock(map_key: str) -> Path:
+    """--parallel-maps: the lock of one map's launches (the run itself holds the shared GPU token)."""
+    return live_tune_module().GPU_LOCK.with_name(f"unmatched-gpu-{map_key}.lock")
+
+
+def live_tune_module():
+    if str(LIVE_TUNE.parent) not in sys.path:
+        sys.path.insert(0, str(LIVE_TUNE.parent))
+    import live_tune  # noqa: PLC0415
+
+    return live_tune
 
 
 # ---- trace parsing ----------------------------------------------------------------------------------------------------
@@ -935,6 +994,14 @@ def main(argv: list[str] | None = None) -> int:
                                                   "hero); Config/Bench file, passed to live_tune.py bench --fixture")
     r.add_argument("--k1-from", default=None, metavar="DIR",
                    help="no K1 launch: K1 comes from the finished launches DIR/<map>/<Key> (checked), K2 only")
+    r.add_argument("--parallel-maps", action=argparse.BooleanOptionalAction, default=True,
+                   help="the maps at once (default; one client per map, per-map GPU lock under the run's GPU token; "
+                        "validated 2026-10-21); --no-parallel-maps = one map after the other")
+    r.add_argument("--stagger", type=float, default=10.0, help="--parallel-maps: seconds between the map starts")
+    r.add_argument("--lock-timeout", type=float, default=3600.0, help="--parallel-maps: wait for the GPU token, s")
+    r.add_argument("--shot-delay", type=float, default=0.0,
+                   help="-BenchShotDelay=S: s from the measurement window to the shot without ProfileGPU (default 0, "
+                        "validated 2026-10-21; 3 = the old timing; a build without the flag ignores it)")
     s = sub.add_parser("sheet")
     s.add_argument("--frames", default=str(FRAMES_DEFAULT))
     s.add_argument("--out", default=str(OUT_DEFAULT))

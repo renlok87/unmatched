@@ -8991,7 +8991,10 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
 // SHOT with the RENDER fingerprint. Frame rate is unlimited (t.MaxFPS 0,
 // VSync 0) unless -BenchFps=N. Flags: -Bench -ArtPreview -BenchOut=<dir>
 // [-BenchFixture=<json>] [-BenchViews=K1+K2x5] [-BenchWarmup=30]
-// [-BenchSettle=8] [-BenchMeasure=20] [-BenchCsv] [-BenchNoProfileGPU].
+// [-BenchSettle=8] [-BenchMeasure=20] [-BenchCsv] [-BenchNoProfileGPU]
+// [-BenchShotDelay=3] (seconds from the end of the measurement window to the
+// shot; it only waits for the ProfileGPU frame, so it applies only with
+// -BenchNoProfileGPU: AN-18 clip-pose sheets pass 0, the default keeps 3).
 namespace {
 struct FS08BenchState {
   bool bInit = false;
@@ -9004,6 +9007,7 @@ struct FS08BenchState {
   int32 View = 0;
   FString OutDir;
   bool bProfileGpu = true;
+  float ShotDelay = 3.0f;  // -BenchShotDelay=, used only without ProfileGPU (which needs its 3 s frame)
   bool bCsv = false;
   FString HeroId;
   FString ShotPath;
@@ -9058,6 +9062,8 @@ void AS08FlowGameMode::RunRenderBench() {
     Views.ParseIntoArray(B.Views, TEXT("+"), true);
     FParse::Value(Cmd, TEXT("BenchOut="), B.OutDir);
     B.bProfileGpu = !FParse::Param(Cmd, TEXT("BenchNoProfileGPU"));
+    FParse::Value(Cmd, TEXT("BenchShotDelay="), B.ShotDelay);
+    B.ShotDelay = FMath::Max(0.0f, B.ShotDelay);
     B.bCsv = FParse::Param(Cmd, TEXT("BenchCsv"));
     FString Fixture = ArtView.IsValid() ? ArtView->Fixture
                                         : FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchMarmoreal.json"));
@@ -9156,6 +9162,9 @@ void AS08FlowGameMode::RunRenderBench() {
         BoardActor && BoardActor->IsArtActive() ? 1 : 0,
         BoardActor && !BoardActor->GetArtProfileId().IsEmpty() ? *BoardActor->GetArtProfileId() : TEXT("-"),
         *Views, B.Warmup, B.Settle, B.Measure, Fps, B.bProfileGpu ? 1 : 0, B.bCsv ? 1 : 0));
+    if (!B.bProfileGpu && !FMath::IsNearlyEqual(B.ShotDelay, 3.0f)) {
+      FS08Trace::Write(FString::Printf(TEXT("BENCH shot-delay=%.2f"), B.ShotDelay));
+    }
     B.Step = 1;
     B.NextAt = Elapsed + B.Warmup;
     if (ArtView.IsValid()) {
@@ -9224,7 +9233,7 @@ void AS08FlowGameMode::RunRenderBench() {
         GEngine->Exec(GetWorld(), TEXT("ProfileGPU"));
         FS08Trace::Write(FString::Printf(TEXT("BENCH profilegpu view=%s requested (dump in Unmatched.log, LogRHI)"), *View));
       }
-      B.NextAt = Elapsed + 3.0f;
+      B.NextAt = Elapsed + (B.bProfileGpu ? 3.0f : B.ShotDelay);
       B.Step = 5;
       return;
     case 5:  // shot (after the ProfileGPU frame)

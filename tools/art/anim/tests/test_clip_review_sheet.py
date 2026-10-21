@@ -168,7 +168,11 @@ def test_union_default_and_extended(monkeypatch, real_cards):
     assert set(crs.union_tokens()["LungeAttack"]) < set(lunge)
     # per launch group: the MVP heroes alone keep the AN-17 union, the new hero's frames only in its own group
     assert crs.union_tokens(cards, list(MVP)) == crs.union_tokens()
-    assert crs.union_tokens(cards, [NEW]) == crs.union_tokens(cards)
+    # 2026-10-21: a group without an MVP hero shoots only its own card frames (no AN-17 union)
+    own = crs.union_tokens(cards, [NEW])
+    assert own == {clip: toks for clip, toks in crs.hero_tokens(cards, NEW).items()} | {"Idle": own["Idle"]}
+    assert set(own["LungeAttack"]) < set(crs.union_tokens(cards)["LungeAttack"])
+    assert crs.union_tokens(cards, [NEW, "Medusa"]) == crs.union_tokens(cards, list(MVP) + [NEW])
 
 
 # ---- fighter by focus, Idle only while unique ------------------------------------------------------------------------------
@@ -420,7 +424,8 @@ def test_run_per_hero_fixture_map_one_call(monkeypatch, tmp_path, real_cards):
             assert opt(c, "--views") == f"{crs.VIEW_K1}+{crs.VIEW_K2}"
             assert f"--fixture={mm}-{hero}.json" in c
             assert extra(c, "BenchClipPose") == crs.pose_arg(crs.union_tokens(cards, [hero]))
-    assert "LungeAttack@0,1,2," in extra(by["marmoreal", NEW], "BenchClipPose")
+    # the new hero's own K1 group: its card frames incl. the extra k.1, no AN-17 union (frame 2 is not on its cards)
+    assert "LungeAttack@0,1,3," in extra(by["marmoreal", NEW], "BenchClipPose")
 
 
 # ---- run: the launch cache follows the staged build ----------------------------------------------------------------------------
@@ -540,3 +545,60 @@ def test_sheet_reports_k1_and_k2_from_different_builds(monkeypatch, tmp_path, re
 
 def test_self_check_passes():
     assert crs.cmd_check(None) == 0
+
+
+# ---- run: maps at once, shot delay (2026-10-21) ----------------------------------------------------------------------------
+
+def test_run_parallel_maps_per_map_lock_under_the_gpu_token(monkeypatch, tmp_path):
+    lt = crs.live_tune_module()
+    token = tmp_path / "gpu.lock"
+    monkeypatch.setattr(lt, "GPU_LOCK", token)
+    seen = []
+
+    def fake(cmd, **_k):
+        seen.append((opt(cmd, "--map"), next(x for x in cmd if x.startswith("--lock=")), token.is_file()))
+        out = Path(cmd[cmd.index("--out") + 1])
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "exit.txt").write_text("exit=0 seconds=1\n", encoding="utf-8")
+        return _Done()
+
+    monkeypatch.setattr(crs.subprocess, "run", fake)
+    a = argparse.Namespace(frames=str(tmp_path / "f"), maps="marmoreal,sarpedon", heroes="Medusa", packaged=True,
+                           warmup=30.0, settle=3.0, measure=1.0, force=True, fixture="", k1_from=None,
+                           parallel_maps=True, stagger=0.0, lock_timeout=5.0, shot_delay=0.0)
+    assert crs.cmd_run(a) == 0
+    assert sorted(m for m, _l, _t in seen) == ["marmoreal", "sarpedon"]
+    for m, lock, held in seen:
+        assert lock == f"--lock={token.with_name(f'unmatched-gpu-{m}.lock')}"
+        assert held  # the run holds the shared token while the maps shoot
+    assert not token.exists()  # released
+
+
+def test_run_shot_delay_is_passed_only_when_given(monkeypatch, tmp_path):
+    calls = run_cmds(monkeypatch, tmp_path, heroes="Medusa")
+    assert not any(x.startswith("--extra=-BenchShotDelay=") for c in calls for x in c)
+    assert not any(x.startswith("--lock=") for c in calls for x in c)  # serial: live_tune's own GPU token
+    calls2 = []
+
+    def fake(cmd, **_k):
+        calls2.append(cmd)
+        out = Path(cmd[cmd.index("--out") + 1])
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "exit.txt").write_text("exit=0 seconds=1\n", encoding="utf-8")
+        return _Done()
+
+    monkeypatch.setattr(crs.subprocess, "run", fake)
+    a = argparse.Namespace(frames=str(tmp_path / "g"), maps="marmoreal", heroes="Medusa", packaged=True, warmup=30.0,
+                           settle=3.0, measure=1.0, force=True, fixture="", k1_from=None, shot_delay=0.0)
+    assert crs.cmd_run(a) == 0
+    assert extra(calls2[0], "BenchShotDelay") == "0"
+
+
+def test_run_new_hero_alone_skips_the_mvp_union(monkeypatch, tmp_path, real_cards):
+    cards = new_setup(monkeypatch, tmp_path, real_cards, lunge_extra="к.1")
+    monkeypatch.setattr(crs, "live_tune_has_fixture", lambda: True)
+    calls = run_cmds(monkeypatch, tmp_path, heroes=NEW, fixture="S08BenchMarmoreal.hector.json")
+    assert extra(calls[0], "BenchClipPose") == crs.pose_arg(crs.union_tokens(cards, [NEW]))
+    n_new = crs.pose_arg(crs.union_tokens(cards, [NEW])).count(",")
+    n_union = crs.pose_arg(crs.union_tokens(cards)).count(",")
+    assert n_new < n_union
