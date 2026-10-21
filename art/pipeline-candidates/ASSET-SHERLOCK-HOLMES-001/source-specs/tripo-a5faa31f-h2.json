@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-a5faa31f-h2",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "service": "tripo-studio",
+  "task_id": "a5faa31f-fd98-4e8a-b4af-88c506928604",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/workspace/generate/a5faa31f-fd98-4e8a-b4af-88c506928604",
+  "date": "2026-10-21",
+  "iteration": "этап 2 3d-model-pipeline, перегенерация после return_to_stage_2 приёмки модели r1 (evidence/acceptance/20261021-r1/card.json: пропал якорь «curved pipe»); те же виды 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png",
+        "sha256": "dfce48fcedecfc158b224618b0764452af0f2a9ca936e6d56e28fc1d935c7c05"
+      },
+      "left": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-side.png",
+        "sha256": "cf15de0086db53e616aaf2fa37b32bcf925d42b7afc9fbc852dd9a24ce188cb6"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-back.png",
+        "sha256": "24277d22657bb305d42a24ceffb0069331baf3f35ba8883a26041fcab408a58f"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-sherlock-holmes-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "та же форма, что у 734b9954: HD Model, multi-view, H3.1 Best Quality, по частям Balanced, Ultra Mesh 2M, Triangle, Texture off; текстура 8K с Remove Lighting и PBR — отдельными операциями на той же задаче"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 20030.0,
+        "balance_after": 19970.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 19970.0,
+        "balance_after": 19940.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 19940.0,
+        "balance_after": 19935.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/source/sherlock-holmes-h2-tripo-a5faa31f-parts11.glb",
+      "expected_sha256": "dd7cd26d968afa764a9cbfefe3b9b1baf9b3266e85b35d5e9cd3a2c55539ff6e",
+      "expected_bytes": 46577980,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/source/sherlock-holmes-h2-tripo-a5faa31f-tex8k-pbr.glb",
+      "expected_sha256": "c2ebadadbe3d998f7bfde0b4654420033401d3901bc71f1a9dafe3f672cfaf4b",
+      "expected_bytes": 84177076,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 11,
+      "glb_triangles": 1916088,
+      "glb_materials": 0,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 11,
+      "glb_triangles": 1916088,
+      "glb_materials": 11,
+      "glb_images": 33,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

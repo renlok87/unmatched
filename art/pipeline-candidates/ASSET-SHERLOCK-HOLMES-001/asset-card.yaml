@@ -29,6 +29,9 @@ decided_by:                         # один ключ на файл (SKILL.md 
   "stage3.classes": "delegated: пальто, твид (брюки, жилет, рукава, кепи) — wool_coarse одним классом (якорь largest_class); воротник, манжеты и бант кепи — linen; галстук — silk; ботинки — leather_smooth; стекло линзы и волосы — legacy_bake; ручка лупы — wood; кожа — skin (лицо, уши, шея по тону без полуплоскости — look-dev t2)"
   "stage3.teamaccent": "delegated (П3-4, П3-4a): ribbon — бант на макушке кепи (linen, часть 3) 0,17 % площади, area_share_range [0,0015; 0,12]; K2 5× спереди 0,40 %, сзади 0,35 % — screen_share_min 0,0035 (замер); галстук с K2 не виден (голова и козырёк), пальто/твид/рубашка — главные цвета, ботинки — кожа вещей в цвете концепта (как Watson)"
   "stage3.textures": "delegated (F12 пачки, textures.color_repaint): светлая полоса текстуры Tripo на тыле левой кисти (есть и в high-poly) — из соседней кожи (bake t2); тёмный отпечаток верха подставки у ботинков — из соседнего камня (bake t3)"
+  "stage6.motion_source": "delegated (ДС-6; бриф этапа 6 «Sherlock is not a swordsman»): рубящий паттерн меча Beowulf на дыме этапа 3 рвал запястье (сгиб 167°) и задирал пелерину — выпад взят у древкового класса (выпад-укол Achilles r3 ← Merlin, контакт к.7) и стал коротким прямым тычком кулаком с лупой; Idle, HitReact, DeathSettle — паттерн Beowulf"
+  "stage6.keys": "delegated (этап 6): правая рука в LungeAttack и DeathSettle — aim-ключи полными базисами, решены по rest прогона H2-bake (C:/tmp/sherlock-holmes-stage6/gen_spec.py): локоть на своём шарнире, излом запястья ≤ 20° только вокруг шарнира, плечо вперёд, не вбок; hips_loc нет (F112: голова hips на хвосте root, импорт FBX выбрасывает ключи положения — это и было скольжение стоп дыма этапа 3), таз только поворачивается в досягаемости прямых ног; ключ weapon.R образца HitReact снят"
+  "stage6.hit_type": "delegated (§9 справочника анимации): HIT_TYPE CLAW заявки подтверждён — кулачный удар, у CLAW оба банка (CMB-HIT, CMB-LUNGE); смерть DTH-TEMPLATE; FX и звук способности, VO — нет"
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
 POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}
 CREDITS:
@@ -52,7 +55,7 @@ LUNGE_CONTACT_FRAME: 7
 HIT_TYPE: "CLAW"
 CLIP_PREFIX: "SHER"
 AUDIO_KEY: "SHERLOCKHOLMES"
-MOTION_SOURCE: "library: KingArthur (ближний бой правой рукой, контакт к.7); удар кулаком с лупой в правой руке — уточняет этап 6"
+MOTION_SOURCE: "library: Beowulf (Idle, HitReact, DeathSettle; паттерн Angel r2 ← KingArthur, рука с лупой переложена); library: Achilles (LungeAttack — выпад-укол Achilles r3 ← Merlin, контакт к.7: короткий прямой тычок кулаком с лупой)"   # этап 6, ДС-6; SYNTX 0 трат
 UE_NAMES:
   stage: "H2LD"
   skeletal_mesh: "SK_SherlockHolmes_H2LD"
@@ -102,3 +105,17 @@ STAGE3:
   determinism: "после pass приёмки, до 7a (ДС-7) — не делался на этапе 3; FBX bake/look-dev трёх прогонов -t побайтно равны"
   executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "не записан (агент оркестратора)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:исполнитель этапа 3 Sherlock"}
   stage6_notes: "правое предплечье в rest поднято вперёд (локоть ≈ 90°), лупа жёстко на weapon.R — кость оружия относительно кисти не ключевать; aim-ключи меча (Beowulf/Angel/Arthur) на этой руке дают сгиб кисти 167° и разрыв запястья: держать сгиб кисти ≤ ~40°, поворот предплечья на шарнире; рукава и пелерины пальто идут за руками полосой 0,075 (правая) / 0,1 м (левая) — широкий замах руки задирает пелерину; ноги в rest прямые (длина бедра + голени = расстояние таз–щиколотка): опускать таз / сгибать колени, а не поднимать и раскачивать таз, иначе ступни скользят при ik_feet; трубки (концепт) у модели нет"
+# --- блок этапа 6 (исполнитель этапа 6, 2026-10-21; RA-22). Пробный прогон на модели t3: приёмка модели r1 вернула её
+#     на этап 2 (return_to_stage_2, 5,6) — спека и клипы пересобираются на новом H2-bake командой rebuild ниже ---
+STAGE6:
+  run: "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim"   # на bake 20261020-h2-bake-t3 (sha SK 8c8755cb…)
+  spec: "build-profiles/sherlock-holmes-h2anim.json"   # генерируется: python C:/tmp/sherlock-holmes-stage6/gen_spec.py --bake-run <bake run> --out <spec> --run-dir <run>
+  rebuild: "bash C:/tmp/sherlock-holmes-stage6/rebuild.sh <bake run> <run h2anim>"   # спека → h2anim_run → grip_check ×4 → clip_closeups ×4 → заготовки промптов + known-limits → REGISTRATION.md
+  clip_cards: ["AN-160", "AN-161", "AN-162", "AN-163"]
+  prompts: "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance-anim-prompts/"   # + known-limits.md
+  registration: "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/REGISTRATION.md"   # строки CHARS/H2ANIM, enum, 4 строки anim.csv, Hero(...) — вносит оркестратор
+  validators: "h2anim_run.py код 0: validate 4/4 PASS (пик сдвига Idle 2,36 %, LungeAttack 33,2 %, HitReact 20,7 %, DeathSettle 27,9 %), contact 4/4 PASS (скольжение стоп ≤ 0,002 % H; WARN: skin_stretch только скрытые у правого запястья в LungeAttack к.7–9 и DeathSettle к.12–21, limb_body_R DeathSettle до 21 пары с полой без новой области); author readback pose ≤ 2e-5 см, IK стоп достигнута на всех кадрах; grip_check: лупа в кулаке 0° во всех клипах, излом правого запястья ≤ 19,4°, локоть 72–136°, уход плоскости локтя ≤ 2,7°, колени ≥ 175°, пересечений лупы с телом 0; шов Idle diff 0 px (front, q34). clip_manifest build — после регистрации оркестратором"
+  vfx: "по умолчанию (§8): ability_fx none; звезда удара, вспышка/обод (M_UM_Figure_v2), лечение, полевые FX работают сразу; пепел CUE-013 — MIC растворения de011 на 7b; CUE-011/013 sequence_by_fighter — Р7-6 после импорта 7a"
+  sfx: "HIT_TYPE CLAW (готовые банки CMB-HIT-CLAW и CMB-LUNGE-CLAW, новых рецептов нет), смерть DTH-TEMPLATE; новых звуков нет — прослушивать нечего; CharacterKey SHERLOCKHOLMES / HitType CLAW в S08AudioBank.cpp — Р7-5 этапа 7"
+  open: "модель перегенерируется (трубка из концепта): rebuild на новом bake, затем осмотр листов и крупных планов на новом риге; F112 — у рига hips на хвосте root (импорт FBX выбрасывает hips_loc), инструментом не исправлено, клипы обходят его поворотом таза; F112 объясняет и скольжение стоп дыма этапа 3"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "не записан (агент оркестратора)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-sherlock"}
