@@ -45,7 +45,7 @@ LUNGE_CONTACT_FRAME: 7
 HIT_TYPE: "CLAW"
 CLIP_PREFIX: "BRUC"
 AUDIO_KEY: "BRUCELEE"
-MOTION_SOURCE: "library: Achilles (ближний бой, контакт к.7); удар без оружия правой стороной — образец уточняет этап 6 (tripo-preset при отсутствии образца)"
+MOTION_SOURCE: "library: Achilles; AncientLeshen"   # этап 6 (2026-10-21): Idle/LungeAttack/HitReact — спека Achilles r3, DeathSettle — Ancient Leshen r3; причина — STAGE6.decisions
 UE_NAMES:
   stage: "H2LD"
   skeletal_mesh: "SK_BruceLee_H2LD"
@@ -130,3 +130,26 @@ STAGE5:
   determinism: "после pass приёмки r2, до 7a (ДС-7); ожидаемый дрейф кода textures (новые ключи) и rig (leg_chains) против t2"
   open: "1) жёлтая зазубрина у манжеты правого рукава (конец лампаса); 2) левая штанина — тонкая вторичная линия к спине (не в списке r1, не тронута); 3) на внутренней стороне бёдер в крупном плане видна слабая тень прежней полосы; 4) крышка подставки без зерна камня (п. 5); 5) рельеф канта (п. 6); 6) из STAGE3: засветка ногтей правой кисти, этапу 6 — прямые ноги в покое"
   executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe"}
+
+# --- блок этапа 6 (исполнитель этапа 6, 2026-10-21) ---
+STAGE6:
+  run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2anim"
+  spec: "build-profiles/bruce-lee-h2anim.json"
+  model_input: "риг 20261021-h2-bake-r2 (SK_BruceLee_H2.fbx sha256 e5217368…a5a852, F11 leg_chains; look-dev 20261021-h2-lookdev-r2) по указанию оркестратора: доработка r3 идёт только по текстурам, риг и веса r2. Новый SK sha → h2anim_run код 3: та же спека с новым target (ключи и ноги зависят только от rest), C:/tmp/bruce-lee-stage6/gen_spec.py"
+  clip_cards: ["AN-156", "AN-157", "AN-158", "AN-159"]
+  registration: "20261021-h2anim/REGISTRATION.md — строки CHARS/H2ANIM, enum схемы, 4 строки anim.csv, Hero(...) вносит оркестратор одним шагом, затем clip_manifest.py build (MANIFEST_CHECK этим исполнителем не запускался: общий файл)"
+  prompts: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance-anim-prompts/"   # 4 заготовки 7a.2 + known-limits.md; заполнение prep_acceptance.fill_prompt проверено
+  clips:
+    Idle: "60 к. (2,5 с), петля: пружина стойки JKD ×3 (таз −0,4 см к.10/30/50), круги передней кисти; validate PASS (пик 4,9 % H), contact PASS (скольжение стоп ≤ 0,11 % H, шов петли 0,0 / скорость 0,06 % H), пара шва front/q34 — разница 1 из 255, 0 пикселей > 12"
+    LungeAttack: "14 к. (0,583 с), контакт к.7: прямой удар правой (локоть 161°, запястье прямое, корпус +16°, таз +8°, вперёд 0,7 и вниз 0,45 см); validate PASS (пик 21,2 % H), contact PASS (стопы ≤ 0,12 % H, skin_stretch max 2,95× без WARN, limb_body 0)"
+    HitReact: "10 к. (0,417 с): отдача назад, кисти взлетают; validate PASS (пик 22,8 % H), contact PASS"
+    DeathSettle: "21 к. (0,875 с), terminal: поклон таз 6° + корпус 24,5°, колени не ниже 146°, руки повисают; validate PASS (пик 58,1 % H), contact PASS"
+  checks: "h2anim_run.py код 0 (4/4 validate и contact PASS, WARN нет); grip_check — не нужен (оружия нет); clip_closeups --default-shots + свои кадры — 48 JPEG и 2 пары шва, все осмотрены: разрывов, дыр и проникновений нет"
+  vfx: "слоты §8: звезда удара, вспышка и обод (MI от M_UM_Figure_v2), лечение, полевые FX — работают сразу; пепел смерти — MIC растворения de011 на этапе 7; FX способности — нет (STAGE6_SLOTS.ability_fx none, delegated)"
+  sfx: "HIT_TYPE CLAW (готовые банки CMB-HIT-CLAW и CMB-LUNGE-CLAW Harpy); смерть DTH-TEMPLATE (банка DTH-BRUCELEE нет); звук способности, VO, лейтмотив — нет; новых рецептов и звуков в этом прогоне нет; прослушивание пользователем не проводилось"
+  open: "1) инструмент: IK стоп clip_author (Chain.solve) скручивает бедро и голень на ~150°, когда колено rest лежит позади линии бедро–лодыжка (у Bruce на 0,5 см): при опускании таза 0,2–0,6 см pole_at переводит полюс из rest-назад в вперёд и плоскость колена переворачивается (прогон 1: вершина паха 5548 уехала на 3,7 см, WARN skin_stretch hips|leg_upper.L, foot.R|leg_lower.R). Обход в спеке: ноги — aim-ключи каждого кадра (поворот rest без скрутки, стопа держит rest-поворот), ik_feet enabled false + pin_frames [0, N]. Предложение оркестратору: в Chain.solve строить поворот бедра и голени качанием от rest (или держать знак нормали плоскости как у n0) — с тестом; код не правился; 2) регистрация — REGISTRATION.md; 3) звук прямого удара сейчас из банков когтей CLAW: свой рецепт удара кулаком (CMB-LUNGE/HIT-<TYPE>) — по желанию, отдельной задачей; 4) модель r2 приёмки 7,5 (rework) — клипы авторены на риге r2; при новом SK — переавторинг (model_input); 5) приёмщику и 7a: тонкие щели швов рукавов у плеча и ворота сзади, открытая кромка манжет, засветка ногтей — модель (known-limits.md); светлое пятно затенения на груди в HitReact к.2 в Blender (Workbench, нормали) — сверить на UE-кадрах 7a"
+  decisions:
+    "stage6.motion_source": "delegated (ДС-6): таблица §6.1 для класса «без оружия» даёт Harpy (крылья-руки, цифровые ноги) и Ancient Leshen (ствол без ног) — ни то, ни другое не держит прямой удар на прямых ногах; ближайший принятый образец — Achilles r3 (контакт к.7, ноги в rest прямые, выпад-укол к цели → прямой удар), смерть — Ancient Leshen r3 (пустые руки повисают, поклон без колен); заявка этапа 0 уже называла Achilles"
+    "stage6.legs": "delegated: ноги — aim-ключи каждого кадра вместо ik_feet инструмента (скрутка бедра, open п.1); та же двухзвенная IK к rest-лодыжке, полюс колена — от rest к носку по мере сжатия цепи"
+    "stage6.punch": "delegated: «straight lead» передней правой рукой раскрытой кистью-«когтем» (костей пальцев нет, кулак не сжимается), запястье прямое на к.5–9; Idle — пружина стойки, не дыхание"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-bruce"}
