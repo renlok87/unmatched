@@ -500,3 +500,115 @@ export function addAudioFixtures(repo: FixtureRepo): void {
   );
   json(ledgerRel, ledger);
 }
+
+/**
+ * Adds map kits («Карты») to a fixture repo: `alpha` (map, props with defects, status, images), `beta` (no status),
+ * `broken` (map.json is half-written), `gamma` (no map.json, broken props.json, status.json is an array) and a
+ * folder without json files that must be ignored.
+ */
+export function addMapKitFixtures(repo: FixtureRepo): void {
+  const { write } = repo;
+  const json = (rel: string, v: unknown) => write(rel, JSON.stringify(v, null, 2));
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 5, 5]);
+  const kits = 'docs/art-pipeline/map-kits';
+  const imgs = 'art/imagegen/mapkit-alpha';
+  const run = 'art/pipeline-candidates/ASSET-MAPKIT-ALPHA-001/20261021-run';
+
+  write(`${imgs}/concept-1.png`, png);
+  write(`${imgs}/mood.png`, png);
+  write(`${imgs}/props/lamp/front.png`, png);
+  write(`${imgs}/props/lamp/side.png`, png);
+  write(`${imgs}/raw/extra-1.png`, png);
+  write(`${imgs}/raw/notes.txt`, 'not an image');
+  write(`${run}/preview/lamp.png`, png);
+  write(`${run}/export/lamp.glb`, 'glTF-fake-lamp');
+  write(`${run}/export/lamp.fbx`, 'Kaydara FBX Binary  \0fake-lamp');
+  write(`${run}/evidence/lamp-card.json`, '{"score": 8.4}');
+
+  json(`${kits}/alpha/map.json`, {
+    schema: 'unmatched.map-kit/1',
+    map: 'alpha',
+    boardName: 'Alpha Manor',
+    boardNameRu: 'Усадьба Альфа',
+    set: 'Cobble & Fog',
+    boardId: 'cboard-alpha',
+    deTopology: { field: 'AlphaManor', cells: 32, edges: 52 },
+    heroes: ['Hero One', 'Hero Two'],
+    whyChosenRu: 'почему выбрана',
+    moodRu: 'настроение',
+    paletteHex: ['#112233', '#abc', 'not-a-colour', 'red; background:url(x)'],
+    lightingRu: 'свет',
+    backdropRu: 'задник',
+    scopeNoteRu: 'границы работы',
+    concepts: [
+      { path: `${imgs}/mood.png`, kind: 'moodboard', title: 'Мудборд' },
+      { path: `${imgs}/concept-1.png`, kind: 'concept', title: 'Общий вид', status: 'принят' },
+      { path: `${imgs}/missing.png`, kind: 'base', title: 'Нет файла' },
+      { kind: 'concept', title: 'Без пути' },
+    ],
+    propsFile: 'props.json',
+    statusFile: 'status.json',
+  });
+  json(`${kits}/alpha/props.json`, {
+    schema: 'unmatched.map-kit.props/1',
+    map: 'alpha',
+    styleEn: 'stylized miniature',
+    scale: 'game height = real height x 0.3',
+    props: [
+      { key: 'lamp', nameRu: 'Фонарь', nameEn: 'Gas lamp', descEn: 'tall lamp', descRu: 'Уличный фонарь', role: 'animated', zone: 'streets', sizeM: [0.5, 0.5, 3.5], material: 'iron', priority: 'P0', symmetry: 'axial', trisMax: 3500 },
+      { key: 'tree', nameRu: 'Дерево', nameEn: 'Tree', role: 'backdrop', zone: 'garden', sizeM: [1, 2], material: 'wood', priority: 'P2', symmetry: 'axial', trisMax: 9000 },
+      { key: 'crate', nameRu: 'Ящик', nameEn: 'Crate', role: 'dressing', zone: 'yard', sizeM: [1, 1, 1], material: 'wood', priority: 'P1', symmetry: 'axial', trisMax: 1500 },
+      { key: 'cab', nameRu: 'Кэб', nameEn: 'Hansom cab', role: 'hero', zone: 'street', sizeM: [1.8, 4, 2.6], material: 'lacquered wood', priority: 'P0', symmetry: 'asymmetric', trisMax: 8000 },
+      { nameRu: 'Пропс без ключа', priority: 'P1' },
+      { key: 'lamp', nameRu: 'Фонарь (повтор)', priority: 'P1' },
+    ],
+  });
+  json(`${kits}/alpha/status.json`, {
+    schema: 'unmatched.map-kit.status/1',
+    map: 'alpha',
+    updatedAt: '2026-10-21T10:00:00+05:00',
+    props: {
+      lamp: {
+        stage: 'accepted',
+        views: { front: `${imgs}/props/lamp/front.png`, side: `${imgs}/props/lamp/side.png`, slot: 'left', heightMismatchPct: 1.5 },
+        tripo: {
+          taskId: '0123456789abcdef',
+          route: 'Умная сетка P2.0',
+          credits: 115,
+          ops: [{ op: 'generate', quoted: 100, before: 1000, after: 900, status: 'ok' }, { op: 'texture' }, 'junk'],
+          glb: `${run}/export/lamp.glb`, run: '20261021-run' },
+        preview: `${run}/preview/lamp.png`,
+        build: { fbx: `${run}/export/lamp.fbx`, tris: 3200 },
+        acceptance: { score: 8.4, verdict: 'принят', card: `${run}/evidence/lamp-card.json` },
+        note: 'первый пропс',
+      },
+      cab: {
+        stage: 'tripo',
+        views: { front: 'C:/tmp/cab-front.png' },
+        tripo: { taskId: 77, credits: '120' },
+        preview: 'art/missing-preview.png',
+      },
+      crate: { stage: 'weird' },
+      ghost: { stage: 'built' },
+    },
+    totals: { credits: 235 },
+  });
+
+  json(`${kits}/beta/map.json`, { schema: 'unmatched.map-kit/1', map: 'beta', boardName: 'Beta Wood', boardNameRu: 'Лес Бета', set: 'Forest', heroes: ['Robin'], paletteHex: ['#000'], concepts: [], propsFile: 'props.json', statusFile: 'status.json' });
+  json(`${kits}/beta/props.json`, {
+    schema: 'unmatched.map-kit.props/1',
+    map: 'beta',
+    props: [
+      { key: 'stump', nameRu: 'Пень', nameEn: 'Stump', role: 'dressing', sizeM: [1, 1, 0.5], priority: 'P1', symmetry: 'axial', trisMax: 1000 },
+      { key: 'log', nameRu: 'Бревно', nameEn: 'Log', role: 'dressing', sizeM: [3, 0.5, 0.5], priority: 'P0', symmetry: 'unknown', trisMax: 1200 },
+    ],
+  });
+
+  write(`${kits}/broken/map.json`, '{ "map": "broken", ');
+  json(`${kits}/broken/props.json`, { schema: 'unmatched.map-kit.props/1', map: 'broken', props: [{ key: 'rock', nameRu: 'Камень', priority: 'P2' }] });
+
+  write(`${kits}/gamma/props.json`, '{ "props": [');
+  write(`${kits}/gamma/status.json`, '[1]');
+
+  write(`${kits}/notes/README.md`, '# не карта\n');
+}

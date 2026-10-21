@@ -201,6 +201,7 @@ describe('aggregate on a fixture repo', () => {
       expect(d.props).toEqual([]);
       expect(d.warnings.join(' ')).toMatch(/asset-registry\.json/);
       expect(d.audio).toMatchObject({ docs: [], tables: [], registry: { units: [] }, vo: { total: 0 }, ue: { found: null } });
+      expect(d.mapKits).toMatchObject({ found: false, maps: [], totals: { maps: 0, props: 0 } });
     } finally {
       fs.rmSync(empty, { recursive: true, force: true });
     }

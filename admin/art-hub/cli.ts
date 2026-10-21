@@ -36,6 +36,15 @@ function main(argv: string[]) {
     }, SoundWave в UE ${data.audio.ue.soundWaves}, микс ${data.audio.mix.latest ? `${data.audio.mix.latest.date} (${data.audio.mix.latest.rows.length} замера)` : '—'}, AUC-* ${
       data.audio.spends.spent
     } ${data.audio.spends.unit}`,
+    `  карты: ${data.mapKits.totals.maps} (пропсов ${data.mapKits.totals.props}, кредитов Tripo ${data.mapKits.totals.credits}, стадии: ${
+      data.mapKits.totals.byStage.map((s) => `${s.stage} ${s.count}`).join(', ') || '—'
+    })`,
+    ...data.mapKits.maps.map(
+      (m) =>
+        `    ${m.id.padEnd(20)} ${m.counts.total} пропсов, концептов ${m.concepts.length}, кредитов ${m.credits.spent}${m.error ? `, ОШИБКА: ${m.error}` : ''}${
+          m.problems.length ? `, замечаний ${m.problems.length}` : ''
+        }`,
+    ),
   ];
   console.log(lines.join('\n'));
   if (data.warnings.length) console.log(`предупреждения:\n  ${data.warnings.join('\n  ')}`);

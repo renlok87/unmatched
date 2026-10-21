@@ -1,0 +1,731 @@
+{
+  "schema": "unmatched.map-kit.props/1",
+  "map": "soho",
+  "boardName": "Soho",
+  "boardNameRu": "Сохо",
+  "set": "Cobble & Fog",
+  "styleEn": "stylized hand-painted tabletop miniature prop, Victorian London streets and Thames wharf, sooty brick, cast iron, weathered wood, canvas, clean readable silhouette, PBR friendly",
+  "scale": "game height = real height x 0.3 (hero figure 0.55 m = 1.8 m human)",
+  "props": [
+    {
+      "key": "gas-street-lamp",
+      "nameRu": "Газовый фонарь",
+      "nameEn": "Gas street lamp",
+      "descEn": "tall black cast-iron Victorian gas street lamp with fluted column, ladder bar and four-pane lantern",
+      "descRu": "Уличный газовый фонарь (свет — анимация)",
+      "role": "animated",
+      "zone": "streets and embankment",
+      "sizeM": [
+        0.5,
+        0.5,
+        3.5
+      ],
+      "material": "cast iron, glass",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 3500
+    },
+    {
+      "key": "hansom-cab",
+      "nameRu": "Кэб",
+      "nameEn": "Hansom cab",
+      "descEn": "black two-wheeled Victorian hansom cab carriage with driver seat at back, shafts resting on ground, no horse",
+      "descRu": "Двухколёсный кэб без лошади",
+      "role": "hero",
+      "zone": "cobbled street",
+      "sizeM": [
+        1.8,
+        4.0,
+        2.6
+      ],
+      "material": "lacquered wood, iron, leather",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 8000
+    },
+    {
+      "key": "thames-rowboat",
+      "nameRu": "Лодка на Темзе",
+      "nameEn": "Wooden rowboat",
+      "descEn": "weathered clinker-built wooden rowboat with two oars and a coiled rope",
+      "descRu": "Деревянная лодка с вёслами у набережной",
+      "role": "hero",
+      "zone": "embankment (bottom)",
+      "sizeM": [
+        1.4,
+        4.0,
+        0.8
+      ],
+      "material": "weathered wood, rope",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 5000
+    },
+    {
+      "key": "market-stall",
+      "nameRu": "Рыночный лоток",
+      "nameEn": "Costermonger stall",
+      "descEn": "wooden costermonger market stall with striped canvas awning and crates of apples and cabbages",
+      "descRu": "Лоток с полосатым навесом и овощами",
+      "role": "hero",
+      "zone": "street corner",
+      "sizeM": [
+        2.0,
+        1.2,
+        2.4
+      ],
+      "material": "wood, canvas, produce",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 7000
+    },
+    {
+      "key": "chimney-stack",
+      "nameRu": "Дымовая труба",
+      "nameEn": "Brick chimney stack",
+      "descEn": "sooty brick rooftop chimney stack with four terracotta chimney pots",
+      "descRu": "Кирпичный стояк с горшками труб (дым — анимация)",
+      "role": "animated",
+      "zone": "rooftops (blue)",
+      "sizeM": [
+        1.2,
+        0.6,
+        1.8
+      ],
+      "material": "brick, terracotta, soot",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 3500
+    },
+    {
+      "key": "fire-escape-ladder",
+      "nameRu": "Пожарная лестница",
+      "nameEn": "Iron wall ladder",
+      "descEn": "black iron rooftop access ladder with curved hoop top and wall brackets",
+      "descRu": "Железная лестница на крышу (переходы карты)",
+      "role": "hero",
+      "zone": "building walls",
+      "sizeM": [
+        0.6,
+        0.4,
+        3.5
+      ],
+      "material": "iron",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "cargo-crate",
+      "nameRu": "Грузовой ящик",
+      "nameEn": "Wooden cargo crate",
+      "descEn": "rough plank cargo crate with rope handles and stencilled shipping marks",
+      "descRu": "Дощатый ящик с маркировкой",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "material": "wood, rope",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 1500
+    },
+    {
+      "key": "ale-barrel",
+      "nameRu": "Бочка эля",
+      "nameEn": "Ale barrel",
+      "descEn": "oak ale barrel with iron hoops lying on its side on a wooden chock",
+      "descRu": "Дубовая бочка на подставке",
+      "role": "dressing",
+      "zone": "pub yard / wharf",
+      "sizeM": [
+        0.7,
+        1.0,
+        0.8
+      ],
+      "material": "oak, iron",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "pillar-box",
+      "nameRu": "Почтовая тумба",
+      "nameEn": "Victorian pillar box",
+      "descEn": "red cast-iron Victorian hexagonal pillar post box with crown cap",
+      "descRu": "Красная викторианская почтовая тумба",
+      "role": "hero",
+      "zone": "street",
+      "sizeM": [
+        0.6,
+        0.6,
+        1.6
+      ],
+      "material": "painted cast iron",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "textile-bales",
+      "nameRu": "Тюки ткани",
+      "nameEn": "Textile bales",
+      "descEn": "stack of three canvas-wrapped cloth bales tied with rope, one opened showing colourful fabric",
+      "descRu": "Тюки ткани у склада TEXTILES",
+      "role": "hero",
+      "zone": "textile warehouse (green)",
+      "sizeM": [
+        1.4,
+        1.0,
+        1.4
+      ],
+      "material": "canvas, rope, cloth",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 3500
+    },
+    {
+      "key": "dock-bollard",
+      "nameRu": "Причальная тумба",
+      "nameEn": "Cast-iron dock bollard",
+      "descEn": "squat black cast-iron mooring bollard with rope wrapped around it",
+      "descRu": "Чугунный кнехт с канатом",
+      "role": "dressing",
+      "zone": "embankment",
+      "sizeM": [
+        0.5,
+        0.5,
+        0.8
+      ],
+      "material": "cast iron, rope",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 2000
+    },
+    {
+      "key": "mooring-pilings",
+      "nameRu": "Сваи причала",
+      "nameEn": "Mooring pilings",
+      "descEn": "cluster of three tarred wooden pilings bound with rope and iron bands, barnacles at base",
+      "descRu": "Связка просмолённых свай",
+      "role": "dressing",
+      "zone": "river edge",
+      "sizeM": [
+        1.0,
+        1.0,
+        2.5
+      ],
+      "material": "tarred wood, iron, rope",
+      "priority": "P1",
+      "symmetry": "axial",
+      "trisMax": 3000
+    },
+    {
+      "key": "handcart",
+      "nameRu": "Ручная тележка",
+      "nameEn": "Costermonger handcart",
+      "descEn": "two-wheeled wooden handcart loaded with sacks, long handles resting on ground",
+      "descRu": "Тележка с мешками",
+      "role": "dressing",
+      "zone": "street",
+      "sizeM": [
+        1.0,
+        2.2,
+        1.0
+      ],
+      "material": "wood, iron, burlap",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "newspaper-stand",
+      "nameRu": "Газетный лоток",
+      "nameEn": "Newspaper stand",
+      "descEn": "small wooden newsvendor stand with stacked newspapers and a sandwich board leaning",
+      "descRu": "Газетный лоток с афишной доской",
+      "role": "dressing",
+      "zone": "street corner",
+      "sizeM": [
+        1.0,
+        0.6,
+        1.4
+      ],
+      "material": "wood, paper",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3500
+    },
+    {
+      "key": "produce-crates",
+      "nameRu": "Ящики с фруктами",
+      "nameEn": "Stacked produce crates",
+      "descEn": "stack of slatted wooden crates with apples, oranges and turnips",
+      "descRu": "Штабель ящиков с фруктами",
+      "role": "dressing",
+      "zone": "market",
+      "sizeM": [
+        1.0,
+        0.6,
+        1.0
+      ],
+      "material": "wood, produce",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "grain-sacks",
+      "nameRu": "Мешки",
+      "nameEn": "Pile of burlap sacks",
+      "descEn": "pile of bulging burlap grain sacks tied at the top",
+      "descRu": "Куча мешков с зерном",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        1.2,
+        1.0,
+        0.8
+      ],
+      "material": "burlap",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "weathervane",
+      "nameRu": "Флюгер",
+      "nameEn": "Rooftop weathervane",
+      "descEn": "iron rooftop weathervane with a cockerel and compass arms on a short pole",
+      "descRu": "Флюгер-петух (поворот — анимация)",
+      "role": "animated",
+      "zone": "rooftops",
+      "sizeM": [
+        0.8,
+        0.8,
+        1.5
+      ],
+      "material": "wrought iron",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "hanging-shop-sign",
+      "nameRu": "Вывеска",
+      "nameEn": "Hanging shop sign",
+      "descEn": "painted wooden shop sign hanging from a scrolled iron wall bracket, blank painted panel with a tea-pot emblem",
+      "descRu": "Вывеска на кованом кронштейне",
+      "role": "dressing",
+      "zone": "shopfronts",
+      "sizeM": [
+        0.9,
+        0.1,
+        0.9
+      ],
+      "material": "wood, iron",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "horse-trough",
+      "nameRu": "Поилка",
+      "nameEn": "Stone horse trough",
+      "descEn": "long granite horse drinking trough with water and an iron spout",
+      "descRu": "Каменная поилка для лошадей",
+      "role": "dressing",
+      "zone": "street",
+      "sizeM": [
+        2.0,
+        0.7,
+        0.8
+      ],
+      "material": "granite, water, iron",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "street-pump",
+      "nameRu": "Уличная колонка",
+      "nameEn": "Cast-iron street pump",
+      "descEn": "green cast-iron Victorian street water pump with curved handle and spout",
+      "descRu": "Чугунная водоразборная колонка",
+      "role": "dressing",
+      "zone": "square",
+      "sizeM": [
+        0.5,
+        0.8,
+        1.5
+      ],
+      "material": "cast iron",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "street-bench",
+      "nameRu": "Уличная скамья",
+      "nameEn": "Embankment bench",
+      "descEn": "Victorian embankment bench with cast-iron sphinx-style end frames and wooden slats",
+      "descRu": "Скамья набережной с чугунными боковинами",
+      "role": "dressing",
+      "zone": "embankment",
+      "sizeM": [
+        1.8,
+        0.6,
+        0.9
+      ],
+      "material": "cast iron, wood",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3500
+    },
+    {
+      "key": "area-railings",
+      "nameRu": "Ограда приямка",
+      "nameEn": "Area railings",
+      "descEn": "section of black iron area railings with ornamental finials on a stone kerb",
+      "descRu": "Ограда подвального приямка",
+      "role": "dressing",
+      "zone": "building fronts",
+      "sizeM": [
+        2.0,
+        0.3,
+        1.1
+      ],
+      "material": "iron, stone",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "milk-churns",
+      "nameRu": "Молочные бидоны",
+      "nameEn": "Milk churns",
+      "descEn": "group of three steel milk churns with lids",
+      "descRu": "Три молочных бидона",
+      "role": "dressing",
+      "zone": "back alley",
+      "sizeM": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "material": "tin steel",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "wharf-crane",
+      "nameRu": "Причальный кран",
+      "nameEn": "Wooden wharf crane",
+      "descEn": "small wooden jib crane with iron winch, rope and hook on a timber base",
+      "descRu": "Деревянный кран с лебёдкой",
+      "role": "hero",
+      "zone": "embankment",
+      "sizeM": [
+        1.5,
+        2.5,
+        3.5
+      ],
+      "material": "timber, iron, rope",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 5000
+    },
+    {
+      "key": "rope-coil",
+      "nameRu": "Бухта каната",
+      "nameEn": "Coil of rope",
+      "descEn": "large coil of thick hemp rope on wooden planks",
+      "descRu": "Бухта пенькового каната",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        0.8,
+        0.8,
+        0.3
+      ],
+      "material": "hemp rope",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 3000
+    },
+    {
+      "key": "old-anchor",
+      "nameRu": "Якорь",
+      "nameEn": "Old iron anchor",
+      "descEn": "rusty iron admiralty anchor leaning against a crate with chain",
+      "descRu": "Ржавый якорь с цепью",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        1.0,
+        0.4,
+        1.5
+      ],
+      "material": "rusted iron",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "wicker-baskets",
+      "nameRu": "Плетёные корзины",
+      "nameEn": "Stacked wicker baskets",
+      "descEn": "stack of wicker fish baskets with a lid",
+      "descRu": "Стопка плетёных корзин",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        0.7,
+        0.7,
+        1.0
+      ],
+      "material": "wicker",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 3000
+    },
+    {
+      "key": "hand-lantern",
+      "nameRu": "Ручной фонарь",
+      "nameEn": "Oil hand lantern",
+      "descEn": "Victorian bullseye police oil lantern with brass lens",
+      "descRu": "Полицейский масляный фонарь",
+      "role": "animated",
+      "zone": "alleys",
+      "sizeM": [
+        0.2,
+        0.2,
+        0.3
+      ],
+      "material": "tin, brass, glass",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "tea-chest",
+      "nameRu": "Чайный ящик",
+      "nameEn": "Tea chest",
+      "descEn": "plywood tea chest with metal edging and painted East India marks",
+      "descRu": "Чайный ящик Ост-Индской компании",
+      "role": "dressing",
+      "zone": "warehouse",
+      "sizeM": [
+        0.6,
+        0.6,
+        0.6
+      ],
+      "material": "plywood, tin",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 1500
+    },
+    {
+      "key": "wheelbarrow",
+      "nameRu": "Тачка",
+      "nameEn": "Wooden wheelbarrow",
+      "descEn": "old wooden wheelbarrow with iron-rimmed wheel and coal inside",
+      "descRu": "Деревянная тачка с углём",
+      "role": "dressing",
+      "zone": "back alley",
+      "sizeM": [
+        0.7,
+        1.5,
+        0.7
+      ],
+      "material": "wood, iron, coal",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "cart-wheel",
+      "nameRu": "Колесо",
+      "nameEn": "Spare cart wheel",
+      "descEn": "spoked wooden cart wheel with iron tyre leaning upright",
+      "descRu": "Запасное колесо телеги",
+      "role": "dressing",
+      "zone": "stable yard",
+      "sizeM": [
+        1.2,
+        0.2,
+        1.2
+      ],
+      "material": "wood, iron",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "window-flowerbox",
+      "nameRu": "Ящик с цветами",
+      "nameEn": "Window flower box",
+      "descEn": "wooden window flower box with red geraniums on iron brackets",
+      "descRu": "Оконный ящик с геранью",
+      "role": "dressing",
+      "zone": "facades",
+      "sizeM": [
+        1.0,
+        0.3,
+        0.4
+      ],
+      "material": "wood, plants",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "shop-awning",
+      "nameRu": "Маркиза",
+      "nameEn": "Shopfront awning",
+      "descEn": "striped canvas shopfront awning on an iron frame with scalloped edge",
+      "descRu": "Полосатая маркиза витрины",
+      "role": "dressing",
+      "zone": "shopfronts",
+      "sizeM": [
+        2.5,
+        1.2,
+        0.8
+      ],
+      "material": "canvas, iron",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "wall-carriage-lamp",
+      "nameRu": "Настенный фонарь",
+      "nameEn": "Wall carriage lamp",
+      "descEn": "wall-mounted Victorian gas carriage lamp on scrolled bracket",
+      "descRu": "Настенный газовый фонарь (свет — анимация)",
+      "role": "animated",
+      "zone": "doors",
+      "sizeM": [
+        0.4,
+        0.5,
+        0.8
+      ],
+      "material": "iron, glass",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "telegraph-pole",
+      "nameRu": "Телеграфная мачта",
+      "nameEn": "Rooftop telegraph pole",
+      "descEn": "wooden rooftop telegraph pole with crossbars and white ceramic insulators",
+      "descRu": "Телеграфная мачта на крыше",
+      "role": "backdrop",
+      "zone": "rooftops",
+      "sizeM": [
+        1.2,
+        0.3,
+        4.0
+      ],
+      "material": "wood, ceramic",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "factory-chimney",
+      "nameRu": "Заводская труба",
+      "nameEn": "Factory smokestack",
+      "descEn": "tall octagonal brick factory smokestack with iron bands, soot-blackened top",
+      "descRu": "Кирпичная заводская труба (дым — анимация), задник",
+      "role": "backdrop",
+      "zone": "skyline",
+      "sizeM": [
+        2.0,
+        2.0,
+        15.0
+      ],
+      "material": "brick, iron",
+      "priority": "P1",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "pub-barrel-table",
+      "nameRu": "Бочка-стол",
+      "nameEn": "Pub barrel table",
+      "descEn": "upright barrel used as a pub table with two pewter tankards on top",
+      "descRu": "Бочка-столик с кружками у паба",
+      "role": "dressing",
+      "zone": "pub front",
+      "sizeM": [
+        0.7,
+        0.7,
+        1.0
+      ],
+      "material": "oak, iron, pewter",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "cargo-net",
+      "nameRu": "Груз в сетке",
+      "nameEn": "Cargo net bundle",
+      "descEn": "bundle of crates and sacks wrapped in a rope cargo net with a lifting ring",
+      "descRu": "Связка груза в сетке",
+      "role": "dressing",
+      "zone": "wharf",
+      "sizeM": [
+        1.2,
+        1.2,
+        1.2
+      ],
+      "material": "rope, wood, burlap",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "coal-bunker",
+      "nameRu": "Угольный ящик",
+      "nameEn": "Coal bunker",
+      "descEn": "sloped wooden coal bunker with hinged lid and spilled coal",
+      "descRu": "Угольный ящик с откидной крышкой",
+      "role": "dressing",
+      "zone": "back yard",
+      "sizeM": [
+        1.0,
+        0.8,
+        1.0
+      ],
+      "material": "wood, coal",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "police-rattle-box",
+      "nameRu": "Полицейская будка",
+      "nameEn": "Watchman's box",
+      "descEn": "small Victorian wooden watchman's sentry box with pitched roof and lamp",
+      "descRu": "Будка ночного сторожа",
+      "role": "dressing",
+      "zone": "square",
+      "sizeM": [
+        1.0,
+        1.0,
+        2.4
+      ],
+      "material": "painted wood, glass",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3500
+    }
+  ]
+}

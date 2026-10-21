@@ -7,7 +7,7 @@ import React, { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, Col, Empty, Menu, Modal, Result, Row, Space, Spin, Switch, Tabs, Tag, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
-import { BgColorsOutlined, BookOutlined, DashboardOutlined, EyeOutlined, ProjectOutlined, ReloadOutlined, SoundOutlined } from '@ant-design/icons';
+import { BgColorsOutlined, BookOutlined, DashboardOutlined, EnvironmentOutlined, EyeOutlined, ProjectOutlined, ReloadOutlined, SoundOutlined } from '@ant-design/icons';
 import type { ArtHubData, AssetPage, FileRef, LookdevHeroView } from '../../../art-hub/types';
 import { IS_DEV, useArtHubData } from './api';
 import { ArtHubUiContext, StageTag, StatusTag, type ArtHubUi } from './components/common';
@@ -17,6 +17,7 @@ import { AudioSection } from './sections/AudioSection';
 import { ClipsSection } from './sections/ClipsSection';
 import { DecisionsSection } from './sections/DecisionsSection';
 import { HeroLookdev, LookdevSection } from './sections/LookdevSection';
+import { MapKitsSection } from './sections/MapKitsSection';
 import { MaterialsSection } from './sections/MaterialsSection';
 import { PlanSection } from './sections/PlanSection';
 import { UeLayersTable } from './sections/UeLayersSection';
@@ -37,6 +38,7 @@ const OVERVIEW: { key: string; label: string; icon: React.ReactNode }[] = [
   { key: 'plan', label: 'План и задачи', icon: <ProjectOutlined /> },
   { key: 'lookdev', label: 'Look-dev и концепты', icon: <EyeOutlined /> },
   { key: 'materials', label: 'Библиотека материалов', icon: <BgColorsOutlined /> },
+  { key: 'maps', label: 'Карты', icon: <EnvironmentOutlined /> },
   { key: 'audio', label: 'Звук', icon: <SoundOutlined /> },
   { key: 'decisions', label: 'Решения', icon: <BookOutlined /> },
 ];
@@ -80,6 +82,8 @@ const OverviewView: React.FC<{ item: string; data: ArtHubData }> = ({ item, data
       return <LookdevSection lookdev={data.lookdev} />;
     case 'materials':
       return <MaterialsSection materials={data.materials} />;
+    case 'maps':
+      return <MapKitsSection mapKits={data.mapKits} />;
     case 'audio':
       return <AudioSection audio={data.audio} />;
     case 'decisions':
@@ -169,6 +173,7 @@ export const ArtHubPage: React.FC = () => {
       next.set('item', id);
       if (t) next.set('tab', t);
       else next.delete('tab');
+      next.delete('map'); // `?map=` belongs to the «Карты» section only
       setParams(next);
       window.scrollTo({ top: 0 });
     },
@@ -243,8 +248,8 @@ export const ArtHubPage: React.FC = () => {
             Арт-хаб
           </Title>
           <Text type="secondary">
-            Живое отражение файлов арт-пайплайна: план, модели, UE-слои, look-dev, материалы, риг, клипы, видео-референсы, звук (реестр,
-            реплики, микс), кредиты, решения. Только чтение.
+            Живое отражение файлов арт-пайплайна: план, модели, UE-слои, look-dev, материалы, карты (наборы пропсов), риг, клипы,
+            видео-референсы, звук (реестр, реплики, микс), кредиты, решения. Только чтение.
           </Text>
         </Col>
         <Col>

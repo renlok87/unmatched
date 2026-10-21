@@ -1,0 +1,731 @@
+{
+  "schema": "unmatched.map-kit.props/1",
+  "map": "sherwood-forest",
+  "boardName": "Sherwood Forest",
+  "boardNameRu": "Шервудский лес",
+  "set": "Robin Hood vs Bigfoot",
+  "styleEn": "stylized hand-painted tabletop miniature prop, ancient English greenwood of Robin Hood's outlaws, gnarled oak bark, moss, ferns, leather, rough timber, clean readable silhouette, PBR friendly",
+  "scale": "game height = real height x 0.3 (hero figure 0.55 m = 1.8 m human); trees compressed to 0.15-0.2",
+  "props": [
+    {
+      "key": "major-oak",
+      "nameRu": "Великий дуб",
+      "nameEn": "Major Oak",
+      "descEn": "huge ancient gnarled oak with a massive split trunk, wide spreading crown of dense leaf clusters and exposed roots",
+      "descRu": "Огромный древний дуб — символ Шервуда",
+      "role": "hero",
+      "zone": "behind the field",
+      "sizeM": [
+        12.0,
+        12.0,
+        15.0
+      ],
+      "material": "bark, foliage",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 12000
+    },
+    {
+      "key": "fallen-log",
+      "nameRu": "Поваленное бревно",
+      "nameEn": "Mossy fallen log",
+      "descEn": "long fallen oak trunk covered in moss and shelf fungi, broken root end, ferns growing alongside",
+      "descRu": "Поваленный ствол во мху (центр карты)",
+      "role": "hero",
+      "zone": "field centre",
+      "sizeM": [
+        1.0,
+        6.0,
+        1.0
+      ],
+      "material": "bark, moss, fungus",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 7000
+    },
+    {
+      "key": "mossy-boulder",
+      "nameRu": "Замшелый валун",
+      "nameEn": "Large mossy boulder",
+      "descEn": "large rounded grey boulder half covered in thick green moss with small ferns at its base",
+      "descRu": "Большой валун во мху",
+      "role": "dressing",
+      "zone": "rocky clearing (grey)",
+      "sizeM": [
+        2.0,
+        1.6,
+        1.3
+      ],
+      "material": "stone, moss",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "archery-target",
+      "nameRu": "Мишень",
+      "nameEn": "Straw archery target",
+      "descEn": "round woven straw archery butt with painted rings on a wooden A-frame stand, three arrows stuck in it",
+      "descRu": "Соломенная мишень с тремя стрелами",
+      "role": "hero",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.2,
+        0.8,
+        1.6
+      ],
+      "material": "straw, wood, feathers",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "outlaw-campfire",
+      "nameRu": "Костёр разбойников",
+      "nameEn": "Outlaw campfire",
+      "descEn": "campfire in a ring of stones with crossed burning logs and a small cooking pot on a hook",
+      "descRu": "Костёр в кольце камней (огонь — анимация)",
+      "role": "animated",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.2,
+        1.2,
+        0.8
+      ],
+      "material": "stone, wood, fire",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 4000
+    },
+    {
+      "key": "hollow-stump",
+      "nameRu": "Дуплистый пень",
+      "nameEn": "Hollow tree stump",
+      "descEn": "wide hollow oak stump with a dark opening, bracket fungi and ivy",
+      "descRu": "Пень с дуплом — тайник",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        1.5,
+        1.5,
+        1.2
+      ],
+      "material": "bark, fungus, ivy",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "oak-tree",
+      "nameRu": "Дуб",
+      "nameEn": "Oak tree",
+      "descEn": "medium English oak tree with a thick crooked trunk and a round dense crown",
+      "descRu": "Средний дуб",
+      "role": "backdrop",
+      "zone": "forest ring",
+      "sizeM": [
+        8.0,
+        8.0,
+        10.0
+      ],
+      "material": "bark, foliage",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 8000
+    },
+    {
+      "key": "fern-cluster",
+      "nameRu": "Папоротник",
+      "nameEn": "Fern cluster",
+      "descEn": "lush cluster of bracken fern fronds",
+      "descRu": "Куст папоротника",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        1.2,
+        1.2,
+        0.8
+      ],
+      "material": "foliage",
+      "priority": "P0",
+      "symmetry": "axial",
+      "trisMax": 4000
+    },
+    {
+      "key": "lean-to-shelter",
+      "nameRu": "Шалаш",
+      "nameEn": "Outlaw lean-to shelter",
+      "descEn": "lean-to shelter of branches and a stretched green canvas tarp with a bedroll inside",
+      "descRu": "Шалаш из веток и зелёного полотна",
+      "role": "hero",
+      "zone": "outlaw camp",
+      "sizeM": [
+        2.5,
+        2.0,
+        1.6
+      ],
+      "material": "wood, canvas, leaves",
+      "priority": "P0",
+      "symmetry": "asymmetric",
+      "trisMax": 6000
+    },
+    {
+      "key": "plank-footbridge",
+      "nameRu": "Мостик",
+      "nameEn": "Plank footbridge",
+      "descEn": "small rough-hewn plank footbridge with a single rope handrail on stakes",
+      "descRu": "Дощатый мостик через ручей",
+      "role": "dressing",
+      "zone": "stream",
+      "sizeM": [
+        1.2,
+        3.0,
+        1.0
+      ],
+      "material": "wood, rope",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "fly-agaric",
+      "nameRu": "Мухоморы",
+      "nameEn": "Fly agaric mushrooms",
+      "descEn": "cluster of red-capped white-spotted fly agaric mushrooms of different sizes on moss",
+      "descRu": "Группа мухоморов",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        0.5,
+        0.5,
+        0.3
+      ],
+      "material": "mushroom, moss",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "bramble-bush",
+      "nameRu": "Ежевичник",
+      "nameEn": "Bramble bush",
+      "descEn": "tangled thorny bramble bush with blackberries",
+      "descRu": "Колючий ежевичник с ягодами",
+      "role": "dressing",
+      "zone": "path edges",
+      "sizeM": [
+        1.5,
+        1.2,
+        1.0
+      ],
+      "material": "foliage, thorns",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 5000
+    },
+    {
+      "key": "birch-tree",
+      "nameRu": "Берёза",
+      "nameEn": "Young birch tree",
+      "descEn": "slender young silver birch with white peeling bark and light airy leaves",
+      "descRu": "Молодая берёза",
+      "role": "backdrop",
+      "zone": "forest ring",
+      "sizeM": [
+        3.0,
+        3.0,
+        8.0
+      ],
+      "material": "bark, foliage",
+      "priority": "P1",
+      "symmetry": "axial",
+      "trisMax": 6000
+    },
+    {
+      "key": "exposed-roots",
+      "nameRu": "Корни",
+      "nameEn": "Exposed tree roots",
+      "descEn": "arching exposed oak roots emerging from an earth bank with moss",
+      "descRu": "Выступающие корни на откосе",
+      "role": "dressing",
+      "zone": "path edges",
+      "sizeM": [
+        2.0,
+        1.5,
+        0.8
+      ],
+      "material": "bark, earth, moss",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 5000
+    },
+    {
+      "key": "rock-cluster",
+      "nameRu": "Камни",
+      "nameEn": "Small rock cluster",
+      "descEn": "cluster of four small grey rocks with lichen and grass tufts",
+      "descRu": "Группа мелких камней",
+      "role": "dressing",
+      "zone": "rocky clearing",
+      "sizeM": [
+        1.0,
+        1.0,
+        0.4
+      ],
+      "material": "stone, lichen",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "chopped-log-pile",
+      "nameRu": "Колотые дрова",
+      "nameEn": "Chopped log pile",
+      "descEn": "pile of chopped round logs with an axe leaning against it",
+      "descRu": "Куча чурбаков с топором",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.5,
+        1.0,
+        0.8
+      ],
+      "material": "wood, iron",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "arrow-barrel",
+      "nameRu": "Бочка стрел",
+      "nameEn": "Barrel of arrows",
+      "descEn": "open wooden barrel packed with fletched arrows, a longbow leaning against it",
+      "descRu": "Бочка со стрелами и длинный лук",
+      "role": "hero",
+      "zone": "outlaw camp",
+      "sizeM": [
+        0.7,
+        0.7,
+        1.2
+      ],
+      "material": "wood, feathers, yew",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "bow-rack",
+      "nameRu": "Стойка луков",
+      "nameEn": "Longbow rack",
+      "descEn": "rustic wooden rack holding four unstrung yew longbows and quivers",
+      "descRu": "Стойка с длинными луками и колчанами",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.5,
+        0.5,
+        1.8
+      ],
+      "material": "wood, yew, leather",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "venison-rack",
+      "nameRu": "Вяление дичи",
+      "nameEn": "Venison drying rack",
+      "descEn": "wooden tripod rack with a hanging deer haunch and strips of drying meat",
+      "descRu": "Треножник с олениной (королевская дичь)",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.2,
+        1.2,
+        1.8
+      ],
+      "material": "wood, meat, rope",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "camp-cooking-pot",
+      "nameRu": "Котелок",
+      "nameEn": "Camp cooking pot",
+      "descEn": "iron cooking pot hanging from a forked-stick crossbar with ladle",
+      "descRu": "Котелок на рогатинах",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.0,
+        0.5,
+        1.0
+      ],
+      "material": "iron, wood",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "tax-cart",
+      "nameRu": "Обоз шерифа",
+      "nameEn": "Sheriff's tax cart",
+      "descEn": "sturdy wooden two-wheeled cart with iron-banded strongbox and the Sheriff of Nottingham's red banner pole",
+      "descRu": "Телега с казной шерифа Ноттингема",
+      "role": "hero",
+      "zone": "road",
+      "sizeM": [
+        1.6,
+        2.8,
+        1.8
+      ],
+      "material": "wood, iron, cloth",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 7000
+    },
+    {
+      "key": "gold-chest",
+      "nameRu": "Сундук с золотом",
+      "nameEn": "Chest of gold coins",
+      "descEn": "open iron-bound wooden chest overflowing with gold coins and a jewelled goblet",
+      "descRu": "Открытый сундук с монетами",
+      "role": "hero",
+      "zone": "outlaw camp",
+      "sizeM": [
+        0.9,
+        0.6,
+        0.7
+      ],
+      "material": "wood, iron, gold",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 5000
+    },
+    {
+      "key": "wanted-post",
+      "nameRu": "Столб с объявлением",
+      "nameEn": "Wanted notice post",
+      "descEn": "wooden post with a nailed parchment wanted notice and an arrow pinning it",
+      "descRu": "Столб с объявлением о розыске, пробитым стрелой",
+      "role": "dressing",
+      "zone": "road edge",
+      "sizeM": [
+        0.4,
+        0.3,
+        1.8
+      ],
+      "material": "wood, parchment",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "lookout-platform",
+      "nameRu": "Дозорный помост",
+      "nameEn": "Treetop lookout platform",
+      "descEn": "wooden lookout platform built around a tree trunk section with a rope ladder hanging down",
+      "descRu": "Помост на дереве с верёвочной лестницей",
+      "role": "hero",
+      "zone": "forest ring",
+      "sizeM": [
+        2.5,
+        2.5,
+        4.0
+      ],
+      "material": "wood, rope, bark",
+      "priority": "P1",
+      "symmetry": "asymmetric",
+      "trisMax": 7000
+    },
+    {
+      "key": "bigfoot-nest",
+      "nameRu": "Гнездо Бигфута",
+      "nameEn": "Bigfoot nest",
+      "descEn": "huge nest woven from broken branches and moss on the ground, with a few large tufts of brown fur",
+      "descRu": "Гигантское гнездо из веток с клочьями шерсти",
+      "role": "hero",
+      "zone": "deep forest",
+      "sizeM": [
+        3.0,
+        3.0,
+        1.0
+      ],
+      "material": "branches, moss, fur",
+      "priority": "P1",
+      "symmetry": "axial",
+      "trisMax": 6000
+    },
+    {
+      "key": "stick-structure",
+      "nameRu": "Шалаш из жердей",
+      "nameEn": "Bigfoot stick structure",
+      "descEn": "teepee-like structure of large broken branches leaning together, mysterious forest sign",
+      "descRu": "Конус из жердей — знак Бигфута",
+      "role": "dressing",
+      "zone": "deep forest",
+      "sizeM": [
+        2.0,
+        2.0,
+        2.8
+      ],
+      "material": "branches",
+      "priority": "P1",
+      "symmetry": "axial",
+      "trisMax": 4000
+    },
+    {
+      "key": "standing-stone",
+      "nameRu": "Стоячий камень",
+      "nameEn": "Mossy standing stone",
+      "descEn": "ancient tall standing stone with moss and faint carved spirals",
+      "descRu": "Древний менгир во мху",
+      "role": "dressing",
+      "zone": "rocky clearing",
+      "sizeM": [
+        0.8,
+        0.6,
+        2.2
+      ],
+      "material": "stone, moss",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "stepping-stones",
+      "nameRu": "Камни-переходы",
+      "nameEn": "Stream stepping stones",
+      "descEn": "row of flat wet stepping stones with pebbles and reeds",
+      "descRu": "Камни для перехода ручья",
+      "role": "dressing",
+      "zone": "stream",
+      "sizeM": [
+        1.0,
+        2.5,
+        0.3
+      ],
+      "material": "stone, reeds",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    },
+    {
+      "key": "bluebells",
+      "nameRu": "Колокольчики",
+      "nameEn": "Bluebell patch",
+      "descEn": "dense patch of English bluebell flowers with green leaves",
+      "descRu": "Поляна пролесок",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        1.2,
+        1.2,
+        0.35
+      ],
+      "material": "foliage, flowers",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 4000
+    },
+    {
+      "key": "ivy-stump",
+      "nameRu": "Пень в плюще",
+      "nameEn": "Ivy-covered stump",
+      "descEn": "tall broken tree stump wrapped in climbing ivy",
+      "descRu": "Обломанный ствол в плюще",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        0.8,
+        0.8,
+        1.8
+      ],
+      "material": "bark, ivy",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "beehive-skep",
+      "nameRu": "Улей-колода",
+      "nameEn": "Straw beehive skep",
+      "descEn": "dome-shaped woven straw beehive skep on a wooden stand",
+      "descRu": "Плетёный соломенный улей",
+      "role": "dressing",
+      "zone": "camp edge",
+      "sizeM": [
+        0.6,
+        0.6,
+        1.1
+      ],
+      "material": "straw, wood",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 2500
+    },
+    {
+      "key": "ale-barrel-forest",
+      "nameRu": "Бочка эля",
+      "nameEn": "Ale barrel with tankards",
+      "descEn": "oak ale barrel on a log stand with wooden tankards on top",
+      "descRu": "Бочка эля с кружками на пне",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        0.8,
+        0.8,
+        1.1
+      ],
+      "material": "oak, iron, wood",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 3000
+    },
+    {
+      "key": "feast-trestle",
+      "nameRu": "Стол пира",
+      "nameEn": "Outlaw feast table",
+      "descEn": "rough trestle table of split logs with roast fowl, bread, apples and wooden cups",
+      "descRu": "Грубый стол с жареной птицей и хлебом",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.0,
+        2.5,
+        0.8
+      ],
+      "material": "wood, food",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 6000
+    },
+    {
+      "key": "log-bench",
+      "nameRu": "Скамья-бревно",
+      "nameEn": "Split log bench",
+      "descEn": "half-log bench on two short stumps",
+      "descRu": "Скамья из половины бревна",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        0.5,
+        2.0,
+        0.5
+      ],
+      "material": "wood",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "tree-lantern",
+      "nameRu": "Фонарь на суку",
+      "nameEn": "Lantern on branch",
+      "descEn": "iron candle lantern hanging from a short forked branch stake",
+      "descRu": "Фонарь на воткнутой рогатине (свет — анимация)",
+      "role": "animated",
+      "zone": "camp paths",
+      "sizeM": [
+        0.4,
+        0.4,
+        1.6
+      ],
+      "material": "iron, glass, wood",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2000
+    },
+    {
+      "key": "quarterstaff-rack",
+      "nameRu": "Стойка посохов",
+      "nameEn": "Quarterstaff rack",
+      "descEn": "simple rack of crossed poles holding three quarterstaves and a hanging green hood",
+      "descRu": "Стойка с посохами Маленького Джона",
+      "role": "dressing",
+      "zone": "outlaw camp",
+      "sizeM": [
+        1.2,
+        0.5,
+        2.0
+      ],
+      "material": "wood, cloth",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 2500
+    },
+    {
+      "key": "hollow-log-tunnel",
+      "nameRu": "Полое бревно",
+      "nameEn": "Hollow log",
+      "descEn": "large hollow fallen log forming a tunnel, moss on top and mushrooms inside",
+      "descRu": "Полое бревно-лаз",
+      "role": "dressing",
+      "zone": "forest floor",
+      "sizeM": [
+        1.2,
+        3.0,
+        1.2
+      ],
+      "material": "bark, moss",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "toadstool-ring",
+      "nameRu": "Ведьмин круг",
+      "nameEn": "Toadstool fairy ring",
+      "descEn": "ring of pale brown toadstools in grass",
+      "descRu": "Кольцо поганок",
+      "role": "dressing",
+      "zone": "clearing",
+      "sizeM": [
+        1.5,
+        1.5,
+        0.2
+      ],
+      "material": "mushroom, grass",
+      "priority": "P2",
+      "symmetry": "axial",
+      "trisMax": 4000
+    },
+    {
+      "key": "wild-rose",
+      "nameRu": "Шиповник",
+      "nameEn": "Wild dog rose bush",
+      "descEn": "wild dog rose bush with pale pink flowers and red hips",
+      "descRu": "Куст шиповника",
+      "role": "dressing",
+      "zone": "path edges",
+      "sizeM": [
+        1.2,
+        1.0,
+        1.2
+      ],
+      "material": "foliage, flowers",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 4000
+    },
+    {
+      "key": "dead-snag",
+      "nameRu": "Сухостой",
+      "nameEn": "Dead tree snag",
+      "descEn": "tall dead broken tree trunk with woodpecker holes and a single bare branch",
+      "descRu": "Сухой обломанный ствол",
+      "role": "backdrop",
+      "zone": "forest ring",
+      "sizeM": [
+        1.0,
+        1.0,
+        5.0
+      ],
+      "material": "dead wood",
+      "priority": "P2",
+      "symmetry": "asymmetric",
+      "trisMax": 3000
+    }
+  ]
+}

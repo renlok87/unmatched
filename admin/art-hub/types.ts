@@ -806,6 +806,124 @@ export interface MaterialLibraryView {
   evidenceTotal: number;
 }
 
+// ---------------------------------------------------------------- map kits («Карты»)
+
+/** One concept/moodboard/base/reference image of a map kit (map.json → concepts[]). */
+export interface MapKitConceptView {
+  file: FileRef;
+  /** concept | moodboard | base | reference (verbatim; unknown kinds are kept) */
+  kind: string;
+  title: string;
+  status?: string;
+}
+
+export interface MapKitPropViews {
+  front?: FileRef;
+  side?: FileRef;
+  sheet?: FileRef;
+  /** Tripo slot the `side` view fills (text, e.g. «left» or «back»), not a file */
+  slot?: string;
+  /** height mismatch between the views, percent (as written by the view check) */
+  heightMismatchPct?: number;
+}
+
+/** One Tripo operation of a prop (status.json tripo.ops[]). */
+export interface MapKitTripoOp {
+  op: string;
+  status?: string;
+  /** credits quoted for the operation */
+  quoted?: number;
+  /** Tripo balance before and after */
+  before?: number;
+  after?: number;
+}
+
+/** A prop of a map kit: props.json (the list) merged with status.json (the progress; absent → «listed»). */
+export interface MapKitPropView {
+  key: string;
+  nameRu: string;
+  nameEn?: string;
+  descRu?: string;
+  descEn?: string;
+  /** hero | dressing | backdrop | animated (verbatim) */
+  role: string;
+  zone?: string;
+  /** real size, metres: width × depth × height */
+  sizeM?: number[];
+  /** real height × 0.3 (MK-03; trees and big buildings may be shrunk further in the game) */
+  gameHeightM?: number;
+  material?: string;
+  /** P0 | P1 | P2 (verbatim) */
+  priority: string;
+  /** axial | asymmetric (verbatim) */
+  symmetry?: string;
+  /** Tripo multi-view slots: axial → front + left, asymmetric → front + back */
+  slots: string[];
+  trisMax?: number;
+  /** status.json stage verbatim; «listed» when the prop has no status entry */
+  stage: string;
+  stageKnown: boolean;
+  /** true when status.json has an entry for the prop */
+  inStatus: boolean;
+  views: MapKitPropViews;
+  /** render of the built prop; the table falls back to views.front */
+  preview?: FileRef;
+  tripo?: { taskId?: string; route?: string; credits?: number; ops: MapKitTripoOp[]; glb?: FileRef; run?: string };
+  build?: { fbx?: FileRef; tris?: number; report?: FileRef };
+  acceptance?: { score?: number; verdict?: string; card?: FileRef };
+  note?: string;
+}
+
+export interface MapKitView {
+  /** directory name under docs/art-pipeline/map-kits (= `map` of map.json; used in `?map=`) */
+  id: string;
+  boardName: string;
+  boardNameRu?: string;
+  set?: string;
+  boardId?: string;
+  topology?: { field?: string; cells?: number; edges?: number };
+  heroes: string[];
+  whyChosenRu?: string;
+  moodRu?: string;
+  lightingRu?: string;
+  backdropRu?: string;
+  scopeNoteRu?: string;
+  paletteHex: string[];
+  styleEn?: string;
+  /** props.json `scale` (rule of the game height) */
+  scale?: string;
+  files: { map: FileRef; props: FileRef; status: FileRef };
+  /** status.json `updatedAt` */
+  statusUpdatedAt?: string;
+  concepts: MapKitConceptView[];
+  /** art/imagegen/mapkit-<map>/: all images on disk, and those that neither map.json nor status.json mention (first 48) */
+  images: { dir: string; exists: boolean; total: number; unlisted: FileRef[]; unlistedTotal: number };
+  /** first servable concept image, for the landing card */
+  thumb?: FileRef;
+  /** sorted by priority (P0, P1, P2, others), then key */
+  props: MapKitPropView[];
+  counts: {
+    total: number;
+    byStage: { stage: string; count: number }[];
+    byPriority: { priority: string; count: number }[];
+    byRole: { role: string; count: number }[];
+  };
+  /** tripo.credits summed over props; `declared` is status.json totals.credits */
+  credits: { spent: number; tasks: number; declared?: number };
+  /** inconsistencies found while reading (also copied to the hub warnings) */
+  problems: string[];
+  /** set when map.json could not be read: the map is shown as broken, without props */
+  error?: string;
+}
+
+export interface MapKitsOverview {
+  root: string;
+  /** false when docs/art-pipeline/map-kits does not exist */
+  found: boolean;
+  maps: MapKitView[];
+  totals: { maps: number; props: number; credits: number; byStage: { stage: string; count: number }[] };
+}
+
 export interface DecisionView extends DocView {
   /** «Происхождение» paragraph (who decided), cut */
   origin?: string;
@@ -889,6 +1007,8 @@ export interface ArtHubData {
   materials: MaterialLibraryView;
   /** game audio: docs/game-design/audio, evidence/AUDIO, AUC-* spends, UE SoundWaves */
   audio: AudioOverview;
+  /** map kits: docs/art-pipeline/map-kits/<map>/{map,props,status}.json, art/imagegen/mapkit-<map>/ */
+  mapKits: MapKitsOverview;
   decisions: DecisionView[];
   warnings: string[];
 }

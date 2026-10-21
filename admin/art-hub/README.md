@@ -4,7 +4,7 @@
 look-dev, риг, скелетные клипы, видео-референсы, конвейер «видео → скелет», звуки и
 кредиты по каждому персонажу (Medusa, King Arthur, Merlin, Harpy ×3) и по
 пропсам/окружению, плюс обзорные разделы: «Состояние пайплайна», «План и задачи»,
-«Look-dev и концепты», «Библиотека материалов», «Звук», «Решения».
+«Look-dev и концепты», «Библиотека материалов», «Карты», «Звук», «Решения».
 Только чтение: хаб ничего не пишет в данные пайплайна и не повышает статусы.
 
 ## Разделы (меню «Обзор»)
@@ -15,6 +15,7 @@ look-dev, риг, скелетные клипы, видео-референсы, 
 | План и задачи (`plan`) | `docs/art-pipeline/plan-status.json` (`unmatched-plan-status/v1`, пишет трек plan) | волны, задачи с фильтрами по треку/статусу, арт-статус, доказательства (раскрываются в таблицу файлов), следующий шаг/блокер. Пока файла нет — заглушка. Проверки: арт-статус вне словаря, «художественно принято» без акта `docs/game-design/evidence/(ART\|GD)-…/*.md`, отсутствующие файлы доказательств. Пути вне репо (`C:/tmp/…`) — только текст |
 | Look-dev и концепты (`lookdev`) | `art/imagegen/hero-quality-v1/<герой>/`, `docs/art-pipeline/<герой>-lookdev*.md`, `art/pipeline-candidates/<ASSET>/<run>/review/<итерация>/*-lookdev-sheet-*`, `…/preview/{ld_sheet_*,compare-ld-*,ld_concept_zones_*}`, листы `docs/art-pipeline/evidence/<…герой…>/*sheet*` | концепт (front/side/back + prompts.md), отчёты look-dev (заголовок, строка «Дата/Статус», разделы), листы «концепт \| UE» по прогонам и итерациям, свежие первыми. Новые фигуры скилла 3d-model-pipeline: концепт-пакет `art/imagegen/concept-<ключ>-codex/` (связь с ассетом по `CONTENT_KEY` из `art/pipeline-candidates/<ASSET>/asset-card.yaml`) — выбранный дизайн, все генерации с вердиктами `checks/<вид>-g<N>/`, FAIL/WARN, `limit_reached` из `verification.json`, статус из README, виды 1c и лист; карточки приёмки `art/pipeline-candidates/<ASSET>/evidence/acceptance*/**/card.json` (вердикт, коэффициент, оценки). Недописанные файлы — предупреждение пакета, не ошибка |
 | Библиотека материалов (`materials`) | `docs/art-pipeline/material-library/{*.md,um-material-presets-v1.json,sources.json,evidence/}`, `art/material-library/v1/{tiles,preview/tiles-sheet.png}` | классы и расширения (образец цвета из `typicalLinear`, metallic/roughness/shading), CC0-наборы с лицензиями (не-CC0 → предупреждение), процедурные классы, тайлы, кадры доказательств |
+| Карты (`maps`, `?item=maps`, карта — `&map=<папка>`) | `docs/art-pipeline/map-kits/<карта>/{map.json,props.json,status.json}` (схемы `unmatched.map-kit/1`, `…props/1`, `…status/1`; `status.json` необязателен), картинки `art/imagegen/mapkit-<карта>/`, прогоны кит-ассета `art/pipeline-candidates/ASSET-MAPKIT-<КАРТА>-001/` | карточки карт (RU/EN-имя, набор, герои, клетки/рёбра DE, число пропсов, пропсы по стадиям, потрачено кредитов Tripo, первый концепт как миниатюра); страница карты: «почему выбрана», настроение, свет, задник, границы работы, палитра, концепты по видам (`concept`/`moodboard`/`base`/`reference`; картинки из папки, которых нет в json, — отдельным сворачиваемым списком), таблица пропсов (превью, имя RU/EN, описание, роль, зона, размер `w×d×h м` и высота в игре = h×0,3, материал, приоритет, симметрия → слоты Tripo: осевой `front+left`, асимметричный `front+back`, стадия, треугольники факт/лимит, Tripo-задача и кредиты, приёмка) с фильтрами приоритет/стадия/роль, поиском и строкой «Итого». Стадии (`listed`, `views`, `tripo`, `built`, `accepted`, `ue`, `rework`, `rejected`) копируются как есть; пропс без записи в `status.json` — `listed`, стадия вне словаря — пунктиром + замечание. Битый `map.json`/`props.json` одной карты — предупреждение и красная карточка, остальные карты и хаб работают. Отсутствующий файл по пути из json — замечание карты (не предупреждение хаба); пути вне репо (`C:/…`, `..`) — только текст |
 | Звук (`audio`) | `docs/game-design/audio/` (документы `NN-*.md`, `03-sound-registry.csv`, `04-vo-script.md`, «## 0. Итог» из 07), `docs/game-design/evidence/AUDIO/<дата>/*-mix.json`, записи `AUC-*` журнала кредитов, имена `SW_*.uasset` из скана звуков | единицы реестра по статусам (`in-bank` = ассет в UE, триггера нет — причина в заметке) и категориям, таблица с фильтрами (заметка ≤ 200 знаков) и числом SoundWave по колонке `file`; реплики по бойцам (всего / без слов, голоса — ссылкой на 04/07); последний замер микса «карта × клиент» (I, TP, S max, флаги, цели) и папки по датам; траты `AUC-*` (они больше не «не отнесённые»); документы 00…07. Нет файлов — пустое состояние, недописанный `*-mix.json` — предупреждение |
 | Решения (`decisions`) | `docs/game-design/decisions/*.md` | заголовок, дата из имени файла, разделы `##`, абзац «Происхождение» |
 
@@ -59,6 +60,7 @@ npm run art-hub:snapshot -- --out <файл>
 | `aggregate.ts` | Агрегатор (Node, без БД): собирает `ArtHubData` из файлов репо. Кэш по mtime/size: JSON разбирается заново только при изменении файла, результат целиком переиспользуется, пока отпечаток отслеживаемых файлов не изменился (в отпечаток входит и дерево `unreal/Unmatched/Content/PipelineCandidates/*/*` — mtime каталогов двух уровней) |
 | `overview.ts` | Обзорные разделы: план, look-dev и концепты, библиотека материалов, решения, UE-слои героя, свежий слой. Упоминания UE-путей ищутся одним проходом; результат по каждому файлу кэшируется по mtime (`FileCache.derive`) |
 | `audio.ts` | Раздел «Звук» (`buildAudio`) и звук персонажа (`audioForCharacter`). Файлы `docs/game-design/audio` и `evidence/AUDIO` обходятся отдельно от `watched` (не попадают в «свежие файлы» арт-пайплайна), но входят в отпечаток кэша |
+| `map-kits.ts` | Раздел «Карты» (`buildMapKits`). Корни `docs/art-pipeline/map-kits`, `art/imagegen/mapkit-*` и `art/pipeline-candidates/ASSET-MAPKIT-*` обходятся отдельно (`walkMapKits`) и входят в отпечаток кэша: общий обход `art/` ограничен 20 000 файлов и мог бы не увидеть новые картинки |
 | `types.ts` | Модель данных, общая для агрегатора и страницы (без Node-импортов) |
 | `fs-utils.ts` | Обход каталогов (без symlink), кэши JSON/текста/sha256, CSV, разбор markdown (акты, таблицы) |
 | `path-guard.ts` | Белый список путей, защита от traversal, MIME, разбор `Range` |
@@ -118,6 +120,7 @@ symlink/junction, чей реальный путь выходит из спис�
 | `docs/game-design/07-animation-vfx-audio.csv` | запланированные звуковые CUE (по CUE слотов клипа и по упоминанию персонажа) |
 | `docs/art-pipeline/plan-status.json` | раздел «План и задачи» (см. выше) |
 | `docs/game-design/decisions/*.md` | раздел «Решения» (отслеживаются в отпечатке кэша) |
+| `docs/art-pipeline/map-kits/`, `art/imagegen/mapkit-*/`, `art/pipeline-candidates/ASSET-MAPKIT-*/` | раздел «Карты» (см. выше; отслеживаются в отпечатке кэша; кредиты Tripo карты — сумма `tripo.credits` пропсов, `totals.credits` показывается рядом) |
 | `docs/game-design/audio/`, `docs/game-design/evidence/AUDIO/` | раздел «Звук» и звук персонажа (см. выше; отслеживаются в отпечатке кэша) |
 | `unreal/Unmatched/Content/PipelineCandidates/<Folder>/<Layer>/` | только наличие папки и число `.uasset` для вкладки «UE-слои» |
 | `art/`, `public/`, `src/`, `scraped-data/`, `unreal/Unmatched/Content`, `docs/art-pipeline` | поиск аудиофайлов персонажа (wav/mp3/ogg/flac/m4a/aac/opus; SoundWave-uasset в папках audio/sound/sfx) |
@@ -141,7 +144,8 @@ symlink/junction, чей реальный путь выходит из спис�
    `buildVfx(ctx, b)` и вызовите его в цикле по страницам `build()`. Ссылки на файлы
    делайте через `makeRef(ctx, path, { role })` — он сам проверит наличие, размер, sha256 и
    белый список. Если данные лежат вне отслеживаемых корней (`walkWatched`), добавьте корень
-   туда, иначе кэш не заметит изменений.
+   туда, иначе кэш не заметит изменений. Корни крупных или быстро растущих папок удобнее обходить
+   отдельно (как `audio.ts` и `map-kits.ts`) и подмешивать в отпечаток в `get()`.
 3. Если файлы должны открываться в браузере — расширьте `ALLOWED_PREFIXES` /
    `ALLOWED_BLENDER_SUBDIRS` в `path-guard.ts` (и тест в `__tests__/path-guard.test.ts`).
 4. Нарисуйте секцию в `src/pages/art-hub/sections/` и добавьте вкладку в `AssetView`

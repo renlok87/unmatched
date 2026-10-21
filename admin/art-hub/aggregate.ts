@@ -16,6 +16,7 @@
  *   docs/game-design/07-animation-vfx-audio.csv         — planned sound cues
  * Overview sections (plan, look-dev, material library, decisions, UE layers): see overview.ts.
  * Audio section (docs/game-design/audio, evidence/AUDIO, AUC-* spends): see audio.ts.
+ * Map kits section «Карты» (docs/art-pipeline/map-kits, art/imagegen/mapkit-*): see map-kits.ts.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -38,6 +39,7 @@ import {
   type WalkEntry,
 } from './fs-utils';
 import { AUDIO_SOURCES, audioForCharacter, audioRoots, buildAudio } from './audio';
+import { buildMapKits, walkMapKits } from './map-kits';
 import {
   OVERVIEW_SOURCES,
   buildDecisions,
@@ -630,10 +632,13 @@ export class ArtHubAggregator {
     const started = Date.now();
     const watched = this.walkWatched();
     const audioFiles = this.walkAudio();
+    const mapKitFiles = walkMapKits(this.repoRoot);
     const sounds = this.scanSounds();
     const fp = crypto.createHash('sha1');
     for (const f of watched) fp.update(`${f.rel}\0${f.mtimeMs}\0${f.bytes}\n`);
     for (const f of audioFiles) fp.update(`A${f.rel}\0${f.mtimeMs}\0${f.bytes}\n`);
+    // map kits are walked on their own: the shared `art/` walk is capped and could drop new images
+    for (const f of mapKitFiles) fp.update(`M${f.rel}\0${f.mtimeMs}\0${f.bytes}\n`);
     for (const s of sounds) fp.update(`S${s}\n`);
     const cueSt = this.cache.stat(path.join(this.repoRoot, ...SOURCES.cueTable.split('/')));
     fp.update(`C${cueSt.mtimeMs ?? 0}:${cueSt.bytes ?? 0}`);
@@ -643,7 +648,7 @@ export class ArtHubAggregator {
     if (this.last && this.last.fingerprint === fingerprint) {
       return { ...this.last.data, checkedAt: new Date().toISOString() } as ArtHubData;
     }
-    const data = build(this.repoRoot, this.cache, watched, audioFiles, sounds, this.opts, fingerprint, started);
+    const data = build(this.repoRoot, this.cache, watched, audioFiles, mapKitFiles, sounds, this.opts, fingerprint, started);
     this.last = { fingerprint, data };
     return data;
   }
@@ -710,6 +715,7 @@ function build(
   cache: FileCache,
   watched: WalkEntry[],
   audioFiles: WalkEntry[],
+  mapKitFiles: WalkEntry[],
   soundFiles: string[],
   opts: AggregateOptions,
   fingerprint: string,
@@ -1142,6 +1148,12 @@ function build(
     characters.filter((c) => c.inRegistry).map((c) => ({ id: c.id, shortName: c.shortName })),
   );
   const decisions = buildDecisions(overviewHelpers);
+  const mapKits = buildMapKits(overviewHelpers, { files: mapKitFiles });
+  for (const mk of mapKits.maps) {
+    trackSource(ctx, mk.files.map.path, mk.files.map.exists ? undefined : 'нет файла');
+    trackSource(ctx, mk.files.props.path, mk.files.props.exists ? undefined : 'нет файла');
+    if (mk.files.status.exists) trackSource(ctx, mk.files.status.path);
+  }
 
   return {
     schema: 'unmatched.art-hub/1',
@@ -1158,6 +1170,7 @@ function build(
     lookdev,
     materials,
     audio,
+    mapKits,
     decisions,
     warnings: ctx.warnings,
   };
