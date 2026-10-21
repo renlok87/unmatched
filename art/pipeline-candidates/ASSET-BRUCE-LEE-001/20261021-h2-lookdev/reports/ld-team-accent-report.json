@@ -1,0 +1,403 @@
+{
+  "checks": {
+    "dress_keeps_concept_colour_per_part": {
+      "expected": "<= 0.2 of the dress cloth (3D area of the core texels) carries the accent >= 0.5",
+      "measured": {
+        "jumpsuit": {
+          "accent_ge_0_5_share": 0.0,
+          "accent_ge_0_5_share_3d": 0.0,
+          "core_texels_4k": 2940056,
+          "part": 0
+        },
+        "sleeve_l": {
+          "accent_ge_0_5_share": 0.0,
+          "accent_ge_0_5_share_3d": 0.0,
+          "core_texels_4k": 245709,
+          "part": 5
+        },
+        "sleeve_r": {
+          "accent_ge_0_5_share": 0.0,
+          "accent_ge_0_5_share_3d": 0.0,
+          "core_texels_4k": 243094,
+          "part": 8
+        }
+      },
+      "note": "the dress stays plum-charcoal as in the concept; the accent is a hem strip",
+      "passed": true
+    },
+    "geometry_rig_uv_unchanged": {
+      "expected": "the FBX pair = the ld_fbx read-back bytes (positions / UV0 per loop and bones = H2.1); mask on UV0 of the atlas",
+      "measured": {
+        "fbx": {
+          "base_fbx": {
+            "file": "SM_BruceLee_H2LD_Base.fbx",
+            "sha256_equals_ld_fbx_readback": true
+          },
+          "skeletal_fbx": {
+            "file": "SK_BruceLee_H2LD.fbx",
+            "sha256_equals_ld_fbx_readback": true
+          }
+        },
+        "ld_fbx_checks": [
+          "bone_heads_tails_as_h21",
+          "bones_and_parents_as_h21",
+          "export_frame_face_points_along_rotated_front_ue_plus_x",
+          "positions_and_uv0_per_loop_as_h21",
+          "triangles_as_h21",
+          "uv1_metres_density_readback",
+          "uv_layers_order"
+        ],
+        "ld_fbx_passed": true,
+        "mask_px_4k": [
+          4096,
+          4096
+        ],
+        "matid_px_4k": [
+          4096,
+          4096
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "old_teammask_unchanged": {
+      "expected": "T_Medusa_H2LD_{,2K_}TeamMask.png of the look-dev run byte-identical (deprecated, not rewritten)",
+      "measured": {
+        "2K_TeamMask": true,
+        "TeamMask": true
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_2k_readback": {
+      "expected": "L8 2048 x 2048, bytes = the box of the 4K float mask",
+      "measured": {
+        "mode": "L",
+        "px": [
+          2048,
+          2048
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_area_share": {
+      "expected": [
+        0.05,
+        0.12
+      ],
+      "measured": {
+        "share_3d_hem": 0.0,
+        "share_3d_ribbon": 0.0767,
+        "share_3d_total": 0.0767
+      },
+      "note": "share of the figure's 3D surface (all parts but the base)",
+      "passed": true
+    },
+    "team_accent_only_on_dye_allowed_classes": {
+      "expected": "0: the accent only on classes with teamDyeAllowed (linen, leather_smooth)",
+      "measured": {
+        "accent_classes": [
+          "wool_coarse"
+        ],
+        "texels_4k_with_accent_on_classes_without_teamDyeAllowed": 0
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_zero_on_never_classes_2k": {
+      "expected": "0 (8 bit) on the 2K core texels (class interior eroded 2 px of the 2K MatID)",
+      "measured": {
+        "leather_smooth": 0,
+        "legacy_bake": 0,
+        "linen": 0,
+        "skin": 0,
+        "stone_base": 0
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_zero_on_never_classes_4k": {
+      "expected": "0 (8 bit) on the core texels of ['skin', 'legacy_bake', 'stone_base', 'leather_smooth', 'linen']",
+      "measured": {
+        "leather_smooth": 0,
+        "legacy_bake": 0,
+        "linen": 0,
+        "skin": 0,
+        "stone_base": 0
+      },
+      "note": "",
+      "passed": true
+    }
+  },
+  "conventions": {
+    "TeamAccent": "L8 linear (UE TC_Grayscale, sRGB off, mips normal): 0 = concept colour, 1 = full team dye; UV0 of the atlas; gutter = nearest covered texel; team-accent.md",
+    "TeamMask": "T_Medusa_H2LD_{,2K_}TeamMask.png (R = the whole dress cloth, G base band): DEPRECATED, kept byte-identical for compatibility (v1 MIs, the LD-medusa-ue import of 2026-09-29)"
+  },
+  "dress_core_by_part": {
+    "jumpsuit": {
+      "accent_ge_0_5_share": 0.0,
+      "accent_ge_0_5_share_3d": 0.0,
+      "core_texels_4k": 2940056,
+      "part": 0
+    },
+    "sleeve_l": {
+      "accent_ge_0_5_share": 0.0,
+      "accent_ge_0_5_share_3d": 0.0,
+      "core_texels_4k": 245709,
+      "part": 5
+    },
+    "sleeve_r": {
+      "accent_ge_0_5_share": 0.0,
+      "accent_ge_0_5_share_3d": 0.0,
+      "core_texels_4k": 243094,
+      "part": 8
+    }
+  },
+  "labels_in_coverage": [
+    7,
+    9,
+    10,
+    13,
+    14
+  ],
+  "mi_parameters": {
+    "TeamDye": 1.0,
+    "TeamDyeGain": 21.5,
+    "TeamMaskTexture": "T_BruceLee_H2LD_TeamAccent (textures/T_BruceLee_H2LD_TeamAccent_2K.png)",
+    "note": "M_UM_Figure_v2 без изменения графа: слот TeamMaskTexture MI героя = TeamAccent (вместо T_Medusa_H2LD_2K_TeamMask, W4-B, deprecated). Маска ненулевая только на классах с teamDyeAllowed (проверка team_accent_only_on_dye_allowed_classes), поэтому TeamAccent x teamDyeAllowed = TeamAccent: красится ровно акцент."
+  },
+  "outputs": {
+    "T_BruceLee_H2LD_TeamAccent_2K.png": {
+      "bytes": 63853,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "0570af1ffb144f31355831bbcb300cf870b636740e30a0c0b54b823d6134ebf6"
+    },
+    "T_BruceLee_H2LD_TeamAccent_4K.png": {
+      "bytes": 145235,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "da72507cee65965d6bd373f6d5b930c811f40f0d37639627d45ac53911a4ac70"
+    },
+    "preview/ld_teamaccent_1K.png": {
+      "bytes": 1326159,
+      "mode": "RGB",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "6c1708b5aa2c54a2b15b69b9abec49aa0797e71be6d6c3de67a5f89925686198"
+    }
+  },
+  "passed": true,
+  "pins": {
+    "lookdev_profile": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev.json",
+      "sha256": "3a94e4ea7be4b3ac6c36b67a813c385ea4d9a7d386770bc2dd1068d9ef3787f8"
+    },
+    "lookdev_run:2K_MatID": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_2K_MatID.png",
+      "sha256": "71a20c5b7193a3be1a197216982ba2182749f8611b5fcb6532395b562ba798ff"
+    },
+    "lookdev_run:2K_TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_2K_TeamMask.png",
+      "sha256": "c1ccbb9236799151b74dcb3e7723be03556a22982830f2ae6b1f50834754e1aa"
+    },
+    "lookdev_run:BC": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_BC.png",
+      "sha256": "af13d6b68726664bd9016f44c6426e50f75bee65b7a6c87153c21b412e61c717"
+    },
+    "lookdev_run:LUT_dds": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_UM_MatLUT_BruceLee.dds",
+      "sha256": "9096e066fc00ff71166a698b0f4f649981b81c568d86825a3745f9ecc8df3a21"
+    },
+    "lookdev_run:MatID": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_MatID.png",
+      "sha256": "0f52f166a61914a172f59c902f98464c7552710b3191cc2cb7f5e626f829ecde"
+    },
+    "lookdev_run:N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_N_OpenGL.png",
+      "sha256": "38a77260a17b259e98a4357fe4b3176c056cd7a3f9ec061c8d0921c015ee219a"
+    },
+    "lookdev_run:ORM": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_ORM.png",
+      "sha256": "6e9138e6e25be2d0462abf3908d23ec2fdaa3ad40282d0beec8705b916998e6d"
+    },
+    "lookdev_run:TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/textures/T_BruceLee_H2LD_TeamMask.png",
+      "sha256": "40a9cf571227ec714dfd101ed887dcb09d845af387202fc13454086cbd086852"
+    },
+    "source_run:part_ids": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake/work/uv/part_ids.npy",
+      "sha256": "c18941effcefc599bcab2be92e52a143e709212189cdfcdd025db52d7c80bb10"
+    },
+    "source_run:position": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake/work/uv/position.npy",
+      "sha256": "97c6bd7605e4383ef8910692222669618729aea871e69dea9cb5a98f91b2d3fd"
+    }
+  },
+  "profile_id": "bruce-lee-h2-lookdev-teamaccent/1",
+  "render_sets": {
+    "id": {
+      "bytes": 304586,
+      "file": "work/ta/id/id_accent.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "1a376898e0a7a025d2299852c2efcbc130679e468f07d28807476a299f555113"
+    },
+    "ld_p1": {
+      "bytes": 16314527,
+      "file": "work/ta/sets/ld_p1/BC.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "0f95d5ea24dd5fbd46dbe010bb6af3dcd72092bc137fb5bd7839ad704daa234e"
+    },
+    "ld_p2": {
+      "bytes": 16241258,
+      "file": "work/ta/sets/ld_p2/BC.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "af0ed73b5f420b3fcce32eff97f3669c12d5c5a9f8664597c43079273179f191"
+    },
+    "lut_exr": {
+      "file": "work/ta/T_UM_MatLUT_BruceLee.exr",
+      "from": "the pinned DDS of the look-dev run (lookdev.write_exr, HALF)"
+    }
+  },
+  "stage": "ta_maps",
+  "status": "измерено",
+  "team_accent": {
+    "area_method": "texel area = |dPOS/drow x dPOS/dcol| of the H2.1 position bake (authored frame, metres), clipped at 8 x median against island-edge jumps; figure = all parts but [1] (the base)",
+    "figure_area_m2": 0.255782,
+    "hem": {
+      "skipped": "no team_accent.hem in the profile"
+    },
+    "ribbon": {
+      "candidate_texels_4k": 502881,
+      "components_3d": 7,
+      "dropped_leather_above_z_texels_4k": 6648,
+      "kept_components": [
+        {
+          "max_m": [
+            -0.0337,
+            0.0217,
+            0.4659
+          ],
+          "min_m": [
+            -0.1074,
+            -0.031,
+            0.3812
+          ],
+          "opened_texels": 48320
+        },
+        {
+          "max_m": [
+            -0.0358,
+            0.0334,
+            0.4137
+          ],
+          "min_m": [
+            -0.0989,
+            -0.0162,
+            0.0886
+          ],
+          "opened_texels": 175404
+        },
+        {
+          "max_m": [
+            -0.0264,
+            -0.0012,
+            0.2289
+          ],
+          "min_m": [
+            -0.0346,
+            -0.0056,
+            0.2065
+          ],
+          "opened_texels": 2077
+        },
+        {
+          "max_m": [
+            0.037,
+            0.0045,
+            0.2923
+          ],
+          "min_m": [
+            -0.0256,
+            -0.0155,
+            0.201
+          ],
+          "opened_texels": 36425
+        },
+        {
+          "max_m": [
+            0.0876,
+            0.0455,
+            0.4665
+          ],
+          "min_m": [
+            0.0173,
+            0.0187,
+            0.3731
+          ],
+          "opened_texels": 50980
+        },
+        {
+          "max_m": [
+            0.1,
+            0.0465,
+            0.4094
+          ],
+          "min_m": [
+            0.0269,
+            -0.0073,
+            0.0893
+          ],
+          "opened_texels": 177486
+        }
+      ],
+      "opened_texels_4k": 490866,
+      "ribbon_texels_4k": 496233
+    },
+    "share_3d_hem": 0.0,
+    "share_3d_ribbon": 0.0767,
+    "share_3d_total": 0.0767,
+    "texels_4k_ge_0_5": 495855
+  },
+  "team_dye_gain": {
+    "TeamDyeGain": 21.5,
+    "accent_Y_p50_p95": [
+      0.02682,
+      0.05142
+    ],
+    "accent_Y_p50_p95_by_zone": {
+      "ribbon": [
+        0.02682,
+        0.05142
+      ]
+    },
+    "dyed_accent_albedo_median_over_team": 0.5766,
+    "dyed_accent_albedo_p95_max_channel": 0.8921,
+    "gain_for_median": 29.83,
+    "gain_for_p95": 21.691,
+    "palette_max_channel_linear": 0.807,
+    "previous_MI_value": null,
+    "rule": "team-accent.md: TeamDyeGain героя = min(0,8 / Y_p50, 0,9 / (макс. канал палитры x Y_p95)) по текселям акцента (>= 0,5) BC look-dev, Y в [0,02; 0,8], вниз до шага 0,5"
+  }
+}

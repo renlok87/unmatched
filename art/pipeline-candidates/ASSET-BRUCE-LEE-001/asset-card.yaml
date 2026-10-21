@@ -38,7 +38,7 @@ OWNER_HERO_SLUG: null
 WEAPON_BONE: null
 WEAPON_SOCKET_BONE: "hand.R"
 FIGURE_HEIGHT_M: 0.55
-FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_BOUNDS_TOP_M: 0.54999        # этап 3: 20261021-h2-bake-t2/reports/rig-report.json#bounds_authored_m.skeletal[1][2] (верх волос; деталей выше головы нет)
 FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
 IDLE_SECONDS: 2.5
 LUNGE_CONTACT_FRAME: 7
@@ -82,3 +82,22 @@ decided_by_stage0:
   UE_NAMES: "delegated (§7.2): из KEY и поколения H2"
   QUALITY_REFERENCE: "delegated (§7.2): ближний бой → king-arthur"
   MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"
+# --- блок этапа 3 (исполнитель этапа 3, 2026-10-21) ---
+STAGE3:
+  profile_version: 2
+  bake_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2"
+  lookdev_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2"
+  teamaccent_run: null              # TeamAccent записан в каталог look-dev t2
+  profiles: ["build-profiles/bruce-lee-h2-bake-h2-t2.json", "build-profiles/bruce-lee-h2-lookdev-t2.json",
+             "build-profiles/bruce-lee-h2-lookdev-teamaccent-t2.json"]
+  previous_runs: "20261021-h2-bake + 20261021-h2-lookdev (профили без суффикса) — t1: все стадии и проверки PASS, но дымовой прогон нашёл разрыв кожи у правого локтя в LungeAttack (skin_stretch, 50 видимых рёбер до 40,7×); t2 = правка рига (суставы локтей и лодыжек внутрь сгиба, полосы суставов шире) с --reuse-from t1 от стадии rig, look-dev и TeamAccent t2 — только новые пины"
+  run_date_note: "каталоги датированы 20261021 (день прогона), а не 20261020 из шаблона брифа"
+  numbers: "tris тела 39 659 (POLY_BUDGET 45 000), подставка 1 420 (≤ 2 500); пробы 12/12 на .blend и FBX; seams PASS (новое пятно ≤ 4 px); непрерывность весов на стыках частей max L1 0,04–0,16; верх 0,54999 м; TeamAccent 7,67 % (лампасы, ribbon wool_coarse), TeamDyeGain 21,5, dE акцент/ткань 24,0, P1/P2 47,7, видимость K2 5× 0,090/0,085"
+  handover: "HANDBOOK §4.4 на t2: тон _tone.py — код 0, t_cap 2,0 (linen ok якорь, skin 1,066 ok; leather_smooth, wool_coarse, stone_base — пол альбедо; WARN loo_unavailable у linen: прочие классы вне пола < 10 %); capture_acceptance_set → C:/tmp/bruce-lee-stage3-check/frames (28 кадров, осмотрены close-head/hands/torso/legs-back/weapon/attack, pose-01…05, 04b) — дефектов геометрии нет; base_seethrough /2 — with_figure 0,00 uu² (PASS); rider_gap — не применим (жёстких частей нет); дым (паттерн Ancient Leshen r3, класс оружия «нет»): LungeAttack и HitReact contact PASS, skin_stretch 0 (t1 — 50 рёбер), Idle/DeathSettle — foot_slide 2,4–2,6 % H и below_base_top Idle 0,48 % H на кадрах недостижимого IK образца (ноги Bruce в покое прямые: таз–лодыжка 0,176 м при цепи 0,177 м), не дефект модели; grip_check: локоть R 86–173°, колено ≥ 162,5°; крупные планы дыма (28 JPEG) — без разрывов проймы, ворота, локтя"
+  determinism: "после pass приёмки, до 7a (ДС-7); на этапе 3 полного повтора не было"
+  decisions:
+    "stage3.legs": "delegated: комбинезон — одна часть Tripo (торс + обе штанины); правило cloth (бедро своей стороны ниже промежности) + стыки rig.junctions с туфлями полосой 10 см (цепочка ноги туфли): общий инструмент не умеет цепочку ноги внутри одной части"
+    "stage3.hair_class": "delegated: волосы — leather_smooth вместо legacy_bake: у MatID 0 нет пола альбедо, чёрные волосы держали t_cap 1,5"
+    "stage3.team_accent": "delegated: акцент — чёрные лампасы (кант костюма, wool_coarse), жёлтая ткань — главный цвет, не красится"
+  open: "1) колено: голень штанины гнётся по всей длине (стык с туфлей полосой 10 см, глубже — вес чужой ноги), при сгибе > 40° видна мягкая «резиновая» голень — предложение оркестратору: опция cloth-правила с цепочками ног (st_rig.py rule_weights cloth, profile.rule_bones), прототип C:/tmp/bruce-lee-stage3-scout/knee-proto*; 2) жёлтая засветка Tripo на кончиках ногтей правой кисти (≈ 4,7 тыс. текселей 4K) — средствами профиля не убирается; 3) кадры приёмки берут roughness из ORM Tripo (костюм 0,43 — глянец), в UE класс linen/wool_coarse берёт rTyp 0,85 из LUT; 4) этапу 6: ноги в покое прямые — таз только вниз/вперёд со сгибом колен, подъём таза IK не достаёт"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage3 Bruce Lee"}

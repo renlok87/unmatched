@@ -1,0 +1,326 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "bruce-lee-h2-lookdev/2",
+ "asset_id": "ASSET-BRUCE-LEE-001",
+ "status": "предложено",
+ "status_note": "Look-dev этапа 3 Bruce Lee (мини-пачка 2026-10-20) на bake-прогоне art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2. Не художественная приёмка. t2: пины bake t2 (правка рига по дымовому прогону t1); классы и усиления без изменений (t_cap 2,0 на t1).",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-bake-h2-t2.json",
+  "run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2",
+  "prefix": "T_BruceLee_H2",
+  "files": {
+   "BC": "textures/T_BruceLee_H2_BC.png",
+   "ORM": "textures/T_BruceLee_H2_ORM.png",
+   "TeamMask": "textures/T_BruceLee_H2_TeamMask.png",
+   "N": "textures/T_BruceLee_H2_N.png",
+   "N_OpenGL": "textures/T_BruceLee_H2_N_OpenGL.png",
+   "2K_N": "textures/T_BruceLee_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_BruceLee_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_BruceLee_H2_BC.png",
+   "baseline_ORM": "textures/T_BruceLee_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_BruceLee_H2.fbx",
+   "base_fbx": "export/SM_BruceLee_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "091c670b883108269ba66afa0ac6cc31676877f9eac7ea904b4495b70cc1ea42",
+   "ORM": "4001358499caa1686204108e8a9b17763f62141867fbd2bb1602235082b4ae70",
+   "TeamMask": "40a9cf571227ec714dfd101ed887dcb09d845af387202fc13454086cbd086852",
+   "N": "1f83ad4ab607582ec9c03ae3bc6df7470f04b2f20f19e609b16da6cbbd3476cd",
+   "N_OpenGL": "38a77260a17b259e98a4357fe4b3176c056cd7a3f9ec061c8d0921c015ee219a",
+   "2K_N": "912ac4f707f9b55fd924825bb6b6953df2164d4657f18a68df657e9770381b6f",
+   "2K_N_OpenGL": "9fb6de3b621524973c8299d652ceb82a27bae94549cd5899adf725688acff4ad",
+   "baseline_BC": "091c670b883108269ba66afa0ac6cc31676877f9eac7ea904b4495b70cc1ea42",
+   "baseline_ORM": "4001358499caa1686204108e8a9b17763f62141867fbd2bb1602235082b4ae70",
+   "part_ids": "c18941effcefc599bcab2be92e52a143e709212189cdfcdd025db52d7c80bb10",
+   "metal_mask": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39",
+   "position": "97c6bd7605e4383ef8910692222669618729aea871e69dea9cb5a98f91b2d3fd",
+   "island_ids": "a33199ab218fa5b04de6c63b6d005d9870d66bbb961fccf0f8ebd4721c020e72",
+   "sk_authored": "ea8726b1ceb865635960bee197b961942c1ab810ba715ed158263bc8266a9a14",
+   "skeletal_fbx": "57a3b6637f130acbc7f6b568b2ceba3bf7c541ed827939b98a79c3d72bf5189f",
+   "base_fbx": "18758876128c81bd29d2280cf63120b33a3630be6e654819b3053051df611b76"
+  }
+ },
+ "prefix": "T_BruceLee_H2LD",
+ "lut_name": "T_UM_MatLUT_BruceLee",
+ "lut_hero": "BruceLee",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_BruceLee_H2LD.fbx",
+  "base_fbx": "SM_BruceLee_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [],
+ "team_dye_note": "TeamMask.R пуст (cloth_parts [] H2-профиля: жёлтый комбинезон — главный цвет, не красится); цвет команды героя — TeamAccent (профиль bruce-lee-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1 по частям H2 (роли проверены цветным рендером частей разведки) + HSV запечённого BC: жёлтый комбинезон и рукава — linen (хлопок, Cloth); чёрные лампасы на комбинезоне и рукавах — wool_coarse (матовая чёрная тесьма; другой класс, чем ткань — контраст и выбор акцента TeamAccent); лицо, шея, предплечья и кисти — skin; волосы, брови и глаза — leather_smooth (класса волос в v1 нет; глянцевый чёрный диэлектрик); туфли — leather_smooth (жёлтые полоски туфель — тот же класс); подставка — stone_base; металла нет",
+  "part_default": {
+   "0": "linen",
+   "1": "stone_base",
+   "2": "skin",
+   "3": "skin",
+   "4": "skin",
+   "5": "linen",
+   "6": "leather_smooth",
+   "7": "leather_smooth",
+   "8": "linen"
+  },
+  "rules": [
+   {
+    "name": "stripes_black",
+    "parts": [
+     0,
+     5,
+     8
+    ],
+    "hsv": {
+     "v_max": 0.3
+    },
+    "class": "wool_coarse",
+    "note": "чёрные лампасы по бокам комбинезона и рукавов (концепт #141414); жёлтая ткань v ≥ 0,5 даже в складках"
+   },
+   {
+    "name": "hair_dark",
+    "parts": [
+     2
+    ],
+    "hsv": {
+     "v_max": 0.25
+    },
+    "class": "leather_smooth",
+    "note": "чёрные блестящие волосы, брови, глаза: класса волос в v1 нет; leather_smooth (DefaultLit, roughness 0,33–0,41) — глянцевый чёрный диэлектрик, как волосы концепта. Не legacy_bake: у MatID 0 нет пола альбедо (grade.median_floor), и чёрные волосы, которые свет кадра поднимает до Y 1,9× концепта, оставались бы вне допуска тона при любом усилении (разведка ld2: 2,20 → 1,93 при усилении 0,45)"
+   },
+   {
+    "name": "cuff_yellow_r",
+    "parts": [
+     3
+    ],
+    "hsv": {
+     "hue_deg": [
+      35,
+      65
+     ],
+     "s_min": 0.45,
+     "v_min": 0.35
+    },
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.05,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "class": "linen",
+    "note": "жёлтые тексели ткани на правом предплечье у края рукава (y ≥ −0,05 м: локоть и обшлаг; разведка — 12 тыс. текселей y −0,036…−0,03); кончики пальцев (y < −0,09, жёлтая засветка Tripo на ногтях) не берутся — остаются skin"
+   },
+   {
+    "name": "cuff_yellow_l",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "hue_deg": [
+      35,
+      65
+     ],
+     "s_min": 0.45,
+     "v_min": 0.35
+    },
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.01,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "class": "linen",
+    "note": "то же на левом предплечье (y ≥ −0,01 м; разведка — 11 тыс. текселей y 0,008…0,027); пальцы (y < −0,06) — skin"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "leather_smooth": {
+    "rgb": [
+     0.3168,
+     0.3386,
+     0.3133
+    ],
+    "scout_iter1": [
+     0.3168,
+     0.3386,
+     0.3133
+    ],
+    "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)"
+   },
+   "linen": {
+    "rgb": [
+     1.093,
+     0.9675,
+     0.2282
+    ],
+    "scout_iter1": [
+     1.093,
+     0.9675,
+     0.2282
+    ],
+    "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)"
+   },
+   "skin": {
+    "rgb": [
+     0.8867,
+     0.7129,
+     0.4516
+    ],
+    "scout_iter1": [
+     0.8867,
+     0.7129,
+     0.4516
+    ],
+    "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)"
+   },
+   "stone_base": {
+    "rgb": [
+     0.5467,
+     0.5339,
+     0.523
+    ],
+    "scout_iter1": [
+     0.5467,
+     0.5339,
+     0.523
+    ],
+    "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)"
+   },
+   "wool_coarse": {
+    "rgb": [
+     0.8436,
+     0.7664,
+     0.6056
+    ],
+    "scout_iter1": [
+     0.8436,
+     0.7664,
+     0.6056
+    ],
+    "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)"
+   }
+  },
+  "gains_note": "итерации ld_measure разведки (≤ 3): ld1 без усилений — t_cap 1,0 (вне допуска все классы); ld2 с полной подсказкой — 1,5 (волосы legacy_bake без пола альбедо, Y 1,93); ld3 — волосы в leather_smooth — 2,0; тёмные классы (туфли и волосы, лампасы, камень) — на полу альбедо grade.median_floor (концепт темнее пола 0,02: остаток — свет кадра); металла нет"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-bruce-lee-codex/bruce-lee-front.png",
+  "side": "art/imagegen/concept-bruce-lee-codex/bruce-lee-side.png",
+  "back": "art/imagegen/concept-bruce-lee-codex/bruce-lee-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "exposure": {
+   "mode": "anchor_class",
+   "class": "linen",
+   "note": "экспозиция концепт/кадр Blender — по жёлтому комбинезону (самая большая зона, главный цвет)"
+  },
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по палитре листа: жёлтый #E0B830 (h 46, s 0,79, v 0,88), чёрные лампасы #141414, кожа #C49A74 (h 28, s 0,41, v 0,77), туфли #1E1C1C, камень подставки",
+   "linen": {
+    "mask_px": -4,
+    "hue_deg": [
+     [
+      33,
+      62
+     ]
+    ],
+    "s_min": 0.45,
+    "v_min": 0.4
+   },
+   "wool_coarse": {
+    "mask_px": -2,
+    "v_max": 0.22
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      8,
+      40
+     ]
+    ],
+    "s_min": 0.18,
+    "s_max": 0.65,
+    "v_min": 0.35
+   },
+   "leather_smooth": {
+    "mask_px": 2,
+    "v_max": 0.25,
+    "note": "чёрные туфли и чёрные волосы"
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.5
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "face_3q",
+   "hand_r",
+   "hand_l",
+   "side_stripe_l",
+   "shoe_l",
+   "back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-bruce-lee-codex/checks-report.json",
+  "side": "left"
+ },
+ "history": {
+  "previous_profiles": [
+   "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-lookdev.json"
+  ],
+  "note": "t2 = классы, правила, усиления и ворота как в bruce-lee-h2-lookdev.json; изменены только пины источника — bake-прогон 20261021-h2-bake-t2 (суставы локтей и лодыжек). Прогон 20261021-h2-lookdev не тронут"
+ }
+}

@@ -1,0 +1,40 @@
+{
+  "base_exposure": -1.563,
+  "blender_exposure": -2.563,
+  "camera": {
+    "azimuth_deg": 0.0,
+    "distance_m": 19.31,
+    "fov_h_deg": 35.0,
+    "pitch_deg": -55.0
+  },
+  "exposure_offset_stops": -1.0,
+  "k1_board_p50_final": 130.787,
+  "label": "blender EEVEE, фигура скрыта; якорь W4-A",
+  "method": "W4-A anchor (cobble-probe sky.calibration): K1 board ROI p50 of Rec.709 luma of the 8-bit sRGB frame = 131.2; figure hidden, 40 m board of the cobblestone mean albedo, K1 camera; the exposure offset (stops, added to log2(1 / (1.2 * 2^EV100))) bisected until |p50 - target| <= tolerance (review_h3.py rev. 2, same numbers)",
+  "roi_px": [
+    600,
+    700,
+    1360,
+    940
+  ],
+  "steps": [
+    {
+      "k1_board_p50": 40.787,
+      "offset_stops": -4.0
+    },
+    {
+      "k1_board_p50": 215.0,
+      "offset_stops": 2.0
+    },
+    {
+      "k1_board_p50": 131.0,
+      "offset_stops": -1.0
+    },
+    {
+      "k1_board_p50": 130.787,
+      "offset_stops": -1.0
+    }
+  ],
+  "target_board_p50_luma": 131.2,
+  "tolerance_luma": 0.75
+}

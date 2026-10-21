@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.acceptance-tone/1",
+  "rule": {
+    "main_share_min": 0.1,
+    "y_ratio_ok": [
+      0.8,
+      1.25
+    ],
+    "hue_abs_max_deg": 15.0,
+    "hue_checked": "|dHue| проверяется, только когда обе медианы хроматические (sat >= 0.15); оттенок почти серого цвета — шум (RB-06)",
+    "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по построению, его яркость проверяет только y_ratio_loo",
+    "family": "same | changed: обе медианы хроматические (sat >= 0.15) и |dHue| > 30 deg, либо переход нейтральный <-> хроматический с |dSat| >= 0.20 — смена семейства (S); светлота и насыщенность внутри семейства — тон (T)",
+    "cap": "1.0 — основной класс вне допуска; 1.5 — только второстепенные; 2.0 — все в допуске; status floor (ld-maps-report grade.median_floor_applied) T не снижает"
+  },
+  "framing": "concept",
+  "exposure_k_concept_over_ld": 1.0333,
+  "exposure": {
+    "class": "linen",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по жёлтому комбинезону (самая большая зона, главный цвет)"
+  },
+  "anchor_class": "linen",
+  "classes": [
+    {
+      "class": "leather_smooth",
+      "pixels_ld": 100992,
+      "y_ratio": 3.594,
+      "d_hue_deg": -12.0,
+      "d_sat": -0.01,
+      "share": 0.0896,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "linen",
+      "pixels_ld": 552072,
+      "y_ratio": 1.0,
+      "d_hue_deg": -4.0,
+      "d_sat": -0.188,
+      "share": 0.4898,
+      "role": "main",
+      "anchor": true,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "skin",
+      "pixels_ld": 90771,
+      "y_ratio": 1.066,
+      "d_hue_deg": -2.0,
+      "d_sat": -0.011,
+      "share": 0.0805,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "stone_base",
+      "pixels_ld": 328552,
+      "y_ratio": 1.717,
+      "d_hue_deg": -10.0,
+      "d_sat": 0.001,
+      "share": 0.2915,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": 1.701,
+      "status": "floor"
+    },
+    {
+      "class": "wool_coarse",
+      "pixels_ld": 54730,
+      "y_ratio": 1.666,
+      "d_hue_deg": -10.0,
+      "d_sat": 0.064,
+      "share": 0.0486,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "floor"
+    }
+  ],
+  "t_cap": 2.0,
+  "out_of_tolerance": [],
+  "floor_limited": [
+    "leather_smooth",
+    "stone_base",
+    "wool_coarse"
+  ],
+  "family_changed_main": [],
+  "warnings": [
+    "loo_unavailable: linen — у остальных классов вне пола меньше 10 % пикселей, яркость класса относительно фигуры не проверена"
+  ],
+  "sources": {
+    "measure_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/measure-report.json",
+    "maps_report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-maps-report.json"
+  }
+}

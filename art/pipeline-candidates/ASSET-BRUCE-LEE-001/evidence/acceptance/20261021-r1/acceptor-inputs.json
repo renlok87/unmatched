@@ -1,0 +1,106 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r1/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2",
+    "bake_run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/asset-card.yaml",
+      "sha256": "e6e34ff3ab1d387f876480110756823edb5457e63004bd16928ffa9cf5544a7b"
+    },
+    "previous_card": null
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_BruceLee_H2LD",
+      "base": "SM_BruceLee_H2LD_Base",
+      "materials": [
+        "MI_BruceLee_H2LD",
+        "MI_BruceLee_H2LD_Base",
+        "MI_BruceLee_H2LD_P1",
+        "MI_BruceLee_H2LD_P2",
+        "MI_BruceLee_H2LD_Base_P1",
+        "MI_BruceLee_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton",
+      "clips": "/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_BruceLee_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_BruceLee_H2LD_Edge",
+        "T_UM_MatLUT_BruceLee"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.55,
+    "FIGURE_BOUNDS_TOP_M": 0.54999,
+    "texture_files": [
+      "T_BruceLee_H2LD_2K_BC.png",
+      "T_BruceLee_H2LD_2K_Edge.png",
+      "T_BruceLee_H2LD_2K_MatID.png",
+      "T_BruceLee_H2LD_2K_N.png",
+      "T_BruceLee_H2LD_2K_ORM.png",
+      "T_BruceLee_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-bake-h2-t2.json",
+      "sha256": "c18830116c6a904221012101c18ee1d213c0dd30dde0e13dce12d9069b989115",
+      "meshes": {
+        "body": "SK_BruceLee_H2_Body",
+        "base": "SM_BruceLee_H2_Base"
+      },
+      "materials.atlas": "M_BruceLee_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.55
+    },
+    "height": {
+      "body_mesh": "SK_BruceLee_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_BruceLee_H2_Body.bounds_m.max[2]",
+        "value": 0.54999
+      },
+      "other_meshes_top_m": {},
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 54.999,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.55,
+      "FIGURE_BOUNDS_TOP_M": 0.54999,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2",
+    "texture": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/textures/T_BruceLee_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "0570af1ffb144f31355831bbcb300cf870b636740e30a0c0b54b823d6134ebf6",
+    "output": "T_BruceLee_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair",
+  "prev_fix_list": {
+    "cycle": null,
+    "items": []
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_BruceLee_H2LD\", \"base\": \"SM_BruceLee_H2LD_Base\", \"materials\": [\"MI_BruceLee_H2LD\", \"MI_BruceLee_H2LD_Base\", \"MI_BruceLee_H2LD_P1\", \"MI_BruceLee_H2LD_P2\", \"MI_BruceLee_H2LD_Base_P1\", \"MI_BruceLee_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton\", \"clips\": \"/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_BruceLee_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_BruceLee_H2LD_Edge\", \"T_UM_MatLUT_BruceLee\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_BruceLee_H2LD_2K_BC.png, T_BruceLee_H2LD_2K_Edge.png, T_BruceLee_H2LD_2K_MatID.png, T_BruceLee_H2LD_2K_N.png, T_BruceLee_H2LD_2K_ORM.png, T_BruceLee_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-bake-h2-t2.json\", \"meshes\": {\"body\": \"SK_BruceLee_H2_Body\", \"base\": \"SM_BruceLee_H2_Base\"}, \"materials.atlas\": \"M_BruceLee_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.55}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_BruceLee_H2_Body.bounds_m.max[2] = 0.54999 м против FIGURE_HEIGHT_M заявки 0.55 м ± 1 %; art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-t2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 54.999 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_BruceLee_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-t2/textures/T_BruceLee_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair",
+    "PREV_FIX_LIST": "нет (r1 или у прежней карточки пустые rework_fix_list и known_issues)"
+  }
+}

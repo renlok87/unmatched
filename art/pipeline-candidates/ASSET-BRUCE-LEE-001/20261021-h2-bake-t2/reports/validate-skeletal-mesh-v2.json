@@ -1,0 +1,69 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "<run>/export/SK_BruceLee_H2.fbx",
+ "clip_bytes": 1510316,
+ "clip_sha256": "57a3b6637f130acbc7f6b568b2ceba3bf7c541ed827939b98a79c3d72bf5189f",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-10-20",
+ "skeleton": "UM_HUMANOID_17_v2",
+ "character": "BruceLee",
+ "kind": "skeletal-mesh",
+ "clip_role": null,
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "pass",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "pass",
+   "missing": [],
+   "extra": [],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "pass",
+   "present": [],
+   "legacy_present": [],
+   "character": "BruceLee",
+   "expected": null
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "pass",
+   "facing_yaw_deg": 9.605,
+   "expected": 0.0,
+   "tol_deg": 10.0,
+   "delta_deg": 9.605
+  },
+  {
+   "check": "ref_pose_root_axis",
+   "status": "pass",
+   "root_x_axis_yaw_deg": 90.0,
+   "expected": 90,
+   "delta_deg": 0.0
+  }
+ ],
+ "bones": {},
+ "bone_count": 16,
+ "result": "pass",
+ "fails": [],
+ "warnings": []
+}

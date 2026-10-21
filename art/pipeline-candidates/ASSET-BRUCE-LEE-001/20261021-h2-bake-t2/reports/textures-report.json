@@ -1,0 +1,225 @@
+{
+  "bc_mean_srgb_in_islands": [
+    152.89,
+    115.1,
+    51.27
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 93705,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 784,
+        "cap_vertices": 667,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 93705,
+        "rim_samples": 9385
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.000576,
+        "BC": 0.000576,
+        "NORMAL": 0.000576,
+        "RM": 0.000576
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0052
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.005
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.6766,
+        "p1": 36.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "not applicable: team_mask.cloth_parts is empty (a hero without cloth; TeamMask is deprecated, TeamAccent carries the team colour)",
+      "measured": null,
+      "not_applicable": true,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "metal_mask": {
+    "note": "no metal pass (textures.materials.metal absent or without parts): all-zero mask for look-dev; BC and ORM keep the Tripo values",
+    "path": "work/uv/metal_mask.npy",
+    "value": 0.0
+  },
+  "outputs": {
+    "T_BruceLee_H2_2K_BC.png": {
+      "bytes": 4650343,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "e871326aa44095eb41c3f358fcd1b52e5bb574eb8de632d4d9e7d1df15cdf9c5"
+    },
+    "T_BruceLee_H2_2K_N.png": {
+      "bytes": 4106831,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "912ac4f707f9b55fd924825bb6b6953df2164d4657f18a68df657e9770381b6f"
+    },
+    "T_BruceLee_H2_2K_N_OpenGL.png": {
+      "bytes": 4107087,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "9fb6de3b621524973c8299d652ceb82a27bae94549cd5899adf725688acff4ad"
+    },
+    "T_BruceLee_H2_2K_ORM.png": {
+      "bytes": 3097136,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "12f79f1119bad0b3a122e568bb56a607777027ed1f4fc811382b33408cc62154"
+    },
+    "T_BruceLee_H2_2K_TeamMask.png": {
+      "bytes": 37202,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "c1ccbb9236799151b74dcb3e7723be03556a22982830f2ae6b1f50834754e1aa"
+    },
+    "T_BruceLee_H2_BC.png": {
+      "bytes": 16189105,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "091c670b883108269ba66afa0ac6cc31676877f9eac7ea904b4495b70cc1ea42"
+    },
+    "T_BruceLee_H2_N.png": {
+      "bytes": 12083832,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "1f83ad4ab607582ec9c03ae3bc6df7470f04b2f20f19e609b16da6cbbd3476cd"
+    },
+    "T_BruceLee_H2_N_OpenGL.png": {
+      "bytes": 12085175,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "38a77260a17b259e98a4357fe4b3176c056cd7a3f9ec061c8d0921c015ee219a"
+    },
+    "T_BruceLee_H2_ORM.png": {
+      "bytes": 9865544,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "4001358499caa1686204108e8a9b17763f62141867fbd2bb1602235082b4ae70"
+    },
+    "T_BruceLee_H2_TeamMask.png": {
+      "bytes": 99947,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "40a9cf571227ec714dfd101ed887dcb09d845af387202fc13454086cbd086852"
+    }
+  },
+  "passed": true,
+  "prefix": "T_BruceLee_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 8431578,
+      "BC": 8431578,
+      "HIT": 8431578,
+      "NORMAL": 8431578,
+      "RM": 8431578
+    },
+    "caps": {
+      "cap_texels": 93705,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 784,
+      "cap_vertices": 667,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 93705,
+      "rim_samples": 9385
+    },
+    "footprints": null,
+    "in_island_unbaked_texels": {
+      "AO": 96418,
+      "BC": 96418,
+      "HIT": 96418,
+      "NORMAL": 96418,
+      "RM": 96418
+    },
+    "size": 4096,
+    "uv_texels": 8527996
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 135928,
+    "cloth_parts": [],
+    "cloth_share_of_cloth_texels": 0.0,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": null
+  },
+  "reused_from": {
+    "run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake",
+    "stage": "textures",
+    "sha256": "7421d150e05e2c45b070793ad9fa4127773c788b4b8c0cbcab08bc8aa66605b5"
+  }
+}

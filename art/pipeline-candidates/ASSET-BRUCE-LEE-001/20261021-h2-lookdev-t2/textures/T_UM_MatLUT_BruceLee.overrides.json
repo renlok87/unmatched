@@ -1,0 +1,59 @@
+{
+ "asset_id": "ASSET-BRUCE-LEE-001",
+ "classes": {
+  "leather_smooth": {
+   "bc": [
+    0.0319,
+    0.0262,
+    0.0284
+   ],
+   "ymedClassHero": 0.02772
+  },
+  "linen": {
+   "bc": [
+    0.6939,
+    0.3185,
+    0.0015
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.37521
+  },
+  "skin": {
+   "bc": [
+    0.4508,
+    0.1812,
+    0.063
+   ],
+   "ymedClassHero": 0.23037
+  },
+  "stone_base": {
+   "bc": [
+    0.0296,
+    0.0262,
+    0.0284
+   ],
+   "ymedClassHero": 0.02719
+  },
+  "wool_coarse": {
+   "bc": [
+    0.0331,
+    0.0252,
+    0.0307
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.02683
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "BruceLee",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero BruceLee --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}
