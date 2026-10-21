@@ -2,7 +2,7 @@
 
 <!-- ЗАГОТОВКА этапа 6 (2026-10-21, волна A мини-пачки 2026-10-20), не запускалась; собрана скриптом
 C:/tmp/sherlock-holmes-stage6/gen_prompts.py по спеке и отчётам прогона. На шаге 7a.2 её заполняет
-tools/tripo-pipeline/ue7a/prep_acceptance.py (--asset-dir art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001 --key SherlockHolmes --run art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim --spec art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json --cycle r1):
+tools/tripo-pipeline/ue7a/prep_acceptance.py (--asset-dir art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001 --key SherlockHolmes --run art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2 --spec art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json --cycle r1):
 {{E}}, {{DATE}}, {{CYCLE}}, {{PREVIOUS_CARD_JSON}}, {{FRAMES_FILES_JSON}}, список пределов из
 evidence/acceptance-anim-prompts/known-limits.md, заметка о меше-носителе UE-кадров; sha256 в accepted_object сверяются с
 файлами (новый прогон модели — --refresh-sha или пересборка заготовок тем же скриптом). Профиль приёмщика —
@@ -31,20 +31,21 @@ tools/art/acceptance/asset-acceptance-2.schema.json; файл card.json запи
 ## Вход
 - Кадры: {{E}}/Idle/frames/ — открой КАЖДЫЙ файл из списка {{FRAMES_FILES_JSON}} в полном размере (1:1):
   Blender-лист `SherlockHolmes-Idle-blender-sheet.jpg` (кадры key_frames [0, 15, 30, 45], виды front / left / q34, кости поверх),
-  крупные планы Blender (art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/preview/closeups-blender/: SherlockHolmes-Idle-f30-q34.jpg, SherlockHolmes-Idle-f30-q34b.jpg, SherlockHolmes-Idle-f30-q34bl.jpg, SherlockHolmes-Idle-f31-back.jpg, SherlockHolmes-Idle-f31-q34b.jpg, SherlockHolmes-Idle-f31-q34r.jpg, SherlockHolmes-Idle-f31-topb.jpg, SherlockHolmes-Idle-seam-f60-f00-front.jpg, SherlockHolmes-Idle-seam-f60-f00-q34.jpg; камера каждого кадра — в
+  крупные планы Blender (art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/closeups-blender/: SherlockHolmes-Idle-f15-left.jpg, SherlockHolmes-Idle-f15-q34r.jpg, SherlockHolmes-Idle-f30-q34.jpg, SherlockHolmes-Idle-f30-q34b.jpg, SherlockHolmes-Idle-f30-q34bl.jpg, SherlockHolmes-Idle-f31-back.jpg, SherlockHolmes-Idle-f31-q34b.jpg, SherlockHolmes-Idle-f31-q34r.jpg, SherlockHolmes-Idle-f31-topb.jpg, SherlockHolmes-Idle-f45-front.jpg, SherlockHolmes-Idle-seam-f60-f00-front.jpg, SherlockHolmes-Idle-seam-f60-f00-q34.jpg; камера каждого кадра — в
   SherlockHolmes-Idle-closeups.json). UE-кадры `SherlockHolmes-Idle-fNN-{front,q34}-ue-editor.jpg`, лист
   `SherlockHolmes-H2Anim-ue-sheet.jpg`. Другие файлы каталога {{E}} (card*.json, final.json, acceptor-*) не открывай.
 - Клип: AM_SherlockHolmes_Idle, роль idle (петля), 60 к. при 24 fps (2.500 с); кадр 0 = rest, последний кадр = rest (петля).
   Замысел (design клипа в спеке art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json): «собранный наблюдатель: спокойное дыхание (грудь и плечи поднимаются вместе), голова медленно обводит поле слева направо, будто ищет улику; правая кисть с лупой перед грудью на вдохе чуть поднимается и опускается, лупа жёстко в кулаке; левая рука свободно висит у бока; таз едва поворачивается (±2°) без сдвига, стопы на месте; пальто и пелерина идут с корпусом».
-- Отчёты: docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_Idle.validation.json (G-VALIDATE), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/contact-Idle.json (G-CONTACT), docs/art-pipeline/animation-library/clip-manifest.json
-  (запись SHER-Idle, G-MANIFEST), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-import-clips.json и ue-measure-clips.json (UE-импорт и замер),
-  art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/author-Idle.json (ik_log), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/grip-Idle.json (машинный замер по FBX клипа): поворот weapon.R (лупы) в кулаке ≤ 0.0° на всех кадрах, излом правого запястья ≤ 0.0°, локоть правой руки 82.8–86.5°, уход плоскости сгиба локтя ≤ 1.3°, колени не ниже 175.5°, пересечений лупы с телом 0.
+- Отчёты: docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_Idle.validation.json (G-VALIDATE), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-Idle.json (G-CONTACT), docs/art-pipeline/animation-library/clip-manifest.json
+  (запись SHER-Idle, G-MANIFEST), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-import-clips.json и ue-measure-clips.json (UE-импорт и замер),
+  art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/author-Idle.json (ik_log), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/grip-Idle.json (машинный замер по FBX клипа): поворот weapon.R (лупы) в кулаке ≤ 0.0° на всех кадрах, излом правого запястья ≤ 0.0°, локоть правой руки 82.8–86.5°, уход плоскости сгиба локтя ≤ 1.3°, колени не ниже 175.2°, пересечений лупы с телом 0.
 - Референс движения: образец библиотеки D-11 — спека Beowulf (art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json, clips.Idle: дыхание, голова обводит поле) ← Angel r2 ← клипы King Arthur; art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/contact-sheet-2fps.png. Сдвиг таза образца заменён поворотом таза ±2° (у рига Шерлока ключи положения hips теряются при импорте FBX); это ориентир тайминга и поз, не цель. Своего видео-референса у Шерлока нет (ДС-6, траты 0).
 - Характер героя: лист концепта art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png (и кадры модели
   art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance/<цикл принятой модели>/frames/sheet.png), эталон качества
   art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png. Заявка: Sherlock Holmes — детектив, герой
   ближнего боя (кулачный удар, HIT_TYPE CLAW), высокий худой, кепи-охотничья, пальто Инвернесс с пелериной поверх
-  твидового костюма, лупа в ПРАВОЙ руке (оружие — кость weapon.R); карточка задачи AN-160
+  твидового костюма, изогнутая трубка во рту (жёстко на голове), лупа в ПРАВОЙ руке (оружие — кость weapon.R);
+  карточка задачи AN-160
   (docs/game-design/visual/06-tasks/anim.csv).
 - Известные пределы этой фигуры (учитываются как ограничение — в rationale и known_issues, не в rework_fix_list и не
   ниже 1,0, если кадр не показывает видимый разрыв, дыру или отрыв части; один список на все 4 клипа):
@@ -78,9 +79,9 @@ tools/art/acceptance/asset-acceptance-2.schema.json; файл card.json запи
    [{"item": "R"|"C"|"D"|"L"|"G-…", "frame": "<имя из frames.files>", "note": "<что видно>"}]; можно [].
 6. Константы: schema "unmatched.anim-acceptance/1", kind "anim", asset_id "ASSET-SHERLOCK-HOLMES-001", clip "Idle",
    date "{{DATE}}", cycle "{{CYCLE}}", previous_card {{PREVIOUS_CARD_JSON}},
-   accepted_object [{"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/export/AM_SherlockHolmes_Idle.fbx", "sha256": "5a11ee530a817448ee1eaaeebea1ac859699ae2c8b641e00a9e5f09ba2b01ee4"}, {"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json", "sha256": "4d35290610f863dd8a95562402cc64aba92780bd10a44cf803b31828e23187d5"}],
+   accepted_object [{"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_Idle.fbx", "sha256": "296219ba002e9119ce47c4adaa695dbf99d156327b05858017eab1b071d62afe"}, {"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json", "sha256": "b8cd7099343c70a32db99ff24c46c6c1748d71f93f37ddb68e923025bcc33d8a"}],
    frames {"dir": "{{E}}/Idle/frames", "files": {{FRAMES_FILES_JSON}}},
-   reports ["docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_Idle.validation.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/contact-Idle.json", "docs/art-pipeline/animation-library/clip-manifest.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-import-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-measure-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/grip-Idle.json"] (только те, что существуют, плюс другие из note гейтов),
+   reports ["docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_Idle.validation.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-Idle.json", "docs/art-pipeline/animation-library/clip-manifest.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-import-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-measure-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/grip-Idle.json"] (только те, что существуют, плюс другие из note гейтов),
    acceptor {"profile": "Opus xhigh", "session_id": "<сессия приёмщика>"},
    executor_session_id "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-sherlock",
    decided_by "delegated (ВР-реестр 2026-10-06)". При pass status_note = "художественно принято, по делегированию

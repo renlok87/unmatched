@@ -1,0 +1,845 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.02345
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 1.1e-05,
+      "frame": 45,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 961
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 1e-05,
+      "frame": 13,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 906
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 701,
+        "vertices": 358,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "weapon.R": {}
+      },
+      "parts_bones": {
+       "weapon.R": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "hips": 16,
+       "spine": 3
+      },
+      "max_pairs": 30,
+      "frame": 25,
+      "regions": {
+       "hips": 22,
+       "spine": 8
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {
+       "hips": 15,
+       "spine": 8
+      },
+      "max_pairs": 33,
+      "frame": 27,
+      "regions": {
+       "spine": 14,
+       "hips": 19
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 691,
+      "bleed_regions": {
+       "arm_lower.L->hips": 176,
+       "arm_lower.R->spine": 158,
+       "arm_upper.L->spine": 92,
+       "hand.L->hips": 88,
+       "arm_upper.R->spine": 86,
+       "arm_upper.R->hips": 84,
+       "arm_lower.R->hips": 70,
+       "arm_lower.L->spine": 46
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 35,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.167,
+      "max_growth_of_height": 0.00508,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "weapon.R"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "worst_bone": null,
+      "tol": 0.002,
+      "base_top_cm": 5.524,
+      "base_radius_cm": 14.685,
+      "base_top_max_vertex_cm": 6.002
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 5.8e-05,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/SherlockHolmes-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.33046
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 1.5e-05,
+      "frame": 4,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 961
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 1.4e-05,
+      "frame": 7,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 906
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 701,
+        "vertices": 358,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "weapon.R": {}
+      },
+      "parts_bones": {
+       "weapon.R": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 5,
+       "hips": 18
+      },
+      "max_pairs": 31,
+      "frame": 9,
+      "regions": {
+       "hips": 25,
+       "spine": 6
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {
+       "hips": 15,
+       "spine": 8
+      },
+      "max_pairs": 32,
+      "frame": 8,
+      "regions": {
+       "hips": 24,
+       "spine": 8
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 691,
+      "bleed_regions": {
+       "arm_lower.L->hips": 176,
+       "arm_lower.R->spine": 158,
+       "arm_upper.L->spine": 92,
+       "hand.L->hips": 88,
+       "arm_upper.R->spine": 86,
+       "arm_upper.R->hips": 84,
+       "arm_lower.R->hips": 70,
+       "arm_lower.L->spine": 46
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       8,
+       9
+      ],
+      "frame": 8,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 1,
+      "warn_regions": {
+       "arm_lower.R|hand.R": 1
+      },
+      "warn_z_of_height": 0.645,
+      "max_ratio": 4.666,
+      "max_growth_of_height": 0.0817,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "weapon.R"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "worst_bone": null,
+      "tol": 0.002,
+      "base_top_cm": 5.524,
+      "base_radius_cm": 14.685,
+      "base_top_max_vertex_cm": 6.002
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/SherlockHolmes-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.20537
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 1.1e-05,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 961
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 5e-06,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 906
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 701,
+        "vertices": 358,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "weapon.R": {}
+      },
+      "parts_bones": {
+       "weapon.R": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 5,
+       "hips": 18
+      },
+      "max_pairs": 25,
+      "frame": 10,
+      "regions": {
+       "hips": 20,
+       "spine": 5
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {
+       "hips": 15,
+       "spine": 8
+      },
+      "max_pairs": 31,
+      "frame": 9,
+      "regions": {
+       "spine": 8,
+       "hips": 23
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 691,
+      "bleed_regions": {
+       "arm_lower.L->hips": 176,
+       "arm_lower.R->spine": 158,
+       "arm_upper.L->spine": 92,
+       "hand.L->hips": 88,
+       "arm_upper.R->spine": 86,
+       "arm_upper.R->hips": 84,
+       "arm_lower.R->hips": 70,
+       "arm_lower.L->spine": 46
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 2,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 1.793,
+      "max_growth_of_height": 0.04661,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "weapon.R"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "worst_bone": null,
+      "tol": 0.002,
+      "base_top_cm": 5.524,
+      "base_radius_cm": 14.685,
+      "base_top_max_vertex_cm": 6.002
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/SherlockHolmes-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.28799
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 1.1e-05,
+      "frame": 12,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 961
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 6e-06,
+      "frame": 12,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 906
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ],
+      "parts": [
+       {
+        "part": "weapon.R",
+        "kind": "body_bone",
+        "bone": "weapon.R",
+        "islands": false,
+        "triangles": 701,
+        "vertices": 358,
+        "excluded_attach_bones": [
+         "weapon.R"
+        ]
+       }
+      ],
+      "rest_parts_bones": {
+       "weapon.R": {}
+      },
+      "parts_bones": {
+       "weapon.R": {}
+      }
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "hips": 16,
+       "spine": 3
+      },
+      "max_pairs": 23,
+      "frame": 5,
+      "regions": {
+       "hips": 20,
+       "spine": 3
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "warn",
+      "rest_regions": {
+       "hips": 15,
+       "spine": 8
+      },
+      "max_pairs": 54,
+      "frame": 9,
+      "regions": {
+       "spine": 7,
+       "hips": 47
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [
+       {
+        "f": 9,
+        "bone": "hips",
+        "pairs": 47,
+        "rest_pairs": 15
+       },
+       {
+        "f": 10,
+        "bone": "hips",
+        "pairs": 44,
+        "rest_pairs": 15
+       },
+       {
+        "f": 11,
+        "bone": "hips",
+        "pairs": 38,
+        "rest_pairs": 15
+       },
+       {
+        "f": 12,
+        "bone": "hips",
+        "pairs": 32,
+        "rest_pairs": 15
+       },
+       {
+        "f": 13,
+        "bone": "hips",
+        "pairs": 29,
+        "rest_pairs": 15
+       },
+       {
+        "f": 14,
+        "bone": "hips",
+        "pairs": 34,
+        "rest_pairs": 15
+       }
+      ],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 691,
+      "bleed_regions": {
+       "arm_lower.L->hips": 176,
+       "arm_lower.R->spine": 158,
+       "arm_upper.L->spine": 92,
+       "hand.L->hips": 88,
+       "arm_upper.R->spine": 86,
+       "arm_upper.R->hips": 84,
+       "arm_lower.R->hips": 70,
+       "arm_lower.L->spine": 46
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "frame": 16,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 1,
+      "warn_regions": {
+       "arm_lower.R|hand.R": 1
+      },
+      "warn_z_of_height": 0.585,
+      "max_ratio": 4.417,
+      "max_growth_of_height": 0.03416,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+      "parts": [
+       "weapon.R"
+      ]
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "worst_bone": null,
+      "tol": 0.002,
+      "base_top_cm": 5.524,
+      "base_radius_cm": 14.685,
+      "base_top_max_vertex_cm": 6.002
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/SherlockHolmes-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 2.2,
+  "lines": [
+   "CLIP_AUTHOR OK Idle art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_Idle.fbx rest 1.144e-05 pose 1.6e-05 unreached []",
+   "CLIP_AUTHOR OK LungeAttack art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_LungeAttack.fbx rest 1.144e-05 pose 2e-05 unreached []",
+   "CLIP_AUTHOR OK HitReact art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_HitReact.fbx rest 1.144e-05 pose 1.6e-05 unreached []",
+   "CLIP_AUTHOR OK DeathSettle art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_DeathSettle.fbx rest 1.144e-05 pose 2.2e-05 unreached []"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json",
+ "validation_dir": "docs/art-pipeline/animation-library/validation-h2anim"
+}

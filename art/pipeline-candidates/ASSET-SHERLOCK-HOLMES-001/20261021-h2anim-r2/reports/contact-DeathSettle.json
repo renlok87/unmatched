@@ -1,0 +1,1369 @@
+{
+ "schema": "unmatched.h2anim-contact/1",
+ "clip": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_DeathSettle.fbx",
+ "clip_name": "DeathSettle",
+ "hero": "SherlockHolmes",
+ "spec": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json",
+ "base": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-bake-t2/export/SM_SherlockHolmes_H2_Base.fbx",
+ "height_m": 0.4945,
+ "frames": 22,
+ "role": "terminal",
+ "tool": "tools/tripo-pipeline/anim/clip_contact_check.py",
+ "base_top": {
+  "top_cm": 5.524,
+  "max_vertex_cm": 6.002,
+  "up_faces": 564,
+  "up_area_share": 0.3703,
+  "fallback": null,
+  "rule": "верх подставки — 90-й перцентиль по площади высот центров граней, смотрящих вверх (нормаль ≤ 30° от +Z), не выше максимума вершин; не максимум вершин (C40: бугорок 3 мм на 6,00 см при видимой поверхности 5,68 см у Beowulf заставлял острие висеть)"
+ },
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "foot_slide_L",
+   "status": "pass",
+   "max_of_height": 1.1e-05,
+   "frame": 12,
+   "pinned_frames": 22,
+   "tol": 0.005,
+   "foot_vertices": 961
+  },
+  {
+   "check": "foot_slide_R",
+   "status": "pass",
+   "max_of_height": 6e-06,
+   "frame": 12,
+   "pinned_frames": 22,
+   "tol": 0.005,
+   "foot_vertices": 906
+  },
+  {
+   "check": "weapon_body",
+   "status": "pass",
+   "soft_violations": [],
+   "soft_frames": 0,
+   "rest_pairs": 0,
+   "rest_bones": {},
+   "max_pairs": 0,
+   "frame": 0,
+   "body_bones": {},
+   "violations": [],
+   "violating_frames": 0,
+   "excluded_grip_bones": [
+    "arm_lower.R",
+    "hand.R"
+   ],
+   "parts": [
+    {
+     "part": "weapon.R",
+     "kind": "body_bone",
+     "bone": "weapon.R",
+     "islands": false,
+     "triangles": 701,
+     "vertices": 358,
+     "excluded_attach_bones": [
+      "weapon.R"
+     ]
+    }
+   ],
+   "rest_parts_bones": {
+    "weapon.R": {}
+   },
+   "parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "check": "limb_body_L",
+   "status": "pass",
+   "rest_regions": {
+    "hips": 16,
+    "spine": 3
+   },
+   "max_pairs": 23,
+   "frame": 5,
+   "regions": {
+    "hips": 20,
+    "spine": 3
+   },
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "limb_body_R",
+   "status": "warn",
+   "rest_regions": {
+    "hips": 15,
+    "spine": 8
+   },
+   "max_pairs": 54,
+   "frame": 9,
+   "regions": {
+    "spine": 7,
+    "hips": 47
+   },
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [
+    {
+     "f": 9,
+     "bone": "hips",
+     "pairs": 47,
+     "rest_pairs": 15
+    },
+    {
+     "f": 10,
+     "bone": "hips",
+     "pairs": 44,
+     "rest_pairs": 15
+    },
+    {
+     "f": 11,
+     "bone": "hips",
+     "pairs": 38,
+     "rest_pairs": 15
+    },
+    {
+     "f": 12,
+     "bone": "hips",
+     "pairs": 32,
+     "rest_pairs": 15
+    },
+    {
+     "f": 13,
+     "bone": "hips",
+     "pairs": 29,
+     "rest_pairs": 15
+    },
+    {
+     "f": 14,
+     "bone": "hips",
+     "pairs": 34,
+     "rest_pairs": 15
+    }
+   ],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "skin_weight_bleed",
+   "status": "info",
+   "frames": [],
+   "frame": 0,
+   "max_bleed_fail_edges": 0,
+   "bleed_vertices": 691,
+   "bleed_regions": {
+    "arm_lower.L->hips": 176,
+    "arm_lower.R->spine": 158,
+    "arm_upper.L->spine": 92,
+    "hand.L->hips": 88,
+    "arm_upper.R->spine": 86,
+    "arm_upper.R->hips": 84,
+    "arm_lower.R->hips": 70,
+    "arm_lower.L->spine": 46
+   },
+   "radius_of_height": 0.1,
+   "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+  },
+  {
+   "check": "skin_stretch",
+   "status": "warn",
+   "fail_frames": [],
+   "torn_frames": [],
+   "warn_frames": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+   ],
+   "frame": 16,
+   "visible_torn_edges": 0,
+   "visible_regions": {},
+   "visible_xyz_cm": [],
+   "fail_edges": 0,
+   "fail_regions": {},
+   "fail_z_of_height": null,
+   "warn_edges": 1,
+   "warn_regions": {
+    "arm_lower.R|hand.R": 1
+   },
+   "warn_z_of_height": 0.585,
+   "max_ratio": 4.417,
+   "max_growth_of_height": 0.03416,
+   "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+   "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+   "warn_rule": "ребро > 3× rest и > 1.0 % H"
+  },
+  {
+   "check": "weapon_tip",
+   "status": "info",
+   "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+  },
+  {
+   "check": "weapon_below_base_top_outside",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0,
+   "tol": 0.002,
+   "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+   "parts": [
+    "weapon.R"
+   ]
+  },
+  {
+   "check": "below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.0,
+   "max_penetration_of_height": 0.0,
+   "frame": 0,
+   "worst_bone": null,
+   "tol": 0.002,
+   "base_top_cm": 5.524,
+   "base_radius_cm": 14.685,
+   "base_top_max_vertex_cm": 6.002
+  },
+  {
+   "check": "hem_below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.0,
+   "max_penetration_of_height": 0.0,
+   "frame": 0,
+   "warn_above": 0.002,
+   "fail_above": 0.015,
+   "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+  },
+  {
+   "check": "below_ground",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0
+  },
+  {
+   "check": "loop_seam",
+   "status": "info",
+   "note": "не петля (terminal)"
+  }
+ ],
+ "fails": [],
+ "result": "pass",
+ "per_frame": [
+  {
+   "f": 0,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 16,
+     "spine": 3
+    },
+    "R": {
+     "spine": 8,
+     "hips": 15
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.0,
+    "max_growth_of_height": 0.0
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 1,
+   "foot_slide": {
+    "L": 1e-06,
+    "R": 1e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 8,
+     "spine": 4
+    },
+    "R": {
+     "spine": 5,
+     "hips": 20
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.152,
+    "max_growth_of_height": 0.00906
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 2,
+   "foot_slide": {
+    "L": 3e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 17,
+     "spine": 2
+    },
+    "R": {
+     "spine": 6,
+     "hips": 11
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.415,
+    "max_growth_of_height": 0.02403
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 3,
+   "foot_slide": {
+    "L": 4e-06,
+    "R": 3e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 17,
+     "spine": 4
+    },
+    "R": {
+     "hips": 15,
+     "spine": 4
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.536,
+    "max_growth_of_height": 0.0299
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 4,
+   "foot_slide": {
+    "L": 4e-06,
+    "R": 3e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 15,
+     "spine": 2
+    },
+    "R": {
+     "spine": 7,
+     "hips": 17
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.432,
+    "max_growth_of_height": 0.01709
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 5,
+   "foot_slide": {
+    "L": 4e-06,
+    "R": 3e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 20,
+     "spine": 3
+    },
+    "R": {
+     "spine": 8,
+     "hips": 16
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.349,
+    "max_growth_of_height": 0.00922
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 6,
+   "foot_slide": {
+    "L": 4e-06,
+    "R": 3e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 13,
+     "spine": 1
+    },
+    "R": {
+     "spine": 4,
+     "hips": 19
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.46,
+    "max_growth_of_height": 0.00752
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 7,
+   "foot_slide": {
+    "L": 5e-06,
+    "R": 3e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 16,
+     "spine": 6
+    },
+    "R": {
+     "spine": 6,
+     "hips": 17
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.647,
+    "max_growth_of_height": 0.0104
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 8,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 4e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 21,
+     "spine": 2
+    },
+    "R": {
+     "spine": 6,
+     "hips": 23
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.821,
+    "max_growth_of_height": 0.01283
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 9,
+   "foot_slide": {
+    "L": 7e-06,
+    "R": 4e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 13,
+     "spine": 4
+    },
+    "R": {
+     "spine": 7,
+     "hips": 47
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.084,
+    "max_growth_of_height": 0.01525
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 10,
+   "foot_slide": {
+    "L": 8e-06,
+    "R": 5e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 16,
+     "spine": 4
+    },
+    "R": {
+     "spine": 4,
+     "hips": 44
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.777,
+    "max_growth_of_height": 0.0202
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 11,
+   "foot_slide": {
+    "L": 1e-05,
+    "R": 5e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 16,
+     "spine": 1
+    },
+    "R": {
+     "hips": 38,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 3.476,
+    "max_growth_of_height": 0.02516
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 12,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 13,
+     "spine": 5
+    },
+    "R": {
+     "spine": 11,
+     "hips": 32
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 4.004,
+    "max_growth_of_height": 0.02858
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 13,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 13
+    },
+    "R": {
+     "hips": 29,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 4.218,
+    "max_growth_of_height": 0.03063
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 14,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 4,
+     "hips": 9
+    },
+    "R": {
+     "hips": 34,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 4.317,
+    "max_growth_of_height": 0.03242
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 15,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 5e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 17
+    },
+    "R": {
+     "spine": 9,
+     "hips": 40
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 4.356,
+    "max_growth_of_height": 0.03368
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 16,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 13
+    },
+    "R": {
+     "hips": 36,
+     "spine": 9
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.585
+    },
+    "max_ratio": 4.389,
+    "max_growth_of_height": 0.03416
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 17,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 14
+    },
+    "R": {
+     "hips": 33,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.586
+    },
+    "max_ratio": 4.414,
+    "max_growth_of_height": 0.03395
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 18,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 1,
+     "hips": 14
+    },
+    "R": {
+     "hips": 32,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.587
+    },
+    "max_ratio": 4.417,
+    "max_growth_of_height": 0.03346
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 19,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 14
+    },
+    "R": {
+     "hips": 32,
+     "spine": 7
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.588
+    },
+    "max_ratio": 4.408,
+    "max_growth_of_height": 0.03287
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 20,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 6,
+     "hips": 16
+    },
+    "R": {
+     "hips": 33,
+     "spine": 8
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.589
+    },
+    "max_ratio": 4.396,
+    "max_growth_of_height": 0.03237
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  },
+  {
+   "f": 21,
+   "foot_slide": {
+    "L": 1.1e-05,
+    "R": 6e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3,
+     "hips": 19
+    },
+    "R": {
+     "hips": 34,
+     "spine": 6
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.589
+    },
+    "max_ratio": 4.39,
+    "max_growth_of_height": 0.03216
+   },
+   "weapon_tip": null,
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.0,
+   "base_penetration_bone": null,
+   "hem_penetration": 0.0,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "weapon.R": {}
+   }
+  }
+ ],
+ "note": "техническая проверка контактов; не художественная приёмка"
+}

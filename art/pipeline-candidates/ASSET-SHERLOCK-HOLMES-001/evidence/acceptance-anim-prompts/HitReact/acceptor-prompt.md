@@ -2,7 +2,7 @@
 
 <!-- ЗАГОТОВКА этапа 6 (2026-10-21, волна A мини-пачки 2026-10-20), не запускалась; собрана скриптом
 C:/tmp/sherlock-holmes-stage6/gen_prompts.py по спеке и отчётам прогона. На шаге 7a.2 её заполняет
-tools/tripo-pipeline/ue7a/prep_acceptance.py (--asset-dir art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001 --key SherlockHolmes --run art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim --spec art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json --cycle r1):
+tools/tripo-pipeline/ue7a/prep_acceptance.py (--asset-dir art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001 --key SherlockHolmes --run art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2 --spec art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json --cycle r1):
 {{E}}, {{DATE}}, {{CYCLE}}, {{PREVIOUS_CARD_JSON}}, {{FRAMES_FILES_JSON}}, список пределов из
 evidence/acceptance-anim-prompts/known-limits.md, заметка о меше-носителе UE-кадров; sha256 в accepted_object сверяются с
 файлами (новый прогон модели — --refresh-sha или пересборка заготовок тем же скриптом). Профиль приёмщика —
@@ -31,20 +31,21 @@ tools/art/acceptance/asset-acceptance-2.schema.json; файл card.json запи
 ## Вход
 - Кадры: {{E}}/HitReact/frames/ — открой КАЖДЫЙ файл из списка {{FRAMES_FILES_JSON}} в полном размере (1:1):
   Blender-лист `SherlockHolmes-HitReact-blender-sheet.jpg` (кадры key_frames [0, 2, 4, 7, 10], виды front / left / q34, кости поверх),
-  крупные планы Blender (art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/preview/closeups-blender/: SherlockHolmes-HitReact-f02-back.jpg, SherlockHolmes-HitReact-f02-q34.jpg, SherlockHolmes-HitReact-f02-q34b-b.jpg, SherlockHolmes-HitReact-f02-q34b.jpg, SherlockHolmes-HitReact-f02-q34bl.jpg, SherlockHolmes-HitReact-f02-q34r.jpg, SherlockHolmes-HitReact-f02-topb.jpg; камера каждого кадра — в
+  крупные планы Blender (art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/preview/closeups-blender/: SherlockHolmes-HitReact-f02-back.jpg, SherlockHolmes-HitReact-f02-front.jpg, SherlockHolmes-HitReact-f02-left-b.jpg, SherlockHolmes-HitReact-f02-left.jpg, SherlockHolmes-HitReact-f02-q34.jpg, SherlockHolmes-HitReact-f02-q34b-b.jpg, SherlockHolmes-HitReact-f02-q34b.jpg, SherlockHolmes-HitReact-f02-q34bl.jpg, SherlockHolmes-HitReact-f02-q34r-b.jpg, SherlockHolmes-HitReact-f02-q34r.jpg, SherlockHolmes-HitReact-f02-topb.jpg, SherlockHolmes-HitReact-f04-left.jpg; камера каждого кадра — в
   SherlockHolmes-HitReact-closeups.json). UE-кадры `SherlockHolmes-HitReact-fNN-{front,q34}-ue-editor.jpg`, лист
   `SherlockHolmes-H2Anim-ue-sheet.jpg`. Другие файлы каталога {{E}} (card*.json, final.json, acceptor-*) не открывай.
 - Клип: AM_SherlockHolmes_HitReact, роль oneshot, 10 к. при 24 fps (0.417 с); кадр 0 = rest, последний кадр = rest.
   Замысел (design клипа в спеке art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json): «удар спереди: корпус откидывается назад с доворотом вправо, таз отклоняется назад (поворот, без сдвига), голова мотнулась назад, кулак с лупой вздрагивает вверх к груди (лупа жёстко в кулаке), левая рука отлетает чуть вперёд-наружу; быстрое возвращение; стопы на месте, без приседа».
-- Отчёты: docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_HitReact.validation.json (G-VALIDATE), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/contact-HitReact.json (G-CONTACT), docs/art-pipeline/animation-library/clip-manifest.json
-  (запись SHER-HitReact, G-MANIFEST), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-import-clips.json и ue-measure-clips.json (UE-импорт и замер),
-  art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/author-HitReact.json (ik_log), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/grip-HitReact.json (машинный замер по FBX клипа): поворот weapon.R (лупы) в кулаке ≤ 0.0° на всех кадрах, излом правого запястья ≤ 0.0°, локоть правой руки 79.0–86.5°, уход плоскости сгиба локтя ≤ 2.7°, колени не ниже 175.5°, пересечений лупы с телом 0.
+- Отчёты: docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_HitReact.validation.json (G-VALIDATE), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-HitReact.json (G-CONTACT), docs/art-pipeline/animation-library/clip-manifest.json
+  (запись SHER-HitReact, G-MANIFEST), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-import-clips.json и ue-measure-clips.json (UE-импорт и замер),
+  art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/author-HitReact.json (ik_log), art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/grip-HitReact.json (машинный замер по FBX клипа): поворот weapon.R (лупы) в кулаке ≤ 0.0° на всех кадрах, излом правого запястья ≤ 0.0°, локоть правой руки 79.0–86.5°, уход плоскости сгиба локтя ≤ 2.7°, колени не ниже 175.2°, пересечений лупы с телом 0.
 - Референс движения: образец библиотеки D-11 — спека Beowulf (clips.HitReact: отдача корпуса назад с доворотом, голова мотнулась, руки по инерции) ← Angel r2 ← King Arthur; art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/contact-sheet-2fps.png. Ключ кости оружия образца снят: лупа жёстко в кулаке; это ориентир тайминга и поз, не цель. Своего видео-референса у Шерлока нет (ДС-6, траты 0).
 - Характер героя: лист концепта art/imagegen/concept-sherlock-holmes-codex/sherlock-holmes-front.png (и кадры модели
   art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance/<цикл принятой модели>/frames/sheet.png), эталон качества
   art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png. Заявка: Sherlock Holmes — детектив, герой
   ближнего боя (кулачный удар, HIT_TYPE CLAW), высокий худой, кепи-охотничья, пальто Инвернесс с пелериной поверх
-  твидового костюма, лупа в ПРАВОЙ руке (оружие — кость weapon.R); карточка задачи AN-162
+  твидового костюма, изогнутая трубка во рту (жёстко на голове), лупа в ПРАВОЙ руке (оружие — кость weapon.R);
+  карточка задачи AN-162
   (docs/game-design/visual/06-tasks/anim.csv).
 - Известные пределы этой фигуры (учитываются как ограничение — в rationale и known_issues, не в rework_fix_list и не
   ниже 1,0, если кадр не показывает видимый разрыв, дыру или отрыв части; один список на все 4 клипа):
@@ -62,7 +63,7 @@ tools/art/acceptance/asset-acceptance-2.schema.json; файл card.json запи
 2. Баллы R, C, D, L (0–2, шаг 0,5) — только по кадрам, по якорям §10.4 (видны признаки и верхнего, и нижнего
    якоря — нижний). R — читаемость и тайминг с front и q34, характер героя, спиной к камере нет (ВР-06); C — контакт
    и опора; D — деформация на пике амплитуды на крупном плане; L — оседание и цикл.
-   Для этого клипа особенно: R — удар спереди читается: корпус откидывается, голова мотается, кулак с лупой вздрагивает; C — реакция с нужной стороны, стопы на месте; D — лупа не входит в козырёк кепи и лицо на к.2–4, кромки рукавов и пелерины целы; L — мягкий возврат в rest. В rationale назови кадры и видимый признак; frames — имена файлов из
+   Для этого клипа особенно: R — удар спереди читается: корпус откидывается, голова мотается, кулак с лупой вздрагивает; C — реакция с нужной стороны, стопы на месте; D — лупа не входит в козырёк кепи, лицо и трубку на к.2–4, кромки рукавов и пелерины целы; L — мягкий возврат в rest. В rationale назови кадры и видимый признак; frames — имена файлов из
    frames.files.
 3. score = round((R + C + D + L) / 8 × 10, 1) с округлением half-up (6,25 → 6,3; НЕ round() Python), как в
    validate_card.py. Вердикт по §10.5: любой гейт FAIL, любое измерение < 1,0 или score < 8,0 → rework_blender;
@@ -78,9 +79,9 @@ tools/art/acceptance/asset-acceptance-2.schema.json; файл card.json запи
    [{"item": "R"|"C"|"D"|"L"|"G-…", "frame": "<имя из frames.files>", "note": "<что видно>"}]; можно [].
 6. Константы: schema "unmatched.anim-acceptance/1", kind "anim", asset_id "ASSET-SHERLOCK-HOLMES-001", clip "HitReact",
    date "{{DATE}}", cycle "{{CYCLE}}", previous_card {{PREVIOUS_CARD_JSON}},
-   accepted_object [{"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/export/AM_SherlockHolmes_HitReact.fbx", "sha256": "5e5eac49ded7b4fc57be36e3fa883f1c01a904b1d97eacf2642dca0e02ea1202"}, {"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json", "sha256": "4d35290610f863dd8a95562402cc64aba92780bd10a44cf803b31828e23187d5"}],
+   accepted_object [{"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/export/AM_SherlockHolmes_HitReact.fbx", "sha256": "7cfc36c4907b1526ec82d6f568372b051af1553789fd338ef40007fb7e6186ba"}, {"path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2anim.json", "sha256": "b8cd7099343c70a32db99ff24c46c6c1748d71f93f37ddb68e923025bcc33d8a"}],
    frames {"dir": "{{E}}/HitReact/frames", "files": {{FRAMES_FILES_JSON}}},
-   reports ["docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_HitReact.validation.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/contact-HitReact.json", "docs/art-pipeline/animation-library/clip-manifest.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-import-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/ue-measure-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim/reports/grip-HitReact.json"] (только те, что существуют, плюс другие из note гейтов),
+   reports ["docs/art-pipeline/animation-library/validation-h2anim/AM_SherlockHolmes_HitReact.validation.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/contact-HitReact.json", "docs/art-pipeline/animation-library/clip-manifest.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-import-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/ue-measure-clips.json", "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2anim-r2/reports/grip-HitReact.json"] (только те, что существуют, плюс другие из note гейтов),
    acceptor {"profile": "Opus xhigh", "session_id": "<сессия приёмщика>"},
    executor_session_id "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage6-sherlock",
    decided_by "delegated (ВР-реестр 2026-10-06)". При pass status_note = "художественно принято, по делегированию
