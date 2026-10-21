@@ -3,7 +3,7 @@
  "revision": "h2anim-2026-09-29",
  "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
  "notes": [
-  "32 production-слота = 4 клипа D-11 x 8 персонажей (бриф 18 §4, Angel, Ancient Leshen, Achilles и Beowulf): 31 безусловный, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): 36",
+  "32 production-слота = 4 клипа D-11 x 8 персонажей (бриф 18 §4, Angel, Ancient Leshen, Achilles и Beowulf): 31 безусловный, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): 40",
   "production-слоты — контракт v2 (v1 закрыт для новых клипов, RIG-CONTRACT §0 п.2); черновики AM_Medusa_* v1 — тестовые записи",
   "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
   "test-записи не могут стать artistically_accepted (правило схемы)"
@@ -2105,6 +2105,239 @@
     "date": "2026-09-29"
    },
    "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2/export/SK_BruceLee_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + ключи паттерна библиотеки art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json (Achilles) (MOTION_SOURCE «library: Achilles; AncientLeshen»; reference_kind: library pattern (D-11, Ancient Leshen r3 DeathSettle <- Medusa DeathSettle: bow of the torso without falling to the knees, empty hands hang; pelvis lowered on straight legs as Achilles r3 / Beowulf), not a Bruce Lee video; папка образца art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle); контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton; художественно не принят"
+  },
+  {
+   "id": "WAT-Idle",
+   "character": "Watson",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "48fd85e9cdc096f8e4c02dbbd6977cfc9cbbf4c33dec26f8719ee5ecb79fa5b7"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": 2.3333
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-20"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_Idle",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SK_DrWatson_H2.fbx): шаблон дельт нет + ключи паттерна библиотеки art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json (Medusa) (MOTION_SOURCE «library: Medusa (дальний бой, контакт к.8: тайминг и ключевые позы клипов Medusa, зеркально на правую руку; выстрел из револьвера вместо натяжения лука, правая рука и саквояж решены по rest)»; reference_kind: library pattern (D-11, Medusa Idle: timing and key poses mirrored to the right hand; ranged class, contact frame 8), not a DrWatson video; right arm (revolver) and left arm (bag) solved per key from the rest pose; папка образца art/animation-refs/ASSET-MEDUSA-001/MED-Idle); контакты (clip_contact_check): PASS; UE: не импортирован на канонический скелет /Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton; художественно не принят"
+  },
+  {
+   "id": "WAT-LungeAttack",
+   "character": "Watson",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "2c7f69353e352f278815094c503b907f31c333dedeacdf5c5822b325667f0c81"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": 0.5833
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-20"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_LungeAttack",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SK_DrWatson_H2.fbx): шаблон дельт нет + ключи паттерна библиотеки art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json (Medusa) (MOTION_SOURCE «library: Medusa (дальний бой, контакт к.8: тайминг и ключевые позы клипов Medusa, зеркально на правую руку; выстрел из револьвера вместо натяжения лука, правая рука и саквояж решены по rest)»; reference_kind: library pattern (D-11, Medusa LungeAttack: timing and key poses mirrored to the right hand; ranged class, contact frame 8), not a DrWatson video; right arm (revolver) and left arm (bag) solved per key from the rest pose; папка образца art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack); контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: не импортирован на канонический скелет /Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton; художественно не принят"
+  },
+  {
+   "id": "WAT-HitReact",
+   "character": "Watson",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "8e647d26bff91ba3d1bf4796af67436f1777440d31eec662f4c08649109aa7ec"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": 0.4167
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-20"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_HitReact",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SK_DrWatson_H2.fbx): шаблон дельт нет + ключи паттерна библиотеки art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json (Medusa) (MOTION_SOURCE «library: Medusa (дальний бой, контакт к.8: тайминг и ключевые позы клипов Medusa, зеркально на правую руку; выстрел из револьвера вместо натяжения лука, правая рука и саквояж решены по rest)»; reference_kind: library pattern (D-11, Medusa HitReact: timing and key poses mirrored to the right hand; ranged class, contact frame 8), not a DrWatson video; right arm (revolver) and left arm (bag) solved per key from the rest pose; папка образца art/animation-refs/ASSET-MEDUSA-001/MED-HitReact); контакты (clip_contact_check): PASS; UE: не импортирован на канонический скелет /Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton; художественно не принят"
+  },
+  {
+   "id": "WAT-DeathSettle",
+   "character": "Watson",
+   "asset_id": "ASSET-DR-WATSON-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "c9053a5ed9e8ec0cb5706155b940b1d20a83730a27ecfbfa72309d2a07314c2c"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": 0.875
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-10-20"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_DeathSettle",
+    "status": "proposed",
+    "evidence": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/reports/ue-import-clips.json"
+   },
+   "status": "measured",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_DrWatson_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
+   },
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SK_DrWatson_H2.fbx): шаблон дельт нет + ключи паттерна библиотеки art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json (Medusa) (MOTION_SOURCE «library: Medusa (дальний бой, контакт к.8: тайминг и ключевые позы клипов Medusa, зеркально на правую руку; выстрел из револьвера вместо натяжения лука, правая рука и саквояж решены по rest)»; reference_kind: library pattern (D-11, Medusa DeathSettle: timing and key poses mirrored to the right hand; ranged class, contact frame 8), not a DrWatson video; right arm (revolver) and left arm (bag) solved per key from the rest pose; папка образца art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle); контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: не импортирован на канонический скелет /Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton; художественно не принят"
   },
   {
    "id": "MED-Idle-draft",
