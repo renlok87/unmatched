@@ -634,6 +634,28 @@ bool FS09MoveSelOpponentStatusTest::RunTest(const FString&) {
     Sources.Note({Pending});
     TestEqual(TEXT("the pending text is kept by its id"), Sources.TextOf(TEXT("fx-1-p0")), Pending.Text);
     TestEqual(TEXT("an unseen id: no text"), Sources.TextOf(TEXT("fx-9")), FString());
+    // 2026-10-21 recheck: the one fighter of a per-fighter choice («Крылатое буйство») names a step that stayed
+    {
+      FS08PendingEffect Own = Pending;
+      Own.FighterIds = {TEXT("f-1-sk0")};
+      FS08PendingEffect Shared = Pending;
+      Shared.Id = TEXT("fx-2-p0");
+      Shared.FighterIds = {TEXT("f-1-sk0"), TEXT("f-1-hero")};
+      FS09EffectSources Steps;
+      Steps.Note({Own, Shared});
+      TestEqual(TEXT("the one fighter of a per-fighter choice"), Steps.FighterOf(TEXT("fx-1-p0")), FString(TEXT("f-1-sk0")));
+      TestEqual(TEXT("a choice among several fighters names none"), Steps.FighterOf(TEXT("fx-2-p0")), FString());
+      TestEqual(TEXT("an unseen id names none"), Steps.FighterOf(TEXT("fx-9")), FString());
+      const TArray<FS08PendingEffect> Queue = S09OpponentView::PendingQueue(
+          With(Opp, TEXT("{\"pendingEffects\":[{\"id\":\"fx-3-p1\",\"playerId\":\"") + Opp +
+                        TEXT("\",\"type\":\"MOVE\",\"text\":\"t\",\"fighterIds\":[\"f-1-sk1\"]}]}")));
+      TestTrue(TEXT("PendingQueue reads fighterIds"),
+               Queue.Num() == 1 && Queue[0].FighterIds.Num() == 1 && Queue[0].FighterIds[0] == TEXT("f-1-sk1"));
+      Steps.Note(Queue);
+      TestEqual(TEXT("noted from the queue"), Steps.FighterOf(TEXT("fx-3-p1")), FString(TEXT("f-1-sk1")));
+      Steps.Reset();
+      TestEqual(TEXT("Reset forgets the fighters"), Steps.FighterOf(TEXT("fx-1-p0")), FString());
+    }
     auto Card = [](const TCHAR* Name, const TCHAR* Text, bool bHidden) {
       FS09CardView C;
       C.Name = Name;

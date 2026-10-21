@@ -325,7 +325,8 @@ hex (sRGB → Lab D65, автор пакета, 2026-10-03; цвета зон к
   статусы ходов (MS-E-13, MS-E-78..80).
 - Если есть ходы NeedBoost — в руке подсвечиваются карты с BOOST ≥ максимума их `RequiredBoost`, кроме уже выбранной
   (MS-E-14, MS-E-79).
-- Строка буста в панели: «Буст: Gaze of Stone +4 (сброс)» или «Буст: нет».
+- Строка буста в панели: «УСИЛЕНИЕ: Gaze of Stone +4 (сброс)» или «УСИЛЕНИЕ: нет» (RU-термин УСИЛЕНИЕ, плейтест
+  2026-10-21 F3a и повторная проверка).
 - Буст можно выбрать и тогда, когда ход бойца уже полный: выбранный боец остаётся выбранным (MS-S-07), его ярусы
   расширяются в тот же кадр. Подсказка о бусте (`ms.boost.hint`) видна, пока открыт черновик, а не только до первого
   хода (MS-R-76; SD-53; 01 F-08). Основание — R-01 (live 2026-10-04): s05 464.812, Huntsman прошёл свои 2 клетки,
@@ -348,9 +349,9 @@ UMG-гибрид (решение U-4 `decisions/2026-09-29-render-ui-user-decisi
  2  Harpies 2   M07 → M12   5/7        [▲][▼][×]
  —  Harpies 1   не ходит
  —  Harpies 3   не может двигаться     (серый)
-Буст: Gaze of Stone +4   [сменить (B)]
+УСИЛЕНИЕ: Gaze of Stone +4   [сменить (B)]
 [ Отменить шаг (Backspace) ]  [ Сбросить черновик (Esc) ]
-[ ПОДТВЕРДИТЬ: 2 бойца, буст +4 (Enter) ]
+[ ПОДТВЕРДИТЬ: 2 бойца, УСИЛЕНИЕ +4 (Enter) ]
 ```
 
 | ID | Требование | Тест |
@@ -497,7 +498,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 |---|---|---|---|
 | `why.cell.unreachable` | Не хватает шагов: нужно {need}, есть {have} | Not enough movement: need {need}, have {have} | `NOT_ENOUGH_MOVEMENT`; клиент — путь есть, но длиннее допуска с максимальным бустом |
 | `why.cell.no.path` | Туда не пройти | No way to get there | клиент — пути нет вовсе (блок, нет связей; MS-E-19, MS-E-28) |
-| `why.cell.needs.boost` | Нужен буст +{n} | Needs boost +{n} | клиент — NeedBoost |
+| `why.cell.needs.boost` | Нужно УСИЛЕНИЕ +{n} | Needs boost +{n} | клиент — NeedBoost |
 | `why.cell.enemy` | Здесь враг | An enemy is here | `PATH_BLOCKED_BY_ENEMY`, клетка = цель |
 | `why.cell.enemy.path` | Путь закрыт врагом | The path is blocked by an enemy | `PATH_BLOCKED_BY_ENEMY`, клетка ≠ цель |
 | `why.cell.ally` | Пространство занято союзником | Occupied by an ally | `POSITION_OCCUPIED` (манёвр) |
@@ -511,7 +512,7 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `why.fighter.not.yours` | Это боец соперника | That is an opponent's fighter | `NOT_YOUR_FIGHTER` |
 | `why.fighter.defeated` | Боец побеждён | Fighter is defeated | `FIGHTER_DEFEATED` |
 | `why.boost.no.value` | У карты нет УСИЛЕНИЯ | This card has no BOOST | `BOOST_NO_VALUE`; клиент (MS-D-20) |
-| `why.boost.card.gone` | Карты буста больше нет в руке | The boost card is no longer in hand | `CARD_NOT_IN_HAND` |
+| `why.boost.card.gone` | Карты УСИЛЕНИЯ больше нет в руке | The boost card is no longer in hand | `CARD_NOT_IN_HAND` |
 | `why.maneuver.not.open` | Манёвр не начат | No maneuver in progress | `MANEUVER_NOT_OPEN`, `INVALID_PHASE` |
 | `why.place.zone` | Нужно пространство в зоне бойца: {fighterName} | Choose a space in {fighterName}'s zone | `PLACE_OUTSIDE_ZONE` |
 | `why.predraft.lost` | Цель больше недоступна — выберите заново | Target no longer reachable — choose again | клиент |
@@ -545,15 +546,15 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.panel.row` | {order}  {fighterName}  {from} → {to}  {steps}/{allowance} | {order}  {fighterName}  {from} → {to}  {steps}/{allowance} |
 | `ms.panel.row.stay` | {fighterName}: не ходит | {fighterName}: stays |
 | `ms.panel.row.immobilized` | {fighterName}: не может двигаться | {fighterName}: cannot move |
-| `ms.panel.boost` | Буст: {cardName} +{n} (сброс) | Boost: {cardName} +{n} (discard) |
-| `ms.panel.boost.none` | Буст: нет | Boost: none |
-| `ms.boost.hint` | Буст: сбросьте 1 карту, её BOOST прибавится к движению каждого бойца | Boost: discard 1 card; its BOOST adds to every fighter's movement |
-| `ms.boost.empty` | Нет карт для буста | No cards to boost with |
-| `ms.btn.boost.change` | Сменить буст (B) | Change boost (B) |
+| `ms.panel.boost` | УСИЛЕНИЕ: {cardName} +{n} (сброс) | Boost: {cardName} +{n} (discard) |
+| `ms.panel.boost.none` | УСИЛЕНИЕ: нет | Boost: none |
+| `ms.boost.hint` | УСИЛЕНИЕ: сбросьте 1 карту, её УСИЛЕНИЕ прибавится к движению каждого бойца | Boost: discard 1 card; its BOOST adds to every fighter's movement |
+| `ms.boost.empty` | Нет карт для УСИЛЕНИЯ | No cards to boost with |
+| `ms.btn.boost.change` | Сменить УСИЛЕНИЕ (B) | Change boost (B) |
 | `ms.btn.undo` | Отменить шаг (Backspace) | Undo step (Backspace) |
 | `ms.btn.clear.move` | Снять ход (Delete) | Clear move (Delete) |
 | `ms.btn.reset` | Сбросить черновик (Esc) | Reset draft (Esc) |
-| `ms.btn.confirm` | Подтвердить: {n} бойц(а/ов), буст +{b} (Enter) | Confirm: {n} fighter(s), boost +{b} (Enter) |
+| `ms.btn.confirm` | Подтвердить: {n} бойц(а/ов), УСИЛЕНИЕ +{b} (Enter) | Confirm: {n} fighter(s), boost +{b} (Enter) |
 | `ms.btn.confirm.noboost` | Подтвердить: {n} бойц(а/ов) (Enter) | Confirm: {n} fighter(s) (Enter) |
 | `ms.btn.confirm.zero` | Подтвердить без движения (Enter) | Confirm without moving (Enter) |
 | `ms.btn.confirm.zero.boost` | Подтвердить: сбросить {cardName} без движения (Enter) | Confirm: discard {cardName} without moving (Enter) |
@@ -611,12 +612,14 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.btn.noboost` | Атаковать без УСИЛЕНИЯ (N) | Attack without BOOST (N) |
 | `ms.log.maneuver` | {player}: манёвр{boostPart}: {moves} | {player}: maneuver{boostPart}: {moves} |
 | `ms.log.attack` | {attacker} → {target}: урон {damage} | {attacker} → {target}: {damage} damage |
-| `ms.log.boost.part` | , буст +{n} ({cardName}) | , boost +{n} ({cardName}) |
+| `ms.log.boost.part` | , УСИЛЕНИЕ +{n} ({cardName}) | , boost +{n} ({cardName}) |
 | `ms.log.move` | {fighterName} {from}→{to} | {fighterName} {from}→{to} |
 | `ms.log.move.steps` | {fighterName} → {n} клетк(а/и/ок) | {fighterName} → {n} space(s) |
 | `ms.log.move.place` | {fighterName} → новая клетка | {fighterName} → placed |
 | `ms.log.more` | и ещё {n} | and {n} more |
 | `ms.log.stay` | без движения | no movement |
+| `ms.log.move.stay` | {fighterName} — на месте | {fighterName} stays in place |
+| `ms.log.effect.step` | {cardName}: {moves} | {cardName}: {moves} |
 | `ms.settings.anim.speed` | Скорость анимации | Animation speed |
 | `ms.settings.anim.none` / `.fast` / `.normal` / `.slow` | Нет / Быстро / Обычно / Медленно | None / Fast / Normal / Slow |
 | `ms.settings.hints` | Подсказки ходов (фаза 4) | Move hints (phase 4) |

@@ -373,12 +373,19 @@ void FS09EffectSources::Note(const TArray<FS08PendingEffect>& Queue) {
   for (const FS08PendingEffect& Pending : Queue) {
     if (Pending.Id.IsEmpty() || Texts.Contains(Pending.Id)) continue;
     Texts.Add(Pending.Id, Pending.Text);
+    if (Pending.FighterIds.Num() == 1) Fighters.Add(Pending.Id, Pending.FighterIds[0]);
     Ids.Add(Pending.Id);
   }
   while (Ids.Num() > MaxKept) {
     Texts.Remove(Ids[0]);
+    Fighters.Remove(Ids[0]);
     Ids.RemoveAt(0);
   }
+}
+
+FString FS09EffectSources::FighterOf(const FString& PendingId) const {
+  const FString* Fighter = Fighters.Find(PendingId);
+  return Fighter ? *Fighter : FString();
 }
 
 FString FS09EffectSources::TextOf(const FString& PendingId) const {
@@ -481,6 +488,15 @@ TArray<FS08PendingEffect> PendingQueue(const FS08Snapshot& Snapshot) {
     (*Entry)->TryGetStringField(TEXT("playerId"), Pending.PlayerId);
     (*Entry)->TryGetStringField(TEXT("type"), Pending.Type);
     (*Entry)->TryGetStringField(TEXT("text"), Pending.Text);
+    // 2026-10-21 recheck: the fighter of a per-fighter choice («Крылатое буйство»: one MOVE per fighter) names the
+    // journal line of a step that left it in place (FS09EffectSources::FighterOf)
+    const TArray<TSharedPtr<FJsonValue>>* Ids = nullptr;
+    if ((*Entry)->TryGetArrayField(TEXT("fighterIds"), Ids) && Ids) {
+      for (const TSharedPtr<FJsonValue>& Id : *Ids) {
+        FString Parsed;
+        if (Id.IsValid() && Id->TryGetString(Parsed) && !Parsed.IsEmpty()) Pending.FighterIds.Add(Parsed);
+      }
+    }
     Out.Add(MoveTemp(Pending));
   }
   return Out;

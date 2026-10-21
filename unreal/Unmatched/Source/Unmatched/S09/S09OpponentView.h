@@ -217,14 +217,20 @@ public:
   void Note(const TArray<FS08PendingEffect>& Queue);
   /** The text of a pending effect seen before ('' when it was never seen - a seq gap, a reconnect). */
   FString TextOf(const FString& PendingId) const;
+  /** 2026-10-21 recheck: the one fighter a pending choice was about (fighterIds of a single id: the per-fighter MOVE
+   *  of «Крылатое буйство»); '' when unseen or not tied to one fighter. A step that left its fighter in place has no
+   *  move in the trail, so this names it in the journal. */
+  FString FighterOf(const FString& PendingId) const;
   void Reset() {
     Ids.Reset();
     Texts.Reset();
+    Fighters.Reset();
   }
 
 private:
   TArray<FString> Ids;  // oldest first
   TMap<FString, FString> Texts;
+  TMap<FString, FString> Fighters;
 };
 
 namespace S09OpponentView {

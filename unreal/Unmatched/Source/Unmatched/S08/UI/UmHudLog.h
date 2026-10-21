@@ -55,6 +55,9 @@ struct UNMATCHED_API FUmLogEntry {
   TArray<FText> Shorter;
   /** The card of an effect / a boost when the public piles name it (the click opens the inspector). */
   FString CardId;
+  /** 2026-10-21 recheck: the effect a step belongs to (UmHudLog::EffectGroup of the trail's sourceRef; '' for the
+   *  maneuvers, combats and areas) - the next step of the same play drops the card the row above already names. */
+  FString Group;
 };
 
 /** The block's canvas. */
@@ -89,11 +92,17 @@ UNMATCHED_API FBox2D ListRectSu(const FBox2D& TopRectSu);
 /** «Х{n}» / «T{n}» (hud.log.turn). */
 UNMATCHED_API FText TurnText(int32 Turn);
 /** The line of a trail in the UI language (ms.log.maneuver / ms.log.effect / ms.opp.moves.yours, ms.log.move,
- *  ms.log.stay, ms.log.more, ms.log.boost.part) - the structure of FS09EventFeed::Describe / DescribeEffect. */
+ *  ms.log.stay, ms.log.more, ms.log.boost.part) - the structure of FS09EventFeed::Describe / DescribeEffect.
+ *  2026-10-21 recheck: a move with an empty path is a fighter an effect step left in place (ms.log.move.stay); an
+ *  effect row's shorter form is the card and the step (ms.log.effect.step, «Крылатое буйство: Гарпия 1 — на месте»),
+ *  and with bStepOfPrevious (the row above is the previous step of the same play) the step alone. */
 UNMATCHED_API void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters,
                                  const FS09EventFeed::FNameOf& PlayerName, const FS09EventFeed::FNameOf& FighterName,
                                  const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull,
-                                 TArray<FText>* OutShorter = nullptr);
+                                 TArray<FText>* OutShorter = nullptr, bool bStepOfPrevious = false);
+/** 2026-10-21 recheck: the effect a pending choice belongs to - its id without the trailing «-p<n>» (the server names
+ *  the choices of one effect «<effect id>-p<n>», one per fighter); '' when the id has no such suffix. */
+UNMATCHED_API FString EffectGroup(const FString& SourceRef);
 /** VS-5 E4: the first of Text, Shorter... whose width (Measure, su) fits WidthSu; else the last (shortest) one. */
 UNMATCHED_API FText PickRowText(const FUmLogEntry& Entry, float WidthSu, TFunctionRef<float(const FText&)> Measure);
 }  // namespace UmHudLog
@@ -132,6 +141,8 @@ class UNMATCHED_API UUmHudLog : public UUserWidget {
   bool Tick(double NowMs);
   void SetOnInspect(TFunction<void(const FString& CardId)> In) { OnInspect = MoveTemp(In); }
   int32 Num() const { return Rows.Num(); }
+  /** The newest entry (nullptr when empty): a new effect step reads its group and seq. */
+  const FUmLogEntry* LastEntry() const { return Rows.Num() > 0 ? &Rows.Last().Entry : nullptr; }
   /** Rows on screen now (min(total, VisibleRows)); 0 when hidden / closed. */
   int32 ShownRows() const;
   bool IsAtEnd() const;

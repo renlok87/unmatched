@@ -2871,16 +2871,38 @@ void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FStrin
   if (Trail.bBoost) Shown.BoostName = Title(Card, Trail.BoostName);
   const FString ShownCard = bEffect ? Title(Card, CardName) : CardName;
   if (Card) E.CardId = Card->CardId;
+  // 2026-10-21 recheck (v-36: «Крылатое буйство» x3 without the step): a step of a per-fighter effect that left its
+  // fighter in place has no move in the trail - the fighter of the resolved choice (seen in pendingEffects) is shown
+  // as a move with an empty path («Гарпия 1 — на месте»); the next step of the same play (the previous row, seq - 1)
+  // drops the card the row above names
+  bool bStepOfPrevious = false;
+  if (bEffect) {
+    if (Shown.Moves.Num() == 0) {
+      const FString StayId = EffectSources.FighterOf(Trail.SourceRef);
+      if (const FS08BoardFighter* Stay = StayId.IsEmpty() ? nullptr : FindFighter(StayId)) {
+        FS09LastMovement::FMove M;
+        M.FighterId = Stay->Id;
+        M.From = FIntPoint(Stay->X, Stay->Y);
+        Shown.Moves.Add(M);
+      }
+    }
+    E.Group = UmHudLog::EffectGroup(Trail.SourceRef);
+    const UUmHudLog* Log = R.Feed.GetLog();
+    const FUmLogEntry* Prev = Log ? Log->LastEntry() : nullptr;
+    bStepOfPrevious = Prev && !E.Group.IsEmpty() && Prev->Group == E.Group && Prev->Seq == Trail.Seq - 1;
+  }
   UmHudLog::DescribeTrail(
       Shown, ShownCard, YourFighters, [this](const FString& Id) { return UmWorldLayer::DisplayNameOf(PlayerHeroName(Id)); },
       [this](const FString& Id) -> FString {
         const FS08BoardFighter* F = FindFighter(Id);
         return F ? UmWorldLayer::DisplayName(*F).ToString() : Id;
       },
-      [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full, &E.Shorter);
+      [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full, &E.Shorter,
+      bStepOfPrevious);
   R.Feed.PushLog(E, static_cast<double>(NowMs()));
-  FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d card=%d total=%d"), E.Seq, E.Turn, E.TeamSlot,
-                                   E.CardId.IsEmpty() ? 0 : 1, R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d card=%d step=%d moves=%d total=%d"), E.Seq, E.Turn,
+                                   E.TeamSlot, E.CardId.IsEmpty() ? 0 : 1, bStepOfPrevious ? 1 : 0, Shown.Moves.Num(),
+                                   R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
 }
 
 void AS08FlowGameMode::UmHudToastReason(const FS09Reason& Reason, float Seconds) {

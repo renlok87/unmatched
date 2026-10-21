@@ -185,7 +185,8 @@ bool FUmHudLogFeedTest::RunTest(const FString&) {
   B.BoostName = TEXT("Рывок");
   for (int32 I = 0; I < 3; ++I) B.Moves.Add(M);
   UmHudLog::DescribeTrail(B, FString(), {}, Player, Fighter, Cell, Text, Full);
-  TestTrue(TEXT("boost part «, буст +2 (Рывок)»"), Text.ToString().Contains(TEXT(", буст +2 (Рывок)")));
+  // 2026-10-21 recheck: the RU term УСИЛЕНИЕ, as the slot ribbon (F3a)
+  TestTrue(TEXT("boost part «, УСИЛЕНИЕ +2 (Рывок)»"), Text.ToString().Contains(TEXT(", УСИЛЕНИЕ +2 (Рывок)")));
   TestTrue(TEXT("four moves: inline «и ещё 2», full has all four"),
            Text.ToString().Contains(TEXT("и ещё 2")) && !Full.ToString().Contains(TEXT("и ещё")));
   TestEqual(TEXT("«Х{n}» (hud.log.turn)"), UmHudLog::TurnText(3).ToString(), FString(TEXT("Х3")));
@@ -935,6 +936,86 @@ bool FUmHudLogShortRowTest::RunTest(const FString&) {
   TestTrue(TEXT("the row shows the arrow"), Shown.ToString().Contains(TEXT("→")));
   TestTrue(TEXT("the shown text fits the row (Slate font measure)"), Width >= 0.0f && Width <= Log->RowTextWidthSu());
   TestTrue(TEXT("the tooltip keeps every move"), Log->GetRowTooltip(0).ToString().Contains(TEXT("Harpies 2 → 1 клетка")));
+  return true;
+}
+
+// 2026-10-21 recheck (v-36: «Крылатое буйство» three times without the step): the rows of a per-fighter effect name the
+// card and the step - a fighter left in place included («Гарпия 1 — на месте»); the next step of the same play drops
+// the card the row above names; EffectGroup ties the steps of one effect.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudLogEffectStepsTest,
+    "Unmatched.S08.Hud.Log.EffectSteps card and step per row, a stay named, the next step without the card",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudLogEffectStepsTest::RunTest(const FString&) {
+  using namespace UmFeedTest;
+  FWorld W(TEXT("UmHudLogEffectSteps"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  FRu Ru;
+  TestEqual(TEXT("EffectGroup drops «-p<n>»"), UmHudLog::EffectGroup(TEXT("cmq7d-fullText-0-p1")), FString(TEXT("cmq7d-fullText-0")));
+  TestEqual(TEXT("EffectGroup: the steps of one effect match"), UmHudLog::EffectGroup(TEXT("cmq7d-fullText-0-p3")),
+            UmHudLog::EffectGroup(TEXT("cmq7d-fullText-0-p0")));
+  TestEqual(TEXT("EffectGroup: a maneuver id is no step"), UmHudLog::EffectGroup(TEXT("maneuver-17")), FString());
+  TestEqual(TEXT("EffectGroup: «-p» without a number is no step"), UmHudLog::EffectGroup(TEXT("fx-p")), FString());
+  auto Player = [](const FString&) { return FString(TEXT("Медуза")); };
+  auto Fighter = [](const FString& Id) { return Id == TEXT("h1") ? FString(TEXT("Гарпия 1")) : FString(TEXT("Медуза")); };
+  auto Cell = [](const FIntPoint& C) { return FString::Printf(TEXT("S%02d"), C.X); };
+  const FString Card = TEXT("Крылатое буйство");
+  // a step that left its fighter in place: the move with an empty path (UmHudLogTrail adds it from pendingEffects)
+  FS09LastMovement Stay;
+  Stay.bValid = true;
+  Stay.Seq = 25;
+  Stay.PlayerId = TEXT("p1");
+  Stay.Source = TEXT("EFFECT");
+  Stay.SourceRef = TEXT("cmq7d-fullText-0-p1");
+  FS09LastMovement::FMove M;
+  M.FighterId = TEXT("h1");
+  M.From = FIntPoint(19, 0);
+  Stay.Moves.Add(M);
+  FText Text, Full;
+  TArray<FText> Shorter;
+  UmHudLog::DescribeTrail(Stay, Card, {}, Player, Fighter, Cell, Text, Full, &Shorter);
+  TestEqual(TEXT("the full line names the stay"), Full.ToString(), FString(TEXT("Медуза: эффект Крылатое буйство: Гарпия 1 — на месте")));
+  if (!TestEqual(TEXT("the first step: one shorter form"), Shorter.Num(), 1)) return false;
+  TestEqual(TEXT("the card and the step"), Shorter[0].ToString(), FString(TEXT("Крылатое буйство: Гарпия 1 — на месте")));
+  UmHudLog::DescribeTrail(Stay, Card, {}, Player, Fighter, Cell, Text, Full, &Shorter, true);
+  if (!TestEqual(TEXT("the next step: the step alone after the card form"), Shorter.Num(), 2)) return false;
+  TestEqual(TEXT("the next step alone"), Shorter[1].ToString(), FString(TEXT("Гарпия 1 — на месте")));
+  // a step that moved: the card and the move
+  FS09LastMovement Move = Stay;
+  Move.Moves[0].FighterId = TEXT("medusa");
+  Move.Moves[0].Path = {FIntPoint(21, 0), FIntPoint(25, 0), FIntPoint(29, 0)};
+  UmHudLog::DescribeTrail(Move, Card, {}, Player, Fighter, Cell, Text, Full, &Shorter);
+  TestEqual(TEXT("the card and the move"), Shorter.Num() > 0 ? Shorter[0].ToString() : FString(),
+            FString(TEXT("Крылатое буйство: Медуза → 3 клетки")));
+  // no fighter known (a seq gap): the card and «без движения», then the card alone
+  FS09LastMovement Unknown = Stay;
+  Unknown.Moves.Reset();
+  UmHudLog::DescribeTrail(Unknown, Card, {}, Player, Fighter, Cell, Text, Full, &Shorter, true);
+  TestTrue(TEXT("unknown fighter: «Крылатое буйство: без движения», then the card"),
+           Shorter.Num() == 2 && Shorter[0].ToString() == TEXT("Крылатое буйство: без движения") && Shorter[1].ToString() == Card);
+  // the widget at 1080p (300 su column): the first step keeps the card, the next one shows the step in full
+  UUmHudLog* Log = CreateWidget<UUmHudLog>(W.World, UUmHudLog::StaticClass());
+  if (!TestNotNull(TEXT("log"), Log)) return false;
+  FUmLogFrame F;
+  F.SizeSu = FVector2D(300.0, 200.0);
+  Log->SetFrame(F);
+  FUmLogEntry First;
+  First.Seq = 24;
+  First.Group = UmHudLog::EffectGroup(Move.SourceRef);
+  UmHudLog::DescribeTrail(Move, Card, {}, Player, Fighter, Cell, First.Text, First.Full, &First.Shorter);
+  Log->Push(First, 1000.0);
+  TestTrue(TEXT("LastEntry is the pushed step"), Log->LastEntry() && Log->LastEntry()->Seq == 24 && Log->LastEntry()->Group == First.Group);
+  FUmLogEntry Next;
+  Next.Seq = 25;
+  Next.Group = UmHudLog::EffectGroup(Stay.SourceRef);
+  UmHudLog::DescribeTrail(Stay, Card, {}, Player, Fighter, Cell, Next.Text, Next.Full, &Next.Shorter, true);
+  Log->Push(Next, 1000.0);
+  const FString Row0 = Log->GetRowShownText(0).ToString();
+  const FString Row1 = Log->GetRowShownText(1).ToString();
+  AddInfo(FString::Printf(TEXT("rows: «%s» / «%s», width %.1f su"), *Row0, *Row1, Log->RowTextWidthSu()));
+  TestTrue(TEXT("the first step's row starts with the card"), Row0.StartsWith(Card));
+  TestTrue(TEXT("the next step's row names the fighter and the stay"), Row1.Contains(TEXT("Гарпия 1")) && Row1.Contains(TEXT("на месте")));
+  TestTrue(TEXT("the shown step fits the row"), UmTextFit::WidthSu(FText::FromString(Row1), TEXT("type.body")) <= Log->RowTextWidthSu());
+  TestTrue(TEXT("the tooltip keeps the card and the player"), Log->GetRowTooltip(1).ToString().StartsWith(TEXT("Медуза: эффект Крылатое буйство")));
   return true;
 }
 

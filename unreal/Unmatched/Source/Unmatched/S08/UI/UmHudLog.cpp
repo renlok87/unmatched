@@ -66,8 +66,11 @@ void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterN
     FFormatNamedArguments Args;
     Args.Add(TEXT("fighterName"), FText::FromString(FighterName(Move.FighterId)));
     Args.Add(TEXT("n"), Move.Path.Num());  // a number: the RU plural клетка / клетки / клеток
-    Parts.Add(UmText::Format(EUmTable::Ms, Move.bPlace ? TEXT("ms.log.move.place") : TEXT("ms.log.move.steps"), Args)
-                  .ToString());
+    // 2026-10-21 recheck: an empty path is the fighter an effect step left in place («Гарпия 1 — на месте»)
+    const TCHAR* Key = Move.Path.Num() == 0 ? TEXT("ms.log.move.stay")
+                       : Move.bPlace        ? TEXT("ms.log.move.place")
+                                            : TEXT("ms.log.move.steps");
+    Parts.Add(UmText::Format(EUmTable::Ms, Key, Args).ToString());
   }
   if (Parts.Num() == 0) {
     Inline = Full = UmText::Get(EUmTable::Ms, TEXT("ms.log.stay")).ToString();
@@ -91,9 +94,21 @@ void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterN
 }
 }  // namespace
 
+FString EffectGroup(const FString& SourceRef) {
+  int32 Dash = INDEX_NONE;
+  if (!SourceRef.FindLastChar(TEXT('-'), Dash) || Dash <= 0) return FString();
+  const FString Tail = SourceRef.Mid(Dash + 1);  // «p<n>»
+  if (Tail.Len() < 2 || Tail[0] != TEXT('p')) return FString();
+  for (int32 I = 1; I < Tail.Len(); ++I) {
+    if (!FChar::IsDigit(Tail[I])) return FString();
+  }
+  return SourceRef.Left(Dash);
+}
+
 void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters,
                    const FS09EventFeed::FNameOf& PlayerName, const FS09EventFeed::FNameOf& FighterName,
-                   const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull, TArray<FText>* OutShorter) {
+                   const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull, TArray<FText>* OutShorter,
+                   bool bStepOfPrevious) {
   if (OutShorter) OutShorter->Reset();
   const FString Player = PlayerName(Trail.PlayerId);
   const bool bEffect = Trail.Source == TEXT("EFFECT");
@@ -109,33 +124,36 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
   }
   FString Inline, Full, First;
   Moves(Trail, FighterName, CellName, Inline, Full, &First);
+  if (bEffect) {
+    OutText = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}});
+    OutFull = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Full}});
+    if (!OutShorter) return;
+    // 2026-10-21 recheck (v-36: «Крылатое буйство» three times, no step): the row keeps the card AND the step - the
+    // card and the moves without the player (the stripe names the side, the tooltip keeps all), as the area line
+    // «Беспокойные духи: Медуза — урон 2»; a long one ends with «…» (the card and the fighter stay readable)
+    OutShorter->Add(Ms(TEXT("ms.log.effect.step"), {{TEXT("cardName"), Card}, {TEXT("moves"), Inline}}));
+    if (bStepOfPrevious && Trail.Moves.Num() > 0) {
+      // the next step of the same play: the row above names the card, this one the step («Гарпия 2 — на месте»)
+      OutShorter->Add(FText::FromString(Inline));
+      if (First != Inline) OutShorter->Add(FText::FromString(First));
+    } else if (Trail.Moves.Num() == 0) {
+      OutShorter->Add(FText::FromString(Card));  // RC acceptance B2: no fighter to name - the card alone
+    }
+    return;
+  }
   if (OutShorter && Trail.Moves.Num() > 0) {
-    // VS-5 E4 (HB-39): the moves without the player and the card (the stripe names the side, the tooltip keeps all),
-    // then the first move alone
+    // VS-5 E4 (HB-39): the moves without the player (the stripe names the side, the tooltip keeps all), then the first
+    // move alone
     OutShorter->Add(FText::FromString(Inline));
     if (First != Inline) OutShorter->Add(FText::FromString(First));
   }
-  if (OutShorter && Trail.Moves.Num() == 0 && bEffect) {
-    // 2026-10-15 playtest: «Медуза: эффект Рывок: бе…» - without the player: «эффект Рывок: без движения»
-    FString NoPlayer = Ms(TEXT("ms.log.effect"), {{TEXT("player"), FString()}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}}).ToString();
-    NoPlayer.RemoveFromStart(TEXT(": "));
-    OutShorter->Add(FText::FromString(NoPlayer.TrimStartAndEnd()));
-    // the card and the moves alone («Крылатое буйство: без движения») when even that does not fit the row
-    OutShorter->Add(FText::FromString(Card + TEXT(": ") + Inline));
-    OutShorter->Add(FText::FromString(Card));  // RC acceptance B2: a long card name alone (the tooltip keeps all)
-  }
-  if (OutShorter && Trail.Moves.Num() == 0 && !bEffect) {
+  if (OutShorter && Trail.Moves.Num() == 0) {
     // 2026-10-15 playtest: «Медуза: манёвр: без движе…» - a maneuver without moves had no shorter form; without the
     // player (the stripe names the side, the tooltip keeps all) it reads «манёвр: без движения»
     FString NoPlayer = Ms(TEXT("ms.log.maneuver"), {{TEXT("player"), FString()}, {TEXT("boostPart"), FString()},
                                                      {TEXT("moves"), Inline}}).ToString();
     NoPlayer.RemoveFromStart(TEXT(": "));
     OutShorter->Add(FText::FromString(NoPlayer.TrimStartAndEnd()));
-  }
-  if (bEffect) {
-    OutText = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}});
-    OutFull = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Full}});
-    return;
   }
   const FString Boost = Trail.bBoost ? Ms(TEXT("ms.log.boost.part"), {{TEXT("n"), FString::FromInt(Trail.BoostValue)},
                                                                      {TEXT("cardName"), Trail.BoostName.IsEmpty() ? FString(TEXT("?")) : Trail.BoostName}})
