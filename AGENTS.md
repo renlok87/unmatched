@@ -182,6 +182,28 @@ parent, executable path, and relation to this run; never kill processes by name
 alone. Do not close the user's Unreal Editor or Codex-owned MCP services. Keep a
 shared development service running only while current work needs it.
 
+## Model and effort for new agents (user decision 2026-10-21, binding)
+
+The user's words on 2026-10-21: «Там много параллельных сессий, и лимиты съедаются очень быстро. Возможно, стоит
+базовые задачи переключить на Sonnet High, либо Опус Medium. Сам возьми в зависимости от приоритета. Текущие задачи не
+трогай, которые в работе, но следующие запускай с подобным правилом.»
+
+This applies to every NEW session (`start_session`: `model`, `effort`), subagent (Agent `model`) and workflow agent
+(`agent(..., {model, effort})`). Sessions, workflows and agents already running keep their settings. This section
+supersedes the 2026-09-29 rule «all new workflows on Opus high».
+
+| Tier | Use for |
+|---|---|
+| **Sonnet high** (`model: "sonnet"`, `effort: "high"`) — the default | research and web search, file and code sweeps, docs and evidence READMEs, playtests and checks through `devexec.py`, Computer Use and browser clicking (Gemini, Tripo Studio, Z-Code), Art Hub and prop-list data entry, mechanical edits, status checks, ledger lines |
+| **Opus medium** (`effort: "medium"`) | code implementation with real logic (C++, backend, Blender and UE pipeline tools), Blender authoring and rework of a figure (stages 3 and 5), orchestrator sessions that coordinate other agents, integration and merge fixes |
+| **Opus high** | the second acceptor and the «Opus high» blind reviewer; architecture or design decisions; a bug that a cheaper tier has already failed to fix |
+| **Opus xhigh** | only the first acceptor and the «Opus xhigh» blind reviewer (section "AI tools and side models") |
+
+- The acceptance profiles «Opus xhigh» and «Opus high» stay as they are: the cards and `validate_card.py` depend on them.
+- Lower the tier when the step is mechanical. Raise it by one step only after a cheaper agent has visibly failed the
+  same step, and write down why.
+- Haiku is allowed for trivial lookups (one file or fact).
+
 ## AI tools and side models (user decision 2026-10-20, binding)
 
 The user's words on 2026-10-20: «Я отменил подписку на ChatGPT, так что если нужно генерировать ассеты, либо
