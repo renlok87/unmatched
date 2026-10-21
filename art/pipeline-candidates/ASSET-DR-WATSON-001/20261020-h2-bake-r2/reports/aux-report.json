@@ -1,0 +1,166 @@
+{
+  "ao_exclusions": [
+    {
+      "ao_delta_vs_bake": {
+        "max": 0.9141,
+        "mean": 0.04651,
+        "min": 0.0,
+        "p99": 0.7109,
+        "texels_gt_16_255": 220413,
+        "texels_gt_1_255": 297477
+      },
+      "baked_texels": 1522238,
+      "cage_extrusion_m": 0.0006,
+      "control_baked_texels": 1522238,
+      "control_delta_vs_bake": {
+        "max_abs": 0.0,
+        "note": "the same bake with nothing hidden: GPU noise floor of the AO bake",
+        "texels_gt_1_255": 0
+      },
+      "hidden_occluders": [
+        "tripo_part_3",
+        "tripo_part_13"
+      ],
+      "name": "coat_l_without_bag",
+      "part": "tripo_part_1"
+    },
+    {
+      "ao_delta_vs_bake": {
+        "max": 0.8984,
+        "mean": 0.02051,
+        "min": 0.0,
+        "p99": 0.5391,
+        "texels_gt_16_255": 105601,
+        "texels_gt_1_255": 162142
+      },
+      "baked_texels": 1595676,
+      "cage_extrusion_m": 0.0006,
+      "hidden_occluders": [
+        "tripo_part_5",
+        "tripo_part_14",
+        "tripo_part_12",
+        "tripo_part_19"
+      ],
+      "name": "coat_r_without_forearm",
+      "part": "tripo_part_2"
+    },
+    {
+      "ao_delta_vs_bake": {
+        "max": 0.9219,
+        "mean": 0.11731,
+        "min": 0.0,
+        "p99": 0.7578,
+        "texels_gt_16_255": 178724,
+        "texels_gt_1_255": 225137
+      },
+      "baked_texels": 506433,
+      "cage_extrusion_m": 0.000676,
+      "hidden_occluders": [
+        "tripo_part_1"
+      ],
+      "name": "bag_without_coat",
+      "part": "tripo_part_3"
+    }
+  ],
+  "checks": {
+    "position_covers_uv_raster": {
+      "expected": "every UV-raster texel has a position (the same triangles and pixel-centre rule as the uv stage)",
+      "measured": {
+        "position_outside_uv_raster": 0,
+        "uv_texels": 8157801,
+        "uv_texels_without_position": 0
+      },
+      "passed": true
+    }
+  },
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "passed": true,
+  "position": {
+    "frame": "final (authored) frame, metres, rest pose",
+    "per_part": {
+      "tripo_part_0": {
+        "texels_written": 774198,
+        "triangles": 1384
+      },
+      "tripo_part_1": {
+        "texels_written": 1537498,
+        "triangles": 3386
+      },
+      "tripo_part_10": {
+        "texels_written": 202687,
+        "triangles": 1800
+      },
+      "tripo_part_11": {
+        "texels_written": 158877,
+        "triangles": 1420
+      },
+      "tripo_part_12": {
+        "texels_written": 186636,
+        "triangles": 2299
+      },
+      "tripo_part_13": {
+        "texels_written": 194721,
+        "triangles": 1200
+      },
+      "tripo_part_14": {
+        "texels_written": 205232,
+        "triangles": 1199
+      },
+      "tripo_part_15": {
+        "texels_written": 210490,
+        "triangles": 1397
+      },
+      "tripo_part_16": {
+        "texels_written": 31650,
+        "triangles": 499
+      },
+      "tripo_part_17": {
+        "texels_written": 19245,
+        "triangles": 299
+      },
+      "tripo_part_18": {
+        "texels_written": 9406,
+        "triangles": 349
+      },
+      "tripo_part_19": {
+        "texels_written": 23410,
+        "triangles": 250
+      },
+      "tripo_part_2": {
+        "texels_written": 1597669,
+        "triangles": 3299
+      },
+      "tripo_part_3": {
+        "texels_written": 521613,
+        "triangles": 2077
+      },
+      "tripo_part_4": {
+        "texels_written": 564390,
+        "triangles": 1050
+      },
+      "tripo_part_5": {
+        "texels_written": 390652,
+        "triangles": 1977
+      },
+      "tripo_part_6": {
+        "texels_written": 523029,
+        "triangles": 1049
+      },
+      "tripo_part_7": {
+        "texels_written": 423060,
+        "triangles": 2008
+      },
+      "tripo_part_8": {
+        "texels_written": 317571,
+        "triangles": 3908
+      },
+      "tripo_part_9": {
+        "texels_written": 265767,
+        "triangles": 1699
+      }
+    }
+  },
+  "resolution": 4096,
+  "stage": "aux",
+  "status": "измерено"
+}

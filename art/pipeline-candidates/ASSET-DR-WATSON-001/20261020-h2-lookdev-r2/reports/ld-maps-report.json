@@ -1,0 +1,1252 @@
+{
+  "checks": {
+    "dielectric_bc_in_class_luminance_range": {
+      "expected": "<= 5 % of a class outside the preset luminance range (the v2 shader clamps the rest)",
+      "measured": {
+        "leather_smooth": {
+          "Y_p5_p95": [
+            0.0204,
+            0.0834
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "leather_worn": {
+          "Y_p5_p95": [
+            0.0207,
+            0.1814
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "linen": {
+          "Y_p5_p95": [
+            0.0214,
+            0.6787
+          ],
+          "range": [
+            0.02,
+            0.85
+          ],
+          "share_outside": 0.0
+        },
+        "silk": {
+          "Y_p5_p95": [
+            0.023,
+            0.3052
+          ],
+          "range": [
+            0.02,
+            0.85
+          ],
+          "share_outside": 0.0
+        },
+        "skin": {
+          "Y_p5_p95": [
+            0.0804,
+            0.3955
+          ],
+          "range": [
+            0.03,
+            0.6
+          ],
+          "share_outside": 0.0
+        },
+        "stone_base": {
+          "Y_p5_p95": [
+            0.0208,
+            0.0908
+          ],
+          "range": [
+            0.02,
+            0.12
+          ],
+          "share_outside": 0.0
+        },
+        "wood": {
+          "Y_p5_p95": [
+            0.0226,
+            0.2018
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "wool_coarse": {
+          "Y_p5_p95": [
+            0.027,
+            0.1436
+          ],
+          "range": [
+            0.02,
+            0.8
+          ],
+          "share_outside": 0.0
+        }
+      },
+      "passed": true
+    },
+    "lut_dds_read_back": {
+      "measured": {
+        "dds_sha256": "dd736ff411b074915cb1018125467151cc137f76040f6c268bd14c4699f0f570"
+      },
+      "passed": true
+    },
+    "lut_metal_f0_from_concept": {
+      "expected": {
+        "gold_antique": {
+          "Y": 0.13791,
+          "tolerance": 0.002
+        },
+        "steel_blued": {
+          "Y": 0.06299,
+          "tolerance": 0.002
+        }
+      },
+      "measured": {
+        "gold_antique": {
+          "Y": 0.1379,
+          "bc": [
+            0.2556,
+            0.1135,
+            0.033
+          ]
+        },
+        "steel_blued": {
+          "Y": 0.06302,
+          "bc": [
+            0.0771,
+            0.06,
+            0.0515
+          ]
+        }
+      },
+      "passed": true
+    },
+    "lut_metal_f0_plausible": {
+      "expected": "metal classes used by the hero: Y(F0) >= 0.45, channels <= 1 (library rule; oxide films excepted)",
+      "measured": {
+        "gold_antique": {
+          "Y": 0.1379,
+          "bc": [
+            0.2556,
+            0.1135,
+            0.033
+          ]
+        },
+        "steel_blued": {
+          "Y": 0.063,
+          "bc": [
+            0.0771,
+            0.06,
+            0.0515
+          ]
+        }
+      },
+      "passed": true
+    },
+    "matid_decodes_to_labels_4k": {
+      "expected": "floor(v / 16) == class index on every island texel",
+      "passed": true
+    },
+    "matid_values_valid": {
+      "expected": "index * 16 + 8",
+      "measured": [
+        8,
+        24,
+        72,
+        120,
+        136,
+        152,
+        168,
+        184,
+        216,
+        232,
+        248
+      ],
+      "passed": true
+    },
+    "orm_metallic_binary_per_class_4k": {
+      "expected": "ORM.B = 0 in dielectric classes, 255 in metal classes (4K; 2K = box average)",
+      "passed": true
+    },
+    "team_mask_only_on_cloth_classes": {
+      "measured": 0,
+      "passed": true
+    }
+  },
+  "classes": {
+    "gold_antique": {
+      "Y_p5_p50_p95": [
+        0.1788,
+        0.4755,
+        0.8581
+      ],
+      "bc_linear_median": [
+        0.6867,
+        0.4397,
+        0.159
+      ],
+      "bc_linear_median_before_grade": [
+        0.3564,
+        0.162,
+        0.0497
+      ],
+      "edge_mask_mean": 0.3158,
+      "share_of_islands": 0.0018,
+      "team_r_mean": 0.0,
+      "texels_4k": 14807,
+      "ymedClassHero": 0.4755
+    },
+    "leather_smooth": {
+      "Y_p5_p50_p95": [
+        0.0204,
+        0.0274,
+        0.0834
+      ],
+      "bc_linear_median": [
+        0.0497,
+        0.0232,
+        0.011
+      ],
+      "bc_linear_median_before_grade": [
+        0.0782,
+        0.0356,
+        0.0185
+      ],
+      "edge_mask_mean": 0.1548,
+      "share_of_islands": 0.0453,
+      "team_r_mean": 0.0,
+      "texels_4k": 369367,
+      "ymedClassHero": 0.02742
+    },
+    "leather_worn": {
+      "Y_p5_p50_p95": [
+        0.0207,
+        0.0263,
+        0.1814
+      ],
+      "bc_linear_median": [
+        0.0467,
+        0.0222,
+        0.0123
+      ],
+      "bc_linear_median_before_grade": [
+        0.0595,
+        0.0296,
+        0.0168
+      ],
+      "edge_mask_mean": 0.1901,
+      "share_of_islands": 0.0622,
+      "team_r_mean": 0.0,
+      "texels_4k": 507640,
+      "ymedClassHero": 0.02635
+    },
+    "legacy_bake": {
+      "Y_p5_p50_p95": [
+        0.0168,
+        0.1219,
+        0.2455
+      ],
+      "bc_linear_median": [
+        0.2051,
+        0.1022,
+        0.0545
+      ],
+      "bc_linear_median_before_grade": [
+        0.2831,
+        0.1529,
+        0.0953
+      ],
+      "edge_mask_mean": 0.1863,
+      "share_of_islands": 0.0217,
+      "team_r_mean": 0.0,
+      "texels_4k": 176641,
+      "ymedClassHero": 0.12185
+    },
+    "linen": {
+      "Y_p5_p50_p95": [
+        0.0214,
+        0.0332,
+        0.6787
+      ],
+      "bc_linear_median": [
+        0.0395,
+        0.0319,
+        0.0284
+      ],
+      "bc_linear_median_before_grade": [
+        0.0273,
+        0.0222,
+        0.0203
+      ],
+      "edge_mask_mean": 0.0875,
+      "share_of_islands": 0.0324,
+      "team_r_mean": 0.0,
+      "texels_4k": 264437,
+      "ymedClassHero": 0.03319
+    },
+    "silk": {
+      "Y_p5_p50_p95": [
+        0.023,
+        0.0756,
+        0.3052
+      ],
+      "bc_linear_median": [
+        0.1301,
+        0.0648,
+        0.0296
+      ],
+      "bc_linear_median_before_grade": [
+        0.1119,
+        0.0529,
+        0.0252
+      ],
+      "edge_mask_mean": 0.1965,
+      "share_of_islands": 0.032,
+      "team_r_mean": 0.0,
+      "texels_4k": 261282,
+      "ymedClassHero": 0.07557
+    },
+    "skin": {
+      "Y_p5_p50_p95": [
+        0.0804,
+        0.3237,
+        0.3955
+      ],
+      "bc_linear_median": [
+        0.6172,
+        0.2582,
+        0.1248
+      ],
+      "bc_linear_median_before_grade": [
+        0.5149,
+        0.2747,
+        0.1746
+      ],
+      "edge_mask_mean": 0.1634,
+      "share_of_islands": 0.0674,
+      "team_r_mean": 0.0,
+      "texels_4k": 549837,
+      "ymedClassHero": 0.32367
+    },
+    "steel_blued": {
+      "Y_p5_p50_p95": [
+        0.0714,
+        0.2306,
+        0.3413
+      ],
+      "bc_linear_median": [
+        0.2502,
+        0.227,
+        0.2086
+      ],
+      "bc_linear_median_before_grade": [
+        0.4564,
+        0.491,
+        0.5271
+      ],
+      "edge_mask_mean": 0.1896,
+      "share_of_islands": 0.0175,
+      "team_r_mean": 0.0,
+      "texels_4k": 142373,
+      "ymedClassHero": 0.23057
+    },
+    "stone_base": {
+      "Y_p5_p50_p95": [
+        0.0208,
+        0.0331,
+        0.0908
+      ],
+      "bc_linear_median": [
+        0.0423,
+        0.0307,
+        0.0262
+      ],
+      "bc_linear_median_before_grade": [
+        0.0545,
+        0.0437,
+        0.0382
+      ],
+      "edge_mask_mean": 0.0362,
+      "share_of_islands": 0.0949,
+      "team_r_mean": 0.0,
+      "texels_4k": 774198,
+      "ymedClassHero": 0.03308
+    },
+    "wood": {
+      "Y_p5_p50_p95": [
+        0.0226,
+        0.093,
+        0.2018
+      ],
+      "bc_linear_median": [
+        0.1529,
+        0.0802,
+        0.0437
+      ],
+      "bc_linear_median_before_grade": [
+        0.2705,
+        0.159,
+        0.1119
+      ],
+      "edge_mask_mean": 0.2281,
+      "share_of_islands": 0.0083,
+      "team_r_mean": 0.0,
+      "texels_4k": 67673,
+      "ymedClassHero": 0.09299
+    },
+    "wool_coarse": {
+      "Y_p5_p50_p95": [
+        0.027,
+        0.054,
+        0.1436
+      ],
+      "bc_linear_median": [
+        0.0887,
+        0.0452,
+        0.0296
+      ],
+      "bc_linear_median_before_grade": [
+        0.0953,
+        0.0437,
+        0.0222
+      ],
+      "edge_mask_mean": 0.0651,
+      "share_of_islands": 0.6165,
+      "team_r_mean": 0.5683,
+      "texels_4k": 5029546,
+      "ymedClassHero": 0.05403
+    }
+  },
+  "classify_steps": [
+    "part_default",
+    {
+      "rule": "face_skin",
+      "texels": 150142
+    },
+    {
+      "rule": "hat_band",
+      "texels": 40177
+    },
+    {
+      "rule": "shirt_cuff",
+      "texels": 7695
+    },
+    {
+      "rule": "gold_bag",
+      "texels": 13531
+    },
+    {
+      "rule": "gold_chain",
+      "texels": 832
+    },
+    {
+      "rule": "steel",
+      "texels": 140834
+    }
+  ],
+  "edge_mask": {
+    "config": {
+      "curvature_per_m": [
+        150,
+        600
+      ],
+      "smooth_px": 3
+    },
+    "curvature_p50_p90_p99_per_m": [
+      4.8,
+      327.1,
+      1221.9
+    ],
+    "edge_share_ge_0.5": 0.0869,
+    "metres_per_texel_4k_median": 0.0001326
+  },
+  "edge_texture": "T_DrWatson_H2LD_{,2K_}Edge.png: R8 (L), маска рёбер для EdgeMaskTexture v2 (линейная, sRGB выкл.)",
+  "grade": {
+    "blur_px": 2,
+    "gains": {
+      "gold_antique": {
+        "note": "металл — подсказка итерации 2 разведки (ld-s2) после потолка канала 0,92 (metal_cap); итерация 1 — полная подсказка (H2LD в превью почти чёрное 53/25/2 против концепта 139/95/50)",
+        "rgb": [
+          2.5814,
+          3.9406,
+          5.2354
+        ],
+        "scout_iter1": [
+          2.5098,
+          4.1473,
+          18.5111
+        ]
+      },
+      "leather_smooth": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.5636,
+          0.5636,
+          0.5174
+        ],
+        "scout_iter1": [
+          0.5636,
+          0.5636,
+          0.5174
+        ]
+      },
+      "leather_worn": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.5885,
+          0.5793,
+          0.5111
+        ],
+        "scout_iter1": [
+          0.5885,
+          0.5793,
+          0.5111
+        ]
+      },
+      "legacy_bake": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.7283,
+          0.6617,
+          0.5687
+        ],
+        "scout_iter1": [
+          0.7283,
+          0.6617,
+          0.5687
+        ]
+      },
+      "linen": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          1.4053,
+          1.4064,
+          1.3578
+        ],
+        "scout_iter1": [
+          1.4053,
+          1.4064,
+          1.3578
+        ]
+      },
+      "silk": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          1.162,
+          1.2018,
+          1.1962
+        ],
+        "scout_iter1": [
+          1.162,
+          1.2018,
+          1.1962
+        ]
+      },
+      "skin": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          1.1932,
+          0.9408,
+          0.7165
+        ],
+        "scout_iter1": [
+          1.1932,
+          0.9408,
+          0.7165
+        ]
+      },
+      "steel_blued": {
+        "note": "металл — демпфированно: итерация 2 × корень остатка итерации 2 (разведка ld-s2: H2LD 97/90/87 против концепта 77/68/63); HANDBOOK §4.4",
+        "rgb": [
+          0.5454,
+          0.4634,
+          0.3985
+        ],
+        "scout_iter1": [
+          0.4286,
+          0.3398,
+          0.2724
+        ],
+        "scout_iter2": [
+          0.4545,
+          0.3685,
+          0.3044
+        ]
+      },
+      "stone_base": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.7397,
+          0.6964,
+          0.6666
+        ],
+        "scout_iter1": [
+          0.7397,
+          0.6964,
+          0.6666
+        ]
+      },
+      "wood": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.568,
+          0.5075,
+          0.3894
+        ],
+        "scout_iter1": [
+          0.568,
+          0.5075,
+          0.3894
+        ]
+      },
+      "wool_coarse": {
+        "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD",
+        "rgb": [
+          0.9352,
+          1.0311,
+          1.3121
+        ],
+        "scout_iter1": [
+          0.9352,
+          1.0311,
+          1.3121
+        ]
+      }
+    },
+    "gains_note": "итерации ld_measure (≤ 3): подсказка concept / H2LD; металл — демпфированно (HANDBOOK §4.4). t_cap разведки: ld-s1 1,0 (9 классов вне допуска) → ld-s2 1,5 (вне: gold_antique 0,36, steel_blued 1,55) → ld-s3 1,5 (вне: gold_antique 0,33 — латунь и цепочка 336 px рендера, медиана смешана с соседями, ярче не даёт потолок канала металла 0,92)",
+    "luminance_clamp": {
+      "leather_smooth": {
+        "in_toe_below_2lo": 0.8135,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.3709
+      },
+      "leather_worn": {
+        "in_toe_below_2lo": 0.6988,
+        "lowered_above_max": 0.0078,
+        "raised_below_min": 0.379
+      },
+      "linen": {
+        "in_toe_below_2lo": 0.6318,
+        "lowered_above_max": 0.009,
+        "raised_below_min": 0.162
+      },
+      "silk": {
+        "in_toe_below_2lo": 0.2743,
+        "lowered_above_max": 0.0032,
+        "raised_below_min": 0.0726
+      },
+      "skin": {
+        "in_toe_below_2lo": 0.0424,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0129
+      },
+      "stone_base": {
+        "in_toe_below_2lo": 0.6067,
+        "lowered_above_max": 0.0279,
+        "raised_below_min": 0.2123
+      },
+      "wood": {
+        "in_toe_below_2lo": 0.2408,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0864
+      },
+      "wool_coarse": {
+        "in_toe_below_2lo": 0.288,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0341
+      }
+    },
+    "median_floor": 1.2,
+    "median_floor_applied": {
+      "leather_worn": {
+        "gain_used": [
+          0.6428,
+          0.6327,
+          0.5582
+        ],
+        "median_Y_with_profile_gain": 0.02197,
+        "raised_to": 0.024
+      }
+    }
+  },
+  "lut": {
+    "applied": [
+      {
+        "class": "gold_antique",
+        "field": "bc",
+        "value": [
+          0.2556,
+          0.1135,
+          0.033
+        ]
+      },
+      {
+        "class": "gold_antique",
+        "field": "wornBC",
+        "value": [
+          0.6521,
+          0.2806,
+          0.0756
+        ]
+      },
+      {
+        "class": "gold_antique",
+        "field": "ymedClassHero",
+        "value": 0.4755
+      },
+      {
+        "class": "leather_smooth",
+        "field": "bc",
+        "value": [
+          0.0497,
+          0.0232,
+          0.011
+        ]
+      },
+      {
+        "class": "leather_smooth",
+        "field": "ymedClassHero",
+        "value": 0.02742
+      },
+      {
+        "class": "leather_worn",
+        "field": "bc",
+        "value": [
+          0.0467,
+          0.0222,
+          0.0123
+        ]
+      },
+      {
+        "class": "leather_worn",
+        "field": "ymedClassHero",
+        "value": 0.02635
+      },
+      {
+        "class": "linen",
+        "field": "bc",
+        "value": [
+          0.0395,
+          0.0319,
+          0.0284
+        ]
+      },
+      {
+        "class": "linen",
+        "field": "roughTypical",
+        "value": 0.85
+      },
+      {
+        "class": "linen",
+        "field": "sheenIntensity",
+        "value": 0.0
+      },
+      {
+        "class": "linen",
+        "field": "specular",
+        "value": 0.1
+      },
+      {
+        "class": "linen",
+        "field": "ymedClassHero",
+        "value": 0.03319
+      },
+      {
+        "class": "silk",
+        "field": "bc",
+        "value": [
+          0.1301,
+          0.0648,
+          0.0296
+        ]
+      },
+      {
+        "class": "silk",
+        "field": "ymedClassHero",
+        "value": 0.07557
+      },
+      {
+        "class": "skin",
+        "field": "bc",
+        "value": [
+          0.6172,
+          0.2582,
+          0.1248
+        ]
+      },
+      {
+        "class": "skin",
+        "field": "ymedClassHero",
+        "value": 0.32367
+      },
+      {
+        "class": "steel_blued",
+        "field": "bc",
+        "value": [
+          0.0771,
+          0.06,
+          0.0515
+        ]
+      },
+      {
+        "class": "steel_blued",
+        "field": "wornBC",
+        "value": [
+          0.195,
+          0.1494,
+          0.1271
+        ]
+      },
+      {
+        "class": "steel_blued",
+        "field": "ymedClassHero",
+        "value": 0.23057
+      },
+      {
+        "class": "stone_base",
+        "field": "bc",
+        "value": [
+          0.0423,
+          0.0307,
+          0.0262
+        ]
+      },
+      {
+        "class": "stone_base",
+        "field": "ymedClassHero",
+        "value": 0.03308
+      },
+      {
+        "class": "wood",
+        "field": "bc",
+        "value": [
+          0.1529,
+          0.0802,
+          0.0437
+        ]
+      },
+      {
+        "class": "wood",
+        "field": "ymedClassHero",
+        "value": 0.09299
+      },
+      {
+        "class": "wool_coarse",
+        "field": "bc",
+        "value": [
+          0.0887,
+          0.0452,
+          0.0296
+        ]
+      },
+      {
+        "class": "wool_coarse",
+        "field": "roughTypical",
+        "value": 0.85
+      },
+      {
+        "class": "wool_coarse",
+        "field": "sheenIntensity",
+        "value": 0.0
+      },
+      {
+        "class": "wool_coarse",
+        "field": "specular",
+        "value": 0.1
+      },
+      {
+        "class": "wool_coarse",
+        "field": "ymedClassHero",
+        "value": 0.05403
+      }
+    ],
+    "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
+    "dds": "T_UM_MatLUT_Watson.dds",
+    "dds_sha256": "dd736ff411b074915cb1018125467151cc137f76040f6c268bd14c4699f0f570",
+    "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index",
+    "overrides_json": "T_UM_MatLUT_Watson.overrides.json",
+    "overrides_sha256": "db411f18cb3e3aabd040965b1e183140d099998e3704d5bdcd6851809a086b25",
+    "read_back_equals_half": true
+  },
+  "lut_start_values": {
+    "applied": {
+      "linen": {
+        "roughTypical": 0.85,
+        "sheenIntensity": 0.0,
+        "specular": 0.1
+      },
+      "wool_coarse": {
+        "roughTypical": 0.85,
+        "sheenIntensity": 0.0,
+        "specular": 0.1
+      }
+    },
+    "mode": "f139",
+    "rule": "F139 / Beowulf UE r3: cloth classes start with sheenIntensity 0, specular 0.1, roughTypical 0.85 (the library sheen 0.35 washed the fur out in UE); a lut_overrides field wins; lut_start_values \"library\" keeps the presets"
+  },
+  "matid": {
+    "downsample": "2x2 majority",
+    "encoding": "R8 unorm, index * 16 + 8, decode floor(v * 255 / 16)",
+    "gutter_px_4k": 16,
+    "master_px": 4096,
+    "runtime_px": 2048
+  },
+  "metal_f0": {
+    "applied_by": "ld_measure",
+    "classes": {
+      "gold_antique": {
+        "anchor": {
+          "class": "skin",
+          "concept_Y_linear": 0.3131,
+          "lut_bc_Y": 0.32489
+        },
+        "concept": {
+          "Y_linear": 0.1329,
+          "hue_deg": 30.0,
+          "sat": 0.632
+        },
+        "f0_linear": [
+          0.2556,
+          0.1135,
+          0.033
+        ],
+        "f0_srgb_value": 0.5426,
+        "reached": true,
+        "replaced_bc": [
+          0.6867,
+          0.4397,
+          0.159
+        ],
+        "replaced_bc_Y": 0.47195,
+        "scales": {},
+        "target": {
+          "Y": 0.13791,
+          "hue_deg": 30.0,
+          "sat": 0.632
+        },
+        "worn": {
+          "linear": [
+            0.6521,
+            0.2806,
+            0.0756
+          ],
+          "reached": true,
+          "srgb_value": 0.8279,
+          "target": {
+            "Y": 0.34476,
+            "hue_deg": 30.0,
+            "sat": 0.632
+          }
+        }
+      },
+      "steel_blued": {
+        "anchor": {
+          "class": "skin",
+          "concept_Y_linear": 0.3131,
+          "lut_bc_Y": 0.32489
+        },
+        "concept": {
+          "Y_linear": 0.0607,
+          "hue_deg": 21.4,
+          "sat": 0.182
+        },
+        "f0_linear": [
+          0.0771,
+          0.06,
+          0.0515
+        ],
+        "f0_srgb_value": 0.3076,
+        "reached": true,
+        "replaced_bc": [
+          0.2502,
+          0.227,
+          0.2086
+        ],
+        "replaced_bc_Y": 0.2306,
+        "scales": {},
+        "target": {
+          "Y": 0.06299,
+          "hue_deg": 21.4,
+          "sat": 0.182
+        },
+        "worn": {
+          "linear": [
+            0.195,
+            0.1494,
+            0.1271
+          ],
+          "reached": true,
+          "srgb_value": 0.4788,
+          "target": {
+            "Y": 0.15747,
+            "hue_deg": 21.4,
+            "sat": 0.182
+          }
+        }
+      }
+    },
+    "concept_report": {
+      "note": "concept zones of this run's ld_measure (h2-bake 0.9.0, skill check C18)",
+      "path": "reports/measure-report.json",
+      "source": "self"
+    },
+    "concept_source": "self",
+    "ld_maps_lut": {
+      "gold_antique": {
+        "bc": [
+          0.6867,
+          0.4397,
+          0.159
+        ],
+        "wornBC": null
+      },
+      "steel_blued": {
+        "bc": [
+          0.2502,
+          0.227,
+          0.2086
+        ],
+        "wornBC": null
+      }
+    },
+    "lut_column": {
+      "gold_antique": 4,
+      "steel_blued": 1
+    },
+    "rule": "F0 = sRGB colour of the concept class median hue / saturation with linear luminance Yconcept(class) / Yconcept(anchor) x Y(LUT bc of the anchor) x y_scale (pilot F138)"
+  },
+  "outputs": {
+    "T_DrWatson_H2LD_2K_BC.png": {
+      "bytes": 5412973,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "5cea94d91fd734d4930529389a2997129aeb8bcef481a5959aa1c5f31a787c1a"
+    },
+    "T_DrWatson_H2LD_2K_Edge.png": {
+      "bytes": 892549,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "b0ac68d831de221ba0146665dc7d9e34bfa226ab01057b6b8ba269aeb05b8c8b"
+    },
+    "T_DrWatson_H2LD_2K_MatID.png": {
+      "bytes": 86587,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "ab80a62924ead7823193d0ca9fd1b774c50f5ccf83f193e3d700c808a8b00065"
+    },
+    "T_DrWatson_H2LD_2K_N.png": {
+      "bytes": 4322295,
+      "copied_from": "T_DrWatson_H2_2K_N.png",
+      "sha256": "bb6a6f53586c7262974bee723cee80485364e4e16a3bc52cea8d111b4728752c"
+    },
+    "T_DrWatson_H2LD_2K_N_OpenGL.png": {
+      "bytes": 4322843,
+      "copied_from": "T_DrWatson_H2_2K_N_OpenGL.png",
+      "sha256": "faa8b4ffa4246bd9a819eae7a0473e4106091a65e6e186c8fe0d2d989b37e55d"
+    },
+    "T_DrWatson_H2LD_2K_ORM.png": {
+      "bytes": 3042802,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "5662f3f6def6a5fc5bfaa4203e21b00c575a8041e558d30b85de8d6c60f783dd"
+    },
+    "T_DrWatson_H2LD_2K_TeamMask.png": {
+      "bytes": 962415,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "f67f263cd3e8515db4b2b9cbcd3bf49c3d87254facab1ec62259d320064f3692"
+    },
+    "T_DrWatson_H2LD_BC.png": {
+      "bytes": 19136696,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "eecae352a178eefd410a896e5c522842d4d400286629023c988b8eba7fae0aaa"
+    },
+    "T_DrWatson_H2LD_Edge.png": {
+      "bytes": 2343561,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "7a3aac0a5c5411a52fb40a720c0e40752a36373067def27b993cbc52262777dd"
+    },
+    "T_DrWatson_H2LD_MatID.png": {
+      "bytes": 200260,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "00f449b028fef5d50c41c486b57e81812dc90f30700a91fe03d8b64c6148ebf5"
+    },
+    "T_DrWatson_H2LD_N.png": {
+      "bytes": 12701835,
+      "copied_from": "T_DrWatson_H2_N.png",
+      "sha256": "316d8307ea2690b9deacb15ac86fc3deab28a6193462d48cfd1fe8e704fbe4c5"
+    },
+    "T_DrWatson_H2LD_N_OpenGL.png": {
+      "bytes": 12702525,
+      "copied_from": "T_DrWatson_H2_N_OpenGL.png",
+      "sha256": "6395cdd25c3c85c607a610e954a1c39c2d78a7f4895fd348b4a459b04295ef01"
+    },
+    "T_DrWatson_H2LD_ORM.png": {
+      "bytes": 9521225,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "29ad11c685c26daaa6c954af2ce8467542e1501c28ff4fa19ab01526cadc3345"
+    },
+    "T_DrWatson_H2LD_TeamMask.png": {
+      "bytes": 2774963,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "de838ee7ca47ddf33503bb082c96a4826663450873401999f64cb213b6c2ac2d"
+    },
+    "T_UM_MatLUT_Watson.dds": {
+      "bytes": 2196,
+      "sha256": "dd736ff411b074915cb1018125467151cc137f76040f6c268bd14c4699f0f570"
+    },
+    "T_UM_MatLUT_Watson.overrides.json": {
+      "bytes": 1819,
+      "sha256": "db411f18cb3e3aabd040965b1e183140d099998e3704d5bdcd6851809a086b25"
+    }
+  },
+  "passed": true,
+  "pins": {
+    "2K_N": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_2K_N.png",
+      "pinned": true,
+      "sha256": "bb6a6f53586c7262974bee723cee80485364e4e16a3bc52cea8d111b4728752c"
+    },
+    "2K_N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_2K_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "faa8b4ffa4246bd9a819eae7a0473e4106091a65e6e186c8fe0d2d989b37e55d"
+    },
+    "BC": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_BC.png",
+      "pinned": true,
+      "sha256": "97787779f2acc717f722fb9fdc98c4b97786189344128ad5770553a69caa4afc"
+    },
+    "N": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_N.png",
+      "pinned": true,
+      "sha256": "316d8307ea2690b9deacb15ac86fc3deab28a6193462d48cfd1fe8e704fbe4c5"
+    },
+    "N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "6395cdd25c3c85c607a610e954a1c39c2d78a7f4895fd348b4a459b04295ef01"
+    },
+    "ORM": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_ORM.png",
+      "pinned": true,
+      "sha256": "560db159bb2617ed0c0acba142f70997a2aade2e45842726c40f85b3c9fbf3cc"
+    },
+    "TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_TeamMask.png",
+      "pinned": true,
+      "sha256": "779defcd7f6c1000874040a83e6c501393513d8b28bf0f1781a858efe26eedba"
+    },
+    "base_fbx": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/export/SM_DrWatson_H2_Base.fbx",
+      "pinned": true,
+      "sha256": "a9a22ffc8c4f10b71656f87d98950e51c4c4b7a9c10e20f174532478c3ceeb84"
+    },
+    "baseline_BC": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_BC.png",
+      "pinned": true,
+      "sha256": "97787779f2acc717f722fb9fdc98c4b97786189344128ad5770553a69caa4afc"
+    },
+    "baseline_ORM": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/textures/T_DrWatson_H2_ORM.png",
+      "pinned": true,
+      "sha256": "560db159bb2617ed0c0acba142f70997a2aade2e45842726c40f85b3c9fbf3cc"
+    },
+    "island_ids": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/work/uv/island_ids.npy",
+      "pinned": true,
+      "sha256": "53fe22a455e722773014cc25fe7cdf9b2318fff6246a00c7973ae5b2256a0335"
+    },
+    "metal_mask": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/work/uv/metal_mask.npy",
+      "pinned": true,
+      "sha256": "8b8a60f70865d6a5d74f96cf78b6467d56af5d481efb9b7e6f0aba31b065c8b4"
+    },
+    "part_ids": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/work/uv/part_ids.npy",
+      "pinned": true,
+      "sha256": "f556a49aac5b630402e68a657fa7e58da18029ca6c73f1d2ff27116d87841230"
+    },
+    "position": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/work/uv/position.npy",
+      "pinned": true,
+      "sha256": "8a95b8d612083dd69c67460e2ca40003763822b62843c57b5f00489a4cca2285"
+    },
+    "sk_authored": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/work/sk_authored.blend",
+      "pinned": true,
+      "sha256": "2fb859d538782e59922b7f93c70ef39a1350a84e6eaf6ee07bdc80f56acbfc01"
+    },
+    "skeletal_fbx": {
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/export/SK_DrWatson_H2.fbx",
+      "pinned": true,
+      "sha256": "4660af2c6c1af7517e4794cf36b220fc967d267cd7c1bdb02b0c7131ceb157e9"
+    }
+  },
+  "prefix": "T_DrWatson_H2LD",
+  "reclass_from_baseline_texels": 0,
+  "small_components_relabelled": {
+    "leather_smooth": 0,
+    "leather_worn": 442,
+    "legacy_bake": 344,
+    "linen": 623,
+    "silk": 3,
+    "skin": 150,
+    "stone_base": 0,
+    "wood": 1539,
+    "wool_coarse": 124
+  },
+  "stage": "ld_maps",
+  "status": "измерено",
+  "team_mask": {
+    "A": 255,
+    "B": "0 (без изменений)",
+    "G": "полоса подставки (без изменений)",
+    "R": "одежда (TeamColor) только в классах ['wool_coarse']"
+  }
+}
