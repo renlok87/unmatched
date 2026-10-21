@@ -1,0 +1,1160 @@
+{
+ "schema": "unmatched.h2anim-contact/1",
+ "clip": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2/export/AM_DrWatson_LungeAttack.fbx",
+ "clip_name": "LungeAttack",
+ "hero": "DrWatson",
+ "spec": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json",
+ "base": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SM_DrWatson_H2_Base.fbx",
+ "height_m": 0.40196,
+ "frames": 15,
+ "role": "oneshot",
+ "tool": "tools/tripo-pipeline/anim/clip_contact_check.py",
+ "base_top": {
+  "top_cm": 4.871,
+  "max_vertex_cm": 5.004,
+  "up_faces": 758,
+  "up_area_share": 0.3429,
+  "fallback": null,
+  "rule": "верх подставки — 90-й перцентиль по площади высот центров граней, смотрящих вверх (нормаль ≤ 30° от +Z), не выше максимума вершин; не максимум вершин (C40: бугорок 3 мм на 6,00 см при видимой поверхности 5,68 см у Beowulf заставлял острие висеть)"
+ },
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "foot_slide_L",
+   "status": "pass",
+   "max_of_height": 6e-06,
+   "frame": 5,
+   "pinned_frames": 15,
+   "tol": 0.005,
+   "foot_vertices": 778
+  },
+  {
+   "check": "foot_slide_R",
+   "status": "pass",
+   "max_of_height": 2e-06,
+   "frame": 3,
+   "pinned_frames": 15,
+   "tol": 0.005,
+   "foot_vertices": 623
+  },
+  {
+   "check": "weapon_body",
+   "status": "pass",
+   "soft_violations": [],
+   "soft_frames": 0,
+   "rest_pairs": 324,
+   "rest_bones": {
+    "hips": 324
+   },
+   "max_pairs": 324,
+   "frame": 0,
+   "body_bones": {
+    "hips": 324
+   },
+   "violations": [],
+   "violating_frames": 0,
+   "excluded_grip_bones": [
+    "arm_lower.R",
+    "hand.R"
+   ],
+   "parts": [
+    {
+     "part": "SK_DrWatson_H2_Revolver",
+     "kind": "mesh",
+     "triangles": 2299
+    },
+    {
+     "part": "weapon.R",
+     "kind": "body_bone",
+     "bone": "weapon.R",
+     "islands": false,
+     "triangles": 250,
+     "vertices": 196,
+     "excluded_attach_bones": [
+      "weapon.R"
+     ]
+    },
+    {
+     "part": "hand.L#islands",
+     "kind": "body_bone",
+     "bone": "hand.L",
+     "islands": true,
+     "triangles": 2077,
+     "vertices": 1138,
+     "excluded_attach_bones": [
+      "hand.L"
+     ]
+    }
+   ],
+   "rest_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 324
+    }
+   },
+   "parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 324
+    }
+   }
+  },
+  {
+   "check": "limb_body_L",
+   "status": "pass",
+   "rest_regions": {
+    "spine": 1,
+    "hips": 325
+   },
+   "max_pairs": 327,
+   "frame": 14,
+   "regions": {
+    "hips": 325,
+    "spine": 2
+   },
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "limb_body_R",
+   "status": "pass",
+   "rest_regions": {
+    "spine": 4
+   },
+   "max_pairs": 4,
+   "frame": 0,
+   "regions": {
+    "spine": 4
+   },
+   "new_region_frames": 0,
+   "pair_violations": [],
+   "soft_violations": [],
+   "wings": false,
+   "level": "fail"
+  },
+  {
+   "check": "skin_weight_bleed",
+   "status": "info",
+   "frames": [],
+   "frame": 0,
+   "max_bleed_fail_edges": 0,
+   "bleed_vertices": 0,
+   "bleed_regions": {},
+   "radius_of_height": 0.1,
+   "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+  },
+  {
+   "check": "skin_stretch",
+   "status": "warn",
+   "fail_frames": [],
+   "torn_frames": [],
+   "warn_frames": [
+    4,
+    5,
+    6,
+    7,
+    10
+   ],
+   "frame": 6,
+   "visible_torn_edges": 0,
+   "visible_regions": {},
+   "visible_xyz_cm": [],
+   "fail_edges": 0,
+   "fail_regions": {},
+   "fail_z_of_height": null,
+   "warn_edges": 6,
+   "warn_regions": {
+    "arm_lower.R|hand.R": 6
+   },
+   "warn_z_of_height": 0.676,
+   "max_ratio": 4.284,
+   "max_growth_of_height": 0.02415,
+   "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+   "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+   "warn_rule": "ребро > 3× rest и > 1.0 % H"
+  },
+  {
+   "check": "weapon_tip",
+   "status": "info",
+   "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+  },
+  {
+   "check": "weapon_below_base_top_outside",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0,
+   "tol": 0.002,
+   "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки",
+   "parts": [
+    "SK_DrWatson_H2_Revolver",
+    "weapon.R",
+    "hand.L#islands"
+   ]
+  },
+  {
+   "check": "below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.001195,
+   "max_penetration_of_height": 0.001195,
+   "frame": 0,
+   "worst_bone": "foot.R",
+   "tol": 0.002,
+   "base_top_cm": 4.871,
+   "base_radius_cm": 11.756,
+   "base_top_max_vertex_cm": 5.004
+  },
+  {
+   "check": "hem_below_base_top",
+   "status": "pass",
+   "rest_penetration_of_height": 0.001647,
+   "max_penetration_of_height": 0.001647,
+   "frame": 0,
+   "warn_above": 0.003647,
+   "fail_above": 0.015,
+   "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+  },
+  {
+   "check": "below_ground",
+   "status": "pass",
+   "max_of_height": 0.0,
+   "frame": 0
+  },
+  {
+   "check": "loop_seam",
+   "status": "info",
+   "note": "не петля (oneshot)"
+  }
+ ],
+ "fails": [],
+ "result": "pass",
+ "per_frame": [
+  {
+   "f": 0,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 324,
+   "weapon_body_bones": {
+    "hips": 324
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 325,
+     "spine": 1
+    },
+    "R": {
+     "spine": 4
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.0,
+    "max_growth_of_height": 0.0
+   },
+   "weapon_tip": {
+    "r_of_base": 1.0752,
+    "dz_of_height": 0.851397,
+    "xyz_cm": [
+     8.541,
+     -9.325,
+     39.094
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001647,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 324
+    }
+   }
+  },
+  {
+   "f": 1,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 3
+    },
+    "R": {
+     "spine": 2
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.37,
+    "max_growth_of_height": 0.00287
+   },
+   "weapon_tip": {
+    "r_of_base": 1.1084,
+    "dz_of_height": 0.838291,
+    "xyz_cm": [
+     9.58,
+     -8.84,
+     38.567
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001642,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {}
+   }
+  },
+  {
+   "f": 2,
+   "foot_slide": {
+    "L": 2e-06,
+    "R": 1e-06
+   },
+   "weapon_body_pairs": 12,
+   "weapon_body_bones": {
+    "hips": 12
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 13,
+     "spine": 1
+    },
+    "R": {
+     "spine": 1
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.836,
+    "max_growth_of_height": 0.00648
+   },
+   "weapon_tip": {
+    "r_of_base": 1.1505,
+    "dz_of_height": 0.818874,
+    "xyz_cm": [
+     10.942,
+     -7.957,
+     37.786
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001634,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 12
+    }
+   }
+  },
+  {
+   "f": 3,
+   "foot_slide": {
+    "L": 3e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 10,
+   "weapon_body_bones": {
+    "hips": 10
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 11
+    },
+    "R": {
+     "spine": 3
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.629,
+    "max_growth_of_height": 0.01263
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2072,
+    "dz_of_height": 0.785325,
+    "xyz_cm": [
+     12.62,
+     -6.498,
+     36.438
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.00163,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 10
+    }
+   }
+  },
+  {
+   "f": 4,
+   "foot_slide": {
+    "L": 5e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 7,
+   "weapon_body_bones": {
+    "hips": 7
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 8,
+     "spine": 3
+    },
+    "R": {
+     "spine": 1
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 2,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 2
+     },
+     "z_of_height": 0.706
+    },
+    "max_ratio": 3.402,
+    "max_growth_of_height": 0.01862
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2582,
+    "dz_of_height": 0.742326,
+    "xyz_cm": [
+     13.847,
+     -5.206,
+     34.71
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001631,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 7
+    }
+   }
+  },
+  {
+   "f": 5,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 10,
+   "weapon_body_bones": {
+    "hips": 10
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 11,
+     "spine": 1
+    },
+    "R": {
+     "spine": 1
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 5,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 5
+     },
+     "z_of_height": 0.688
+    },
+    "max_ratio": 3.856,
+    "max_growth_of_height": 0.02214
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2945,
+    "dz_of_height": 0.694053,
+    "xyz_cm": [
+     14.276,
+     -5.278,
+     32.769
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001633,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 10
+    }
+   }
+  },
+  {
+   "f": 6,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 10,
+   "weapon_body_bones": {
+    "hips": 10
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 12
+    },
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 6,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 6
+     },
+     "z_of_height": 0.676
+    },
+    "max_ratio": 4.284,
+    "max_growth_of_height": 0.02415
+   },
+   "weapon_tip": {
+    "r_of_base": 1.3082,
+    "dz_of_height": 0.65578,
+    "xyz_cm": [
+     14.259,
+     -5.769,
+     31.231
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001634,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 10
+    }
+   }
+  },
+  {
+   "f": 7,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 10,
+   "weapon_body_bones": {
+    "hips": 10
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 11,
+     "spine": 1
+    },
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 6,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 6
+     },
+     "z_of_height": 0.676
+    },
+    "max_ratio": 4.284,
+    "max_growth_of_height": 0.02415
+   },
+   "weapon_tip": {
+    "r_of_base": 1.3101,
+    "dz_of_height": 0.655831,
+    "xyz_cm": [
+     14.286,
+     -5.763,
+     31.233
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001634,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 10
+    }
+   }
+  },
+  {
+   "f": 8,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 1,
+     "hips": 1
+    },
+    "R": {
+     "spine": 3
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.594,
+    "max_growth_of_height": 0.00779
+   },
+   "weapon_tip": {
+    "r_of_base": 1.152,
+    "dz_of_height": 0.761049,
+    "xyz_cm": [
+     12.565,
+     -5.062,
+     35.462
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001634,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {}
+   }
+  },
+  {
+   "f": 9,
+   "foot_slide": {
+    "L": 6e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "hips": 1
+    },
+    "R": {
+     "spine": 3
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 3.158,
+    "max_growth_of_height": 0.0121
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2011,
+    "dz_of_height": 0.729753,
+    "xyz_cm": [
+     13.203,
+     -5.013,
+     34.204
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001633,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {}
+   }
+  },
+  {
+   "f": 10,
+   "foot_slide": {
+    "L": 5e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 1
+    },
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 1,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {
+      "arm_lower.R|hand.R": 1
+     },
+     "z_of_height": 0.686
+    },
+    "max_ratio": 3.714,
+    "max_growth_of_height": 0.01769
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2535,
+    "dz_of_height": 0.697213,
+    "xyz_cm": [
+     13.683,
+     -5.477,
+     32.896
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001631,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {}
+   }
+  },
+  {
+   "f": 11,
+   "foot_slide": {
+    "L": 3e-06,
+    "R": 2e-06
+   },
+   "weapon_body_pairs": 7,
+   "weapon_body_bones": {
+    "hips": 7
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 8,
+     "spine": 3
+    },
+    "R": {}
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.952,
+    "max_growth_of_height": 0.01426
+   },
+   "weapon_tip": {
+    "r_of_base": 1.2443,
+    "dz_of_height": 0.740149,
+    "xyz_cm": [
+     12.896,
+     -6.912,
+     34.622
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.00163,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 7
+    }
+   }
+  },
+  {
+   "f": 12,
+   "foot_slide": {
+    "L": 2e-06,
+    "R": 1e-06
+   },
+   "weapon_body_pairs": 12,
+   "weapon_body_bones": {
+    "hips": 12
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 15,
+     "spine": 1
+    },
+    "R": {
+     "spine": 1
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 2.089,
+    "max_growth_of_height": 0.00845
+   },
+   "weapon_tip": {
+    "r_of_base": 1.1926,
+    "dz_of_height": 0.795283,
+    "xyz_cm": [
+     11.256,
+     -8.365,
+     36.838
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001634,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 12
+    }
+   }
+  },
+  {
+   "f": 13,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 0,
+   "weapon_body_bones": {},
+   "limb_body_pairs": {
+    "L": {
+     "spine": 2,
+     "hips": 1
+    },
+    "R": {
+     "spine": 1
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.535,
+    "max_growth_of_height": 0.00415
+   },
+   "weapon_tip": {
+    "r_of_base": 1.1361,
+    "dz_of_height": 0.82702,
+    "xyz_cm": [
+     9.807,
+     -9.075,
+     38.114
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001642,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {}
+   }
+  },
+  {
+   "f": 14,
+   "foot_slide": {
+    "L": 0.0,
+    "R": 0.0
+   },
+   "weapon_body_pairs": 324,
+   "weapon_body_bones": {
+    "hips": 324
+   },
+   "limb_body_pairs": {
+    "L": {
+     "hips": 325,
+     "spine": 2
+    },
+    "R": {
+     "spine": 4
+    }
+   },
+   "skin_stretch": {
+    "fail": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "warn": {
+     "edges": 0,
+     "bleed_edges": 0,
+     "visible_edges": 0,
+     "visible_regions": {},
+     "visible_xyz_cm": [],
+     "regions": {},
+     "z_of_height": null
+    },
+    "max_ratio": 1.0,
+    "max_growth_of_height": 0.0
+   },
+   "weapon_tip": {
+    "r_of_base": 1.0752,
+    "dz_of_height": 0.851397,
+    "xyz_cm": [
+     8.541,
+     -9.325,
+     39.094
+    ]
+   },
+   "weapon_below_base_top_outside": 0.0,
+   "base_penetration": 0.001195,
+   "base_penetration_bone": "foot.R",
+   "hem_penetration": 0.001647,
+   "below_ground": 0.0,
+   "weapon_parts_bones": {
+    "SK_DrWatson_H2_Revolver": {},
+    "weapon.R": {},
+    "hand.L#islands": {
+     "hips": 324
+    }
+   }
+  }
+ ],
+ "note": "техническая проверка контактов; не художественная приёмка"
+}

@@ -5,11 +5,11 @@
  "ue_hero": "DrWatson",
  "asset_id": "ASSET-DR-WATSON-001",
  "status": "proposed",
- "status_note": "Этап 6 скилла 3d-model-pipeline (волна A мини-пачки 2026-10-20): 4 клипа D-11 на H2-меше Dr. Watson (прогон art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2): револьвер в правой руке (weapon.R, отдельный меш), саквояж жёстко на hand.L, длинное пальто (cloth_shell, стыки рукавов r2), котелок, ноги в rest почти прямые (запас цепи 0,02 см). Паттерн библиотеки — Medusa (дальний бой, контакт к.8, Idle 56 к.): тайминг и ключевые позы её клипов, зеркально на правую руку. Правая рука во всех клипах, кроме Idle, — aim-ключи полными базисами, решены по rest этого прогона скриптом C:/tmp/dr-watson-stage6/gen_spec.py: локоть гнётся только на своём шарнире (≤ 108°, rest 91°), предплечье не скручивается, кисть только сгибается без скрутки (≤ 26°); в Idle — малые волны вокруг шарнира. Левая рука — aim-ключи arm_upper.L: саквояж держит место у полы в осях таза (в поклоне — отвесно) со сдвигом наружу, не глубже rest. Таз: голова hips не на хвосте root (импорт FBX не соединяет кости, F112 не действует), hips_loc — только малые сдвиги и опускание для досягаемости ног (запас ≥ 0.01 см на каждом кадре). Без шаблонов черновиков. Оси ключей: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо, Y наклон вперёд, Z поворот влево. Цель H2 зафиксирована sha256. Статус максимум «технически импортировано»; приёмка клипов — шаг 7a.2 (ДС-1).",
+ "status_note": "Этап 6 скилла 3d-model-pipeline (волна A мини-пачки 2026-10-20): 4 клипа D-11 на H2-меше Dr. Watson (прогон art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3): револьвер в правой руке (weapon.R, отдельный меш), саквояж жёстко на hand.L, длинное пальто (cloth_shell, стыки рукавов r2), котелок, ноги в rest почти прямые (запас цепи 0,02 см). Паттерн библиотеки — Medusa (дальний бой, контакт к.8, Idle 56 к.): тайминг и ключевые позы её клипов, зеркально на правую руку. Правая рука во всех клипах, кроме Idle, — aim-ключи полными базисами, решены по rest этого прогона скриптом C:/tmp/dr-watson-stage6/gen_spec.py: локоть гнётся только на своём шарнире (≤ 108°, rest 91°), предплечье не скручивается, кисть только сгибается без скрутки (≤ 26°); в Idle — малые волны вокруг шарнира. Левая рука — aim-ключи arm_upper.L: саквояж держит место у полы в осях таза (в поклоне — отвесно) со сдвигом наружу, не глубже rest. Таз: голова hips не на хвосте root (импорт FBX не соединяет кости, F112 не действует), hips_loc — только малые сдвиги и опускание для досягаемости ног (запас ≥ 0.01 см на каждом кадре). Без шаблонов черновиков. Оси ключей: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо, Y наклон вперёд, Z поворот влево. Цель H2 зафиксирована sha256. Статус максимум «технически импортировано»; приёмка клипов — шаг 7a.2 (ДС-1).",
  "target": {
-  "sk_fbx": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/export/SK_DrWatson_H2.fbx",
-  "base_fbx": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2/export/SM_DrWatson_H2_Base.fbx",
-  "sha256": "4660af2c6c1af7517e4794cf36b220fc967d267cd7c1bdb02b0c7131ceb157e9",
+  "sk_fbx": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SK_DrWatson_H2.fbx",
+  "base_fbx": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3/export/SM_DrWatson_H2_Base.fbx",
+  "sha256": "cb8e5b6f8fb8a31edcac1a5297593bb4f4655024d072025f59faf9a0c5e562f9",
   "rest_generation": "H2"
  },
  "meshes": {
@@ -28,7 +28,7 @@
    }
   ]
  },
- "run_dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim",
+ "run_dir": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2anim-r2",
  "ue": {
   "skeleton": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton",
   "mesh_for_preview": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson",
@@ -2031,7 +2031,7 @@
  "history": {
   "pattern_spec": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
   "pattern_sha256": "a296638a775be04088020726272f02e90ecdcb61430fda24bb9b05e85f7bb319",
-  "generator": "C:/tmp/dr-watson-stage6/gen_spec.py --bake-run art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r2",
+  "generator": "C:/tmp/dr-watson-stage6/gen_spec.py --bake-run art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake-r3",
   "rest": {
    "arm_R_reach_cm": 10.908,
    "elbow_rest_deg": 91.3,
