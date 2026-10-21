@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSideboard.fbx",
+      "sha256": "8be4336cca6369f2f2e7254da1cf1e042853fd0ea22b7ab2d6679ce73259b4d2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_BC.png",
+      "sha256": "2b7a8bf16bccece66315d5402c868d72a09e13015fdb43c66a45b3677a68cfd4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_N.png",
+      "sha256": "1409fc7265baee8538841fa8e73bef0941949068ccfa1a3ed01242ba884d18b4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_ORM.png",
+      "sha256": "d7bb90d88fbd4dd55cf1663d8dcdbfb83e831af908692260cd5f439d071fe85e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-sideboard-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSideboard.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "5165 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "UV0 islands 1374, used 0.69, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "T_Env_BaskervilleSideboard_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "SM_Env_BaskervilleSideboard, M_Env_BaskervilleSideboard",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: резной буфет из махагони с зеркальной надстройкой, на столешнице хрустальные графины и серебряное блюдо. Все главные части совпадают с sheet.png: арочное зеркало, гребень с центральным шпилем, угловые стойки с навершиями, волюты с вазонами, три ящика с бронзовыми ручками, три двери с готическими арками и резьбой, цоколь с выступами-раскреповкой, три графина на подносе слева, блюдо на подставке справа. Доля надстройки по высоте 0,52 против 0,49 на листе (около 3 % высоты, в пределах 5 %). Лишних и пропавших частей нет. Предмет узнаётся со всех 8 ракурсов: на 090/270 читается профиль с надстройкой и волютами, сзади ровные филёнчатые щиты. Есть расхождение с описанием по ширине: при высоте 48 uu выходит 36,3×11,9 uu, отношение ширины к высоте около 0,76 против примерно 1,13 у заказанных 1,8×0,6×1,6 м. Модель здесь точно повторяет лист, поэтому это не дефект генерации; вынесено в known_issues.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей нет. Тонкие элементы целы: шпиль, навершия, вазоны, ножки подставки блюда. Сетка лоупольная (smart mesh): филёнки плоские, фаски по форме, резьба дверей отдана нормали; на wire-* сетка следует форме. Дефекты видны только на крупном плане. Ажурный гребень сделан сплошной пластиной, просветы в нём лишь нарисованы (wire-34, wire-front, close-head); концы волют комковатые; под центральной подвеской тёмный кончик. Задняя сторона гребня — ступенчатый оплывший бугор (wire-back), но спинка стоит к стене. Открытые контуры из отчёта сборки (дно, низ надстройки, щели за пилястрами) и зазор графинов около 0,55 uu в кадрах не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: насыщенное красное дерево с текстурой волокон, гранёное стекло графинов, серебро блюда, бронза ручек, состаренное зеркало. В BC нет запечённого света и теней (проверен сам T_Env_BaskervilleSideboard_BC.png: щиты ровного цвета). Белые пятна на щитах, цоколе и низе дверей — блики key-света: в ORM шероховатость равномерная, около 0,27. Детализация резьбы богаче эталона кита Sarpedon. Дефекты крупного плана: на зеркале справа внизу неровное белое неметаллическое пятно (шов проекции маски металличности; на turn-315 видна лишь точка); графины частично окрашены в коричневый цвет дерева; просветы гребня закрашены светло-серым. Общий глянец выше, чем на листе и в стиле ручной росписи миниатюры; это параметр материала, не порча текстуры.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score = round((2,0+1,5+1,5)/6×10, 1) = 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Замечания F и T есть только на крупном плане или зависят от параметров материала, поэтому вынесены в known_issues. Балл в диапазоне 8,0–8,4: по §8.5 нужен второй приёмщик (Opus high).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Футпринт уже заказанного: при высоте 48 uu выходит 36,3×11,9 uu (в натуральном масштабе около 1,21×0,40 м) против примерно 1,8×0,6×1,6 м в описании; отношение ширины к высоте около 0,76 вместо примерно 1,13. Модель повторяет пропорции sheet.png. Проверить при раскладке столовой."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Ажурный гребень сделан сплошной пластиной (см. wire-34/wire-front), просветы только нарисованы; концы волют комковатые, под центральной подвеской тёмный кончик. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Задняя сторона гребня — ступенчатый оплывший бугор, щиты спинки плоские. Видно только сзади; проп стоит спинкой к стене."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На зеркале справа внизу неровное белое неметаллическое пятно (шов проекции маски металличности, на turn-315 видна точка); стекло графинов частично окрашено в коричневый цвет дерева."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Шероховатость в ORM.G равномерная, около 0,27: под key-светом на щитах спинки, цоколе и низе дверей видны сильные белые блики (turn-000, turn-135). Глянец выше, чем на листе и в стиле ручной росписи миниатюры; BC чистый. При желании поднять шероховатость в параметрах env_kit или материала."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-SIDEBOARD-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп sideboard (буфет) кита Baskerville Manor принят по делегированию с баллом 8,3 (S 2,0 / F 1,5 / T 1,5). Замечания крупного плана и глянец вынесены в known_issues; при балле 8,0–8,4 нужен второй приёмщик Opus high."
+}

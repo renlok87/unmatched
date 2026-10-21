@@ -1,0 +1,177 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleIronGardenBench.fbx",
+      "sha256": "5b1122643581a281bb9f94565375460b2f5299498bd4b309ba3e698014ed3cf6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronGardenBench_BC.png",
+      "sha256": "f96e1e5d39ae0b029cafbcf93d7b36890404d0d5ec2992b0e6f2d0c10d73549b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronGardenBench_N.png",
+      "sha256": "e9be60c434f4a9490f5eeb06aa4ea1d067b99f425276b4a0da894cca2cc4bed2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronGardenBench_ORM.png",
+      "sha256": "791343a5fabc9ed68255dc6adce1a3e3bd265db6fdd94dd633a94933c2412245"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-iron-garden-bench-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleIronGardenBench.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+      "note": "5584 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+      "note": "UV0 islands 755, used 0.5807, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+      "note": "T_Env_BaskervilleIronGardenBench_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json",
+      "note": "SM_Env_BaskervilleIronGardenBench, M_Env_BaskervilleIronGardenBench",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Предмет тот, что заказан: викторианская чугунная скамья с деревянными рейками, боковины с папоротником, подлокотники-завитки, навершия-шишки, лапы-ножки; пропорции близки к sheet.png, узнаётся со всех 8 ракурсов. Но зазоры между рейками спинки закрыты фантомной перепонкой (оболочкой) светло-серого цвета: на sheet.png зазоры сквозные (виден фон), а на wire-front/wire-back сквозными остались только квадратные окошки у крайних стоек, по всей средней части между рейками сплошная поверхность; на turn-000, turn-180, turn-315 и close-head за рейками светло-серая плоскость с центральной стойкой перед ней. Второстепенно: сиденье сплошное с бороздками вместо реек с зазорами (close-base). По рубрике фантомная оболочка на wire-* -> 0,5.",
+      "frames": [
+        "sheet.png",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дыр, рваных краёв и вывернутых частей нет; тонкие подлокотники, навершия, завитки и ножки целы; сетка на wire-34 следует форме, внешние стороны боковин с читаемым рельефом папоротника (turn-090, turn-270). Дефект на полном росте: внутренние стороны обеих боковин — оплывшие гладкие массы (большой лист и круглый лист без прожилок, нижний орнамент — бесформенный комок), видно на turn-045 (левая боковина), turn-315 и turn-135 (правая). Мелочь: светлая щепка-полоска под центром передней кромки сиденья (turn-045, turn-315). Перепонка спинки учтена в S.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "turn-135.jpg",
+        "wire-34.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево читается как дерево (тёплые рейки с волокном и болтами), чугун как тёмно-серый металл; внешние стороны боковин с хорошей прорисовкой папоротника, уровень детализации там не беднее эталона кита. Дефект на полном росте в одной зоне: внутренние стороны боковин — мыло без рисунка папоротника с тёмными пятнистыми разводами (turn-315, turn-135, turn-045). Перепонка спинки окрашена светло-серым фоном исходной картинки (чужой цвет, следствие фантомной оболочки, учтено в S). Крупный план: размытая волнистая текстура на верхней рейке спинки (close-head); на чугуне светлые полосы, похожие на запечённые блики (turn-090, turn-045).",
+      "frames": [
+        "turn-315.jpg",
+        "turn-135.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 4.2,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5: Tripo закрыл сквозные зазоры между рейками спинки фантомной перепонкой, окрашенной серым фоном исходного вида (wire-front, wire-back, turn-000, turn-180), поэтому нужна перегенерация в Tripo (этап 2). Для перегенерации: вид с контрастным фоном, хорошо видным в зазорах спинки, и/или вид сзади. Сквозные зазоры проверить на wire-front. Внутренние стороны боковин должны получить папоротник, а не оплывшие массы. Score = (0,5+1,0+1,0)/6×10 = 4,2.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wire-front.jpg",
+      "note": "Фантомная оболочка: зазоры между рейками спинки закрыты сплошной светло-серой перепонкой (сквозные только окошки у крайних стоек); на sheet.png зазоры открытые. Видно также на wire-back, turn-000, turn-180, close-head."
+    },
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Сиденье — сплошной блок с бороздками вместо реек с зазорами (второстепенно)."
+    },
+    {
+      "item": "F",
+      "frame": "turn-315.jpg",
+      "note": "Внутренние стороны обеих боковин — оплывшие гладкие массы вместо листьев папоротника: виден на полном росте (также turn-045, turn-135)."
+    },
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "note": "Светлая щепка-полоска геометрии под центром передней кромки сиденья (также turn-315)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "Внутренние стороны боковин: мыло без рисунка папоротника и тёмные пятнистые разводы (также turn-315, turn-045)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Крупный план: размытая волнистая текстура дерева на верхней рейке спинки; перепонка окрашена серым фоном исходной картинки."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Светлые полосы на чугуне подлокотников и ножек, похожие на запечённые блики (второстепенно)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-IRON-GARDEN-BENCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп iron-garden-bench (Baskerville Manor) не принят. Фантомная перепонка закрыла зазоры спинки, внутренние стороны чугунных боковин оплыли. Вернуть на этап 2 и перегенерировать в Tripo."
+}

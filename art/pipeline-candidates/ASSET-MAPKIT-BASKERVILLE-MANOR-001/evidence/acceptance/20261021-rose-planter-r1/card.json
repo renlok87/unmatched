@@ -1,0 +1,179 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleRosePlanter.fbx",
+      "sha256": "2482cee1b21ea0bc56d5c39d9531c0d1d1e8941fddddb7aa0ec61e902fdcbb21"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRosePlanter_BC.png",
+      "sha256": "ff48ee4a01afc0a206c621be1e3475005c6440141ddae8456d8c8f5c698789ca"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRosePlanter_N.png",
+      "sha256": "4e62eb6138222b88eeb95b6822d7fe1354b72eee55197e85a3db1b40d04d4fcb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRosePlanter_ORM.png",
+      "sha256": "b02d316591e2189eebed5a932203f787d7e8c1b1ddc641b9769337d678c9828f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-rose-planter-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleRosePlanter.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+      "note": "3604 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+      "note": "UV0 islands 1161, used 0.6935, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+      "note": "T_Env_BaskervilleRosePlanter_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json",
+      "note": "SM_Env_BaskervilleRosePlanter, M_Env_BaskervilleRosePlanter",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Кадка совпадает с sheet.png: серый камень/свинец, 4 угловых навершия, готический ажур с квадрифолиями (3 арки спереди, 2 сбоку), высота кадки около 34 % роста против около 38 % на листе. Куст другой. На листе это плотная округлая масса листвы с тёмно-красными розами. В модели это гладкий купол-«шапка» с нарисованной листвой, из купола торчат: крупные плоские треугольные листовые карты (колючий силуэт на turn-045/090/270 и wire-34); А-образная пара прямых стеблей с розой на вершине (turn-000/180, close-head); горизонтальный стержень-перекладина поперёк кроны (turn-045/090/270, close-weapon). На боковых видах крона читается звездой с крестом и столбиком роз: это фантомы невидимых сторон, генерация шла только по front + single. Розы светлее и розовее заказанного dark red. Ширина/высота 0,995 против около 0,92 на листе и 0,89 по заказу: розы на стеблях выходят за кадку. Предмет узнаётся со всех 8 ракурсов благодаря кадке, но отличий два и более, а фантомные перекладина и шипы на боковых видах на границе 0,5. Итог 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Кадка чистая: ровные грани, навершия целы, дыр и просветов нет (close-base, turn-000). Крона на полном росте с дефектами. Крупные плоские треугольники-шипы торчат из купола без связи с формой: мусорная геометрия, сетка на wire-34/wire-front формы не следует. По бокам между низом шипов и бортиком виден фон (turn-090/270). Купол — оплывшая гладкая масса вместо куста. У части роз чёрные затемнённые низы (close-head), что согласуется с отчётом: 12 % площади граней смотрят внутрь, 223 нормали углов направлены внутрь поверхности, 84 неманифолд-ребра, 115 дыр. Розы — грубые восьмигранные призмы, для стилизации допустимо. Сетка купола и кадки форме следует. Дефекты на полном росте в одной зоне (крона) и оплывшая форма главной части: 1,0.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Кадка: ручная роспись серого камня/свинца, ажур, сколы и потёртости читаются, детализация на уровне кита. Верхи угловых столбиков слегка затемнены, похоже на запечённое затенение. Розы: нарисованные бутоны читаются на игровой дистанции, но цвет светлее и розовее заказанного тёмно-красного. Листва: купол покрыт мягкой размытой фото-листвой. Треугольные карты на полном росте бледно-зелёные, текстура мыльная, размазанная, на них просвечивают призраки чужих роз (turn-090/270, close-weapon). UV без перекрытий между островами: 1161 остров, покрытие 69 %. Дефект на полном росте в одной зоне (листва): 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. В кроне куста фантомные элементы: горизонтальная перекладина, А-образные стебли и плоские треугольники-шипы на боковых видах, купол оплыл. Их исправляет перегенерация Tripo (этап 2), а не параметры env_kit. Кадка удалась и годится как образец. score 5,0 < 8,0, гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Горизонтальный стержень-перекладина поперёк кроны и вертикальный столбик роз (на turn-270 то же): фантом невидимых сторон, генерация шла только по front + single. При перегенерации подать боковой и задний виды плотного куста."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "А-образная пара прямых стеблей с розой на вершине: на листе её нет, там округлая плотная масса листвы."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Крупные плоские треугольные листовые карты торчат из гладкого купола: колючий силуэт кроны со всех ракурсов, сетка не следует форме."
+    },
+    {
+      "item": "F",
+      "frame": "turn-270.jpg",
+      "note": "Просвет фона между низом кроны (шипами) и бортиком кадки по бокам (то же на turn-090)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Чёрные затемнённые низы роз: в отчёте 12 % площади граней смотрят внутрь и 223 нормали углов направлены внутрь поверхности."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Мыльная бледно-зелёная текстура на треугольных картах листвы, на них просвечивают призраки роз."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Розы светлее и розовее заказанного dark red; купол листвы покрыт размытой фото-текстурой."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-ROSE-PLANTER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп rose-planter (Розы в кадке) не принят, оценка 5,0. Кадка годна, но в кроне куста фантомные перекладина, А-образные стебли и шипы-треугольники. Нужна перегенерация Tripo (этап 2) с боковым и задним видами плотного тёмно-красного куста."
+}

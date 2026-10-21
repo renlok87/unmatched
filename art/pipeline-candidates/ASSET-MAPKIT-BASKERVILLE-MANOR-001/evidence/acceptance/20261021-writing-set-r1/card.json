@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleWritingSet.fbx",
+      "sha256": "89e5564af19ba2341d33fcc68b620ea0c3414c46b35d67a9b63d3b7dbc4204b9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWritingSet_BC.png",
+      "sha256": "d1298a656ca74b5310fdc3f5e0ab75c96e451da4de7032eeafe61a1ca8657bd5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWritingSet_N.png",
+      "sha256": "97a9a5b1f2bb2bffbd1cb3ddd7ce99aed79fb5ac65ff90aedc7bd4f479cbc149"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWritingSet_ORM.png",
+      "sha256": "71f0fccd70b28e7e4b3ddab7eb3ff2efdb66a7dab1d9a8c13cf9469162b96d4a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-writing-set-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleWritingSet.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+      "note": "4896 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+      "note": "UV0 islands 1588, used 0.7236, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+      "note": "T_Env_BaskervilleWritingSet_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json",
+      "note": "SM_Env_BaskervilleWritingSet, M_Env_BaskervilleWritingSet",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот же, что на sheet.png и в описании. Это латунный готический письменный прибор: в центре замок (львиный медальон спереди, медальон с пером сзади), две гранёные стеклянные чернильницы с куполами-крышками, два пера в стоячих подставках (тёмное слева, светлое пёстрое справа, как на листе), лупа с деревянной ручкой спереди слева, всё на кожаном бюваре с латунными уголками. Пропорции главных частей совпадают с видом листа на глаз: перья выше шпиля, чернильницы рядом с замком в ту же долю ширины, наклон перьев наружу. Лишних и пропавших частей нет, фантомных оболочек на turn-090/270 и wire-* нет. Предмет узнаётся со всех 8 ракурсов, включая боковые. Мелочь в пределах допуска: бювар тоньше доски на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полных ростах нет дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей. Тонкие элементы целы: шпиль, пинакли, финиалы крышек, стержни и опахала перьев. Сетка в 4896 tris на wire-front/back/34 следует форме; крупные плоскости фасадов несут деталь текстурой и нормалью. Дефекты только крупного плана. На close-head ярусы шпиля и колпаки дымоходов кривоватые и слегка оплывшие, видна гранёность. На wire-34 завиток перед замком и ручка лупы комковатые. Бювар — плоскость без толщины, поэтому на ракурсах с нулевой высотой камеры (turn-045/135/225/315) латунные уголки выглядят отдельными кусочками у края.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Латунь даёт металл с готическими арками, окнами, львом и медальоном; стекло чернильниц гранёное; кожа бювара тёмная с зерном; у перьев свой рисунок; линза из бирюзового стекла. Запечённого направленного света в BC нет, растяжек и швов на полном росте не видно, детализация для пропа богатая. Дефект: на правом крыле крыши замка лежит пятно чужого, стеклянного бело-серого цвета. На close-weapon это белые мазки и серые гладкие плоскости крутой крыши за фронтоном. На полных ростах turn-270, turn-315 и turn-045 оно видно мелкой точкой (около 1–2 % силуэта), а на игровой дистанции (проп 6 uu при фигуре 55 uu) не читается. По примечанию рубрики о фоновом пропе засчитано как дефект крупного плана. Линза — непрозрачный диск; это допустимая стилизация.",
+      "frames": [
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "turn-045.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Балл 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS или n/a. Балл попал в полосу 8.0–8.4, поэтому нужен второй независимый приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "На правом крыле крыши замка — бело-серое пятно чужого (стеклянного) цвета. На turn-315 и turn-045 оно видно мелкой точкой; на игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На крупном плане видны белые мазки на черепице правого крыла, а крутые плоскости крыши за фронтоном серые и гладкие, без рисунка."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Ярусы шпиля и колпаки дымоходов кривоватые, слегка оплывшие и гранёные; видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Бювар — плоскость без толщины: на боковых ракурсах с нулевой высотой камеры латунные уголки выглядят отдельными. Завиток перед замком и ручка лупы комковатые."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-WRITING-SET-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп writing-set (письменный прибор) кита Baskerville Manor принят по делегированию с баллом 8.3. Балл в полосе 8.0–8.4, нужна вторая приёмка «Opus high». Мелкие дефекты крупного плана записаны в known_issues: белое пятно на крыше, кривые шпили, бювар без толщины."
+}

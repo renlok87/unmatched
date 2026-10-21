@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSideboard.fbx",
+      "sha256": "8be4336cca6369f2f2e7254da1cf1e042853fd0ea22b7ab2d6679ce73259b4d2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_BC.png",
+      "sha256": "2b7a8bf16bccece66315d5402c868d72a09e13015fdb43c66a45b3677a68cfd4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_N.png",
+      "sha256": "1409fc7265baee8538841fa8e73bef0941949068ccfa1a3ed01242ba884d18b4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSideboard_ORM.png",
+      "sha256": "d7bb90d88fbd4dd55cf1663d8dcdbfb83e831af908692260cd5f439d071fe85e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-sideboard-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSideboard.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "5165 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "UV0 islands 1374, used 0.69, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "T_Env_BaskervilleSideboard_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json",
+      "note": "SM_Env_BaskervilleSideboard, M_Env_BaskervilleSideboard",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png почти один в один: зеркальная спинка с аркой, резной гребень со шпилем, две угловые башенки-финиалы, боковые консоли-волюты, три ящика с бронзовыми ручками, три готические дверцы, цоколь с выступами, три графина слева и серебряное блюдо на подставке справа. Пропорции главных частей (тумба примерно половина высоты, спинка с гребнем вторая половина, глубина ≈ 1/3 ширины) совпадают с видами. Лишних и фантомных частей на turn-090/270 и wire-34 нет. Силуэт читается со всех ракурсов, сбоку и сзади тоже.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полный рост форма чистая: дыр, вывернутых частей и мусорной геометрии нет, тонкие финиалы и шпили целы, сетка на wire-34 следует форме (резьба дверей в нормалях, сам меш упрощён). На крупном плане видно: просветы ажурного гребня заполнены белесой оболочкой, а в sheet.png они сквозные (close-head, close-weapon); завитки гребня гранёные; под центральной подвеской гребня чёрный кончик (close-head); графины слегка оплывшие (close-weapon). Все эти дефекты видны только на крупном плане.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 0.5,
+      "rationale": "Красное дерево, бронза ручек, серебро блюда и тёмное зеркало читаются верно, детализация резьбы на уровне кита. Но в BC запечены белые блики-мазки, и видно их на полный рост в нескольких зонах: (1) нижние половины всех трёх дверец и цоколь спереди, причём на turn-000 и turn-315 пятна стоят на тех же местах предмета, то есть это не спекуляр рендера, и в sheet.png их нет; (2) задняя панель и спинка сзади: крупные белые растянутые мазки по направлению волокон (turn-180, turn-135); (3) зеркало: белое пятно с рваным краем у блюда (turn-315, close-weapon) и плоская белесая заливка в арке. Сверх этого: просветы гребня белые, графины мутно-коричневые вместо хрусталя. Запечённый свет в двух и более зонах на полный рост даёт 0,5 по рубрике.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "S 2,0 / F 1,5 / T 0,5 → round(4,0/6×10,1) = 6,7 < 8,0, а T < 1,0. Силуэт верный, поэтому return_to_stage_2 не нужен: работа по текстуре (запечённые белые блики в BC на дверцах, цоколе, задней панели и зеркале) и мелкие правки формы гребня.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Убрать запечённые белые блики из BC на нижних половинах трёх дверец, цоколе и ящиках спереди (те же места на turn-315): перетекстурировать исходник в Tripo без запекания света (PBR) или сделать де-лайт BC, сохранив цвет и волокна красного дерева.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Задняя панель и спинка сзади: убрать крупные белые растянутые мазки (turn-180, turn-135), заменить ровным красным деревом с волокнами как на боковинах.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Зеркало: убрать белое пятно с рваным краем у блюда и белесую заливку в арке, дать ровное тёмное стекло; графинам дать прозрачно-светлый хрусталь вместо мутно-коричневого.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Просветы ажурного гребня заполнены белесой оболочкой: сделать их сквозными или хотя бы затонировать в тёмное дерево; убрать чёрный кончик под центральной подвеской.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Завитки гребня гранёные на крупном плане (упрощение до 5165 tris); на игровой дистанции не читается, не блокирует."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Графины слегка оплывшие по форме; для фонового пропа допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-SIDEBOARD-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп sideboard (буфет) не принят, 6.7, нужна доработка: в BC запечены белые блики на дверцах, цоколе, задней панели и зеркале; просветы гребня залиты белым. Силуэт верный."
+}

@@ -1,7 +1,7 @@
 {
   "schema": "unmatched.map-kit.status/1",
   "map": "baskerville-manor",
-  "updatedAt": "2026-10-21T12:48:24+05:00",
+  "updatedAt": "2026-10-21T13:25:50+05:00",
   "props": {
     "grand-piano": {
       "stage": "accepted",
@@ -1361,7 +1361,7 @@
       }
     },
     "sideboard": {
-      "stage": "built",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/sideboard/view-thumb.png",
         "slot": "single",
@@ -1409,10 +1409,25 @@
           48.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSideboard.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-sideboard-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 6.7,
+        "final": "rework_blender",
+        "finalScore": 6.7
       }
     },
     "piano-stool": {
-      "stage": "built",
+      "stage": "rejected",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/piano-stool/view-thumb.png",
         "slot": "single",
@@ -1460,10 +1475,22 @@
           15.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-piano-stool-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 6.7,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1.5,
+          "T": 1.5
+        }
       }
     },
     "sundial": {
-      "stage": "built",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/sundial/view-thumb.png",
         "slot": "single",
@@ -1511,10 +1538,23 @@
           30.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-sundial-r1/card.json",
+        "rc": 1,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1
+        },
+        "note": "card failed validate_card (S fix listed for Blender with S=1.5); verdict rework_blender 6.7 kept as rework"
       }
     },
     "book-stack": {
-      "stage": "built",
+      "stage": "rework",
       "tripo": {
         "taskId": "973a44bc-6a45-443a-a30d-00cf66c669c3",
         "ops": [
@@ -1562,10 +1602,22 @@
           15.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-book-stack-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 2,
+          "F": 1,
+          "T": 1.5
+        }
       }
     },
     "brass-telescope": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/brass-telescope/view-thumb.png",
         "slot": "single",
@@ -1596,11 +1648,39 @@
             "status": "ok"
           }
         ],
-        "credits": 115.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-BRASS-TELESCOPE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-BRASS-TELESCOPE",
+        "triangles": 4814
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleBrassTelescope.fbx",
+        "tris": 4814,
+        "checks": true,
+        "dimsUu": [
+          28.732,
+          28.556,
+          45.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-brass-telescope-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
       }
     },
     "coat-stand": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/coat-stand/view-thumb.png",
         "slot": "single",
@@ -1631,11 +1711,42 @@
             "status": "ok"
           }
         ],
-        "credits": 115.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-COAT-STAND.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-COAT-STAND",
+        "triangles": 5136
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleCoatStand.fbx",
+        "tris": 5136,
+        "checks": true,
+        "dimsUu": [
+          16.401,
+          18.462,
+          57.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-coat-stand-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
       }
     },
     "crystal-chandelier": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/crystal-chandelier/view-thumb.png",
         "slot": "single",
@@ -1666,11 +1777,39 @@
             "status": "ok"
           }
         ],
-        "credits": 115.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-CRYSTAL-CHANDELIER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-CRYSTAL-CHANDELIER",
+        "triangles": 5098
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleCrystalChandelier.fbx",
+        "tris": 5098,
+        "checks": true,
+        "dimsUu": [
+          23.197,
+          23.197,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-crystal-chandelier-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
       }
     },
     "newel-post-lamp": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/newel-post-lamp/view-thumb.png",
         "slot": "single",
@@ -1692,13 +1831,48 @@
             "before": 10470.0,
             "after": 10460.0,
             "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 10255.0,
+            "after": 10250.0,
+            "status": "ok"
           }
         ],
-        "credits": 110.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-NEWEL-POST-LAMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-NEWEL-POST-LAMP",
+        "triangles": 5224
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleNewelPostLamp.fbx",
+        "tris": 5224,
+        "checks": true,
+        "dimsUu": [
+          13.269,
+          13.269,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-newel-post-lamp-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
       }
     },
     "iron-garden-bench": {
-      "stage": "tripo",
+      "stage": "rejected",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/iron-garden-bench/view-thumb.png",
         "slot": "single",
@@ -1720,13 +1894,48 @@
             "before": 10460.0,
             "after": 10450.0,
             "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 10250.0,
+            "after": 10245.0,
+            "status": "ok"
           }
         ],
-        "credits": 110.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-IRON-GARDEN-BENCH.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-IRON-GARDEN-BENCH",
+        "triangles": 5584
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleIronGardenBench.fbx",
+        "tris": 5584,
+        "checks": true,
+        "dimsUu": [
+          18.98,
+          39.848,
+          27.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronGardenBench.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-iron-garden-bench-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 4.2,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 0.5,
+          "F": 1,
+          "T": 1
+        }
       }
     },
     "rose-planter": {
-      "stage": "tripo",
+      "stage": "rejected",
       "views": {
         "front": "art/imagegen/mapkit-baskerville-manor/props/rose-planter/view-thumb.png",
         "slot": "single",
@@ -1741,22 +1950,585 @@
             "before": 10390.0,
             "after": 10290.0,
             "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 10245.0,
+            "after": 10235.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 10135.0,
+            "after": 10130.0,
+            "status": "ok"
           }
         ],
-        "credits": 100.0
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-ROSE-PLANTER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-ROSE-PLANTER",
+        "triangles": 3604
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleRosePlanter.fbx",
+        "tris": 3604,
+        "checks": true,
+        "dimsUu": [
+          18.638,
+          26.868,
+          27.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRosePlanter.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-rose-planter-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1,
+          "T": 1
+        }
+      }
+    },
+    "gun-cabinet": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/gun-cabinet/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "8fd8dc70-df6e-4aab-a544-0cdf92021b31",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 10235.0,
+            "after": 10135.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 10125.0,
+            "after": 10115.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 10015.0,
+            "after": 10010.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-GUN-CABINET.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-GUN-CABINET",
+        "triangles": 4854
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGunCabinet.fbx",
+        "tris": 4854,
+        "checks": true,
+        "dimsUu": [
+          11.277,
+          17.905,
+          57.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGunCabinet.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-gun-cabinet-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "travel-trunk": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/travel-trunk/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "f142eb41-1081-48cf-b143-fe01af86df0f",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 10115.0,
+            "after": 10015.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 10010.0,
+            "after": 10000.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9900.0,
+            "after": 9895.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-TRAVEL-TRUNK.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-TRAVEL-TRUNK",
+        "triangles": 4420
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTravelTrunk.fbx",
+        "tris": 4420,
+        "checks": true,
+        "dimsUu": [
+          15.324,
+          25.818,
+          21.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-travel-trunk-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 7.5,
+        "final": "rework_blender",
+        "finalScore": 7.5
+      }
+    },
+    "writing-set": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/writing-set/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "e9e11f17-bfca-49f8-a565-dc287786e597",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 10000.0,
+            "after": 9900.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9795.0,
+            "after": 9785.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9675.0,
+            "after": 9670.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-WRITING-SET.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-WRITING-SET",
+        "triangles": 4896
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleWritingSet.fbx",
+        "tris": 4896,
+        "checks": true,
+        "dimsUu": [
+          7.112,
+          9.484,
+          6.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWritingSet.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-writing-set-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "umbrella-stand": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/umbrella-stand/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "1ddb27ae-d567-483f-8607-af51109d3a01",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9895.0,
+            "after": 9795.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9685.0,
+            "after": 9675.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9670.0,
+            "after": 9665.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-UMBRELLA-STAND.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-UMBRELLA-STAND",
+        "triangles": 3936
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleUmbrellaStand.fbx",
+        "tris": 3936,
+        "checks": true,
+        "dimsUu": [
+          9.51,
+          11.963,
+          27.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json"
+      }
+    },
+    "stone-urn": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/stone-urn/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "acce345e-c714-40c9-a96f-c6035af48e9d",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9785.0,
+            "after": 9685.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9565.0,
+            "after": 9555.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9445.0,
+            "after": 9440.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-STONE-URN.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-STONE-URN",
+        "triangles": 3704
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleStoneUrn.fbx",
+        "tris": 3704,
+        "checks": true,
+        "dimsUu": [
+          15.388,
+          16.057,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json"
+      }
+    },
+    "garden-gas-lamp": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/garden-gas-lamp/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "0decb7b4-bf77-4695-9182-49a2cdbcfa48",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9670.0,
+            "after": 9570.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9555.0,
+            "after": 9545.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9340.0,
+            "after": 9335.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-GARDEN-GAS-LAMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-GARDEN-GAS-LAMP",
+        "triangles": 5527
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGardenGasLamp.fbx",
+        "tris": 5527,
+        "checks": true,
+        "dimsUu": [
+          11.088,
+          11.088,
+          78.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json"
+      }
+    },
+    "iron-fence": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/iron-fence/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "16caf5a2-83cf-4777-8a40-19171cdae4e4",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9545.0,
+            "after": 9445.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9335.0,
+            "after": 9325.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9205.0,
+            "after": 9200.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/source/MK-BSK-IRON-FENCE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh",
+        "assetId": "MK-BSK-IRON-FENCE",
+        "triangles": 4831
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleIronFence.fbx",
+        "tris": 4831,
+        "checks": true,
+        "dimsUu": [
+          40.872,
+          42.513,
+          48.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json"
+      }
+    },
+    "moor-tor-boulder": {
+      "stage": "tripo",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/moor-tor-boulder/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "370b3be2-d8a7-4a13-95f4-ff79ac9041cf",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9440.0,
+            "after": 9340.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9225.0,
+            "after": 9215.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 9100.0,
+            "after": 9095.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0
+      }
+    },
+    "moor-dead-tree": {
+      "stage": "tripo",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/moor-dead-tree/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "29fdfcd7-c081-4582-95ff-eeb13123231b",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9325.0,
+            "after": 9225.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 9215.0,
+            "after": 9205.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 110.0
+      }
+    },
+    "topiary-cone": {
+      "stage": "tripo",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/topiary-cone/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "a9629b31-dbf7-400a-8ff0-7549c381da12",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9200.0,
+            "after": 9100.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 8995.0,
+            "after": 8985.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 110.0
+      }
+    },
+    "hedge-block": {
+      "stage": "tripo",
+      "views": {
+        "front": "art/imagegen/mapkit-baskerville-manor/props/hedge-block/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "2118a870-b579-4a52-b306-1176efdc4738",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 9095.0,
+            "after": 8995.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 8985.0,
+            "after": 8975.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 110.0
       }
     }
   },
   "totals": {
-    "credits": 3770.0,
+    "credits": 5045.0,
     "byStage": {
       "listed": 0,
       "views": 0,
-      "tripo": 6,
+      "tripo": 4,
       "built": 5,
-      "accepted": 11,
-      "rework": 6,
-      "rejected": 3,
+      "accepted": 15,
+      "rework": 12,
+      "rejected": 6,
       "ue": 0
     }
   }

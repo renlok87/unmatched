@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleNewelPostLamp.fbx",
+      "sha256": "50ee6031fad50eda494359d218e3e279899af4ca7ef5695ba04710a5039b76dc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleNewelPostLamp_BC.png",
+      "sha256": "a7fd989e572a149e5806f1979121972443e59fa352e37e0e65dec09d46c1ab5a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleNewelPostLamp_N.png",
+      "sha256": "56e0a7b01f1c796901f580d5c13adf4c5048ddaedae5f9245fc45d3012c2a911"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleNewelPostLamp_ORM.png",
+      "sha256": "207090e770752061689bf65d1bf29f14efb210f27ce02f41ced97c517b45cb06"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-newel-post-lamp-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleNewelPostLamp.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+      "note": "5224 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+      "note": "UV0 islands 1097, used 0.6373, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+      "note": "T_Env_BaskervilleNewelPostLamp_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleNewelPostLamp.build.json",
+      "note": "SM_Env_BaskervilleNewelPostLamp, M_Env_BaskervilleNewelPostLamp",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот самый заказанный предмет: восьмигранная резная готическая тумба со стрельчатыми ажурными панелями, поясом бутонов и подвесок и ступенчатым цоколем; сверху женская фигура в викторианском платье держит поднятой правой рукой светильник со стеклянным плафоном. Всё как на sheet.png. Пропорции совпадают с листом на глаз в пределах около 5 %: верх плафона около 5 % высоты, стопы фигуры около 47 %, ширина тумбы к высоте около 0,25 (13,3×54 uu). Лишних и пропавших частей нет, на turn-090/270 фантомных выступов нет. Предмет узнаётся со всех 8 ракурсов. Пятно цвета того же семейства: тёмный дуб или орех плюс тёплая коричневая фигура и белый плафон. Предупреждение frames.json о ключе листа — проблема метаданных: по содержанию лист соответствует описанию.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывёрнутых частей и мусора. Тонкие элементы целы: поднятая рука, стержень светильника, локон, подвески тумбы. Фигура проработана: лицо, причёска, пышные рукава, корсет, драпировки юбки; кисть на стержне читается. Отчёт сборки указывает 21 отверстие: это скрытые торцевые крышки между оболочками тумбы и подошва фигуры, в кадрах они не видны. Обращённых наружу неверных граней 0. На wire-front и wire-34 сетка следует форме: плотная триангуляция на фигуре, длинные треугольники на плоских панелях тумбы, ажур передан нормалью. Лёгкая гранёность контура плафона на close-head — следствие бюджета, а не дефект.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Тумба — убедительное дерево: чёткая текстура волокна, резьба, тёмный лак, детализация не беднее кита Sarpedon. Плафон читается как матовое молочное стекло. Запечённого направленного света в BC нет: блики двигаются вместе с камерой (turn-000 и turn-180), в BC только привычное для Tripo затемнение в углублениях. Дефекты видны лишь на крупном плане. Фигура должна быть бронзовой, но читается как глянцевое лакированное дерево: metallic≈0 (mean 0,013), roughness около 0,3, на close-head и close-weapon видны полосы, похожие на волокно, и пятнистые белые блики. На полном росте это просто тёмно-коричневая статуэтка того же семейства цвета, что и на листе. На close-head тёмное грязное пятно у основания плафона и серая полоса на горлышке. На close-base тонкий светлый вертикальный шов на панели и смазанная полоса на нижнем профиле цоколя.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 2,0 + T 1,5 = 5,5 из 6 → 9,2 ≥ 8,0; ни одно измерение не ниже 1,0; гейты PASS или n/a. Дефекты текстуры видны только на крупном плане, а для фонового пропа диорамы на игровой дистанции они не важны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Бронзовая фигура читается как лакированное дерево: metallic≈0, roughness около 0,3, полосы как от волокна и пятнистые белые блики. На полном росте приемлемо (тёмная коричневая статуэтка). Если понадобится, металлический вид фигуре можно дать маской metallic в env_kit params."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Тёмное грязное пятно у основания плафона и серая полоса на горлышке стекла, видны только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Тонкий светлый вертикальный шов на панели тумбы и смазанная полоса на нижнем профиле цоколя, видны только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-NEWEL-POST-LAMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп newel-post-lamp принят по делегированию с оценкой 9,2. Мелочи только на крупном плане: фигура читается лакированным деревом вместо бронзы, пятно на плафоне, шов на панели тумбы."
+}

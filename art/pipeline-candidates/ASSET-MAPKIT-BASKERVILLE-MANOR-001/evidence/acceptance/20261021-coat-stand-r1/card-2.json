@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleCoatStand.fbx",
+      "sha256": "d4a360522a8c33ec32d28f2dbf150b2566d71f63b112383b14357ebfe2fc0352"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_BC.png",
+      "sha256": "e35abca7d19b9a29456c7275a51189a57c1ce79b048dc53aaddeedb592789eff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_N.png",
+      "sha256": "890d454181a332773510761a543cb78c3b8ca2fefbb2c57fd6f28c8e5704e710"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_ORM.png",
+      "sha256": "ce3f97c483f0604b55b35dba61f01cfe646d9cd403b85228b1659ade43b79879"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-coat-stand-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleCoatStand.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "5136 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "UV0 islands 1058, used 0.5453, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "T_Env_BaskervilleCoatStand_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "SM_Env_BaskervilleCoatStand, M_Env_BaskervilleCoatStand",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: гнутая стойка с короной S-крюков и финиалом, охотничья шапка на левом крюке, ярусная накидка Inverness справа почти до кольца для зонтов, кольцо с U-петлями, четыре раскинутые ноги с нижним кольцом. Пропорции частей в пределах ~5 %, лишних и пропавших частей нет, узнаётся со всех ракурсов (turn-000/045/090/180/270, wire-34). Отличия только тоновые (светлее дерево и накидка), они учтены в T.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: тонкие крюки и ноги целы, нет дыр, вывернутых частей и мусора, сетка на wire-34/wire-front следует форме. На крупных планах: гранёное нижнее кольцо и концы ног (close-base), бугристые неровные крюки и грубая завязка ушей шапки (close-head, close-weapon), накидка однослойная с тонкими краями; тёмная прорезь на накидке спереди (turn-000) читается как пройма Inverness.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: дерево как дерево, накидка как ткань, шапка в клетку; запечённого света на полном росте нет. Дефекты крупного плана: на накидке полосатые растянутые пятна с красноватыми вкраплениями (close-base), рисунок шапки ближе к трещинам или волокнам дерева, чем к твиду, и белёсый блик на макушке (close-head). Дерево бледнее и розовее «rich mahogany» с sheet.png и гладкое, почти пластиковое, накидка светлее тёмно-оливковой с листа. На игровой дистанции это допустимо.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a; замечания F/T только крупного плана, для фонового пропа диорамы некритичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Гранёное нижнее кольцо и концы ног; накидка однослойная с тонкими краями (только крупный план)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Крюки бугристые и неровной толщины, грубая завязка ушей шапки (только крупный план)."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Полосатая растянутая текстура накидки с красноватыми пятнами."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Рисунок шапки ближе к трещинам дерева, чем к твиду; белёсый блик на макушке; дерево бледнее и розовее заказанного махагона."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-COAT-STAND-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп coat-stand (вешалка) принят по делегированию, 8.3: силуэт совпадает с листом; замечания только крупного плана (гранёное кольцо, бугристые крюки, полосы на накидке, бледное дерево)."
+}

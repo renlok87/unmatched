@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleCrystalChandelier.fbx",
+      "sha256": "636d5886d20e3f7a00fe3c438091e8b2ce6ed712258640bf80aa993dc3a4a052"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCrystalChandelier_BC.png",
+      "sha256": "c0ba963cfa03e747c0e5ae19559a94e8ee45d303fad9b90345987e1c188ed4ce"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCrystalChandelier_N.png",
+      "sha256": "1e398b70ee7a06668f0e68c6c3a926b9635bb4d71287d3aa5deed70fdba399ad"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCrystalChandelier_ORM.png",
+      "sha256": "899ec6bd0c5ef5a56fc74ed834827e9fc108b26441c6bfa23b43524a4c913884"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-crystal-chandelier-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleCrystalChandelier.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+      "note": "5098 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+      "note": "UV0 islands 1833, used 0.4845, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+      "note": "T_Env_BaskervilleCrystalChandelier_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCrystalChandelier.build.json",
+      "note": "SM_Env_BaskervilleCrystalChandelier, M_Env_BaskervilleCrystalChandelier",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: викторианская хрустальная люстра — чашка-потолочник, короткая цепь, корона из завитков, хрустальное тело, латунный пояс, 8 рожков со свечами, подвески-призмы, нижний хрустальный шар. Все главные части на месте и совпадают с sheet.png по порядку и высоте (цепь ≈25–27 % высоты на обоих), узнаётся со всех ракурсов (4/8-кратная симметрия, turn-000/045/090/180/270 читаются одинаково), фантомных выступов и оболочек на turn-090/270 и wire-* нет. Одно второстепенное отличие контура: силуэт стройнее листа — размах рожков ≈0,64 высоты против ≈0,72 на sheet.png (на пороге ~10 %, точнее по листу 230 px не измерить). Хрустальный «шатёр» из нитей бусин сделан сплошной вазой из чеканного стекла — допустимая стилизация, на игровой дистанции читается так же.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Цепь, чашка, корона, свечи с бобешами, тело, пояс, призмы и нижний шар целые, сетка на wire-34/wire-front следует форме, мусора и оплывших масс нет. Дефект на полном росте в одной зоне — по кольцу рожков: гирлянды-перемычки между рожками сделаны плоскими перекрученными лентами, которые рендерятся серебристыми «бабочками» из двух треугольников с шахматно пропавшими гранями (turn-000/090/180/270 на высоте рожков слева и справа, крупно на close-base, шахматка на wire-34). Это совпадает с отчётом сборки: 26 дыр и 12 трещин открытых контуров на z≈8,4–9 uu, r≈7,8 uu (кольцо рожков), 248 нормалей углов внутрь поверхности. Мелкие бугры на рожках видны только крупно.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Хрусталь читается как хрусталь (чеканное стекло тела, матовые призмы, хрустальные «пламена» свечей), свечи — воск, на поясе нарисован рельефный орнамент; запечённого света и теней в цвете на полном росте нет, швов и растяжек нет, детализация на уровне кита. Латунь светлее и бледнее античной бронзы листа и читается скорее как крашеное золото, чем металл: по отчёту metallic_mean 0,092, металлических текселей >0,5 лишь 1,1 %. Семейство цвета то же, это не чужой цвет. Дефекты крупного плана: белые мазки на кончиках завитков короны и на рожке (close-weapon, close-base), шумные тёмные крапины на нижней хрустальной чаше (close-base).",
+      "frames": [
+        "turn-000.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1,5+1,0+1,5)/6×10, 1) = 6,7 < 8,0, F = 1,0. S = 1,5 не ниже порога перегенерации, все гейты PASS/n/a → rework_blender. Главное: плоские перекрученные ленты-гирлянды между рожками с пропавшими гранями видны на полном росте; кроме того, латунь без металличности и светлее листа.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Убрать 8 плоских перекрученных лент-гирлянд между рожками: открытые оболочки на z≈8,4–9 uu, r≈7,8 uu (дыры и трещины из shells_and_holes отчёта сборки, серебристые «бабочки» на turn-000/close-base, шахматка на wire-34). Удалить эти оболочки целиком или заменить их цепочками призм; рожки, свечи и призмы не трогать. Проверить, что на turn-* по кольцу рожков нет треугольных пластин и просветов.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Вернуть латуни металл и тон листа: по маске латунного цвета BC поднять metallic в ORM.B до ≈0,8–1,0 (сейчас mean 0,09) и затемнить и насытить латунь к античной бронзе sheet.png; хрусталь и свечи оставить неметаллом.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Закрасить белые мазки хрустального цвета на кончиках завитков короны и на рожке (close-weapon, close-base) цветом латуни и смягчить тёмные крапины на нижней хрустальной чаше.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Силуэт стройнее листа: размах рожков ≈0,64 высоты против ≈0,72 на sheet.png и ≈0,83 по описанию 1×1×1,2 м. Хрустальный шатёр из нитей сделан вазой из чеканного стекла. Это стилизация, перегенерация не нужна; при желании масштаб XY можно не трогать."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-CRYSTAL-CHANDELIER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп crystal-chandelier (Люстра) не принят в r1 (6,7): нужна доработка в Blender. Убрать плоские перекрученные ленты-гирлянды между рожками, вернуть латуни металличность и тон античной бронзы, подчистить белые мазки на короне."
+}

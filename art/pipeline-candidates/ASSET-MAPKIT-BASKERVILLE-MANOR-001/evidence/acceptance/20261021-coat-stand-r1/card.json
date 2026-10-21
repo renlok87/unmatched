@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleCoatStand.fbx",
+      "sha256": "d4a360522a8c33ec32d28f2dbf150b2566d71f63b112383b14357ebfe2fc0352"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_BC.png",
+      "sha256": "e35abca7d19b9a29456c7275a51189a57c1ce79b048dc53aaddeedb592789eff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_N.png",
+      "sha256": "890d454181a332773510761a543cb78c3b8ca2fefbb2c57fd6f28c8e5704e710"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleCoatStand_ORM.png",
+      "sha256": "ce3f97c483f0604b55b35dba61f01cfe646d9cd403b85228b1659ade43b79879"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-coat-stand-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleCoatStand.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "5136 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "UV0 islands 1058, used 0.5453, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "T_Env_BaskervilleCoatStand_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleCoatStand.build.json",
+      "note": "SM_Env_BaskervilleCoatStand, M_Env_BaskervilleCoatStand",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png и в описании: гнутая вешалка с навершием, верхними S-крючьями и нижними крючками, кепи-дирстокер на верхнем левом крюке, инвернесс с пелериной (два яруса) справа, кольцо для зонтов на ~29 % высоты с петлями-опорами, четыре разведённые ноги с нижним кольцом. Пропорции частей совпадают с листом в пределах ~5 % (шляпа на 16–31 % сверху, низ плаща ~79 % высоты, кольцо ~29 % от пола). Лишних и пропавших частей нет; на turn-090/270 и wire-* фантомных выступов нет (вертикальная дуга за стойкой на close-head — задний крюк в проекции). Узнаётся со всех 8 ракурсов, включая turn-135, где плащ закрывает стойку. Плащ и дерево светлее листа, но в том же семействе цвета — учтено в T.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: тонкие крючья, ноги, кольца и подпорки целы, без дыр, просветов, чёрных пятен и мусора; ткань плаща лежит складками, сетка на wire-* следует форме (длинные вертикальные полосы на плаще идут вдоль складок). Дефекты видны только на крупном плане: гнутые рукава крючьев неровной толщины, местами вздуты, с плоскими гранями (close-head); нижнее кольцо и кончики ног гранёные, с тёмными торцами, в узле подпорок у стойки комок (close-base); узкая тёмная прорезь в плаще под пелериной (turn-000, wire-front) читается как пройма.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию: гнутое дерево с лёгкой текстурой волокон (видна на ноге в close-base), шерсть-твид на плаще, клетчатый твид на кепи с завязкой. Швов, растяжек и крупных мыльных пятен на полном росте нет. Дефекты крупного плана: на подоле плаща горизонтальная полосатость с розово-красными мазками (close-base); светлое пятно, похожее на запечённый блик, на макушке кепи в одном и том же месте с разных ракурсов (close-head, close-weapon). Дерево бледнее и розовее медно-коричневого листа и «rich mahogany» стиля кита, плащ светлее (хаки против тёмной оливы листа). Семейство цвета то же, поэтому это не «чужой цвет» и не опускает до 1,0. Для фонового пропа на игровой дистанции читаемость сохраняется.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 → 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Остатки только крупного плана (неровные крючья, гранёные кольцо и ножки, полосы на подоле, блик на кепи) и сдвиг тона (дерево бледнее и розовее «mahogany», плащ светлее листа) записаны в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гнутые рукава верхних крючьев неровной толщины, местами вздуты и с плоскими гранями; видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Нижнее кольцо и кончики ног гранёные, с тёмными торцами; в узле подпорок кольца для зонтов у стойки комок; только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На подоле плаща горизонтальная полосатость, похожая на растяжку, и розово-красные мазки на оливковом твиде; только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Светлое пятно на макушке кепи-дирстокера похоже на запечённый блик (то же место на close-head)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Дерево бледно-розовое, а не медно-коричневое, как на sheet.png и в «rich mahogany» стиля кита; плащ светлее (хаки против тёмной оливы листа). Можно затемнить и сдвинуть тон BC в env_kit params; на приёмку не влияет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-COAT-STAND-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп coat-stand (вешалка Baskerville Manor) принят по делегированию, 8,3: силуэт совпадает с листом. Остатки крупного плана и более бледный тон дерева и плаща записаны в known_issues."
+}

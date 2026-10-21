@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTravelTrunk.fbx",
+      "sha256": "726f91fe3922b4615cb1d00b0d77eda00356b841ff567a8cb31f1f5d8b445944"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_BC.png",
+      "sha256": "6a04eb760858b803f30e6a6202c1668586a935ff22fb8d16a79c7de315731d4f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_N.png",
+      "sha256": "e59bc656568b0121367d954f4e39a49053e45b6e6e18ed3525fb3709b32455d6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_ORM.png",
+      "sha256": "16153410dacc586b9605176094cde3716f475fa138063220475d3d93be6fe1cd"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-travel-trunk-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleTravelTrunk.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "4420 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "UV0 islands 189, used 0.3017, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "T_Env_BaskervilleTravelTrunk_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "SM_Env_BaskervilleTravelTrunk, M_Env_BaskervilleTravelTrunk",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый дорожный сундук с листа: куполообразная крышка, два кожаных ремня с пряжками, центральный замок и два боковых замка-защёлки, латунные уголки сверху и снизу, кожаные ручки на торцах, круглые наклейки-этикетки. Пропорции фронта (ширина/высота ≈1,09 против ≈1,03 на листе) в допуске, купол и пояс крышки совпадают; лишних и пропавших частей нет, на turn-090/270 фантомных выступов нет, предмет узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, вывернутых частей и мусорной геометрии нет, сетка на wire-34 следует форме (рейки купола, ремни, уголки веером, ручка). Дефекты только на крупном плане: боковые защёлки и пряжки слегка оплывшие/комковатые (нижние лепестки защёлок), ремень на торце крышки стоит над поверхностью с тёмным просветом под ним.",
+      "frames": [
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Фронт хорош: кожа, деревянные планки, стежки, этикетки с замками и пейзажами читаются, запечённых теней нет. Но вся задняя/верхняя зона текстуры дорисована генератором: на задней стенке этикетки перевёрнуты и зеркальны (фиолетовая с перевёрнутым замком, красная с перевёрнутыми горами), верхняя левая этикетка сзади размыта в пятно; этикетки на верху купола — мыло со стёртым рисунком и бликоподобной светлой полосой, а купол с игровой камеры сверху виден первым. Латунь бледно-кремовая, ближе к пластику, чем к старой латуни листа. Дефект виден на полном росте (turn-180, turn-135, turn-315) в одной зоне.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0: S 2.0, F 1.5, T 1.0; силуэт верный (S ≥ 1.5, перегенерация формы не нужна), но текстура задней стенки и верха купола испорчена (перевёрнутые и размытые этикетки), а мелкая латунная фурнитура оплывшая на крупном плане.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Перетекстурировать заднюю стенку и верх купола: убрать перевёрнутые/зеркальные и размытые этикетки (повторная текстура Tripo с видом сзади/сверху или замена задних этикеток на чистую кожу/копии фронтальных); убрать светлую бликоподобную полосу с верха купола.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Притемнить и прогреть латунь (оттенок к старой латуни листа, металличность фурнитуры в ORM), чтобы уголки и замки читались металлом, а не бежевым пластиком.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Оплывшие защёлки и пряжки и просвет под ремнём на торце крышки: при перегенерации текстуры взять вариант с более чёткой фурнитурой или прижать ремень к крышке; дефект только крупного плана, не блокирует.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-TRAVEL-TRUNK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп travel-trunk: силуэт верный, но на доработку — перевёрнутые и размытые этикетки сзади и на куполе, бледная латунь, оплывшая фурнитура на крупном плане."
+}

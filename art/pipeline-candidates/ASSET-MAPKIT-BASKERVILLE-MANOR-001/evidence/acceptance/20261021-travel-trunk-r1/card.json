@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTravelTrunk.fbx",
+      "sha256": "726f91fe3922b4615cb1d00b0d77eda00356b841ff567a8cb31f1f5d8b445944"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_BC.png",
+      "sha256": "6a04eb760858b803f30e6a6202c1668586a935ff22fb8d16a79c7de315731d4f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_N.png",
+      "sha256": "e59bc656568b0121367d954f4e39a49053e45b6e6e18ed3525fb3709b32455d6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTravelTrunk_ORM.png",
+      "sha256": "16153410dacc586b9605176094cde3716f475fa138063220475d3d93be6fe1cd"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-travel-trunk-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleTravelTrunk.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "4420 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "UV0 islands 189, used 0.3017, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "T_Env_BaskervilleTravelTrunk_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTravelTrunk.build.json",
+      "note": "SM_Env_BaskervilleTravelTrunk, M_Env_BaskervilleTravelTrunk",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: дорожный сундук с крышкой-«бочкой». Все главные части sheet.png на месте и в той же раскладке: два кожаных ремня с пряжками, центральный замок, две боковые защёлки, двойной обод по шву крышки, латунные уголки на крышке и на дне, ручка на правом боку и та же схема наклеек (3 на крышке; пейзаж, собор с наложенной красной наклейкой и фиолетовый собор спереди; наклейка на торце крышки и корабль на боку). Вторая ручка на невидимом в листе левом боку естественна, фантомных выступов на turn-090/270 и wire-* нет. Сундук узнаётся со всех 8 ракурсов. Пропорции на глаз совпадают с листом (compare-* не сняты, frames.json это отмечает). По габаритам источника W:D:H = 1 : 0.59 : 0.81 (с ручками), то есть сундук выше заказанного ≈1×0.6×0.7. Но так нарисован и сам лист, а у пропа фона это на читаемость не влияет. Основное пятно цвета (коричневая кожа и красное дерево) того же семейства. Светлую латунь оцениваю в T.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Hard-surface сетка Smart Mesh чистая. На wire-front/back/34 рёбра идут по форме: длинные треугольники на плоских панелях, веера на уголках, плотная трубка у ручек. Дыр, вывернутых частей и мусора на полном росте нет, тонкие элементы целы (ремни, пряжки, ручки, заклёпки). Щель шва крышки задумана. По отчёту: inward 2 грани, non-manifold 0. Дефекты видны только на крупном плане. На close-head у гребня крышки ремень отходит от поверхности, и в просвете видна тёмная изнанка: оболочки ремней 1–2 открыты снизу (дыра 82 ребра по отчёту). На close-weapon кромки нижней пластины левой защёлки и язычок пряжки слегка оплывшие. На полном росте этого не видно.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Спереди и с боков материалы читаются: кожа с прострочкой, деревянные рейки с волокном, заклёпки, расписные наклейки. Детализация богатая, тени в цвет не запечены, свет от сцены. Недочёты: (1) латунь фурнитуры светлая кремово-бежевая и почти не металл: ORM metallic mean 0.086, >0.5 только у 0.06 % текселей. Она читается как светлое золото или крашеный металл, а в sheet.png латунь античная, темнее и насыщеннее. (2) Сзади Tripo досочинил наклейки: две из них перевёрнутые копии передних (фиолетовый собор и красные горы шпилями вниз), левая наклейка на крышке размыта, над центральной виден призрачный овал. (3) Наклейки на верхней части крышки на крупном плане смазаны горизонтальными растяжками (stretch anisotropy p95 2.74, max 236). Пункты 2–3 на игровой дистанции (21 uu против фигуры 55 uu) читаются как выцветшие старые наклейки и текстуру не разрушают, поэтому считаю их недочётами крупного плана, а не дефектом зоны на полном росте. AO нет (ORM.R=1), это зафиксировано гейтом.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "(2.0+1.5+1.5)/6×10 = 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a. Балл в полосе 8.0–8.4, поэтому по §8.3 нужен второй приёмщик другого профиля («Opus high»).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "У гребня крышки ремень отходит от поверхности, в просвете видна тёмная изнанка открытой снизу оболочки ремня (оболочки 1–2 в build.json). Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Кромки нижней пластины левой защёлки и язычок пряжки слегка оплывшие. Только крупный план."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Латунь уголков, замка и защёлок светлая кремово-бежевая и почти не металл (ORM metallic mean 0.086). Светлее и менее «металлическая», чем античная латунь sheet.png. Если понадобится, исправляется маской metallic по оттенку BC (env_kit params)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Наклейки сзади досочинены Tripo: фиолетовый собор и красные горы перевёрнуты, левая наклейка на крышке размыта, над центральной призрачный овал. На игровой дистанции читаются как выцветшие наклейки."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Наклейки на верхней части крышки смазаны горизонтальными растяжками от вытянутых UV-треугольников (anisotropy p95 2.74). Только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-TRAVEL-TRUNK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп travel-trunk (Дорожный сундук) принят по делегированию с баллом 8.3: силуэт и раскладка совпадают с листом. Мелочи вынесены в known_issues: изнанка ремня у гребня, досочинённые наклейки сзади, бледная неметаллическая латунь. Балл в полосе 8.0–8.4, нужен второй приёмщик «Opus high»."
+}

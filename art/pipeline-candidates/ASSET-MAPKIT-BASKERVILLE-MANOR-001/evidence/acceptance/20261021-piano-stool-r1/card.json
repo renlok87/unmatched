@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervillePianoStool.fbx",
+      "sha256": "7c40af0986713e9fb5b557e07b0f7f96a5dc835857687972fe4357f262b00751"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePianoStool_BC.png",
+      "sha256": "30e31e4fbb152923601dd383aefee639f651f0468b80d6e1190d35302af5bc60"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePianoStool_N.png",
+      "sha256": "7335a9e71ba793b96a6b5a7ccc072f358495a356903cbb5ea0e9dc409a9e9757"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePianoStool_ORM.png",
+      "sha256": "da5ba78177e2d1d6e310e765d5c027f813e172714bafd85774a5ed09c2504e32"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-piano-stool-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervillePianoStool.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+      "note": "5484 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+      "note": "UV0 islands 67, used 0.5905, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+      "note": "T_Env_BaskervillePianoStool_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePianoStool.build.json",
+      "note": "SM_Env_BaskervillePianoStool, M_Env_BaskervillePianoStool",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан: круглая викторианская банкетка с тафтингованным бархатным сиденьем, винтовой стойкой с токарными кольцами, трёхногой резной опорой на когтистых лапах и подвесным навершием снизу. Вид спереди (turn-000) почти совпадает с sheet.png, пропорции сиденья к основанию (~35 % высоты) и стойки в норме. Главная часть, сиденье (подушка вместе с деревянным ободом), наклонена вперёд примерно на 15° к вертикальной стойке. На turn-090 и turn-270 край сиденья поднимается примерно на 15 % высоты фигуры. Сзади (turn-180, wire-back, turn-135, turn-225) видна нижняя сторона сиденья, а спереди верх раскрыт больше, чем позволяет камера. На sheet.png сиденье горизонтально: Tripo принял перспективу вида сверху за наклон. Второе и третье отличия: лапы бледно-кремовые вместо латунных с вида, бархат светлее (малиновый вместо тёмно-малинового), семейство цвета то же. Наклон главной части больше 10 % высоты силуэта и есть два и более отличий, поэтому 1,0. Предмет узнаётся со всех 8 ракурсов, но на игровой дистанции сбоку выглядит как сломанная банкетка.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, рваных краёв, вывернутых или оплывших масс нет. Тонкие элементы целы: резьба винта, кольца стойки, навершие, когти лап, валики над ножками. Сетка Tripo Smart Mesh на wire-* плотная и следует форме, на сиденье просматривается тафтинг. Мелкие дефекты видны только при внимательном взгляде. На стыке ножек со стойкой светлые тонкие щели (turn-135 около ножки слева, turn-225 справа); в отчёте 4 открытые петли по ~3,2 uu² на внутренних гранях ножек и 3 трещины-слайвера. Нижняя сторона сиденья — открытая чёрная полость с гранёной ступицей (дыра 64,9 uu² в оболочке сиденья). Её видно только снизу и сзади из-за наклона сиденья, с игровой камеры сверху она не видна.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-180.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании: полированное тёмное красное дерево с текстурой волокна и резным акантом на ножках, бархатное сиденье с тафтингом и тёмным галуном, рельефные лапы. По детализации не беднее эталона кита. В BaseColor нет запечённых белых бликов: белые пятна на рендерах — спекуляр (roughness mean 0,287), они меняются с ракурсом. Есть лишь мягкое затемнение в углублениях. Растяжек на полном росте нет. Дефекты крупного плана: белые точки-крапинки и размытая полоса-шов на бархате (close-head вверху справа от центра, close-weapon), бархат местами мыльный. На полном росте лапы бледно-кремовые и читаются ближе к кости, чем к латуни с вида. Дерево очень глянцевое, почти лак или пластик. Оба отличия в пределах стилизации, но не идеально.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: сиденье (главная часть) наклонено вперёд примерно на 15° относительно стойки (turn-090/270, низ сиденья виден сзади на turn-180), а на sheet.png оно горизонтально. Есть и второстепенные цветовые отличия (лапы, бархат). Score = (1,0+1,5+1,5)/6×10 = 6,7 < 8,0. По рубрике нужна перегенерация в Tripo (этап 2), например с ортографическим или боковым видом, где сиденье ровное. Гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Сиденье (подушка и деревянный обод) наклонено вперёд примерно на 15° к вертикальной стойке: сбоку край поднимается примерно на 15 % высоты, сзади (turn-180) видна нижняя сторона. На sheet.png сиденье горизонтально; Tripo прочитал перспективу вида сверху как наклон. При перегенерации подать вид, где сиденье ровное (ортографический фронт или боковой вид). Альтернатива — повернуть сиденье выше винта в Blender, но это вне политики env_kit (только ориентация, масштаб, пивот)."
+    },
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "note": "Светлые тонкие щели на стыке ножек со стойкой (turn-135, turn-225); в отчёте 4 открытые петли по ~3,2 uu² на внутренних гранях ножек и 3 трещины-слайвера. Нижняя сторона сиденья — открытая чёрная полость (дыра 64,9 uu²), видна сзади только из-за наклона сиденья."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане на бархате видны белые точки-крапинки и размытая полоса-шов (close-head, close-weapon), бархат местами мыльный."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Лапы бледно-кремовые и читаются ближе к кости, чем к латуни с sheet.png. Бархат светлее эталона (малиновый вместо тёмно-малинового). Дерево очень глянцевое (roughness mean 0,287), блики почти пластиковые."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-PIANO-STOOL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп piano-stool кита Baskerville Manor не принят (6,7): сиденье наклонено примерно на 15° к стойке, нужна перегенерация в Tripo (этап 2) с ровным сиденьем."
+}

@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleBrassTelescope.fbx",
+      "sha256": "debcbe1e74745c5222d0c975b30badeba906fceea41b941a56f45d5582266bcb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassTelescope_BC.png",
+      "sha256": "0767704c548f5f464d4e0e1d955c385520796baeccb052e464dd89ea4f9e8c7f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassTelescope_N.png",
+      "sha256": "4a7ddbfaccc633067ce72435377dadd02a99446c7307229ea46c5b923c4abf96"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassTelescope_ORM.png",
+      "sha256": "a49ddc2400f6236f5b5c04438fc3bb61f60b86a6c784af97c4bd34b89944efab"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-brass-telescope-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleBrassTelescope.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+      "note": "4814 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+      "note": "UV0 islands 913, used 0.6783, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+      "note": "T_Env_BaskervilleBrassTelescope_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassTelescope.build.json",
+      "note": "SM_Env_BaskervilleBrassTelescope, M_Env_BaskervilleBrassTelescope",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и он совпадает с sheet.png: латунный рефрактор на деревянной треноге. Совпадают объектив с линзой, искатель сверху у заднего конца, окуляр, U-вилка на колонке, головка треноги с зажимами, три деревянные ноги с латунными обоймами, латунная распорка и острые наконечники. Предмет узнаётся со всех 8 ракурсов: на turn-135/315 труба видна с торца, но объектив и тренога читаются. Основное пятно цвета — латунь и красное дерево, как на листе. Одно отличие контура главной части: на листе труба цельная и плавно сужается, у модели основная труба обрывается ободом, а к фокусёру идёт сплющенный клин. Это даёт ступеньку и провал в верхнем контуре трубы на turn-000/045/090/180/270. Стойка треноги и длина трубы на глаз чуть шире листа, но лист всего 230 px, точной меры нет, расхождение не больше ~10 %.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка на wire-* следует форме. Тонкие элементы целы: ноги, распорка, искатель, наконечники, винты. Дыр и чёрных пятен на ногах и основной трубе нет. Дефект на полном росте в одной зоне — стык трубы. Переходный конус от фокусёра к основной трубе сплющен в плоский открытый лоток-клин с острыми гранями: он читается как латунная пластина на turn-045/090/180/225/270 и close-head, а сквозь щель видна его внутренняя сторона. Отчёт сборки подтверждает: открытая вытянутая дыра 19 uu² в shell 4 при z≈37 uu и единственная вывернутая грань там же. В той же зоне винт высоты на оси вилки висит отдельно (изолированный shell, gap 0,51 uu), просвет виден на turn-045/225. Мелочь крупного плана: латунные планки на ногах отходят от дерева с просветом (close-base, turn-090/270).",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: латунь — металл с потёртостью, ноги — лакированное красное дерево с волокном, линза — стекло. Запечённого света в цвете нет: тёмные зоны трубы меняются с ракурсом, это отражение металла, а ORM.R=1. Растяжек и швов на полном росте нет, UV без перекрытий, детализация для фонового пропа достаточная. Дефекты только на крупных планах: мыльные грязные пятна на клине стыка и белые искры на вилке (close-head), рваный край линзы объектива (close-weapon), светлые кромки на обоймах ног (close-base).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6,7 < 8,0: (S 1,5 + F 1,0 + T 1,5) / 6 × 10. F = 1,0: сплющенный открытый стык трубы и отлетевший винт вилки видны на полном росте. S = 1,5 ≥ 1,5, поэтому перегенерация Tripo не обязательна: нужна доработка формы и текстуры исходника. Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Заменить сплющенный открытый клин между основной трубой и фокусёром замкнутой сужающейся трубой (конусом), сомкнутой с задним ободом основной трубы. Закрыть открытую петлю shell 4 (19 uu², z≈37 uu) и развернуть вывернутую грань. Посадить винт высоты на ось вилки без зазора (turn-045/225). Прижать латунные планки к ногам (close-base).",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "После правки формы подчистить BC на стыке трубы и на вилке: убрать мыльные пятна и белые искры. Выровнять край линзы объектива (close-weapon) и светлые кромки на обоймах ног (close-base).",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Стык трубы даёт ступеньку в верхнем контуре: на листе труба цельная. Стойка треноги и длина трубы на глаз чуть шире листа, но лист всего 230 px. Сверить контур после доработки формы."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-BRASS-TELESCOPE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп brass-telescope (Baskerville Manor) в r1 не принят, score 6,7, нужна доработка. Сплющенный открытый стык трубы, отлетевший винт вилки, текстура на крупных планах."
+}

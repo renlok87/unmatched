@@ -118,11 +118,21 @@ def prompt_short(m: str, key: str) -> str:
     miniature" pulls in a base plate unless the prompt forbids it."""
     p = prop(m, key)
     w, d, h = p["sizeM"]
-    return (f"3/4 front view of ONE object, camera low at the object's mid height, centred, 10% margin, plain flat "
-            f"mid-grey (#808080) background, soft even daylight, no shadows, no floor, no base, no plinth, no text or "
-            f"letters. Stylized hand-painted tabletop "
-            f"miniature prop, {THEME[m]}. Object: {p['nameEn']} - {p['descEn']}. Materials: {p['material']}. "
-            f"About {w:g} x {d:g} x {h:g} m (w x d x h).")
+    text = f"{p['nameEn']} {p['descEn']}".lower()
+    # NOTES F12: a wall or hanging prop gets a phantom stand or back plate unless the prompt rules it out
+    tail = (" Wall-mounted: flat back, nothing behind it, no stand, no legs." if any(w_ in text for w_ in ("wall", "mounted"))
+            else " Hanging item: shown alone with only a short chain or hook at the top, nothing below it, no stand."
+            if any(w_ in text for w_ in ("hanging", "chandelier"))
+            and not any(w_ in text for w_ in ("tripod", "pole", "stand", "rack", "spit", "beam")) else "")
+    s = (f"3/4 front view of ONE object, camera low at the object's mid height, centred, 10% margin, plain flat "
+         f"mid-grey (#808080) background, soft even daylight, no shadows, no floor, no base, no plinth, no text or "
+         f"letters. Stylized hand-painted tabletop "
+         f"miniature prop, {THEME[m]}. Object: {p['nameEn']} - {p['descEn']}. Materials: {p['material']}. "
+         f"About {w:g} x {d:g} x {h:g} m (w x d x h).{tail}")
+    # NOTES F13: Tripo Image silently drops prompts with "wrought-iron" / "cast-iron"
+    for bad in ("Wrought-iron", "wrought-iron", "Wrought iron", "wrought iron", "Cast-iron", "cast-iron"):
+        s = s.replace(bad, "black iron")
+    return s
 
 
 def _bbox_of_object(arr, x0: int, x1: int, bg_tol: float):

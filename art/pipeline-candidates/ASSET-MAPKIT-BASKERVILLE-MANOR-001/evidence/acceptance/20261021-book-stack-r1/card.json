@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleBookStack.fbx",
+      "sha256": "c53566d53604bd5d8404b671475dc227921433bc1675355614756ed4fe5ec887"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBookStack_BC.png",
+      "sha256": "406f92371c3710aae5f58a63f97f790d59ea59531c5218287713e6711cdb8a41"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBookStack_N.png",
+      "sha256": "cae6559f55c50a118729990e0e7378ff1fb895c8f8ebfb70fa5ea40618966a84"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBookStack_ORM.png",
+      "sha256": "596c54acda70c8d5de03acc779ed0f7cc215e9075beb984168298613be5ae1f2"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-book-stack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleBookStack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+      "note": "5214 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+      "note": "UV0 islands 1018, used 0.4841, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+      "note": "T_Env_BaskervilleBookStack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBookStack.build.json",
+      "note": "SM_Env_BaskervilleBookStack, M_Env_BaskervilleBookStack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: неровная стопка из 5 книг в кожаных переплётах со свечным огарком и потёками воска на корешке верхней книги. Порядок и цвета книг совпадают с sheet.png (тёмно-зелёная, коричневая с тиснёными розетками, красная с латунным ромбом-застёжкой, тёмно-зелёная, коричневая), ступенчатый сдвиг книг и фитиль есть. Пропорции: свеча около 16–18 % высоты (на sheet около 16 %), высота к ширине около 1,34 (размер 0.4×0.5 м дает 1,25), глубина около 0,32 м. Свеча чуть приземистее, чем на sheet, в пределах 5 %. Лишних или пропавших главных частей нет, предмет узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Спереди и на 3/4 форма чистая: корешки, бинты, рваные торцы нижней книги, капли воска и фитиль целы, сетка на wire-34 и wire-front следует форме. Дефект виден на полном росте в одной зоне: у верхней книги со стороны обреза у угла нет клина книжного блока. Видна полость с внутренней поверхностью крышки: тёмный клин на turn-135, turn-180 и turn-225, «скобка» на turn-270, вырез на turn-090; на wire-back провал подтверждён геометрией. Мелочи крупного плана: тонкая щель в блоке страниц нижней книги (turn-135, turn-225, wire-back), небольшие вмятины на блоках книг 2 и 4 (wire-back).",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: потёртая кожа трёх оттенков с тиснёными розетками и бинтами, латунная застёжка, бумага обрезов, восковой огарок. Запечённого направленного света нет, детализация корешков богатая, для фона диорамы её хватает. Дефекты видны только на крупном плане. На close-head капли воска на корешке обрезаны горизонтальной линией у края, а продолжение потёков нарисовано в цвете размыто. Текстура корешка под свечой мыльная. На блоках страниц книг 2 и 4 есть бледные пятна (turn-135), обрезы местами размыты штрихами. На полном росте всё это читается как бумага и потёртость.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "S=2.0, F=1.0, T=1.5, score round(4.5/6×10,1)=7.5 < 8.0. Все гейты PASS или n/a, S ≥ 1.5, поэтому не перегенерация, а доработка. Главная причина — провал книжного блока у верхней книги со стороны обреза, он виден на полном росте с 4 из 8 ракурсов. Вторично — шов потёков воска на корешке и мыло страниц на крупном плане.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "У верхней книги у угла со стороны обреза вырезан клин книжного блока, видна полость с внутренней стороной крышки (turn-135, turn-180, turn-225, turn-270, wire-back). Закрыть полость, чтобы блок страниц был сплошным и ровно продолжал соседние страницы, и спроецировать на заплату текстуру обреза. Либо взять исходник Tripo без провала. Заодно закрыть тонкую щель в блоке страниц нижней книги (turn-135, turn-225, wire-back).",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать шов потёков воска на корешке верхней книги: геометрические капли обрезаны горизонтальной линией, продолжение нарисовано в BC размыто. Подчистить BC под геометрию капель, продолжить или снять нарисованные хвосты. Убрать бледные мыльные пятна на блоках страниц книг 2 и 4 (turn-135) и мыло корешка под свечой.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Небольшие вмятины (тёмные дуги) на блоках страниц книг 2 и 4. На игровой дистанции не читаются, отдельной правки не требуют."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Огарок чуть приземистее, чем на sheet.png (высота к ширине около 1,0 против около 1,2). В пределах стилизации, на оценку S не влияет."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-BOOK-STACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп book-stack (Стопка книг) кита Baskerville Manor — 7,5, на доработку в Blender. Нужно закрыть провал блока страниц у верхней книги со стороны обреза и подчистить шов потёков воска на корешке."
+}

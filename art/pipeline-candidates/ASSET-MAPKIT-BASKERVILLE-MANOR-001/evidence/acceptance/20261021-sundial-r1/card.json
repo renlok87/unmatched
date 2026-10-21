@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSundial.fbx",
+      "sha256": "105968d2f7ff1ba513cbe2941a682b9fbebbbec22d149f1bfd81060293d62235"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSundial_BC.png",
+      "sha256": "91db9814b1ca3b6c0b533cc68e23e3ffdad2d571876c71eab4561d06066781fa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSundial_N.png",
+      "sha256": "8dbaf0fb5efc7a439213bac90bd280bdab86727da4861465da2aefdfb71ddddc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSundial_ORM.png",
+      "sha256": "a4fd873a65216c90e331dddfaba4acce5ec6dc936b4d04a8f7202632b170a5c2"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-sundial-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSundial.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+      "note": "5247 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+      "note": "UV0 islands 611, used 0.6945, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+      "note": "T_Env_BaskervilleSundial_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSundial.build.json",
+      "note": "SM_Env_BaskervilleSundial, M_Env_BaskervilleSundial",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и узнаётся со всех 8 ракурсов: диск циферблата с ажурным гномоном на квадратной капители с фаской и резным фризом, шейка с розетками, балясина с аканфом, ступенчатый цоколь со стрельчатой резьбой. Пропорции главных частей совпадают с sheet.png (капитель ~15 %, балясина ~50 %, цоколь ~25 % высоты), лишних и пропавших частей нет. Одно второстепенное отличие контура: на sheet.png диск горизонтальный, а в модели он наклонён примерно на 5°. На turn-090/270 он выглядит тонкой перекошенной доской: левый и правый края расходятся на ~34 px при ширине 413 px. По отчёту диск — отдельная оболочка shell 2 с z 25.32–26.72 uu при верхе капители 26.31: с одной стороны он утоплен в капитель, с другой приподнят. Основное цветовое пятно (серо-бежевый камень) совпадает; цвет диска учтён в T.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, чёрных пятен и оплывших масс. Резьба (фриз, аканф, стрельчатая арка) на рендере читается чисто, сетка на wire-* следует форме балясины и уступов; резьба цоколя — низкополигональный рельеф плюс нормаль, это допустимо. Дефекты видны только на крупном плане: ажур гномона оплывший и бугристый, похож на тесто (close-head, close-weapon), а в основании треугольного лезвия гномона видна тёмная полость (close-head). Край верха капители под диском местами рваный. Низ диска и низ постамента открыты (дыры в отчёте), но с игровой камеры их не видно.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Камень читается как камень: светлый резной известняк с лёгкой грязью, без швов, растяжек и мыла, детализация резьбы богатая; затемнение в углублениях вписано в BC, для стилизации это допустимо. Дефект на полном росте в одной зоне: заказанная бронза циферблата и гномона не читается. Диск бледно-бежевый с розоватым оттенком, гномон светло-коричневый, оба похожи на песчаник или терракоту, а не на тёмно-бронзовый с патиной диск из sheet.png. Отчёт подтверждает: metallic_mean 0.009, metallic_fraction_gt_0.5 = 0. На крупном плане часовые линии циферблата нарисованы неровно и выглядят как трещины.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6.7 < 8.0, T = 1.0 (бронза циферблата и гномона не читается на полном росте); S = 1.5 ≥ 1.5, перегенерация не нужна — доработка в Blender: перекрасить и выровнять диск, гномон",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Перевести циферблат и гномон в бронзу по их островам UV (большой круглый остров диска внизу слева на uv-layout.png и острова гномона): BC затемнить и утеплить до тёплой бронзы с зеленоватой патиной, как на sheet.png; в ORM.B поднять metallic до ~0.8–1.0, roughness ~0.4–0.55. Сейчас metallic 0 и бледно-бежевый BC, диск читается как камень или терракота.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "S",
+      "frame": "turn-270.jpg",
+      "fix": "Выровнять диск циферблата (отдельная оболочка shell 2, 104 tris, z 25.32–26.72 uu) в горизонт: убрать наклон ~5° и посадить нижнюю грань на верх капители z≈26.31 uu без утопания с одной стороны и подъёма с другой.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Гномон (shell 1, 2005 tris): сгладить или упростить оплывший бугристый ажур, либо заменить чистой треугольной пластиной с 2–3 вырезами, и закрыть тёмную полость в основании лезвия. На полном росте гномон читается, дефект виден только на крупном плане.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Низ постамента открыт (дыра 44 ребра на z=0) и низ диска циферблата открыт (36 рёбер): с игровой камеры не видно, по политике env_kit «measured only» не чинится."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Часовые линии циферблата нарисованы неровно и на крупном плане выглядят как трещины; на игровой дистанции (высота 30 uu) не различимы."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Затемнение в углублениях резьбы вписано в BC (ORM.R=1, AO нет); для стилизованного пропа допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-SUNDIAL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп sundial (Baskerville Manor) на доработку в Blender, 6.7: бронза циферблата и гномона не читается (бледно-бежевый, metallic 0), диск наклонён ~5°, ажур гномона оплывший на крупном плане."
+}
