@@ -345,6 +345,14 @@ def main():
     ap.add_argument("--only", choices=["main", "barrel"], default=None,
                     help="barrel: build + K1 and the barrel frames only (repro comparison)")
     a = ap.parse_args()
+    # ДС-3a: сцена L_P17ControlScene общая для всех слотов 7a; при втором редакторе проекта — отказ
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ue7a"))
+    import editor_slot  # noqa: PLC0415
+
+    try:
+        editor_slot.shared_write_guard("control_scene build")
+    except editor_slot.SharedWriteRefused as exc:
+        raise SystemExit("ERROR: %s" % exc)
     chosen = use_asset_set(a.asset_set)
     a.barrel = a.barrel or BARREL
     out = (Path(a.out).resolve() / a.tag)

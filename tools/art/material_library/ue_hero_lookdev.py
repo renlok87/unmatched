@@ -448,10 +448,14 @@ def cvar_value(ue, name):
 def cmd_review(a, cfg) -> dict:
     """The whole editor part (level switch, temporary actors, frames, cleanup, previous level restored) runs as ONE step
     under the shared editor lock (ue_lock.py; owner from UE_LOCK_OWNER, look-dev C rule 2026-09-30)."""
-    from ue_lock import ue_lock
+    from ue_lock import capture_gpu_token, ue_lock
     with ue_lock("ue_hero_lookdev review %s %s" % (cfg["hero"], a.tag)) as lock:
-        rep = _cmd_review(a, cfg)
+        # DS-3a: in slot mode (UE_EDITOR_SLOT) the frames are shot under the GPU token (no capture of another slot or a
+        # bench meanwhile: F153 / F155); single editor -> no token, as before
+        with capture_gpu_token("ue_hero_lookdev review %s %s" % (cfg["hero"], a.tag)) as gpu:
+            rep = _cmd_review(a, cfg)
         rep["editor_lock"] = {k: v for k, v in lock.items() if k != "waits"}
+        rep["gpu_token"] = {k: v for k, v in gpu.items() if k in ("taken", "reason", "waited_s", "lock", "stamp")}
     write_json(Path(a.out).resolve() / ("review-%s.json" % a.tag), rep)
     return rep
 

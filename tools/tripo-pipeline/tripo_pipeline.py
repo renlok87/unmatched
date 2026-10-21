@@ -741,7 +741,8 @@ class McpUnreal:
         self.tool_name_style = None  # "short" or "qualified", detected on first call
 
     def describe(self) -> dict:
-        return {"backend": "mcp", "client": client_script(self.cmd).name, "endpoint": "127.0.0.1:8123/mcp"}
+        url = os.environ.get("UE_MCP_URL", "http://127.0.0.1:8123/mcp")  # the client's own default (slot 0)
+        return {"backend": "mcp", "client": client_script(self.cmd).name, "endpoint": url.split("://", 1)[-1]}
 
     def _once(self, toolset: str, tool: str, args: dict):
         call = run_client(self.cmd, ["call", toolset, tool, json.dumps(args, ensure_ascii=False)], 900,

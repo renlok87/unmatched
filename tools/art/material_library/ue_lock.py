@@ -25,6 +25,19 @@ Keep each locked step short (one hero / one scene part per lock).
 
     python tools/art/material_library/ue_lock.py --step "<step>" [--wait-timeout S] [--max-hold S] -- <command ...>
         # runs a command under the lock; exit code = the command's, 124 = gave up waiting (--wait-timeout)
+
+One lock file per live editor (DS-3a 2026-10-21, docs/game-design/decisions/2026-10-21-parallel-7a-editor-slots.md): the
+7a editor of slot N (tools/tripo-pipeline/ue7a/editor_slot.py, MCP port 8123+N) has its own lock, so the steps of two
+heroes in two editors never wait for each other. The lock file is, in this order:
+  --lock PATH (CLI) | UE_EDITOR_LOCK | --slot N (CLI) / UE_EDITOR_SLOT=N -> lock_path_for_slot(N) | C:/tmp/ue-editor.lock
+Slot 0 IS the old single editor (port 8123, C:/tmp/ue-editor.lock): without these variables nothing changes.
+    python tools/art/material_library/ue_lock.py --slot 1 --step "<step>" -- <command ...>
+    python tools/art/material_library/ue_lock.py --lock C:/tmp/clip-manifest.lock --step "manifest" -- <command ...>
+
+capture_gpu_token(step): the GPU token C:/tmp/unmatched-gpu.lock (UNMATCHED_GPU_LOCK; the token of live_tune.py and
+render_bench.py) around an editor capture, so the look-dev / clip frames of one slot are not shot while another slot
+(or a bench) renders (F153 unsettled frames, F155 anchor noise). Taken only in slot mode (UE_EDITOR_SLOT set) or with
+UE_CAPTURE_GPU_TOKEN=1; UE_CAPTURE_GPU_TOKEN=0 or no slot -> a no-op, as before.
 """
 from __future__ import annotations
 
@@ -50,9 +63,32 @@ def _env_float(name: str, default: float | None) -> float | None:
         return default
 
 
-LOCK = Path(os.environ.get("UE_EDITOR_LOCK", "C:/tmp/ue-editor.lock"))  # one lock file per live editor
+DEFAULT_LOCK = Path("C:/tmp/ue-editor.lock")  # slot 0: the single 7a editor of DS-3 (MCP :8123)
+MAX_SLOT = 9
+
+
+def lock_path_for_slot(slot) -> Path:
+    """The lock file of the 7a editor slot N: 0 -> C:/tmp/ue-editor.lock (unchanged), N -> C:/tmp/ue-editor-slot<N>.lock."""
+    n = int(slot)
+    if n < 0 or n > MAX_SLOT:
+        raise ValueError("editor slot %r: want 0..%d" % (slot, MAX_SLOT))
+    return DEFAULT_LOCK if n == 0 else DEFAULT_LOCK.with_name("ue-editor-slot%d.lock" % n)
+
+
+def env_lock_path(environ=None) -> Path:
+    """UE_EDITOR_LOCK, else the lock of UE_EDITOR_SLOT, else C:/tmp/ue-editor.lock."""
+    env = os.environ if environ is None else environ
+    if env.get("UE_EDITOR_LOCK", "").strip():
+        return Path(env["UE_EDITOR_LOCK"].strip())
+    if env.get("UE_EDITOR_SLOT", "").strip():
+        return lock_path_for_slot(env["UE_EDITOR_SLOT"].strip())
+    return DEFAULT_LOCK
+
+
+LOCK = env_lock_path()  # one lock file per live editor
+GPU_LOCK = Path(os.environ.get("UNMATCHED_GPU_LOCK", "C:/tmp/unmatched-gpu.lock"))  # live_tune.py / render_bench.py token
 OWNER = os.environ.get("UE_LOCK_OWNER", "look-dev-C")  # parallel groups name themselves (e.g. look-dev-C-A)
-POLL_S = 20.0
+POLL_S = _env_float("UE_LOCK_POLL_S", 20.0) or 20.0  # wait poll and heartbeat period (one editor, heroes interleaved: 2-5 s)
 STALE_S = 25 * 60.0
 MAX_HOLD_S = _env_float("UE_LOCK_MAX_HOLD_S", 2 * 3600.0)   # heartbeat limit of a held lock; 0 or less = no limit
 WAIT_TIMEOUT_S = _env_float("UE_LOCK_WAIT_TIMEOUT_S", None)  # None = wait forever
@@ -303,6 +339,35 @@ def ue_lock(step: str, owner: str = OWNER, poll_s: float = POLL_S, stale_s: floa
             print("UE LOCK: lock vanished while held", flush=True)
 
 
+def capture_token_wanted(environ=None) -> bool:
+    """UE_CAPTURE_GPU_TOKEN=1/0 decides; unset -> only in slot mode (UE_EDITOR_SLOT set)."""
+    env = os.environ if environ is None else environ
+    v = env.get("UE_CAPTURE_GPU_TOKEN", "").strip().lower()
+    if v in ("1", "true", "yes", "on"):
+        return True
+    if v in ("0", "false", "no", "off"):
+        return False
+    return bool(env.get("UE_EDITOR_SLOT", "").strip())
+
+
+@contextmanager
+def capture_gpu_token(step: str, lock: Path | None = None, wait_timeout_s: float | None = 3600.0,
+                      max_hold_s: float = 3600.0, poll_s: float = 10.0, environ=None):
+    """The GPU token around one editor capture (look-dev review, clip frames / close-ups) in slot mode.
+
+    Atomic create as ue_lock (pid line, heartbeat, dead-PID takeover of OUR format); a live_tune.py / render_bench.py
+    token (one line, no pid line, no heartbeat) is never judged stale by its mtime (stale_s = inf): we wait for it. Order
+    is always editor lock -> GPU token (benches take no editor lock), so there is no lock cycle."""
+    if not capture_token_wanted(environ):
+        yield {"taken": False, "reason": "no UE_EDITOR_SLOT / UE_CAPTURE_GPU_TOKEN=0: single editor, no token"}
+        return
+    with ue_lock("gpu-capture " + step, owner=OWNER + "-capture", poll_s=poll_s, stale_s=float("inf"),
+                 lock=Path(lock) if lock else GPU_LOCK, max_hold_s=max_hold_s, wait_timeout_s=wait_timeout_s) as info:
+        info["taken"] = True
+        info["lock"] = str(Path(lock) if lock else GPU_LOCK)
+        yield info
+
+
 def _cmdline(cmd: list) -> str:
     return subprocess.list2cmdline(cmd) if sys.platform == "win32" else " ".join(cmd)
 
@@ -311,8 +376,13 @@ def main(argv=None) -> int:
     for stream in (sys.stdout, sys.stderr):  # RB-11/F47: UTF-8 even in a cp1251 pipe (agents' Bash tool)
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="backslashreplace")
-    ap = argparse.ArgumentParser(description="run one command under the shared UE editor lock")
+    ap = argparse.ArgumentParser(description="run one command under the UE editor lock (one lock per editor slot)")
     ap.add_argument("--step", required=True)
+    where = ap.add_mutually_exclusive_group()
+    where.add_argument("--slot", type=int, default=None,
+                       help="the 7a editor slot N (editor_slot.py): lock C:/tmp/ue-editor-slot<N>.lock, 0 = "
+                            "C:/tmp/ue-editor.lock (default: UE_EDITOR_LOCK, else UE_EDITOR_SLOT, else slot 0)")
+    where.add_argument("--lock", default=None, help="an explicit lock file (e.g. C:/tmp/clip-manifest.lock)")
     ap.add_argument("--wait-timeout", type=float, default=None,
                     help="give up waiting for a busy lock after S seconds: exit %d with the owner and PID of the lock "
                          "(default UE_LOCK_WAIT_TIMEOUT_S or wait forever)" % EXIT_WAIT_TIMEOUT)
@@ -325,9 +395,11 @@ def main(argv=None) -> int:
     if not cmd:
         raise SystemExit("no command")
     try:
-        with ue_lock(a.step, max_hold_s=a.max_hold, wait_timeout_s=a.wait_timeout, cmd=_cmdline(cmd)) as info:
-            print("UE LOCK: held %s (pid %d, waited %.0f s)" % (info["stamp"], info["pid"], info["waited_s"]),
-                  flush=True)
+        lock = Path(a.lock) if a.lock else (lock_path_for_slot(a.slot) if a.slot is not None else LOCK)
+        with ue_lock(a.step, max_hold_s=a.max_hold, wait_timeout_s=a.wait_timeout, cmd=_cmdline(cmd),
+                     lock=lock) as info:
+            print("UE LOCK: held %s (pid %d, waited %.0f s, %s)" % (info["stamp"], info["pid"], info["waited_s"],
+                                                                    lock.as_posix()), flush=True)
             rc = subprocess.call(cmd)
     except UeLockTimeout as exc:
         print(str(exc), file=sys.stderr, flush=True)

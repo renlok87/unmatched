@@ -770,6 +770,19 @@ def main(argv=None) -> int:
             for role in spec["masters"]:
                 print(role, graph_signature(spec, role))
             return tp.EXIT_OK
+        client = tp.client_script(tp.client_command("TRIPO_PIPELINE_UNREAL_MCP_CMD", args.unreal_mcp_client,
+                                                    tp.DEFAULT_MCP_CLIENTS / "unreal_mcp.py"))
+        if args.command == "build" and client.name == "unreal_mcp.py":
+            # ДС-3a: мастера общие для всех слотов 7a; пока открыт второй редактор проекта, сборка мастера запрещена
+            # (только для живого редактора: поддельный клиент тестов редакторов проекта не касается)
+            sys.path.insert(0, str(Path(__file__).resolve().parent / "ue7a"))
+            import editor_slot  # noqa: PLC0415
+
+            try:
+                editor_slot.shared_write_guard("um_masters build")
+            except editor_slot.SharedWriteRefused as exc:
+                print("ERROR: %s" % exc, file=sys.stderr)
+                return tp.EXIT_CONFLICT
         return run(args)
     except ValueError as exc:
         print("ERROR: %s" % exc, file=sys.stderr)

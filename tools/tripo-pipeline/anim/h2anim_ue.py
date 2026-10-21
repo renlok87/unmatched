@@ -723,8 +723,19 @@ def main():
             p.add_argument("--eye-z", type=float, default=40.0)
             p.add_argument("--light-pinned", help="review report json with light_profile.data (cobble-probe removed by ND-5)")
     a = ap.parse_args()
-    {"state": cmd_state, "skeleton": cmd_skeleton, "import": cmd_import, "measure": cmd_measure,
-     "frames": cmd_frames, "sheet": cmd_sheet}[a.cmd](a)
+    fn = {"state": cmd_state, "skeleton": cmd_skeleton, "import": cmd_import, "measure": cmd_measure,
+          "frames": cmd_frames, "sheet": cmd_sheet}[a.cmd]
+    if a.cmd != "frames":
+        return fn(a)
+    # ДС-3a: в режиме слотов (UE_EDITOR_SLOT) кадры и крупные планы снимаются под GPU-токеном (F153/F155); один
+    # редактор без UE_EDITOR_SLOT — без токена, как раньше. Блокировку редактора держит обёртка ue_lock.py.
+    sys.path.insert(0, str(REPO / "tools/art/material_library"))
+    from ue_lock import capture_gpu_token  # noqa: PLC0415
+
+    with capture_gpu_token("h2anim_ue frames %s%s" % (Path(a.spec).name, " closeup" if a.closeup else "")) as gpu:
+        if gpu.get("taken"):
+            print("GPU TOKEN: held %s (waited %.0f s)" % (gpu.get("stamp"), gpu.get("waited_s", 0)), flush=True)
+        return fn(a)
 
 
 if __name__ == "__main__":
