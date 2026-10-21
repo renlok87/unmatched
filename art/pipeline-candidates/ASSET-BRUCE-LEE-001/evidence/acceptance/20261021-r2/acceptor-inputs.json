@@ -1,0 +1,225 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-BRUCE-LEE-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r2/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2",
+    "bake_run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/asset-card.yaml",
+      "sha256": "8fe2551e6868ed63e2e422239747048206c8bc65cfbf13acda7700240439341a"
+    },
+    "previous_card": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r1/card.json"
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_BruceLee_H2LD",
+      "base": "SM_BruceLee_H2LD_Base",
+      "materials": [
+        "MI_BruceLee_H2LD",
+        "MI_BruceLee_H2LD_Base",
+        "MI_BruceLee_H2LD_P1",
+        "MI_BruceLee_H2LD_P2",
+        "MI_BruceLee_H2LD_Base_P1",
+        "MI_BruceLee_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton",
+      "clips": "/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_BruceLee_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_BruceLee_H2LD_Edge",
+        "T_UM_MatLUT_BruceLee"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.55,
+    "FIGURE_BOUNDS_TOP_M": 0.54999,
+    "texture_files": [
+      "T_BruceLee_H2LD_2K_BC.png",
+      "T_BruceLee_H2LD_2K_Edge.png",
+      "T_BruceLee_H2LD_2K_MatID.png",
+      "T_BruceLee_H2LD_2K_N.png",
+      "T_BruceLee_H2LD_2K_ORM.png",
+      "T_BruceLee_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-bake-h2-r2.json",
+      "sha256": "3ff99862feb692927b5a8a3d24de0d9bb628f5f145ac3b4af5aae253359f2ae1",
+      "meshes": {
+        "body": "SK_BruceLee_H2_Body",
+        "base": "SM_BruceLee_H2_Base"
+      },
+      "materials.atlas": "M_BruceLee_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.55
+    },
+    "height": {
+      "body_mesh": "SK_BruceLee_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_BruceLee_H2_Body.bounds_m.max[2]",
+        "value": 0.54999
+      },
+      "other_meshes_top_m": {},
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 54.999,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.55,
+      "FIGURE_BOUNDS_TOP_M": 0.54999,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2",
+    "texture": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/textures/T_BruceLee_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "af2ebb3c7e7dbbbf5cee8dea3206e70ccff057d37b6641109bdc84fc6bd6c71f",
+    "output": "T_BruceLee_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair",
+  "prev_fix_list": {
+    "cycle": "r1",
+    "items": [
+      {
+        "list": "rework_fix_list",
+        "n": 1,
+        "item": "G-TOPO",
+        "frame": "wire-34.jpg",
+        "text": "SM_BruceLee_H2_Base: 4 почти вырожденных треугольника (< 1e-4 см²) из 1420 = 0,28 % > 0,1 % (ld-fbx-report.json#meshes_pre_export.SM_BruceLee_H2_Base.near_degenerate_triangles): найти и убрать щепки — по wire-34 длинные узкие треугольники веера крышки подставки у стоп (вырезы base_hole) или триангуляция retopo подставки; норма — не больше 1 на 1420"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 2,
+        "item": "T",
+        "frame": "turn-090.jpg",
+        "text": "синие линии вдоль обоих краёв всех лампасов (штанины, рукава, бока корпуса; также turn-000, turn-180, turn-270, close-torso, close-legs-back) и синие пятна на жёлтых полосках кед (turn-045, turn-315, close-base): кромку стыка лампас|комбинезон перекрасить в чёрный лампаса или жёлтый комбинезона, как на листе; на правом боку лампас — одна тёмная полоса, а не две линии с жёлтой серединой (turn-270)"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 3,
+        "item": "T",
+        "frame": "turn-045.jpg",
+        "text": "тёмная рваная полоса с синей каймой по внутренней стороне обоих бёдер от паха к колену (turn-045 правое бедро, turn-315 левое, pose-03, close-legs, close-legs-back); на листе внутренняя сторона штанин жёлтая — перекрасить в цвет комбинезона"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 4,
+        "item": "T",
+        "frame": "close-torso.jpg",
+        "text": "лампасы читаются серебристым хромом, комбинезон — глянцевой кожей (close-torso, close-torso-back, turn-180); на листе матовый хлопок — поднять шероховатость ткани комбинезона и лампасов"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 5,
+        "item": "T",
+        "frame": "close-base.jpg",
+        "text": "смазанное пятно без зерна камня, светлее и с синеватыми линиями на крышке подставки вокруг и между стоп; вернуть зерно камня (по wire-34 место совпадает с веером крышек под стопами)"
+      },
+      {
+        "list": "rework_fix_list",
+        "n": 6,
+        "item": "F",
+        "frame": "close-hands.jpg",
+        "text": "выпуклый лампас на боку корпуса и у манжет рукавов комковатый, «блоками» (close-hands панель hand.L внизу справа, close-torso правый бок, close-attack панель спины у манжеты); на листе ровная плоская полоса"
+      },
+      {
+        "list": "known_issues",
+        "n": 1,
+        "item": "T",
+        "frame": "turn-000.jpg",
+        "text": "волосы и кеды серо-графитовые вместо чёрных (#141414 / #1E1C1C листа): класс leather_smooth status floor (tone.json y_ratio 3,594) — T не снижает; этап 7: тон по UE-съёмке"
+      },
+      {
+        "list": "known_issues",
+        "n": 2,
+        "item": "T",
+        "frame": "turn-090.jpg",
+        "text": "лампасы тёмно-серые, а не чёрные: wool_coarse status floor (tone.json y_ratio 1,666) — T не снижает; этап 7: тон по UE-съёмке"
+      },
+      {
+        "list": "known_issues",
+        "n": 3,
+        "item": "T",
+        "frame": "close-base.jpg",
+        "text": "подставка светлее листа: stone_base — основной класс (share 0,29) на floor (y_ratio_loo 1,701) — T не снижает; этап 7: тон по UE-съёмке"
+      },
+      {
+        "list": "known_issues",
+        "n": 4,
+        "item": "T",
+        "frame": "tone.json",
+        "text": "WARN loo_unavailable: linen — яркость якорного класса относительно фигуры не проверена; комбинезон бледнее и бежевее насыщенного #E0B830 листа (linen d_sat −0,188; яркость и оттенок в допуске) — сверить на UE-съёмке этапа 7"
+      },
+      {
+        "list": "known_issues",
+        "n": 5,
+        "item": "T",
+        "frame": "close-head.jpg",
+        "text": "тёмная полоса над верхней губой (читается как тонкие усы), лицо старше листа (глубокие носогубные складки, опущенные углы рта); сине-зелёные кончики прядей у лба — только крупный план"
+      },
+      {
+        "list": "known_issues",
+        "n": 6,
+        "item": "T",
+        "frame": "close-head-back.jpg",
+        "text": "светлая дуга на шее над воротом сзади и сине-зелёные кончики прядей на затылке — только крупный план"
+      },
+      {
+        "list": "known_issues",
+        "n": 7,
+        "item": "T",
+        "frame": "close-hands.jpg",
+        "text": "жёлтые пятнышки цвета комбинезона на ногтях и кончиках пальцев правой кисти (и close-attack, панель бок) — только крупный план"
+      },
+      {
+        "list": "known_issues",
+        "n": 8,
+        "item": "F",
+        "frame": "pose-04b.jpg",
+        "text": "под поднятой левой стопой на крышке подставки светлые точки (< 8 px), светлая точка у носка кеды и на close-base — возможно, край выреза крышки base_hole (сомнение в опознании); этап 6: клип, уводящий стопу с контакта, проверяет крышку"
+      },
+      {
+        "list": "known_issues",
+        "n": 9,
+        "item": "G-TOPO",
+        "frame": "wire-front.jpg",
+        "text": "справочно: 1 почти вырожденный треугольник в SK_BruceLee_H2_Body (0,003 %, UE его отбросит); retopo-report.json#checks.near_degenerate_faces = 0"
+      },
+      {
+        "list": "known_issues",
+        "n": 10,
+        "item": "G-RIG",
+        "frame": "turn-000.jpg",
+        "text": "справочно: validate-skeletal-mesh-v2.json ref_pose_facing 9,605° при допуске 10° (pass, у края)"
+      },
+      {
+        "list": "known_issues",
+        "n": 11,
+        "item": "T",
+        "frame": "uv-layout.png",
+        "text": "справка: покрытие атласа 52,1 %, 424 острова (311 тело + 113 подставка), острова подставки мелкие; след на кадрах — только пятно на крышке подставки (в rework_fix_list)"
+      }
+    ]
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_BruceLee_H2LD\", \"base\": \"SM_BruceLee_H2LD_Base\", \"materials\": [\"MI_BruceLee_H2LD\", \"MI_BruceLee_H2LD_Base\", \"MI_BruceLee_H2LD_P1\", \"MI_BruceLee_H2LD_P2\", \"MI_BruceLee_H2LD_Base_P1\", \"MI_BruceLee_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton\", \"clips\": \"/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_BruceLee_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_BruceLee_H2LD_Edge\", \"T_UM_MatLUT_BruceLee\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_BruceLee_H2LD_2K_BC.png, T_BruceLee_H2LD_2K_Edge.png, T_BruceLee_H2LD_2K_MatID.png, T_BruceLee_H2LD_2K_N.png, T_BruceLee_H2LD_2K_ORM.png, T_BruceLee_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2-bake-h2-r2.json\", \"meshes\": {\"body\": \"SK_BruceLee_H2_Body\", \"base\": \"SM_BruceLee_H2_Base\"}, \"materials.atlas\": \"M_BruceLee_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.55}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_BruceLee_H2_Body.bounds_m.max[2] = 0.54999 м против FIGURE_HEIGHT_M заявки 0.55 м ± 1 %; art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 54.999 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_BruceLee_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2/textures/T_BruceLee_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "yellow jumpsuit with black side stripes; bare-handed fighting stance; short black hair",
+    "PREV_FIX_LIST": "- r1 rework_fix_list п.1 · G-TOPO · wire-34.jpg — SM_BruceLee_H2_Base: 4 почти вырожденных треугольника (< 1e-4 см²) из 1420 = 0,28 % > 0,1 % (ld-fbx-report.json#meshes_pre_export.SM_BruceLee_H2_Base.near_degenerate_triangles): найти и убрать щепки — по wire-34 длинные узкие треугольники веера крышки подставки у стоп (вырезы base_hole) или триангуляция retopo подставки; норма — не больше 1 на 1420\n- r1 rework_fix_list п.2 · T · turn-090.jpg — синие линии вдоль обоих краёв всех лампасов (штанины, рукава, бока корпуса; также turn-000, turn-180, turn-270, close-torso, close-legs-back) и синие пятна на жёлтых полосках кед (turn-045, turn-315, close-base): кромку стыка лампас|комбинезон перекрасить в чёрный лампаса или жёлтый комбинезона, как на листе; на правом боку лампас — одна тёмная полоса, а не две линии с жёлтой серединой (turn-270)\n- r1 rework_fix_list п.3 · T · turn-045.jpg — тёмная рваная полоса с синей каймой по внутренней стороне обоих бёдер от паха к колену (turn-045 правое бедро, turn-315 левое, pose-03, close-legs, close-legs-back); на листе внутренняя сторона штанин жёлтая — перекрасить в цвет комбинезона\n- r1 rework_fix_list п.4 · T · close-torso.jpg — лампасы читаются серебристым хромом, комбинезон — глянцевой кожей (close-torso, close-torso-back, turn-180); на листе матовый хлопок — поднять шероховатость ткани комбинезона и лампасов\n- r1 rework_fix_list п.5 · T · close-base.jpg — смазанное пятно без зерна камня, светлее и с синеватыми линиями на крышке подставки вокруг и между стоп; вернуть зерно камня (по wire-34 место совпадает с веером крышек под стопами)\n- r1 rework_fix_list п.6 · F · close-hands.jpg — выпуклый лампас на боку корпуса и у манжет рукавов комковатый, «блоками» (close-hands панель hand.L внизу справа, close-torso правый бок, close-attack панель спины у манжеты); на листе ровная плоская полоса\n- r1 known_issues п.1 · T · turn-000.jpg — волосы и кеды серо-графитовые вместо чёрных (#141414 / #1E1C1C листа): класс leather_smooth status floor (tone.json y_ratio 3,594) — T не снижает; этап 7: тон по UE-съёмке\n- r1 known_issues п.2 · T · turn-090.jpg — лампасы тёмно-серые, а не чёрные: wool_coarse status floor (tone.json y_ratio 1,666) — T не снижает; этап 7: тон по UE-съёмке\n- r1 known_issues п.3 · T · close-base.jpg — подставка светлее листа: stone_base — основной класс (share 0,29) на floor (y_ratio_loo 1,701) — T не снижает; этап 7: тон по UE-съёмке\n- r1 known_issues п.4 · T · tone.json — WARN loo_unavailable: linen — яркость якорного класса относительно фигуры не проверена; комбинезон бледнее и бежевее насыщенного #E0B830 листа (linen d_sat −0,188; яркость и оттенок в допуске) — сверить на UE-съёмке этапа 7\n- r1 known_issues п.5 · T · close-head.jpg — тёмная полоса над верхней губой (читается как тонкие усы), лицо старше листа (глубокие носогубные складки, опущенные углы рта); сине-зелёные кончики прядей у лба — только крупный план\n- r1 known_issues п.6 · T · close-head-back.jpg — светлая дуга на шее над воротом сзади и сине-зелёные кончики прядей на затылке — только крупный план\n- r1 known_issues п.7 · T · close-hands.jpg — жёлтые пятнышки цвета комбинезона на ногтях и кончиках пальцев правой кисти (и close-attack, панель бок) — только крупный план\n- r1 known_issues п.8 · F · pose-04b.jpg — под поднятой левой стопой на крышке подставки светлые точки (< 8 px), светлая точка у носка кеды и на close-base — возможно, край выреза крышки base_hole (сомнение в опознании); этап 6: клип, уводящий стопу с контакта, проверяет крышку\n- r1 known_issues п.9 · G-TOPO · wire-front.jpg — справочно: 1 почти вырожденный треугольник в SK_BruceLee_H2_Body (0,003 %, UE его отбросит); retopo-report.json#checks.near_degenerate_faces = 0\n- r1 known_issues п.10 · G-RIG · turn-000.jpg — справочно: validate-skeletal-mesh-v2.json ref_pose_facing 9,605° при допуске 10° (pass, у края)\n- r1 known_issues п.11 · T · uv-layout.png — справка: покрытие атласа 52,1 %, 424 острова (311 тело + 113 подставка), острова подставки мелкие; след на кадрах — только пятно на крышке подставки (в rework_fix_list)"
+  }
+}
