@@ -1,0 +1,735 @@
+{
+  "checks": {
+    "dielectric_bc_in_class_luminance_range": {
+      "expected": "<= 5 % of a class outside the preset luminance range (the v2 shader clamps the rest)",
+      "measured": {
+        "leather_smooth": {
+          "Y_p5_p95": [
+            0.0209,
+            0.0579
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "linen": {
+          "Y_p5_p95": [
+            0.2839,
+            0.4597
+          ],
+          "range": [
+            0.02,
+            0.85
+          ],
+          "share_outside": 0.0
+        },
+        "skin": {
+          "Y_p5_p95": [
+            0.1584,
+            0.2742
+          ],
+          "range": [
+            0.03,
+            0.6
+          ],
+          "share_outside": 0.0
+        },
+        "stone_base": {
+          "Y_p5_p95": [
+            0.0205,
+            0.0819
+          ],
+          "range": [
+            0.02,
+            0.12
+          ],
+          "share_outside": 0.0
+        },
+        "wool_coarse": {
+          "Y_p5_p95": [
+            0.0236,
+            0.0292
+          ],
+          "range": [
+            0.02,
+            0.8
+          ],
+          "share_outside": 0.0
+        }
+      },
+      "passed": true
+    },
+    "lut_dds_read_back": {
+      "measured": {
+        "dds_sha256": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96"
+      },
+      "passed": true
+    },
+    "lut_metal_f0_plausible": {
+      "expected": "metal classes used by the hero: Y(F0) >= 0.45, channels <= 1 (library rule; oxide films excepted)",
+      "measured": {},
+      "passed": true
+    },
+    "matid_decodes_to_labels_4k": {
+      "expected": "floor(v / 16) == class index on every island texel",
+      "passed": true
+    },
+    "matid_values_valid": {
+      "expected": "index * 16 + 8",
+      "measured": [
+        8,
+        120,
+        152,
+        168,
+        216,
+        232
+      ],
+      "passed": true
+    },
+    "orm_metallic_binary_per_class_4k": {
+      "expected": "ORM.B = 0 in dielectric classes, 255 in metal classes (4K; 2K = box average)",
+      "passed": true
+    },
+    "team_mask_only_on_cloth_classes": {
+      "measured": 0,
+      "passed": true
+    }
+  },
+  "classes": {
+    "leather_smooth": {
+      "Y_p5_p50_p95": [
+        0.0209,
+        0.0277,
+        0.0579
+      ],
+      "bc_linear_median": [
+        0.0307,
+        0.0262,
+        0.0284
+      ],
+      "bc_linear_median_before_grade": [
+        0.0203,
+        0.0168,
+        0.0185
+      ],
+      "edge_mask_mean": 0.1954,
+      "share_of_islands": 0.1102,
+      "team_r_mean": 0.0,
+      "texels_4k": 939378,
+      "ymedClassHero": 0.02765
+    },
+    "linen": {
+      "Y_p5_p50_p95": [
+        0.2839,
+        0.3741,
+        0.4597
+      ],
+      "bc_linear_median": [
+        0.6939,
+        0.3185,
+        0.0015
+      ],
+      "bc_linear_median_before_grade": [
+        0.6376,
+        0.3278,
+        0.007
+      ],
+      "edge_mask_mean": 0.071,
+      "share_of_islands": 0.4087,
+      "team_r_mean": 0.0,
+      "texels_4k": 3483835,
+      "ymedClassHero": 0.37412
+    },
+    "skin": {
+      "Y_p5_p50_p95": [
+        0.1584,
+        0.2302,
+        0.2742
+      ],
+      "bc_linear_median": [
+        0.4508,
+        0.1812,
+        0.063
+      ],
+      "bc_linear_median_before_grade": [
+        0.5089,
+        0.2542,
+        0.1413
+      ],
+      "edge_mask_mean": 0.0701,
+      "share_of_islands": 0.2957,
+      "team_r_mean": 0.0,
+      "texels_4k": 2520130,
+      "ymedClassHero": 0.23022
+    },
+    "stone_base": {
+      "Y_p5_p50_p95": [
+        0.0205,
+        0.0272,
+        0.0819
+      ],
+      "bc_linear_median": [
+        0.0296,
+        0.0262,
+        0.0284
+      ],
+      "bc_linear_median_before_grade": [
+        0.0284,
+        0.0262,
+        0.0296
+      ],
+      "edge_mask_mean": 0.0097,
+      "share_of_islands": 0.1248,
+      "team_r_mean": 0.0,
+      "texels_4k": 1063515,
+      "ymedClassHero": 0.02719
+    },
+    "wool_coarse": {
+      "Y_p5_p50_p95": [
+        0.0236,
+        0.0269,
+        0.0292
+      ],
+      "bc_linear_median": [
+        0.0284,
+        0.0262,
+        0.0284
+      ],
+      "bc_linear_median_before_grade": [
+        0.0137,
+        0.0123,
+        0.013
+      ],
+      "edge_mask_mean": 0.2215,
+      "share_of_islands": 0.0606,
+      "team_r_mean": 0.0,
+      "texels_4k": 516402,
+      "ymedClassHero": 0.02695
+    }
+  },
+  "classify_steps": [
+    "part_default",
+    {
+      "rule": "stripes_black",
+      "texels": 516722
+    },
+    {
+      "rule": "hair_dark",
+      "texels": 378106
+    },
+    {
+      "rule": "cuff_yellow_r",
+      "texels": 11633
+    },
+    {
+      "rule": "cuff_yellow_l",
+      "texels": 11275
+    }
+  ],
+  "edge_mask": {
+    "config": {
+      "curvature_per_m": [
+        150,
+        600
+      ],
+      "smooth_px": 3
+    },
+    "curvature_p50_p90_p99_per_m": [
+      4.6,
+      304.8,
+      1073.3
+    ],
+    "edge_share_ge_0.5": 0.0796,
+    "metres_per_texel_4k_median": 0.0001906
+  },
+  "edge_texture": "T_BruceLee_H2LD_{,2K_}Edge.png: R8 (L), маска рёбер для EdgeMaskTexture v2 (линейная, sRGB выкл.)",
+  "grade": {
+    "blur_px": 2,
+    "gains": {
+      "leather_smooth": {
+        "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)",
+        "rgb": [
+          0.3168,
+          0.3386,
+          0.3133
+        ],
+        "scout_iter1": [
+          0.3168,
+          0.3386,
+          0.3133
+        ]
+      },
+      "linen": {
+        "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)",
+        "rgb": [
+          1.093,
+          0.9675,
+          0.2282
+        ],
+        "scout_iter1": [
+          1.093,
+          0.9675,
+          0.2282
+        ]
+      },
+      "skin": {
+        "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)",
+        "rgb": [
+          0.8867,
+          0.7129,
+          0.4516
+        ],
+        "scout_iter1": [
+          0.8867,
+          0.7129,
+          0.4516
+        ]
+      },
+      "stone_base": {
+        "note": "разведка C:/tmp/bruce-lee-stage3-scout: полная подсказка gain_suggestion ld_measure прогона ld1 (без усилений, якорь linen); итерация ld3/ld4 разведки — t_cap 2,0 (тёмные классы на полу альбедо)",
+        "rgb": [
+          0.5467,
+          0.5339,
+          0.523
+        ],
+        "scout_iter1": [
+          0.5467,
+          0.5339,
+          0.523
+        ]
+      },
+      "wool_coarse": {
+        "note": "r3: лампасы BC нейтральные (textures.color_repaint stripe_neutral, s ≤ 0,08) — усиление r2 [0,84; 0,77; 0,61] подбиралось под сине-бурый лампас t2 и с нейтральным BC давало бордово-лиловый тон (самоконтроль r3: ld wool_coarse median sRGB (54, 44, 45), s 0,19 против нейтрального концепта (38, 35, 37)); r3 — нейтральное усиление с той же яркостью Rec.709 (0,771); класс на полу альбедо (grade.median_floor), яркость задаёт пол",
+        "rgb": [
+          0.771,
+          0.771,
+          0.771
+        ],
+        "rgb_r2": [
+          0.8436,
+          0.7664,
+          0.6056
+        ],
+        "scout_iter1": [
+          0.8436,
+          0.7664,
+          0.6056
+        ]
+      }
+    },
+    "gains_note": "итерации ld_measure разведки (≤ 3): ld1 без усилений — t_cap 1,0 (вне допуска все классы); ld2 с полной подсказкой — 1,5 (волосы legacy_bake без пола альбедо, Y 1,93); ld3 — волосы в leather_smooth — 2,0; тёмные классы (туфли и волосы, лампасы, камень) — на полу альбедо grade.median_floor (концепт темнее пола 0,02: остаток — свет кадра); металла нет",
+    "luminance_clamp": {
+      "leather_smooth": {
+        "in_toe_below_2lo": 0.8307,
+        "lowered_above_max": 0.0147,
+        "raised_below_min": 0.3598
+      },
+      "linen": {
+        "in_toe_below_2lo": 0.0016,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0015
+      },
+      "skin": {
+        "in_toe_below_2lo": 0.0193,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0028
+      },
+      "stone_base": {
+        "in_toe_below_2lo": 0.7889,
+        "lowered_above_max": 0.012,
+        "raised_below_min": 0.388
+      },
+      "wool_coarse": {
+        "in_toe_below_2lo": 0.9927,
+        "lowered_above_max": 0.0004,
+        "raised_below_min": 0.1711
+      }
+    },
+    "median_floor": 1.2,
+    "median_floor_applied": {
+      "leather_smooth": {
+        "gain_used": [
+          1.3389,
+          1.431,
+          1.3241
+        ],
+        "median_Y_with_profile_gain": 0.00568,
+        "raised_to": 0.024
+      },
+      "stone_base": {
+        "gain_used": [
+          0.9031,
+          0.882,
+          0.864
+        ],
+        "median_Y_with_profile_gain": 0.01453,
+        "raised_to": 0.024
+      },
+      "wool_coarse": {
+        "gain_used": [
+          1.8991,
+          1.8991,
+          1.8991
+        ],
+        "median_Y_with_profile_gain": 0.00974,
+        "raised_to": 0.024
+      }
+    }
+  },
+  "lut": {
+    "applied": [
+      {
+        "class": "leather_smooth",
+        "field": "bc",
+        "value": [
+          0.0307,
+          0.0262,
+          0.0284
+        ]
+      },
+      {
+        "class": "leather_smooth",
+        "field": "ymedClassHero",
+        "value": 0.02765
+      },
+      {
+        "class": "linen",
+        "field": "bc",
+        "value": [
+          0.6939,
+          0.3185,
+          0.0015
+        ]
+      },
+      {
+        "class": "linen",
+        "field": "roughTypical",
+        "value": 0.85
+      },
+      {
+        "class": "linen",
+        "field": "sheenIntensity",
+        "value": 0.0
+      },
+      {
+        "class": "linen",
+        "field": "specular",
+        "value": 0.1
+      },
+      {
+        "class": "linen",
+        "field": "ymedClassHero",
+        "value": 0.37412
+      },
+      {
+        "class": "skin",
+        "field": "bc",
+        "value": [
+          0.4508,
+          0.1812,
+          0.063
+        ]
+      },
+      {
+        "class": "skin",
+        "field": "ymedClassHero",
+        "value": 0.23022
+      },
+      {
+        "class": "stone_base",
+        "field": "bc",
+        "value": [
+          0.0296,
+          0.0262,
+          0.0284
+        ]
+      },
+      {
+        "class": "stone_base",
+        "field": "ymedClassHero",
+        "value": 0.02719
+      },
+      {
+        "class": "wool_coarse",
+        "field": "bc",
+        "value": [
+          0.0284,
+          0.0262,
+          0.0284
+        ]
+      },
+      {
+        "class": "wool_coarse",
+        "field": "roughTypical",
+        "value": 0.85
+      },
+      {
+        "class": "wool_coarse",
+        "field": "sheenIntensity",
+        "value": 0.0
+      },
+      {
+        "class": "wool_coarse",
+        "field": "specular",
+        "value": 0.1
+      },
+      {
+        "class": "wool_coarse",
+        "field": "ymedClassHero",
+        "value": 0.02695
+      }
+    ],
+    "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
+    "dds": "T_UM_MatLUT_BruceLee.dds",
+    "dds_sha256": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96",
+    "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index",
+    "overrides_json": "T_UM_MatLUT_BruceLee.overrides.json",
+    "overrides_sha256": "f71a6b7db641b29dfacd4630b2747cb8c803a7aad28f4ba6f65ac01f9e1dc853",
+    "read_back_equals_half": true
+  },
+  "lut_start_values": {
+    "applied": {
+      "linen": {
+        "roughTypical": 0.85,
+        "sheenIntensity": 0.0,
+        "specular": 0.1
+      },
+      "wool_coarse": {
+        "roughTypical": 0.85,
+        "sheenIntensity": 0.0,
+        "specular": 0.1
+      }
+    },
+    "mode": "f139",
+    "rule": "F139 / Beowulf UE r3: cloth classes start with sheenIntensity 0, specular 0.1, roughTypical 0.85 (the library sheen 0.35 washed the fur out in UE); a lut_overrides field wins; lut_start_values \"library\" keeps the presets"
+  },
+  "matid": {
+    "downsample": "2x2 majority",
+    "encoding": "R8 unorm, index * 16 + 8, decode floor(v * 255 / 16)",
+    "gutter_px_4k": 16,
+    "master_px": 4096,
+    "runtime_px": 2048
+  },
+  "outputs": {
+    "T_BruceLee_H2LD_2K_BC.png": {
+      "bytes": 4410347,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "d78dde2348c566c00349a7e633cf5b419ee580b8d1677dfc65dcaac9b4c1f97f"
+    },
+    "T_BruceLee_H2LD_2K_Edge.png": {
+      "bytes": 824001,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "72a5def6fe69223ed0d655527a2849de95ed38ee40d54ce555de0a9702ed72dc"
+    },
+    "T_BruceLee_H2LD_2K_MatID.png": {
+      "bytes": 88784,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "a9ef86ebd2cdac178b49c1a38b762dc9eff50b27ab31a5990b05a0087118924f"
+    },
+    "T_BruceLee_H2LD_2K_N.png": {
+      "bytes": 4109210,
+      "copied_from": "T_BruceLee_H2_2K_N.png",
+      "sha256": "02cdfc892a946ce9bbb61a6f31e97b4bdc2cecfbb1cbe0c9c50a371ae9091c2c"
+    },
+    "T_BruceLee_H2LD_2K_N_OpenGL.png": {
+      "bytes": 4109429,
+      "copied_from": "T_BruceLee_H2_2K_N_OpenGL.png",
+      "sha256": "49622d14374aa41e2b077c297f753511a634f9714b98e079bbf5a1d11abf3b71"
+    },
+    "T_BruceLee_H2LD_2K_ORM.png": {
+      "bytes": 2907622,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "d123a08106b2968b7e0a3029972da2fff01a0ca1742db7d70f95127ff48cc3d4"
+    },
+    "T_BruceLee_H2LD_2K_TeamMask.png": {
+      "bytes": 37158,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "9b808b6415b88a4961baab6a3b7096e6458b38e6f4bea38e43bce150553357ee"
+    },
+    "T_BruceLee_H2LD_BC.png": {
+      "bytes": 15378993,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "2616508bcd033316dd248d1a8bda7eaddfd7f142bbcf3783dc3e4c8a589bf6ed"
+    },
+    "T_BruceLee_H2LD_Edge.png": {
+      "bytes": 2208395,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "3b54e07db630fa57224127fe1fa1712c8e0c94bc8e0bd3fddbee9875b5505fd2"
+    },
+    "T_BruceLee_H2LD_MatID.png": {
+      "bytes": 206195,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "e8fab5eb831fe881a907b8d174ae981f9a8cc4e4cf89ebe0adb5d9981eb86371"
+    },
+    "T_BruceLee_H2LD_N.png": {
+      "bytes": 12091169,
+      "copied_from": "T_BruceLee_H2_N.png",
+      "sha256": "e48ae59f736c8b2f0bcb27a2c21cc58c6981461f0aed1951ebdc343a1a5728b2"
+    },
+    "T_BruceLee_H2LD_N_OpenGL.png": {
+      "bytes": 12093333,
+      "copied_from": "T_BruceLee_H2_N_OpenGL.png",
+      "sha256": "120fd2fb52758531e7cd49a71849e104c5fa4a7c4fa1ca8c9a23802a75c96043"
+    },
+    "T_BruceLee_H2LD_ORM.png": {
+      "bytes": 9062651,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "2e05d34a1d5833471a24e81b5f3f8bcc74a9cca767ac06afa3d77fce794f4d0d"
+    },
+    "T_BruceLee_H2LD_TeamMask.png": {
+      "bytes": 99858,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "21c9c4038301a20a522ed0626e6e0e930347d9a7ab618557c3e9320b6ba72630"
+    },
+    "T_UM_MatLUT_BruceLee.dds": {
+      "bytes": 2196,
+      "sha256": "f88f842025d74c73c0ca9588c82ac72a2d7bd11a7aa746e5d33e3387bd67ee96"
+    },
+    "T_UM_MatLUT_BruceLee.overrides.json": {
+      "bytes": 1208,
+      "sha256": "f71a6b7db641b29dfacd4630b2747cb8c803a7aad28f4ba6f65ac01f9e1dc853"
+    }
+  },
+  "passed": true,
+  "pins": {
+    "2K_N": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_2K_N.png",
+      "pinned": true,
+      "sha256": "02cdfc892a946ce9bbb61a6f31e97b4bdc2cecfbb1cbe0c9c50a371ae9091c2c"
+    },
+    "2K_N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_2K_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "49622d14374aa41e2b077c297f753511a634f9714b98e079bbf5a1d11abf3b71"
+    },
+    "BC": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_BC.png",
+      "pinned": true,
+      "sha256": "4af4e3def0b8d092bc7c331623232128cf6888c192a7af15bce0b658ddc873ab"
+    },
+    "N": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_N.png",
+      "pinned": true,
+      "sha256": "e48ae59f736c8b2f0bcb27a2c21cc58c6981461f0aed1951ebdc343a1a5728b2"
+    },
+    "N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "120fd2fb52758531e7cd49a71849e104c5fa4a7c4fa1ca8c9a23802a75c96043"
+    },
+    "ORM": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_ORM.png",
+      "pinned": true,
+      "sha256": "14dfed6c49dc5b246af3fbe7c3045fdc9aba13a495ace5758f19cdf9325bbf09"
+    },
+    "TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_TeamMask.png",
+      "pinned": true,
+      "sha256": "21c9c4038301a20a522ed0626e6e0e930347d9a7ab618557c3e9320b6ba72630"
+    },
+    "base_fbx": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/export/SM_BruceLee_H2_Base.fbx",
+      "pinned": true,
+      "sha256": "3bf6bae25b2b977d000436e3d2d45ca80304661816c4df1f28f46966da2d05de"
+    },
+    "baseline_BC": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_BC.png",
+      "pinned": true,
+      "sha256": "4af4e3def0b8d092bc7c331623232128cf6888c192a7af15bce0b658ddc873ab"
+    },
+    "baseline_ORM": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/textures/T_BruceLee_H2_ORM.png",
+      "pinned": true,
+      "sha256": "14dfed6c49dc5b246af3fbe7c3045fdc9aba13a495ace5758f19cdf9325bbf09"
+    },
+    "island_ids": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/work/uv/island_ids.npy",
+      "pinned": true,
+      "sha256": "3e011052e42cc524903fdba9af7690ef94d45e4cbf3bda300ed2ae600d431b43"
+    },
+    "metal_mask": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/work/uv/metal_mask.npy",
+      "pinned": true,
+      "sha256": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39"
+    },
+    "part_ids": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/work/uv/part_ids.npy",
+      "pinned": true,
+      "sha256": "1ea939daeeeeb85a3213ebf80630817bbed9f7109d7651ecb38b47bdb771003a"
+    },
+    "position": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/work/uv/position.npy",
+      "pinned": true,
+      "sha256": "760611500875df379cfad3a075d9d64a0c2975b2d1f93e0b69de788cb48de483"
+    },
+    "sk_authored": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/work/sk_authored.blend",
+      "pinned": true,
+      "sha256": "24f631e7fd84d3aa6e031ee35caeb09d1c3c54c4dc7c2f5baa51a282e253eff6"
+    },
+    "skeletal_fbx": {
+      "path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3/export/SK_BruceLee_H2.fbx",
+      "pinned": true,
+      "sha256": "e5217368491abd625bd5b791dfe6c1122da4174ad2045c3b6a660898b2a5a852"
+    }
+  },
+  "prefix": "T_BruceLee_H2LD",
+  "reclass_from_baseline_texels": 0,
+  "small_components_relabelled": {
+    "leather_smooth": 792,
+    "linen": 296,
+    "skin": 9927,
+    "stone_base": 0,
+    "wool_coarse": 528
+  },
+  "stage": "ld_maps",
+  "status": "измерено",
+  "team_mask": {
+    "A": 255,
+    "B": "0 (без изменений)",
+    "G": "полоса подставки (без изменений)",
+    "R": "одежда (TeamColor) только в классах []"
+  }
+}

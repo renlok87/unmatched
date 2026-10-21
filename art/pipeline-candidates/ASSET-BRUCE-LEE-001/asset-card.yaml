@@ -103,33 +103,60 @@ STAGE3:
   executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:stage3 Bruce Lee"}
   superseded_by: "STAGE5 (цикл r2): прогоны 20261021-h2-bake-t2 / 20261021-h2-lookdev-t2 и профили *-t2 заменены r2 — в этап 4 идут только r2"
 
-# --- блок этапа 5, доработка r2 (исполнитель этапа 3, 2026-10-21) ---
+# --- блок этапа 5, доработки r2 и r3 (исполнитель этапа 3, 2026-10-21) ---
 STAGE5:
-  cycle: "r2"
-  source_card: "docs/art-pipeline/evidence/acceptance/20261021-r1/card.json"   # r1 7,5 rework_blender
-  profile_version: 3
-  bake_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2"
-  lookdev_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2"
-  teamaccent_run: null              # TeamAccent записан в каталог look-dev r2
-  profiles: ["build-profiles/bruce-lee-h2-bake-h2-r2.json", "build-profiles/bruce-lee-h2-lookdev-r2.json",
-             "build-profiles/bruce-lee-h2-lookdev-teamaccent-r2.json"]
-  reuse_from: "20261021-h2-bake-t2"   # prepare взят из t2, первая пересчитанная стадия retopo; textures → manifest перезапущены после уточнения коробок
-  late_fix: false
-  superseded_runs: ["20261021-h2-bake-t2", "20261021-h2-lookdev-t2", "20261021-h2-bake", "20261021-h2-lookdev"]
-  tool_changes: "textures.color_repaint и textures.roughness_remap (materials.py, textures.py, tests/test_color_repaint_roughness_remap.py, HANDBOOK §4.2; одобрено координатором: опции A/B, F12 партии 2026-10-20) — без ключей байт-в-байт как раньше (пины sha256); F11 leg_chains — st_rig.py aa4de7aff"
-  fixes:
-    "1 G-TOPO": "retopo.cleanup.merge_distance_m 2,5e-5 → подставка 1 413 tris, почти вырожденных 0 (r1: 4/1 420); тело 1/39 659 (0,003 %, без изменений)"
-    "2 лампасы": "color_repaint stripe_navy — 168 530 текселей тёмно-синих кромок → чёрный соседа (без источника 0, расстояние p50 1,1 мм); stripe_split_r — середина правого лампаса штанины и рукава (жёлтая полоса между двумя тёмными линиями) 41 192 текселя в 104 коробках 2,5 мм; shoe_blue — синие пятна на полосках туфель 15 143 текселя"
-    "3 внутренняя сторона бёдер": "color_repaint inner_thigh + inner_thigh_olive + inner_thigh_dim (24 коробки 1 см) — 48 522 + 24 679 + 27 631 текселей тёмной рваной полосы с синей каймой → жёлтый соседей"
-    "4 глянец": "roughness_remap suit_matte (части 0/5/8): ORM.G p5/p50/p95 0,410/0,428/0,447 → 0,78/0,849/0,92 (3,98 млн текселей); кадры — матовый хлопок, лампасы без хрома; UE берёт roughTypical 0,85 из LUT"
-    "5 крышка подставки": "частично: color_repaint base_blue — синие линии на верхе подставки 5 467 текселей; rim_filters base_hole_1/2 (keep s ≤ 0,2, v ≤ 0,4); зерна камня в крышке нет — плоская заливка и плоская нормаль заплатки, инструмент не синтезирует; зерно в UE даёт detail-тайл stone_base"
-    "6 рельеф лампасов": "не закрыт: бугристый кант — форма исходника (в хайполи Tripo тот же рельеф), профилем дёшево не правится"
-  numbers: "tris тела 39 659 (≤ 45 000), подставка 1 413 (≤ 2 500); пробы 12/12 (вкл. shin_l/r_bend 40°); seams PASS; непрерывность весов на стыках max L1 0,04–0,16 (кромка штанины/туфля 0,079/0,083); верх 0,54999 м; тон t_cap 2,0; TeamAccent PASS — 7,77 % (ribbon), TeamDyeGain 23,0, dE акцент/ткань 24,7, P1/P2 47,8, видимость K2 5× 0,097/0,090; base_seethrough with_figure 0,00 uu² (PASS)"
-  knee_f11: "leg_chains L/R (leg_upper → leg_lower → foot, полосы 0,015/0,012/0,02 м), стыки лодыжек с tripo_part_6/7 сняты. kneecheck на sk_authored: lunge_r (голень 70°) max отношение рёбер ноги 2,68, присед 65° — 2,97, удар — 2,34; рёбер > 3× с ростом > 1 % H — 0, fail 0. t2: 1,68/1,73/1,91, но голень гнулась по всей длине («резина»); r2 — сгиб в колене, голень прямая. Кромка штанины и туфля без разрывов. Дым (паттерн Ancient Leshen): колено сгибается только до 17,5° (knee_min 162,5°); LungeAttack и HitReact contact PASS; Idle/DeathSettle foot_slide — недостижимый IK образца (прямые ноги в покое), не модель; 28 крупных планов дыма без разрывов"
-  handover: "кадры приёмки r2 → C:/tmp/bruce-lee-stage3-check/frames-r2 (повороты, крупные планы, позы осмотрены); плоские BC-виды bcview.py → C:/tmp/bruce-lee-stage3-check; рабочие скрипты C:/tmp/bruce-lee-stage3-scout (mkboxes.py, kneecheck.py)"
-  determinism: "после pass приёмки r2, до 7a (ДС-7); ожидаемый дрейф кода textures (новые ключи) и rig (leg_chains) против t2"
-  open: "1) жёлтая зазубрина у манжеты правого рукава (конец лампаса); 2) левая штанина — тонкая вторичная линия к спине (не в списке r1, не тронута); 3) на внутренней стороне бёдер в крупном плане видна слабая тень прежней полосы; 4) крышка подставки без зерна камня (п. 5); 5) рельеф канта (п. 6); 6) из STAGE3: засветка ногтей правой кисти, этапу 6 — прямые ноги в покое"
-  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe"}
+  - cycle: "r2"
+    source_card: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r1/card.json"   # r1 7,5 rework_blender
+    profile_version: 3
+    bake_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r2"
+    lookdev_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r2"
+    teamaccent_run: null              # TeamAccent записан в каталог look-dev r2
+    profiles: ["build-profiles/bruce-lee-h2-bake-h2-r2.json", "build-profiles/bruce-lee-h2-lookdev-r2.json",
+               "build-profiles/bruce-lee-h2-lookdev-teamaccent-r2.json"]
+    reuse_from: "20261021-h2-bake-t2"   # prepare взят из t2, первая пересчитанная стадия retopo; textures → manifest перезапущены после уточнения коробок
+    late_fix: false
+    superseded_runs: ["20261021-h2-bake-t2", "20261021-h2-lookdev-t2", "20261021-h2-bake", "20261021-h2-lookdev"]
+    tool_changes: "textures.color_repaint и textures.roughness_remap (materials.py, textures.py, tests/test_color_repaint_roughness_remap.py, HANDBOOK §4.2; одобрено координатором: опции A/B, F12 партии 2026-10-20) — без ключей байт-в-байт как раньше (пины sha256); F11 leg_chains — st_rig.py aa4de7aff"
+    fixes:
+      "1 G-TOPO": "retopo.cleanup.merge_distance_m 2,5e-5 → подставка 1 413 tris, почти вырожденных 0 (r1: 4/1 420); тело 1/39 659 (0,003 %, без изменений)"
+      "2 лампасы": "color_repaint stripe_navy — 168 530 текселей тёмно-синих кромок → чёрный соседа (без источника 0, расстояние p50 1,1 мм); stripe_split_r — середина правого лампаса штанины и рукава (жёлтая полоса между двумя тёмными линиями) 41 192 текселя в 104 коробках 2,5 мм; shoe_blue — синие пятна на полосках туфель 15 143 текселя"
+      "3 внутренняя сторона бёдер": "color_repaint inner_thigh + inner_thigh_olive + inner_thigh_dim (24 коробки 1 см) — 48 522 + 24 679 + 27 631 текселей тёмной рваной полосы с синей каймой → жёлтый соседей"
+      "4 глянец": "roughness_remap suit_matte (части 0/5/8): ORM.G p5/p50/p95 0,410/0,428/0,447 → 0,78/0,849/0,92 (3,98 млн текселей); кадры — матовый хлопок, лампасы без хрома; UE берёт roughTypical 0,85 из LUT"
+      "5 крышка подставки": "частично: color_repaint base_blue — синие линии на верхе подставки 5 467 текселей; rim_filters base_hole_1/2 (keep s ≤ 0,2, v ≤ 0,4); зерна камня в крышке нет — плоская заливка и плоская нормаль заплатки, инструмент не синтезирует; зерно в UE даёт detail-тайл stone_base"
+      "6 рельеф лампасов": "не закрыт: бугристый кант — форма исходника (в хайполи Tripo тот же рельеф), профилем дёшево не правится"
+    numbers: "tris тела 39 659 (≤ 45 000), подставка 1 413 (≤ 2 500); пробы 12/12 (вкл. shin_l/r_bend 40°); seams PASS; непрерывность весов на стыках max L1 0,04–0,16 (кромка штанины/туфля 0,079/0,083); верх 0,54999 м; тон t_cap 2,0; TeamAccent PASS — 7,77 % (ribbon), TeamDyeGain 23,0, dE акцент/ткань 24,7, P1/P2 47,8, видимость K2 5× 0,097/0,090; base_seethrough with_figure 0,00 uu² (PASS)"
+    knee_f11: "leg_chains L/R (leg_upper → leg_lower → foot, полосы 0,015/0,012/0,02 м), стыки лодыжек с tripo_part_6/7 сняты. kneecheck на sk_authored: lunge_r (голень 70°) max отношение рёбер ноги 2,68, присед 65° — 2,97, удар — 2,34; рёбер > 3× с ростом > 1 % H — 0, fail 0. t2: 1,68/1,73/1,91, но голень гнулась по всей длине («резина»); r2 — сгиб в колене, голень прямая. Кромка штанины и туфля без разрывов. Дым (паттерн Ancient Leshen): колено сгибается только до 17,5° (knee_min 162,5°); LungeAttack и HitReact contact PASS; Idle/DeathSettle foot_slide — недостижимый IK образца (прямые ноги в покое), не модель; 28 крупных планов дыма без разрывов"
+    handover: "кадры приёмки r2 → C:/tmp/bruce-lee-stage3-check/frames-r2 (повороты, крупные планы, позы осмотрены); плоские BC-виды bcview.py → C:/tmp/bruce-lee-stage3-check; рабочие скрипты C:/tmp/bruce-lee-stage3-scout (mkboxes.py, kneecheck.py)"
+    determinism: "после pass приёмки r2, до 7a (ДС-7); ожидаемый дрейф кода textures (новые ключи) и rig (leg_chains) против t2"
+    open: "1) жёлтая зазубрина у манжеты правого рукава (конец лампаса); 2) левая штанина — тонкая вторичная линия к спине (не в списке r1, не тронута); 3) на внутренней стороне бёдер в крупном плане видна слабая тень прежней полосы; 4) крышка подставки без зерна камня (п. 5); 5) рельеф канта (п. 6); 6) из STAGE3: засветка ногтей правой кисти, этапу 6 — прямые ноги в покое"
+    executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe"}
+  - cycle: "r3"
+    source_card: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r2/card.json"   # r2 7,5 rework_blender (S 2,0 · F 1,5 · T 0,5 · D 2,0), коммит 30b0d8f6
+    profile_version: 4
+    bake_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-bake-r3"
+    lookdev_run: "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-lookdev-r3"
+    teamaccent_run: null              # TeamAccent записан в каталог look-dev r3
+    profiles: ["build-profiles/bruce-lee-h2-bake-h2-r3.json", "build-profiles/bruce-lee-h2-lookdev-r3.json",
+               "build-profiles/bruce-lee-h2-lookdev-teamaccent-r3.json"]   # bruce-lee-h2-bake/4, -lookdev/4, -teamaccent/4
+    reuse_from: "20261021-h2-bake-r2"   # --reuse-from --stages textures, затем по одной стадии без --reuse-from (каждая Blender-стадия за воротами < 2 blender.exe); после двух итераций самоконтроля textures → manifest и look-dev перезапущены в тех же каталогах
+    late_fix: false
+    stage4_inputs: {sk: "20261021-h2-lookdev-r3/export/SK_BruceLee_H2LD.fbx", base: "20261021-h2-lookdev-r3/export/SM_BruceLee_H2LD_Base.fbx", textures: "20261021-h2-lookdev-r3/textures/", side_view: "left"}
+    geometry_note: "меняются только текстуры: SK_BruceLee_H2.fbx r3 = r2 (sha256 e5217368…), SK_BruceLee_H2LD.fbx r3 = r2 (a7af9667…), SM_BruceLee_H2LD_Base.fbx r3 = r2 (11bba0d8…) — риг, веса, UV и клипы этапа 6 (20261021-h2anim на риге r2) остаются в силе; base_seethrough и дым r2 действительны"
+    superseded_runs: ["20261021-h2-bake-r2", "20261021-h2-lookdev-r2"]
+    tool_changes: "textures.color_repaint[].majority {radius_m ≤ 0,012, min_source_fraction ∈ (0,5; 1]} (одобрено координатором): тексель перекрашивается, только если в шаре radius_m среди запечённых текселей тех же частей доля источников ≥ min_source_fraction (cKDTree.query_ball_point return_length); materials.py (majority_fraction, _majority_problems), textures.py (докстрока), tests/test_color_repaint_roughness_remap.py (+9 тестов: счёт шара, дыра и крапина без расширения полосы, без majority полоса расширяется, проверка ключа), HANDBOOK §4.2 (одно предложение); без ключа байт-в-байт (тесты пинов зелёные)"
+    fixes:
+      "(a) правый рукав": "stripe_fill ×3 (majority 5 мм, ≥ 55 % тёмных; 19 977 + 6 842 + 4 374 текселей) и stripe_trim ×3 (11 868 + 5 484 + 3 000): жёлтые вставки и пятна у локтя и манжеты залиты, кромка без выступов; самоконтроль turn-270/315/225, pose-03b, close-attack — одна сплошная полоса от плеча до манжеты"
+      "(b) левая штанина сзади": "те же проходы большинства залили жёлтую середину между двумя линиями (полоса 13–15 мм); самоконтроль turn-135/180, close-legs-back — одна тёмная полоса от пояса до низа"
+      "(c) правая штанина": "hip_gap_r — зазор «вкладки» под поясом справа (2 346 текселей, 6 рамок 2,5 мм); края edge_dim/rust/grey ×2 (majority 3 мм), пятна spot_* (majority 6 мм к v ≥ 0,68) и knee_spot_r (647 текселей у колена); stripe_tone (259 635) и stripe_neutral ×2 (465 196 + 394 856): один нейтральный тон полосы (s ≤ 0,08) — бордовые линии и лиловый тон после пола альбедо ушли; самоконтроль turn-270/315, close-legs, close-weapon — без рваных краёв, крапин и светлой линии"
+      "(d) кеды": "полоски заново по геометрии: по две параллельные полосы на каждой стороне (наружные — по своим полосам, 126,2° / 118,7°, ширина 5,3 мм; внутренние — то же направление и ширина, шаг 8,9 мм; 296 рамок полос и 205 рамок зоны), shoe_band_* (9 978 текселей в полосах → жёлтый), shoe_side_dark/tint (25 321 вне полос → нейтральный чёрный), shoe_halo ×2, сглаживание кромки majority 1,2 мм, shoe_neutral (44 510 тонированных тёмных → s ≤ 0,2); самоконтроль turn-045, pose-03, close-base, close-legs — ровные жёлтые полосы на чёрной коже без прожилок"
+      "крупный план": "fingertip_yellow — засветка ногтей правой и левой кисти (6 860 текселей → кожа): close-attack, close-hands чистые; крышка подставки — не трогалась (по указанию: только крупный план, необязательно)"
+      "look-dev": "усиление wool_coarse r2 [0,84; 0,77; 0,61] (подобрано под сине-бурый лампас t2) → нейтральное 0,771 той же яркости; tone.json wool_coarse dHue 0°, dSat −0,015 (r2: 34,5° / +0,125)"
+    numbers: "tris тела 39 659, подставка 1 413 (почти вырожденных 1 / 0) — без изменений; пробы 12/12 (.blend и FBX); seams PASS; textures/ld-maps/ld-fbx PASS; тон t_cap 2,0 (out_of_tolerance пуст; floor — leather_smooth, stone_base, wool_coarse); TeamAccent PASS — 7,98 % (ribbon), TeamDyeGain 29,5, dE акцент/ткань 26,5, P1/P2 47,4, видимость K2 5× 0,099/0,095"
+    self_check: "capture_acceptance_set.py на FBX r3 → C:/tmp/bruce-lee-r3-check (--side-view left, лист sheet-bruce-lee.png, --asset-card, --previous кадры r2): осмотрены turn-000…315, close-legs, close-legs-back, close-attack, close-weapon, close-base, close-torso(-back), close-hands, pose-01…05 — (a)–(d) не видны; первая итерация нашла бордовые линии внутри лампасов (оттенок тёмных текселей × усиление wool_coarse) и сине-чёрное пятно на внутренней стороне правой кеды — закрыты stripe_neutral, нейтральным усилением и shoe_neutral"
+    handover: "лаборатория без Blender: C:/tmp/bruce-lee-stage3-scout/r3 (lab.py — перекраска сырого BC тем же кодом и плоские точечные виды по позициям покоя; gen_r3.py, gen_r3_ld.py, hipboxes.py, shoegeo.py, shoeboxes.py, run_r3*.sh)"
+    determinism: "после pass приёмки r3, до 7a (ДС-7); дрейф кода textures (majority) против r2 ожидаем"
+    open: "1) крышка подставки — гладкое пятно без зерна камня (крупный план, необязательно; зерно — detail-тайл stone_base в UE); 2) рельеф канта лампасов (форма исходника, r1 п. 6) — на крупном плане видна выпуклая линия внутри полосы; 3) у манжет рукавов тёмная полоса оборачивает обшлаг (одинаково с обеих сторон, форма Tripo); 4) на нижнем краю нижней полоски правой кеды у подошвы — тёмная зазубрина (крупный план close-base); 5) оранжевая линия по центру груди — шов геометрии (BC там жёлтый), крупный план"
+    executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "по умолчанию сессии (не задан)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe"}
 
 # --- блок этапа 6 (исполнитель этапа 6, 2026-10-21) ---
 STAGE6:
