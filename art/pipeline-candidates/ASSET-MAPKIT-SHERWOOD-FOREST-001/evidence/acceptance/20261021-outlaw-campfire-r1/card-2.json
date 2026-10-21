@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOutlawCampfire.fbx",
+      "sha256": "bd483ca396a607d159b71d1553f67e02c03eeb9c698c8416775bdd4445ec3005"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_BC.png",
+      "sha256": "ae56a40493ed6c319f111719dc8dd44f9afaf8e75558cef15a2764365f21b7cd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_N.png",
+      "sha256": "115d705233cee674442a604dc1f42ba702c02bb6f7e91fdfc7e972502463e78b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_ORM.png",
+      "sha256": "f81834c9b2dcd147210c6f73a571adb7ce12bcd5ab482de0d146b0496bdceebf"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-outlaw-campfire-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodOutlawCampfire.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "4924 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "UV0 islands 1139, used 0.5985, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "T_Env_SherwoodOutlawCampfire_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "SM_Env_SherwoodOutlawCampfire, M_Env_SherwoodOutlawCampfire",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: кольцо из камней, скрещённые поленья, две рамы-опоры с перекладиной, крюк и котелок, как на sheet.png; пропорции главных частей совпадают, лишних и пропавших главных частей нет, на всех ракурсах читается, включая боковые turn-090 и turn-270. Есть одно второстепенное отличие контура: пламя. На листе высокие языки пламени поднимаются к котелку, у модели вместо них низкие гранёные оранжевые осколки, и силуэт огня заметно меньше (turn-000, turn-180, turn-135).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и оплывших масс нет; тонкие элементы (крюк, дужка, верёвки, распорки) целы; на wire-34 сетка следует форме. Дефекты видны только на крупных планах: (1) поперёк горловины котелка лежит лишняя плоская плита-брусок (close-weapon, close-base, wire-34); (2) пламя собрано из гранёных пластин-осколков с резкими срезами (close-base, turn-045); (3) ушки котелка и кончик крюка сильно гранёные (close-weapon, close-head).",
+      "frames": [
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: расписанное дерево с корой и мхом, верёвка, камень с мхом, серое железо котелка; запечённых теней и бликов на полном росте не видно, детализация дерева и камня на уровне стилизованного кита. Дефекты крупного плана: на гранях пламени лежит древесная текстура, смазанная оранжевым (close-base, turn-045); на камнях проступает мелкий сетчатый шум (turn-090, turn-180); вдоль пояса котелка идёт светлая полоса-шов (turn-000, turn-180).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 при S = 1.5 (перегенерация не нужна) и всех гейтах PASS/n/a; F и T по 1.5 — дефекты крупного плана в зоне огня и котелка, их можно поправить доработкой.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Убрать лишнюю плоскую плиту-брусок поперёк горловины котелка (оставить открытую горловину или ровную тёмную поверхность варева); сгладить гранёные ушки котелка и кончик крюка.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Гранёные пластины-осколки пламени заменить сглаженными языками огня или убрать с сетки под будущий VFX огня (роль пропа animated), обугленные поленья оставить.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "fix": "Перекрасить грани пламени: убрать древесную текстуру, смазанную оранжевым, дать чистый градиент огня жёлтый-оранжевый-красный (или отдельный эмиссивный слот); убрать мелкий сетчатый шум с камней и светлую полосу-шов на поясе котелка.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Силуэт пламени меньше и ниже, чем на sheet.png (там языки огня поднимаются к котелку); для animated-пропа пламя может дорисовать VFX, отдельной перегенерации не требует."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-OUTLAW-CAMPFIRE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп outlaw-campfire (Sherwood Forest) на доработку: 7.5 — убрать плиту в горловине котелка, переделать гранёное пламя и его текстуру, убрать шум с камней."
+}

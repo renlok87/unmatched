@@ -1,0 +1,155 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotStoneCairn.fbx",
+      "sha256": "149dac6e19c01ce2c01876d9778fe09bcb154874760b7ac1be56cca1a497c69b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_BC.png",
+      "sha256": "27580ffca9c9aa30f47c27753f152741825b0e622f0dc2f29042641bef531a35"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_N.png",
+      "sha256": "ebb53555fecd7dc569a273be7f559300e724dd9edf1baf507b7384989bcf99dc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_ORM.png",
+      "sha256": "fc7056efbb96095e162ce6371027db1e6ee65e228d645856ae3d97a6aef72363"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-stone-cairn-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotStoneCairn.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "note": "4911 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "note": "UV0 islands 991, used 0.6284, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "note": "T_Env_HeorotStoneCairn_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "note": "SM_Env_HeorotStoneCairn, M_Env_HeorotStoneCairn",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет: ярусная коническая пирамидка из окатанных камней, высокий яйцевидный навершный камень (~14-15 % высоты и на листе, и на модели), снежные шапки на каждом ярусе, широкое кольцо крупных камней в основании, чёрные вороньи перья воткнуты между камнями. Ширина к высоте 0,71 спереди (bounds 0,255×0,36 м) против 0,67 по заказу 0,8×1,2 м; на листе 0,63, но лист снят с лёгким превышением, и с поправкой на это расхождение около 5 %. Узнаётся со всех 8 ракурсов, фантомных выступов и оболочек на turn-090/270 и wire-* нет. Перьев немного больше, чем на миниатюре, и есть резные руны: это деталь поверхности в теме Norse, контур они не меняют. sheet.png — миниатюра 230 px без ключа (предупреждение frames.json), поэтому пропорции сверены на глаз.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, вывернутых частей и мусорной геометрии. Каждый камень читается отдельной формой, оплывших масс нет. Сетка на wire-front/back/34 — равномерная триангуляция, она следует форме камней. Перья — тонкие карточки, все целы и не висят в воздухе. Основание на close-base замкнуто ровным плоским дном. На close-head и close-weapon видна огранка силуэтов: для пропа на 4,9k треугольников это норма, а не дефект генерации.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказаны: серый камень с моховым зеленоватым оттенком и трещинами, белый снег на верхних гранях, тёмные перья с прожилками; руны дают тему. Детализация на уровне эталона кита Sarpedon (T_Env_RockOutcrop_BC), запечённых бликов и чужих цветов нет. Дефект крупного плана: по всему камню идёт регулярный ромбический узор «сетки» (артефакт текстуры Tripo), он отчётливо виден на close-head и close-weapon. На полном росте он едва заметен и читается как зерно камня; навершие на крупном плане слегка мыльное.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS / n/a (G-RIG). Единственный дефект — узор «сетки» в текстуре камня, он виден только на крупном плане и на игровой дистанции фонового пропа не читается.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Регулярный ромбический узор «сетки» в BC/N камня (артефакт Tripo), виден только на крупном плане; навершие слегка мыльное. На игровой дистанции некритично."
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Перья — тонкие карточки: с ребра читаются как иглы (turn-090, turn-045, wire-34). В UE материал перьев должен рендерить обе стороны, иначе с обратной стороны они пропадут."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-STONE-CAIRN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп stone-cairn (Heorot) принят по делегированию: 9.2. Силуэт и форма чистые, на крупном плане в текстуре камня есть узор «сетки», на игровой дистанции некритично."
+}

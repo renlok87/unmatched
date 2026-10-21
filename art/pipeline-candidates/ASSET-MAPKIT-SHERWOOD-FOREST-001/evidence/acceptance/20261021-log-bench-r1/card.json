@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodLogBench.fbx",
+      "sha256": "0f51ba3c27c196bb3605f4ab73e14b9f83c685e461f0d055b25ec878ad23a031"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLogBench_BC.png",
+      "sha256": "37284335786bc1f41778d915652d088e3865d25a1dc0c89a2be884592969c6cb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLogBench_N.png",
+      "sha256": "7e107eb4b98c8ec8f89a660ff1c296e26bfc6a9c942c2ec97f6246ba5991d188"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLogBench_ORM.png",
+      "sha256": "546ec9dda78bbd6a287f6b469e4bcc6de15d80d498c9af33fdc1f6310a9af472"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-log-bench-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodLogBench.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+      "note": "4842 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+      "note": "UV0 islands 149, used 0.4505, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+      "note": "T_Env_SherwoodLogBench_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json",
+      "note": "SM_Env_SherwoodLogBench, M_Env_SherwoodLogBench",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что на sheet.png: бревно с выдолбленным сиденьем-корытом, поднятыми торцами-подлокотниками и спилами с годичными кольцами на обоих концах, на двух коротких расширяющихся книзу пеньках. Положение пеньков совпадает с видом (левый ≈10 % от торца, правый ≈20 %), высота пеньков к диаметру бревна как на листе, торцевой спил со срезом под сиденье на передне-верхнем углу тоже есть на листе. Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет. Скамья читается со всех 8 ракурсов, включая торцевые turn-135/315. Пропорция массивнее описания ≈0.5×2×0.5 м (длина ≈2,5 высоты), но так нарисовано на sheet.png; для стилизованного настольного пропа это допустимо (вынесено в known_issues как заметка для раскладки).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и оплывших масс. Пеньки плотно садятся седловиной под бревно, без зазоров и висящих частей, низ пеньков плоский. Сетка на wire-34/front/back следует форме: цилиндр бревна, кромки корыта и веерные торцы. Мелкие сгущения треугольников на кромке сиденья — это вырезанные V-зарубки, на рендере они читаются как задуманная резьба, а не как мусор. Крупные планы close-head/close-base/close-weapon без геометрических дефектов.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кора с мхом на бревне и пеньках, светлая колотая древесина с волокнами внутри сиденья, годичные кольца и радиальные трещины на спилах. Цвет совпадает с sheet.png (коричневая кора, зелёный мох, светлый срез). Запечённых теней и бликов в цвете на полном росте не видно, швов и растяжек на полном росте нет. По детализации проп на уровне кита. Дефект только на крупном плане: close-head (верх сиденья) мыльный, волокна размыты, со ступенчатыми полосками вдоль линий. Текстура 2048 при покрытии UV 46 % растянута на длинное бревно; на close-weapon кора тоже мягковата. На игровой дистанции не заметно.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; единственный дефект (мыло текстуры сиденья) виден только на крупном плане.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Верх сиденья на крупном плане мыльный, волокна размыты со ступенчатыми полосками: 2048 при покрытии UV 46 % на длинном бревне. На игровой дистанции не заметно."
+    },
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Пропорция как на sheet.png: длина ≈2,5 высоты. При высоте 15 uu длина ≈37 uu (≈1,2 м), короче описания ≈0.5×2×0.5 м; учесть при раскладке. Это не дефект генерации."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-LOG-BENCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп log-bench (Скамья-бревно) кита Sherwood Forest принят по делегированию с оценкой 9.2. Силуэт и форма соответствуют листу. Мыло текстуры сиденья видно только на крупном плане."
+}

@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOakTree.fbx",
+      "sha256": "2fee3b2c7f0b74c753a8a767e28f65639a8a6c48e185816be59e5f9242f50a93"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_BC.png",
+      "sha256": "c6cfeba5c14a55c6295ee51a10db62c3c2ef231ff1c1742aff4b5fd5d7c9fc31"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_N.png",
+      "sha256": "387d8bff69679440379483355888475df3be5b34cc6d080abdd73741847d1fa6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_ORM.png",
+      "sha256": "a740d60e6be2a70661df9f1d18cadf8767d32aa7b1173edfc3874a1246febfb7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-oak-tree-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodOakTree.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "5216 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "UV0 islands 1636, used 0.4899, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "T_Env_SherwoodOakTree_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "SM_Env_SherwoodOakTree, M_Env_SherwoodOakTree",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: дуб с толстым кривым стволом, корневыми наплывами и округлой кроной. Общий контур и пропорции совпадают с sheet.png: ширина примерно равна высоте, открытый ствол занимает нижнюю четверть, цвета того же семейства. Дерево узнаётся со всех ракурсов. Одно отличие: на виде крона плотная и цельная, а у модели это россыпь отдельных гранёных «подушек» с крупными просветами и с отдельными кусками по краю (turn-000, turn-090, turn-180). Фантомных оболочек на боковых видах и wire-* нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка на wire-* следует форме. Дыр, чёрных пятен и вывернутых частей нет, ствол и корни чистые (close-base). Но на полном росте в одной зоне, по периферии кроны, висят тонкие пластины и комья листвы, не связанные ни с одной веткой, — это мусорная геометрия: turn-090 слева у ствола (x≈320–400, y≈820–885); turn-000 справа (x≈860–930, y≈820–885 и x≈1020–1095, y≈630–750); turn-180 слева (x≈250–470, y≈815–905); turn-315 справа (x≈930–1030, y≈815–885); wire-front, те же места. Кроме того, верхние комья кроны — угловатые призмы с плоским верхом и читаются как ящики (turn-000 вверху, x≈390–905, y≈85–335).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Кора читается как кора: резной рельеф, пятна мха, запечённого света нет (close-base, turn-270). У листвы лиственная фактура того же семейства, хотя она светлее и желтее, чем на sheet.png. Растяжки текстуры на боковых стенках комьев и мыльная гладкая грань видны на крупных планах (close-head, close-weapon). На полном росте заметно только одно мутное пятно (turn-000, x≈825–905, y≈335–440). Детализация на уровне кита Sarpedon.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6,7 < 8,0. F = 1,0: на полном росте видны оторванные от веток пластины и комья листвы по краю кроны. S = 1,5 ≥ 1,5, поэтому перегенерация не нужна, нужна доработка в Blender по F и T. Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Удалить с периферии кроны отдельные части листвы (loose parts), не связанные с ветками: тонкие пластины и мелкие комья (turn-090 слева у ствола; turn-000 справа внизу и справа на средней высоте; turn-180 слева; turn-315 справа). Отсекать по размеру и по связи с ветками. После этого переснять turn-* и wire-front.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать растяжки BC на боковых стенках комьев листвы и мыльную гладкую грань (turn-000 справа вверху, close-weapon справа): перепроецировать или перепечь эти острова. Слегка затемнить и насытить листву к тону sheet.png.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "На sheet.png крона плотная и цельная, а у модели это россыпь отдельных гранёных «подушек» с крупными просветами. На игровой дистанции силуэт дуба читается, это отличие допустимо как стилизация."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Верхние комья кроны — угловатые призмы с плоским верхом (результат Smart Mesh low-poly). Если после чистки их всё ещё видно как ящики, исправлять через исходник Tripo (больше граней или скругление)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-OAK-TREE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп oak-tree (Дуб) не принят, 6,7: нужна доработка в Blender — убрать оторванные от веток куски листвы по краю кроны и растяжки текстуры на боках комьев."
+}

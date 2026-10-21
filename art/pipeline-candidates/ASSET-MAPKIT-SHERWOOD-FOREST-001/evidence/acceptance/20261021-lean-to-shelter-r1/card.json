@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodLeanToShelter.fbx",
+      "sha256": "28de7e86acea9eb23f8276909083fd32acd73ad36ae04defc87ba1b7a133e46f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLeanToShelter_BC.png",
+      "sha256": "61bef672eb668b46bc244a2cc81e7a9292aebd859c2738b55aa5e29a59106e52"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLeanToShelter_N.png",
+      "sha256": "dad12aaaab67cd4396a6415efc49ab997828d0ad6bc00b26469ee053682a60ff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodLeanToShelter_ORM.png",
+      "sha256": "87b532f49bc3d7bb41af5a9499f0e90668762120ae5e613108de479ba1ad182e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-lean-to-shelter-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodLeanToShelter.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+      "note": "4131 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+      "note": "UV0 islands 1011, used 0.7207, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+      "note": "T_Env_SherwoodLeanToShelter_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json",
+      "note": "SM_Env_SherwoodLeanToShelter, M_Env_SherwoodLeanToShelter",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: шалаш-навес с перекрещёнными жердями на обоих торцах, коньковой жердью, зелёным тентом на заднем скате, открытым передом, лиственными торцами, настилом и спальником внутри — как на sheet.png; узнаётся со всех 8 ракурсов (turn-090/270 — треугольный лиственный торец, turn-180 — скат тента). Пропорции и главные части совпадают с видом в пределах точности 230-px листа. Одно второстепенное отличие контура: у верхушки левого перекрестья торчит тонкий плоский шип-осколок (turn-000, turn-315, wire-front), на виде его нет. Подвешенные туесок и сумка на левой стойке на 230-px виде не различимы, читаются как деталь лагеря — не засчитаны.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Каркас, стойки, верёвочная обмотка, коньковая жердь с петлями и лиственная бахрома целы; внешняя сетка тента ровная и следует форме (wire-back, turn-135, turn-225). Дефект на полном росте в зоне интерьера: внутренняя сторона левого торца смята в треугольные складки с просветом (turn-045, wire-34), в полу тёмные клинья-щели и длинный треугольный осколок (turn-000, wire-front), изнутри левого торца с игровой высоты видна «лестница» висящих обрезков жердей (close-base). Плюс мелкий оторванный фрагмент, висящий в воздухе над правым перекрестьем на всех ракурсах (turn-000, turn-090, wire-front). Основная зона одна (интерьер), фрагмент — мелкий мусор, на игровой дистанции почти не виден, поэтому 1,0, а не 0,5.",
+      "frames": [
+        "turn-045.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево читается как стилизованная кора с волокном и обмоткой, тент — как ткань со складками, листва — дубовые листья и папоротник; снаружи уровень детализации не беднее кита Sarpedon (turn-135, turn-225, turn-180). Запечённого света нет: светлая диагональ внутри тента есть и на wire-front, это свет сцены. Дефект на полном росте в одной зоне — левый торец: размытые проекционные пятна цвета холста поверх листвы снаружи (turn-270, turn-315) и мыло на его внутренней стороне и на задней панели интерьера (turn-045, close-base). На крупном плане конька зелёная обёртка размыта, с тёмными пятнами (close-head, close-weapon) — только крупный план.",
+      "frames": [
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "turn-045.jpg",
+        "close-base.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 5,8 < 8,0: F=1,0 (смятый интерьер, щели в полу, висящий фрагмент) и T=1,0 (мыло на левом торце); S=1,5 — предмет и силуэт верные, перегенерация не обязательна, нужна доработка.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "fix": "Интерьер: убрать или перестроить смятые треугольные складки на внутренней стороне левого торца и щели-клинья с треугольным осколком в полу (turn-000, wire-front), убрать висящие обрезки жердей изнутри левого торца (close-base); нужен цельный настил и гладкая внутренняя сторона торца",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Удалить оторванный висящий фрагмент над правым перекрестьем конька (виден на всех 8 ракурсах) фильтром мелких отдельных кусков; заодно срезать плоский шип у верхушки левого перекрестья (turn-000)",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "fix": "Левый торец: убрать размытые проекционные пятна цвета холста поверх листвы снаружи (turn-270, turn-315) и мыло на внутренней стороне торца и задней панели интерьера (turn-045, close-base): перепечь текстуру этой зоны из чистого исходника",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Тонкий плоский шип-осколок у верхушки левого перекрестья, на sheet.png его нет (деталь контура)"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Зелёная обёртка над коньковой жердью размыта, с тёмными пятнами; видно только на крупном плане (также close-weapon.jpg)"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-LEAN-TO-SHELTER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп lean-to-shelter (шалаш) не принят, 5,8: силуэт верный, но нужна доработка — смятый интерьер со щелями в полу, висящий фрагмент над коньком и мыло на левом торце."
+}

@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodMajorOak.fbx",
+      "sha256": "ed864c2d49ad4794638aeb5db03c7ae02197289e9404dd54b7712c80e657a7cf"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_BC.png",
+      "sha256": "b6a6a00ac54e75c41a66fd57c1fed152b8af393be8742ebefad8015ac4070d02"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_N.png",
+      "sha256": "15bccb26d940abbb172019ec8d3e22fbc44b8a77ae139ecbcfc1eaf9e1af3fcf"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMajorOak_ORM.png",
+      "sha256": "fa0c880ae08a161c9a9eeb09b0311f1440f31c075f154b8292a4d13b04a65ff0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-major-oak-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodMajorOak.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "note": "4786 tris (бюджет env_kit 12000, проп 12000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "note": "UV0 islands 1551, used 0.5196, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "note": "T_Env_SherwoodMajorOak_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json",
+      "note": "SM_Env_SherwoodMajorOak, M_Env_SherwoodMajorOak",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот же: древний узловатый дуб с раздвоенным стволом (расщелина между двумя стволами, обломанные щепы в развилке) и мощными открытыми корнями. Ствол и корни совпадают с sheet.png, общие пропорции (ширина ≈ высота, крона над нижними ~45 % высоты) в допуске, дуб узнаётся со всех 8 ракурсов. Но крона, одна из двух главных частей, по контуру другая. На виде это плотная округлая сплошная шапка листвы. В модели это редкие отдельные угловатые кластеры-коробки с жёсткими прямыми рёбрами и сквозными просветами фона между ними, они висят в воздухе отдельно от концов веток (по отчёту сборки 32 изолированных оболочки над землёй, зазор 4–16 uu). Отличий в главной части два и больше (плотность и сплошность кроны, форма кластеров, отрыв от веток) → 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Ствол, расщелина и корни чистые: сетка на wire-34/wire-front следует форме, тонкие корни и ветви целы, на close-base нет дыр, рваных краёв и чёрных пятен. Вся крона на полном росте выглядит как грубые гранёные коробки с жёсткими рёбрами, оторванные от веток. Часть оболочек листвы открыта: в отчёте 33 открытые петли-дыры и 575 открытых рёбер; кроме дна ствола, это целые грани кубов листвы по ~600–1400 uu². На turn-045 (вверху справа) и turn-270 (вверху по центру) видна внутренняя сторона коробок. Дефект на полном росте в одной зоне (крона) → 1,0.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-045.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Кора читается как кора: рисованная фактура с мхом, детализация ствола и корней не беднее кита Sarpedon, запечённого света в цвете почти нет, цветовые семейства (зелёная листва, светло-бурая кора) совпадают с видом. В кроне на полном росте есть дефекты. Текстура листвы растянута полосами на боковых гранях коробок (turn-045 вверху справа, turn-135 справа, turn-315 вверху). Фотографически размытые мыльные пятна листвы и зелёная муть на верхней части ствола под кроной (close-weapon, turn-225, turn-315). Белые пятна на гранях листвы (turn-000, turn-180, turn-225). Всё это в одной зоне (крона и развилка); низ ствола и корни чистые → 1,0.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. Крона собрана из редких угловатых кубов с просветами, оторванных от веток, а на sheet.png крона плотная и округлая. Это дефект исходника Tripo «Умная сетка»: листва низкополигональная, весь проп 4786 tris при бюджете 12000. env_kit по своему правилу форму не чинит, поэтому нужна перегенерация в Tripo (этап 2). Score 5,0 (S 1,0 + F 1,0 + T 1,0); гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Крона — редкие отдельные угловатые кластеры-коробки со сквозными просветами фона вместо плотной округлой кроны с sheet.png. Кластеры висят отдельно от концов веток: 32 изолированных оболочки над землёй, зазор 4–16 uu. При перегенерации нужна сплошная округлая масса листвы, связанная с ветками; бюджет 12000 tris позволяет плотнее, сейчас 4786. Ствол, расщелину и корни сохранить как ориентир: они удались."
+    },
+    {
+      "item": "F",
+      "frame": "turn-270.jpg",
+      "note": "Листва — гранёные коробки с жёсткими рёбрами. Часть граней кубов открыта: 33 дыры по отчёту сборки, кроме дна ствола, по ~600–1400 uu². На полном росте видна внутренняя сторона коробок (также turn-045 вверху справа, wire-34)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "note": "Растяжки и полосы текстуры листвы на боковых гранях кубов кроны (также turn-135 справа, turn-315 вверху)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Размытые мыльные зелёные пятна и фотографическая муть на верхней части ствола под кроной и на части кластеров листвы (также turn-225, turn-315)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-225.jpg",
+      "note": "Белые пятна на гранях листвы (также turn-000 справа вверху, turn-180 слева внизу кроны)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-MAJOR-OAK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп major-oak (Великий дуб) не принят: крона из оторванных угловатых кубов вместо плотной округлой, нужна перегенерация в Tripo (этап 2); ствол, расщелина и корни удались."
+}

@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFernCluster.fbx",
+      "sha256": "703846afee15345d50539cda4cc44d8d15706b159e5651a24e75d96f73087fd4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFernCluster_BC.png",
+      "sha256": "6f64d33b34201f38002616af77e6758febecd47c947623a525a012735ad7c47a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFernCluster_N.png",
+      "sha256": "871c76e3f04baad1b19a0e96d1c6a1aa0f9b451283c38f3cc3285212675f706d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFernCluster_ORM.png",
+      "sha256": "c6cf147054321f88c97437ca95123df1f195888beb6bf4c683f2e91c604af94e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fern-cluster-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodFernCluster.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+      "note": "2553 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+      "note": "UV0 islands 571, used 0.6919, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+      "note": "T_Env_SherwoodFernCluster_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json",
+      "note": "SM_Env_SherwoodFernCluster, M_Env_SherwoodFernCluster",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Общий габарит совпадает с листом: веерный куст шире, чем высота (bbox 0,284×0,267×0,24 м, W/H ≈ 1,18 против ≈ 1,14 на sheet.png), внешние вайи дугой наружу, цвет того же зелёного семейства. Но отличий больше одного. (1) Каждая вайя — цельный ремнёвидный лист, а на листе заказан папоротник-орляк с перистыми вайями: отдельные пёрышки дают перистый, зубчатый контур. Перистость есть только в рисунке текстуры, контур её не несёт, поэтому силуэт читается как костенец, бромелия или верхушка ананаса (особенно wire-front и wire-back). (2) В центре на turn-090, turn-270, turn-135 и turn-225 широкие чашевидные листья, как у капусты или хосты; на листе их нет, там узкие стоячие вайи. (3) Внизу юбка из коротких треугольных кончиков, свисающих вниз, и тёмное блюдце по кругу (turn-000, turn-180, wire-back) вместо длинных нижних вай, лежащих на земле. Узнаётся одинаково со всех 8 ракурсов, лишних предметов нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дыр и разорванной сетки нет, тонкие кончики вай целы. Сетка на wire-* — ленты треугольников вдоль листа и следует форме. Края вай угловато-полигональные (close-head), для стилизации это допустимо. На полном росте есть дефекты. Широкие центральные листья оплывшие и скомканные, как мятый целлофан: тёмные глянцевые складки на turn-090, turn-270 и close-weapon. У основания мусор из мелких осколков и тёмное блюдце-кольцо (turn-000, wire-front, wire-back). По отчёту сборки 48 % площади смотрит внутрь (ray_escape inward 0.4799). Blender рисует обе стороны, а при одностороннем материале в UE часть листвы пропадёт.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материал читается как листва: на вайях нарисован стилизованный рисунок пёрышек с жилкой (close-head), палитра зелёная, металла нет (metallic 0.024). На полном росте видны дефекты. Широкие центральные листья — гладкое размытое зелёное «мыло» без рисунка, с тёмным пятном (turn-090, close-weapon). Просветы между пёрышками запечены в BC светло-серыми штрихами (фон листа вместо прозрачности): на close-head их хорошо видно, на turn-000 и turn-045 они читаются как белёсая рябь. На тёмных листьях карта нормалей даёт жёлто-зелёные блики-морщины, похожие на мятую фольгу (turn-000 слева и справа, turn-270). Это уровень ниже чистых материалов кита Sarpedon.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: Tripo построил цельные ремнёвидные листья и широкие капустные листья в центре вместо перистых вай орляка с листа, а у основания добавил юбку из свисающих кончиков. Силуэт читается как бромелия или костенец, а не как куст папоротника. В Blender перистый контур не исправить, нужна перегенерация в Tripo (этап 2). Перистый контур вай задать в виде front/single, в промпте требовать перистые вайи, отдельные листочки, без широких цельных листьев. Score = (1,0 + 1,0 + 1,0) / 6 × 10 = 5,0.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Широкие центральные листья оплывшие и скомканные, глянцевые складки как у мятого целлофана; то же на turn-270 и close-weapon."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "У основания мусор из мелких осколков и тёмное кольцо-блюдце из свисающих кончиков (shell 19 у земли с большой открытой петлёй); видно и на turn-000 и wire-back."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "По отчёту сборки 48 % площади смотрит внутрь (ray_escape inward 0.4799, 41 грань с несогласованной намоткой). В UE листве нужен двусторонний материал, иначе часть вай пропадёт."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Центральные широкие листья — размытое «мыло» без рисунка, с тёмным пятном; то же на turn-090."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Просветы между пёрышками запечены в BC светло-серыми штрихами (фон листа); на полном росте это белёсая рябь (turn-000, turn-045)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "На тёмных листьях карта нормалей и блик дают жёлто-зелёные морщины, похожие на мятую фольгу; то же на turn-000."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-FERN-CLUSTER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп fern-cluster не принят (5,0): вместо перистых вай орляка получились цельные листья, как у бромелии. Нужна перегенерация в Tripo (этап 2) с перистыми вайями."
+}

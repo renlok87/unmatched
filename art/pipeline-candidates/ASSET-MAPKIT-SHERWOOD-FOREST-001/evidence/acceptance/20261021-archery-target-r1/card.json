@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodArcheryTarget.fbx",
+      "sha256": "f338433eac21438023984dd6584bba0a793236874290b4fbab670d4744dc4465"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArcheryTarget_BC.png",
+      "sha256": "7670befe9d39e949fcc0ab4612fc146bdf8cd458c2468f9f87afa1a3af3ee105"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArcheryTarget_N.png",
+      "sha256": "dc5b558c80055fcc665325b8a4daf25071b4c30177d0e866ef2153115224e01c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArcheryTarget_ORM.png",
+      "sha256": "648216b3579208922a4de74d9803f593498fd302b0d39a5a56a3dc4208c5526d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-archery-target-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodArcheryTarget.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+      "note": "4185 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+      "note": "UV0 islands 931, used 0.7217, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+      "note": "T_Env_SherwoodArcheryTarget_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json",
+      "note": "SM_Env_SherwoodArcheryTarget, M_Env_SherwoodArcheryTarget",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан: круглый плетёный соломенный мат с кольцами в том же порядке, что на sheet.png (солома / зелёное / солома / синее / солома / красный центр), деревянная стойка-козлы с поперечиной и верёвочными обвязками, три стрелы. Ракурс turn-315 почти совпадает с видом листа: стрелы из центра и внутренних колец уходят вправо, оперение справа, как на листе. Доля мата по высоте ≈ 69 % против ≈ 65 % на листе, поперечина на ≈ 80 % высоты, расхождение в пределах допуска. Лишних и пропавших главных частей нет. С боков (turn-090/270) читается как соломенный мат на ногах со стрелами, предмет узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, вывернутых частей и оплывших масс нет. Стрелы (тонкие элементы) целы, у всех трёх есть древко и оперение. Ноги-цилиндры, торцы брёвен опоры и верёвки читаются (close-base). На wire-34/wire-front/wire-back сетка следует форме: плоский лицевой диск, обод мата скруглён и плотнее. Дефекты видны только на крупном плане: соломенные «вихры» на верхнем ободе сделаны плоскими карточками с рваными бумажными краями (close-head), сверху мата мелкие комочки (turn-045, turn-270).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Спереди материалы читаются как заказано: солома с плетением и обвязкой, кольца выкрашены, дерево с волокнами, верёвка, оперение светлое. Цвета совпадают с листом, детализация не беднее кита Sarpedon. Дефект на полном росте в одной зоне, на тыльной стороне мата. На turn-180 поперёк красного центра лежит полупрозрачный размытый «призрак» деревянной перекладины. На wire-back это одна сплошная поверхность без такой геометрии, то есть это проекция в текстуре. На turn-135/225 рядом с задними стойками размытые тёмные «тени-призраки» стоек, на wire-back в той же зоне тёмное пятно по нормалям. В UV круг тыльной стороны мутный, с тёмной диагональной полосой. Мелкие дефекты: на лицевой стороне у верхней стрелы мыльная заплатка с серо-синим потёком (видна только на close-head/close-weapon), у низа бокового обода тёмные пятна, похожие на запечённую контактную тень (turn-270/225/135).",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "wire-back.jpg",
+        "uv-layout.png",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "S=2.0, F=1.5, T=1.0 → round(4.5/6×10, 1) = 7.5 < 8.0. Все гейты PASS/n/a, S ≥ 1.5, значит не перегенерация, а rework_blender. Главная причина: на тыльной стороне мата в текстуре запечён полупрозрачный «призрак» перекладины поперёк красного центра и размытые тени задних стоек, видно на полном росте (turn-180/135/225). Вторично: мыльная заплатка у верхней стрелы спереди и плоские соломенные лоскуты с рваными краями на ободе (крупный план).",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Тыльная сторона мата: убрать запечённый полупрозрачный «призрак» деревянной перекладины поперёк красного центра и размытые тени-призраки задних стоек (также turn-135.jpg, turn-225.jpg; тёмное пятно в N на wire-back.jpg). Перетекстурить тыльную сторону в Tripo либо заменить её остров BC/N чистой соломой или чистой копией колец, без проекции стойки.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Лицевая сторона: убрать мыльную заплатку с серо-синим потёком над синим кольцом у верхней стрелы (также close-weapon.jpg), восстановить плетение соломы и край синего кольца.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "fix": "Низ бокового обода мата: ослабить или убрать тёмные пятна, похожие на запечённую контактную тень от опоры (также turn-225.jpg, turn-135.jpg), чтобы бок читался ровной соломой, а не подпалиной.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Верхний обод мата: подрезать или убрать плоские соломенные карточки с рваными бумажными краями и мелкие комочки сверху (turn-045.jpg, turn-270.jpg), например порогом удаления мелких отдельных фрагментов; соломенные вихры оставить, но объёмнее и мельче.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Кольца мишени повторены на тыльной стороне мата (двусторонняя мишень). Это не заказано, но и не дефект; после чистки призраков можно оставить."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-ARCHERY-TARGET-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп archery-target (Мишень) не принят: 7,5, доработка rework_blender. Нужно убрать с тыльной стороны мата запечённый призрак перекладины и тени стоек, мыльную заплатку у верхней стрелы и плоские рваные соломенные лоскуты на ободе."
+}

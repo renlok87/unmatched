@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodGoldChest.fbx",
+      "sha256": "27ab2b92b64acd8459443ed9917538ce41421004fdecb4c8d246febd7e2b7902"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodGoldChest_BC.png",
+      "sha256": "407bc0c5d6b580b5556aa8a557680e30b597c90c9b77e1b23f66b34782bf7a07"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodGoldChest_N.png",
+      "sha256": "12e1aed4ef976a6d415725ee4744a8074e43b67bc02798724f24d8dd31f60d40"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodGoldChest_ORM.png",
+      "sha256": "a6def4a4c65d65b7499293a3e9affd00a9ab1ff22d41fa0bcd7470d148f743f3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-gold-chest-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodGoldChest.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+      "note": "4325 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+      "note": "UV0 islands 612, used 0.7785, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+      "note": "T_Env_SherwoodGoldChest_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json",
+      "note": "SM_Env_SherwoodGoldChest, M_Env_SherwoodGoldChest",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: открытый сундук с бочкообразной крышкой на железных полосах с заклёпками, накладка замка с замочной скважиной, кольца-ручки по бокам, куча золота, кубок лежит на боку. Узнаётся со всех 8 ракурсов, фантомных выступов на turn-090/270 и wire-* нет (крючок сбоку — это проушина крышки, на виде спереди она висит по центру). Пропорции корпуса и крышки сходятся с видом. Одно второстепенное отличие по контуру: на виде золото — бугристая горка монет вровень с краем, которая переливается через передний край, а у модели это гладкий клин, поднятый к петлям, с монетами только рельефом и одним крупным диском-монетой; переливается лишь оплывший комок на левом переднем углу.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дыр, просветов, вывернутых частей и мусора нет. Кольца, проушина и ножка кубка целы, сетка на wire-* следует форме, крупный план верха (close-head) чистый. Дефект на полном росте в одной зоне: на передней стенке справа от замка панель непланарна, её триангуляция даёт резкий диагональный светлый клин. Клин виден на turn-000, turn-045 и turn-315, на close-base и в глине wire-front, значит дело в геометрии и нормалях, а не в текстуре. Мелочь: комок монет на левом переднем углу оплывший.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево и железо отличные: рисованная древесина с волокнами, кованое железо с заклёпками, запечённого света нет. По детализации не хуже кита Sarpedon (close-head). Дефект на полном росте в одной зоне, в куче монет. Справа на ней лежит красно-сине-зелёный мазок чужого цвета: он читается как грязь, а не как самоцветы, и виден на turn-000, turn-045, turn-090 и close-base. Задняя половина кучи — мыльное бледное размытое пятно «песка» без монет (close-base, turn-225, turn-270). Кубок читается как золото.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 5.8 < 8.0 (S 1.5, F 1.0, T 1.0). S ≥ 1.5, поэтому перегенерация не нужна. Доработка: диагональный перепад шейдинга на передней стенке (F) и мазок чужого цвета и мыло на куче монет (T). Все гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Убрать диагональный светлый клин на передней стенке справа от замка (непланарная панель, виден также на turn-045, turn-315 и в глине wire-front): выровнять панель или пересчитать нормали (weighted/face-weighted normals, planar dissolve этой стенки) перед запеканием, затем перезапечь BC/N/ORM.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Убрать на куче монет красно-сине-зелёный мазок справа и заменить мыльную бледную заднюю половину кучи (turn-225/270) на тот же монетный рисунок в едином золоте; самоцветы оставить только на кубке.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Куча золота — гладкий клин к петлям, а не бугристая горка, переливающаяся через передний край, как на sheet.png; один крупный диск-монета в куче. На игровой дистанции читается, перегенерации не требует."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Комок монет на левом переднем углу оплывший (мелочь крупного плана)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-GOLD-CHEST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп gold-chest (сундук с золотом) не принят, 5.8: доработать в env_kit диагональный перепад шейдинга на передней стенке и перекрасить кучу монет (мазок чужого цвета, мыльная задняя часть)."
+}

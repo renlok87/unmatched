@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodMossyBoulder.fbx",
+      "sha256": "bad7a9563f331d13612fccd58b276b26261b9c0c3904997559e0c79abecb3ee0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_BC.png",
+      "sha256": "44ae2b90878d284577f7865a55219e5a3ba9ec1fcbfeaa70c0b436c9afc6731d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_N.png",
+      "sha256": "a284915e4afa83984ff296f1c7bda02b31eb9e9bf560b9aa9425b3c7f3c9faa7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_ORM.png",
+      "sha256": "a9959a7c3aaf4cad12071e29023501d1a9681a809b6bd5df98381fb0ef0ad556"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-mossy-boulder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodMossyBoulder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "4161 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "UV0 islands 448, used 0.7644, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "T_Env_SherwoodMossyBoulder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "SM_Env_SherwoodMossyBoulder, M_Env_SherwoodMossyBoulder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет, компоновка совпадает с листом: округлый серый валун; мох закрывает левую сторону и макушку (около половины поверхности); справа серые скруглённые доли камня с малой долей внизу по центру; вокруг основания кольцо папоротника на мшистой подложке. Вид turn-000 почти повторяет sheet.png. Пропорции: силуэт с папоротниками в орто под 0° даёт h/w 0,65. Лист снят сверху под углом около 15–20°, и под таким ракурсом модель дала бы h/w около 0,77–0,80 против 0,81 на листе, это в допуске. Вылет папоротника за камень отличается от листа меньше чем на 5 % роста. Лишних и пропавших частей нет. Валун узнаётся со всех 8 ракурсов: на 270° почти сплошной мох, на 090–180° камень долями. Замечание без снижения: план почти круглый, камень 54,6×52,3 uu против заказанных около 60×48 uu (≈2×1,6 м при высоте 39 uu). Каждая ось в пределах ±9 % при «≈» в описании, контур от этого не меняется.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Тело валуна чистое: сетка равномерная (4161 tris) и следует форме, на полном росте нет дыр, рваных краёв, мусора и оплывших масс (wire-front, wire-back, wire-34). Все дефекты сидят на кольце папоротника и мелкие. На части листьев тонкие тёмные клинья: это вывернутые или обратные грани, ray-escape inward 3,5 % площади. Они явно видны на wire-*, а в текстуре едва заметны у крайних кустов (turn-000, turn-090, turn-315). Листья сделаны открытыми зубчатыми однослойными карточками (sheet 8,5 % площади). Кусты висят на 0,35–1,33 uu над z=0. Есть 4 крошечных фрагмента по 2 треугольника. Низ валуна открыт, на доске его не видно. Тонкие элементы целы. На игровой дистанции всё это не читается, поэтому оценка 1,5.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в заказе: густой ворсистый мох, серый камень с трещинами между долями, папоротник с прожилками. Запечённого направленного света и бликов нет, тёмные швы между долями — расписанный AO в духе стилизации. Швов и растяжек на полном росте нет, UV без перекрытий, 2048. Палитра в семействе листа, мох немного светлее и желтее. Дефекты видны только при разглядывании или на крупном плане. На камне и под тонким мхом нижнего пояса мелкий регулярный узор «мешковины» (turn-270, turn-315, доли на turn-135) — артефакт текстуры Tripo. Мох на макушке слегка мыльный, мазки тянутся (close-head). Подложка под папоротником гладкая, без детали (close-base). Оценка 1,5.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-135.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8,3 ≥ 8,0 (S 2,0 / F 1,5 / T 1,5), ни одно измерение не ниже 1,0, все гейты PASS или n/a. Дефекты F и T видны только на крупном плане или при разглядывании; для фонового пропа на игровой дистанции они не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Тёмные клинья на части листьев папоротника: вывернутые или обратные грани, ray-escape inward 3,5 % площади. Явно видны на wire-front и wire-back, в текстуре едва заметны у крайних кустов на turn-000, turn-090 и turn-315."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Папоротник сделан из открытых однослойных зубчатых карточек, кусты висят на 0,35–1,33 uu над землёй. Есть 4 фрагмента по 2 треугольника на высоте 2,8–4,5 uu, низ валуна открыт. При одностороннем материале в UE листья с обратной стороны пропадут: проверить two-sided при импорте."
+    },
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "note": "Мелкий регулярный узор «мешковины» на камне и под тонким мхом нижнего пояса (turn-270, turn-315) и на долях камня (turn-135). Это артефакт текстуры Tripo, заметен только при разглядывании."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мох на макушке слегка мыльный, мазки тянутся. Подложка под папоротником гладкая, без детали (close-base). Видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-MOSSY-BOULDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mossy-boulder (Sherwood Forest) принят по делегированию: 8,3 (S 2,0 / F 1,5 / T 1,5). Замечания по папоротнику и узору текстуры записаны в known_issues."
+}

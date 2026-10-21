@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFirewoodStack.fbx",
+      "sha256": "26dcdc2f59d4b192c9c21bc3494448eced1d09affaf8df67ff3ac5c15ce7e37f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_BC.png",
+      "sha256": "71a88bf943245051b45c9c4bfdbe7c715b386287169ceb209fee818dc5556c95"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_N.png",
+      "sha256": "237242978852e02eabab4429f1eef78bbfb519378406b363cf3d143a393a3659"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_ORM.png",
+      "sha256": "1b0439697f07dc2aa653198c4da48abfead6b7383e18f6415927ee22ca36c629"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-firewood-stack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFirewoodStack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "note": "5136 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "note": "UV0 islands 1432, used 0.615, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "note": "T_Env_HeorotFirewoodStack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "note": "SM_Env_HeorotFirewoodStack, M_Env_HeorotFirewoodStack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это тот самый предмет: поленница колотых дров в рамной стойке на ножках, под двускатной дощатой крышей со снегом, как на sheet.png. Пропорции совпадают с видом 3/4: ширина к высоте около 1,15 против 1,08 на листе, крыша занимает около 36 % высоты в обоих случаях. Стойки, обвязка, бабка с подкосами на фронтонах (turn-090/270) и ножки на месте, фантомных частей нет, предмет узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: на листе скаты крыши сплошные, а у модели доски кровли разной длины и сквозная прореха через оба ската (turn-000, turn-180 и все виды 3/4). Снег на крыше лежит только по коньку и концам досок, на листе он покрывает скаты; это соответствует заказанному «light dusting».",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дефект на полном росте в одной зоне: крыша. В обоих скатах не хватает досок, доски обрываются на разной высоте, и сквозь кровлю виден фон: turn-000 справа от центра, turn-180 слева, turn-045/135/225/315 и wire-front. Посередине ската торчит большая плоская треугольная пластина (wire-34), между коньком и досками видна щель (close-head). Остальная форма в порядке: рама, стойки, подкосы, нижняя обвязка и ножки чистые, сетка на wire-34 следует форме, стопка поленьев на виде 3/4 (close-base, turn-045) читается плотной. У отдельных колотых торцов мелкие наросты и зазубрины (wire-front), это дефект крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево рамы и поленьев выглядит деревом (торцы с кольцами, кора по краю, рисованное волокно), снег читается снегом, лёгкая присыпка на верхах поленьев видна на turn-090/270. Запечённого направленного света и теней в цвете нет, все ракурсы освещены ровно. Дефекты видны только на крупном плане: волокно на досках кровли размазано и растянуто полосами (close-weapon, close-head), большая плоская пластина ската (close-base) мыльная. На полном росте они читаются как стилизованная древесина. Внутренняя сторона крыши за фронтоном на turn-270 плоская тёмно-серая.",
+      "frames": [
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "S+F+T = 4.0 из 6, score 6.7 < 8.0, F = 1.0. Причина — сквозные дыры и недостающие доски в обоих скатах крыши, они видны на полном росте. Плюс размазанная текстура досок кровли на крупном плане. S = 1.5, не ниже 1.5, поэтому по рубрике вердикт rework_blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Закрыть кровлю: достроить недостающие доски обоих скатов до карниза, чтобы на turn-000/180 и видах 3/4 сквозь крышу не было видно фона. Убрать плоскую треугольную пластину посреди ската (wire-34) и щель между коньком и досками (close-head). Если правка исходника не даёт сплошной кровли, взять другой вариант Tripo с цельной крышей.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Убрать размазанное и растянутое полосами волокно на досках кровли и мыло на большой плоской пластине ската (close-weapon, close-head, close-base): перезапечь или перетекстурировать доски крыши с плотностью текселя не ниже, чем у рамы. Заодно осветлить тёмно-серую внутреннюю сторону крыши за фронтоном (turn-270) до цвета дерева.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "На листе снег покрывает скаты целиком, у модели он лежит только по коньку и концам досок. Это соответствует заказанному «light dusting of snow», но сверху крыша на игровой дистанции будет читаться коричневой, а не белой."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Колотые поленья уложены сквозными рядами на всю глубину, поэтому на строго фронтальном и тыльном видах сквозь зазоры виден фон. На листе торцы стоят плотнее. На видах 3/4 и сверху (close-base) стопка плотная, сверху это не заметно."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "У отдельных торцов колотых поленьев мелкие наросты и зазубрины. Это видно только на крупном плане, для колотых дров допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-FIREWOOD-STACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп firewood-stack (Поленница, Heorot) не принят, 6.7: закрыть дыры в обоих скатах крыши и убрать размазанную текстуру досок кровли (rework_blender)."
+}

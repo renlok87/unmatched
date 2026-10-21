@@ -37,10 +37,10 @@
     "memory_rule_note": "'FBX_SCALE_UNITS + import 100' (S05 memory) belongs to a profile without the UnitScaleFactor patch; with UM_FBX_v1 (lantern/barrel, RIG-CONTRACT.md) UE imports at import_uniform_scale 1.0"
   },
   "totals": {
-    "assets_built": 36,
-    "triangles": 174361,
+    "assets_built": 40,
+    "triangles": 194300,
     "triangles_max": 5584,
-    "export_bytes": 502984484,
+    "export_bytes": 556988969,
     "checks_passed": true
   },
   "findings": [
@@ -179,7 +179,25 @@
     "MK-HEO-SMITH-ANVIL: non-manifold edges 9",
     "MK-HEO-SMITH-ANVIL: faces facing inward by ray escape 73 (2.4 % of area; one-sided material culls them from outside)",
     "MK-HEO-SMITH-ANVIL: open sheet faces seen from both sides 595 (15.0 % of area)",
-    "MK-HEO-SMITH-ANVIL: isolated shells (gap > 0.5 uu) 4, off ground 4"
+    "MK-HEO-SMITH-ANVIL: isolated shells (gap > 0.5 uu) 4, off ground 4",
+    "MK-HEO-STONE-CAIRN: open edges 194 in 16 loop(s): 0 zero-width crack(s), 16 hole(s) totalling 91.2 uu2 (largest 10.0 uu2, rim 19.8 uu, mean width 1.02 uu, at z 16 uu)",
+    "MK-HEO-STONE-CAIRN: non-manifold edges 1",
+    "MK-HEO-STONE-CAIRN: faces facing inward by ray escape 22 (0.7 % of area; one-sided material culls them from outside)",
+    "MK-HEO-STONE-CAIRN: recalc winding disagreements 30 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-STONE-CAIRN: isolated shells (gap > 0.5 uu) 4, off ground 4",
+    "MK-HEO-FIREWOOD-STACK: open edges 639 in 66 loop(s): 3 zero-width crack(s), 63 hole(s) totalling 578.5 uu2 (largest 214.3 uu2, rim 198.2 uu, mean width 2.16 uu, at z 28 uu)",
+    "MK-HEO-FIREWOOD-STACK: non-manifold edges 36",
+    "MK-HEO-FIREWOOD-STACK: faces facing inward by ray escape 6 (0.1 % of area; one-sided material culls them from outside)",
+    "MK-HEO-FIREWOOD-STACK: recalc winding disagreements 19 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-FIREWOOD-STACK: isolated shells (gap > 0.5 uu) 22, off ground 18",
+    "MK-HEO-SNOW-BOULDER: open edges 685 in 61 loop(s): 10 zero-width crack(s), 51 hole(s) totalling 2014.9 uu2 (largest 1211.7 uu2, rim 146.5 uu, mean width 16.54 uu, at z 0 uu)",
+    "MK-HEO-SNOW-BOULDER: non-manifold edges 19",
+    "MK-HEO-SNOW-BOULDER: faces facing inward by ray escape 38 (16.1 % of area; one-sided material culls them from outside)",
+    "MK-HEO-SNOW-BOULDER: recalc winding disagreements 6 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-HEO-SNOW-BOULDER: isolated shells (gap > 0.5 uu) 2, off ground 0",
+    "MK-HEO-RUNE-STONE: open edges 88 in 1 loop(s): 0 zero-width crack(s), 1 hole(s) totalling 357.7 uu2 (largest 357.7 uu2, rim 76.4 uu, mean width 9.37 uu, at z 0 uu)",
+    "MK-HEO-RUNE-STONE: faces facing inward by ray escape 23 (0.1 % of area; one-sided material culls them from outside)",
+    "MK-HEO-RUNE-STONE: open sheet faces seen from both sides 318 (3.4 % of area)"
   ],
   "assets": {
     "MK-HEO-ANTLER-CHANDELIER": {
@@ -1388,6 +1406,180 @@
         "non-manifold edges 15",
         "faces facing inward by ray escape 3 (0.2 % of area; one-sided material culls them from outside)",
         "recalc winding disagreements 81 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
+      ]
+    },
+    "MK-HEO-FIREWOOD-STACK": {
+      "ue": {
+        "mesh": "SM_Env_HeorotFirewoodStack",
+        "textures": [
+          "T_Env_HeorotFirewoodStack_BC",
+          "T_Env_HeorotFirewoodStack_N",
+          "T_Env_HeorotFirewoodStack_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotFirewoodStack",
+        "fbx_material_slot": [
+          "M_Env_HeorotFirewoodStack"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 30.0
+      },
+      "scale_factor_source_to_final": 0.343432,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFirewoodStack.fbx",
+        "sha256": "26dcdc2f59d4b192c9c21bc3494448eced1d09affaf8df67ff3ac5c15ce7e37f",
+        "bytes": 278828
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_BC.png",
+          "sha256": "71a88bf943245051b45c9c4bfdbe7c715b386287169ceb209fee818dc5556c95",
+          "bytes": 5677313,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_N.png",
+          "sha256": "237242978852e02eabab4429f1eef78bbfb519378406b363cf3d143a393a3659",
+          "bytes": 1219652,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFirewoodStack_ORM.png",
+          "sha256": "1b0439697f07dc2aa653198c4da48abfead6b7383e18f6415927ee22ca36c629",
+          "bytes": 4816012,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFirewoodStack.json",
+        "mesh_objects": [
+          "SM_Env_HeorotFirewoodStack"
+        ],
+        "triangles": 5136,
+        "materials": [
+          "M_Env_HeorotFirewoodStack"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -10.824,
+          -17.163,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          10.824,
+          17.163,
+          30.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          21.649,
+          34.326,
+          30.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 21.649,
+          "Y_width": 34.326,
+          "Z_height": 30.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 639,
+          "non_manifold_edges": 36,
+          "faces_with_inconsistent_winding": 17
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1432,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001221,
+          0.001221,
+          0.996582,
+          0.998779
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 3076,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 3,
+        "uv_area_used_fraction": 0.615,
+        "texel_density_px_per_m_at_raster": 744.5,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 639,
+        "open_edge_loops": 66,
+        "non_manifold_edges": 36,
+        "faces_with_inconsistent_winding": 19,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 3,
+          "hole": 63
+        },
+        "hole_area_uu2_total": 578.467,
+        "shells": 87,
+        "shells_isolated": 22,
+        "shells_isolated_off_ground": 18,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.231267966,
+        "corners_pointing_into_surface": 90,
+        "ray_escape_faces": {
+          "outward": 3460,
+          "inward": 6,
+          "sheet": 1,
+          "enclosed": 1669
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.347,
+          "inward": 0.0011,
+          "sheet": 0.0,
+          "enclosed": 0.6519
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFirewoodStack.build.json",
+      "findings": [
+        "open edges 639 in 66 loop(s): 3 zero-width crack(s), 63 hole(s) totalling 578.5 uu2 (largest 214.3 uu2, rim 198.2 uu, mean width 2.16 uu, at z 28 uu)",
+        "non-manifold edges 36",
+        "faces facing inward by ray escape 6 (0.1 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 19 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 22, off ground 18"
       ]
     },
     "MK-HEO-FUR-PILE": {
@@ -4670,6 +4862,178 @@
         "recalc winding disagreements 16 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
       ]
     },
+    "MK-HEO-RUNE-STONE": {
+      "ue": {
+        "mesh": "SM_Env_HeorotRuneStone",
+        "textures": [
+          "T_Env_HeorotRuneStone_BC",
+          "T_Env_HeorotRuneStone_N",
+          "T_Env_HeorotRuneStone_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotRuneStone",
+        "fbx_material_slot": [
+          "M_Env_HeorotRuneStone"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 66.0
+      },
+      "scale_factor_source_to_final": 0.660322,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotRuneStone.fbx",
+        "sha256": "f535e8251a01740ec5abd6b3ff632ad1fd1ca6a8d5d47e5526bd23648373d0ff",
+        "bytes": 168844
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_BC.png",
+          "sha256": "e186c67a9c72b316e22a0aed96c3598206a5efbd66e3bbd74d61b6f5303463a8",
+          "bytes": 7712507,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_N.png",
+          "sha256": "034634963110a1e1a9f1f7d6d3eb70e5ea59647e6783c598906a89555ed82402",
+          "bytes": 5664650,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_ORM.png",
+          "sha256": "af7ceaca192ee90f2a085149eb5e42bf0b80b62b4b050150365f575cb4682fdc",
+          "bytes": 1685943,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotRuneStone.json",
+        "mesh_objects": [
+          "SM_Env_HeorotRuneStone"
+        ],
+        "triangles": 5144,
+        "materials": [
+          "M_Env_HeorotRuneStone"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -9.786,
+          -11.881,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          9.786,
+          11.881,
+          66.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          19.571,
+          23.763,
+          66.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 19.571,
+          "Y_width": 23.763,
+          "Z_height": 66.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 88,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 27,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6556,
+        "texel_density_px_per_m_at_raster": 1376.0,
+        "min_gutter_px_estimate": 5,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 88,
+        "open_edge_loops": 1,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 1
+        },
+        "hole_area_uu2_total": 357.736,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.04905913,
+        "corners_pointing_into_surface": 4,
+        "ray_escape_faces": {
+          "outward": 4799,
+          "inward": 23,
+          "sheet": 318,
+          "enclosed": 4
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9648,
+          "inward": 0.0013,
+          "sheet": 0.0337,
+          "enclosed": 0.0002
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "findings": [
+        "open edges 88 in 1 loop(s): 0 zero-width crack(s), 1 hole(s) totalling 357.7 uu2 (largest 357.7 uu2, rim 76.4 uu, mean width 9.37 uu, at z 0 uu)",
+        "faces facing inward by ray escape 23 (0.1 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 318 (3.4 % of area)"
+      ]
+    },
     "MK-HEO-SCOP-LYRE": {
       "ue": {
         "mesh": "SM_Env_HeorotScopLyre",
@@ -5018,6 +5382,180 @@
         "isolated shells (gap > 0.5 uu) 4, off ground 4"
       ]
     },
+    "MK-HEO-SNOW-BOULDER": {
+      "ue": {
+        "mesh": "SM_Env_HeorotSnowBoulder",
+        "textures": [
+          "T_Env_HeorotSnowBoulder_BC",
+          "T_Env_HeorotSnowBoulder_N",
+          "T_Env_HeorotSnowBoulder_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotSnowBoulder",
+        "fbx_material_slot": [
+          "M_Env_HeorotSnowBoulder"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 36.0
+      },
+      "scale_factor_source_to_final": 0.413505,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSnowBoulder.fbx",
+        "sha256": "06cc53e979a99b3622df1d702cf9051a9f0b4be8e7def02a1241c19c72061168",
+        "bytes": 234540
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_BC.png",
+          "sha256": "9c00c4450248040f89aef29efe322bd1caff76e71251474a0e1052a81fd47a82",
+          "bytes": 4633795,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_N.png",
+          "sha256": "a844068973addd8137cc8ad376ffebe83404c797dfb73a7b22df031e65e6567f",
+          "bytes": 1941571,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_ORM.png",
+          "sha256": "25e2bb051bf8b30fd3f56b5ec6d474dfae2bca2c7a400d9c365484981c58b247",
+          "bytes": 4070986,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSnowBoulder.json",
+        "mesh_objects": [
+          "SM_Env_HeorotSnowBoulder"
+        ],
+        "triangles": 4748,
+        "materials": [
+          "M_Env_HeorotSnowBoulder"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -20.544,
+          -20.665,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          20.544,
+          20.665,
+          36.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          41.088,
+          41.33,
+          36.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 41.088,
+          "Y_width": 41.33,
+          "Z_height": 36.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 685,
+          "non_manifold_edges": 19,
+          "faces_with_inconsistent_winding": 6
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 748,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.997559,
+          0.999023
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 2478,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.7185,
+        "texel_density_px_per_m_at_raster": 970.0,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 685,
+        "open_edge_loops": 61,
+        "non_manifold_edges": 19,
+        "faces_with_inconsistent_winding": 6,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 10,
+          "hole": 51
+        },
+        "hole_area_uu2_total": 2014.919,
+        "shells": 2,
+        "shells_isolated": 2,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.702720721,
+        "corners_pointing_into_surface": 25,
+        "ray_escape_faces": {
+          "outward": 4494,
+          "inward": 38,
+          "sheet": 115,
+          "enclosed": 101
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6322,
+          "inward": 0.161,
+          "sheet": 0.0084,
+          "enclosed": 0.1984
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "findings": [
+        "open edges 685 in 61 loop(s): 10 zero-width crack(s), 51 hole(s) totalling 2014.9 uu2 (largest 1211.7 uu2, rim 146.5 uu, mean width 16.54 uu, at z 0 uu)",
+        "non-manifold edges 19",
+        "faces facing inward by ray escape 38 (16.1 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 6 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 2, off ground 0"
+      ]
+    },
     "MK-HEO-SNOWY-PINE": {
       "ue": {
         "mesh": "SM_Env_HeorotSnowyPine",
@@ -5191,6 +5729,180 @@
         "open sheet faces seen from both sides 310 (4.3 % of area)",
         "recalc winding disagreements 6 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
         "isolated shells (gap > 0.5 uu) 49, off ground 48"
+      ]
+    },
+    "MK-HEO-STONE-CAIRN": {
+      "ue": {
+        "mesh": "SM_Env_HeorotStoneCairn",
+        "textures": [
+          "T_Env_HeorotStoneCairn_BC",
+          "T_Env_HeorotStoneCairn_N",
+          "T_Env_HeorotStoneCairn_ORM"
+        ],
+        "material_instance": "MI_Env_HeorotStoneCairn",
+        "fbx_material_slot": [
+          "M_Env_HeorotStoneCairn"
+        ],
+        "folder": "/Game/EnvKit/Heorot/"
+      },
+      "board": "Heorot",
+      "target": {
+        "dimension": "height",
+        "uu": 36.0
+      },
+      "scale_factor_source_to_final": 0.360176,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotStoneCairn.fbx",
+        "sha256": "149dac6e19c01ce2c01876d9778fe09bcb154874760b7ac1be56cca1a497c69b",
+        "bytes": 249228
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_BC.png",
+          "sha256": "27580ffca9c9aa30f47c27753f152741825b0e622f0dc2f29042641bef531a35",
+          "bytes": 6489858,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_N.png",
+          "sha256": "ebb53555fecd7dc569a273be7f559300e724dd9edf1baf507b7384989bcf99dc",
+          "bytes": 4353734,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotStoneCairn_ORM.png",
+          "sha256": "fc7056efbb96095e162ce6371027db1e6ee65e228d645856ae3d97a6aef72363",
+          "bytes": 4807024,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotStoneCairn.json",
+        "mesh_objects": [
+          "SM_Env_HeorotStoneCairn"
+        ],
+        "triangles": 4911,
+        "materials": [
+          "M_Env_HeorotStoneCairn"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -13.551,
+          -12.742,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          13.551,
+          12.742,
+          36.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          27.101,
+          25.483,
+          36.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 27.101,
+          "Y_width": 25.483,
+          "Z_height": 36.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 194,
+          "non_manifold_edges": 1,
+          "faces_with_inconsistent_winding": 29
+        },
+        "protrusion_axis_readback": "-X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 991,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001221,
+          0.001221,
+          0.994141,
+          0.998779
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6284,
+        "texel_density_px_per_m_at_raster": 1553.3,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 194,
+        "open_edge_loops": 16,
+        "non_manifold_edges": 1,
+        "faces_with_inconsistent_winding": 30,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 16
+        },
+        "hole_area_uu2_total": 91.154,
+        "shells": 17,
+        "shells_isolated": 4,
+        "shells_isolated_off_ground": 4,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.14007764,
+        "corners_pointing_into_surface": 30,
+        "ray_escape_faces": {
+          "outward": 4718,
+          "inward": 22,
+          "sheet": 38,
+          "enclosed": 133
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.967,
+          "inward": 0.0069,
+          "sheet": 0.0042,
+          "enclosed": 0.0219
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotStoneCairn.build.json",
+      "findings": [
+        "open edges 194 in 16 loop(s): 0 zero-width crack(s), 16 hole(s) totalling 91.2 uu2 (largest 10.0 uu2, rim 19.8 uu, mean width 1.02 uu, at z 16 uu)",
+        "non-manifold edges 1",
+        "faces facing inward by ray escape 22 (0.7 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 30 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 4, off ground 4"
       ]
     },
     "MK-HEO-THREE-LEG-STOOL": {

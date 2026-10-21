@@ -1,0 +1,148 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodQuarterstaffRack.fbx",
+      "sha256": "15c4c0802f242c461e12df344aed21f67d343a6863323ecedcbdd84d41158f0c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodQuarterstaffRack_BC.png",
+      "sha256": "1c2eebdeff4f411e144b2cfff10788aa9d4b4c26853fecb7e334bfec651868a9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodQuarterstaffRack_N.png",
+      "sha256": "dd090b8ef4e6453a58b04c8de4529ba87d38488b0641b0639fcb34e14f1d5ddc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodQuarterstaffRack_ORM.png",
+      "sha256": "c1b34162fce58186bc6cbc5e63592b7a4d08dd76040c801bcdc26233cb1953c0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-quarterstaff-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodQuarterstaffRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+      "note": "4982 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+      "note": "UV0 islands 963, used 0.5806, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+      "note": "T_Env_SherwoodQuarterstaffRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json",
+      "note": "SM_Env_SherwoodQuarterstaffRack, M_Env_SherwoodQuarterstaffRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png и в описании: A-образная стойка из скрещённых жердей с верхней перекладиной и двумя нижними, три посоха (сучковатый светлый, резной красноватый, зеленоватый с обмоткой) и зелёный капюшон, свисающий с правого края перекладины. Пропорции и главные части совпадают с видом, лишних или пропавших частей нет; на turn-090/270 читается A-рама с капюшоном, без фантомных оболочек; узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: жерди и посохи цельные и круглые, тонкие посохи не порваны, капюшон цельный с читаемым проёмом, сетка на wire-34 следует форме. Дефекты только на крупном плане: обвязка на задней левой нижней перекладине (close-base) оплыла в бесформенный комок, похожий на смятую ткань, а не на верёвку; часть верхних обвязок слегка слита с жердью.",
+      "frames": [
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокнами и мхом, верёвочные обвязки, зелёная ткань; запечённых теней в цвете на полном росте нет, уровень детализации сопоставим с китом пропов. Только на крупном плане: текстура верхушек посохов мягкая, со смазанными пятнами и нарисованными белыми бликами по рёбрам резьбы (close-head), ткань капюшона выглядит излишне глянцевой, атласной.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; остаются мелкие дефекты крупного плана (обвязка, мягкая текстура верхушек посохов), на игровой дистанции фонового пропа их не видно.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "обвязка задней левой нижней перекладины оплыла в бесформенный комок; видно только на крупном плане"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "верхушки посохов: мягкая текстура со смазанными пятнами и нарисованными бликами; ткань капюшона излишне глянцевая; только крупный план"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-QUARTERSTAFF-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп quarterstaff-rack (Sherwood Forest) принят по делегированию: 8.3; мелкие дефекты крупного плана (обвязка, текстура верхушек посохов) записаны в known_issues."
+}

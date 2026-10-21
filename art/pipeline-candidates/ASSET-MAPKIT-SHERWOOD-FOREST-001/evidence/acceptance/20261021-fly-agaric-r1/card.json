@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFlyAgaric.fbx",
+      "sha256": "7daf120c257d80ae2963ed6ca6ce7996d596abb95acd15782886281f6ee461ca"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFlyAgaric_BC.png",
+      "sha256": "68e03202316c2058fc272ce0010636c2772d973f42cd4023a7c09d8d57ff491d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFlyAgaric_N.png",
+      "sha256": "19e189547ba0c43b50523ef4913d6b062b4564252d023b71dc262c12d8335c75"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFlyAgaric_ORM.png",
+      "sha256": "f49b3315e4d9a5918eb0d213bcfcb15b40a60904da44005ff27807eb4d21a5c1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fly-agaric-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodFlyAgaric.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+      "note": "3685 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+      "note": "UV0 islands 265, used 0.6608, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+      "note": "T_Env_SherwoodFlyAgaric_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json",
+      "note": "SM_Env_SherwoodFlyAgaric, M_Env_SherwoodFlyAgaric",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: куст мухоморов на моховой подушке, как на sheet.png — большой центральный гриб, средние справа и слева, мелкие грибы спереди, кольца-юбки на ножках, листья и клевер во мху. Пропорции главных частей и красно-белая гамма совпадают с видом, с обратной стороны добавлены ещё грибы (это допустимо). Проп узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: бородавки на краях шляпок (большой и средних) торчат за силуэт бахромой отдельных пластин (лучше всего видно на turn-090 и turn-270). На виде шляпки гладкие, с плоскими пятнами. Моховое основание шире и скорее похоже на плоскую плиту с косыми краями, чем на округлую подушку; это мелочь.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дефект на полном росте в одной зоне, на шляпках. Бородавки сделаны отдельными плоскими шестиугольными пластинами; у краёв большой и средних шляпок они висят в воздухе с видимым зазором до поверхности. На turn-090 и turn-270 по краю большой шляпки идёт россыпь оторванных чешуек; на close-head пластины явно парят над кромкой, на wire-34 видна та же бахрома. Остальное в порядке: ножки с кольцами и моховое основание целые, без дыр и оплывших масс, сетка на wire-front/back и wire-34 следует форме. Второстепенное: тонкие листья-карточки у основания на задних ракурсах (turn-135, turn-180) почти чёрные и местами свисают за край мха. Дно основания открыто (дыра 72 uu² в отчёте), но на столе его не видно.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "wire-34.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано, в стиле рисованной миниатюры: красная глянцевая шляпка с кремовыми бородавками, кремовые волокнистые ножки с зелёным переходом у земли, живописный мох прядями, листья с прожилками. Детализация на уровне кита, швов и растяжек на полном росте нет. Дефекты видны только на крупном плане (close-head, close-weapon). BaseColor шляпок не совпадает с геометрией бородавок: на красном видны призрачные контуры пятен и белёсые кляксы рядом с пластинами, часть пластин берёт красный цвет шляпки, на их боках текстура растянута. На полном росте это даёт лишь лёгкую грязноватость пятен на средних шляпках (turn-315, turn-000). Белёсую дымку на верхушках шляпок не отличить с уверенностью от блика рендера.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "S=1.5, F=1.0, T=1.5, сумма 4.0, score = round(4.0/6×10, 1) = 6.7 < 8.0, поэтому не pass. S ≥ 1.5, значит перегенерация в Tripo не нужна: силуэт и состав куста совпадают с sheet.png. Все гейты PASS или n/a. Главный дефект — пластины-бородавки, оторванные от краёв шляпок и видные на полном росте, плюс несовпадение BaseColor с бородавками на крупном плане. Это доработка в Blender и текстуре.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Убрать или прижать к поверхности шляпки мелкие оторванные оболочки-пластины бородавок, торчащие за кромку большой и средних шляпок. Например, удалить или притянуть к ближайшей поверхности мелкие оболочки, у которых зазор до шляпки больше порога или которые выходят за её силуэт. Бородавки в средней части шляпок, лежащие на поверхности, оставить.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "fix": "Листья-карточки у основания почти чёрные на задних ракурсах: выправить нормали тонких листовых оболочек (пересчитать нормали или сбросить кастомные нормали на листьях), а свисающие за край мха карточки укоротить или удалить.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Свести BaseColor шляпок с геометрией бородавок: острова UV пластин залить кремовым цветом бородавки, а призрачные контуры и белёсые кляксы пятен на красном перекрасить в цвет шляпки (или перетекстурировать тот же меш в Tripo без запечённых пятен).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Моховое основание шире и площе подушки с вида: плита с косыми краями. Для фонового пропа на доске допустимо, доработка не нужна."
+    },
+    {
+      "item": "G-TEX",
+      "frame": "uv-layout.png",
+      "note": "ORM.R = 1 (нет AO: у Tripo нет карты occlusion, бейк не запускался). Гейт PASS, затенение под шляпками держится только на освещении сцены."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Дно основания открыто (самая крупная дыра 72 uu² в отчёте сборки), 192 оболочки. На столе снизу не видно, отдельной доработки не требует."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-FLY-AGARIC-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп fly-agaric (мухоморы, Sherwood Forest) в r1 не принят: 6,7, rework_blender. Нужно снять или прижать к шляпкам оторванные пластины-бородавки по краям, поправить тёмные листья-карточки у основания и свести BaseColor пятен с бородавками."
+}

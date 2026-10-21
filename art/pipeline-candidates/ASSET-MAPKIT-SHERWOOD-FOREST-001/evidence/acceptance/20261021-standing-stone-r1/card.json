@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodStandingStone.fbx",
+      "sha256": "d480758755e62ce23e501de30f3ec18a177697f8d15bb5fed3ab4eab7765b968"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStandingStone_BC.png",
+      "sha256": "dd6c877e1a18fc7ec809c78f3fe00ca6a8283fc1c9d425e9bd36bde8e9e84d39"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStandingStone_N.png",
+      "sha256": "0e0aa17377408dcabce12e7be3b0c0916ff71bf55ec45f5779ca4d9c8ccdc185"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStandingStone_ORM.png",
+      "sha256": "858d43ec7c3ff0a57bbe3f625be6f4b1516401ccd6d647a74e982235e57ef303"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-standing-stone-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodStandingStone.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+      "note": "5002 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+      "note": "UV0 islands 32, used 0.6678, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+      "note": "T_Env_SherwoodStandingStone_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json",
+      "note": "SM_Env_SherwoodStandingStone, M_Env_SherwoodStandingStone",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это заказанный предмет: высокий сужающийся менгир со скруглённой вершиной, столбец из 4-5 резных спиралей по фасаду, мох в трещинах, светло-серый камень с зелёным мхом, как на sheet.png. Фронтальные пропорции совпадают с листом и описанием: ширина/высота 0,243/0,66 = 0,37 против 0,8/2,2 = 0,36, сужение к верху примерно в 0,5 ширины основания, как на листе. На всех 8 ракурсах читается как стоячий камень, лишних и пропавших частей нет. Одно второстепенное отличие: сечение почти квадратное (bounds 0,243 x 0,241 м, на turn-090 бок так же широк, как фасад), хотя описание задаёт плиту 0,8 x 0,6, то есть глубину около 0,18 м. Бока и спина собраны из округлых бугров с мхом в швах и выглядят скорее как сросшиеся валуны, чем как одна плита. На листе только фронтальный вид, и его правый край тоже бугристый, поэтому это стилизация, а не ошибка формы.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка плотная и равномерная, на wire-front, wire-back и wire-34 она следует форме. Силуэт целый: нет рваных краёв, мусорной геометрии и оплывших масс, складка-расщелина внизу смоделирована честно. Дефект: на левом боку примерно на 42 % высоты один тёмный плоский треугольник с прямыми краями, без текстуры. Это вывернутая нормаль или пропущенная грань, через которую видна изнанка. Он виден на кадрах полного роста turn-045 (около 683,685), turn-090 (около 580,688) и на глине wire-34 (около 676,705). Это чёрное пятно на полном росте в одной зоне, то есть уровень 1,0 по рубрике, хотя по размеру это микродефект (около 2 % роста). Дно расщелины на close-base сглажено и слегка оплывает, но это заметно только на крупном плане.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании: серый выветренный камень, резные спирали с рельефом, мох в швах. Запечённых бликов и жёсткого света в цвете нет, затемнения в швах читаются как нарисованная грязь и мох. Детализация не беднее эталона кита Sarpedon (T_Env_RockOutcrop_BC), UV0 на 32 острова без перекрытий. Дефекты в основном крупного плана: по всей поверхности идёт мелкий ромбический узор, похожий на сетку или чешую (артефакт текстуры Tripo), он хорошо виден на close-head, close-weapon и close-base, а на полном росте лишь слегка рябит во мху на turn-270 и turn-225. Дно расщелины на close-base смазано и растянуто. Есть слабое голубовато-серое пятно на левом боку в верхней трети (turn-045, turn-090, turn-135): малоконтрастное, на полном росте читается как лишайник.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1,5 + 1,0 + 1,5) / 6 x 10, 1) = 6,7, это ниже 8,0. S = 1,5 (не ниже 1,5), поэтому перегенерация в Tripo не нужна. Силуэт, спирали и палитра совпадают с листом, все гейты PASS или n/a. Доработка в Blender: вывернутая или пропущенная грань на левом боку (F, на полном росте) и чистка текстуры (T: узор-сетка, смазанное дно расщелины, голубоватое пятно).",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Найти тёмный треугольник на левом боку (+X) на высоте около 0,28 м (turn-045 около 683,685; turn-090 около 580,688; wire-34 около 676,705). Пересчитать нормали наружу, закрыть дыру (fill или merge by distance), проверить меш на non-manifold и вывернутые грани, переснять turn-045, turn-090 и wire-34.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Ослабить мелкий ромбический узор (сетку или чешую) в BC и N, сгладить его или перетекстурировать. Убрать или затонировать под камень голубовато-серое пятно на левом боку в верхней трети (turn-090, turn-135). Дорисовать смазанное и растянутое дно расщелины у основания (close-base).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Сечение почти квадратное: глубина 0,241 м против примерно 0,18 м по описанию 0,8 x 0,6 x 2,2. Бока и спина собраны из сросшихся бугров (turn-180). Лист даёт только фронтальный вид, поэтому это второстепенное отличие и стилизация, перегенерация не требуется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-STANDING-STONE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп standing-stone (Sherwood Forest), r1: доработка в Blender (6,7). Силуэт и спирали совпадают с листом. Нужно убрать тёмную вывернутую или пропущенную грань на левом боку и подчистить узор-сетку, смазанную расщелину и голубоватое пятно в текстуре."
+}

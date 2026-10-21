@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodPlankFootbridge.fbx",
+      "sha256": "f0170c514516367774abd627c2c9be15ee8aa3e4857a64280aa6329428f20a30"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodPlankFootbridge_BC.png",
+      "sha256": "f710edf8d39f62c2879846968d1c7d81fd808173bc7cce683d76b66e7fa068af"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodPlankFootbridge_N.png",
+      "sha256": "cce0996500802cea13013126f861d75665a0d234095826d5163d3d944f243561"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodPlankFootbridge_ORM.png",
+      "sha256": "8c826228194c80d7d943ecf9283f119538929d4caaf9abc7d9792933ebe54007"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-plank-footbridge-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodPlankFootbridge.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+      "note": "5123 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+      "note": "UV0 islands 983, used 0.5984, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+      "note": "T_Env_SherwoodPlankFootbridge_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json",
+      "note": "SM_Env_SherwoodPlankFootbridge, M_Env_SherwoodPlankFootbridge",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и узнаётся со всех 8 ракурсов, включая торцы turn-090/270: дощатый мостик из грубого дерева, две продольные балки с поперечными колодами по углам, три кола и один верёвочный поручень между двумя из них, на третьем колу обвязка. Это совпадает со схемой sheet.png. Пропорции кол/настил и цвет (серо-бурое выветренное дерево) того же семейства. Одно второстепенное отличие контура: лишний треугольный «плавник»-пластина между колом с узлом каната и настилом на конце с двумя колами (turn-000, turn-180, turn-315, wire-front, wire-back); на виде издали он читается как подкос. Настил уложен неровными V-парами с треугольными щелями, а не параллельно, как на sheet.png (close-base). На одном конце есть приподнятая продольная доска и выступающие сдвоенные брёвна. Это засчитано как допустимая стилизация «rough-hewn» и вынесено в known_issues. Провисшая балка с изогнутой доской снизу (turn-090/270) с игровой камеры не видна.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка чистая и низкополигональная, на wire-34/front/back триангуляция следует доскам, колам и канату. Тонкие элементы целы: канат — непрерывная трубка с обмотками и узлами, колы без разрывов. Дыр, чёрных пятен и вывернутых частей на полном росте нет. Дефекты как дефекты читаются только на крупном плане и в сетке: треугольная пластина у кола почти нулевой толщины (close-weapon, плоская заливка на wire-front); под продольной балкой оплывший комок с плотной триангуляцией (wire-back, низ справа) и свисающая изогнутая доска (turn-270, turn-090). На полном росте они читаются как подкос и кривое бревно и находятся снизу, вне игровой камеры.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с рисованными волокнами, светлыми гранями и мхом у оснований кольев и на балках, канат с витыми прядями. Запечённых теней и бликов на полном росте не видно: затемнение у оснований зелёное, это мох, а не AO. Швов и мыла в полный рост нет. Детализация на уровне кита Sarpedon (рисованное дерево, 2K). Дефекты только крупного плана: на close-head канат мылится, пряди размыты; на close-weapon размазано волокно на клине и вдоль ребра кола (светлая полоса-растяжка), доска настила мягкая. UV used 0.60 при 983 островах даёт невысокую плотность текселя на тонких элементах.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5, F 1.5, T 1.5), все гейты PASS/n/a. S не ниже 1.5, поэтому не перегенерация, а доработка: убрать треугольную пластину у кола и комок с изогнутой доской под балкой, поднять чёткость текстуры каната и кольев.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Удалить треугольную пластину-«плавник» почти нулевой толщины между колом с узлом каната и настилом (видна на turn-000, turn-180, turn-315, wire-front, wire-back). Убрать или подравнять оплывший комок и свисающую изогнутую доску под продольной балкой (wire-back, turn-270), чтобы низ читался как прямые брёвна.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Поднять плотность текселя каната и кольев: плотнее упаковка UV (used 0.60 при 983 островах), укрупнить острова каната и кольев. Перепечь BC/N, чтобы пряди каната и волокно кольев не мылились на крупном плане и без растяжки вдоль рёбер кольев (close-weapon).",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Доски настила уложены неровными V-парами с треугольными щелями, а не параллельно, как на sheet.png. На одном конце приподнятая продольная доска и выступающие сдвоенные брёвна. Засчитано как стилизация «rough-hewn»; после доработки сверить, что настил по-прежнему читается с игровой камеры."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-PLANK-FOOTBRIDGE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп plank-footbridge (Sherwood Forest) не принят: 7.5, нужна доработка в Blender — убрать треугольную пластину у кола и комок под балкой, поднять чёткость текстуры каната и кольев."
+}

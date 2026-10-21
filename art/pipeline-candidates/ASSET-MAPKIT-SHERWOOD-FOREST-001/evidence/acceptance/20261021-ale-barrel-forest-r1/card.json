@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodAleBarrelForest.fbx",
+      "sha256": "f8370c09703853a8ab6467521c51c2d7797ba4d110f5ed5cacef7319872bbdf5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodAleBarrelForest_BC.png",
+      "sha256": "07e1dd6eaba853209bc03dbd71a7f6c889cdcd135f00e9f6e14b4002b821932d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodAleBarrelForest_N.png",
+      "sha256": "ec07ea9c009d58b553b0f52b21a5fe57ae43534e9fc08b68bd507a22b8a20b45"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodAleBarrelForest_ORM.png",
+      "sha256": "9335434663ee1fd35999baabe1063096b8192e98c49c3d907cd32f4cafeae0a7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-ale-barrel-forest-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodAleBarrelForest.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+      "note": "5275 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+      "note": "UV0 islands 1062, used 0.6411, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+      "note": "T_Env_SherwoodAleBarrelForest_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json",
+      "note": "SM_Env_SherwoodAleBarrelForest, M_Env_SherwoodAleBarrelForest",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: дубовая бочка с железными обручами на заклёпках, резной дуб на переднем днище, кран, бревенчатая подставка с наклонными ногами и двумя лежнями, деревянные кружки сверху. Узнаётся со всех 8 ракурсов, пропорции близки к листу и к размеру 0.8x0.8x1.1 м (габарит 0.215x0.224x0.33 м), основное пятно цвета — тёплое дерево с серым железом, как на листе. Одно второстепенное отличие контура: два тонких поперечных бруса подставки торчат вбок за габарит только с одной стороны (turn-000 справа, turn-180 слева, wire-front, close-base), подставка асимметрична. На заднем днище придуман крупный деревянный диск-втулка со штырями (turn-135, turn-180, turn-225; на turn-090/270 небольшой выступ за днище): тыл на листе не показан, читается как втулка бочки, а не как оболочка, поэтому отдельным отличием не считаю.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей нет; кружки полые, ручки кружек, кран и обручи целы; сетка на wire-34/wire-front/wire-back следует форме. Мелочи видны только при пристальном осмотре: на задних стыках ног с лежнями торцы поперечин и шпильки оплывшие, комковатые, с тонкими штырями вниз (turn-180, turn-225, wire-back); силуэт бочки гранёный (около 20 граней, wire-front, turn-000). На игровой дистанции (проп 33 uu) не читается.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дубовые клёпки с ручной росписью волокон, железные обручи с заклёпками — серый металл, торцы брёвен с годичными кольцами, кора на лежнях, резной дуб на днище, редкие пятна мха; запечённого света в цвете на полном росте не видно, швов и растяжек нет, детализация богатая, в стиле кита. Дефекты только крупного плана: мыльные размытые пятна BC в затенённых зонах между кружками — задняя центральная кружка тёмная и без рисунка клёпок (close-weapon), белёсое пятно у верхней втулки и под передней кружкой (close-head).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5, F 1.5, T 1.5), все гейты PASS/n/a; S не ниже 1.5, перегенерация не нужна — мелкая доработка формы задней части подставки и пятен текстуры между кружками.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Подчистить заднюю часть подставки: оплывшие комковатые торцы поперечин и тонкие штыри вниз на стыках ног с лежнями (turn-180, turn-225, wire-back); укоротить или убрать два поперечных бруса, торчащих вбок за габарит подставки с одной стороны (turn-000, wire-front, close-base), чтобы подставка была симметричной.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Переписать BC в затенённых зонах между кружками: задняя центральная кружка тёмная и мыльная без клёпок (close-weapon), белёсое пятно у верхней втулки и под передней кружкой (close-head) — восстановить рисунок дерева и обручей как у соседних кружек.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Два тонких поперечных бруса подставки торчат вбок только с одной стороны (turn-000 справа, turn-180 слева, wire-front): подставка асимметрична."
+    },
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "На заднем днище придуман крупный деревянный диск-втулка со штырями сверху и снизу; на листе тыла нет, на turn-090/270 даёт небольшой выступ за днище. Читается как втулка, не как фантомная оболочка."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Силуэт бочки гранёный (около 20 граней); на игровой дистанции не читается, правка не требуется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-ALE-BARREL-FOREST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ale-barrel-forest (Sherwood Forest): 7,5 — не принят, доработка в Blender: подчистить заднюю часть подставки и торчащие вбок брусья, убрать мыльные пятна BC между кружками."
+}

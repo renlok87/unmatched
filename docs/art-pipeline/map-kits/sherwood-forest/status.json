@@ -1,10 +1,10 @@
 {
   "schema": "unmatched.map-kit.status/1",
   "map": "sherwood-forest",
-  "updatedAt": "2026-10-21T15:46:51+05:00",
+  "updatedAt": "2026-10-21T16:57:34+05:00",
   "props": {
     "major-oak": {
-      "stage": "built",
+      "stage": "rejected",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/major-oak/view-thumb.png",
         "slot": "single",
@@ -52,10 +52,22 @@
           225.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMajorOak.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-major-oak-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1,
+          "T": 1
+        }
       }
     },
     "fallen-log": {
-      "stage": "built",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/fallen-log/view-thumb.png",
         "slot": "single",
@@ -103,10 +115,22 @@
           30.0
         ],
         "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fallen-log-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
       }
     },
     "mossy-boulder": {
-      "stage": "tripo",
+      "stage": "accepted",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/mossy-boulder/view-thumb.png",
         "slot": "single",
@@ -143,10 +167,36 @@
         "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
         "assetId": "MK-SHW-MOSSY-BOULDER",
         "triangles": 4161
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodMossyBoulder.fbx",
+        "tris": 4161,
+        "checks": true,
+        "dimsUu": [
+          60.388,
+          60.388,
+          39.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-mossy-boulder-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
       }
     },
     "archery-target": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/archery-target/view-thumb.png",
         "slot": "single",
@@ -177,11 +227,45 @@
             "status": "ok"
           }
         ],
-        "credits": 125.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-ARCHERY-TARGET.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-ARCHERY-TARGET",
+        "triangles": 4185,
+        "levelled": {
+          "rx_deg": -2.75,
+          "rz_deg": 3.75,
+          "tilt_deg": 4.65,
+          "gain": 33.12
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodArcheryTarget.fbx",
+        "tris": 4185,
+        "checks": true,
+        "dimsUu": [
+          29.893,
+          35.909,
+          48.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArcheryTarget.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-archery-target-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1
+        }
       }
     },
     "hollow-stump": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/hollow-stump/view-thumb.png",
         "slot": "single",
@@ -212,11 +296,39 @@
             "status": "ok"
           }
         ],
-        "credits": 125.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-HOLLOW-STUMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-HOLLOW-STUMP",
+        "triangles": 4001
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowStump.fbx",
+        "tris": 4001,
+        "checks": true,
+        "dimsUu": [
+          51.185,
+          51.185,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-hollow-stump-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
       }
     },
     "lean-to-shelter": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/lean-to-shelter/view-thumb.png",
         "slot": "single",
@@ -238,13 +350,48 @@
             "before": 3170.0,
             "after": 3150.0,
             "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2690.0,
+            "after": 2685.0,
+            "status": "ok"
           }
         ],
-        "credits": 120.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-LEAN-TO-SHELTER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-LEAN-TO-SHELTER",
+        "triangles": 4131
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodLeanToShelter.fbx",
+        "tris": 4131,
+        "checks": true,
+        "dimsUu": [
+          48.853,
+          67.161,
+          48.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLeanToShelter.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-lean-to-shelter-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 5.8,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1
+        }
       }
     },
     "fern-cluster": {
-      "stage": "tripo",
+      "stage": "rejected",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/fern-cluster/view-thumb.png",
         "slot": "single",
@@ -266,13 +413,48 @@
             "before": 2950.0,
             "after": 2930.0,
             "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2685.0,
+            "after": 2680.0,
+            "status": "ok"
           }
         ],
-        "credits": 120.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-FERN-CLUSTER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-FERN-CLUSTER",
+        "triangles": 2553
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFernCluster.fbx",
+        "tris": 2553,
+        "checks": true,
+        "dimsUu": [
+          26.696,
+          28.447,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFernCluster.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fern-cluster-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1,
+          "T": 1
+        }
       }
     },
     "outlaw-campfire": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/outlaw-campfire/view-thumb.png",
         "slot": "single",
@@ -287,13 +469,58 @@
             "before": 3150.0,
             "after": 3050.0,
             "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2830.0,
+            "after": 2810.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2560.0,
+            "after": 2555.0,
+            "status": "ok"
           }
         ],
-        "credits": 100.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-OUTLAW-CAMPFIRE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-OUTLAW-CAMPFIRE",
+        "triangles": 4924
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOutlawCampfire.fbx",
+        "tris": 4924,
+        "checks": true,
+        "dimsUu": [
+          29.577,
+          29.433,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-outlaw-campfire-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 7.5,
+        "final": "rework_blender",
+        "finalScore": 7.5
       }
     },
     "plank-footbridge": {
-      "stage": "tripo",
+      "stage": "rework",
       "views": {
         "front": "art/imagegen/mapkit-sherwood-forest/props/plank-footbridge/view-thumb.png",
         "slot": "single",
@@ -308,22 +535,1483 @@
             "before": 3050.0,
             "after": 2950.0,
             "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2810.0,
+            "after": 2790.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2555.0,
+            "after": 2550.0,
+            "status": "ok"
           }
         ],
-        "credits": 100.0
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-PLANK-FOOTBRIDGE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-PLANK-FOOTBRIDGE",
+        "triangles": 5123,
+        "levelled": {
+          "rx_deg": -11.75,
+          "rz_deg": -5.75,
+          "tilt_deg": 13.08,
+          "gain": 5468.95
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodPlankFootbridge.fbx",
+        "tris": 5123,
+        "checks": true,
+        "dimsUu": [
+          50.736,
+          62.82,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodPlankFootbridge.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-plank-footbridge-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "oak-tree": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/oak-tree/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "700a55ff-8a04-488a-b51f-5cec7b0a8a24",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2930.0,
+            "after": 2830.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2680.0,
+            "after": 2660.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2305.0,
+            "after": 2300.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-OAK-TREE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-OAK-TREE",
+        "triangles": 5216
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOakTree.fbx",
+        "tris": 5216,
+        "checks": true,
+        "dimsUu": [
+          123.233,
+          153.91,
+          150.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-oak-tree-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "fly-agaric": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/fly-agaric/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "e3cb784b-df8c-458f-a1e5-08423fd49fe2",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2790.0,
+            "after": 2690.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2345.0,
+            "after": 2325.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2160.0,
+            "after": 2155.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-FLY-AGARIC.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-FLY-AGARIC",
+        "triangles": 3685
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFlyAgaric.fbx",
+        "tris": 3685,
+        "checks": true,
+        "dimsUu": [
+          11.129,
+          11.351,
+          9.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFlyAgaric.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fly-agaric-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "tax-cart": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/tax-cart/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "a1580b17-bff0-472d-b773-2b18597e509b",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2660.0,
+            "after": 2560.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2325.0,
+            "after": 2305.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 2155.0,
+            "after": 2150.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-TAX-CART.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-TAX-CART",
+        "triangles": 4456,
+        "levelled": {
+          "rx_deg": 2.0,
+          "rz_deg": 1.25,
+          "tilt_deg": 2.36,
+          "gain": 4.49
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTaxCart.fbx",
+        "tris": 4456,
+        "checks": true,
+        "dimsUu": [
+          51.806,
+          44.043,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tax-cart-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 2,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "gold-chest": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/gold-chest/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "2258055c-a5d5-4598-9cdc-68630ac327eb",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2550.0,
+            "after": 2450.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2200.0,
+            "after": 2180.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1910.0,
+            "after": 1905.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-GOLD-CHEST.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-GOLD-CHEST",
+        "triangles": 4325
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodGoldChest.fbx",
+        "tris": 4325,
+        "checks": true,
+        "dimsUu": [
+          16.712,
+          19.461,
+          21.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodGoldChest.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-gold-chest-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 5.8,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1
+        }
+      }
+    },
+    "arrow-barrel": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/arrow-barrel/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "5029e57f-d569-47a4-8894-0b05bffbf226",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2445.0,
+            "after": 2345.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2180.0,
+            "after": 2160.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1905.0,
+            "after": 1900.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-ARROW-BARREL.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-ARROW-BARREL",
+        "triangles": 4766
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodArrowBarrel.fbx",
+        "tris": 4766,
+        "checks": true,
+        "dimsUu": [
+          12.821,
+          20.981,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-arrow-barrel-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "wanted-post": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/wanted-post/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "c42523e1-d5b8-4bf9-9fcc-ff469201b92f",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2300.0,
+            "after": 2200.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 2050.0,
+            "after": 2030.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1780.0,
+            "after": 1775.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-WANTED-POST.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-WANTED-POST",
+        "triangles": 4845
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodWantedPost.fbx",
+        "tris": 4845,
+        "checks": true,
+        "dimsUu": [
+          24.138,
+          15.749,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-wanted-post-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "standing-stone": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/standing-stone/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "a5018526-f296-4521-b20c-4026f3478b77",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2150.0,
+            "after": 2050.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1930.0,
+            "after": 1910.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1655.0,
+            "after": 1650.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-STANDING-STONE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-STANDING-STONE",
+        "triangles": 5002
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodStandingStone.fbx",
+        "tris": 5002,
+        "checks": true,
+        "dimsUu": [
+          24.085,
+          24.278,
+          66.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStandingStone.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-standing-stone-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 6.7,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "chopped-log-pile": {
+      "stage": "rejected",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/chopped-log-pile/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "9c33f5f1-01cd-497c-9ff3-7d654a564f97",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 2030.0,
+            "after": 1930.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1800.0,
+            "after": 1780.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1530.0,
+            "after": 1525.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-CHOPPED-LOG-PILE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-CHOPPED-LOG-PILE",
+        "triangles": 5277
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodChoppedLogPile.fbx",
+        "tris": 5277,
+        "checks": true,
+        "dimsUu": [
+          22.329,
+          30.011,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-chopped-log-pile-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 0.5,
+          "T": 1.5
+        }
+      }
+    },
+    "bow-rack": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/bow-rack/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "d85e6f2a-f8c6-46c3-b4c7-3edf75ebd089",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1900.0,
+            "after": 1800.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1675.0,
+            "after": 1655.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1405.0,
+            "after": 1400.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-BOW-RACK.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-BOW-RACK",
+        "triangles": 4414
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodBowRack.fbx",
+        "tris": 4414,
+        "checks": true,
+        "dimsUu": [
+          25.351,
+          44.292,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-bow-rack-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 1.5,
+          "F": 2,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "camp-cooking-pot": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/camp-cooking-pot/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "aedbdb9d-9919-40f8-aa97-86a240f4f18a",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1775.0,
+            "after": 1675.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1550.0,
+            "after": 1530.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1280.0,
+            "after": 1275.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-CAMP-COOKING-POT.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-CAMP-COOKING-POT",
+        "triangles": 5374
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodCampCookingPot.fbx",
+        "tris": 5374,
+        "checks": true,
+        "dimsUu": [
+          12.323,
+          30.875,
+          30.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-camp-cooking-pot-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 9.2,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "ale-barrel-forest": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/ale-barrel-forest/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "7f84428d-058f-493d-b56e-0ffc96f7d544",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1650.0,
+            "after": 1550.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1425.0,
+            "after": 1405.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1155.0,
+            "after": 1150.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-ALE-BARREL-FOREST.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-ALE-BARREL-FOREST",
+        "triangles": 5275
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodAleBarrelForest.fbx",
+        "tris": 5275,
+        "checks": true,
+        "dimsUu": [
+          22.36,
+          21.522,
+          33.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodAleBarrelForest.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-ale-barrel-forest-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "beehive-skep": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/beehive-skep/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "f4351c12-ddb8-4b8b-a376-7514bf6912ba",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1525.0,
+            "after": 1425.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1300.0,
+            "after": 1280.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1030.0,
+            "after": 1025.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-BEEHIVE-SKEP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-BEEHIVE-SKEP",
+        "triangles": 4898
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodBeehiveSkep.fbx",
+        "tris": 4898,
+        "checks": true,
+        "dimsUu": [
+          19.426,
+          19.233,
+          33.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBeehiveSkep.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-beehive-skep-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "log-bench": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/log-bench/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "77390c51-1d4e-459e-ba4e-f32698bcf6de",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1400.0,
+            "after": 1300.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1175.0,
+            "after": 1155.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 1025.0,
+            "after": 1020.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-LOG-BENCH.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-LOG-BENCH",
+        "triangles": 4842
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodLogBench.fbx",
+        "tris": 4842,
+        "checks": true,
+        "dimsUu": [
+          31.586,
+          37.309,
+          15.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodLogBench.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-log-bench-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 9.2,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 2,
+          "T": 1.5
+        }
+      }
+    },
+    "feast-trestle": {
+      "stage": "rejected",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/feast-trestle/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "6057bf9f-e43f-4f5f-97ed-04e7143120ff",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1275.0,
+            "after": 1175.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 1050.0,
+            "after": 1030.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 900.0,
+            "after": 895.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-FEAST-TRESTLE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-FEAST-TRESTLE",
+        "triangles": 4870
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFeastTrestle.fbx",
+        "tris": 4870,
+        "checks": true,
+        "dimsUu": [
+          32.288,
+          50.491,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-feast-trestle-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 6.7,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "quarterstaff-rack": {
+      "stage": "accepted",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/quarterstaff-rack/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "4b5981bb-f0e7-420f-a663-7f96fb82b3b2",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1150.0,
+            "after": 1050.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 920.0,
+            "after": 900.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 675.0,
+            "after": 670.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-QUARTERSTAFF-RACK.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-QUARTERSTAFF-RACK",
+        "triangles": 4982
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodQuarterstaffRack.fbx",
+        "tris": 4982,
+        "checks": true,
+        "dimsUu": [
+          22.716,
+          44.875,
+          60.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodQuarterstaffRack.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-quarterstaff-rack-r1/card.json",
+        "rc": 0,
+        "verdictTool": "pass",
+        "score": 8.3,
+        "verdict": "pass",
+        "scores": {
+          "S": 2,
+          "F": 1.5,
+          "T": 1.5
+        },
+        "score2": 8.3,
+        "final": "pass",
+        "finalScore": 8.3
+      }
+    },
+    "stick-structure": {
+      "stage": "rejected",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/stick-structure/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "ef238ccf-3439-44b5-b6f7-ca298cef8c69",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 1020.0,
+            "after": 920.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 795.0,
+            "after": 775.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 550.0,
+            "after": 545.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-STICK-STRUCTURE.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-STICK-STRUCTURE",
+        "triangles": 4362
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodStickStructure.fbx",
+        "tris": 4362,
+        "checks": true,
+        "dimsUu": [
+          62.908,
+          69.802,
+          84.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-stick-structure-r1/card.json",
+        "rc": 0,
+        "verdictTool": "return_to_stage_1|return_to_stage_2",
+        "score": 5.8,
+        "verdict": "return_to_stage_2",
+        "scores": {
+          "S": 1,
+          "F": 1,
+          "T": 1.5
+        }
+      }
+    },
+    "stepping-stones": {
+      "stage": "rework",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/stepping-stones/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "b9fe5074-364c-4270-8af9-ee12b0eb44c2",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 895.0,
+            "after": 795.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 670.0,
+            "after": 650.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 405.0,
+            "after": 400.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-STEPPING-STONES.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-STEPPING-STONES",
+        "triangles": 3887,
+        "levelled": {
+          "rx_deg": -23.0,
+          "rz_deg": 2.0,
+          "tilt_deg": 23.09,
+          "gain": 20.49
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodSteppingStones.fbx",
+        "tris": 3887,
+        "checks": true,
+        "dimsUu": [
+          38.938,
+          25.799,
+          9.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json"
+      },
+      "acceptance": {
+        "card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-stepping-stones-r1/card.json",
+        "rc": 0,
+        "verdictTool": "rework_blender",
+        "score": 7.5,
+        "verdict": "rework_blender",
+        "scores": {
+          "S": 1.5,
+          "F": 1.5,
+          "T": 1.5
+        }
+      }
+    },
+    "hollow-log-tunnel": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/hollow-log-tunnel/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "c71ad1a8-e739-4831-840e-e9a68767d5ea",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 775.0,
+            "after": 675.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 545.0,
+            "after": 525.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 280.0,
+            "after": 275.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-HOLLOW-LOG-TUNNEL.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-HOLLOW-LOG-TUNNEL",
+        "triangles": 5150,
+        "levelled": {
+          "rx_deg": -5.0,
+          "rz_deg": 2.5,
+          "tilt_deg": 5.59,
+          "gain": 232.44
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowLogTunnel.fbx",
+        "tris": 5150,
+        "checks": true,
+        "dimsUu": [
+          62.811,
+          62.088,
+          36.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json"
+      }
+    },
+    "tree-lantern": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/tree-lantern/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "bea38491-4adb-4cd0-8625-436dc79f29e4",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 650.0,
+            "after": 550.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 425.0,
+            "after": 405.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 175.0,
+            "after": 170.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-TREE-LANTERN.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-TREE-LANTERN",
+        "triangles": 5178
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTreeLantern.fbx",
+        "tris": 5178,
+        "checks": true,
+        "dimsUu": [
+          9.356,
+          18.032,
+          48.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json"
+      }
+    },
+    "rock-cluster": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/rock-cluster/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "08fa4661-76d6-4883-9550-7f75dece0919",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 525.0,
+            "after": 425.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 300.0,
+            "after": 280.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 70.0,
+            "after": 65.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-ROCK-CLUSTER.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-ROCK-CLUSTER",
+        "triangles": 2926,
+        "levelled": {
+          "rx_deg": -2.75,
+          "rz_deg": 1.25,
+          "tilt_deg": 3.02,
+          "gain": 48.57
+        }
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodRockCluster.fbx",
+        "tris": 2926,
+        "checks": true,
+        "dimsUu": [
+          20.639,
+          20.783,
+          12.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json"
+      }
+    },
+    "ivy-stump": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/ivy-stump/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "ba4f86d6-9252-49c9-b0cb-82bb19ce6af4",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 400.0,
+            "after": 300.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 65.0,
+            "after": 45.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 15.0,
+            "after": 10.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-IVY-STUMP.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-IVY-STUMP",
+        "triangles": 2900
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodIvyStump.fbx",
+        "tris": 2900,
+        "checks": true,
+        "dimsUu": [
+          33.793,
+          29.783,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json"
+      }
+    },
+    "venison-rack": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/venison-rack/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "b62f9c19-d490-416d-aacf-8c19dd1e693e",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 275.0,
+            "after": 175.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-4k",
+            "quoted": 20.0,
+            "before": 45.0,
+            "after": 25.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 10.0,
+            "after": 5.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 125.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-VENISON-RACK.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-VENISON-RACK",
+        "triangles": 5026
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodVenisonRack.fbx",
+        "tris": 5026,
+        "checks": true,
+        "dimsUu": [
+          30.838,
+          39.808,
+          54.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json"
+      }
+    },
+    "exposed-roots": {
+      "stage": "built",
+      "views": {
+        "front": "art/imagegen/mapkit-sherwood-forest/props/exposed-roots/view-thumb.png",
+        "slot": "single",
+        "source": "Tripo Image Nano Banana Pro -> Generate 3D (F7)"
+      },
+      "tripo": {
+        "taskId": "c2242d5e-28bc-497c-8a24-20236bb119c0",
+        "ops": [
+          {
+            "op": "generate",
+            "quoted": 100.0,
+            "before": 170.0,
+            "after": 70.0,
+            "status": "ok"
+          },
+          {
+            "op": "texture-2k",
+            "quoted": 10.0,
+            "before": 25.0,
+            "after": 15.0,
+            "status": "ok"
+          },
+          {
+            "op": "pbr",
+            "quoted": 5.0,
+            "before": 5.0,
+            "after": 0.0,
+            "status": "ok"
+          }
+        ],
+        "credits": 115.0,
+        "route": "smart-mesh-p2",
+        "glb": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-EXPOSED-ROOTS.glb",
+        "run": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh",
+        "assetId": "MK-SHW-EXPOSED-ROOTS",
+        "triangles": 4552
+      },
+      "build": {
+        "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodExposedRoots.fbx",
+        "tris": 4552,
+        "checks": true,
+        "dimsUu": [
+          51.122,
+          49.424,
+          24.0
+        ],
+        "report": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json"
       }
     }
   },
   "totals": {
-    "credits": 1065.0,
+    "credits": 3990.0,
     "byStage": {
       "listed": 0,
       "views": 0,
-      "tripo": 7,
-      "built": 2,
-      "accepted": 0,
-      "rework": 0,
-      "rejected": 0,
+      "tripo": 0,
+      "built": 6,
+      "accepted": 7,
+      "rework": 14,
+      "rejected": 5,
       "ue": 0
     }
   }

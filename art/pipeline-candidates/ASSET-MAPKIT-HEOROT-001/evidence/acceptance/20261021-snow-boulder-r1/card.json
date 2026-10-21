@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSnowBoulder.fbx",
+      "sha256": "06cc53e979a99b3622df1d702cf9051a9f0b4be8e7def02a1241c19c72061168"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_BC.png",
+      "sha256": "9c00c4450248040f89aef29efe322bd1caff76e71251474a0e1052a81fd47a82"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_N.png",
+      "sha256": "a844068973addd8137cc8ad376ffebe83404c797dfb73a7b22df031e65e6567f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_ORM.png",
+      "sha256": "25e2bb051bf8b30fd3f56b5ec6d474dfae2bca2c7a400d9c365484981c58b247"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-snow-boulder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSnowBoulder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "4748 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "UV0 islands 748, used 0.7185, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "T_Env_HeorotSnowBoulder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "SM_Env_HeorotSnowBoulder, M_Env_HeorotSnowBoulder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: скопление тёмного гранита под толстой снежной шапкой с бахромой сосулек. Композиция совпадает с sheet.png. Шапка занимает около 79 % ширины основания (на листе около 84 %), кромка шапки на 20–32 % высоты (на листе около 33 %). Нижние камни выступают слева и справа, на средних ярусах тоже висят сосульки, как на листе. Отношение ширины к высоте около 1,1, между листом (~1,0, вид чуть сверху) и заказанными 1,8×1,5 м. Лишних и пропавших частей нет. На wire-* и turn-090/270 фантомных оболочек нет. Предмет узнаётся со всех 8 ракурсов. Камень сине-серый, того же холодного семейства, что на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, вывернутых частей и мусорной геометрии нет. Сосульки целы, их тонкие шипы видны на wire-front/wire-back. Сетка триангулирована, плотность неровная, но форму камней и шапки она держит. Мелкие дефекты видны только при пристальном просмотре. Узкие тёмные щели в местах, где сосульки сходятся со шапкой: turn-000 и wire-front (бахрома слева вверху), turn-270, turn-315, turn-225. Ступенчатый, гранёный контур верха шапки на close-head. На игровой дистанции фонового пропа (36 uu) всё это не читается. Нижний срез плоский, для стоящего пропа это допустимо.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: камень с трещинами и пятнистым тоном, снег мягкий, бело-голубой. В BC камень тёмный сланцево-синий, на рендере он светлее из-за света, но запечённого света и бликов в цвете нет. На полном росте нет швов, растяжек и мыла. Недочёты видны только крупным планом. Микродеталь камня мягче эталона RockOutcrop из кита Sarpedon. Сосульки сделаны тем же непрозрачным снежным материалом и как отдельный лёд не читаются (стилизация совпадает с листом). На крупных островах UV (uv-layout) в BC есть размытые градиенты, в видимых ракурсах они не проявляются.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 / 6 × 10 = 8,3 ≥ 8,0. Ни одно измерение не ниже 1,0, гейты PASS или n/a. Замечания F и T относятся к крупному плану и на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Узкие тёмные щели в местах, где сосульки сходятся со шапкой: бахрома слева вверху на turn-000 и wire-front, также на turn-270, turn-315 и turn-225. Видны только при пристальном просмотре."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Верх снежной шапки на крупном плане даёт гранёный, ступенчатый контур (низкополигональный силуэт)."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Микродеталь гранита мягче эталона кита Sarpedon (RockOutcrop). Сосульки из того же непрозрачного снежного материала, как отдельный лёд не читаются."
+    },
+    {
+      "item": "T",
+      "frame": "uv-layout.png",
+      "note": "На крупных островах UV в BC размытые градиенты. В ракурсах turn-* не проявляются."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-SNOW-BOULDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп snow-boulder (заснеженный валун) принят по делегированию: 8,3. Мелкие щели у сосулек и мягкая микродеталь камня записаны в known_issues."
+}

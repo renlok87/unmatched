@@ -1,0 +1,173 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodArrowBarrel.fbx",
+      "sha256": "a6504c4ba58b2a4e9c7947405a58db0689bd99ae9368eeedc962c0292bb09ce3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArrowBarrel_BC.png",
+      "sha256": "a41fa8fda7844963b83bcbca9f0a567b0f531fa85622f5f0a01f728614b1b6e7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArrowBarrel_N.png",
+      "sha256": "841a9e4c37803d364eee56f7f5284e2dd6992c98cf67c95320261822cc1bc4db"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodArrowBarrel_ORM.png",
+      "sha256": "e6847c9e8448d4714e7af6037b1fc7b7ab4863c3798670588b5e1640220103e9"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-arrow-barrel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodArrowBarrel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+      "note": "4766 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+      "note": "UV0 islands 934, used 0.4713, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+      "note": "T_Env_SherwoodArrowBarrel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodArrowBarrel.build.json",
+      "note": "SM_Env_SherwoodArrowBarrel, M_Env_SherwoodArrowBarrel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: открытая бочка с пучком оперённых стрел (оперение вверх) и прислонённый справа лук с кожаной обмоткой рукояти и тетивой, обращённой к бочке, как на листе. Пропорции против sheet.png в допуске: верх стрел ≈18 % роста от верха лука (лист ≈19,5 %), верх бочки ≈43 % (лист ≈44 %), три обруча, лёгкая бочкообразность. Узнаётся со всех 8 ракурсов, фантомных выступов и оболочек на turn-090/270 и wire-* нет. Одно второстепенное отличие контура: на боку вместо одного тёмного кожаного ремня листа висят две светлые плетёные петли на железных кольцах с заострёнными загнутыми концами (заметны на turn-270/315/225). Нижний конец лука висит ≈1,6 см (≈4,6 % высоты) над землёй, а на листе стоит на земле; это в допуске 5 %, отдельным отличием не считаю.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте чисто: нет дыр, просветов, чёрных пятен, вывернутых частей и оплывших масс. Тонкие элементы целы: тетива непрерывна на всех ракурсах, плечи лука и ремни целые. Сетка на wire-front, wire-34 и wire-back ровная и следует форме: цилиндр бочки, обручи отдельными кольцами, трубка лука с утолщениями обмоток. Дефекты только на крупном плане (close-head, close-weapon): древки стрел — квадратные бруски с плоско срезанными хвостами, оперение — плоские мятые карты с рваными краями, хаотично пересекающиеся. Close-base (низ бочки, обручи с заклёпками, нижнее плечо лука) без дефектов.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: клёпки дерева с волокнами и тёмными швами, тёмное железо обручей с заклёпками, красно-коричневая кожаная обмотка рукояти, светлое тисовое дерево лука с зеленью мха, светлые перья с тёмными полосами. Запечённого света нет: светлые кромки обручей — стилизованная роспись в духе кита. Швов и растяжек на полном росте нет. Только крупным планом (close-head, частично close-weapon) — мыло: древки и хвосты стрел размазаны полосами зелёного и оранжевого, оперение мутное. На uv-layout стрелы разложены тонкими щепками, покрытие атласа ≈47 %, тексельная плотность стрел низкая. Зелёные пятна мха листа превращены в нарисованных оленя и ели (лёгкое мыло у нижних елей на close-base). Это допустимая стилизация под Шервуд.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1,5+1,5+1,5)/6×10, 1) = 7,5 < 8,0. S = 1,5: одно второстепенное отличие от листа (боковые ремни). F = 1,5 и T = 1,5: дефекты стрел видны только на крупном плане (квадратные древки, мятое оперение, мыло текстуры). Гейты PASS или n/a. S ≥ 1,5, поэтому доработка в Blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Пучок стрел: квадратные древки с плоско срезанными хвостами и плоское мятое оперение с рваными пересекающимися краями. Выровнять карты оперения и сгладить древки (≥6 граней), либо заменить пучок стрел из исходника.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Мыло на древках, хвостах и оперении стрел. Поднять тексельную плотность стрел: переупаковать UV0 (покрытие ≈47 %, стрелы тонкими щепками) с бóльшим масштабом островов стрел и перепечь BC/N.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-270.jpg",
+      "note": "На боку две светлые плетёные петли на железных кольцах с заострёнными загнутыми концами вместо одного тёмного кожаного ремня листа; на игровой дистанции читаются как верёвочные ручки."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Нижний конец лука висит ≈1,6 см (≈4,6 % высоты) над плоскостью земли; на листе лук стоит на земле. В допуске 5 %."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Зелёные пятна мха листа заменены нарисованным оленем и елями; нижние ели слегка размазаны. Допустимая стилизация."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-ARROW-BARREL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп arrow-barrel: 7,5, на доработку в Blender. Нужно поднять тексельную плотность и выправить форму стрел (мыло и мятое оперение на крупном плане). Бочка и лук в порядке."
+}

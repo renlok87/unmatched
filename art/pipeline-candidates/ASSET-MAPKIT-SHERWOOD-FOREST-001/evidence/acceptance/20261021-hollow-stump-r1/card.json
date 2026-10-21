@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowStump.fbx",
+      "sha256": "429f23a29d34b43a3610cec14829c2f106a51a3f162be42f0e4bef9d13fe427e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowStump_BC.png",
+      "sha256": "4fc83b4c93aa95a99f082e0ab4d1d20805bd40fa5f38120c5dac99370a749a0b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowStump_N.png",
+      "sha256": "080367a0f678dbd8dd01a0059a3b5ca6d1b9e95a0f3b2eb947319195d00e1729"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowStump_ORM.png",
+      "sha256": "30650100696abedd49ab8dde5740c1eb1aba183e68e03ac2792da0015335c6c8"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-hollow-stump-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodHollowStump.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+      "note": "4001 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+      "note": "UV0 islands 181, used 0.6359, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+      "note": "T_Env_SherwoodHollowStump_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowStump.build.json",
+      "note": "SM_Env_SherwoodHollowStump, M_Env_SherwoodHollowStump",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот: широкий дуплистый пень с тёмным проёмом спереди, ярусы трутовиков слева и справа от проёма, плющ, рваная крона с высоким зубцом сзади, раскинутые корни; общая пропорция (ширина/высота ~1.42 против ~1.38 у листа с поправкой на ракурс) совпадает, узнаётся со всех 8 ракурсов, фантомных частей нет. Одно второстепенное отличие контура: проём заметно уже, чем на sheet.png (≈32 % высоты против ≈40 %, ≈39 % ширины ствола против ≈50 %), яйцевидный с заострённым верхом вместо широкой арки; крона менее расщеплённая. Цвет того же семейства, но светлее и бледнее листа.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: нет дыр, рваных краёв, вывернутых частей и оплывших масс, трутовики и листья плюща целы, сетка 4001 tris на wire-* следует форме (корни, проём, крона). Дефекты только крупного плана: мелкий оторванный фрагмент у правого корня у земли (close-base, wire-34), гранёность зубцов кроны и плоские карточки листьев видны на close-head/close-weapon; тёмные щели между корнями на turn-045/turn-180 читаются как естественные трещины.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кора с мхом, кремовые трутовики, листья плюща, тёмный проём с подстилкой внутри; запечённого света в цвете нет, мыла и швов на полном росте нет, детализация BC 2048 достаточна для фонового пропа. Дефекты крупного плана: внутренняя стенка кроны размазана вертикальными растяжками (close-head), на коре вблизи регулярный сетчатый/чешуйчатый узор генерации (close-weapon, слабо на нижней части turn-090/turn-180).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 1.5, F 1.5, T 1.5); S ≥ 1.5, поэтому не перегенерация, а доработка; гейты PASS/n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Убрать мелкий оторванный фрагмент у правого корня у земли (виден на close-base и wire-34): отбросить изолированные крошечные оболочки по порогу площади, не трогая трутовики и листья плюща.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать вертикальные растяжки на внутренней стенке кроны и регулярный сетчатый узор на коре (close-weapon): перетекстурировать исходник в Tripo (HD-текстура/повторная генерация текстуры) с теми же видами.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Проём уже и более яйцевидный, чем широкая арка на sheet.png; крона менее расщеплённая; тон светлее листа. На игровой дистанции пень с проёмом читается."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-34.jpg",
+      "note": "4001 tris при целевом бюджете пропа 4000 (+1 треугольник); в пределах бюджета env_kit 12000, гейт перенесён как посчитан (PASS)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-HOLLOW-STUMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hollow-stump: 7.5, доработка — убрать оторванный фрагмент у основания и перетекстурировать растяжки внутри кроны и сетчатый узор коры."
+}

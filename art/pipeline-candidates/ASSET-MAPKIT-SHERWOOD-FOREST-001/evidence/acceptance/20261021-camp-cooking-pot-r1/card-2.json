@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodCampCookingPot.fbx",
+      "sha256": "a0cb7046d880b020960f2c3270d98ee6f517fd5f32ab5081298111724f718772"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_BC.png",
+      "sha256": "be67340a2a97d2036e52002abaca735bdd4c656d3b34887cb2dcd3c2dbaf29d0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_N.png",
+      "sha256": "3ff99b7898df3386a646a057f9d9596b8fdf1f20b43bf38dcfa9f9ed5e30f44d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_ORM.png",
+      "sha256": "ca845d75ddaab892146955b13fdd69abf5b6bfecf4770c2b7cf3781e81cf53ab"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-camp-cooking-pot-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodCampCookingPot.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "5374 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "UV0 islands 117, used 0.5676, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "T_Env_SherwoodCampCookingPot_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "SM_Env_SherwoodCampCookingPot, M_Env_SherwoodCampCookingPot",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет из sheet.png: две рогатые стойки с верёвочной обвязкой, перекладина, железный котёл на дужке через крюк-кольцо, половник на медном кольце справа (спереди). Пропорции стоек, перекладины и котла совпадают с видом; мох у оснований стоек как на листе. С 90/270 читается как стойка-рогатина с котлом за ней, фантомных выступов и оболочек нет; сзади (180) зеркальный, чистый вид с половником слева.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, рваных краёв и чёрных пятен нет; тонкие элементы (дужка котла, ушки, рукоять и чаша половника, крюк, кольца, верёвки) целы и замкнуты. Котёл полый с толстым ободом. На wire-34 сетка следует форме, мусорной геометрии нет. Лёгкая гранёность кольца-крюка видна только на крупном плане close-head и для фонового пропа несущественна.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: дерево с прорисованной корой и торцами, верёвка, кованое железо котла с чеканной фактурой, медное кольцо, мох у оснований — в стиле hand-painted кита. Запечённого света на полном росте нет, швов и растяжек не видно. На крупном плане кольцо-крюк и дерево перекладины мыльные (close-head), внутренняя часть чаши половника — размытое светлое пятно (close-base); на игровой дистанции не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 >= 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; силуэт и форма полностью соответствуют листу, мелкие текстурные дефекты только на крупном плане.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Кольцо-крюк на перекладине и древесина перекладины размыты на крупном плане (низкая плотность текселей); на игровой дистанции не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Внутренняя поверхность чаши половника — мыльное светлое пятно без фактуры; только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-CAMP-COOKING-POT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп camp-cooking-pot (котелок на рогатинах) принят по делегированию, 9.2; мыльные кольцо-крюк и чаша половника на крупном плане — в known_issues."
+}

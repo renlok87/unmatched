@@ -1,0 +1,183 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodChoppedLogPile.fbx",
+      "sha256": "3a31dc9b88f54869b33eb568556beaff82e15527e03d20113c92e79c670a2563"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodChoppedLogPile_BC.png",
+      "sha256": "9acb0ec1984ac242118f322a86bfe781c47ca6da85765e9366b793bec64534cf"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodChoppedLogPile_N.png",
+      "sha256": "eb014ef731c27b0401240a3e5465ccf52db90ee90ab642c3712645516449e8d3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodChoppedLogPile_ORM.png",
+      "sha256": "86deb74afe9702183c47b178987d01f6ee91400443e9a9baa0f60f5f1b8b55a7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-chopped-log-pile-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodChoppedLogPile.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+      "note": "5277 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+      "note": "UV0 islands 1236, used 0.6213, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+      "note": "T_Env_SherwoodChoppedLogPile_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodChoppedLogPile.build.json",
+      "note": "SM_Env_SherwoodChoppedLogPile, M_Env_SherwoodChoppedLogPile",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан, и узнаётся со всех 8 ракурсов: треугольная поленница круглых чурбаков торцами вперёд, топор прислонён справа, обух вровень с верхом кладки, рукоять в обмотке до земли (как на sheet.png). Отличий от вида больше двух. По обоим передним краям стоят лишние мшистые планки, они дают A-образный контур спереди и сзади (turn-000, turn-180, wire-front, wire-back). На боку лежит перекинутая мшистая полоса в виде перевёрнутой V, а на противоположном боку торчат вертикальные мшистые обрубки и врезанный в боковину кружок торца (turn-090, turn-045, wire-34, turn-270, turn-315). В щелях между чурбаками висят мелкие катышки-сучки. Сзади верхнее левое полено превратилось в бесформенный ком (turn-180). Пропорции повторяют лист, но выше заказанных: H/W около 0,8 против 0,8/1,5 по описанию. Основное цветовое пятно (светлые торцы, коричневая кора, мох, сталь) совпадает с видом.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 0.5,
+      "rationale": "Дефекты видны на полном росте в нескольких зонах. (1) Торец среднего левого чурбака спереди разбит: тёмные треугольные дыры и вывернутые внутренние грани, на turn-315 это крупная чёрная треугольная дыра (turn-000, turn-045, close-base). (2) Нижний правый чурбак расколот вдоль: рваная полоса коры отходит от тела с зазором (turn-000, turn-045, close-base). (3) Сзади верхний левый чурбак оплыл в бесформенный ком, справа наверху торчат осколки, торцы внизу выгрызены «пакманом» с тёмными щелями (turn-180, turn-225). (4) Возле топора лежит смятая тёмно-зелёная мусорная геометрия, края коры рваные (close-weapon). (5) Между чурбаками висят мелкие оторванные катышки. Отчёт сборки подтверждает: 33 дыры (401 uu²), 34 трещины, 319 неманифолдных рёбер, 5,5 % площади смотрит внутрь, 6 изолированных оболочек, из них 5 над землёй. Цилиндры чурбаков и топор на wire-* в остальном следуют форме.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на виде. Дерево читается деревом: годовые кольца и радиальные трещины на торцах, рисованная кора на боковинах. Металл обуха читается металлом: серая сталь с рисованным бликом по кромке. Кожаная обмотка рукояти и мох на коре читаются. Стилизация hand-painted выдержана, запечённых теней в цвете на полном росте не видно, растяжек UV нет (stretch p95 1,08). Дефекты видны только на крупном плане: мох на верхнем бревне размыт до мыла и полосит (close-head), кора у топора местами смазана, на лишних мшистых планках текстура полосит (close-weapon, turn-090).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. К заказанной поленнице с топором добавлены лишние мшистые планки по передним краям (A-образный контур) и перекинутые полосы и обрубки на боках. Форма разрушена на полном росте в нескольких зонах (F = 0,5): разбитые торцы с чёрными дырами, рваный расколотый чурбак, оплывший ком сзади, висящие катышки, 33 дыры и 319 неманифолдных рёбер по отчёту. Score 5,0 < 8,0. По рубрике это перегенерация в Tripo (этап 2), а не правка в Blender.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Лишние мшистые планки и полосы, которых нет на sheet.png: перевёрнутая V на боку, вертикальные обрубки на противоположном боку (turn-270), наклонные планки по обоим передним краям дают A-образный контур (turn-000, wire-front, wire-back)."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пропорция выше заказанной: H/W около 0,8 против ≈0,53 по описанию 1,5×1×0,8 м. Лист sheet.png тоже высокий, поэтому при перегенерации стоит просить более низкую и длинную кладку."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Торец среднего левого чурбака спереди разбит: тёмные треугольные дыры и вывернутые грани, на turn-315 видна крупная чёрная дыра. Нижний правый чурбак расколот, рваная полоса коры отходит с зазором."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Сзади верхний левый чурбак оплыл в бесформенный ком, справа наверху торчат осколки, нижние торцы выгрызены с тёмными щелями (также turn-225)."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Возле топора лежит смятая тёмно-зелёная мусорная геометрия, края коры рваные."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Между чурбаками висят мелкие катышки (по отчёту 5 изолированных оболочек над землёй). По отчёту также 33 дыры (401 uu²), 34 трещины, 319 неманифолдных рёбер и 5,5 % площади внутрь."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мох на верхнем бревне размыт до мыла и полосит. Текстура на лишних мшистых планках смазана (close-weapon, turn-090). Дефекты видны только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-CHOPPED-LOG-PILE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп chopped-log-pile не принят (5,0): лишние мшистые планки по бокам и разбитые торцы с дырами на полном росте. Нужна перегенерация в Tripo (этап 2)."
+}

@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodStickStructure.fbx",
+      "sha256": "7cee951b7f0dc8d64ca0aa0ad6406bc1c4c4e0d534610fdf4d916df25318c18f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStickStructure_BC.png",
+      "sha256": "8b734a887d8be3a8ddcf2a0e2b0661cdd990bbacc67bddf07bff532438666679"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStickStructure_N.png",
+      "sha256": "2bd4154fe69d0be4c9cba7a9de935555c1ece8c9eadbbbe2914d9ae528e3fbd2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodStickStructure_ORM.png",
+      "sha256": "4a424c7eb09a42846db08199337f498b26d0a57482f8cd7293ea7d2e54d0ea5f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-stick-structure-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodStickStructure.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+      "note": "4362 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+      "note": "UV0 islands 1334, used 0.5945, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+      "note": "T_Env_SherwoodStickStructure_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodStickStructure.build.json",
+      "note": "SM_Env_SherwoodStickStructure, M_Env_SherwoodStickStructure",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан: шалаш-конус из обломанных жердей, X-обвязка у верхушки, плетёный знак-треугольник и тёмный вход спереди, мох и плющ. Это совпадает с sheet.png, и шалаш узнаётся со всех 8 ракурсов. Сбита пропорция главной массы. На turn-000 W/H ≈ 0,83 (bbox 146–1053 × 54–1145 px), на sheet.png ≈ 0,73 (≈148 × 202 px): конус шире и приземистее на ~13 %. Против заказа 2 × 2 × 2,8 м (0,71) ширина 69,8 uu при высоте 84 uu, то есть на 16 % больше. Мелкое: плетёный знак упрощён, глиф-фигурка стоит над треугольником; по тамбнейлу 230 px это точно не проверить. Основное пятно цвета (оливково-коричневая кора с зелёным мхом) того же семейства. Пропорция главной части сбита больше чем на 10 %, поэтому 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Спереди жерди, обвязка и знак целы, сетка на жердях следует форме (wire-front). Бока и спина на полном росте — сплошная оплывшая перепонка-оболочка между жердями: на turn-090/135/180/225/270 и wire-back это гладкий конус из длинных треугольников, в который жерди наполовину вплавлены. Шалаш читается как замшелый конус, а не как приставленные друг к другу жерди. У земли комли расходятся юбками-плавниками с рваным краем (close-base, низ turn-000 и turn-270). Из пучка на верхушке торчит прямая тонкая игла-осколок (turn-000, turn-045, turn-180, turn-225, close-head). Это мусорная геометрия, но на игровой дистанции она субпиксельная. В отчёте 92 дыры, 43 non-manifold рёбер и 70 inward-граней у основания; чёрных пятен в кадрах не видно. Главная часть оплыла на полном росте, поэтому 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кора в стилизованной ручной прорисовке, мох, плющ и листья (turn-000, turn-045, turn-090). Запечённого направленного света и теней в цвете нет. Чужих цветов, швов и растяжек на полном росте нет. Детализация коры фасада на уровне кита, UV без перекрытий, 2K. Дефекты видны на крупных планах. На перепонках и обломанных верхушках расплылись зелёные пятна-«мыло» и смазана кора (close-head, close-weapon). На гладких перепонках (правая часть turn-000, центр turn-135) рисунок листвы беднее и мутнее, чем на коре; это следствие геометрии перепонки, она учтена в F.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: главная масса шире листа на ~13 % (против заказа 2 × 2,8 м — на 16 %). По рубрике это return_to_stage_2, перегенерация в Tripo. Перепонки-оболочка между жердями на боках и спине, юбки у комлей и игла на верхушке — дефекты исходника Tripo. Политика env_kit — без ремонта геометрии, поэтому сборка их не исправит. Score 5,8 < 8,0.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Конус шире листа: W/H ≈ 0,83 против ≈ 0,73 на sheet.png (~13 %); против заказа 2 × 2,8 м ширина больше на 16 %. При перегенерации держать узкий высокий шалаш."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Бока и спина — сплошная оплывшая перепонка между жердями, жерди вплавлены в гладкий конус (также turn-090, turn-270, wire-back). Нужны раздельные жерди с тёмными просветами."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Комли жердей расходятся юбками-плавниками с рваным краем (также низ turn-000 и turn-270)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Из верхушки торчит прямая тонкая игла-осколок, мусорная геометрия (видна также на turn-000, turn-045, turn-180, turn-225)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На перепонках и обломанных верхушках расплылись зелёные пятна-«мыло» и смазана кора (также close-head, turn-135)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-STICK-STRUCTURE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп stick-structure не принят (5,8): вернуть на этап 2 и перегенерировать в Tripo. Нужен более узкий и высокий шалаш, без перепонок между жердями и без иглы на верхушке."
+}

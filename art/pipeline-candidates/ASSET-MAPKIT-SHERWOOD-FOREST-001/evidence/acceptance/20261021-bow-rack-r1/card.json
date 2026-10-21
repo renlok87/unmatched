@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodBowRack.fbx",
+      "sha256": "2654d7fb44c23ffd1d819d4bca73300cec5b2a6543cba9ad541b1e7135229cd6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodBowRack_BC.png",
+      "sha256": "a1d60be0830e8404c5a4b3cb205ac1acde34a4a2ea69c34453afc06ac26dbe8b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodBowRack_N.png",
+      "sha256": "2c4368514d56085d275286f20b9bed021f43339ea60747110c5cf403b52f8dfa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodBowRack_ORM.png",
+      "sha256": "c55cd6d3d4ffcf364d7997b0f8b1d7a79e7e816eb0be94f70879f3a80589603b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-bow-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodBowRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+      "note": "4414 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+      "note": "UV0 islands 1297, used 0.5472, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+      "note": "T_Env_SherwoodBowRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodBowRack.build.json",
+      "note": "SM_Env_SherwoodBowRack, M_Env_SherwoodBowRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с листом: деревянная A-образная стойка из жердей с верхней перекладиной с пазами и нижней рамой на ножках-брусках, четыре длинных лука с кожаными обмотками рукоятей, по колчану со стрелами снаружи каждой стойки, верёвочные обвязки. Узнаётся со всех 8 ракурсов, на 090/270 тоже читается как козлы с колчаном и торчащими концами луков. Ширина 0,443 м при высоте 0,54 м совпадает с описанием (1,5/1,8 → 0,45 м) примерно на 2 %; луки выходят над стойками примерно на 11 % высоты, на листе примерно на 13–15 %. Одно второстепенное отличие контура: справа есть лишняя наклонная жердь со срезанным верхом. На turn-000 она идёт перед правой стойкой, на turn-045/135/225 пересекает колчан и низ луков, на листе 230 px её уверенно не видно. Ещё замечания, без отдельного снижения: опоры стоят шире, чем в описании (глубина 0,254 м против примерно 0,15 м по 0,5/1,8; лист в 3/4 этого не опровергает); на 3/4 видах луки изогнуты S-волной, а на листе изгиб мягкий, это стилизация. Предупреждение frames.json о ключе листа (key None) — формальное: sheet.png — view-thumb из папки этого пропа и изображает тот же предмет. Фантомных оболочек на turn-090/270 и wire-* нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, чёрных пятен, вывернутых или оплывших частей и мусорной геометрии. Тонкие элементы целы: луки, древки и оперение стрел, верёвочные обвязки, пряжки колчанов, петля подвеса. Нижняя рама и ножки на close-base стыкуются чисто. Сетка на wire-34 и wire-front следует форме: цилиндры жердей, сужающиеся плечи луков, колчаны. Плотность ровная для 4,4k треугольников. Концы луков на close-head упрощены и гранёны, на плечах виден лёгкий излом полигонов. Это норма бюджета фонового пропа, а не дефект; на игровой дистанции не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию: рисованное тёплое дерево с волокнами и мшисто-зелёными прожилками на жердях, тёмно-рыжая кожа колчанов со швами и металлическими пряжками, светлое оперение, верёвка, луки из тиса с кожаной обмоткой. Запечённого блика и тени на полном росте нет; стиль кита (stylized hand-painted, moss) соблюдён. Дефект виден только на крупном плане: блоки-пазы верхней перекладины (close-weapon, close-head) покрыты полосчатым зелёно-жёлтым размазанным пятном, похожим больше на слоистый камень, чем на дерево (мыло/растяжка проекции). На полном росте он читается как мшистые сучки. На turn-180 на левом конце перекладины есть мелкий сероватый участок — заметен только при разглядывании. Развёртка без перекрытий, покрытие 58 %.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score = round((1.5+2.0+1.5)/6×10, 1) = 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a. Отличия от листа второстепенные (лишняя наклонная жердь справа, опоры шире), текстурный дефект только на крупном плане (полосчатое пятно на блоках верхней перекладины). Для фонового пропа диорамы на игровой дистанции это не мешает. Оценка в зоне 8.0–8.4, по §8.5 нужен второй приёмщик другого профиля.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Справа лишняя наклонная жердь со срезанным верхом: перед правой стойкой и поперёк колчана и низа луков (также turn-000, turn-135, turn-225); на листе её уверенно не видно. Опоры A-рамы глубже описания: 0,254 м против примерно 0,15 м при высоте 0,54 м."
+    },
+    {
+      "item": "S",
+      "frame": "turn-315.jpg",
+      "note": "На 3/4 видах луки изогнуты S-волной вместо мягкого изгиба ненатянутого лука на листе; стилизация, узнаваемость не страдает."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Блоки-пазы верхней перекладины: полосчатое зелёно-жёлтое размазанное пятно (мыло проекции), больше похоже на слоистый камень, чем на дерево; видно только на крупном плане (также close-head)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Мелкий сероватый участок на левом конце верхней перекладины сзади; на игровой дистанции незаметен."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-BOW-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп bow-rack (Стойка луков, Sherwood Forest) принят по делегированию: 8.3 (S 1.5, F 2.0, T 1.5). Оценка в зоне 8.0–8.4, нужен второй приёмщик Opus high. Замечания: лишняя наклонная жердь справа, мыло на блоках верхней перекладины."
+}

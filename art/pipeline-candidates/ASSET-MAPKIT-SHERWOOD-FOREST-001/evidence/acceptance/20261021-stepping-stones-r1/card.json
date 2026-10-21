@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodSteppingStones.fbx",
+      "sha256": "38c7d1bfcbf278448c7b00d4654930591a06d2d407450b268b6b78e2e696e5bc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodSteppingStones_BC.png",
+      "sha256": "6e94f78d730bee929b3b8f7dc57a367cdf6b21554a4566b4325b1ccb2517d4b3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodSteppingStones_N.png",
+      "sha256": "7368f5b68c9a8551ec35edb51b286790fb78ba40adcb143ac4a65ecce41bd1eb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodSteppingStones_ORM.png",
+      "sha256": "1104b2480749bd44d8f21bf4ce175162b58f698edc7bc53991c479bea75a52af"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-stepping-stones-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodSteppingStones.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+      "note": "3887 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+      "note": "UV0 islands 857, used 0.6888, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+      "note": "T_Env_SherwoodSteppingStones_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodSteppingStones.build.json",
+      "note": "SM_Env_SherwoodSteppingStones, M_Env_SherwoodSteppingStones",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: ряд из 6 плоских камней-переходов по диагонали русла, окаймление из гальки и мшистых валунов, кусты рогоза с коричневыми початками по обоим берегам (на листе 5–6 камней, рогоз по бокам и сзади). Пропорции главных частей совпадают с листом, узнаётся со всех 8 ракурсов. Одно отличие: на листе камни лежат в сплошном тёмном водном ложе между берегами, а в модели этого ложа нет. Между камнями пусто (виден фон), сами камни висят примерно на 1 uu над низом пропа. В заказе вода не названа (материалы stone, reeds), поэтому это второстепенное отличие, а не пропавшая главная часть. Палитра того же семейства (серо-зелёный камень, мох, зелёный камыш, коричневые початки), только камни светлее и глянцевее, чем на листе.",
+      "frames": [
+        "sheet.png",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте всё чисто: плиты переходов ровные, со скруглёнными краями, галька целая, тонкие листья камыша и стебли рогоза без дыр и обрывов (close-weapon). Сетка на wire-* следует форме, триангуляция равномерная, мусорной геометрии нет. Дефекты видны только на крупном плане (close-base). Камни-плиты висят над основанием без контакта: по отчёту 6 изолированных оболочек выше низа на 0,8–1,1 uu, на turn-000 и wire-front виден тёмный просвет под ними. Под передним камнем лежит рваная тонкая пластина остатка ложа. Валуны левого берега местами оплывшие и комковатые. Отчёт сборки фиксирует 8 % площади граней, смотрящих внутрь (левый берег), и 82 % открытых листовых поверхностей. В Blender это не видно, но в UE с односторонним материалом возможны провалы.",
+      "frames": [
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в заказе: камень серо-зелёный с пятнами мха, камыш зелёный с градиентом, початки коричневые. Швов, растяжек и мыльных пятен нет. Исходник 4K ужат до 2K, детализация на уровне кита Sarpedon. Минусы. Шероховатость всего ассета около 0,1 (roughness_mean 0.106 в отчёте). Для мокрых камней это допустимо, но камыш и початки блестят как пластик (close-weapon), а на валунах берега блик распадается на белые пятна (turn-090, turn-270, close-base). В BC на верхушках плит запечены светлые прожилки, похожие на каустику. AO нет (ORM.R=1). На игровой дистанции (3/4 сверху, close-base) проп читается как мокрые камни-переходы, поэтому оценка 1,5, а не ниже.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "Сумма S+F+T = 4,5 из 6, score 7,5 < 8,0. Все измерения ≥ 1,0 и S = 1,5, поэтому перегенерация не нужна. Нужна доработка: снизить общий глянец (камыш, початки, валуны берега) и посадить камни-плиты на основание. Это убирает висящие плиты и рваный остаток ложа.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Переназначить ORM.G (roughness) с порогом снизу: около 0,5 для камыша, початков, мха и валунов берега, около 0,25–0,3 для верхушек плит, чтобы сохранить мокрый вид. Убрать пластиковый блеск и распад блика на белые пятна (turn-090, turn-270). По возможности запечь AO в ORM.R.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Посадить плиты на общее основание: тонкое тёмное ложе или водная плёнка под камнями, как на листе, либо опустить плиты до низа пропа. Убрать висящие оболочки (6 изолированных, 0,8–1,1 uu над низом) и рваную пластину под передним камнем. Развернуть грани левого берега, смотрящие внутрь (8 % площади), или назначить материалу двусторонний режим для листьев камыша.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "На листе камни лежат в сплошном тёмном водном ложе, в модели ложа нет: между плитами пусто. В раскладке проп должен стоять на нарисованном русле или водной плоскости доски."
+    },
+    {
+      "item": "T",
+      "frame": "uv-layout.png",
+      "note": "В BC на верхушках плит запечены светлые прожилки, похожие на каустику, AO нет (ORM.R=1). На игровой дистанции это читается как фактура мокрого камня."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Кадр пуст: у плоского пропа верхние 22 % высоты — воздух над рогозом. Тонкие элементы оценены по close-weapon.jpg и close-base.jpg."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-STEPPING-STONES-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп stepping-stones (Sherwood Forest): 7,5 — на доработку в Blender. Нужно снизить глянец камыша и валунов и посадить висящие плиты на основание; перегенерация не нужна."
+}

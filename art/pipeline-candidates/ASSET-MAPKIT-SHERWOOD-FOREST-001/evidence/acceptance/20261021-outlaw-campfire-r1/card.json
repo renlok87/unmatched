@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOutlawCampfire.fbx",
+      "sha256": "bd483ca396a607d159b71d1553f67e02c03eeb9c698c8416775bdd4445ec3005"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_BC.png",
+      "sha256": "ae56a40493ed6c319f111719dc8dd44f9afaf8e75558cef15a2764365f21b7cd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_N.png",
+      "sha256": "115d705233cee674442a604dc1f42ba702c02bb6f7e91fdfc7e972502463e78b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOutlawCampfire_ORM.png",
+      "sha256": "f81834c9b2dcd147210c6f73a571adb7ce12bcd5ab482de0d146b0496bdceebf"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-outlaw-campfire-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodOutlawCampfire.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "4924 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "UV0 islands 1139, used 0.5985, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "T_Env_SherwoodOutlawCampfire_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOutlawCampfire.build.json",
+      "note": "SM_Env_SherwoodOutlawCampfire, M_Env_SherwoodOutlawCampfire",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот же предмет, что на sheet.png. Все главные части на месте: кольцо из замшелых серых камней, скрещённые тлеющие поленья, две опоры (вертикальная стойка, наружный косой подкос с верёвочной обвязкой у стойки и у ноги), перекладина с X-обвязками на концах, крюк по центру и чугунный котелок с дужкой. Пропорции совпадают с листом в пределах допуска. Расстояние между стойками к ширине кольца: 0,64 против 0,66 на листе. Ширина котла к расстоянию между стойками: 0,39 против 0,38. Высота перекладины над основанием стоек — около 0,84 от расстояния между стойками и там, и там. Концы стоек над перекладиной: 14 % против 12 %. Проп узнаётся со всех 8 ракурсов. Задние и внутренние ноги опор (треноги) и наклон стоек в глубину видны на 090/135/270/315 — это достройка объёма по единственному виду листа, а не фантом: на wire-front/back они симметричны и стоят на земле. Пламя есть и на 000/180 доходит до дна котла, как на листе. Его гранёная форма отнесена к F/T. Соотношение габаритов 0,295×0,296×0,24 м (1,23:1) отличается от ориентировочных 1,2×1,2×0,8 м в описании, но совпадает с листом. Лист — эталон формы.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых или оплывших частей нет. Тонкие элементы целы: крюк, дужка котла, верёвочные обвязки. Сетка на wire-front/back/34 следует форме: цилиндрические стойки и поленья, камни с плотной сеткой, котёл. Дефекты видны только на крупном плане. 1) Горловина котла закрыта плоской пластиной с поперечной планкой, за краем торчит плоская плита (close-weapon, close-base). 2) Языки пламени — смятые гранёные осколки (wire-front, wire-34), вблизи читаются как кристаллы; на 000 масса огня между поленьями и котлом меньше, чем на листе. 3) Конец крюка гранёный ромбом (close-head). 4) На торцах стоек сбоку — щепа (turn-090/270). На игровой дистанции всё это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе. Дерево — рисованная волокнистая кора с торцевыми кольцами, верёвка — витая, камень — светло-серый с мхом, котёл — серый чугун, на поленьях оранжевый жар, как на листе. Запечённых теней и бликов в цвете на полном росте нет (ORM.R=1). Детализация на уровне стилизованного кита. Дефекты крупного плана: 1) мелкая сетчатая «холщовая» штриховка Tripo на камнях и нижней половине котла (turn-090, turn-225, close-base); 2) немного размытая, вытянутая фактура перекладины (close-head); 3) крюк ржаво-коричневый вместо тёмного железа на листе; 4) градиент на осколках пламени вблизи выглядит стеклянным. На полном росте эти дефекты не мешают читаемости.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score = round((2.0+1.5+1.5)/6×10, 1) = 8.3 ≥ 8.0; ни одно измерение не ниже 1.5; гейты PASS или n/a. Балл в полосе 8.0–8.4, поэтому по §8.3 нужен независимый второй приёмщик другого профиля («Opus high»).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Горловина котла закрыта плоской пластиной с поперечной планкой, за краем торчит плоская плита; видно и сверху на close-base. Мусорная геометрия Tripo, видна только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Пламя — смятые гранёные осколки (также wire-34, turn-180), вблизи похожи на кристаллы. На turn-000 масса огня под котлом меньше, чем на листе. Для роли animated пламя лучше дать VFX поверх меша."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Сетчатая «холщовая» штриховка Tripo на камнях и нижней половине котла (также turn-225, close-base). На игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Фактура перекладины слегка размыта и вытянута. Крюк ржаво-коричневый, а на листе — тёмное железо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-OUTLAW-CAMPFIRE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп outlaw-campfire (Костёр разбойников, Sherwood Forest) принят по делегированию с баллом 8.3 (S 2.0, F 1.5, T 1.5). Балл в полосе 8.0–8.4, поэтому нужен второй приёмщик «Opus high». Мелочи крупного плана записаны в known_issues: пластина в горловине котла, гранёное пламя, штриховка на камнях."
+}

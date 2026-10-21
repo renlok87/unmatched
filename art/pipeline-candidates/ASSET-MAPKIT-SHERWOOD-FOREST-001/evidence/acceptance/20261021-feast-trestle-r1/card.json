@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFeastTrestle.fbx",
+      "sha256": "b3e1302da0d4b3db71e7f3b79d3ffe8bb8d01057c8ba67a9120a54056a6977f6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFeastTrestle_BC.png",
+      "sha256": "4f4311f9a847c70b44471c3405f62336f7aaabcc8be8ef47892d47ebe4805880"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFeastTrestle_N.png",
+      "sha256": "c20c0628e96437ec4a9b611633e71d64c112f70932cb8a4391ab46b37e8c7451"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFeastTrestle_ORM.png",
+      "sha256": "f6a1af1232c229c08ba8e1b873703bceec2db59be5aa64aef912c887978ca871"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-feast-trestle-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodFeastTrestle.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+      "note": "4870 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+      "note": "UV0 islands 1190, used 0.6571, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+      "note": "T_Env_SherwoodFeastTrestle_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFeastTrestle.build.json",
+      "note": "SM_Env_SherwoodFeastTrestle, M_Env_SherwoodFeastTrestle",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан: стол-козлы из колотых брёвен с А-образными ножками в верёвочной вязке и двумя нижними продольными брусьями. На крышке курица на блюде, хлеб, яблоки, миски и деревянные кружки с обручами — всё как на sheet.png и в описании. Лишних и пропавших частей нет, стол узнаётся со всех 8 ракурсов, основное пятно — серо-коричневое дерево, как на листе. Но пропорция главной части сбита. Габарит 0,505×0,323×0,24 м (50,5×32,3×24 uu), крышка ≈0,30 м в глубину при длине 0,505 м, т.е. L:D ≈ 1,6:1. В заказе 1×2,5 м (2,5:1); при высоте 24 uu (0,8 м) длина должна быть ≈75 uu, а здесь 50,5. На листе стол длинный и узкий: блюдо с птицей занимает почти всю глубину крышки (≈0,8), у модели ≈0,64 (close-base) — крышка глубже листа примерно на 25 % и глубже заказа примерно на 50 %. Оценка на глаз по листу 230 px: кадров compare-* нет, но направление отклонения совпадает и с листом, и с заказом. С торца (turn-090/270) стол выглядит широкой приземистой А-рамой. Отклонение главной части > 10 % → 1,0. Курица бледнее листа (персиково-розовая против золотистой) — второстепенный оттенок под AgX, отдельным отличием не считал.",
+      "frames": [
+        "sheet.png",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: нет дыр, просветов, чёрных пятен, вывернутых или мусорных частей и оплывших масс. Тонкие ручки кружек и верёвочная вязка целы. Сетка на wire-34 и wire-front следует форме: брусья, торцы брёвен, миски и кружки читаются. 67 открытых петель из отчёта сборки (верх ножек под крышкой, низ птицы, подошвы) и плавающие на ≈0,5 uu блюда на кадрах не видны. Дефекты крупного плана: мелкие яблоки и фрукты у блюда — гранёные низкополигональные «кристаллы» с острыми верхушками (close-head, close-weapon); в мисках с торцевых ракурсов они читаются как острые бутоны (turn-090/270). Торцы брёвен тоже гранёные. → 1,5.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: выветренное серо-коричневое дерево с волокнами и мхом, верёвка, хлеб с надрезами, курица, яблоки, кружки из клёпок с обручами. Запечённого света и теней в цвете не видно (тёмный низ крышки — тени EEVEE). Детализация на полном росте достаточная для фонового пропа. Дефекты крупного плана: текстура мелких фруктов размыта (мыло), на кромке передней доски крышки горизонтальные растянутые штрихи (close-weapon), у курицы белёсые крапины-блики (close-head). Торцы досок крышки — светлая жёлто-зелёная полосатая лента со щелями, заметная с торцов (turn-090/135/270/315); она читается как торец древесины, но выбивается из тона крышки. Развёртка без перекрытий: 1190 островов, покрытие 0,66. → 1,5.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: пропорция главной части сбита больше чем на 10 %. След стола 50,5×32,3 uu (L:D ≈ 1,6:1) против 2,5:1 в заказе (1×2,5 м) и примерно 2,1–2,5:1 на sheet.png; при высоте 24 uu стол на треть короче заказанных ≈75 uu. По рубрике это перегенерация в Tripo (этап 2). Нужны виды, где крышка длинная и узкая (блюда занимают почти всю её глубину). Еду, вязку, ножки-козлы и палитру сохранить: они удачны. Score 6,7.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Крышка заметно глубже листа и заказа. След 50,5×32,3 uu (≈1,6:1) против ≈2,5:1 (1×2,5 м); на sheet.png блюдо с птицей занимает почти всю глубину крышки, здесь ≈0,64 глубины. С торца (turn-090/270) стол выглядит широкой приземистой А-рамой."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Мелкие яблоки и фрукты у блюда и в мисках — гранёные низкополигональные «кристаллы» с острыми верхушками; с торцов (turn-090/270) они читаются как острые бутоны. Торцы брёвен гранёные. Дыр, чёрных пятен и мусорной геометрии на кадрах нет."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Текстура мелких фруктов размыта (мыло), у курицы белёсые крапины-блики; курица бледно-персиковая вместо золотистой корочки листа. На кромке передней доски крышки горизонтальные растянутые штрихи (close-weapon)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Торцы досок крышки — светлая жёлто-зелёная полосатая лента с тёмными щелями, заметная на торцевых ракурсах (turn-090/135/270/315). Читается как торец древесины, но выбивается из серо-коричневого тона крышки."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-FEAST-TRESTLE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп feast-trestle (Sherwood Forest) не принят, 6,7: крышка стола заметно глубже листа и заказа (≈1,6:1 против ≈2,5:1). Нужна перегенерация в Tripo (этап 2) с длинной узкой крышкой; еду, вязку и палитру сохранить."
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodCampCookingPot.fbx",
+      "sha256": "a0cb7046d880b020960f2c3270d98ee6f517fd5f32ab5081298111724f718772"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_BC.png",
+      "sha256": "be67340a2a97d2036e52002abaca735bdd4c656d3b34887cb2dcd3c2dbaf29d0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_N.png",
+      "sha256": "3ff99b7898df3386a646a057f9d9596b8fdf1f20b43bf38dcfa9f9ed5e30f44d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodCampCookingPot_ORM.png",
+      "sha256": "ca845d75ddaab892146955b13fdd69abf5b6bfecf4770c2b7cf3781e81cf53ab"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-camp-cooking-pot-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodCampCookingPot.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "5374 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "UV0 islands 117, used 0.5676, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "T_Env_SherwoodCampCookingPot_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodCampCookingPot.build.json",
+      "note": "SM_Env_SherwoodCampCookingPot, M_Env_SherwoodCampCookingPot",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот же, что на sheet.png. Есть две рогатины с развилкой и верёвочной обвязкой, перекладина, центральное кольцо с S-крюком, чугунный котёл на дужке, черпак на крюке у правой стойки и расширенные замшелые основания. Пропорции по фронту (turn-000 против листа): тело котла 29 % высоты против 33 %, обод на 56 % против 54 %, перекладина на 26 % против 24 %, ширина к высоте 1,03 против 1,02. Всё в пределах 5 %. Лишних и пропавших частей нет. На turn-090/270 и wire-34 фантомных выступов и оболочек нет, предмет узнаётся со всех 8 ракурсов. Медно-рыжее колечко крюка черпака мелкое и основного пятна цвета не меняет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: дужка, ручка черпака, крюки, верёвочная обвязка. Сетка на wire-34 следует форме, стойки и ступни-корни чистые. Минус: боковые ушки котла на задних 3/4 ракурсах (turn-135/225/315) читаются как мягкие оплывшие капли, а не кованые S-скобы, как на фронте. Центральный S-крюк слегка комковатый (close-weapon). Это детали около 4 uu на пропе высотой 30 uu, на игровой дистанции они не читаются, поэтому оценены как дефект уровня крупного плана. Пять открытых петель из отчёта сборки сидят в местах примыкания ушек, дужки и ручки черпака и на кадрах не видны.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: расписное дерево с волокнами и тёмными бороздами в духе hand-painted, верёвка, мох у оснований, тёмный кованый чугун с чеканкой. На полном росте текстуры резкие, без швов и растяжек. Направленного света, запечённого в цвет, не видно: блики смещаются с ракурсом. Детализация на уровне кита. Минусы крупного плана: на close-head текстура кольца на перекладине смазана («мыло»), на close-base в чаше черпака и внутри котла мягкие размытые светлые пятна. Metallic в ORM почти ноль (metallic_mean 0.02), металл держится только цветом BC, но на кадрах читается как чугун.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 из 6 → 8.3 ≥ 8.0. Ни одно измерение не ниже 1.0, гейты PASS/n/a. Дефекты только уровня крупного плана, на игровой дистанции фонового пропа не читаются. Балл в окне 8.0–8.4, нужен второй приёмщик другого профиля.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "note": "Боковые ушки котла на задних 3/4 ракурсах (turn-135/225/315) выглядят мягкими оплывшими каплями вместо кованых S-скоб; центральный S-крюк слегка комковатый (close-weapon). На игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Смазанная текстура кольца на перекладине на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Мягкие размытые светлые пятна в чаше черпака и внутри котла на крупном плане. Metallic в ORM почти ноль, металл читается только цветом BC."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-CAMP-COOKING-POT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп camp-cooking-pot принят по делегированию с баллом 8.3 (окно 8.0–8.4, нужен второй приёмщик «Opus high»). Оплывшие ушки котла на задних ракурсах и мягкая текстура мелкого металла на крупном плане записаны в known_issues."
+}

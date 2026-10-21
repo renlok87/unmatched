@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotRuneStone.fbx",
+      "sha256": "f535e8251a01740ec5abd6b3ff632ad1fd1ca6a8d5d47e5526bd23648373d0ff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_BC.png",
+      "sha256": "e186c67a9c72b316e22a0aed96c3598206a5efbd66e3bbd74d61b6f5303463a8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_N.png",
+      "sha256": "034634963110a1e1a9f1f7d6d3eb70e5ea59647e6783c598906a89555ed82402"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRuneStone_ORM.png",
+      "sha256": "af7ceaca192ee90f2a085149eb5e42bf0b80b62b4b050150365f575cb4682fdc"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-rune-stone-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotRuneStone.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "note": "5144 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "note": "UV0 islands 27, used 0.6556, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "note": "T_Env_HeorotRuneStone_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRuneStone.build.json",
+      "note": "SM_Env_HeorotRuneStone, M_Env_HeorotRuneStone",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и спереди совпадает с sheet.png: высокий серый камень со скруглённым верхом, змеиная лента с рунами сверху вниз, голова змея наверху, три розетки-кольца, узел внизу, каменная осыпь со снегом у основания. Высота 66 uu и ширина по bbox (0.79 м в реальном масштабе) сходятся с заказом. Одно второстепенное отличие: сечение скорее круглое, чем плоская плита 0.8×0.4 м. На середине высоты толщина к ширине около 0.75, по bbox 0.82, а в заказе 0.5. Поэтому с боков (turn-090/270) камень читается как толстый менгир, а от резьбы виден только узкий край. Вида сбоку в листе нет, и в процентах высоты отклонение в пределах около 3–6 %. Лишних и пропавших частей нет. Со всех 8 ракурсов это стоячий камень, спина гладкая, без резьбы (лист её не показывает).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка единая и чистая: на wire-front/back/34 ровная треугольная сетка Smart Mesh, она идёт по форме. Нет дыр, просветов, вывернутых или мусорных частей. Купол верха, сколы на плечах и осыпь основания читаются. Резьба змея и рун передана нормалью, без геометрии, и на всех ракурсах и крупных планах читается чисто, без чёрных пятен. Камни основания на close-base целые, контакт с землёй ровный. Мелкие комки треугольников у осыпи (wire-front внизу по центру, wire-34) на текстурированных кадрах не видны.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Гранит и красная краска в резьбе читаются хорошо, резьба детальная, уровень не ниже кита Sarpedon, явного запечённого света нет. Главный дефект виден на полном росте в одной зоне. Верхний купол камня (верх около 12 % роста) покрыт красно-бурой текстурой с узором змеиной чешуи. Это чужой цвет: на листе верх серый, а чешуя змея спроецирована на невидимый в листе верх. Дефект хорошо заметен на turn-045/090/135/180/225, а для настольной камеры сверху верх камня особенно виден. Дефекты крупного плана: по всему граниту в BC и N идёт мелкий сетчато-чешуйчатый узор (close-head, close-weapon, close-base), поверхность блестит, как мокрая; на спине бледный красный след резьбы (turn-180, turn-225), на игровой дистанции он читается как следы краски.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0: T = 1.0, на полном росте виден красно-бурый чешуйчатый верхний купол (чужой цвет, на листе верх серый). S = 1.5 не ниже 1.5, F = 2.0, все гейты PASS/n/a, поэтому доработка в сборке, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "fix": "Перекрасить верхний купол (выше головы змея, верх около 12 % роста) в серый гранит тела камня: убрать красно-бурый тон и чешуйчатый рисунок в BC и N этой зоны. Красный оставить только в резьбе змеиной ленты. Делается ретекстуром того же меша в Tripo с явным серым гранитным верхом либо перекраской BC этой зоны по маске высоты и красного тона.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Смягчить сетчато-чешуйчатый микроузор по всему граниту: снизить силу нормали и размыть высокие частоты N и BC вне резьбы. Поднять roughness камня до матового гранита, чтобы не было мокрого блеска на краях резьбы. Бледный красный след на спине (turn-180/225) приглушить до тона камня.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Сечение круглее заказанной плиты 0.8×0.4 м: толщина к ширине около 0.75–0.82, а не 0.5, поэтому с боков камень читается как толстый менгир. При доработке по желанию сжать толщину по Y примерно до 0.4 м в реальном масштабе через параметры env_kit, не трогая высоту и ширину."
+    },
+    {
+      "item": "T",
+      "frame": "turn-225.jpg",
+      "note": "Бледный красно-фиолетовый след резьбы на гладкой спине: просочилась проекция лицевой стороны. На игровой дистанции читается как следы краски, полную высоту не портит."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-RUNE-STONE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп rune-stone (Рунный камень) на доработку, 7.5: перекрасить красно-чешуйчатый верх в серый гранит, смягчить чешуйчатый микроузор и блеск камня, затем r2."
+}

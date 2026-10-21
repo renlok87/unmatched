@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodWantedPost.fbx",
+      "sha256": "0a0e96a026c191cb0d83a1097806b3171638fca551c66996893f0e52ac859b0e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodWantedPost_BC.png",
+      "sha256": "8b95fd50bda40d1affb652d2896282708028392a2d26ec8b2817bb41ac7afa67"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodWantedPost_N.png",
+      "sha256": "a8499c79410b9758c899fddcc5c7ac1716313f79036f74cc89b8aabbc1f00671"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodWantedPost_ORM.png",
+      "sha256": "eea3bf5052f21b8f7f64b4637577e77a1f117da0abf9d02f87eab4bd6dc4b85d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-wanted-post-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodWantedPost.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+      "note": "4845 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+      "note": "UV0 islands 154, used 0.5798, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+      "note": "T_Env_SherwoodWantedPost_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodWantedPost.build.json",
+      "note": "SM_Env_SherwoodWantedPost, M_Env_SherwoodWantedPost",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это тот же предмет, что на sheet.png: высокий столб с расщеплённой верхушкой, сучок справа вверху, пергамент на двух гвоздях в верхней трети, стрела пробивает лист и уходит вправо вверх, плющ внизу; пропорции столба и положение листа совпадают с видом. Одно второстепенное отличие: лишние стрелы, которых нет в заказе. Вторая стрела с оперением торчит над верхним краем листа (turn-045, turn-135, close-weapon), третья вбита в бок и тыл столба на середине высоты (turn-090, turn-270, turn-180). Они по теме и читаются как часть сюжета, силуэт с игровой дистанции узнаётся со всех ракурсов. Пергамент чуть толще, чем на виде, — допустимая стилизация.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей. Тонкие элементы целы: древки и оперение стрел, гвозди, листья плюща. Сетка на wire-34 следует форме: плотнее у основания и на листьях, разреженная на плоских гранях столба, мусорной геометрии нет. Края пергамента скатаны валиками, это стилизованная, а не оплывшая форма.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказаны: дерево с рисованной фактурой волокон и мхом к основанию, светлый пергамент, тёмные железные гвозди, зелёный плющ и оперение. Запечённых теней нет, детализация на уровне кита. Дефект только крупного плана: растяжка проекции на гранях расщеплённой верхушки — параллельные полосы и мыло на торце и верхнем левом боку (close-weapon, close-head, на turn-315 едва заметно). На игровой дистанции читается как волокно.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 1.5 + F 2.0 + T 1.5 = 5.0/6 → 8.3 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a. Лишние стрелы и растяжка на верхушке — известные недочёты, на игровой дистанции фонового пропа не мешают.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Две лишние стрелы против заказа (одна стрела): над верхним краем пергамента и в боку и тылу столба на середине высоты (также turn-045, turn-135, turn-180, turn-270)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Растяжка проекции текстуры на гранях расщеплённой верхушки: параллельные полосы и мыло на торце и верхнем левом боку (также close-head.jpg, слабо turn-315.jpg)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-WANTED-POST-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wanted-post (Sherwood Forest) принят по делегированию: 8.3. Известные недочёты — две лишние стрелы и растяжка текстуры на верхушке столба, видны только на крупном плане."
+}

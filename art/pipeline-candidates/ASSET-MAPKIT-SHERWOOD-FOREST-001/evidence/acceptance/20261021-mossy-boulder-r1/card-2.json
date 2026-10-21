@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodMossyBoulder.fbx",
+      "sha256": "bad7a9563f331d13612fccd58b276b26261b9c0c3904997559e0c79abecb3ee0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_BC.png",
+      "sha256": "44ae2b90878d284577f7865a55219e5a3ba9ec1fcbfeaa70c0b436c9afc6731d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_N.png",
+      "sha256": "a284915e4afa83984ff296f1c7bda02b31eb9e9bf560b9aa9425b3c7f3c9faa7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodMossyBoulder_ORM.png",
+      "sha256": "a9959a7c3aaf4cad12071e29023501d1a9681a809b6bd5df98381fb0ef0ad556"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-mossy-boulder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodMossyBoulder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "4161 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "UV0 islands 448, used 0.7644, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "T_Env_SherwoodMossyBoulder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodMossyBoulder.build.json",
+      "note": "SM_Env_SherwoodMossyBoulder, M_Env_SherwoodMossyBoulder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан и показан на sheet.png: крупный округлый серый валун, примерно половина покрыта густым зелёным мхом (как на виде, мох слева/сзади, серые каменные плиты справа), у основания кольцо мелких папоротников. Купольный силуэт и пропорции совпадают с видом, лишних или пропавших частей нет; на turn-090/270 и wire-34 фантомных выступов и оболочек нет, валун узнаётся со всех ракурсов. Камень светлее, чем на виде, но того же серого семейства.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Основная масса валуна цельная: без дыр, чёрных пятен и вывернутых частей, сетка на wire-34 ровно следует куполу. Слабое место — папоротники у основания. Это низкополигональные плоские карты с зубчатыми треугольными краями и тёмными изнанками на кончиках (close-base.jpg, wire-34.jpg, края turn-000/turn-270). Дефект заметен в основном на крупном плане; на игровой высоте 39 uu кольцо читается как папоротники. Каменные плиты местами выражены больше текстурой, чем геометрией (wire-34 мягче, чем рисунок).",
+      "frames": [
+        "close-base.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно: мох — ворсистый мох (close-head.jpg), камень — шершавый серый камень с трещинами, папоротники — зелёные листья. Запечённого света и теней в цвете нет, швов и растяжек на полном росте не видно; по детализации проп на уровне кита. Мелкие дефекты: на камне местами тонкий сетчатый «тканевый» узор генерации (крупный план turn-090/close-base); на turn-270 внизу задней стороны мягкая размытая серо-зелёная полоса, где камень просвечивает сквозь мох; верх мха на close-head слегка мыльный.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение не ниже 1.0 (S 2.0, F 1.5, T 1.5), все гейты PASS или n/a; замечания F/T видны только на крупном плане и для фонового пропа на игровой дистанции некритичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Карты папоротников у основания низкополигональные: зубчатые треугольные края и тёмные изнанки на кончиках; на игровой дистанции некритично."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "Внизу задней стороны мягкая размытая полоса, где камень просвечивает сквозь мох; на камне местами тонкий сетчатый узор генерации, заметный на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SHW-MOSSY-BOULDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mossy-boulder (Замшелый валун, Sherwood Forest) принят по делегированию: 8.3, мелкие замечания по картам папоротников и мыльной полосе мха — в known_issues."
+}

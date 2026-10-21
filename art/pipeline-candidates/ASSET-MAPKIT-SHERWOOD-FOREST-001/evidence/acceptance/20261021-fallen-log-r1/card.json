@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodFallenLog.fbx",
+      "sha256": "e8f3982d13470d46d17b122bf8a4773049f412a9e637f6c53a50f5f7e9a305fd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_BC.png",
+      "sha256": "7a885fa7874974b21fb3693306e1108987f22d9eacd4169e1449e255f1c19140"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_N.png",
+      "sha256": "07db195f8102bb2d1780ef394eb33fb812088fb8679548c5254d004b559036d7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodFallenLog_ORM.png",
+      "sha256": "95d8c2fa9a496078178e1cab52d8b5e2c89ddeac6afaefa9429aad4c1e0c995f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-fallen-log-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodFallenLog.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "note": "4358 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "note": "UV0 islands 121, used 0.6214, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "note": "T_Env_SherwoodFallenLog_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodFallenLog.build.json",
+      "note": "SM_Env_SherwoodFallenLog, M_Env_SherwoodFallenLog",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это заказанный предмет: длинный замшелый ствол (два сросшихся ствола), расщеплённый облом с полым дуплом слева (turn-270, turn-315), ряды трутовиков-полок по боку, моховой подол с растениями у основания. С sheet.png совпадают масса, облом, распределение мха и палитра: кора бежево-коричневая, мох жёлто-зелёный. Узнаётся со всех 8 ракурсов; фантомных оболочек на turn-090/270 и wire-* нет. Одно второстепенное отличие контура. Дальний торец лист не показывает, и Tripo сделал его пачкой из трёх пиленых спилов с кольцами (turn-045/090/135): читается как распиленные дрова, а не естественно поваленный дуб. Объёмные растения — широколистные карточки, перистый папоротник только нарисован на подоле. Пропорции по листу на глаз в пределах, но длина/высота ≈2,6:1 против ≈6:1 в описании: бревно короче, так в концепте. Предупреждение frames.json о несовпадении ключа листа служебное: на листе то же бревно.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка Smart Mesh ровная и следует форме (wire-34/front/back): равномерные треугольники, веера на спилах, полюс-звезда сверху без артефактов. Дыр, чёрных пятен и вывернутых частей на кадрах нет; трутовики и листья целы. Дефекты видны на крупном плане и с низкого ракурса. Основной корпус (оболочка 0, низ мохового подола) начинается на 2 uu выше точки опоры: опору задают кончики листьев (оболочка 15, z 0), и листья свисают ниже линии подола (turn-000, turn-045, turn-315, close-base). На доске подол и бревно повиснут над полем примерно на 2 uu. На торцах — тонкие отогнутые лоскуты подола с рваными углами (turn-000 справа, turn-135 и turn-180 слева). По отчёту: 20 мелких оболочек листьев и грибов с зазором ≥0,5 uu; дно открыто (на доске не видно); 6 % площади граней смотрит внутрь, но тёмных пятен на кадрах это не даёт.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кора с резной продольной фактурой, мелкий жёлто-зелёный мох, трутовики с пластинками, спилы с кольцами и трещинами, папоротник нарисован на подоле. Стилизованная ручная роспись в духе кита. Запечённых бликов нет; швов и растяжек на полном росте нет (UV: 121 остров без перекрытий). На крупном плане (close-weapon) мох и кора мыльные: бледное размытое пятно коры без детали на верхе ствола, видно и в close-base по центру сверху. Тёмное пятно в дупле облома (turn-270) похоже на нарисованную тень. На игровой дистанции фон читается, дефекты только крупного плана — 1,5.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0, гейты PASS/n/a, ни одно измерение не ниже 1,0; S = 1,5 (не < 1,5), поэтому rework_blender, а не перегенерация. F 1,5: корпус висит на 2 uu над точкой опоры. T 1,5: мыло коры и мха на крупном плане. Если исправить посадку, выйдет 1,5 + 2,0 + 1,5 = 8,3.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Посадка: опустить меш на 2,0 uu, чтобы ноль Z считался по низу основной оболочки 0 (моховой подол), а не по кончикам листьев оболочки 15. Подол ляжет на доску без просвета, кончики листьев уйдут в поле. Цель высоты 30 uu пересчитать по корпусу или оставить.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Мыло BC: убрать бледное размытое пятно коры на верхе ствола и проверить тёмное пятно в дупле облома (turn-270) — ретушью BC или HD-перетекстурированием исходника Tripo. При даунскейле 4096→2048 вместо box 2x2 взять фильтр, сохраняющий резкость.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Дальний торец — три пиленых спила: Tripo додумал сторону, которой не видно на листе. Растения — широколистные карточки вместо перистого папоротника. Длина/высота ≈2,6:1 против ≈6:1 в описании, так в концепте. Перегенерации не требует."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Тонкие отогнутые лоскуты мохового подола с рваными углами на торцах (также turn-000 справа и turn-135 слева). После посадки проверить, не торчат ли они над доской."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Кадр пуст (frames.json errors: доля переднего плана 0,000): кадр «верх 22 %» рассчитан на фигуру и у низкого длинного пропа попал в пустоту. Верх ствола крупным планом оценён по close-weapon.jpg. Это дефект набора кадров, не модели."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-FALLEN-LOG-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп fallen-log (Sherwood Forest): 7,5, на доработку в Blender. Нужно опустить корпус на 2 uu, чтобы моховой подол лёг на доску, и снять мыло BC на верхе ствола. Пиленый дальний торец остаётся замечанием."
+}

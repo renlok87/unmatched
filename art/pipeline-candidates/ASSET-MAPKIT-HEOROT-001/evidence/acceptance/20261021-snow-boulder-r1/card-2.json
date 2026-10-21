@@ -1,0 +1,153 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotSnowBoulder.fbx",
+      "sha256": "06cc53e979a99b3622df1d702cf9051a9f0b4be8e7def02a1241c19c72061168"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_BC.png",
+      "sha256": "9c00c4450248040f89aef29efe322bd1caff76e71251474a0e1052a81fd47a82"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_N.png",
+      "sha256": "a844068973addd8137cc8ad376ffebe83404c797dfb73a7b22df031e65e6567f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotSnowBoulder_ORM.png",
+      "sha256": "25e2bb051bf8b30fd3f56b5ec6d474dfae2bca2c7a400d9c365484981c58b247"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-snow-boulder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotSnowBoulder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "4748 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "UV0 islands 748, used 0.7185, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "T_Env_HeorotSnowBoulder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotSnowBoulder.build.json",
+      "note": "SM_Env_HeorotSnowBoulder, M_Env_HeorotSnowBoulder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: груда тёмно-серо-синих гранитных глыб под толстой снежной шапкой с ярусами сосулек. Пропорции (ширина/высота ~1,15 против ~1,07 на виде) и главные части совпадают, плоская снежная шапка сверху и ярусы сосулек на каждом уступе есть на всех 8 ракурсах; фантомных выступов и оболочек на turn-090/270 и wire-34 нет, узнаётся со всех сторон.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: читаемые глыбы, целые заострённые сосульки, сетка на wire-34 следует форме, низ ровно срезан под установку. При разглядывании видны мелкие тёмные щели-просветы в стыках сосулек и камня (turn-000 у левых сосулек верхнего яруса, turn-270 в центре справа, turn-315 у среднего яруса слева и под шапкой справа) — дефект уровня крупного плана, на игровой дистанции (36 uu) не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Гранит читается камнем с рукописной фактурой и трещинами, снег чистый белый, запечённого направленного света и швов на полном росте нет. Минусы крупного плана: верх снежной шапки почти без детали (close-head — ровная заливка), сосульки окрашены как снег, без голубого ледяного оттенка с вида sheet.png, так что лёд как отдельный материал выражен слабо; гранит чуть светлее «dark granite». На игровой дистанции не мешает.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; дефекты F и T только крупного плана для фонового пропа.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-315.jpg",
+      "note": "мелкие тёмные щели-просветы в стыках сосулек и камня (также turn-000, turn-270); видны только при разглядывании"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "верх снежной шапки — почти ровная заливка без детали; сосульки цвета снега без ледяного голубого оттенка вида sheet.png"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-SNOW-BOULDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп snow-boulder (Heorot) принят по делегированию, 8.3: мелкие щели в стыках сосулек и простая снежная шапка — известные недочёты крупного плана."
+}
