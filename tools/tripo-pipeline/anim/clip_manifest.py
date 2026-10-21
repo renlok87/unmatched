@@ -64,6 +64,9 @@ H2ANIM["Achilles"] = "art/pipeline-candidates/ASSET-ACHILLES-001/build-profiles/
 # фигура-проверка доработанного скилла 2026-10-14, этап 6 Beowulf (регистрация Р6-1 отдельными строками)
 CHARS["Beowulf"] = ("BEO", "ASSET-BEOWULF-001")
 H2ANIM["Beowulf"] = "art/pipeline-candidates/ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json"
+# мини-пачка 2026-10-20 (волна A), этап 6 Bruce Lee (регистрация Р6-1 отдельными строками)
+CHARS["BruceLee"] = ("BRUC", "ASSET-BRUCE-LEE-001")
+H2ANIM["BruceLee"] = "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json"
 # Переопределение спеки на клип (F103): доработка одного клипа новым прогоном — одна строка
 #   H2ANIM_CLIP["<Character>", "<Clip>"] = "art/pipeline-candidates/<ASSET_ID>/build-profiles/<content-key>-h2anim-rN.json"
 # остальные клипы героя берут спеку из H2ANIM. Пусто — у всех героев одна спека на 4 клипа (как раньше).
