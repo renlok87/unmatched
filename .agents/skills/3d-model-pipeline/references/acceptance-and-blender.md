@@ -920,7 +920,9 @@ rework_blender`).
    `acceptor-inputs.json` коммитится с карточкой, приёмщик его не открывает. WARN выдержки читать до вызова: «TeamAccent
    … не найден» — строка G-TEX TeamAccent_2K будет FAIL (сначала найти прогон TeamAccent), «bake-профиль изменён после
    look-dev» — вход не тот. Все плейсхолдеры заполняются до вызова; незаполненный `{{…}}` в промпте — ошибка
-   запускающего, приёмщика не вызывать.
+   запускающего, приёмщика не вызывать. Заполняет целиком `python tools/art/acceptance/model_prompt.py --evidence $E
+   --executor-session-id <id>` (шаблон §8.2 + `acceptor-inputs.json` + заявка → `$E/acceptor-prompt.md`, «Opus xhigh»;
+   `--second` → `acceptor-prompt-2.md`, «Opus high»); незаполненный плейсхолдер — код 1 (мини-пачка 2026-10-20).
 4. Вызвать приёмщика выбранным профилем (§8.3 или §8.4). Приёмщик возвращает только JSON.
 5. Записать ответ **без изменений** в `$E/card.json` (это делает запускающий, не приёмщик). Единственная разрешённая
    правка — у «Sol 6.1 xhigh»: `acceptor.session_id` `codex:pending` → `codex:<thread_id>` из первого события
