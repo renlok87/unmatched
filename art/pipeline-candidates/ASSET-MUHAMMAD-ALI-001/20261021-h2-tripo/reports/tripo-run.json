@@ -1,0 +1,462 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-85",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "date": "2026-10-21",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (субагент этапа 2 волны B, Sonnet) в Chrome пользователя через Claude in Chrome (DOM, без курсора): клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "a26d04a3-71b1-499e-b4c6-7c821ff19120",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/a26d04a3-71b1-499e-b4c6-7c821ff19120"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+        "sha256": "4dd1804e89b6221312d3a8b639486d1f9b92f7a12856799d7f69cf0bdd6fcd1e"
+      },
+      "left": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+        "sha256": "3a9330fab24eb07b80dd000d9dfb01cac682cef3242a1b5e7ffea6dbdbbcb10f"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png",
+        "sha256": "889a20fceff2504312af2975c0f0a893d2099375f72f4b545b29ab16bc911c8e"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма Studio стояла на H2-настройках (по частям Баланс, без текстуры, ультра 2M, треугольники, 8K выкл., Private), режим ввода — одно изображение; на время прогона переключена на multi-view",
+    "studio_settings_after": "настройки генерации не менялись; режим ввода формы сбрасывается на одно изображение при загрузке страницы"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 10470.0,
+        "balance_after": 10410.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 10290.0,
+        "balance_after": 10260.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 10235.0,
+        "balance_after": 10230.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-parts12.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "a278717cc7ffb5cecffafc98b48979ef7a283e1355eeb2f906620b8fb457a0fe",
+      "bytes": 46472448,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 12,
+      "triangles": 1932060,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 582591
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 77821
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 73346
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 337847
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 140668
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 73568
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 166157
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 113163
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 110580
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 89349
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 88563
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 78407
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "dff2e9ad72f421a7f40955fcfdb02ea9f6d6c85b244958f44760552b63fab36b",
+      "bytes": 79920684,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 12,
+      "triangles": 1932060,
+      "materials": 12,
+      "images": 36,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 582591
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 77821
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 73346
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 337847
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 140668
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 73568
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 166157
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 113163
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 110580
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 89349
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 88563
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 78407
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 582591,
+      "min": [
+        -0.2795,
+        0.0,
+        -0.2787
+      ],
+      "max": [
+        0.2795,
+        0.1147,
+        0.2787
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 337847,
+      "min": [
+        -0.1315,
+        0.448,
+        -0.0828
+      ],
+      "max": [
+        0.1151,
+        0.6582,
+        0.0694
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 140668,
+      "min": [
+        -0.0598,
+        0.8363,
+        -0.0467
+      ],
+      "max": [
+        0.0396,
+        0.9793,
+        0.0717
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 73568,
+      "min": [
+        -0.1511,
+        0.2408,
+        -0.0653
+      ],
+      "max": [
+        -0.0377,
+        0.4639,
+        0.0446
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 166157,
+      "min": [
+        -0.114,
+        0.6523,
+        -0.101
+      ],
+      "max": [
+        0.0843,
+        0.891,
+        0.0493
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 113163,
+      "min": [
+        -0.1953,
+        0.1098,
+        -0.0702
+      ],
+      "max": [
+        -0.0994,
+        0.2506,
+        0.0898
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 110580,
+      "min": [
+        0.092,
+        0.1108,
+        -0.0702
+      ],
+      "max": [
+        0.1857,
+        0.2506,
+        0.0903
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 89349,
+      "min": [
+        0.0129,
+        0.7068,
+        0.0464
+      ],
+      "max": [
+        0.1106,
+        0.8322,
+        0.1637
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 88563,
+      "min": [
+        -0.1399,
+        0.7068,
+        0.0464
+      ],
+      "max": [
+        -0.0422,
+        0.8322,
+        0.1638
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 78407,
+      "min": [
+        -0.1739,
+        0.639,
+        -0.0868
+      ],
+      "max": [
+        -0.0806,
+        0.8313,
+        0.0885
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 77821,
+      "min": [
+        0.0497,
+        0.6391,
+        -0.0867
+      ],
+      "max": [
+        0.1442,
+        0.8317,
+        0.0882
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 73346,
+      "min": [
+        0.0229,
+        0.2416,
+        -0.0652
+      ],
+      "max": [
+        0.1416,
+        0.4641,
+        0.0447
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-a26d04a3-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/preview",
+    "out": "dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-MUHAMMAD-ALI-001\\20261021-h2-tripo\\preview\\draft-orthos-zv2i8yzp --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [
+    "F-B2-12 Генерация multi-view H3.1 «по частям» Баланс, ультра 2M, треугольники: 12 частей, 1 932 060 tris; брака §5.4 нет, повторов нет. Орто parts-GLB (серый, до текстуры) осмотрены до траты на текстуру: одна фигура на одной подставке, стойка с защитой, две руки с перчатками перед лицом, трусы, шнурованные ботинки; оружия нет (WEAPON_HAND none) и не появилось; лишних рук, второго лица, дыр и вывернутых стоп нет. Перчатки — отдельные части (7, 8), зазор предплечье–корпус сохранён.",
+    "F-B2-13 Известные замечания приёмки 1c: лицо и объём волос — по front (в профиле лицо уже и старше) воспроизведено: на front лицо шире, на side уже; волосы — короткая кудрявая шапка (на текстуре и сзади видна кудрявая фактура, брака нет). «Трескучий» шум кожи на виде сзади (артефакт концепта) на модели не виден: кожа гладкая, с сильным глянцем.",
+    "F-B2-14 Текстура 8K с «Удалить освещение» (вкл., проверено zoom перед кликом) и PBR: 12 материалов, 36 изображений, tris равны parts-GLB (1 932 060), skins 0; орто текстурного GLB (preview/) осмотрены: красные перчатки, белые трусы с чёрной полосой, белые ботинки, коричневая кожа на месте. Кожа после PBR блестит («масляный» вид на плечах, спине, ногах), подставка получила шумный цветочный рельеф (как на листе 1c): на look-dev этапа 3–5 приглушить глянец кожи; металл-маски не нужны.",
+    "Кредиты: на шапке Studio после «Generate» баланс упал на 80 (10 470 → 10 390): 60 этой операции и 20 параллельной сессии «Карты и пропсы»; после PBR −105 (5 + 100 той же сессии). Строки журнала и operations[] этого отчёта записаны с after = before − цена с кнопки (60, 30, 5), чтобы чужие траты не попали в cost; сырые значения шапки — в notes строк журнала.",
+    "Роли частей — черновик по габаритам из буфера вершин (parts_roles_draft); подтверждает разведка этапа 3 по частям. Оси glTF: Y вверх, фронт +Z, правая сторона фигуры −X."
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json",
+    "this_hero_total_quoted": 95
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "parts_roles_draft": {
+    "tripo_part_0": "подставка (y 0–0,115, ±0,28)",
+    "tripo_part_1": "белые атласные трусы (y 0,45–0,66)",
+    "tripo_part_2": "голова (верх y 0,979)",
+    "tripo_part_4": "торс: грудь, спина, шея (y 0,65–0,89)",
+    "tripo_part_9": "правая рука (x<0): плечо и предплечье до перчатки",
+    "tripo_part_10": "левая рука (x>0): плечо и предплечье до перчатки",
+    "tripo_part_8": "правая перчатка (x<0, красная, перед лицом)",
+    "tripo_part_7": "левая перчатка (x>0, красная, перед лицом)",
+    "tripo_part_3": "правая нога: бедро и голень (x<0, y 0,24–0,46)",
+    "tripo_part_11": "левая нога: бедро и голень (x>0)",
+    "tripo_part_5": "правый ботинок (x<0)",
+    "tripo_part_6": "левый ботинок (x>0)"
+  }
+}

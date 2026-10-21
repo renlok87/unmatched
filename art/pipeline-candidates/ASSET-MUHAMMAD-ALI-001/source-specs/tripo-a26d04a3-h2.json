@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-a26d04a3-h2",
+  "asset_id": "ASSET-MUHAMMAD-ALI-001",
+  "service": "tripo-studio",
+  "task_id": "a26d04a3-71b1-499e-b4c6-7c821ff19120",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/a26d04a3-71b1-499e-b4c6-7c821ff19120",
+  "date": "2026-10-21",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+        "sha256": "4dd1804e89b6221312d3a8b639486d1f9b92f7a12856799d7f69cf0bdd6fcd1e"
+      },
+      "left": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+        "sha256": "3a9330fab24eb07b80dd000d9dfb01cac682cef3242a1b5e7ffea6dbdbbcb10f"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png",
+        "sha256": "889a20fceff2504312af2975c0f0a893d2099375f72f4b545b29ab16bc911c8e"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-muhammad-ali-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 10470.0,
+        "balance_after": 10410.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 10290.0,
+        "balance_after": 10260.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 10235.0,
+        "balance_after": 10230.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-parts12.glb",
+      "expected_sha256": "a278717cc7ffb5cecffafc98b48979ef7a283e1355eeb2f906620b8fb457a0fe",
+      "expected_bytes": 46472448,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-tex8k-pbr.glb",
+      "expected_sha256": "dff2e9ad72f421a7f40955fcfdb02ea9f6d6c85b244958f44760552b63fab36b",
+      "expected_bytes": 79920684,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 1932060,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 1932060,
+      "glb_materials": 12,
+      "glb_images": 36,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

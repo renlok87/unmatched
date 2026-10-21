@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-66eca7a1-h2",
+  "asset_id": "ASSET-SINBAD-001",
+  "service": "tripo-studio",
+  "task_id": "66eca7a1-d1c0-41ee-97c8-c58e047c09d5",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/66eca7a1-d1c0-41ee-97c8-c58e047c09d5",
+  "date": "2026-10-21",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-front.png",
+        "sha256": "8f7933d254377c23601dbd064d36b1f5aa6aaead326e24fcab1857caa2b4d4e6"
+      },
+      "left": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-side.png",
+        "sha256": "8c0a4fd11d4e4103962961c7ac116f0f78eedd01c467475894e3e180321f2cd0"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-back.png",
+        "sha256": "39036668467cd00bb405ac5ab251cc8c770522c553b90e97ce1f9d6d6f09cc40"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-sinbad-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 11140.0,
+        "balance_after": 11080.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 10950.0,
+        "balance_after": 10920.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 10620.0,
+        "balance_after": 10615.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/source/sinbad-h2-tripo-66eca7a1-parts19.glb",
+      "expected_sha256": "d1acfb3d7632d6f26bfadcf9673ff9991b30f4dcd112a499f515c36f6af66261",
+      "expected_bytes": 46991000,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/source/sinbad-h2-tripo-66eca7a1-tex8k-pbr.glb",
+      "expected_sha256": "94e3ff275f88c3fe7f690280392001915bfe0f931450793cab63d889c03c1074",
+      "expected_bytes": 77505064,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 19,
+      "glb_triangles": 1950218,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 19,
+      "glb_triangles": 1950218,
+      "glb_materials": 19,
+      "glb_images": 57,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

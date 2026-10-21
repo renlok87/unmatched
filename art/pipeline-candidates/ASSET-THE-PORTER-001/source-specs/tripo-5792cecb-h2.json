@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-5792cecb-h2",
+  "asset_id": "ASSET-THE-PORTER-001",
+  "service": "tripo-studio",
+  "task_id": "5792cecb-c822-4bed-bf3c-766769467ed5",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/5792cecb-c822-4bed-bf3c-766769467ed5",
+  "date": "2026-10-21",
+  "iteration": "этап 2 3d-model-pipeline: H2 по видам этапа 1c",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач.",
+    "backend": null,
+    "note": "подпись UI формы"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-the-porter-codex/the-porter-front.png",
+        "sha256": "1ae35cc005c6749306d69fefa2496034d39a30d616ff54fc63041a5f0ade920a"
+      },
+      "left": {
+        "path": "art/imagegen/concept-the-porter-codex/the-porter-side.png",
+        "sha256": "ce8adce5267bff76057d5edb817532418d7264599b1f06dbc05270666c4bdecd"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-the-porter-codex/the-porter-back.png",
+        "sha256": "dae03ea26ef92078e8c6ed147c132de887847735291e364e20058d4cb0e4c38c"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/concept-the-porter-codex/prompts.md",
+    "slot_note": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 160.0,
+        "balance_before": 10820.0,
+        "balance_after": 10660.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 10515.0,
+        "balance_after": 10485.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 10.0,
+        "balance_before": 10260.0,
+        "balance_after": 10250.0
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/source/the-porter-h2-tripo-5792cecb-parts18.glb",
+      "expected_sha256": "60fabe54e22e0b7da35305191fe87d827bfa59dc672c24ce1fd30eaee24b1579",
+      "expected_bytes": 45551088,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/source/the-porter-h2-tripo-5792cecb-tex8k-pbr.glb",
+      "expected_sha256": "e151243b42b22a396498841ce942a6a5c3ec3dd41c2598b49c0075cd6ca22739",
+      "expected_bytes": 79406940,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (Удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB не коммитятся (.gitignore ассета *-tripo/source/*.glb); восстанавливаются выгрузкой из Studio по task_url и проверяются по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 18,
+      "glb_triangles": 1890606,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 18,
+      "glb_triangles": 1890606,
+      "glb_materials": 18,
+      "glb_images": 54,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-THE-PORTER-001/20261021-h2-tripo/reports/tripo-run.json",
+    "docs/game-design/visual/credits-ledger.json"
+  ]
+}

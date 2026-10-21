@@ -1,0 +1,629 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "AN-100",
+  "asset_id": "ASSET-SINBAD-001",
+  "date": "2026-10-21",
+  "service": "tripo-studio",
+  "performed_by": "запускающий агент (субагент этапа 2 волны B, Sonnet) в Chrome пользователя через Claude in Chrome (DOM, без курсора): клики формы, цены с кнопки, балансы с шапки Studio, экспорт GLB в Downloads и перенос в source/",
+  "tasks": [
+    {
+      "task_id": "66eca7a1-d1c0-41ee-97c8-c58e047c09d5",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/66eca7a1-d1c0-41ee-97c8-c58e047c09d5"
+    }
+  ],
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, из нескольких видов, H3.1 Макс.кач.",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "views": {
+      "front": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-front.png",
+        "sha256": "8f7933d254377c23601dbd064d36b1f5aa6aaead326e24fcab1857caa2b4d4e6"
+      },
+      "left": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-side.png",
+        "sha256": "8c0a4fd11d4e4103962961c7ac116f0f78eedd01c467475894e3e180321f2cd0"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/concept-sinbad-codex/sinbad-back.png",
+        "sha256": "39036668467cd00bb405ac5ab251cc8c770522c553b90e97ce1f9d6d6f09cc40"
+      }
+    },
+    "slot_mapping": "FRONT=front, LEFT=side, BACK=back, RIGHT пуст",
+    "slot_consistency": "Боковой вид этапа 1c нарисован поверх ortho_left (SIDE_VIEW: left в карточке), подан в слот LEFT: согласовано (tripo3d-stages.md §5.5); второй боковой слот пуст.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": true,
+      "topology": "Треугольник",
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на той же задаче, не настройки генерации геометрии"
+    },
+    "studio_settings_before": "форма Studio стояла на H2-настройках (по частям Баланс, без текстуры, ультра 2M, треугольники, 8K выкл., Private), режим ввода — одно изображение; на время прогона переключена на multi-view",
+    "studio_settings_after": "настройки генерации не менялись; режим ввода формы сбрасывается на одно изображение при загрузке страницы"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "HD модель, из нескольких видов, H3.1 Макс.кач., по частям (Баланс), ультра-сетка 2M, треугольники, без текстуры",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60.0,
+        "balance_before": 11140.0,
+        "balance_after": 11080.0
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, Удалить освещение, по видам задачи, на high-poly модели по частям",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30.0,
+        "balance_before": 10950.0,
+        "balance_after": 10920.0
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": null,
+      "evidence": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5.0,
+        "balance_before": 10620.0,
+        "balance_after": 10615.0
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/source/sinbad-h2-tripo-66eca7a1-parts19.glb",
+      "stage": "generate",
+      "format": "glb",
+      "sha256": "d1acfb3d7632d6f26bfadcf9673ff9991b30f4dcd112a499f515c36f6af66261",
+      "bytes": 46991000,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 19,
+      "triangles": 1950218,
+      "materials": 1,
+      "images": 0,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 353705
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 55719
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 36633
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 31475
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 29636
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 62426
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 51862
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 22708
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 7791
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 3764
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 384047
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 262887
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 156218
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 84794
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 95094
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 52608
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 58257
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 143977
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 56617
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/source/sinbad-h2-tripo-66eca7a1-tex8k-pbr.glb",
+      "stage": "pbr",
+      "format": "glb",
+      "sha256": "94e3ff275f88c3fe7f690280392001915bfe0f931450793cab63d889c03c1074",
+      "bytes": 77505064,
+      "container": "OK",
+      "gltf_version": 2,
+      "generator": "Tripo",
+      "mesh_count": 19,
+      "triangles": 1950218,
+      "materials": 19,
+      "images": 57,
+      "skins": 0,
+      "animations": 0,
+      "primitive_modes": [
+        4
+      ],
+      "meshes": [
+        {
+          "name": "meshes[0]",
+          "triangles": 353705
+        },
+        {
+          "name": "meshes[10]",
+          "triangles": 55719
+        },
+        {
+          "name": "meshes[11]",
+          "triangles": 36633
+        },
+        {
+          "name": "meshes[12]",
+          "triangles": 31475
+        },
+        {
+          "name": "meshes[13]",
+          "triangles": 29636
+        },
+        {
+          "name": "meshes[14]",
+          "triangles": 62426
+        },
+        {
+          "name": "meshes[15]",
+          "triangles": 51862
+        },
+        {
+          "name": "meshes[16]",
+          "triangles": 22708
+        },
+        {
+          "name": "meshes[17]",
+          "triangles": 7791
+        },
+        {
+          "name": "meshes[18]",
+          "triangles": 3764
+        },
+        {
+          "name": "meshes[1]",
+          "triangles": 384047
+        },
+        {
+          "name": "meshes[2]",
+          "triangles": 262887
+        },
+        {
+          "name": "meshes[3]",
+          "triangles": 156218
+        },
+        {
+          "name": "meshes[4]",
+          "triangles": 84794
+        },
+        {
+          "name": "meshes[5]",
+          "triangles": 95094
+        },
+        {
+          "name": "meshes[6]",
+          "triangles": 52608
+        },
+        {
+          "name": "meshes[7]",
+          "triangles": 58257
+        },
+        {
+          "name": "meshes[8]",
+          "triangles": 143977
+        },
+        {
+          "name": "meshes[9]",
+          "triangles": 56617
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "meshes_equal": true,
+    "tris_equal": true
+  },
+  "parts": [
+    {
+      "node": "tripo_part_0",
+      "mesh": "meshes[0]",
+      "tris": 353705,
+      "min": [
+        -0.1693,
+        0.151,
+        -0.1154
+      ],
+      "max": [
+        0.2219,
+        0.5684,
+        0.0743
+      ]
+    },
+    {
+      "node": "tripo_part_1",
+      "mesh": "meshes[1]",
+      "tris": 384047,
+      "min": [
+        -0.1495,
+        0.2084,
+        -0.1114
+      ],
+      "max": [
+        0.1103,
+        0.6417,
+        0.1156
+      ]
+    },
+    {
+      "node": "tripo_part_2",
+      "mesh": "meshes[2]",
+      "tris": 262887,
+      "min": [
+        -0.2592,
+        0.0,
+        -0.2753
+      ],
+      "max": [
+        0.3019,
+        0.0965,
+        0.2753
+      ]
+    },
+    {
+      "node": "tripo_part_3",
+      "mesh": "meshes[3]",
+      "tris": 156218,
+      "min": [
+        -0.092,
+        0.5927,
+        -0.0913
+      ],
+      "max": [
+        0.1381,
+        0.8258,
+        0.0866
+      ]
+    },
+    {
+      "node": "tripo_part_4",
+      "mesh": "meshes[4]",
+      "tris": 84794,
+      "min": [
+        0.0932,
+        0.354,
+        -0.1191
+      ],
+      "max": [
+        0.2455,
+        0.5831,
+        0.0871
+      ]
+    },
+    {
+      "node": "tripo_part_5",
+      "mesh": "meshes[5]",
+      "tris": 95094,
+      "min": [
+        -0.0633,
+        0.5948,
+        -0.1017
+      ],
+      "max": [
+        0.1044,
+        0.8511,
+        0.0788
+      ]
+    },
+    {
+      "node": "tripo_part_6",
+      "mesh": "meshes[6]",
+      "tris": 52608,
+      "min": [
+        -0.1726,
+        0.0938,
+        -0.0755
+      ],
+      "max": [
+        -0.0722,
+        0.1551,
+        0.0897
+      ]
+    },
+    {
+      "node": "tripo_part_7",
+      "mesh": "meshes[7]",
+      "tris": 58257,
+      "min": [
+        -0.3019,
+        0.5066,
+        0.075
+      ],
+      "max": [
+        -0.2007,
+        0.8179,
+        0.2546
+      ]
+    },
+    {
+      "node": "tripo_part_8",
+      "mesh": "meshes[8]",
+      "tris": 143977,
+      "min": [
+        -0.0481,
+        0.744,
+        -0.0911
+      ],
+      "max": [
+        0.1913,
+        0.9788,
+        0.0735
+      ]
+    },
+    {
+      "node": "tripo_part_9",
+      "mesh": "meshes[9]",
+      "tris": 56617,
+      "min": [
+        -0.1787,
+        0.6077,
+        -0.0767
+      ],
+      "max": [
+        -0.0714,
+        0.7916,
+        0.0191
+      ]
+    },
+    {
+      "node": "tripo_part_10",
+      "mesh": "meshes[10]",
+      "tris": 55719,
+      "min": [
+        0.119,
+        0.601,
+        -0.0809
+      ],
+      "max": [
+        0.2222,
+        0.7926,
+        0.013
+      ]
+    },
+    {
+      "node": "tripo_part_11",
+      "mesh": "meshes[11]",
+      "tris": 36633,
+      "min": [
+        0.1676,
+        0.5321,
+        -0.0525
+      ],
+      "max": [
+        0.2611,
+        0.6474,
+        0.0361
+      ]
+    },
+    {
+      "node": "tripo_part_12",
+      "mesh": "meshes[12]",
+      "tris": 31475,
+      "min": [
+        -0.2229,
+        0.544,
+        -0.0251
+      ],
+      "max": [
+        -0.1324,
+        0.6339,
+        0.063
+      ]
+    },
+    {
+      "node": "tripo_part_13",
+      "mesh": "meshes[13]",
+      "tris": 29636,
+      "min": [
+        0.2163,
+        0.4619,
+        -0.0067
+      ],
+      "max": [
+        0.274,
+        0.549,
+        0.0574
+      ]
+    },
+    {
+      "node": "tripo_part_14",
+      "mesh": "meshes[14]",
+      "tris": 62426,
+      "min": [
+        -0.0305,
+        0.6852,
+        -0.0549
+      ],
+      "max": [
+        0.0694,
+        0.9065,
+        0.0645
+      ]
+    },
+    {
+      "node": "tripo_part_15",
+      "mesh": "meshes[15]",
+      "tris": 51862,
+      "min": [
+        0.1163,
+        0.0935,
+        -0.0747
+      ],
+      "max": [
+        0.2182,
+        0.1555,
+        0.0894
+      ]
+    },
+    {
+      "node": "tripo_part_16",
+      "mesh": "meshes[16]",
+      "tris": 22708,
+      "min": [
+        -0.2415,
+        0.5067,
+        0.031
+      ],
+      "max": [
+        -0.1872,
+        0.5783,
+        0.1179
+      ]
+    },
+    {
+      "node": "tripo_part_17",
+      "mesh": "meshes[17]",
+      "tris": 7791,
+      "min": [
+        -0.2121,
+        0.4884,
+        0.0282
+      ],
+      "max": [
+        -0.1781,
+        0.5353,
+        0.0673
+      ]
+    },
+    {
+      "node": "tripo_part_18",
+      "mesh": "meshes[18]",
+      "tris": 3764,
+      "min": [
+        -0.1831,
+        0.5925,
+        -0.0426
+      ],
+      "max": [
+        -0.1241,
+        0.6513,
+        0.0157
+      ]
+    }
+  ],
+  "parts_note": "рамки по вершинам (accessor min/max Tripo не годится: DBL_MIN, F10)",
+  "register_source": {
+    "exit": 0,
+    "out": "register-source: registered tripo-66eca7a1-h2 (2 files, historical spend {'studio-credits': 95.0}; this command spent 0)"
+  },
+  "preview": {
+    "exit": 0,
+    "dir": "art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/preview",
+    "out": "lb --render-dir C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-SINBAD-001\\20261021-h2-tripo\\preview\\draft-orthos-oprmmh6q --views front,left,back,right --res 1152x1536\nOK: 4 видов → art/pipeline-candidates/ASSET-SINBAD-001/20261021-h2-tripo/preview (ortho-framing.json)"
+  },
+  "findings": [
+    "F-B2-5 Генерация multi-view H3.1 «по частям» Баланс, ультра 2M, треугольники: 19 частей, 1 950 218 tris; брака §5.4 нет, повторов нет. Орто parts-GLB (серый, до текстуры) осмотрены до траты на текстуру: одна фигура на одной подставке, сабля в правой руке фигуры (−X, слева на front), ножны на левом бедре, тюрбан с хвостом, кушак, загнутые носы туфель, гарда с дужкой — якоря целы; лишних рук, второго оружия, второго лица, дыр и вывернутых стоп нет.",
+    "F-B2-6 Известное замечание приёмки 1c (V-вырез рубахи на front против стоячего воротника на side) воспроизведено: на front грудь открыта (V-вырез), на профиле воротник стоячий. Этапу 3 держать вырез по front. Золотая кайма на текстуре светлее, чем на листе 1c (#D4A63A у кромки); тона брать из palette.json.",
+    "F-B2-7 Текстура 8K с «Удалить освещение» (вкл., проверено zoom перед кликом) и PBR: 19 материалов, 57 изображений (BC, N, RM на часть), tris равны parts-GLB (1 950 218), skins 0; орто текстурного GLB (preview/) осмотрены: цвета листа 1c (белое, синее, золото, коричневая кожа ножен) на месте, запечённого света нет.",
+    "Роли частей — черновик по габаритам из буфера вершин (parts_roles_draft); подтверждает разведка этапа 3 по частям. Оси glTF: Y вверх, фронт +Z, правая сторона фигуры −X."
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95.0,
+    "ledger": "docs/game-design/visual/credits-ledger.json",
+    "this_hero_total_quoted": 95
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "parts_roles_draft": {
+    "tripo_part_2": "подставка (y 0–0,097, ±0,27)",
+    "tripo_part_6": "туфля правая (x<0, носок загнут)",
+    "tripo_part_15": "туфля левая",
+    "tripo_part_0": "шаровары (353 тыс. tris, y 0,15–0,57)",
+    "tripo_part_1": "синий кушак с хвостами и нижняя юбка жилета (384 тыс. tris)",
+    "tripo_part_3": "торс и рубаха (y 0,59–0,83)",
+    "tripo_part_5": "жилет (передний борт и спина, перевязь) — предположительно",
+    "tripo_part_8": "тюрбан и хвост тюрбана (верх y 0,979)",
+    "tripo_part_14": "голова: лицо и борода",
+    "tripo_part_7": "клинок сабли (правая рука фигуры, −X, вынесена вперёд по +Z)",
+    "tripo_part_16": "гарда и дужка сабли",
+    "tripo_part_17": "навершие рукояти сабли (7,8 тыс. tris)",
+    "tripo_part_12": "правая кисть с рукоятью",
+    "tripo_part_9": "правая рука: рукав и наруч",
+    "tripo_part_10": "левая рука: рукав",
+    "tripo_part_11": "левый наруч (предплечье)",
+    "tripo_part_13": "левая кисть",
+    "tripo_part_4": "ножны сабли на левом бедре (x>0)",
+    "tripo_part_18": "мелкая деталь, правое плечо/наруч (розетка или пряжка), 3,8 тыс. tris — роль не ясна"
+  }
+}
