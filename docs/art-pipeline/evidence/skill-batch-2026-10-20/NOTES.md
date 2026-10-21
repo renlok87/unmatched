@@ -233,3 +233,15 @@ concept-sheet §11 (Opus `card-2.json` 8,1: S 2, C 1,5, Q 1,5, P 1,5). Вход�
   `superseded_by`, файл сохранён как `*-parts11-packuv-unwelded.glb`). Выгрузка — через Claude in Chrome в своей
   вкладке (расширение теперь подключено к Chrome этого компьютера), без мыши и рабочего стола.
 - Правило на будущее (в справочник этапа 2 при доработке скилла): «Pack UV» при экспорте parts — выкл.
+
+## 7b, первый проход регистратора: Bruce Lee + Dr. Watson (2026-10-21, 0b9eee57)
+
+- Регистратор (субагент Opus medium) одним шагом: `Specs()` (Bruce герой, Watson помощник), тесты «ten heroes»,
+  AudioBank BRUCELEE/CLAW и WATSON/ARROW, `HiPolyPath` Брюса, CUE-011/013, cook (7 каталогов, включая HP2 Брюса),
+  `S08FighterNames.json` (bruce-lee; sherlock-holmes целиком с «Доктор Ватсон»), bench-фикстуры обеих досок,
+  de010 Contact и de011 dissolve-MIC, записи `asset-registry.json`. Сборка UnmatchedEditor — Succeeded,
+  Unmatched.S08 401/401, `registration_check --heroes BruceLee,DrWatson` код 0. Упаковки нет — ждёт Шерлока.
+- Решение оркестратора по витрине: `HiPolyPath` Брюса оставлен в коде, слепой раунд «было/стало» (X/Y: пакет с
+  витриной и с `-S08ShowcaseV2`) — до отчёта о волне; провал → удалить строку. HP2 в git не идёт (как KingArthur).
+- Открыто к упаковке: проход регистратора для Шерлока; одна упаковка; кадры `-Bench` обеих досок; лист AN-18;
+  слой `live-packaged-probe`; строки `03-asset-registry.csv`; неиспользуемый материал подставки Tripo в HP2 (~61 МБ).
