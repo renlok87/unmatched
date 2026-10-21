@@ -1,0 +1,124 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-THE-PORTER-001",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-the-porter-codex/the-porter-front.png",
+      "sha256": "1ae35cc005c6749306d69fefa2496034d39a30d616ff54fc63041a5f0ade920a"
+    },
+    {
+      "path": "art/imagegen/concept-the-porter-codex/the-porter-side.png",
+      "sha256": "ce8adce5267bff76057d5edb817532418d7264599b1f06dbc05270666c4bdecd"
+    },
+    {
+      "path": "art/imagegen/concept-the-porter-codex/the-porter-back.png",
+      "sha256": "dae03ea26ef92078e8c6ed147c132de887847735291e364e20058d4cb0e4c38c"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-the-porter-codex",
+    "files": [
+      "sheet-the-porter.png",
+      "the-porter-front.png",
+      "the-porter-side.png",
+      "the-porter-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-the-porter-codex/checks-report.json",
+    "art/imagegen/concept-the-porter-codex/generation-records.json",
+    "art/imagegen/concept-the-porter-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-the-porter-codex/checks-report.json",
+      "note": "check_concept_views.py: verdict PASS, summary PASS 33 / WARN 0 / FAIL 0; sha256 трёх входов в отчёте совпадают с accepted_object. Близко к порогу WARN, но ниже него: set.height 2.955 % (WARN > 3.0) и set.base_bottom 1.375 % (WARN > 1.5). Оба значения учтены в C."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Силуэт ясный на всех трёх видах, поза по разделу 4.4, не T и не A. the-porter-front.png: дубинка в правой руке вынесена вбок от корпуса; левая рука опущена и отделена просветом (у сумки он узкий); корзина с тюком выступает над плечами и по бокам; хвост красного платка читается. the-porter-side.png: строгий левый профиль; дубинка вынесена вперёд в дальней правой руке; корзина за спиной, платок с хвостом на ближней стороне. Ближняя рука в профиле лежит вдоль корпуса, что для профиля естественно. the-porter-back.png: блок корзины, обе руки отделены от туловища, дубинка справа для зрителя торчит над рукой, ноги и подставка читаются. Голову сзади закрывает тюк, видна только красная макушка платка; так устроены и утверждённый дизайн, и орто 1b, это не дефект. Тонкие части помечены для этапов 3–4: бахрома хвоста платка, рваные подолы туники и кушака, верёвочные лямки, обмотка на рукояти дубинки.",
+      "frames": [
+        "the-porter-front.png",
+        "the-porter-side.png",
+        "the-porter-back.png",
+        "sheet-the-porter.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На трёх видах совпадают поза, пропорции, все якоря и сторона оружия. Дубинка в собственной правой руке: в the-porter-front.png слева для зрителя, в the-porter-back.png справа, в the-porter-side.png в дальней руке, как положено для левого профиля по SIDE_VIEW left и ortho_left. По sheet-the-porter.png верх дубинки на всех видах около 26 % кадра, хват и нижний конец на одной высоте. На одной высоте и общие детали костюма: заплата на левом рукаве, сумка на левом бедре, концы кушака, хвост платка на левой стороне. Совпадают и высота обода и дна корзины, ширина корзины спереди и сзади, низ подола. Профиль и вид сзади строгие. the-porter-front.png почти дословно повторяет утверждённый design/the-porter-front.png. Мелкие расхождения: (1) the-porter-front.png выведен в масштабе около 0,965 от бокового и заднего видов и рамки орто: высота 87,6 % против 90,2 %, ширина подставки 71,2 % против 73,6–73,9 %, низ подставки 92,8 % против 94,1 %; это чуть ниже порогов WARN; (2) красно-бурый мешок на тюке виден только в the-porter-side.png; (3) крестообразный мотив плетения в центре задней стенки корзины в the-porter-back.png унаследован от рельефа ortho_back; (4) рисунок заплат сзади свой. Это уровень мелких расхождений, поэтому 1,5, а не 2.",
+      "frames": [
+        "sheet-the-porter.png",
+        "the-porter-front.png",
+        "the-porter-side.png",
+        "the-porter-back.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Детализация на уровне эталона medusa-quality-reference.png: расписанная коллекционная миниатюра, детали лежат внутри силуэта. Плетение корзины проработано по прутьям. У верёвок видны волокна. Заплаты прошиты видимыми стежками, края туники и кушака обтрёпаны. У кожаной сумки есть клапан и швы, голени обмотаны, на башмаках ремешки. На лице морщины, борода с фактурой, на предплечьях вены и волосы. Материалы ткани, кожи, дерева и лозы хорошо различаются. Так выглядят все три вида: the-porter-front.png, the-porter-side.png, the-porter-back.png. Беднее только гладкая ткань тюка и простая каменная подставка, она такая же, как в эталоне. Артефактов генерации нет: кисти с пятью пальцами, лишних конечностей и предметов нет, надписей и водяного знака не видно.",
+      "frames": [
+        "the-porter-front.png",
+        "the-porter-side.png",
+        "the-porter-back.png",
+        "sheet-the-porter.png"
+      ]
+    },
+    "P": {
+      "value": 2,
+      "rationale": "Палитра совпадает с PALETTE, свотчи листа sheet-the-porter.png сходятся с фигурой. Туника в заплатах тона patched brown #7B5B3A. Корзина цвета wicker #B79A62; на освещённых прутьях тон чуть теплее и насыщеннее, в пределах света и покраски. Шаровары, кушак, рукава и тюк dusty cream #D8CBAF. Платок дает акцент red headcloth #A8382E. Командного цвета и кольца на подставке нет. Все якоря на месте, где они видимы: короткая деревянная дубинка в собственной правой руке (the-porter-front.png, the-porter-side.png, the-porter-back.png), плетёная корзина на спине на всех видах, головной платок спереди и в профиле, сзади видна его макушка. По checks-report.json все четыре свотча найдены на фигуре.",
+      "frames": [
+        "sheet-the-porter.png",
+        "the-porter-front.png",
+        "the-porter-side.png",
+        "the-porter-back.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "the-porter-front.png",
+      "note": "Передний вид выведен в масштабе около 0,965 от бокового, заднего и рамки орто: высота 87,6 % против 90,2 %, ширина подставки 71,2 % против 73,6–73,9 %, низ подставки 92,8 % против 94,1 %. Значения чуть ниже WARN: set.height 2.955, set.base_bottom 1.375. Если этап 2 требует точной регистрации видов, выровнять масштаб front по ширине подставки."
+    },
+    {
+      "item": "C",
+      "frame": "the-porter-back.png",
+      "note": "В центре задней стенки корзины крестообразный мотив плетения, похож на штопку. Он унаследован от рельефа ortho_back черновика 1b, на других видах его не видно. На этапе 3 оставить как ремонт плетения или упростить до ровного плетения."
+    },
+    {
+      "item": "C",
+      "frame": "the-porter-side.png",
+      "note": "Красно-бурый мешок наверху тюка виден только в профиле; спереди и сзади тюк кремовый с серой верёвкой. Мелкое расхождение, на этапе 3 выбрать один вариант."
+    },
+    {
+      "item": "S",
+      "frame": "the-porter-back.png",
+      "note": "Сзади голову закрывает тюк, видна только красная макушка платка; так в дизайне и в орто 1b. Для камеры сверху на этапах 3–4 держать макушку платка выше тюка. Тонкие части для этапов 3–4: бахрома хвоста платка, рваные подолы туники и кушака, верёвочные лямки, обмотка рукояти дубинки."
+    },
+    {
+      "item": "P",
+      "frame": "sheet-the-porter.png",
+      "note": "На освещённых прутьях корзина чуть теплее и насыщеннее свотча wicker #B79A62, в пределах света. На look-dev проверить тон лозы по свотчу."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-THE-PORTER-001-r1"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261021",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Лист 1c ASSET-THE-PORTER-001 r1, вердикт pass, score 9.4 (S 2, C 1.5, Q 2, P 2), гейт G-CHECKS PASS. Балл выше полосы 8,0–8,4, второй приёмщик не нужен. Художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Замечания для этапов 2–4 в known_issues."
+}

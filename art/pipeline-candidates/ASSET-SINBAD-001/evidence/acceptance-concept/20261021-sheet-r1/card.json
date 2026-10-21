@@ -1,0 +1,119 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-SINBAD-001",
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-sinbad-codex/sinbad-front.png",
+      "sha256": "8f7933d254377c23601dbd064d36b1f5aa6aaead326e24fcab1857caa2b4d4e6"
+    },
+    {
+      "path": "art/imagegen/concept-sinbad-codex/sinbad-side.png",
+      "sha256": "8c0a4fd11d4e4103962961c7ac116f0f78eedd01c467475894e3e180321f2cd0"
+    },
+    {
+      "path": "art/imagegen/concept-sinbad-codex/sinbad-back.png",
+      "sha256": "39036668467cd00bb405ac5ab251cc8c770522c553b90e97ce1f9d6d6f09cc40"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-sinbad-codex",
+    "files": [
+      "sheet-sinbad.png",
+      "sinbad-front.png",
+      "sinbad-side.png",
+      "sinbad-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-sinbad-codex/checks-report.json",
+    "art/imagegen/concept-sinbad-codex/generation-records.json",
+    "art/imagegen/concept-sinbad-codex/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-sinbad-codex/checks-report.json",
+      "note": "check_concept_views.py: summary PASS 33 / WARN 0 / FAIL 0, verdict PASS; код 0 (verification.json stage_1c.checks, set final, exit_code 0). Рост 91,2–91,3 %, низ подставки и центр по одной линии (0,125 % / 0,112 %)."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "S 2: ясный силуэт на всех трёх видах. sinbad-front.png и sinbad-back.png: обе руки отделены от корпуса просветами, локти согнуты, широкая боевая стойка с поднятой саблей — не T- и не A-поза; сабля целиком на фоне, клинок, дужка гарды и навершие читаются; белый тюрбан с синим хвостом, пустые ножны на левом бедре выходят за контур шаровар. sinbad-side.png: строгий левый профиль, клинок вынесен вперёд и весь на фоне, ножны на ближнем (левом) бедре. Лишних или недостающих частей нет (одна голова, одно оружие, ножны пустые). Тонкие части для этапов 3–4: остриё и дужка гарды сабли, загнутые носы туфель, бахрома кушака, хвост тюрбана; на sinbad-side.png ближняя левая кисть касается устья ножен, кисть с саблей проходит у переднего края кушака — так же в орто 1b ortho_left.",
+      "frames": [
+        "sinbad-front.png",
+        "sinbad-side.png",
+        "sinbad-back.png",
+        "sheet-sinbad.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "C 1,5: поза, пропорции, якоря и сторона оружия совпадают на всех видах и с орто 1b (ortho_front/left/back): сабля в собственной правой руке (зритель слева на sinbad-front.png, справа на sinbad-back.png, дальняя рука вперёд на sinbad-side.png), ножны на левом бедре, перевязь с правого плеча к левому бедру спереди и сзади, хвост тюрбана на левом плече на всех трёх видах, длинная синяя пола справа (front и back), центральная кремовая пола с бахромой сзади как в ortho_back; рост 91,2–91,3 %, подставка по одной вертикали; sinbad-side.png — строгий профиль левой стороны (SIDE_VIEW left), sinbad-back.png — строго сзади, лица нет. WARN нет. Снижение до 1,5 за мелкие расхождения: на sinbad-front.png рубаха распахнута глубоким V с открытой грудью, а на sinbad-side.png передний контур груди — кремовая рубаха со стоячим воротом без открытой кожи; фактура ткани разная (мраморная на front, перьевая штриховка на back, тюрбан на back глаже); золотая розетка видна на обоих наручах на back, на правом наруче front её нет. Вид спереди 1c исправил ракурс дизайна 1a: камера ровно, подставка ребром.",
+      "frames": [
+        "sinbad-front.png",
+        "sinbad-side.png",
+        "sinbad-back.png",
+        "sheet-sinbad.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Q 2: уровень эталона medusa-quality-reference — расписанная коллекционная миниатюра на каменной подставке: гравированный клинок с вьющимся орнаментом, золотая вышивка-завитки по жилету и поле, медальон со львом на перевязи, кожаный ремень с заклёпками и пряжками, наручи с розеткой, ножны с золотыми накладками и наконечником, тиснёные туфли, бахрома, фактура ткани и проработанное лицо с короткой чёрной бородой; детали лежат внутри силуэта на sinbad-front.png, sinbad-side.png, sinbad-back.png и читаются в 672 px на sheet-sinbad.png. Крупные поля шаровар несут складки и фактуру, как платье эталона.",
+      "frames": [
+        "sinbad-front.png",
+        "sinbad-side.png",
+        "sinbad-back.png",
+        "sheet-sinbad.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "P 1,5: все цвета PALETTE есть и все якоря видимы: sail white — тюрбан, рубаха, шаровары; sea blue — жилет, кушак, полоса тюрбана; sun-bleached tan — загорелая кожа и светлая кожаная отделка; gold trim — кайма, гарда, накладки ножен; свотчи sheet-sinbad.png совпадают с фигурой по семействам. Отклонение тона: золото на фигуре темнее и теплее (античная бронза) свотча #D4A63A — доля пикселей в пределах 40 лишь 0,03 % (checks-report.json, palette), синий на свету светлее и приглушённее #2E5C8A (1,95 %). Якоря ANCHORS_EN — сабля в собственной правой руке, белый тюрбан, широкий синий кушак, ножны на левом бедре — на месте на sinbad-front.png, sinbad-side.png, sinbad-back.png там, где видимы.",
+      "frames": [
+        "sheet-sinbad.png",
+        "sinbad-front.png",
+        "sinbad-side.png",
+        "sinbad-back.png",
+        "checks-report.json"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "C",
+      "frame": "sinbad-side.png",
+      "note": "Глубокий V-вырез рубахи с открытой грудью с sinbad-front.png не переходит в профиль: на side стоячий ворот, кожи нет (так же в ortho_left). Этапу 3 держать вырез по front и дизайну 1a."
+    },
+    {
+      "item": "C",
+      "frame": "sinbad-back.png",
+      "note": "Фактура ткани отличается от front (перьевая штриховка против мраморной), тюрбан глаже; золотая розетка на правом наруче видна только сзади. Мелочь орнамента, на силуэт не влияет."
+    },
+    {
+      "item": "P",
+      "frame": "sheet-sinbad.png",
+      "note": "Золотая кайма отрисована тёмной античной бронзой против свотча #D4A63A (доля 0,03 %), синий на свету светлее #2E5C8A; на look-dev брать тона из palette.json, а не пипеткой с концепта."
+    },
+    {
+      "item": "S",
+      "frame": "sinbad-side.png",
+      "note": "Тонкие части для этапов 3–4: остриё и дужка гарды сабли, загнутые носы туфель, бахрома кушака и хвост тюрбана; в профиле левая кисть касается устья ножен, кисть с саблей у переднего края кушака."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-ASSET-SINBAD-001-r1"
+  },
+  "executor_session_id": "launcher:stage-1c-sheet-20261021",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "1c r1 Sinbad: художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). S 2 + C 1,5 + Q 2 + P 1,5 = 7/8 → 8,8, выше полосы 8,0–8,4, второй приёмщик не нужен; G-CHECKS PASS (FAIL 0, WARN 0)."
+}
