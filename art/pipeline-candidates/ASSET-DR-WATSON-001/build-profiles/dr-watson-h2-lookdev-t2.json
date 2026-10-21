@@ -1,0 +1,704 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "dr-watson-h2-lookdev/2",
+ "asset_id": "ASSET-DR-WATSON-001",
+ "status": "предложено",
+ "status_note": "t2: + лента котелка в классе silk (TeamAccent). Look-dev этапа 3 (мини-пачка 2026-10-20) на bake-прогоне 20261020-h2-bake: классы библиотеки v1 по зонам концепта, усиления — 3 итерации ld_measure на разведке (C:/tmp/dr-watson-stage3-scout/ld-s1…ld-s3, якорь wool_coarse; металлы демпфированно, золото — подсказка после потолка канала), F0 металлов из концепта этого прогона (metal_f0 self, v2). Не художественная приёмка.",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-bake-h2.json",
+  "run": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake",
+  "prefix": "T_DrWatson_H2",
+  "files": {
+   "BC": "textures/T_DrWatson_H2_BC.png",
+   "ORM": "textures/T_DrWatson_H2_ORM.png",
+   "TeamMask": "textures/T_DrWatson_H2_TeamMask.png",
+   "N": "textures/T_DrWatson_H2_N.png",
+   "N_OpenGL": "textures/T_DrWatson_H2_N_OpenGL.png",
+   "2K_N": "textures/T_DrWatson_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_DrWatson_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_DrWatson_H2_BC.png",
+   "baseline_ORM": "textures/T_DrWatson_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_DrWatson_H2.fbx",
+   "base_fbx": "export/SM_DrWatson_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "20c29fb04ab89a49665c835542b55b3ac72ab29226ed79f08a3e5c28b0e65242",
+   "ORM": "61dfaa2f1c3fb551e892ee2428336488159545ab3e042a016a1a175a4fe3ff49",
+   "TeamMask": "f04cdf647f6f898ad436c425ee2a349d5b20956424db84c03eeca5d3e4a1bbba",
+   "N": "d1d37911746efe80f61fb9e4d7f31324975190fc5f6c5368fd43ca92947196f0",
+   "N_OpenGL": "bb035ed89c27088c039b5a65c70ee9822d44cf3f1fc5c9d5d4da405edb23363b",
+   "2K_N": "d4a91900b945841d02b95b872b5ad3f105cf27a31973af93b87070e1952d9428",
+   "2K_N_OpenGL": "867c51e67361d0f68c84081baffaf6b006883dc64946ce0b07321c5e20d66307",
+   "baseline_BC": "20c29fb04ab89a49665c835542b55b3ac72ab29226ed79f08a3e5c28b0e65242",
+   "baseline_ORM": "61dfaa2f1c3fb551e892ee2428336488159545ab3e042a016a1a175a4fe3ff49",
+   "part_ids": "df39e0240b988a4a4d694bfdeab4a95c2506e000d4a241eefcbb7d2e215a6d24",
+   "metal_mask": "88ce6177f708ea95c056859d071c6af82e30ba56fd63cbc59231768218951ec1",
+   "position": "0724f02f43ec9b726a9d2485972d704c89b6104417344aed7f2f51d495deeed7",
+   "island_ids": "ec52c92758916db2960354f9923a183f1f6cf3d9aa6feb0e0bb8e24b7fe2404e",
+   "sk_authored": "73a0780209bc3f175b0c06a78e02eade256fbcb389ba3f28bd7464387c8c711b",
+   "skeletal_fbx": "924514b6630280f0a5431ab571602aa30134e3fe1607cfefe17685f011ec0e95",
+   "base_fbx": "4458056c05edfd2c670c44df4bc1cafe359b7293f3a5ad918fa8b45dcbcce12c"
+  }
+ },
+ "prefix": "T_DrWatson_H2LD",
+ "lut_name": "T_UM_MatLUT_Watson",
+ "lut_hero": "Watson",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_DrWatson_H2LD.fbx",
+  "base_fbx": "SM_DrWatson_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [
+  "wool_coarse"
+ ],
+ "team_dye_note": "TeamMask.R (устаревшая маска W4-B: пальто по HSV стадии textures) остаётся только на классе пальто; цвет команды героя — TeamAccent (профиль dr-watson-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1: пальто, рукава, брюки и котелок — wool_coarse (шерсть и фетр; брюки — тот же бурый тон, что пальто, один класс держит их соотношение из BC Tripo; котелок вне замера тона — render_gate по насыщенности); жилет, галстук и лента котелка — silk (лента — правило hat_band по геометрии тульи); воротник и манжеты рубашки — linen; саквояж — leather_worn; ботинки — leather_smooth; латунная фурнитура саквояжа и цепочка часов — gold_antique; револьвер — steel_blued (маска металла H2.1; тёмная воронёная сталь концепта, F34: класс по отделке концепта); рукоять — wood; лицо, шея и кисти — skin; волосы, усы и глаза — legacy_bake; подставка — stone_base",
+  "part_default": {
+   "0": "stone_base",
+   "1": "wool_coarse",
+   "2": "wool_coarse",
+   "3": "leather_worn",
+   "4": "wool_coarse",
+   "5": "wool_coarse",
+   "6": "wool_coarse",
+   "7": "wool_coarse",
+   "8": "legacy_bake",
+   "9": "wool_coarse",
+   "10": "silk",
+   "11": "leather_smooth",
+   "12": "wood",
+   "13": "skin",
+   "14": "skin",
+   "15": "leather_smooth",
+   "16": "linen",
+   "17": "silk",
+   "18": "legacy_bake",
+   "19": "wood"
+  },
+  "rules": [
+   {
+    "name": "face_skin",
+    "parts": [
+     8
+    ],
+    "hsv": {
+     "hue_deg": [
+      5,
+      34
+     ],
+     "s_min": 0.15,
+     "s_max": 0.6,
+     "v_min": 0.45
+    },
+    "class": "skin",
+    "note": "лицо (передняя полуплоскость, между подбородком и полями котелка)",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       -0.012,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       -1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.378
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.413
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "min_m": 0.0
+     }
+    ]
+   },
+   {
+    "name": "hat_band",
+    "parts": [
+     9
+    ],
+    "class": "silk",
+    "half_spaces": [
+     {
+      "point_m": [
+       0,
+       0,
+       0.4228
+      ],
+      "normal": [
+       0,
+       0,
+       1
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0,
+       0,
+       0.4285
+      ],
+      "normal": [
+       0,
+       0,
+       -1
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.025,
+       0,
+       0
+      ],
+      "normal": [
+       -1,
+       0,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       -0.025,
+       0,
+       0
+      ],
+      "normal": [
+       1,
+       0,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0,
+       0.027,
+       0
+      ],
+      "normal": [
+       0,
+       -1,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0,
+       -0.027,
+       0
+      ],
+      "normal": [
+       0,
+       1,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.01874,
+       0.01874,
+       0
+      ],
+      "normal": [
+       -0.70711,
+       -0.70711,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       -0.01874,
+       -0.01874,
+       0
+      ],
+      "normal": [
+       0.70711,
+       0.70711,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.01874,
+       -0.01874,
+       0
+      ],
+      "normal": [
+       -0.70711,
+       0.70711,
+       0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       -0.01874,
+       0.01874,
+       0
+      ],
+      "normal": [
+       0.70711,
+       -0.70711,
+       0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "лента котелка: тулья над полями, z 0,4228–0,4285 м, восьмиугольная призма |x| ≤ 0,025, |y| ≤ 0,027, по диагоналям ≤ 0,0265 м — поля, загнутые по бокам до r 0,028–0,030 на z 0,426, в неё не входят (замер position.npy bake-прогона)"
+   },
+   {
+    "name": "shirt_cuff",
+    "parts": [
+     5,
+     7,
+     13,
+     14
+    ],
+    "hsv": {
+     "s_max": 0.2,
+     "v_min": 0.6
+    },
+    "class": "linen",
+    "note": "белые манжеты рубашки у кистей"
+   },
+   {
+    "name": "gold_bag",
+    "parts": [
+     3
+    ],
+    "hsv": {
+     "hue_deg": [
+      26,
+      45
+     ],
+     "s_min": 0.55,
+     "v_min": 0.55
+    },
+    "class": "gold_antique",
+    "note": "латунная рамка и замок саквояжа (светлее и насыщеннее кожи: s ≥ 0,55, v ≥ 0,55)"
+   },
+   {
+    "name": "gold_chain",
+    "parts": [
+     10
+    ],
+    "hsv": {
+     "hue_deg": [
+      26,
+      50
+     ],
+     "s_min": 0.5,
+     "v_min": 0.6
+    },
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.292
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.33
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "class": "gold_antique",
+    "note": "цепочка часов на жилете (z 0,292–0,33 м, ярче охры жилета)"
+   },
+   {
+    "name": "steel",
+    "metal_min": 0.5,
+    "class": "steel_blued",
+    "note": "маска металла H2.1: револьвер; концепт — тёмная воронёная сталь (sRGB p50 ≈ 59/54/51), не светлый полированный никель Tripo"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [
+   "gold_antique",
+   "steel_blued"
+  ],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "gold_antique": {
+    "rgb": [
+     2.5814,
+     3.9406,
+     5.2354
+    ],
+    "scout_iter1": [
+     2.5098,
+     4.1473,
+     18.5111
+    ],
+    "note": "металл — подсказка итерации 2 разведки (ld-s2) после потолка канала 0,92 (metal_cap); итерация 1 — полная подсказка (H2LD в превью почти чёрное 53/25/2 против концепта 139/95/50)"
+   },
+   "leather_smooth": {
+    "rgb": [
+     0.5636,
+     0.5636,
+     0.5174
+    ],
+    "scout_iter1": [
+     0.5636,
+     0.5636,
+     0.5174
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "leather_worn": {
+    "rgb": [
+     0.5885,
+     0.5793,
+     0.5111
+    ],
+    "scout_iter1": [
+     0.5885,
+     0.5793,
+     0.5111
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "legacy_bake": {
+    "rgb": [
+     0.7283,
+     0.6617,
+     0.5687
+    ],
+    "scout_iter1": [
+     0.7283,
+     0.6617,
+     0.5687
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "linen": {
+    "rgb": [
+     1.4053,
+     1.4064,
+     1.3578
+    ],
+    "scout_iter1": [
+     1.4053,
+     1.4064,
+     1.3578
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "silk": {
+    "rgb": [
+     1.162,
+     1.2018,
+     1.1962
+    ],
+    "scout_iter1": [
+     1.162,
+     1.2018,
+     1.1962
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "skin": {
+    "rgb": [
+     1.1932,
+     0.9408,
+     0.7165
+    ],
+    "scout_iter1": [
+     1.1932,
+     0.9408,
+     0.7165
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "steel_blued": {
+    "rgb": [
+     0.5454,
+     0.4634,
+     0.3985
+    ],
+    "scout_iter1": [
+     0.4286,
+     0.3398,
+     0.2724
+    ],
+    "scout_iter2": [
+     0.4545,
+     0.3685,
+     0.3044
+    ],
+    "note": "металл — демпфированно: итерация 2 × корень остатка итерации 2 (разведка ld-s2: H2LD 97/90/87 против концепта 77/68/63); HANDBOOK §4.4"
+   },
+   "stone_base": {
+    "rgb": [
+     0.7397,
+     0.6964,
+     0.6666
+    ],
+    "scout_iter1": [
+     0.7397,
+     0.6964,
+     0.6666
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "wood": {
+    "rgb": [
+     0.568,
+     0.5075,
+     0.3894
+    ],
+    "scout_iter1": [
+     0.568,
+     0.5075,
+     0.3894
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   },
+   "wool_coarse": {
+    "rgb": [
+     0.9352,
+     1.0311,
+     1.3121
+    ],
+    "scout_iter1": [
+     0.9352,
+     1.0311,
+     1.3121
+    ],
+    "note": "итерация 1 разведки C:/tmp/dr-watson-stage3-scout/ld-s1 (ld_measure, якорь wool_coarse): подсказка concept / H2LD"
+   }
+  },
+  "gains_note": "итерации ld_measure (≤ 3): подсказка concept / H2LD; металл — демпфированно (HANDBOOK §4.4). t_cap разведки: ld-s1 1,0 (9 классов вне допуска) → ld-s2 1,5 (вне: gold_antique 0,36, steel_blued 1,55) → ld-s3 1,5 (вне: gold_antique 0,33 — латунь и цепочка 336 px рендера, медиана смешана с соседями, ярче не даёт потолок канала металла 0,92)"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-dr-watson-codex/dr-watson-front.png",
+  "side": "art/imagegen/concept-dr-watson-codex/dr-watson-side.png",
+  "back": "art/imagegen/concept-dr-watson-codex/dr-watson-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по зонам Watson",
+   "wool_coarse": {
+    "mask_px": -4,
+    "hue_deg": [
+     [
+      12,
+      40
+     ]
+    ],
+    "s_min": 0.3,
+    "v_min": 0.12,
+    "render_gate": true,
+    "note": "бурое пальто и брюки; котелок (s < 0,15) вне замера с обеих сторон"
+   },
+   "silk": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      22,
+      45
+     ]
+    ],
+    "s_min": 0.45,
+    "v_min": 0.3,
+    "render_gate": true,
+    "note": "охристый жилет; тёмный галстук вне замера"
+   },
+   "linen": {
+    "mask_px": -2,
+    "s_max": 0.25,
+    "v_min": 0.55
+   },
+   "leather_worn": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      5,
+      40
+     ]
+    ],
+    "s_min": 0.2,
+    "v_min": 0.08,
+    "v_max": 0.55
+   },
+   "leather_smooth": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      5,
+      40
+     ]
+    ],
+    "s_min": 0.25,
+    "v_min": 0.08,
+    "v_max": 0.55
+   },
+   "gold_antique": {
+    "mask_px": 3,
+    "hue_deg": [
+     [
+      24,
+      55
+     ]
+    ],
+    "s_min": 0.4,
+    "v_min": 0.35
+   },
+   "steel_blued": {
+    "mask_px": 2,
+    "s_max": 0.25,
+    "v_min": 0.06
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      5,
+      35
+     ]
+    ],
+    "s_min": 0.15,
+    "s_max": 0.6,
+    "v_min": 0.4
+   },
+   "wood": {
+    "mask_px": 2,
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.25,
+    "v_min": 0.1
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.5
+   },
+   "legacy_bake": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.2,
+    "render_gate": true,
+    "note": "волосы и усы"
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "bowler",
+   "hand_r_grip",
+   "revolver",
+   "hand_l_bag",
+   "waistcoat",
+   "shoe_l",
+   "coat_back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-dr-watson-codex/checks-report.json",
+  "side": "left"
+ },
+ "history": {
+  "previous_profiles": [
+   "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2-lookdev.json"
+  ],
+  "note": "t2: лента котелка — класс silk (правило hat_band), чтобы TeamAccent читался с K2 сверху: один галстук давал 0,27 % площади и с K2 не виден (голова над ним); усиления и прочие классы — как в профиле 1; прогон 20261020-h2-lookdev не тронут"
+ },
+ "metal_f0": {
+  "anchor_class": "skin",
+  "note": "F0 металлов из концепта этого прогона (concept_report self, v2, C18); якорь skin",
+  "classes": {
+   "steel_blued": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   },
+   "gold_antique": {
+    "worn": {
+     "y_ratio": 2.5
+    }
+   }
+  }
+ }
+}

@@ -21,7 +21,13 @@ QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
   - art/imagegen/hero-quality-v1/merlin/
 ASSET_DIR: art/pipeline-candidates/ASSET-DR-WATSON-001
-decided_by: delegated (ВР-реестр 2026-10-06)
+decided_by:                         # один ключ на файл (SKILL.md §7.2, F49); прежнее значение этапа 0 — ключ stage0
+  "stage0": "delegated (ВР-реестр 2026-10-06)"
+  "stage3.base": "delegated (Merlin H2, Base_Sidekick; W2-c): подставка помощника Ø0,24 × 0,05 м; двухъярусная — кольцо по высоте base_band.height_m [0,003; 0,028] (боковина нижнего яруса); в профиле импорта 7a — ue.base_material_mode vertex-mask, VertexMaskWeight 1, SideBandWeight 0 (как Beowulf)"
+  "stage3.weights": "delegated (П3-1, П3-2, П3-3): низ рукояти (часть 19) жёстко на weapon.R; саквояж жёстко на hand.L без новой кости; пальто (две полы-листа), брюки (открыты сзади под пальто) и воротник рубашки — rig.cloth_shell; проймы пальто ↔ рукава — стык весов rig.junctions (левая 0,036, правая 0,03 м, подбор по seams разведки); голова, усы, котелок и воротник — zblend/rigid head"
+  "stage3.metal": "delegated (HANDBOOK §2.4, §4.4): маска металла H2.1 — сталь револьвера (target #B8BEC4); look-dev класс steel_blued (концепт — тёмная воронёная сталь, F34), латунь саквояжа и цепочка — gold_antique по цвету; F0 металлов из концепта этого прогона (metal_f0 self)"
+  "stage3.classes": "delegated: пальто, рукава, брюки — wool_coarse; жилет, галстук и лента котелка — silk; воротник, манжеты и фетр котелка — linen (котелок в wool_coarse синел от усиления пальто, look-dev t3); саквояж leather_worn, ботинки leather_smooth, рукоять wood"
+  "stage3.teamaccent": "delegated (П3-4): ribbon — лента котелка (silk, часть 9) 0,52 % площади, area_share_range [0,005; 0,12]; K2 5× спереди 1,30 %, сзади 1,23 % — порог 0,01 по умолчанию (П3-4a не нужен); галстук не красится: с P1 против охристого жилета dE 5,3 < 15"
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
 POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}
 CREDITS:
@@ -38,7 +44,7 @@ OWNER_HERO_SLUG: null
 WEAPON_BONE: "weapon.R"
 WEAPON_SOCKET_BONE: null
 FIGURE_HEIGHT_M: 0.45
-FIGURE_BOUNDS_TOP_M: null           # пишет этап 3 по rig-report.json#bounds_authored_m (F49)
+FIGURE_BOUNDS_TOP_M: 0.45           # этап 3: rig-report.json#bounds_authored_m.skeletal[1][2] = 0.45004 (верх котелка; револьвер ниже, 0,396)
 FIGURE_HEIGHT_RANGE_M: [0.40, 0.48]
 IDLE_SECONDS: 2.3333
 LUNGE_CONTACT_FRAME: 8
@@ -83,3 +89,16 @@ decided_by_stage0:
   UE_NAMES: "delegated (§7.2)"
   QUALITY_REFERENCE: "delegated (§7.2): помощник → merlin"
   MOTION_SOURCE: "delegated (ДС-6): образец решает этап 6"
+# --- блок этапа 3 (исполнитель этапа 3, 2026-10-21; RA-22) ---
+STAGE3:
+  profile_version: 2
+  bake_run: "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-bake"
+  lookdev_run: "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t3"
+  teamaccent_run: null              # TeamAccent записан в lookdev_run (профиль dr-watson-h2-lookdev-teamaccent.json)
+  profiles: ["build-profiles/dr-watson-h2-bake-h2.json", "build-profiles/dr-watson-h2-lookdev-t3.json",
+             "build-profiles/dr-watson-h2-lookdev-teamaccent.json"]
+  superseded_runs: "до приёмки (суффикс -t, SKILL.md §9): look-dev 20261020-h2-lookdev (профиль dr-watson-h2-lookdev.json: без ленты котелка) → -t2 (лента котелка в классе silk для TeamAccent; галстук один давал 0,27 % и с K2 не виден; в -t2 шли разведочные прогоны TeamAccent — их файлы удалены) → -t3 (живой: фетр котелка linen вместо wool_coarse — синий оттенок котелка от усиления пальто); bake — один прогон, разведка C:/tmp/dr-watson-stage3-scout (run1–run12, удалена)"
+  handover: "HANDBOOK §4.4: тон _tone.py t_cap 1,5 (код 2) после 3 итераций grade на разведке (ld-s1 1,0 → ld-s2 1,5 → ld-s3 1,5): вне допуска только второстепенный gold_antique y 0,33 (латунь саквояжа и цепочка, 336 px рендера — медиана смешана с соседями, ярче не даёт потолок канала металла 0,92); floor leather_worn; основные wool_coarse (якорь, loo 0,89) и stone_base 1,13 / loo 1,12 в допуске; крупные планы capture_acceptance_set осмотрены (C:/tmp/dr-watson-stage3-check, 27 кадров, warnings 0) — найдено и исправлено: синий котелок (look-dev t3); не исправлено: тонкая тёмная щель между шеей и верхним краем воротника спереди (видно изнанку крышки neck_bottom: 40 px сзади при 4 спереди, ниже порога 100; разворот крышки — опция инструмента, не профиля), светлая полоса текстуры Tripo под полями котелка; base_seethrough /2 with_figure 0,00 uu², base_only 0,02; rider_gap саквояж → левая кисть 0,00 мм зазор / 0,43 мм проникновение PASS в rest и во всех 4 клипах дыма; дым клипов (паттерн Beowulf ← Angel r2, оружие в правой; Medusa — лук в левой, её ключи на weapon.L): Idle и HitReact contact PASS, LungeAttack skin_stretch FAIL 1 видимое ребро запястья (сгиб кисти 50°), DeathSettle skin_stretch FAIL 16 рёбер правого локтя (разгибание 91° → 152° с внеосевым поворотом до 36° — чужие оси aim, C42; рвётся с 122° / 11,5°; полосы цепи руки 0,016/0,013/0,01 не помогли — 15 рёбер); grip_check: револьвер в кулаке 0°, пересечений оружия с телом 0; револьвер↔кисть в HitReact к.2–3 проникновение 2,8 мм (не наездник, справочно); seams: новых дыр ≤ 8 px (arm_l_raise 8 на пороге), петли не раскрываются; пробы 14/14 на .blend и FBX (v2); треугольники тело 42 228 + револьвер 1 300 = 43 528 ≤ 45 000, подставка 1 374; TeamAccent 0,52 % (П3-4: диапазон 0,005–0,12), K2 5× спереди 0,0130, сзади 0,0123, dE ≥ 19,7, TeamDyeGain 32"
+  determinism: "после pass приёмки, до 7a (ДС-7) — не делался на этапе 3"
+  executor: {mechanism: "subagent", model: "claude-opus-5-5", effort: "не записан (агент оркестратора)", session: "claude-code:8522fd18-3811-4ad8-8aab-07d443cf58fe/agent:исполнитель этапа 3 Watson"}
+  stage6_notes: "правый локоть в rest согнут ~91°: в клипах держать поворот предплечья на шарнире (внеосевой ≤ ~10°) и разгибание ≤ ~+30°; сгиб кисти с револьвером ≤ ~40°; при отведении руки вбок пола пальто под мышкой тянется за рукавом (стык весов); саквояж в rest врезан в левую полу (крышки coat_bag / bag_coat): в Idle образца пары саквояж–таз растут 327 → 631 (WARN weapon_body)"

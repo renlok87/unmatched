@@ -1,0 +1,690 @@
+{
+  "checks": {
+    "bone_heads_tails_as_h21": {
+      "expected": "equal (5 decimals, export frame)",
+      "measured": "equal",
+      "passed": true
+    },
+    "bones_and_parents_as_h21": {
+      "expected": 17,
+      "measured": 17,
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front_ue_plus_x": {
+      "expected": "dot > 0.5, front = +X",
+      "measured": {
+        "face_normal": [
+          0.6398,
+          0.0167,
+          -0.1373
+        ],
+        "face_polygons": 1106,
+        "rotated_front": [
+          1.0,
+          -0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "positions_and_uv0_per_loop_as_h21": {
+      "expected": "<= 1e-6 m / 1e-7 UV",
+      "measured": {
+        "SK_DrWatson_H2_Body": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SK_DrWatson_H2_Revolver": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SM_DrWatson_H2_Base": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        }
+      },
+      "passed": true
+    },
+    "triangles_as_h21": {
+      "expected": {
+        "SK_DrWatson_H2_Body": 42228,
+        "SK_DrWatson_H2_Revolver": 1300,
+        "SM_DrWatson_H2_Base": 1374
+      },
+      "measured": {
+        "SK_DrWatson_H2_Body": 42228,
+        "SK_DrWatson_H2_Revolver": 1300,
+        "SM_DrWatson_H2_Base": 1374
+      },
+      "passed": true
+    },
+    "uv1_metres_density_readback": {
+      "expected": "area(UV1) / area3D = 1 +- 0.02 (p1..p99 of islands)",
+      "measured": {
+        "SK_DrWatson_H2_Body": {
+          "islands": 576,
+          "ratio_p1_p50_p99": [
+            0.99999,
+            1.0,
+            1.00002
+          ]
+        },
+        "SK_DrWatson_H2_Revolver": {
+          "islands": 187,
+          "ratio_p1_p50_p99": [
+            0.99995,
+            1.0,
+            1.00002
+          ]
+        },
+        "SM_DrWatson_H2_Base": {
+          "islands": 27,
+          "ratio_p1_p50_p99": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "passed": true
+    },
+    "uv_layers_order": {
+      "expected": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "measured": {
+        "SK_DrWatson_H2_Body": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SK_DrWatson_H2_Revolver": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SM_DrWatson_H2_Base": [
+          "UVMap",
+          "UV1_m"
+        ]
+      },
+      "passed": true
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 86444,
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t2/export/SM_DrWatson_H2LD_Base.fbx",
+      "sha256": "da5eee2238020f9e8e597fa2e5e98fc5ae992332939c5c569f55b59b9ff01c68"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 2050940,
+      "path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-lookdev-t2/export/SK_DrWatson_H2LD.fbx",
+      "sha256": "0f9cbcca711d64ca9211c803231c7db4769b94473e2049adf3917261c1ae16aa"
+    }
+  },
+  "failed": [],
+  "meshes_pre_export": {
+    "SK_DrWatson_H2_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_DrWatson_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 6,
+      "polygons": 42228,
+      "triangles": 42228,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 23082
+    },
+    "SK_DrWatson_H2_Revolver": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_DrWatson_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1300,
+      "triangles": 1300,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 745
+    },
+    "SM_DrWatson_H2_Base": {
+      "color_attributes": [
+        "UM_Mask"
+      ],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_DrWatson_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1374,
+      "triangles": 1374,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 848
+    }
+  },
+  "passed": true,
+  "roundtrip": {
+    "ld": {
+      "base": {
+        "armature_objects": [],
+        "armatures": 0,
+        "bones": {},
+        "meshes": {
+          "SM_DrWatson_H2_Base": {
+            "bounds_m": {
+              "max": [
+                0.12007,
+                0.11999,
+                0.05004
+              ],
+              "min": [
+                -0.12001,
+                -0.12009,
+                1e-05
+              ]
+            },
+            "color_attributes": [
+              "UM_Mask"
+            ],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_DrWatson_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 0,
+            "polygons": 1374,
+            "triangles": 1374,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 848,
+            "weights": null
+          }
+        }
+      },
+      "skeletal": {
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "armatures": 1,
+        "bones": {
+          "arm_lower.L": {
+            "head_m": [
+              -0.021,
+              0.066,
+              0.295
+            ],
+            "parent": "arm_upper.L",
+            "tail_m": [
+              -0.01,
+              0.088,
+              0.248
+            ]
+          },
+          "arm_lower.R": {
+            "head_m": [
+              -0.006,
+              -0.081,
+              0.306
+            ],
+            "parent": "arm_upper.R",
+            "tail_m": [
+              0.045,
+              -0.091,
+              0.321
+            ]
+          },
+          "arm_upper.L": {
+            "head_m": [
+              -0.017,
+              0.046,
+              0.348
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.021,
+              0.066,
+              0.295
+            ]
+          },
+          "arm_upper.R": {
+            "head_m": [
+              -0.014,
+              -0.049,
+              0.35
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.006,
+              -0.081,
+              0.306
+            ]
+          },
+          "foot.L": {
+            "head_m": [
+              -0.01,
+              0.046,
+              0.071
+            ],
+            "parent": "leg_lower.L",
+            "tail_m": [
+              0.06402,
+              0.05916,
+              0.04304
+            ]
+          },
+          "foot.R": {
+            "head_m": [
+              -0.01,
+              -0.047,
+              0.075
+            ],
+            "parent": "leg_lower.R",
+            "tail_m": [
+              0.05859,
+              -0.05767,
+              0.04299
+            ]
+          },
+          "hand.L": {
+            "head_m": [
+              -0.01,
+              0.088,
+              0.248
+            ],
+            "parent": "arm_lower.L",
+            "tail_m": [
+              0.00893,
+              0.09368,
+              0.19877
+            ]
+          },
+          "hand.R": {
+            "head_m": [
+              0.045,
+              -0.091,
+              0.321
+            ],
+            "parent": "arm_lower.R",
+            "tail_m": [
+              0.05397,
+              -0.09018,
+              0.34302
+            ]
+          },
+          "head": {
+            "head_m": [
+              -0.002,
+              -0.0,
+              0.379
+            ],
+            "parent": "spine",
+            "tail_m": [
+              0.00171,
+              0.0,
+              0.47363
+            ]
+          },
+          "hips": {
+            "head_m": [
+              -0.004,
+              -0.0,
+              0.232
+            ],
+            "parent": "root",
+            "tail_m": [
+              -0.004,
+              -0.0,
+              0.26
+            ]
+          },
+          "leg_lower.L": {
+            "head_m": [
+              -0.003,
+              0.034,
+              0.15
+            ],
+            "parent": "leg_upper.L",
+            "tail_m": [
+              -0.01,
+              0.046,
+              0.071
+            ]
+          },
+          "leg_lower.R": {
+            "head_m": [
+              -0.003,
+              -0.034,
+              0.15
+            ],
+            "parent": "leg_upper.R",
+            "tail_m": [
+              -0.01,
+              -0.047,
+              0.075
+            ]
+          },
+          "leg_upper.L": {
+            "head_m": [
+              -0.004,
+              0.021,
+              0.232
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.003,
+              0.034,
+              0.15
+            ]
+          },
+          "leg_upper.R": {
+            "head_m": [
+              -0.004,
+              -0.021,
+              0.232
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.003,
+              -0.034,
+              0.15
+            ]
+          },
+          "root": {
+            "head_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "parent": null,
+            "tail_m": [
+              0.0,
+              0.0,
+              0.23203
+            ]
+          },
+          "spine": {
+            "head_m": [
+              -0.004,
+              -0.0,
+              0.274
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.00307,
+              -0.0,
+              0.36869
+            ]
+          },
+          "weapon.R": {
+            "head_m": [
+              0.054,
+              -0.09,
+              0.343
+            ],
+            "parent": "hand.R",
+            "tail_m": [
+              0.07188,
+              -0.09453,
+              0.35802
+            ]
+          }
+        },
+        "meshes": {
+          "SK_DrWatson_H2_Body": {
+            "bounds_m": {
+              "max": [
+                0.06859,
+                0.13264,
+                0.45004
+              ],
+              "min": [
+                -0.06109,
+                -0.10525,
+                0.04805
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_DrWatson_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 6,
+            "polygons": 42228,
+            "triangles": 42228,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 23082,
+            "weights": {
+              "bones_used": {
+                "arm_lower.L": 781,
+                "arm_lower.R": 561,
+                "arm_upper.L": 1149,
+                "arm_upper.R": 1092,
+                "foot.L": 1206,
+                "foot.R": 1059,
+                "hand.L": 2101,
+                "hand.R": 947,
+                "head": 3397,
+                "hips": 6801,
+                "leg_lower.L": 1034,
+                "leg_lower.R": 1106,
+                "leg_upper.L": 2642,
+                "leg_upper.R": 2800,
+                "spine": 5071,
+                "weapon.R": 196
+              },
+              "max_influences": 4,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 23082,
+              "weight_share": {
+                "arm_lower.L": 0.0214,
+                "arm_lower.R": 0.0189,
+                "arm_upper.L": 0.03,
+                "arm_upper.R": 0.0291,
+                "foot.L": 0.0429,
+                "foot.R": 0.0349,
+                "hand.L": 0.0866,
+                "hand.R": 0.0385,
+                "head": 0.1411,
+                "hips": 0.22,
+                "leg_lower.L": 0.0317,
+                "leg_lower.R": 0.0349,
+                "leg_upper.L": 0.0423,
+                "leg_upper.R": 0.0484,
+                "spine": 0.171,
+                "weapon.R": 0.0085
+              }
+            }
+          },
+          "SK_DrWatson_H2_Revolver": {
+            "bounds_m": {
+              "max": [
+                0.0856,
+                -0.07674,
+                0.39564
+              ],
+              "min": [
+                0.03874,
+                -0.09566,
+                0.3429
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_DrWatson_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 0,
+            "polygons": 1300,
+            "triangles": 1300,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 745,
+            "weights": {
+              "bones_used": {
+                "weapon.R": 745
+              },
+              "max_influences": 1,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 745,
+              "weight_share": {
+                "weapon.R": 1.0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "stage": "ld_fbx",
+  "status": "измерено",
+  "ue_import_notes": [
+    "UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs или DstLightmapIndex >= 2, иначе UE перезапишет UV1 картой освещения",
+    "материальный слот тот же (M_DrWatson_H2_Atlas), назначается MI v2"
+  ],
+  "uv1": {
+    "density_tolerance": 0.02,
+    "layer_name": "UV1_m",
+    "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+    "per_mesh": {
+      "SK_DrWatson_H2_Body": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 576,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.41944,
+          0.73401,
+          0.84746
+        ],
+        "uv1_abs_max_m": 0.1089,
+        "uv1_extent": [
+          [
+            -0.0926,
+            -0.1089
+          ],
+          [
+            0.0926,
+            0.1089
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SK_DrWatson_H2_Revolver": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.0153,
+        "islands": 187,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.48933,
+          0.48934,
+          0.48935
+        ],
+        "uv1_abs_max_m": 0.0227,
+        "uv1_extent": [
+          [
+            -0.0155,
+            -0.0227
+          ],
+          [
+            0.0155,
+            0.0227
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SM_DrWatson_H2_Base": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 27,
+        "metres_per_uv_unit_p5_p50_p95": [
+          1.63113,
+          1.63114,
+          1.63115
+        ],
+        "uv1_abs_max_m": 0.1199,
+        "uv1_extent": [
+          [
+            -0.1118,
+            -0.1199
+          ],
+          [
+            0.1118,
+            0.1199
+          ]
+        ],
+        "zero_area_islands": 0
+      }
+    }
+  }
+}
