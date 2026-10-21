@@ -1,0 +1,107 @@
+{
+  "schema": "unmatched.acceptor-inputs/1",
+  "tool": "tools/art/acceptance/acceptor_inputs.py",
+  "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+  "sources": {
+    "frames_json": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/evidence/acceptance/20261021-r1/frames/frames.json",
+    "look_dev_run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3",
+    "bake_run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-bake-t3",
+    "asset_card": {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/asset-card.yaml",
+      "sha256": "9f98599c98177674d0e736b0ec6aad639cc6cb6b162e3d9114074948ae98cbe0"
+    },
+    "previous_card": null
+  },
+  "g_names": {
+    "UE_NAMES": {
+      "stage": "H2LD",
+      "skeletal_mesh": "SK_SherlockHolmes_H2LD",
+      "base": "SM_SherlockHolmes_H2LD_Base",
+      "materials": [
+        "MI_SherlockHolmes_H2LD",
+        "MI_SherlockHolmes_H2LD_Base",
+        "MI_SherlockHolmes_H2LD_P1",
+        "MI_SherlockHolmes_H2LD_P2",
+        "MI_SherlockHolmes_H2LD_Base_P1",
+        "MI_SherlockHolmes_H2LD_Base_P2"
+      ],
+      "dissolve": "/Game/UM/Materials/v2/Dissolve/MI_SherlockHolmes_H2LD_{P1,P2}_Dissolve",
+      "skeleton": "/Game/PipelineCandidates/SherlockHolmes/Rig/SK_SherlockHolmes_Skeleton",
+      "clips": "/Game/PipelineCandidates/SherlockHolmes/H2Anim/AM_SherlockHolmes_{Idle,LungeAttack,HitReact,DeathSettle}",
+      "textures": [
+        "T_SherlockHolmes_H2LD_{BC,N,ORM,MatID,TeamAccent}",
+        "T_SherlockHolmes_H2LD_Edge",
+        "T_UM_MatLUT_SherlockHolmes"
+      ],
+      "prop_name": null
+    },
+    "FIGURE_HEIGHT_M": 0.55,
+    "FIGURE_BOUNDS_TOP_M": 0.55,
+    "texture_files": [
+      "T_SherlockHolmes_H2LD_2K_BC.png",
+      "T_SherlockHolmes_H2LD_2K_Edge.png",
+      "T_SherlockHolmes_H2LD_2K_MatID.png",
+      "T_SherlockHolmes_H2LD_2K_N.png",
+      "T_SherlockHolmes_H2LD_2K_ORM.png",
+      "T_SherlockHolmes_H2LD_TeamAccent_2K.png"
+    ],
+    "bake_profile": {
+      "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-bake-h2-t3.json",
+      "sha256": "e3e21499edaf2d04217a412a0ec24cc65f49f4b8e8c475a6f2b57bcfba93faa9",
+      "meshes": {
+        "body": "SK_SherlockHolmes_H2_Body",
+        "base": "SM_SherlockHolmes_H2_Base"
+      },
+      "materials.atlas": "M_SherlockHolmes_H2_Atlas",
+      "exports.fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "scale.figure_top_m": 0.55
+    },
+    "height": {
+      "body_mesh": "SK_SherlockHolmes_H2_Body",
+      "body_top_m": {
+        "source": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_SherlockHolmes_H2_Body.bounds_m.max[2]",
+        "value": 0.55007
+      },
+      "other_meshes_top_m": {},
+      "skeletal_top_cm": {
+        "source": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-bake-t3/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm",
+        "value": 55.007,
+        "meaning": "верх всей фигуры с оружием — справка, рост не решает"
+      },
+      "FIGURE_HEIGHT_M": 0.55,
+      "FIGURE_BOUNDS_TOP_M": 0.55,
+      "tolerance": 0.01
+    }
+  },
+  "team_accent": {
+    "report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json",
+    "run": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3",
+    "texture": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/textures/T_SherlockHolmes_H2LD_TeamAccent_2K.png",
+    "texture_sha256": "ca3b8de43473024fe31cf6201e52e1ec4e932d52b19a99490d55f084937910ac",
+    "output": "T_SherlockHolmes_H2LD_TeamAccent_2K.png",
+    "same_run": true,
+    "pins_this_look_dev": true,
+    "report_passed": true,
+    "candidates": [
+      "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t2/reports/ld-team-accent-report.json",
+      "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev/reports/ld-team-accent-report.json"
+    ],
+    "why": "тот же look-dev прогон"
+  },
+  "anchors": "magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+  "prev_fix_list": {
+    "cycle": null,
+    "items": []
+  },
+  "excluded": "записи исполнителя (ключи note, *_note, notes, history, comment*; заметки заявки) в выдержку не входят: §1 п.3, F147, F152",
+  "warnings": [],
+  "placeholders": {
+    "UE_NAMES": "{\"stage\": \"H2LD\", \"skeletal_mesh\": \"SK_SherlockHolmes_H2LD\", \"base\": \"SM_SherlockHolmes_H2LD_Base\", \"materials\": [\"MI_SherlockHolmes_H2LD\", \"MI_SherlockHolmes_H2LD_Base\", \"MI_SherlockHolmes_H2LD_P1\", \"MI_SherlockHolmes_H2LD_P2\", \"MI_SherlockHolmes_H2LD_Base_P1\", \"MI_SherlockHolmes_H2LD_Base_P2\"], \"dissolve\": \"/Game/UM/Materials/v2/Dissolve/MI_SherlockHolmes_H2LD_{P1,P2}_Dissolve\", \"skeleton\": \"/Game/PipelineCandidates/SherlockHolmes/Rig/SK_SherlockHolmes_Skeleton\", \"clips\": \"/Game/PipelineCandidates/SherlockHolmes/H2Anim/AM_SherlockHolmes_{Idle,LungeAttack,HitReact,DeathSettle}\", \"textures\": [\"T_SherlockHolmes_H2LD_{BC,N,ORM,MatID,TeamAccent}\", \"T_SherlockHolmes_H2LD_Edge\", \"T_UM_MatLUT_SherlockHolmes\"], \"prop_name\": null} (файлы текстур принимаемого объекта: T_SherlockHolmes_H2LD_2K_BC.png, T_SherlockHolmes_H2LD_2K_Edge.png, T_SherlockHolmes_H2LD_2K_MatID.png, T_SherlockHolmes_H2LD_2K_N.png, T_SherlockHolmes_H2LD_2K_ORM.png, T_SherlockHolmes_H2LD_TeamAccent_2K.png)",
+    "BAKE_PROFILE_KEYS": "{\"path\": \"art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/build-profiles/sherlock-holmes-h2-bake-h2-t3.json\", \"meshes\": {\"body\": \"SK_SherlockHolmes_H2_Body\", \"base\": \"SM_SherlockHolmes_H2_Base\"}, \"materials.atlas\": \"M_SherlockHolmes_H2_Atlas\", \"exports.fbx_preset\": \"blender/_tools/presets/UM_FBX_v1.json\", \"scale.figure_top_m\": 0.55}",
+    "HEIGHT_RULE": "Рост для G-NAMES п.(5) — верх ТЕЛА без оружия: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/reports/ld-fbx-report.json#roundtrip.ld.skeletal.meshes.SK_SherlockHolmes_H2_Body.bounds_m.max[2] = 0.55007 м против FIGURE_HEIGHT_M заявки 0.55 м ± 1 %; art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-bake-t3/reports/rig-report.json#checks.unit_scale_1_and_height.measured.skeletal_top_cm = 55.007 — верх всей фигуры с оружием, справка.",
+    "TA_REPORT": "TeamAccent снят в том же look-dev прогоне: art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/reports/ld-team-accent-report.json — для строки G-TEX «TeamAccent_2K» решает этот отчёт (его outputs.T_SherlockHolmes_H2LD_TeamAccent_2K.png.sha256 = sha256 принимаемой карты art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261020-h2-lookdev-t3/textures/T_SherlockHolmes_H2LD_TeamAccent_2K.png).",
+    "ANCHORS": "magnifying glass in the figure's own RIGHT hand; deerstalker cap; Inverness cape; curved pipe",
+    "PREV_FIX_LIST": "нет (r1 или у прежней карточки пустые rework_fix_list и known_issues)"
+  }
+}
