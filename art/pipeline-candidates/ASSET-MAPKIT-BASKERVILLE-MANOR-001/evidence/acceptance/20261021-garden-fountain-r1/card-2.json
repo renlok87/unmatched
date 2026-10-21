@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGardenFountain.fbx",
+      "sha256": "fa740abbe2a2fdc3a16837fd5e27e4524d90212701b4bf1f3340f63a5b820ff9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_BC.png",
+      "sha256": "4234db84b8c33cd3bc8e972d4a8cca1f0dbf54e07d67f03254e459a0219e5feb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_N.png",
+      "sha256": "f99b1eabb28876471458f5b2cab7cac7a3178ed50d4d0c258d00ea2bbada350e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_ORM.png",
+      "sha256": "d9faada864695bfa323500cc9d88022ae0e4aeabe0c9362fe1d0a45fa038227a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-garden-fountain-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGardenFountain.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "4997 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "UV0 islands 710, used 0.6639, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "T_Env_BaskervilleGardenFountain_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "SM_Env_BaskervilleGardenFountain, M_Env_BaskervilleGardenFountain",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: круглый двухъярусный каменный фонтан — нижняя чаша с готическими арками и лиственным рельефом на стенке, цоколь, граненая опора с арками, верхняя чаша с четырьмя сливными выемками и струями, центральный носик. Пропорции и главные части совпадают с sheet.png, лишних и пропавших частей нет; на turn-090/270 и wire-34 фантомных выступов нет, силуэт читается со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, рваных краёв нет, тонкие струи воды целы и доходят до воды нижней чаши. Дефекты видны только на крупном плане: центральный носик — оплывший бесформенный столбик, под кромкой верхней чаши тёмная щель-складка; на wire-34 в нишах арок есть звёздчатое стягивание треугольников (в рендере почти не видно). В остальном сетка следует форме.",
+      "frames": [
+        "close-head.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: выветренный светлый камень с мхом, голубая вода в обеих чашах и струях; запечённого света нет, детализация рельефа на уровне кита. Дефекты крупного плана: на носике боковая полоса каменной текстуры по воде (затёк на шве UV), мыльная размытость верхней кромки и чаши, лёгкая диагональная штриховка-шум на камне; на боковых видах вдоль центральной струи по опоре идёт тонкая рыжая полоска затёка, заметная, но мелкая на игровой дистанции.",
+      "frames": [
+        "close-head.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; остатки F/T только крупного плана, для фонового пропа диорамы некритичны.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Центральный носик оплывший, под кромкой верхней чаши тёмная щель; видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Звёздчатое стягивание треугольников в нишах арок нижней чаши; в рендере почти не заметно."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Полоса каменной текстуры на боку водяного носика (затёк по шву UV), мыльная кромка верхней чаши."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Тонкая рыжая полоска затёка вдоль центральной струи на опоре (также turn-180/270)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-GARDEN-FOUNTAIN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп garden-fountain (Садовый фонтан) принят по делегированию: 8.3, мелкие дефекты носика и затёки текстуры только на крупном плане."
+}

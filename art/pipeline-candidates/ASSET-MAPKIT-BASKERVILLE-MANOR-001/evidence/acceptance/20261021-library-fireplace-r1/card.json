@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleLibraryFireplace.fbx",
+      "sha256": "0f4203a7b17c1941b9abac458113e32834f3133c9181e737760595432cbe1a22"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryFireplace_BC.png",
+      "sha256": "a22e15b9729dde542fddc91948aef24e33deea50b7214f2bbb0fda0f9e783930"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryFireplace_N.png",
+      "sha256": "2d6f3ab947efa6364652f84ad6b290fa30e78d4cca69037c8af6e6f400d241d1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryFireplace_ORM.png",
+      "sha256": "f1b6d4787c5f8d8deaa136b5f9de7c60423e956d9973ea631e1f3e27818294c1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-library-fireplace-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleLibraryFireplace.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+      "note": "5127 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+      "note": "UV0 islands 263, used 0.4573, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+      "note": "T_Env_BaskervilleLibraryFireplace_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryFireplace.build.json",
+      "note": "SM_Env_BaskervilleLibraryFireplace, M_Env_BaskervilleLibraryFireplace",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Модель — тот предмет, что заказан и что изображён на sheet.png: мраморный портал с полкой, фриз с двумя розетками и центральной пальметтой, каннелированные пилястры с базами, светлое кремовое внутреннее обрамление топки, железная решётка с поленьями, часы по центру полки и два подсвечника по краям. Пропорции главных частей совпадают с видом. Ширина к высоте корпуса до полки 41,2/32,1 uu ≈ 1,28 против 1,8/1,5 = 1,2 в заказе, это в допуске. Часы и подсвечники по размеру те же, что на листе. Основное пятно цвета — серо-чёрный мрамор с кремовыми прожилками, как на листе. Предмет узнаётся со всех 8 ракурсов; сзади это плоская плита с часами и подсвечниками, как и положено камину у стены. Глубина ≈0,5 м против приблизительных 0,6 м заказа: на читаемость не влияет. Задние стойки решётки, выступающие за тыльную грань, — не фантомная часть: это существующая деталь, которая прошивает стенку. Дефект учтён в F, чтобы не считать его дважды.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка следует форме (wire-34, wire-front). Тонкие элементы целы: подсвечники, стойки и прутья решётки с навершиями, гребень часов. Дыр, рваных краёв и чёрных пятен на полном росте нет; открытые края из отчёта (корзина и перила решётки) на кадрах не видны. Дефект на полном росте в одной зоне. Задние стойки решётки (оболочки 6/7 отчёта, y до 5,68 uu) прошивают тыльную стенку корпуса (оболочка 1, до 5,07 uu) примерно на 0,6 uu. На тыле они видны целиком, от ножек до наверший: turn-135, turn-180, turn-225, wire-back; на turn-090 и turn-270 — тонкой полоской за задней гранью. Мелочь: гребень часов со спины читается оплывшим комком (turn-135/225).",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "wire-back.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются так, как заказано: мрамор портала с прожилками, кремовое мраморное обрамление, тёмное кованое железо решётки, дерево поленьев с оранжевыми угольками, дерево часов с читаемым циферблатом и римскими цифрами, латунь подсвечников. Запечённого направленного света и теней в цвете нет (чёрная топка читается как сажа). Растяжек и швов на полном росте нет. Детализация (резьба фриза, розетки, циферблат) не беднее уровня кита Sarpedon. Дефекты видны только на крупном плане: ромбическая сетка-«плетёнка» на дереве часов (close-head, close-weapon) и в мраморе боковин и тыла; верх полки читается как серое дерево, а не мрамор (close-weapon); белёсые мазки на завитках гребня часов (close-head).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0. F = 1,0: задние стойки решётки прошивают тыльную стенку камина и видны на полном росте сзади (turn-135/180/225, wire-back). S = 2,0 ≥ 1,5, поэтому перегенерация не нужна, нужна доработка сборки.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Убрать прошивку тыла. Задние стойки решётки (оболочки 6 и 7, y до 5,68 uu) выходят за тыльную грань корпуса (5,07 uu) примерно на 0,6 uu. Обрезать их по плоскости задней грани (bisect по Y ≈ 5,0 uu с удалением внешней части и закрытием среза) или сдвинуть решётку целиком вперёд внутрь топки на ~0,7 uu. Сейчас политика env_kit — сборка без правки геометрии, поэтому нужен параметр или шаг обрезки по плоскости. Затем переснять turn-090/135/180/225/270 и wire-back.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Смягчить артефакты BC крупного плана: ромбическую сетку-«плетёнку» на дереве часов и в мраморе боковин и тыла, серую древесную текстуру на верхней плоскости полки (должен быть мрамор, close-weapon), белёсые мазки на завитках гребня часов. Сделать это лёгким денойзом или размытием BC в этих островах либо перетекстурированием исходника Tripo с той же сеткой.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Огня в меше нет: поленья с оранжевыми угольками. «Горящие поленья» по роли animated должны дать VFX огня в UE, а не модель."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-LIBRARY-FIREPLACE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп library-fireplace (7,5) — на доработку в Blender: задние стойки решётки прошивают тыльную стенку (F), мелкая «плетёнка» в текстуре часов и полки (T); силуэт и материалы совпадают с листом."
+}

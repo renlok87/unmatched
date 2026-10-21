@@ -1,0 +1,181 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleBrassOilLamp.fbx",
+      "sha256": "c7036fa2b78478752b88023cf28439562d4f563e333fa3876d5535dd23ab5c6f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassOilLamp_BC.png",
+      "sha256": "ec9bf09e036a5c175242345ec5099a84087ceb244b8200ae621c58b09872c8a5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassOilLamp_N.png",
+      "sha256": "1b0dc58bab0ccc2eb3e24f9fc28e52f3a5edf277a837396b1570996d1f00419a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleBrassOilLamp_ORM.png",
+      "sha256": "e334f353a113ca991a9b4bd0f41b50fe536c3b646a87f0f634bfa42aa044f002"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-brass-oil-lamp-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleBrassOilLamp.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+      "note": "5214 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+      "note": "UV0 islands 115, used 0.5223, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+      "note": "T_Env_BaskervilleBrassOilLamp_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleBrassOilLamp.build.json",
+      "note": "SM_Env_BaskervilleBrassOilLamp, M_Env_BaskervilleBrassOilLamp",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: зелёный купольный плафон с горлышком, белое стекло-цилиндр над ним, латунное кольцо и галерея с проволочными лапками, горелка с винтом фитиля, резервуар с поясом, ножка с кольцом, круглая подставка. Вертикальное членение по долям высоты совпадает с листом на глаз: стекло около 15 %, плафон около 30 %, горелка около 14 %, резервуар около 17 %, ножка с подставкой около 25 %. Лист — миниатюра 230 px, поэтому допуск ≤ 5 % проверить точно нельзя. Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет. Лампа узнаётся со всех 8 ракурсов: тело вращения, винт фитиля меняет сторону, как положено. Предупреждение frames.json о ключе листа (key None) — шум инструмента: на листе та же лампа. Наклон верхнего среза стекла около 3° — микродеталь, отнесена к F.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: 4 лапки галереи, шток и шайба винта фитиля. Сетка на wire-* плотная, триангуляция Tripo, но следует форме. Дыры из build.json (2 круга около 50 uu² на z≈10,3) — открытое дно плафона, физически верно; снаружи их закрывает кольцо. Дефекты крупного плана: close-base — огранённый, слегка волнистый край подставки и бугристая поверхность ножки; close-head — верхний срез стекла скошен, на кромке излом; close-weapon — рваные края бликов на плафоне от шумной нормали.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дефект на полном росте в главной зоне — латунном корпусе (резервуар, ножка, подставка). Латунь не читается металлом. По build.json metallic в среднем 0,185, доля текселей с metallic > 0,5 равна 0, roughness в среднем 0,15. Поэтому блики белые, диэлектрические, а оливково-кремовый цвет с бирюзовыми полосами выглядит глазурованной керамикой, а не полированной латунью листа (там тёмно-золотая, контрастная). Видно на turn-000/090 и особенно на close-base. Дефекты крупного плана: декор плафона размыт в мыльные жёлто-кремовые пятна вместо золотого орнамента листа, плафон бледно-мятный вместо изумрудного (та же гамма), стекло-цилиндр непрозрачно-белое (KHR_materials_volume при запекании в BC/N/ORM потерян; на листе стекло тоже светлое). Швов и растяжек на видах нет, острова UV без перекрытий, запечённых теней не видно. Детализация на уровне кита Tripo.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "sheet.png",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0: T = 1,0 — латунный корпус на полном росте читается глазурованной керамикой (metallic≈0, белые блики), F = 1,5 — дефекты крупного плана; S = 2,0, все гейты PASS/n/a, перегенерация не нужна.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Сделать латунь металлом. Маска по оттенку BC: латунные тексели корпуса, горелки, кольца и галереи; без зелёного плафона и белого стекла. В ORM.B поднять metallic до 0,85–1,0 на этой маске, roughness в ORM.G поднять до 0,3–0,4. Убрать или ослабить бирюзовые полосы и сместить оливковый BC латуни к тёплому золоту, ближе к sheet.png. Пересъёмка turn-000/090 и close-base: блики латуни должны быть тёплыми, металлическими.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Ослабить шум нормали на плафоне (масштаб N в зоне плафона около 0,5) — рваные края бликов. На кромках подставки и верхнем срезе стекла сгладить шейдинг (weighted normals / auto-smooth), чтобы убрать огранку и излом кромки на close-base и close-head. Если параметрами не убирается, оставить как known issue крупного плана: на игровой дистанции дефект не виден.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Золотой орнамент плафона из листа размыт в мыльные жёлто-кремовые пятна, плафон бледнее изумрудного листа. Виден только на крупном плане; на игровой дистанции плафон читается как зелёное стекло с узором."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Стекло-цилиндр непрозрачно-белое: объём стекла Tripo (KHR_materials_volume) при сборке BC/N/ORM потерян. Для стилизованного настольного пропа допустимо; на листе стекло тоже светлое."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Верхний срез стекла скошен примерно на 3°, на кромке излом. Микродеталь, на игровой дистанции не видна."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-34.jpg",
+      "note": "В build.json 2 дыры около 50 uu² (z≈10,3): это открытое дно плафона, физически верно и снаружи закрыто кольцом. Ещё 7 трещин-T-стыков на стыках лапок и винта, на кадрах не видны. Гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-BRASS-OIL-LAMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп brass-oil-lamp на доработку в Blender (7,5): силуэт принят, но латунь не читается металлом (metallic≈0); нужна маска metallic/roughness для латуни, огранку и шум нормали поправить по возможности."
+}

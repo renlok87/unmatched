@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-produce-crates-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoProduceCrates.fbx",
+      "sha256": "787562c7c3b2573a9266acf26c11b1ab4629aa06f283f87ecd4e7f588a50f754"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_BC.png",
+      "sha256": "6652bfa599549e47904070884d12b2c757a84b526095b4b6dd12f81429a7ae22"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_N.png",
+      "sha256": "e9ed0fa4056b5745c5945b8153b9a1444ad0800b447310750e00016a9a01011f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoProduceCrates_ORM.png",
+      "sha256": "c40f761947480c21d4c7ae3592945b9a51bc65410d5f09dbeb0d55223e33335d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-produce-crates-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoProduceCrates.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "4774 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "UV0 islands 759, used 0.7224, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "T_Env_SohoProduceCrates_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoProduceCrates.build.json",
+      "note": "SM_Env_SohoProduceCrates, M_Env_SohoProduceCrates",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: штабель реечных ящиков, в верхнем яблоки, апельсины и репа, как на sheet.png. Пропорции около 1×0.6×1 совпадают (спереди ширина примерно равна высоте, сбоку глубина около 0.65 высоты). Узнаётся со всех 8 ракурсов, фантомных оболочек на turn-090/270 и wire-* нет. Одно второстепенное отличие контура: передний борт верхнего ящика проваливается V-образно к центру (turn-000, wire-34, wire-front), на виде борт прямой. Дерево светлее и бежевее серо-коричневого на виде, но того же семейства цвета.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Дыр, вывернутых частей и оплывших масс нет, фрукты и верхний ящик целы, сетка в целом следует форме. Но планки нижнего ящика видны рваными на полном росте. На концах планок шевронные вырезы: два на turn-135, по одному на turn-180 и turn-225. Средняя планка спереди и сзади перекручена «бабочкой», с защемлённой серединой и острым концом (turn-000, wire-front, wire-back, turn-315). У правого края торчат осколки-шипы (turn-045). Донные доски внизу рваные, обрезки разной высоты (turn-090, turn-270, close-base). Дефекты собраны в одной зоне (корпус нижнего ящика с дном), отсюда 1.0. Для фонового пропа на игровой дистанции это читается как обветшалые доски, но правило полного роста нарушено.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются верно. Дерево с волокном и гвоздевыми точками. Яблоки красные с хвостиками, апельсины с зелёной чашечкой, репа фиолетово-белая с ботвой. Запечённых бликов и швов на полном росте нет. На крупном плане волокно мягкое и размазанное (верх close-head), фрукты гладкие и без фактуры (close-head, close-weapon). Детализация BC заметно беднее эталона кита Sarpedon: там чёткие доски, гвозди и скобы. Тёмная шумная внутренняя плоскость видна в щели (turn-225, turn-270), но читается как затенённая внутренность ящика.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "Score 6.7 < 8.0 (S 1.5, F 1.0, T 1.5; все гейты PASS/n/a). S ≥ 1.5, поэтому вердикт rework_blender. Доработать F: рваные планки нижнего ящика видны на полном росте. Доработать T: текстура беднее эталона и мыльная на крупном плане.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "fix": "Убрать рваную геометрию нижнего ящика: шевронные вырезы на концах планок (turn-135, turn-180, turn-225), перекрученную «бабочкой» среднюю планку спереди и сзади (wire-front, wire-back, turn-000), осколки-шипы у правого края (turn-045), рваные обрезки донных досок (turn-090, turn-270, close-base). Нужны прямые цельные планки: перегенерировать исходник или выпрямить планки и подрезать обрезки дна.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Поднять детализацию BC до уровня кита Sarpedon. Дерево: чёткое волокно, гвозди, краевой износ вместо размытых полос (close-head, close-weapon). Фрукты: лёгкая фактура кожуры. Взять HD/4K-текстуру Tripo или перепечь, проверить тёмную шумную внутреннюю плоскость (turn-225, turn-270).",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Передний борт верхнего ящика с V-образным провалом посередине, на sheet.png борт прямой. Дерево светлее и бежевее, чем на виде. Отличие второстепенное, на игровой дистанции проп узнаётся."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-PRODUCE-CRATES-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп produce-crates (ящики с фруктами, кит Soho) не принят, оценка 6.7. Доработать: рваные и перекрученные планки и обрезки дна нижнего ящика, бедная и мыльная текстура дерева и фруктов."
+}

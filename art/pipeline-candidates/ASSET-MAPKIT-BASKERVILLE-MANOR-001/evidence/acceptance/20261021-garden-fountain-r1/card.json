@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGardenFountain.fbx",
+      "sha256": "fa740abbe2a2fdc3a16837fd5e27e4524d90212701b4bf1f3340f63a5b820ff9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_BC.png",
+      "sha256": "4234db84b8c33cd3bc8e972d4a8cca1f0dbf54e07d67f03254e459a0219e5feb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_N.png",
+      "sha256": "f99b1eabb28876471458f5b2cab7cac7a3178ed50d4d0c258d00ea2bbada350e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenFountain_ORM.png",
+      "sha256": "d9faada864695bfa323500cc9d88022ae0e4aeabe0c9362fe1d0a45fa038227a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-garden-fountain-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGardenFountain.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "4997 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "UV0 islands 710, used 0.6639, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "T_Env_BaskervilleGardenFountain_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenFountain.build.json",
+      "note": "SM_Env_BaskervilleGardenFountain, M_Env_BaskervilleGardenFountain",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это заказанный предмет: круглый двухъярусный каменный фонтан. Как на sheet.png, у круглого бассейна цоколь-ступень и стенка со стрельчатыми арками и рельефами листьев между ними; верхняя чаша стоит на пьедестале с арками, по краю чаши четыре слива со струями, в центре столбик-струя. Мох и вода на месте. Силуэт осесимметричен и одинаков на всех 8 ракурсах (bbox 54–1145 × 239–960). Высота к ширине около 0,66 против 0,72 по описанию 2,5×2,5×1,8 м. Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет. Лист маленький (230 px, вид 3/4 сверху), поэтому пропорции сверены на глаз. Предупреждение frames.json о ключе листа визуально не подтверждается: модель совпадает с листом.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, чёрных пятен и вывернутых частей. Тонкие струи целы и доходят до воды (close-base). Чаши, пьедестал и цоколь чистые. Дефекты видны только на сетке и крупном плане. Рельефы листьев и арок на стенке бассейна в геометрии оплывшие и комковатые, в вершинах арок точки схождения треугольников с вмятиной (wire-front, wire-back, wire-34); на текстурных кадрах их маскирует нормаль. Верх центрального столбика-струи комковатый (close-head). На воде бассейна у передней струи слабая складка (close-base).",
+      "frames": [
+        "turn-000.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На полном росте материалы читаются как в описании и на листе: выветренный светлый камень, пятна мха по стенке и краям, голубая вода в чашах и струях. Запечённого направленного света нет. Детализация (рельефы, мох, вариации тона) не беднее камня кита Sarpedon. Дефекты в основном крупного плана. Камень верхней чаши и пьедестала местами мыльный и с сетчатым зерном (close-weapon). Вдоль граней пьедестала и у струй рыжие потёки, на полном росте это тонкие линии (turn-135, turn-180), читаются как ржавые разводы выветривания. Центральный столбик-струя наполовину в текстуре камня, наполовину воды (close-head). На струях нарисованные белые блики. На игровой дистанции это не мешает.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Оценка 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. Замечания F/T есть только на крупном плане и сетке и вынесены в known_issues. Оценка в полосе 8,0–8,4, поэтому по §8.3 нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Рельефы листьев и стрельчатых арок на стенке бассейна в геометрии оплывшие, в вершинах арок точки схождения с вмятиной (также wire-back, wire-34). На текстурных кадрах их прячет карта нормалей."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Верх центрального столбика-струи в верхней чаше комковатый."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Слабая складка на поверхности воды бассейна у основания передней струи."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Камень верхней чаши и пьедестала на крупном плане мыльный, с сетчатым зерном; рыжие потёки вдоль граней пьедестала."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Тонкие рыжие кромки вдоль центральной струи на чаше и пьедестале видны на полном росте (также turn-135, turn-270). Читаются как ржавые разводы, на игровой дистанции незаметны."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Центральный столбик-струя наполовину в текстуре камня, наполовину воды."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-GARDEN-FOUNTAIN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп garden-fountain (Садовый фонтан) принят по делегированию: 8,3 (S 2,0 / F 1,5 / T 1,5). Замечания крупного плана в known_issues. Оценка в полосе 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

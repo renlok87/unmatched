@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-mooring-pilings-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoMooringPilings.fbx",
+      "sha256": "c9250db910636e0960e8bcde36c0b2683f78d8781669a8b54ac9613501a2a1d6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_BC.png",
+      "sha256": "94d2bb8c1333537566a6892b38b5cc77f72aa08be12e0a969a610a1d10e6631b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_N.png",
+      "sha256": "c2f54f474c2497c87e264af5c0f0cba793fde67bd88601c0117c46927536e246"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoMooringPilings_ORM.png",
+      "sha256": "74cc38f7b9c32aaae16253d22d44bb2da0e87d0732b05fee9cd4408aa844a62c"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-mooring-pilings-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoMooringPilings.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "4345 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "UV0 islands 855, used 0.6344, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "T_Env_SohoMooringPilings_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoMooringPilings.build.json",
+      "note": "SM_Env_SohoMooringPilings, M_Env_SohoMooringPilings",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Спереди (turn-000) совпадает с sheet.png: четыре видимых торца с той же лестницей высот (задняя самая высокая, левая, правая, передняя низкая), верхняя железная полоса, три витка каната, нижняя полоса, три передние ноги с гроздьями ракушек; доля пояса по высоте и ширина в пределах ~5 %. Узнаётся со всех 8 ракурсов, фантомных частей нет, ноги стоят на одном уровне. Одно второстепенное отличие: в кластере пять свай, а не заказанные четыре — пятая скрыта спереди, но видна на turn-045/090/135/180/225/315 (пять торцов, пять ног). Сбоку ноги расходятся «шалашом», это допустимо и проверить по однородному листу нельзя.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Цилиндры свай, канат, заклёпки, сквозные болты и ракушки цельные; дыр, просветов, чёрных пятен и вывернутых частей нет; сетка на wire-* повторяет форму. Дефекты мелкие: у нижней железной полосы справа спереди V-образный надрез со ступенькой (wire-front x≈780, wire-34 x≈690–750, на turn-045/090 — клин, на close-base — рваная нижняя кромка). На полном росте он мал и читается как стык поношенной полосы, явным дефектом выглядит только на крупном плане и в сетке. Ещё: вертикальный залом-шов по самой высокой свае и слегка оплывшие края торцов (close-head).",
+      "frames": [
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "turn-045.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: тёмное просмолённое дерево с рисованными прожилками, ржавые железные полосы с заклёпками, витой канат, светлые ракушки. Запечённого направленного света нет, детализация на уровне кита. Дефекты крупного плана: размытые светлые ореолы цвета ракушек протекли на дерево у основания (turn-135 x≈360–450, turn-225 x≈250–310, turn-180), внутри надреза нижней полосы серый клин чужого цвета (turn-045/090, close-base), торцы свай мыльные, со смазанными годичными кольцами (close-head, close-weapon). На игровой дистанции всё это почти не заметно.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 (S 1,5 + F 1,5 + T 1,5): все гейты PASS/n/a, ни одно измерение не ниже 1,0, S ≥ 1,5 → rework_blender по пунктам F и T; лишняя пятая свая (S) — known issue",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "fix": "Нижняя железная полоса справа спереди: убрать V-образный надрез со ступенькой и рваной кромкой (wire-front x≈780, wire-34 x≈690–750, turn-045 x≈700–770), чтобы полоса шла цельной лентой",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Сгладить вертикальный залом-шов по самой высокой свае (от торца вниз) и оплывшие края торцов: сварить и сгладить нормали по шву",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "fix": "Перезапечь BaseColor с меньшей дистанцией луча или каркасом, чтобы цвет ракушек не протекал размытыми ореолами на сваи у основания (turn-135, turn-225, turn-180), и убрать серый клин в надрезе нижней полосы",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Торцы свай мыльные: поднять плотность текселя торцевых островов или перезапечь, чтобы годичные кольца и рисованная кромка читались чётко",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "В кластере пять свай вместо заказанных четырёх. Спереди пятая скрыта и вид совпадает с sheet.png, на остальных ракурсах видны пять торцов и пять ног. Узнаваемость и силуэт не страдают; в Blender не исправляется, при перегенерации Tripo указать четыре сваи"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-MOORING-PILINGS-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mooring-pilings (сваи причала, Soho) r2: 7,5, на доработку в Blender — надрез нижней железной полосы, шов и мыльные торцы, ореолы ракушек на дереве; пять свай вместо четырёх — known issue."
+}

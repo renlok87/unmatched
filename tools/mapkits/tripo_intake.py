@@ -167,6 +167,11 @@ def intake(m: str, key: str, task: str, glb: Path, date: str, move: bool) -> dic
 def level(m: str, key: str, date: str, force: bool) -> dict:
     """Stand a tilted prop level (tools/mapkits/level_glb.py) in its run source and re-hash it in tripo-run.json."""
     import level_glb  # noqa: E402
+    p = mapkit.prop(m, key)
+    text = " ".join(str(p.get(f, "")) for f in ("zone", "nameEn", "descEn")).lower()
+    if not force and any(w in text for w in ("wall", "mounted", "hanging", "awning", "sign")):
+        # a hanging prop has no support polygon: the search would tip it (stag-trophy 11 deg, NOTES F8)
+        return {"asset": asset_id(m, key), "applied": False, "skipped": "wall / hanging prop"}
     aid = asset_id(m, key)
     run = run_dir(m, date)
     src = run / "source" / f"{aid}.glb"

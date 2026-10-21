@@ -1,0 +1,163 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervillePartnersDesk.fbx",
+      "sha256": "bcd313875fd3babc07cdcdb0bc21098c1d647a0791ad860491e8db3ec2f3a4d9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_BC.png",
+      "sha256": "fa01480c925f35ac4a13143c0a44680d6ce8ce66cd40194b49e12f4fbcfd862a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_N.png",
+      "sha256": "1d2da3e2fa284a7909eb2f2bbd28a0d8afde02bac94d51937f6922bbb86b1dad"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_ORM.png",
+      "sha256": "5138346452e7d6a4933b571d56354f2fb2b30e1a8b7f8bec73d23471b862f97f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-partners-desk-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervillePartnersDesk.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "4967 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "UV0 islands 1038, used 0.703, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "T_Env_BaskervillePartnersDesk_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "SM_Env_BaskervillePartnersDesk, M_Env_BaskervillePartnersDesk",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это заказанный предмет: тумбовый письменный стол с кромкой столешницы на 3 ящика (средний длинный, с двумя ручками), по 3 ящика в каждой тумбе, проём для ног, ножки-кронштейны. Сверху зелёная кожаная вставка с золотым тиснением, свитки слева, лист с пером в центре, чернильница с гусиным пером справа. Всё совпадает с sheet.png по составу и расстановке. Пропорции корпуса Ш:Г:В ≈ 1,6:0,96:0,87 м против заказанных 1,6:0,9:0,8: стол чуть выше, но в пределах 10 % и на глаз как на листе. Лишних и фантомных частей на turn-090/270 и wire-* нет, предмет узнаётся со всех 8 ракурсов. Сзади (turn-180) вместо ящиков второго партнёра глухие филёнки. Это упрощение «partners desk», но лист этот вид не показывает, а описание («pedestal writing desk») выполнено. Масштаб в игре вынесен в known_issues: это параметр env_kit, не форма.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и на крупных планах нет дыр, просветов, чёрных пятен, вывернутых частей и оплывших масс. Филёнки, фаски ящиков, ручки-скобы с розетками и ножки-кронштейны читаются чётко. Тонкое гусиное перо цело на всех ракурсах. На wire-front, wire-back и wire-34 сетка следует форме: крупные плоскости отданы большими треугольниками, плотность сидит на фасках ящиков, ручках и ножках, мусорной геометрии нет. Торцы свитков гранёные (low-poly), это бюджет, а не дефект. По отчёту сборки корпус открыт снизу (скрыто, стоит на цоколях), а ray-escape находит 40 «внутренних» граней у ручек ящиков. На кадрах это не видно, проверка вынесена в known_issues.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как заказано и сделаны богато: красное дерево с ясной текстурой (горизонтальной на кромке, вертикальной на филёнках), латунь ручек, зелёная кожа с тиснёной рамкой, бумага с рукописными строками, зелёное стекло чернильницы. Это не беднее уровня кита Sarpedon. Явного запечённого блика нет. Дефект на полном росте в одной зоне: низ задней стенки проёма для ног (полоса ~10 % высоты корпуса) размыт в белёсую розовато-серую дымку («мыло»), чёткой границы с цоколем нет. Видно на turn-000, turn-180, turn-315 и сверху на close-base. Дефект только крупного плана: продольные растянутые полосы текстуры на скошенной кромке вокруг кожаной вставки (close-weapon, close-head). На игровой дистанции стол читается, но по рубрике дефект в одной зоне на полном росте даёт 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score = round((2,0+2,0+1,0)/6×10, 1) = 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS/n/a. T = 1,0 из-за «мыла» внизу проёма для ног, видного на полном росте. Оценка в полосе 8,0–8,4, поэтому нужен второй приёмщик другого профиля.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Низ задней стенки проёма для ног размыт в белёсую дымку («мыло», ~10 % высоты корпуса, без чёткой границы с цоколем). Видно также на turn-180.jpg, turn-315.jpg и close-base.jpg. Исправление: затемнить или перерисовать эту полосу в BC, либо запечь AO в ORM.R (сейчас R=1); иначе перегенерация текстуры в Tripo."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Растянутые продольные полосы текстуры на скошенной кромке вокруг кожаной вставки, на close-head.jpg розоватые. Видно только на крупном плане."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Цель масштаба env_kit 24,0 uu применена к габариту вместе с пером: оболочка пера доходит до 24,0 uu, а верх столешницы стоит на ≈17,7 uu. Корпус выходит ≈0,74 от высоты 24 uu, выведенной из 0,8 м при герое 55 uu, и ширина 32,3 uu против ≈48 uu. Это параметр, не форма. Исправление в env_kit params: задать высоту по корпусу (габарит ≈32,6 uu с пером) или масштаб ×≈1,36 в раскладке."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Отчёт сборки: ray_escape 40 граней «inward» (2,6 % площади) на фасадах ящиков у ручек (x ±9,6…12,3, y −8,95, z 4…12,7 uu), корпус открыт снизу (дыра 555 uu² на z 2,87). На кадрах Blender не видно. Проверить в UE с односторонним материалом, что фасады ящиков не просвечивают."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-PARTNERS-DESK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп partners-desk принят по делегированию с оценкой 8,3 (S 2,0, F 2,0, T 1,0). Известные проблемы: «мыло» внизу проёма для ног и растяжка на кромке столешницы. Цель 24 uu взята вместе с пером, поэтому корпус ≈17,7 uu, поправить в env_kit params или раскладке. Нужен второй приёмщик Opus high."
+}

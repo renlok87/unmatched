@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSuitOfArmour.fbx",
+      "sha256": "52a1b3cf0d5299efdb30c255af45524862b31528e81e80ffd6e56258cfbce009"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_BC.png",
+      "sha256": "b26e574dbe72b3af6aa664a3107d22bdfcd044c98f66dc15126862849b63085b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_N.png",
+      "sha256": "d047ce0defee5e03c5ea95b2f06b7627187677705def4e77624a34d6f28066d3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_ORM.png",
+      "sha256": "53dca77e0f9af1225b9fd545e4a2b83f420e699609cdf7f1df9379bf6fc477cd"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-suit-of-armour-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSuitOfArmour.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "5622 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "UV0 islands 128, used 0.564, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "T_Env_BaskervilleSuitOfArmour_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "SM_Env_BaskervilleSuitOfArmour, M_Env_BaskervilleSuitOfArmour",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: полный латный доспех (армет с забралом, кираса, наплечники, набедренники, острые сабатоны) на деревянной подставке с алебардой в правой руке; поза, сторона алебарды, полумесяц топора с крюком и пика совпадают с sheet.png, узнаётся со всех ракурсов, фантомных частей на turn-090/270 и wire-* нет. Одно второстепенное отличие: деревянная подставка заметно крупнее, чем на виде (ширина ≈0,6 высоты фигуры против ≈0,35 на sheet, высота ≈0,28 против ≈0,16) — сам доспех от этого не искажён.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, чёрных пятен и мусорной геометрии; тонкие элементы целы (древко, пика, лезвие и крюк алебарды, острые носки сабатонов); шлем с прорезью и дыхальцами чистый; сетка на wire-* следует форме, подставка — чистый короб. Пальцы левой латной перчатки чуть мягкие на close-weapon, но читаются — в пределах стилизации.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Металл читается как потемневшая сталь с патиной, заклёпками и кожаными ремнями, древко — тёмное дерево, подставка — красное дерево, как на виде; запечённого света в доспехе нет, детализация на уровне кита. Дефекты только крупного плана: верх подставки на close-base мыльный и выбеленный, волокно дерева мягкое; редкие красноватые пятна на поножах (turn-090, close-base) читаются как ржавчина/грязь.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 1.5 + F 2.0 + T 1.5 = 5.0 из 6 → 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Деревянная подставка шире и выше, чем на sheet.png (≈0,6 против ≈0,35 высоты фигуры по ширине); доспех и алебарда совпадают."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Верх подставки мыльный и выбеленный, волокно мягкое; красноватые пятна на поножах — только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-SUIT-OF-ARMOUR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп suit-of-armour принят по делегированию (8.3): подставка крупнее вида и мягкое дерево на её верху — только известные замечания."
+}

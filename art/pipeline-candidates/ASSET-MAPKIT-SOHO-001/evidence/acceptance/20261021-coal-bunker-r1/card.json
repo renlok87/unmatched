@@ -1,0 +1,180 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCoalBunker.fbx",
+      "sha256": "ab2ad16526e09d6a8e9ac88817a2af5cf92d0dd5d8b08faa0b8a1699ed06ca5b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCoalBunker_BC.png",
+      "sha256": "5be779663f8e1ab4feb97f0ce3522e4f70d0fe6ff5efe216a9184e6b812a05b1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCoalBunker_N.png",
+      "sha256": "4f9a5fb81483641eae8434bbacad4dc7e52ac2b46395eea738311144e7658c3f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCoalBunker_ORM.png",
+      "sha256": "07f4a6f3429c0a5bb00b9d62f597f3fa55ec312fc149355bdc28d89a46205922"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-coal-bunker-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoCoalBunker.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+      "note": "5056 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+      "note": "UV0 islands 809, used 0.7794, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+      "note": "T_Env_SohoCoalBunker_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCoalBunker.build.json",
+      "note": "SM_Env_SohoCoalBunker, M_Env_SohoCoalBunker",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: деревянный ящик из горизонтальных досок с угловыми стойками, приоткрытая крышка на шарнире с двумя планками, которая наклонена вниз к фронту (turn-090), и россыпь угля у переднего угла. Главные части на месте, фантомных частей нет, ящик узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: задне-левый угол короба просел и смят. Левая секция задней стенки ниже правой и уходит внутрь, под нависающей крышкой виден уступ (turn-180, turn-090, turn-135). На листе контур ровный. Пропорции по sheet.png оценены на глаз, лист 230 px: при поправке на высокую камеру листа явного сбоя > 10 % нет. Отдельно: фронт ящика повёрнут примерно на 45° относительно рамки ассета. Ровный вид спереди с симметричными планками крышки — это turn-045, а на turn-000 видны две грани. На силуэт это не влияет, но AABB раздут до 45,6×41,6 uu.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Фронтальная стенка, крышка и куча угля чистые. Сетка там следует форме (wire-34), дыр и чёрных пятен на полном росте нет. Но на полном росте видна одна зона генерационного дефекта: задне-левый угол короба (задняя половина левой стенки и левая секция задней стенки). Доски там смяты, как бумага: Z-образные диагональные складки, вздутые «подушки» вместо ровных планок, внизу торчит осколок и видна тёмная щель (turn-090, turn-135, turn-180, wire-back). На wire-back видно, что это рваная треугольная геометрия, а не стилизованная трещина. Мелочи, видные только при взгляде в щель: тёмные наклонные плоскости внутри под крышкой (turn-000), щель между нижними досками задней стенки (wire-back). По отчёту крышка состоит из двух отдельных оболочек с зазором до 1,8 uu.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как выветренное серо-бежевое с пятнами мха. Материал и стиль соответствуют описанию (weathered wood, stylized hand-painted), основное пятно цвета того же семейства, что на листе: лист чуть теплее. Яркого запечённого блика нет. Полосы «светлая середина / тёмные края» на боковых досках в основном объясняются вздутой геометрией. Дефекты видны только на крупном плане. Текстура крышки и кромок досок мыльная, растянута в горизонтальные полосы (close-head, close-weapon). Уголь светлый серо-голубой с сильным глянцем: на close-base он читается как металл или серые камни, а не как чёрный уголь листа. На полном росте (turn-045) куча всё же темнее дерева и читается как уголь. Для фонового пропа диорамы на игровой дистанции приемлемо.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "Оценка round((1.5+1.0+1.5)/6×10, 1) = 6.7 < 8.0, поэтому pass невозможен. S = 1.5 ≥ 1.5, значит это не return_to_stage_2, а доработка по пунктам F/T. Главный пункт — смятая геометрия задне-левого угла короба. Это дефект исходника Tripo: env_kit не чинит геометрию, поэтому для него нужен другой вариант или перегенерация. Все гейты PASS или n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Задне-левый угол короба (задняя половина левой стенки и левая секция задней стенки, turn-090/135/180, wire-back): доски смяты Z-складками и вздуты, внизу осколок и щель. Взять другой вариант задачи Tripo «Умная сетка» или перегенерировать с видами back/left, чтобы все четыре стенки были ровными досками между угловыми стойками.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Мыльная, растянутая в полосы текстура дерева на крышке и кромках досок (close-head, close-weapon). При перегенерации выбрать вариант с чёткой текстурой волокон; запекание в env_kit этого не исправит.",
+      "tool": "исходник Tripo: текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Уголь светло-серо-голубой и глянцевый, на крупном плане читается как металл. Нужен тёмный, почти чёрный уголь, как на листе: в новом исходнике задать тёмный BC кучи и матовый roughness.",
+      "tool": "исходник Tripo: текстура"
+    },
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "fix": "Фронт ящика (ровный вид с симметричными планками крышки) смотрит на азимут ~45°, а не на 0. В params задать yaw ≈ 45° со знаком, при котором turn-045 становится turn-000, тогда фронт смотрит в UE +X. AABB сожмётся с 45,6×41,6 uu.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Крышка — две отдельные оболочки (shells 3/4 в build.json), висят над стенками с зазором до 1,8 uu и по шарниру короба не касаются. На игровой дистанции читаются как приоткрытая крышка."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "В щели под крышкой у правого переднего угла видны тёмные наклонные плоскости внутренних стенок. Мелочь, видна только при взгляде в щель."
+    },
+    {
+      "item": "G-UV",
+      "frame": "uv-layout.png",
+      "note": "UV0 — атлас Tripo: 809 островов, много тонких щепок, min gutter ≈ 1 px, расстояние между островами < 1 текселя с mip 2. На дальних мипах возможны швы. Гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-COAL-BUNKER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп coal-bunker не принят (6.7). Нужна доработка: смятые доски задне-левого угла короба (исходник Tripo), мыло на крышке и светлый глянцевый уголь. Фронт повёрнут на ~45°, это правится yaw через env_kit params."
+}

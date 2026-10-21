@@ -1,0 +1,167 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoCargoNet.fbx",
+      "sha256": "fe43da010e66fe3908607322c87a51143970a81f776e34335828acb3eacda81c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoNet_BC.png",
+      "sha256": "db4c3ba31d9249be7d254ff0ebfa1f7d66a7e99e772317c617a20f42ecaf4e4a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoNet_N.png",
+      "sha256": "1f4cf1995375d8eb4ef4aed8300515a750845231fe25d5d508c1c30803c7366b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoCargoNet_ORM.png",
+      "sha256": "d031f5e4988d0e981891a814f4e02447527d13f25638632a78291083f7301337"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-cargo-net-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoCargoNet.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+      "note": "4764 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+      "note": "UV0 islands 1301, used 0.6184, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+      "note": "T_Env_SohoCargoNet_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoCargoNet.build.json",
+      "note": "SM_Env_SohoCargoNet, M_Env_SohoCargoNet",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это заказанный предмет: нижний ящик с филёнками, сверху мешки и малый ящик, всё в верёвочной сетке с узлами, веер строп к кольцу; по sheet.png совпадает. Пропорции совпадают с видом: на 3/4 отношение высоты к ширине 0,94 против примерно 0,96 на листе. Петли строп свисают ниже дна, как на листе. Лишних и пропавших частей нет. Узнаётся со всех 8 ракурсов, на turn-090/270 кольцо видно ребром, это норма. Основные пятна цвета (беж верёвки и мешков, светлое дерево, серое кольцо) в тех же семействах, что на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: стропы и тонкие верёвки целы, узлы на месте, дыр, вывернутых частей и мусора нет, ящики с гранёными рамами. На wire-34/front/back сетка следует форме. Дефекты видны только на крупном плане. Кольцо гранёное, грани видны по контуру (close-head). Узел у кольца оплывший комок без отдельных витков. Между верхним ящиком и мешками узкие чёрные щели (close-weapon, тёмный клин под вершиной сетки на turn-090/270).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Перед и зад ящика хорошие: рисованное дерево с волокном, рамами и филёнками; верёвка с витой росписью, мешки читаются мешковиной; на close-base дерево ящика держится. Дефект на полном росте в одной зоне: на turn-090 и turn-270 боковые грани нижнего ящика в мыле. Там мягкие разводы и складки вместо досок и рамы, читаются скорее тканью, чем деревом; на 135/225/315 частично. Это проекция с двух видов без боков. Кольцо матовое светло-серое без признаков железа. По плотности деталей и контрасту текстура беднее эталона кита Sarpedon (T_Env_CrateStack_BC: чёткое волокно, железные уголки). Мелочь: случайные тёмные силуэты на верхнем ящике (turn-315) и бурое пятно на крышке (close-base).",
+      "frames": [
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,0 = 4,5 из 6, итог 7,5 < 8,0. Силуэт принят (S ≥ 1,5), значит доработка, не перегенерация. Причина — T: на полном росте (turn-090/270) мыло на боковых гранях нижнего ящика, кольцо не читается железом.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "fix": "Боковые грани нижнего ящика (turn-090/270) перетекстурировать. Сейчас там мягкие разводы и складки, похожие на ткань. Нужны доски и рама, как на передней грани: текстура исходника по видам сбоку и сзади (multiview) или перепроекция боковых граней с фронтальной текстуры ящика.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Кольцо сделать тёмным железом вместо матового светло-серого: темнее цвет, лёгкий износ или ржавчина, металличность в ORM на острове кольца.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Только крупный план. Защитить кольцо и узел у кольца от децимации (или поднять там плотность) и сгладить нормали кольца, чтобы ушли грани по контуру. Проверить и закрыть тёмные щели между верхним ящиком и мешками (close-weapon).",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "note": "На верхнем ящике справа случайный нарисованный «сюжет» (тёмные силуэты), на крышке ящика бурое пятно (close-base). Мелко, на игровой дистанции читается как маркировка груза. Убрать попутно при перетекстуровке."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-CARGO-NET-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп cargo-net кита Soho отправлен на доработку, оценка 7,5. Силуэт и форма приняты. Перетекстурировать боковые грани нижнего ящика (сейчас мыло) и сделать кольцо железным."
+}

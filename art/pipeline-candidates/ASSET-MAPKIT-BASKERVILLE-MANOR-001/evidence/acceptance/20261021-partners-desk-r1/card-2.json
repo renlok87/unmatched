@@ -1,0 +1,151 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervillePartnersDesk.fbx",
+      "sha256": "bcd313875fd3babc07cdcdb0bc21098c1d647a0791ad860491e8db3ec2f3a4d9"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_BC.png",
+      "sha256": "fa01480c925f35ac4a13143c0a44680d6ce8ce66cd40194b49e12f4fbcfd862a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_N.png",
+      "sha256": "1d2da3e2fa284a7909eb2f2bbd28a0d8afde02bac94d51937f6922bbb86b1dad"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervillePartnersDesk_ORM.png",
+      "sha256": "5138346452e7d6a4933b571d56354f2fb2b30e1a8b7f8bec73d23471b862f97f"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-partners-desk-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervillePartnersDesk.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "4967 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "UV0 islands 1038, used 0.703, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "T_Env_BaskervillePartnersDesk_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervillePartnersDesk.build.json",
+      "note": "SM_Env_BaskervillePartnersDesk, M_Env_BaskervillePartnersDesk",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: тумбовый письменный стол с двумя тумбами по три ящика, тремя ящиками в царге, нишей для ног, фигурными ножками-кронштейнами, зелёной кожаной вставкой столешницы, свитками, бумагой, пером и чернильницей. Пропорции и главные части совпадают с видом, лишних или пропавших частей нет; задняя сторона закрыта филёнками (вид её не задавал). Узнаётся со всех ракурсов, на turn-090/270 и wire-* фантомных выступов нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка чистая: нет дыр, просветов, рваных краёв, вывернутых частей и оплывших масс; ручки-скобы, перо, свитки и ножки целы. На wire-34/wire-front сетка следует форме (филёнки, рамки ящиков, профиль карниза). Гранёные торцы свитков читаются как стилизация низкополигонального пропа, а не как дефект.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-000.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как заказано: красное дерево с текстурой волокон, латунные ручки, зелёная кожа с тиснёной рамкой, бумага с рукописным текстом, тёмно-зелёное стекло чернильницы; детализация на уровне кита Sarpedon. Но в нише для ног на полном росте виден светлый размытый туманный градиент у низа задней стенки (мыло/запечённое осветление в цвете) — одна зона на полном росте. На крупном плане ещё растяжки текстуры (розово-зелёные полосы) на профиле кромки столешницы.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; дефект текстуры T в нише для ног — фоновая зона под столом на игровой дистанции, записан в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Светлый размытый туманный градиент у низа задней стенки ниши для ног (мыло/запечённое осветление в BaseColor), виден на полном росте спереди и сзади (turn-180, turn-225)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Растяжки текстуры дерева на профиле кромки столешницы (полосы розово-зелёного цвета), видны только на крупном плане (также close-head)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-PARTNERS-DESK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп partners-desk принят по делегированию (8.3): форма и силуэт как на виде; известное — мыльный градиент в нише для ног и растяжки на кромке столешницы."
+}

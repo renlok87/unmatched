@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-dock-bollard-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoDockBollard.fbx",
+      "sha256": "24515663f69b96d0abbe4f9451fa244e60bd497f6461b1c44832ef9176ea9174"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_BC.png",
+      "sha256": "6836d0da2353212c3fc9d29e9c7b91fcb28e7af2346feb4e650d150fbb7f8248"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_N.png",
+      "sha256": "965bfebda08c5ecc1ddc76b64fa2cfc97dd0ec8a2185a8f9f4884fe9012afc0f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoDockBollard_ORM.png",
+      "sha256": "a6c2ae7f6f88efefff6dcb4abdf099a4ff4935d2126c403508012bcd16b07339"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-dock-bollard-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoDockBollard.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "5226 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "UV0 islands 64, used 0.6176, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "T_Env_SohoDockBollard_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoDockBollard.build.json",
+      "note": "SM_Env_SohoDockBollard, M_Env_SohoDockBollard",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот же предмет, что на листе и в описании: приземистая чугунная причальная тумба с грибовидной шляпкой, перехватом, расширением книзу и круглым фланцем, вокруг неё пеньковый трос. Трос перекрещён спереди, как на sheet.png, и обвит вокруг ствола. Соотношение шляпки и фланца (0,76 на turn-000 против ~0,75 на листе) и общая высота совпадают с листом в пределах ~5 %. Лишних и пропавших частей нет, тумба узнаётся со всех 8 ракурсов. Цвет того же семейства: сине-чёрный чугун и бежевый трос. Петли троса выходят за фланец чуть дальше, чем на листе (ширина с тросом 38,5 uu, корпус ~27,7 uu); это в пределах точности ракурса миниатюры листа 230 px. Номинал описания 0,5×0,5×0,8 м противоречит слову squat, модель следует приземистому листу. Предупреждение frames.json о несовпадении ключа листа ложное: view-thumb.png лежит в папке dock-bollard и изображает ту же тумбу.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка цельная. По отчёту это 2 замкнутые оболочки (тумба и трос), 0 открытых и неманифолдных рёбер, 0 вывернутых граней. На wire-front, wire-back и wire-34 треугольники ровно следуют форме шляпки, ствола, фланца и жгута троса. Мусорной геометрии, рваных краёв и оплывших масс нет. Трос цел по всей длине, витки читаются. Тёмная зона под перекрестьем троса на wire-front и turn-000 — это тень, а не дыра. Мелочи без снижения оценки: верхний контур шляпки слегка волнистый (wire-front). Низ петель троса за краем фланца висит на ~1 uu над землёй, так же как петля на листе.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "turn-000.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: тёмный сине-чёрный чугун с мелкой зернистостью и светлыми сколами и пеньковый трос с витыми прядями. BC ровный, запечённого света и теней в нём нет: светлый верх шляпки на поворотах — блик key-света, в BC его нет. Растяжек на трубе нет, детализация на уровне Tripo-пропов кита Sarpedon. Дефекты мелкие и заметны только при близком рассмотрении. На задней стороне ствола над верхней петлёй троса есть маленький светлый мазок с оранжевым пикселем и размытая полоса ниже: turn-180, turn-135 и turn-225, ~2–3 % высоты, на игровой дистанции не читаются. На верхней грани фланца и у основания ствола, где трос закрывал виды генерации, видны гладкие мыльные глянцевые пятна (close-base). На close-head виден шов UV на шляпке: волнистая рябь нормалей сменяется зернистостью.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0 ((2.0+2.0+1.5)/6×10), ни одно измерение не ниже 1,0, гейты PASS или n/a",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Задняя сторона ствола над верхней петлёй троса: маленький светлый мазок с оранжевым пикселем и размытая полоса ниже. Видно также на turn-135 и turn-225. Размер ~1 uu, на игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Верх фланца и низ ствола под тросом: гладкие мыльные глянцевые пятна в зонах, которые трос закрывал на видах генерации."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Шов UV на шляпке: граница, где волнистая рябь нормалей сменяется зернистостью. Виден только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Петли троса выходят за фланец и висят на ~1 uu над землёй, как на листе. Габарит с тросом 38,5×31,7 uu, корпус ~27,7 uu: учесть при раскладке на набережной."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-DOCK-BOLLARD-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dock-bollard (причальная тумба Soho) принят по делегированию с оценкой 9.2. Мелкие мазки текстуры на задней стороне ствола и под тросом записаны в known_issues."
+}

@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleWingbackArmchair.fbx",
+      "sha256": "e0261a79e02a8cbc7585742d239879b1e1e6133d1f8134742911d459a854982c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_BC.png",
+      "sha256": "a9352ed0617f309479ca634c27354c328786485ced19927596e1e44ca09fe3e1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_N.png",
+      "sha256": "f00ab7d1c7e05ff73c9e6480eb0865510623b80fbf7d7adc6a8d278eb44c2fb7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_ORM.png",
+      "sha256": "cbcf763b6f96cd3d4e737bfe3c52f56a839a9c6708b2fee7975514e303f3e5f0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-wingback-armchair-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleWingbackArmchair.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "5211 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "UV0 islands 333, used 0.7566, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "T_Env_BaskervilleWingbackArmchair_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "SM_Env_BaskervilleWingbackArmchair, M_Env_BaskervilleWingbackArmchair",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: кресло с ушами, высокая спинка с горбом-кэмелбэк, развёрнутые крылья, валики подлокотников со скруткой спереди, подушка сиденья с кантом, 4 гнутые ножки-кабриоль с лапками, ряды гвоздей по кромкам крыльев, фронту подлокотников и верху спинки. Части и пропорции совпадают с видом sheet.png (ножки ≈22 % высоты, подлокотники на середине, крылья выше подлокотников); лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет; узнаётся со всех 8 ракурсов, включая спину (turn-180: шов спинки, торцы валиков). Пятно цвета — то же семейство (красная кожа + тёмное дерево + светлый металл); тон чуть светлее и краснее oxblood листа — отмечено в known_issues, на балл не влияет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: нет дыр, просветов, вывернутых частей, чёрных пятен; ножки целы, подушка и валики объёмные, стыки ножек с коробом аккуратные; сетка на wire-34/wire-back следует форме (веерные вершины только на плоских боковинах и наружной стороне крыла, на шейдинг не влияют). Дефекты только крупного плана: гвозди на торцах подлокотников — неровные оплывшие бусины, кольцо гвоздей вокруг скрутки на close-weapon выглядит рваным/зубчатым; гребень спинки на close-head слегка волнистый.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "turn-090.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кожа с зерном и патиной, ножки — дерево с выраженной текстурой волокон, гвозди — светлые металлические точки; швов, растяжек и мыла на полном росте нет, детализация (зерно кожи, волокна дерева) на уровне эталона кита; затемнения у стыков совпадают со светом key/fill/rim, явного запечённого блика в цвете не видно. Дефекты крупного плана: гвозди матовые кремово-бежевые и почти не читаются как полированная латунь; на внутренней стороне спинки (close-weapon) мягкие размытые пятна патины.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0 (S 2.0, F 1.5, T 1.5), гейты PASS/n/a; замечания F/T только крупного плана, для фонового пропа на игровой дистанции не значимы.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Тон кожи — светлее и насыщеннее (вишнёво-красный), чем тёмный oxblood на sheet.png; семейство то же. Габарит по frames.json 0.244×0.232×0.36 м: при заказанных ≈0.8×0.9×1.2 м кресло примерно на 14 % мельче по глубине; с видом листа это расхождение не спорит. Предупреждение frames.json о несовпадении ключа листа — артефакт ключа (view-thumb без content_key), по содержанию лист тот: кресло с ушами, гвоздями и ножками-кабриоль."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Гвозди на торцах подлокотников — неровные оплывшие бусины; на close-weapon.jpg кольцо гвоздей вокруг скрутки валика рваное/зубчатое; на close-head.jpg гребень спинки слегка волнистый. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Гвозди матовые кремово-бежевые, металл латуни читается слабо; на close-weapon.jpg на внутренней стороне спинки мягкие размытые пятна патины. Только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-WINGBACK-ARMCHAIR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wingback-armchair кита Baskerville Manor принят по делегированию с оценкой 8.3. Мелочи крупного плана (неровные матовые гвозди, волнистый гребень спинки) записаны в known_issues. Оценка в зоне 8.0–8.4, поэтому нужен второй приёмщик Opus high."
+}

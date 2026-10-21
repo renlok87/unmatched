@@ -1,0 +1,179 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hansom-cab-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoHansomCab.fbx",
+      "sha256": "52bb5f429055703d0157b3477ba65d279da0711e30b06a5231295c4a41685eee"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_BC.png",
+      "sha256": "2543a2b04d775071338b18f0f1eb7a688911ad38c616c785fb69f1b3f93219c8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_N.png",
+      "sha256": "7545f3663e765966957aca5fecaa3046cecd36b1eaa364f16eb905301414b857"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoHansomCab_ORM.png",
+      "sha256": "c2ba67f4a8856c3ba26b50371658486fcc8fc560d28b179c3b7de9ff6c4e976d"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-hansom-cab-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoHansomCab.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "4657 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "UV0 islands 968, used 0.6261, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "T_Env_SohoHansomCab_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoHansomCab.build.json",
+      "note": "SM_Env_SohoHansomCab, M_Env_SohoHansomCab",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот же, что на листе и в описании: чёрный двухколёсный хэнсом-кэб с высоким сиденьем кучера сзади (поручень, спинка), оглобли лежат на земле, лошади нет, есть складные передние дверцы с фартуком, фонари и изогнутое крыло над колесом. Колесо стоит под задней частью кузова, как на листе. Пропорции на глаз совпадают: Ш/В 0,69, как в заказе 1,8/2,6; Д/В 1,68 против 1,54 за счёт оглобель, это меньше 10 %. Кэб узнаётся со всех 8 ракурсов, в том числе с торцов turn-090/270. Светлые петли ремней под оглоблями на листе едва различимы; это правдоподобная деталь упряжи, а не фантомная часть.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка Smart Mesh (4657 tris) следует форме; спицы, обода, поручни, оглобли и кронштейны фонарей целы. Дефект: в боковых окнах и дверце кабины с обеих сторон есть треугольные дыры. В build.json это открытые петли из 3–6 рёбер в shell 0 на высоте окна, площадью 193, 152 и 67 uu². На полном росте (turn-000/180) они видны как чёрные и светлые треугольники внутри окна, на wire-front/back — как просветы. Это дефект на полном росте в одной зоне (зеркально на обоих бортах), отсюда 1,0. На крупном плане вдобавок волнистый оплывший кант крыши, комковатые навершия фонарей и гранёный угол крыши.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: чёрный лак кузова с потёртостями, дерево с волокном на оглоблях, передних дверцах и заднем щите, железо колёс, поручней и фонарей, медная окантовка, точки ржавчины у кронштейнов. Запечённых теней, швов и растяжек нет, детализация на уровне кита. Минусы: на крупном плане размытые мазки на крыше и в низу передних дверец (close-head, close-weapon). Петли ремней под оглоблями светло-серебристые, а не тёмная кожа. Крыша светлее чёрного тона листа. На игровой дистанции цвет ремней и крыши читается как железная фурнитура и потёртый верх.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-315.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0, потому что F 1,0: треугольные дыры в боковых окнах кабины видны на полном росте turn-000/180 и wire-front/back. S 2,0 ≥ 1,5, поэтому нужна доработка, а не перегенерация. Все гейты PASS или n/a.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Закрыть треугольные дыры в боковых окнах и дверце кабины на обоих бортах (shell 0, открытые петли 3–6 рёбер на высоте окна, 193/152/67 uu² по build.json). Проём заполнить целиком тёмной гранью стекла или открыть полностью, без треугольных лоскутов. Проверить на turn-000/180 и wire-front/back.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "fix": "Петли ремней под оглоблями перекрасить в BC из светло-серебристого в тёмную кожу (чёрно-коричневую), как написано в описании (leather).",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать размытые мазки в BC на крыше и в низу передних дверец, крышу привести к чёрному лаку или клеёнке, как на листе.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Крупный план: волнистый оплывший кант крыши и комковатые навершия фонарей. На игровой дистанции не читается."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёный угол крыши (низкополигональная дуга). Кадр «верх 22 %» поймал только угол крыши, поэтому верх дополнительно оценён по close-weapon."
+    },
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "frames.json предупреждает, что view-thumb.png (ключ None) не совпадает с листом ключа Env_SohoHansomCab. Визуально лист — тот же кэб (оглобли, заднее колесо, сиденье кучера, фонарь), S оценён по нему."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-HANSOM-CAB-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hansom-cab (r2) не принят, нужна доработка: треугольные дыры в боковых окнах кабины видны на полном росте (F 1,0), в BC мазки на крыше и светлые ремни (T 1,5). Силуэт совпадает с листом (S 2,0), итог 7,5."
+}

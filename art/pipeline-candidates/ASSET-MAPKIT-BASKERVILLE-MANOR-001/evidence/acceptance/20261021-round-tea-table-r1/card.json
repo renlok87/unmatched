@@ -1,0 +1,172 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleRoundTeaTable.fbx",
+      "sha256": "4cc595c9ea3a6507a903081593b4139d2a147d96c3dac5daf10fad222cf497c1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRoundTeaTable_BC.png",
+      "sha256": "ed569d926be4a860f71630b857216e5263a4dca8379bd2b256760da9e66f9974"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRoundTeaTable_N.png",
+      "sha256": "828c5f0c2abc29490d9290cbd241e67e165f478aa98bc7c915b75de09cc7a5b8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleRoundTeaTable_ORM.png",
+      "sha256": "c67a5ee12dbab974af3db9aeb8bdb7ac1670e6e0021c8b3ba338c02d0466541a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-round-tea-table-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleRoundTeaTable.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+      "note": "5052 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+      "note": "UV0 islands 78, used 0.607, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+      "note": "T_Env_BaskervilleRoundTeaTable_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleRoundTeaTable.build.json",
+      "note": "SM_Env_BaskervilleRoundTeaTable, M_Env_BaskervilleRoundTeaTable",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: круглый столик на точёной колонне-балясине с трёхногой кабриольной опорой и фарфоровый сервиз (чайник с крышкой и навершием, две чашки на блюдцах, тарелочка). Состав и расположение совпадают с sheet.png; соотношение ширины столешницы к высоте стола (~1,1:1) в пределах допуска к листу; лишних и фантомных частей нет (turn-090/270 и wire-* чистые); узнаётся со всех 8 ракурсов; основные пятна цвета — красно-коричневое дерево и белый фарфор, как на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: колонна, три кабриольные ноги с подпятниками, профилированный обод столешницы, чайник с ручкой и носиком целы; сетка на wire-34/front/back следует форме. Дефекты видны только на крупном плане: стенки обеих чашек с вертикальным заломом, будто сложенный лист, и угловатым срезом (close-weapon, close-head); края блюдец рваные и оплывшие, блюдца вдавлены в столешницу; кончик носика чайника рваный и гранёный (close-head). Плоские плашки на стыке ног с колонной (close-base) допустимы как стилизация.",
+      "frames": [
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево читается как дерево, фарфор — как фарфор с росписью, детализация на уровне кита. Но верх столешницы на полном росте покрыт белёсым пятнистым наплывом: это запечённый блик или цвет фарфора в BC, примерно треть–половина верхней плоскости (turn-000, turn-315, turn-270, close-weapon), при этом обод чистый коричневый. Это одна зона на полном росте, отсюда 1,0. Мелочи крупного плана: тёмные грязные кольца вокруг блюдец (close-weapon), мыльная роспись чайника (close-head), серо-зернистая изнанка столешницы (turn-135).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0: T 1,0 — белёсый запечённый блик на верхе столешницы виден на полном росте; F 1,5 — заломы стенок чашек, рваные блюдца и носик чайника на крупном плане. S 2,0 ≥ 1,5, все гейты PASS/n/a, поэтому rework_blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "BC верха столешницы: убрать белёсый пятнистый наплыв (запечённый блик / цвет фарфора) и вернуть ровный тон красного дерева, как на ободе; убрать тёмные грязные кольца вокруг блюдец; заодно перекрасить серо-зернистую изнанку столешницы в тон дерева. Перекраска по HSV-окну env_prop_look не отделит белёсое дерево от фарфора — нужна маска по островам столешницы или ретекстур.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Чашки: убрать вертикальный залом и складку стенки, сделать круглую стенку чашки; блюдца: выровнять рваные оплывшие края и посадку на столешницу; носик чайника: закрыть рваный гранёный срез кончика.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "роспись чайника слегка мыльная на крупном плане; на игровой дистанции не читается, допустимо"
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "изнанка столешницы тёмно-серая с белым зерном вместо дерева; с игровой камеры сверху почти не видна (входит в пункт T доработки)"
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "столешница чуть шире высоты стола (~1,1:1), в описании 0,6×0,6×0,7 м; с sheet.png совпадает — учесть занимаемую площадь при раскладке"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-ROUND-TEA-TABLE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп round-tea-table (Baskerville Manor) не принят, 7,5: силуэт совпадает с sheet.png, на доработку — белёсый запечённый блик на столешнице (T 1,0), заломы чашек и рваные блюдца (F 1,5)."
+}

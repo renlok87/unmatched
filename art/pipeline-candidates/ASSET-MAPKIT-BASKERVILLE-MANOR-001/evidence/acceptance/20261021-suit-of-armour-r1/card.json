@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSuitOfArmour.fbx",
+      "sha256": "52a1b3cf0d5299efdb30c255af45524862b31528e81e80ffd6e56258cfbce009"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_BC.png",
+      "sha256": "b26e574dbe72b3af6aa664a3107d22bdfcd044c98f66dc15126862849b63085b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_N.png",
+      "sha256": "d047ce0defee5e03c5ea95b2f06b7627187677705def4e77624a34d6f28066d3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSuitOfArmour_ORM.png",
+      "sha256": "53dca77e0f9af1225b9fd545e4a2b83f420e699609cdf7f1df9379bf6fc477cd"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-suit-of-armour-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSuitOfArmour.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "5622 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "UV0 islands 128, used 0.564, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "T_Env_BaskervilleSuitOfArmour_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSuitOfArmour.build.json",
+      "note": "SM_Env_BaskervilleSuitOfArmour, M_Env_BaskervilleSuitOfArmour",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с листом: готический полный латный доспех (закрытый шлем с визором, наплечники, нагрудник, ремень, тассеты, наколенники с веерами, острые сабатоны), алебарда в правой руке (полумесяц топора, клюв, верхнее остриё, древко упёрто в постамент), деревянный брусок-постамент. Ракурс turn-000 почти совпадает с ракурсом sheet.png. Высоты совпадают в пределах 5 %: рыцарь занимает около 61 % высоты (на листе около 60 %), алебарда выше шлема. Фантомных и пропавших частей нет, рыцарь узнаётся со всех 8 ракурсов. Одно второстепенное отличие касается постамента. На листе компактный брусок стоит к камере фронтально, почти вровень с древком и стопами. В модели при том же ракурсе брусок повёрнут к камере ребром и заметно выступает за древко и стопы с обеих сторон: на turn-000 его ширина около 550 px при размахе фигуры около 260 px, на листе ширина почти равна размаху. Рыцарь в модели стоит лицом к грани бруска, а весь меш повёрнут на 45° относительно оси 0°: фронтально фигура и грань видны на turn-315, AABB 0,303×0,303 м вместо ≈0,215×0,215 м.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: древко, верхнее остриё, клюв, шпоры, веера наколенников. Стопы и подток древка стоят на крышке постамента без зазора (close-base). Хват правой руки читается, пальцы раздельные (close-weapon). Пальцы левой латной перчатки мягковаты, а манжета расширяется острыми зубцами, как у готических перчаток. Клинок алебарды с ребра толстоват, но это стилизация миниатюры. На close-head контур гребня шлема слегка гранёный, это уровень бюджета 5,6k треугольников, а не разрыв. На wire-front/back/34 плотная треугольная сетка следует форме доспеха, постамент собран малым числом больших треугольников, что для плоских граней нормально.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "На всех поворотах материалы читаются как заказано. Сталь серая с лёгкой зеленцой, с металлическим отливом, заклёпками и светлыми кромками пластин. Ремень и ремешки тассетов из коричневой кожи, древко деревянное, постамент из дерева с вертикальной текстурой. Запечённого направленного света на полном росте не видно: затемнения только во внутренних зонах, как AO. Детализация доспеха не беднее уровня кита. Дефекты видны только на крупном плане. Крышка постамента на close-base вокруг стоп — бледное розовато-белое размытое пятно с разводами: в BC центр островов крышки замылен, в нём тёмная клякса, видимо проекция фигуры при генерации текстуры. Мелкие тёмно-красные метки у колен (turn-045/090/135) читаются как кожаные шнурки и на игровой дистанции не мешают. Дерево постамента светлее и теплее, чем «rich mahogany» стиля кита, но остаётся в семействе дерева и близко к бруску на листе.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-090.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 1,5 + F 2,0 + T 1,5 = 5,0, оценка 8,3 ≥ 8,0, ни одно измерение не ниже 1,0, гейты PASS или n/a. Оценка в диапазоне 8,0–8,4, поэтому нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-315.jpg",
+      "note": "Передняя ось меша повёрнута на 45°: рыцарь и грань постамента смотрят в азимут 315°, а не 0°. AABB 0,303×0,303 м вместо ≈0,215×0,215 м. При расстановке задать yaw с поправкой 45° или повернуть меш вокруг Z в env_kit, чтобы постамент вставал гранью к стене."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Постамент шире и развёрнут относительно фигуры. На листе фронтальный компактный брусок почти вровень с древком и стопами. В модели брусок выступает за древко и стопы с обеих сторон, а рыцарь стоит лицом к грани, не в 3/4 к ней."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Крышка постамента вокруг стоп — бледное замыленное пятно с разводами и тёмной кляксой в BC, видимо проекция фигуры при генерации текстуры. Видно на крупном плане и при камере сверху."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Мелкие тёмно-красные метки у колен читаются как кожаные шнурки и на игровой дистанции не заметны. Дерево постамента светлее, чем «rich mahogany» стиля кита."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-SUIT-OF-ARMOUR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп suit-of-armour (Baskerville Manor) принят по делегированию с оценкой 8,3. Оценка в диапазоне 8,0–8,4, нужен второй приёмщик «Opus high». Открытые замечания: поворот меша на 45° (yaw при расстановке), постамент шире, чем на листе, замыленная крышка постамента."
+}

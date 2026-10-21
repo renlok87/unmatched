@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleDiningChair.fbx",
+      "sha256": "8c125e5ecba76363113dda1cbea9f4602a6c96c3caf440d4364d511f2f5fdf8f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_BC.png",
+      "sha256": "1922bee38ca8a28828903694c5bec3ffca525407d38dac22990de9934712feb1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_N.png",
+      "sha256": "53b2eea94ac781d25a3ea4797519853765c044f9548ee036fcb26c0c76c8b613"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_ORM.png",
+      "sha256": "29d343a08eac6bb6172a0f093279e33b48aca044e901baf3ec57e7edabe82ce9"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-dining-chair-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleDiningChair.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "5168 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "UV0 islands 133, used 0.5591, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "T_Env_BaskervilleDiningChair_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "SM_Env_BaskervilleDiningChair, M_Env_BaskervilleDiningChair",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет и вид с листа: высокая готическая спинка-стрельчатая арка с лилией и S-завитками, фиолетовая обивка панели-гроба на спинке и сиденья, резной царг с завитком, передние гнутые ножки с акантом на коленях и лапами, задние прямые ножки. Главные части и их доли (сиденье на ~0,35 высоты, спинка ~0,65) совпадают с sheet.png. Узнаётся со всех 8 ракурсов, на turn-090/270 профиль чистый, фантомных и пропавших частей нет. Наблюдение без снижения: габарит 0,355x0,404x1,0 м уже ориентировочных 0,5x0,5x1,1 из описания, но совпадает со стройным силуэтом листа.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и оплывших масс нет; тонкие завитки, лилия и ножки целы. Сетка на wire-* следует форме: плотная на резьбе, крупные треугольники на плоских рамах и панели. Дефекты только на крупном плане: в close-head гранёные силуэты завитков и лепестков лилии, зазубренный кончик правого завитка и острый залом шейдинга у острия рамки панели. По отчёту есть открытая граница ~73 uu2 у низа сиденья (z~9,9 uu). В кадрах её не видно, игровая камера снизу не смотрит.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как резное тёмное дерево с волокном, обивка — как фиолетовая ткань. Запечённых теней нет. Детализация заметно богаче пропов кита. Минусы: на turn-180 правая грань деревянной задней стороны панели спинки слабо подкрашена фиолетовым с узором обивки (протечка проекции, также полосой на turn-135/225). Контраст низкий, на игровой дистанции дерево остаётся деревом, поэтому снижено как дефект крупного плана, а не полного роста. В close-base на верхе сиденья белёсые мыльные разводы (возможен запечённый блик). В close-head светлый шум на внешней фаске арки, латунная рамка панели уходит в оливково-зелёный.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8,3 = round((2,0+1,5+1,5)/6x10, 1) >= 8,0; ни одно измерение не ниже 1,0; гейты PASS или n/a. Оценка в полосе 8,0-8,4, поэтому по правилам скилла нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Фиолетовая протечка обивки (с узором ткани) на правой грани деревянной задней стороны панели спинки, полосой видна и на turn-135/225. Контраст низкий. Правка при желании: перекрасить этот остров BC в тон дерева."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Белёсые мыльные разводы на верхе сиденья, возможен запечённый блик в BC или блеск при roughness 0,5."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Светлый шум или растяжка на внешней фаске арки справа сверху. Латунная рамка панели отдаёт оливково-зелёным."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Крупный план: гранёные силуэты завитков и лилии (5168 tris), зазубренный кончик правого завитка, залом шейдинга у острия рамки панели. На полном росте не видно."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "По build.json есть открытая граница ~73 uu2 у низа сиденья (z~9,9 uu), в кадрах не видна. Плюс 20 мелких дыр 1-2 uu2 на тыльной стороне завитков, тоже не видны."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-DINING-CHAIR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dining-chair (обеденный стул) принят по делегированию с оценкой 8,3: силуэт как на листе, геометрия чистая. Мелочи: фиолетовая протечка на задней грани панели спинки и гранёные завитки на крупном плане. Оценка в полосе 8,0-8,4, нужен второй приёмщик «Opus high»."
+}

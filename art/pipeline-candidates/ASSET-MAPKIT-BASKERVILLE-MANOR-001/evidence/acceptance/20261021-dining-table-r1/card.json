@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleDiningTable.fbx",
+      "sha256": "b054993daf014d232a697259247ec0cbdf7152d5af11f0df0c3bfc3135904a9c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningTable_BC.png",
+      "sha256": "d1719828bb03c04a944fd5ebfc7c55c75e9d945efba603ac20bb0cf8c1ad3a33"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningTable_N.png",
+      "sha256": "f5296d7eee55471c321f4417aafc5dcca36a2c8b43e9ba8d64052e4e97363234"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningTable_ORM.png",
+      "sha256": "0336d0b22cb25ec4a2f0f98aeafdbce0f70efcc429ca4f073b56d7ea31408beb"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-dining-table-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleDiningTable.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+      "note": "4763 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+      "note": "UV0 islands 280, used 0.4863, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+      "note": "T_Env_BaskervilleDiningTable_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningTable.build.json",
+      "note": "SM_Env_BaskervilleDiningTable, M_Env_BaskervilleDiningTable",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Сам стол заказанный и узнаётся со всех 8 ракурсов: длинная столешница из красного дерева на четырёх точёных ногах, белая дорожка свисает с торцов, три серебряных канделябра по три свечи, восемь приборов с бокалами. Расхождение с sheet.png главное: Tripo добавил пять вертикальных белых плит-«палаток», которых нет ни на листе, ни в описании. Каждая длиной около 1/6 стола и высотой около 20 % стола. Спереди и сзади (turn-000/180) они сливаются в белую стену над столешницей, сверху (close-base, ракурс игровой камеры) читаются как белые коробки между дорожкой и тарелками, на wire-34 видны как отдельные шатровые оболочки. Это лишний повторяющийся элемент, а не деталь контура. Добавочно дорожка свисает с обоих торцов и снизу у неё тёмная полоса по краю столешницы, на листе такого нет. Вероятная причина в том, что единственный реф Tripo — миниатюра 230 px (refs.front = view-thumb.png, single = null): видимая толщина дорожки превратилась в плиты.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Форма собранная. Ноги, царга и кромка столешницы чистые, сетка на wire-* следует форме, вывернутых частей и мусора нет, тонкие свечи и фитили целы. Дефекты мелкие и в основном на крупном плане. На свисающем конце дорожки прорезана прямоугольная щель (открытый контур около x 30 uu, z 11 uu в отчёте). Она видна на turn-090, turn-135 и close-base, но на игровой дистанции меньше 1 uu. Чашечки и рожки канделябров гранёные, низкополигональные (close-head). Вилки и ножи оплывшие, комковатые, основание канделябра рваное (close-weapon).",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: тёмное красное дерево с волокном на ногах и столешнице, белый лён на дорожке с полосками кромки (turn-270), металлические бокалы. Запечённого направленного света на полном росте не видно. Дефекты крупного плана: серые размытые пятна и разводы на белых плитах и на основании канделябра, мутная текстура чашечек (close-weapon, close-head), смазанные приборы. Канделябры на полном росте выглядят скорее матовым белым или оловом, чем полированным серебром (turn-045), но для стилизованного пропа это допустимо.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. Поверх стола стоят пять лишних вертикальных белых плит, которых нет на листе: они меняют силуэт спереди и сзади и читаются белыми коробками с игровой камеры. Score 6,7 < 8,0. По рубрике это перегенерация в Tripo (этап 2) с полноразмерным видом вместо миниатюры 230 px. Дорожка должна лежать плоско, карточки и салфетки маленькие или убраны. F и T = 1,5 перенесены в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пять вертикальных белых плит-«палаток» (около 1/6 длины и 20 % высоты стола) поверх столешницы, нет на sheet.png и в описании. Спереди и сзади образуют белую стену, сверху (close-base) — белые коробки. Единственный реф Tripo — view-thumb.png 230 px, второго вида нет."
+    },
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Дорожка свисает с обоих торцов; вдоль верха столешницы тёмная полоса под приборами (turn-000/180), на листе её нет."
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Прямоугольная щель-прорезь в свисающем конце дорожки (открытый контур около x 30 uu, z 11 uu в build-отчёте). Видна также на turn-135 и close-base, на игровой дистанции меньше 1 uu."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Вилки и ножи оплывшие и комковатые, основание канделябра рваное. Чашечки и рожки канделябров гранёные (close-head). Всё это только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Серые размытые пятна и разводы на белых плитах и основании канделябра, мутная текстура чашечек и приборов (только крупный план). Канделябры на полном росте читаются матово-белыми, а не полированным серебром (turn-045)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-DINING-TABLE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dining-table (обеденный стол) не принят, 6,7. На столе пять лишних белых вертикальных плит, которых нет на листе. Нужна перегенерация в Tripo (этап 2) по полноразмерному виду вместо миниатюры 230 px."
+}

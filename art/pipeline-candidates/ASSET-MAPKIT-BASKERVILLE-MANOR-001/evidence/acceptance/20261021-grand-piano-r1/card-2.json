@@ -1,0 +1,155 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGrandPiano.fbx",
+      "sha256": "dd9b3199c25e3a74874e7545423cfbd0d66bc03bb3d5f1b0a1da76d54358e92f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandPiano_BC.png",
+      "sha256": "63effe872af65bbb4270895c7b403dee1a129428b5e873edf7b676e0aad56078"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandPiano_N.png",
+      "sha256": "023dcd76a17dfa280949b2c26cda2b0301071a918867fe6ebca101ceac46dd75"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandPiano_ORM.png",
+      "sha256": "71b3f8992cd7601931cb653378ba88899d1ad76a8ca31e83b781ffa7132da8bb"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-grand-piano-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGrandPiano.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+      "note": "5164 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+      "note": "UV0 islands 635, used 0.7149, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+      "note": "T_Env_BaskervilleGrandPiano_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandPiano.build.json",
+      "note": "SM_Env_BaskervilleGrandPiano, M_Env_BaskervilleGrandPiano",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный чёрный лакированный рояль с откинутой на латунной подпорке крышкой, тремя точёными ножками на латунных роликах, лирой с педалями и латунным орнаментом на фронте совпадает с sheet.png. Пропорции корпуса, крышки и ножек сходятся с видом, лишних и пропавших главных частей нет, предмет узнаётся со всех восьми ракурсов. Ножки цвета тёмного махагона, как на виде и в стиле кита.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: ножки, лира, подпорка и педали целы, крышка цельная, сетка на wire-34 следует форме (веерная триангуляция на плоских стенках обода допустима). Мелкие дефекты видны только при разглядывании: ступенчатые коробчатые куски под корпусом у клавиатурного торца (turn-090 справа, turn-270 слева) и ступенька в нижнем крае обода на turn-225/315.",
+      "frames": [
+        "wire-34.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-225.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: глянцевый чёрный лак, латунные ролики, подпорка и орнамент, клавиши цвета слоновой кости, ножки из тёмного дерева. Детализация на уровне кита. Дефекты видны только на крупном плане: шумная полосатая текстура вдоль кромки крышки (close-head), светлые пятна, похожие на запечённый блик, на щёчках клавиатуры (turn-000, turn-045), бурые пятна износа на рёбрах и чуть неровный латунный орнамент на ободе (turn-180).",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a (G-RIG). S=2.0, F=1.5, T=1.5.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Ступенчатые коробчатые куски геометрии под корпусом у клавиатурного торца; так же на turn-270.jpg. На игровой дистанции не читаются."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Шумная полосатая текстура вдоль кромки крышки, видна только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Светлые пятнистые блики на щёчках клавиатуры (возможно, запечённый блик в BC) и бурые пятна износа на рёбрах; мелко."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-GRAND-PIANO-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп grand-piano (рояль) принят по делегированию: 8.3. Мелкие дефекты крупного плана (кромка крышки, блики на щёчках, ступеньки под корпусом) записаны в known_issues."
+}

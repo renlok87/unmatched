@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleHoundStatue.fbx",
+      "sha256": "65efc0fda4a3901aa01a056b0f3fcaf3a02ffc83d0d8de9359abe573e24c86e6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHoundStatue_BC.png",
+      "sha256": "29c5e0f11e874aafed9702e6cf32b3a7ffae6d4243def64214c80c6598cf1123"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHoundStatue_N.png",
+      "sha256": "4f5f711cfd4917acb36dfe10a6ec65934b6e4dc4ef074e90e9e60a6a8db33e1d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHoundStatue_ORM.png",
+      "sha256": "3a196c04370c07873973c984cc72f974e762d75fad642dcdc43214eb75e39f6b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-hound-statue-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleHoundStatue.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+      "note": "5288 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+      "note": "UV0 islands 106, used 0.3819, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+      "note": "T_Env_BaskervilleHoundStatue_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHoundStatue.build.json",
+      "note": "SM_Env_BaskervilleHoundStatue, M_Env_BaskervilleHoundStatue",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Предмет тот: худая сидящая гончая на квадратном двухступенчатом плинте, поза, длинная шея, висячие уши, рёбра и доля плинта (~14 % высоты) совпадают с sheet.png, узнаётся со всех 8 ракурсов. Но хвост раздвоен: от крестца симметрично расходятся два хвоста, каждый ложится на плинт со своей стороны (V-развилка на turn-180 и wire-back, по хвосту на turn-090 и turn-270, два кончика по бокам лап на turn-000 и close-base). На sheet.png хвост один и загнут на одну сторону. Это лишняя фантомная часть, артефакт симметрии генерации, по рубрике 0,5. Второстепенное отличие: основной тон светлее и теплее, чем тёмный серо-зелёный камень sheet.png, мха мало; семейство цвета то же.",
+      "frames": [
+        "sheet.png",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-000.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка цела: дыр, просветов, вывернутых частей и оплывших масс нет. Тонкие элементы (уши, пальцы, хвосты) целы, на wire-34, wire-front и wire-back сетка следует форме; длинные треугольники только на плоских гранях плинта. Дефекты видны только на крупном плане и в мелком масштабе: гранёный силуэт черепа и края уха на close-head, рваный тёмный край нижней челюсти на turn-135 и turn-225.",
+      "frames": [
+        "close-head.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Камень со следами выветривания и пятнами мха в целом читается, запечённого направленного света нет, детализация не беднее эталона кита. Дефект в полный рост в одной зоне, на голове: глаза раскрашены как живые (янтарная радужка, зрачок, блик) вместо заказанных вырезанных глаз, чужой цвет виден на turn-000, turn-045 и turn-315. Дефекты крупного плана: по всей поверхности мелкая сетка, похожая на змеиную кожу, из-за которой камень местами читается как чешуя (close-weapon, на спине заметна и на turn-180); мыльная растяжка в центре груди и шеи (close-weapon); бронзово-коричневые кончики ушей (turn-180).",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5: у статуи раздвоенный хвост, лишняя симметричная часть из генерации Tripo (turn-180, wire-back, turn-090/270). Нужна перегенерация в Tripo с одним хвостом, загнутым на одну сторону, как на sheet.png. Score 5,0 < 8,0; все гейты PASS или n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Хвост раздвоен: от крестца два симметричных хвоста ложатся на плинт влево и вправо (также turn-090, turn-270, wire-back, close-base). На sheet.png хвост один."
+    },
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "Основной тон модели светлее и теплее тёмного серо-зелёного камня на виде, мха заметно меньше заказанного."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Глаза раскрашены как живые (янтарная радужка, зрачок, блик) вместо вырезанных в камне; в полный рост видно на turn-000, turn-045 и turn-315."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "По всей поверхности мелкая сетка, похожая на змеиную кожу (камень местами читается как чешуя), мыльная растяжка на груди и шее; кончики ушей бронзово-коричневые (turn-180)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёный силуэт черепа и края уха на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "turn-135.jpg",
+      "note": "Рваный тёмный край нижней челюсти (также turn-225)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-HOUND-STATUE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hound-statue не принят (5,0): у статуи два хвоста. Нужна перегенерация в Tripo (этап 2) с одним хвостом, как на sheet.png, и с вырезанными каменными глазами вместо раскрашенных живых."
+}

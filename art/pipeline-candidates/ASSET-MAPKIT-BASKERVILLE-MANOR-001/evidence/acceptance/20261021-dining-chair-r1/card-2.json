@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleDiningChair.fbx",
+      "sha256": "8c125e5ecba76363113dda1cbea9f4602a6c96c3caf440d4364d511f2f5fdf8f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_BC.png",
+      "sha256": "1922bee38ca8a28828903694c5bec3ffca525407d38dac22990de9934712feb1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_N.png",
+      "sha256": "53b2eea94ac781d25a3ea4797519853765c044f9548ee036fcb26c0c76c8b613"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleDiningChair_ORM.png",
+      "sha256": "29d343a08eac6bb6172a0f093279e33b48aca044e901baf3ec57e7edabe82ce9"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-dining-chair-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleDiningChair.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "5168 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "UV0 islands 133, used 0.5591, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "T_Env_BaskervilleDiningChair_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleDiningChair.build.json",
+      "note": "SM_Env_BaskervilleDiningChair, M_Env_BaskervilleDiningChair",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: высокий резной готический стул со стрельчатой спинкой, ажурными завитками и флёр-де-лис, фиолетовой вставкой спинки и фиолетовым мягким сиденьем, гнутые передние ножки с лапами, прямые задние — совпадает с sheet.png. Пропорции главных частей (высокая спинка ~2/3 высоты, сиденье, ножки) совпадают; лишних и пропавших частей нет; на turn-090/270 профиль чистый, без фантомных выступов и оболочек; узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, вывернутых частей и мусорной геометрии нет ни на полном росте, ни на крупных планах; тонкие завитки ажура и рамка спинки целы, ножки и царга чистые. Сетка на wire-34/wire-back следует форме (длинные треугольники на плоской вставке спинки допустимы). На close-head видна лёгкая полигональная гранёность краёв завитков — норма для 5168 tris фонового пропа, не дефект.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как резное тёмное дерево с волокнами, обивка — фиолетовая ткань с плетением, совпадает с описанием; резьба передана текстурой и нормалью, детализация на уровне кита. Мелкие дефекты: фиолетовый натёк цвета обивки на деревянную тыльную сторону вставки спинки (turn-180/225), зеленовато-жёлтый оттенок окантовки вставки спинки (turn-000, close-head), светлые пятна на сиденье, похожие на запечённый блик (close-base). На игровой дистанции они читаются как патина/тон дерева, заметны в основном вблизи.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 2,0 + T 1,5 = 5,5 → 9,2 ≥ 8,0, ни одно измерение < 1,0, все гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Фиолетовый натёк цвета обивки на деревянную тыльную сторону вставки спинки (также turn-225); на игровой дистанции читается как тон дерева."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Зеленовато-жёлтый оттенок окантовки фиолетовой вставки спинки (заметен и на turn-000) — можно прочесть как латунь с патиной."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Светлые размытые пятна на фиолетовом сиденье, похожие на запечённый блик; виден только вблизи."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-DINING-CHAIR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп dining-chair (Baskerville Manor) принят по делегированию: 9,2; мелкие огрехи текстуры (натёк фиолетового на тыл спинки, блик на сиденье) — в known_issues."
+}

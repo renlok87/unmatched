@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGrandfatherClock.fbx",
+      "sha256": "1d125c9f312a1f6eba7cfcfdcceb79637b6d3a89bf0a9948dfd6f0d64677832a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandfatherClock_BC.png",
+      "sha256": "8fe15541a44bc1d098db0c07fabf68ba0e26b6578ab5e17ad8a8f71385fdb190"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandfatherClock_N.png",
+      "sha256": "536d603af5e03e8d172897a5b29661ab6883b94f8cbaf158d46c48de704df33a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGrandfatherClock_ORM.png",
+      "sha256": "d22dbcc745aa510f27f658fd525e9943cc8d782a166ee259ae93b9fd87558d6b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-grandfather-clock-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGrandfatherClock.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+      "note": "4864 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+      "note": "UV0 islands 929, used 0.6789, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+      "note": "T_Env_BaskervilleGrandfatherClock_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGrandfatherClock.build.json",
+      "note": "SM_Env_BaskervilleGrandfatherClock, M_Env_BaskervilleGrandfatherClock",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: высокие напольные часы с готическим стрельчатым колпаком, расписным лунным диском, латунным маятником за стеклом и ступенчатым цоколем — совпадает с sheet.png по пропорциям и главным частям; лишних/пропавших частей нет. На боковых видах колпак — экструзия стрельчатой арки вглубь, без фантомных выступов; узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, рваных краёв и оплывших масс нет; тонкие элементы (колонки капители, стрелки, маятник с гирями, ручки) целы; стекло двери с видимым внутренним объёмом. Сетка на wire-34 следует форме, плоские грани — длинные треугольники без вреда для силуэта.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Ореховое дерево, латунь маятника и гирь, расписной лунный диск и эмалевый циферблат читаются верно, запечённого света нет. Дефекты крупного плана: растянутая текстура волокна на крыше колпака и мелкие светлые черточки-шов над аркой; петли и защёлка двери белые (читаются как пластик, а не латунь); слегка мыльный нижний профиль цоколя; на тыльной стороне корпуса закрученное волокно, но на полном росте читается как дерево.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; дефекты T только на крупном плане",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "растянутое волокно на крыше колпака, мелкие светлые черточки-шов над аркой циферблата"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "петли и защёлка двери белые вместо латуни; нижний профиль цоколя слегка мыльный"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "закрученное/растянутое волокно на тыльной панели корпуса (тыл на игровой дистанции почти не виден)"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-GRANDFATHER-CLOCK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп grandfather-clock (Baskerville Manor) принят по делегированию, 9.2; мелкие текстурные огрехи крупного плана (белые петли, растяжка на колпаке) — в known_issues."
+}

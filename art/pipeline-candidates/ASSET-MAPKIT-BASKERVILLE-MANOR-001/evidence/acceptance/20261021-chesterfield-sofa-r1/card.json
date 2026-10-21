@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleChesterfieldSofa.fbx",
+      "sha256": "3a08848215459fd36bb57563abd66dd66a23f09a36318c04422fd6ebf71099bc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleChesterfieldSofa_BC.png",
+      "sha256": "d3ebda8ffae3ea98f74b8008933bdc8d4e50d0851031087782e3ba4143b28b3d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleChesterfieldSofa_N.png",
+      "sha256": "36fe85904ab81b3f40186fcbbe653e78fb8da91fdd2682cfbfe57c4024bf0b6f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleChesterfieldSofa_ORM.png",
+      "sha256": "fbcf6e71f06cd74fdaf9ea7354acfab93a1936f666741abbe3c089e7e60af547"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-chesterfield-sofa-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleChesterfieldSofa.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+      "note": "4996 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+      "note": "UV0 islands 131, used 0.4955, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+      "note": "T_Env_BaskervilleChesterfieldSofa_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleChesterfieldSofa.build.json",
+      "note": "SM_Env_BaskervilleChesterfieldSofa, M_Env_BaskervilleChesterfieldSofa",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: честерфилд со скатанными подлокотниками, стёганой спинкой на одной высоте с подлокотниками, двумя подушками сиденья, передней планкой с пуговицами и четырьмя тёмными деревянными ножками. Пропорции по отчёту 60.7×28.2×24 uu, то есть ширина/высота 2.53 и глубина/высота 1.17 против ≈2.5 и 1.125 у реального образца; отклонение в пределах 5 %. Лишних и пропавших частей нет, фантомных выступов на turn-090/270 и wire-* нет; предмет узнаётся со всех 8 ракурсов. Основное пятно цвета зелёное, как на виде, только светлее и изумруднее тёмно-зелёного sheet; семейство то же.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых или оплывших частей. Стёжка спинки выполнена геометрией, подушки и рулоны подлокотников с чистыми краями, ножки целы. Сетка на wire-34 и wire-front следует форме: плотная на стёжке, разреженная на плоских боковинах. Шесть открытых контуров из отчёта (низ подушек, верх ножек) спрятаны внутри корпуса и ни на одном кадре не видны.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Обивка читается как стёганая зелёная обивка, ножки как тёмное дерево. Отдельно проверен BC: альбедо почти ровное изумрудное, больших запечённых бликов в цвете нет. Белые облачные пятна на стёжке — это настоящий спекуляр при средней roughness ≈0.41. Отличия: материал читается как глянцевая кожа (Tripo назвал исходник «green leather sofa»), а заказан тёмно-зелёный бархат; тон светлее заказанного. На передних гранях подушек и планки видны светлые мазки потёртостей. На крупном плане в щели между спинкой и сиденьем видна размазанная заливка UV (вертикальные серые полосы), на стёжке — мелкие светлые отметины. Для фонового пропа на игровой дистанции это не мешает; дефекты в основном крупного плана.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0; ни одно измерение не ниже 1.0; гейты PASS/n/a. Замечания T не блокируют приёмку и перенесены в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Обивка читается как глянцевая изумрудная кожа (roughness ≈0.41, облачный спекуляр на стёжке), а заказан тёмно-зелёный бархат. Тон светлее, чем на sheet. Если нужен бархат, поднять roughness обивки и затемнить BC (env_kit params или материал в UE)."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "В щели между спинкой и подушками размазанная заливка UV (вертикальные серые полосы); на стёжке мелкие светлые отметины в альбедо (close-head.jpg). Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Светлые мазки потёртостей на передних гранях подушек и передней планки; на полном росте читаются как износ кожи."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "close-base.jpg",
+      "note": "По отчёту 6 скрытых открытых контуров (низ двух подушек, верх четырёх ножек) и две передние ножки-оболочки с зазором ≈0.7 uu до корпуса. На кадрах ничего из этого не видно; гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-CHESTERFIELD-SOFA-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп chesterfield-sofa принят по делегированию (9.2): форма, пропорции и сетка соответствуют виду. Обивка читается как глянцевая изумрудная кожа, а не тёмно-зелёный бархат; это замечание, не блокер."
+}

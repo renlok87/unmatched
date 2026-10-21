@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleManorGate.fbx",
+      "sha256": "3a724e9511aadea7a2f506589152cdc61c8f76ffc5b56e56a2ee87ab552d7238"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleManorGate_BC.png",
+      "sha256": "d89069debfd99caa10cc5b7d20bedd3fc60e11c1300153ee4339fecd20d4d1ef"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleManorGate_N.png",
+      "sha256": "be0d3fd42de71faeecb4d0e6a13d3061e05cc0e127de79366eca443142f21572"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleManorGate_ORM.png",
+      "sha256": "677da20e21ad0941c550771be65506b48dbdd75057893e0a1937e7eac9847599"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-manor-gate-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleManorGate.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+      "note": "5304 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+      "note": "UV0 islands 216, used 0.5948, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+      "note": "T_Env_BaskervilleManorGate_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleManorGate.build.json",
+      "note": "SM_Env_BaskervilleManorGate, M_Env_BaskervilleManorGate",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: двустворчатые кованые ворота между двумя каменными столбами с шарами на квадратных капителях. Все главные части листа на месте: двойная арочная верхняя тяга с завитками, пики-навершия по дуге, средняя тяга с короткими пиками внизу, замковые накладки в центре, петли на столбах. Пропорции совпадают с sheet.png в пределах ~5 % высоты: отношение ширины к высоте около 1,36 против ~1,4 на листе, шары выше центральных пик примерно на 11–12 % высоты, как на листе. На turn-090 и turn-270 виден только столб: полотно целиком прячется в его силуэте, фантомных выступов и оболочек нет. С остальных ракурсов (045/135/180) читается сразу. Центральные стойки заканчиваются скошенными гранёными торцами; на листе в 230 px эта деталь неразличима, на игровой дистанции они читаются как остриё, поэтому отличием я это не считаю.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: все пики, прутья, завитки и обе тяги. На wire-34 и wire-back сетка следует форме: плотные сферы, чистые цилиндры прутьев, крупная триангуляция на плоских гранях столбов. Неровный край столбов читается как грубый тёсаный камень, а не как оплывшая масса. Полотна стоят с небольшим зазором над землёй, основания столбов плоские (close-base). Завитки на close-weapon слегка гранёные (низкополигональное сечение), но это видно только вплотную и дефектом не является.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано и как на листе. Столбы из серого гранита с мхом. Ковка тёмная сине-серая, металл выглядит металлом. Цвет за пределами задуманного семейства не уходит, запечённых теней в цвете нет: обратная сторона turn-180 освещена так же ровно, как перёд. Детализация на уровне кита или богаче. Два дефекта видны только вблизи. Первый: на крупном плане железо мыльное, по центральным стойкам и тягам светлые размазанные полосы, похожие на запечённый блик (close-head, close-weapon). Второй: на шарах и капителях проступает мелкий растровый узор сеточкой (turn-000, turn-090), на игровой дистанции при высоте 90 uu он сливается с фактурой камня.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a; дефекты текстуры только крупного плана",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Железо на крупном плане мыльное: по центральным стойкам и тягам светлые размазанные полосы, похожие на запечённый блик в BaseColor. На полном росте и игровой дистанции не мешает."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "На каменных шарах и капителях проступает мелкий растровый узор сеточкой от исходника Tripo; на игровой дистанции сливается с фактурой гранита."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-MANOR-GATE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп manor-gate (ворота усадьбы Baskerville Manor) принят по делегированию с оценкой 9.2; известные мелочи — мыльное железо и растровый узор на каменных шарах, видны только на крупном плане."
+}

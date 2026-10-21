@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleStagTrophy.fbx",
+      "sha256": "b7e399e6059865084a914d9e6681d1f2b90f0e732ff8ba049dc130af1f27cc69"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStagTrophy_BC.png",
+      "sha256": "0e81008bbd66218c5767fdbc96417e47a7ef6be2e0863d3b669d4b53c2e4d375"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStagTrophy_N.png",
+      "sha256": "87fd83796159481efe7c57b27718f85086996304e42b9494deea4c798e5d83d5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStagTrophy_ORM.png",
+      "sha256": "8f9680da0b79b4acaf55f5eea5f0416bccb390d7b203851c6fc9298cd8907ef1"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-stag-trophy-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleStagTrophy.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+      "note": "5195 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+      "note": "UV0 islands 108, used 0.5247, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+      "note": "T_Env_BaskervilleStagTrophy_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStagTrophy.build.json",
+      "note": "SM_Env_BaskervilleStagTrophy, M_Env_BaskervilleStagTrophy",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 0.5,
+      "rationale": "Сам трофей тот, что заказан: голова благородного оленя с большими многоотростковыми рогами (по 6+ отростков, кроны симметричны) на щите-плакетке с резной кромкой, узнаётся со всех 8 ракурсов, пропорции голова/рога/щит согласуются с sheet.png (на 230 px — на глаз; палитра светлее и розоватее листа, но того же коричневого семейства). Однако Tripo добавил фантомную часть, которой нет ни в заказе (настенный трофей, зона study walls), ни на листе: белую подставку-кронштейн за щитом — вертикальную скруглённую планку и горизонтальную лапку у низа. Это выступ, видный на turn-090/270 (белая планка и лапка за щитом), turn-135/180/225 и wire-back (крупный блок на всю нижнюю половину спины щита); спереди лапка торчит белыми ушками по обе стороны острия щита (turn-000, turn-045, turn-315, close-base). По рубрике фантомная часть на turn-090/270 и wire-* = 0,5.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Основные формы чистые: морда, уши, глаза и нос без дыр и оплывов, тонкие отростки рогов целы, щит с ровной кромкой; сетка на wire-front/wire-34 следует форме (плотнее на рогах и голове, длинные полосы на плоском щите допустимы). Кончики рогов слегка гранёные — только на крупном плане close-head. Дефект на полном росте в одной зоне — фантомная подставка внизу сзади: торец лапки выглядит полым/тёмным, остриё щита проходит сквозь лапку и выходит ниже неё (turn-135, turn-180, turn-225, на wire-back тёмная впадина внутри кольца лапки) — пересекающаяся мусорная геометрия.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы трофея читаются как заказано: мех с рисованными прядями и светлой мордой, рога костяного цвета со светлыми кончиками и продольной фактурой, дуб щита с волокнами и резной канавкой кромки (turn-000, close-base, close-weapon); запечённых бликов и жёстких теней в цвете не видно, швов и растяжек на полном росте нет, мех на close-base мягковат, но для фонового пропа достаточен. Дефект на полном росте в одной зоне: фантомная подставка не затекстурирована — белый/светло-серый чужой цвет с тёмно-серым пятном на лапке, ярко читается на turn-090/180/270 и белыми ушками под щитом на turn-000 и close-base.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 4.2,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 0,5 < 1,5: в исходнике Tripo фантомная белая подставка-кронштейн за щитом (вертикальная планка + лапка внизу), видна на turn-090/270, turn-180 и wire-back и белыми ушками под остриём щита спереди; этого нет ни в заказе (настенный трофей), ни на листе. По рубрике — перегенерация Tripo (этап 2), rework_fix_list пуст; F и T снижены той же зоной и записаны в known_issues. Гейты PASS/n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Фантомная белая подставка-кронштейн за щитом (вертикальная скруглённая планка + горизонтальная лапка у низа): нет ни в заказе (настенный трофей, study walls), ни на sheet.png; видна на turn-090/135/180/225/270 и wire-back, лапка торчит белыми ушками под остриём щита на turn-000/045/315 и close-base. При перегенерации — плоская задняя сторона щита без опоры (вид сзади или подсказка «wall-mounted, flat back»)."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Зона фантомной подставки: торец лапки полый/тёмный, остриё щита проходит сквозь лапку (turn-135, turn-180, turn-225, wire-back). Голова, рога и щит чистые; кончики рогов слегка гранёные только на close-head."
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Подставка не затекстурирована: белый/светло-серый чужой цвет и тёмно-серое пятно на лапке на полном росте (turn-090/180/270, ушки на turn-000 и close-base). Мех, рога и дуб с резной кромкой читаются, запечённого света не видно; общая палитра светлее и розоватее листа (то же коричневое семейство)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-STAG-TROPHY-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп stag-trophy не принят (4.2): Tripo добавил за щитом фантомную белую подставку с лапкой — вернуть на этап 2, перегенерировать с плоской задней стороной щита для стены."
+}

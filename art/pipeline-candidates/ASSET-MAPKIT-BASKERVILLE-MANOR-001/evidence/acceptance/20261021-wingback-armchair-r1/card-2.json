@@ -1,0 +1,151 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleWingbackArmchair.fbx",
+      "sha256": "e0261a79e02a8cbc7585742d239879b1e1e6133d1f8134742911d459a854982c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_BC.png",
+      "sha256": "a9352ed0617f309479ca634c27354c328786485ced19927596e1e44ca09fe3e1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_N.png",
+      "sha256": "f00ab7d1c7e05ff73c9e6480eb0865510623b80fbf7d7adc6a8d278eb44c2fb7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleWingbackArmchair_ORM.png",
+      "sha256": "cbcf763b6f96cd3d4e737bfe3c52f56a839a9c6708b2fee7975514e303f3e5f0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-wingback-armchair-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleWingbackArmchair.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "5211 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "UV0 islands 333, used 0.7566, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "T_Env_BaskervilleWingbackArmchair_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleWingbackArmchair.build.json",
+      "note": "SM_Env_BaskervilleWingbackArmchair, M_Env_BaskervilleWingbackArmchair",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: кресло с ушами, высокая спинка с волнистым гребнем, крылья, скатанные подлокотники, подушка сиденья, четыре изогнутые ножки кабриоль, латунные гвозди по кантам крыльев и подлокотников. Пропорции и части совпадают с sheet.png, лишних и пропавших частей нет, на turn-090/270 фантомных выступов нет, узнаётся со всех ракурсов. Кожа чуть ярче и краснее тёмного oxblood на sheet.png, но того же красного семейства.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Нет дыр, просветов, рваных краёв и вывернутых частей. Ножки кабриоль целые и чистые, подушка с кантом читается, подлокотники-валики правильной формы. На wire-34 сетка следует форме: веера треугольников на плоских боковинах — нормальная плотность Smart Mesh, без мусорной геометрии. Крупные планы close-head и close-base чистые.",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: кожа с зерном и лёгкой патиной, латунные гвозди, дерево с волокном на ножках. Запечённых теней нет. Только на крупном плане: гвозди по верхнему канту спинки сзади смазаны и неровны (turn-180, turn-135), зерно кожи на close-head мягкое. На игровой дистанции (36 uu) это не читается. Кожа немного светлее oxblood из заказа.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a; T 1.5 — дефекты только крупного плана (смазанные гвозди на заднем канте спинки).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Гвозди по верхнему канту спинки сзади смазаны и неровны, с белёсыми бликами; видно только крупным планом, на игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Кожа ярче и краснее тёмного oxblood на sheet.png; семейство цвета то же. При желании можно затемнить через тон материала в UE."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-WINGBACK-ARMCHAIR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп wingback-armchair принят по делегированию (9.2): кресло совпадает с видом; мелочи крупного плана (гвозди на заднем канте, кожа ярче oxblood) записаны в known_issues."
+}

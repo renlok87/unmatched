@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pillar-box-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPillarBox.fbx",
+      "sha256": "73de433085917e3d2b11c66fa980ada0b2fc36dd2c8fbdd73022fb80bcb8be6f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_BC.png",
+      "sha256": "eba375968791ee2d374eb1fe7c01518d0e21b30dbc0f7c158f67bf6db1789c9c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_N.png",
+      "sha256": "6082a4f3867f7457a76e8a25e43a37def000d1f5db4e30472ed7f9f8287bbe78"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPillarBox_ORM.png",
+      "sha256": "b96accafa258775f368fd95e5e8fbd97e1543147e951e1304b663109ca716a79"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-pillar-box-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoPillarBox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "5434 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "UV0 islands 719, used 0.6419, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "T_Env_SohoPillarBox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPillarBox.build.json",
+      "note": "SM_Env_SohoPillarBox, M_Env_SohoPillarBox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: красная викторианская почтовая тумба. Под карнизом прорезь с козырьком, сверху купол с акантом и навершие-бутон, внизу круглая ножка. Пропорции и главные части совпадают с sheet.png (миниатюра 230 px, сверял на глаз). Тумба узнаётся со всех 8 ракурсов. Одно второстепенное отличие: на задней грани (turn-135, turn-180) лишняя открытая ниша-люк с клапаном, шариком-ручкой и двумя «посылками» внутри. Ни в листе, ни в описании её нет. Корпус восьмигранный при «hexagonal» в описании, навершие — бутон, а не корона. На игровой дистанции силуэт граненой колонны тот же, считаю это стилизацией.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Корпус, карниз, купол и ножка целы. Тонкие элементы на месте: козырёк прорези, ручка двери, навершие. Сетка на wire-34 и wire-back следует форме, длинные треугольники только на плоских панелях. Дефект на полном росте в одной зоне: в задней нише (turn-180, turn-135) тёмный треугольный проём в полый корпус. Отчёт сборки подтверждает это: петля «hole» длиной 26 uu на задней грани на высоте ≈25 uu. Рядом мелкие оболочки «посылок» с собственными дырами, а шарик-ручка — изолированная оболочка с зазором 0,57 uu. Только на крупном плане: оплывшие листья аканта на куполе и штырёк-носик на бутоне (close-head), тонкая тёмная щель между корпусом и ножкой (close-base), мелкие сколы кромки карниза.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Читается как крашеный глянцевый металл в цвете листа, основное пятно красное. Швов, растяжек и чужого цвета на модели нет. Оранжевая полоса у правого края BC лежит в зазоре вне островов. Минусы заметны в основном вблизи: в BC запечены мягкие тени фасок и белёсые мазки-блики (close-base, close-head, полосы на нижних панелях). Нет копоти, потёртостей и фактуры чугуна из стиля кита, поэтому детализация беднее эталона Sarpedon. На полном росте это читается как ровный лак, а не как пятно-дефект.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6,7 < 8,0. S 1,5: лишняя ниша-люк с «посылками» на задней грани. F 1,0: в той же нише проём в полый корпус, виден на полном росте. T 1,5: в BC запечены мягкие тени и блики, нет копоти и потёртостей стиля кита. Гейты PASS/n/a. S ≥ 1,5, поэтому доработка по пунктам, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Убрать заднюю нишу-люк: удалить клапан, шарик-ручку и «посылки» (мелкие оболочки у задней грани на высоте 12–27 uu). Закрыть проём глухой утопленной филёнкой, как у соседних граней, чтобы не осталось дыры в полый корпус. Заодно закрыть тонкую щель между корпусом и ножкой. Правка в исходнике Tripo: редактирование формы или перегенерация с глухой задней гранью на виде сзади или сбоку. env_kit по правилу задачи сетку не чинит.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Перетекстурировать как красный крашеный чугун: без запечённых бликов и теней фасок в BC, с лёгкой копотью в углублениях и потёртостями по кромкам в стиле кита. Затем пересобрать через env_kit и снять кадры заново.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Корпус восьмигранный, в описании шестигранный (Penfold). Навершие — бутон, а не корона. На игровой дистанции силуэт тот же, принято как стилизация, отдельной доработки не требует."
+    },
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "Эталон S — миниатюра 230 px с чёрными полосами, без ключа листа (предупреждение frames.json). Ранние виды Gemini front.png и side.png изображают другую конструкцию: шестигранник на гранёном цоколе с короной. Следующий раунд стоит сверять с полноразмерным видом, по которому генерировали."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "wire-back.jpg",
+      "note": "По отчёту сборки: 6 дыр, 13 трещин, 5 non-manifold рёбер, 5 вывернутых граней (3,9 % площади), 7 оболочек, из них 1 изолированная (шарик-ручка). Кроме задней ниши, в кадрах всё это не видно. Гейт PASS не меняю."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-PILLAR-BOX-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп pillar-box (Soho) не принят, 6,7. Нужно убрать заднюю нишу-люк с дырой в корпус и перетекстурировать без запечённых бликов, затем приёмка r3."
+}

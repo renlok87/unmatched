@@ -1,0 +1,171 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGildedPortrait.fbx",
+      "sha256": "91ddf5a4ff7e8a7ecea295416ab459102a713bcba8a3c157251fb6fbe3508fd1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGildedPortrait_BC.png",
+      "sha256": "f8c1acb293627245abfa467d0ad6b4c4697753ce53678912ee464d9912669c48"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGildedPortrait_N.png",
+      "sha256": "929893f20ce2c9a846962df028dbe20b4f5af799d939f9b17e2dc86609185f28"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGildedPortrait_ORM.png",
+      "sha256": "b03b6c77a28d0e854ae6a3f6499e2ce3bc14bdf027be7203395e720ba848eeed"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-gilded-portrait-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGildedPortrait.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+      "note": "5364 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+      "note": "UV0 islands 84, used 0.5478, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+      "note": "T_Env_BaskervilleGildedPortrait_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGildedPortrait.build.json",
+      "note": "SM_Env_BaskervilleGildedPortrait, M_Env_BaskervilleGildedPortrait",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: резная золочёная рама рококо (раковины по углам, картуши в центрах реек, акант, внутренняя бусина) с тёмным масляным портретом сурового предка в брыжах, с бородой и усами. Спереди и на 045/315 совпадает с видом, лишних и пропавших частей нет. Отношение высоты к ширине 1.22 (0.82×1.0 м) против заказанных ≈1.30; это согласуется с листом. Одно второстепенное отличие контура: в профиле (turn-090/270) рама целиком наклонена примерно на 4° — низ выдвинут вперёд, верх ушёл назад, задняя плоскость слегка выгнута (wire-back). Глубина габарита 0.159 м вместо ≈0.08 м по заказу на высоту 1.0, смещение ≈2.7 uu при высоте 39 uu (≈7 % высоты). На листе рама прямая, а на стене зала задняя плоскость в таком виде не ляжет вплотную.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, рваных краёв, чёрных пятен и вывернутых частей. Внутренняя бусина и тонкие завитки целы. Сетка на wire-front/wire-34 плотная на резьбе и редкая на плоском холсте, т. е. следует форме; задняя панель — ровная сетка без дыр. По отчёту одна оболочка, дыр 0, есть одна трещина нулевой ширины (4 ребра), на кадрах её не видно. Дефекты только крупного плана: центральный картуш верхней рейки оплывший, завитки как мягкие капли (close-head); на холсте карта нормалей выдавливает рельеф мазков и морщин лица (close-weapon), хотя полотно должно быть плоским.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Лицевая сторона чистая: позолота читается как потёртое золото с тёмной патиной в углублениях, портрет — как масло в тоне листа, лицо, брыжи и пуговицы читаются. Детализация не беднее уровня кита Sarpedon. Дефекты: задняя панель (turn-180/135/225) залита размазанным золотом с вертикальными растяжками и тёмными мазками вместо деревянной подложки; верхняя грань — бледная выцветшая полоса (close-head); вертикальный шов на правой внутренней раскладке и растяжки в волосах портрета видны только на крупном плане. Задник смотрит в стену зала (зона hall walls), и на игровой дистанции его не видно. Поэтому, по примечанию рубрики о фоновом пропе, оценка 1.5, а не 1.0, хотя по букве рубрики задник — дефект полного роста. Запечённого направленного света на лицевой стороне нет.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "Score 7.5 < 8.0 (S 1.5 + F 1.5 + T 1.5). Гейты PASS/n/a, ни одно измерение не ниже 1.0, S не ниже 1.5, поэтому не перегенерация, а доработка. Главное — наклон рамы ≈4° в профиле, это ориентация в env_kit. Остальное — крупный план и скрытая задняя панель.",
+  "rework_fix_list": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "fix": "Убрать наклон рамы ≈4° (низ вперёд, верх назад): повернуть по pitch так, чтобы задняя плоскость стала вертикальной и легла на стену. Затем перепроверить turn-090/270 и глубину габарита (ожидается ≈0.08–0.1 м на высоту 1.0 вместо 0.159 м). Высоту 39 uu и pivot на низу сохранить.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Центральный картуш верхней рейки оплывший (мягкие капли вместо резных завитков), на холсте рельеф мазков и морщин лица из карты нормалей (close-weapon). Нужна чёткая резьба картуша и плоская нормаль в зоне полотна. Дефекты видны только на крупном плане; если исходник Tripo будут перегенерировать, исправить их тогда же.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Задняя панель залита размазанным золотом с вертикальными растяжками и тёмными мазками, верхняя грань — бледная выцветшая полоса (close-head). Острова задника и верхней грани залить ровным тёмным деревом подложки, или получить чистую текстуру задника в исходнике. Задник смотрит в стену, так что в игре это низкий приоритет.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пропорция 0.82×1.0 м (высота/ширина 1.22) против заказанных ≈1×1.3 м (1.30); совпадает с sheet.png и в пределах стилизации. Не дефект, записано для раскладки (в игре 32×39 uu)."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "close-base.jpg",
+      "note": "По отчёту сборки одна трещина нулевой ширины (4 ребра, 22 uu, центр ≈(-10.3, -0.2, 6.2) uu на левой стойке) и 8 угловых нормалей внутрь поверхности; на кадрах не видны, гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-GILDED-PORTRAIT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп gilded-portrait (портрет в золочёной раме) отправлен на доработку в Blender, оценка 7.5. Нужно снять наклон рамы ≈4° по pitch в env_kit, задник и мелочи крупного плана — по возможности; лицевая сторона совпадает с листом."
+}

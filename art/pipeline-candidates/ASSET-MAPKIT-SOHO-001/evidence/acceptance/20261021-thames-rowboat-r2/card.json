@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-thames-rowboat-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoThamesRowboat.fbx",
+      "sha256": "bb36636551beaf3b468164830f7e1703c0de3b3c58c0387db47d105673471582"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_BC.png",
+      "sha256": "526bf5b6562a865f23052e6535061d15a1b22d8d8ceae72d67bcac3b73899332"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_N.png",
+      "sha256": "7edfa8f70996665ff60510adae4733b2e212dbe652c02913ee135225ed361974"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoThamesRowboat_ORM.png",
+      "sha256": "db789175134cdd70d4c34c5bded912ba2e37527f9598dab7ed7aa9dff59e0466"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-thames-rowboat-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoThamesRowboat.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "5511 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "UV0 islands 668, used 0.5656, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "T_Env_SohoThamesRowboat_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoThamesRowboat.build.json",
+      "note": "SM_Env_SohoThamesRowboat, M_Env_SohoThamesRowboat",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот: деревянная гребная лодка с транцем, форштевнем, двумя вёслами, двумя уключинами, банками, шпангоутами и канатом (обмотка форштевня и бухта на носу), узнаётся со всех 8 ракурсов, лишних частей нет. Два отличия от sheet.png и описания: (1) вся лодка накренена примерно на 19° вокруг продольной оси: планширь и форштевень наклонены на turn-090, верх транца на turn-270; на turn-180 при камере на высоте 0 видна вся внутренность, на turn-000 виден только наружный борт. На листе лодка стоит ровно. (2) Корпус короткий и широкий: ширина по планширям около 37 uu при длине 70,5 uu (L/B около 1,9) против примерно 2,9 у заказанных 1,4×4×0,8 м и у стройного корпуса на листе. Пропорция главной части сбита больше чем на 10 %. close-head.jpg пуст (ошибка кадрирования при съёмке, в frames.json errors), это не дефект модели: верх виден на turn-*, close-base и close-weapon.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-135.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте в цвете нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Вёсла, уключины и канат целы, сетка на wire-* следует форме корпуса. Дефекты видны только на крупном плане и в глине: наружный борт волнистый, вмятины внизу слева и посередине на wire-front; тёмная щель у внутреннего планширя возле транца на close-base; уключины гранёные, комковатые на close-weapon. По отчёту сборки: 4 трещины нулевой ширины, 2 non-manifold рёбра, 1 вывернутая грань; вёсла, банка и уключины отстоят от корпуса примерно на 0,9 uu. На игровой дистанции этого не видно.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как выветренное дерево, канат как канат, уключины как серый металл. Палитра серо-бурого дерева совпадает с листом, изнутри видны доски, шпангоуты и банки. Развёртка чистая: 668 островов, покрытие около 59 %. Минусы крупного плана: на close-weapon фактура борта мыльная и смазанная, на древке весла узор в виде строчки. Наружный борт без читаемых досок клинкерной обшивки, фактура сплошная волокнистая. Низ борта затемнён во всех ракурсах: похоже на окклюзию или потемнение у ватерлинии в цвете, на полном росте читается как роспись выветривания.",
+      "frames": [
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S=1,0 < 1,5: крен около 19° вокруг продольной оси и короткий широкий корпус (L/B около 1,9) против ровной стройной лодки на листе и заказанных 1,4×4×0,8 м. Похоже, Tripo принял приподнятый ракурс листа за горизонтальный. По рубрике это return_to_stage_2: перегенерация в Tripo по ровному виду с камеры на уровне борта; rework_fix_list пуст, F и T по 1,5 перенесены в known_issues. Оговорка: в каталоге r2 не было acceptor-prompt.md и gates.json. Рубрика и константы карточки взяты из шаблона промпта r1 этого пропа и промптов соседних r2 (dock-bollard-r2). accepted_object взят из frames.json, его sha256 сверены с текущими файлами export. Гейты перенесены из build.json в формате шаблона.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Крен лодки около 19° вокруг продольной оси: планширь и форштевень наклонены здесь и на turn-270, на turn-180 при камере на высоте 0 видна вся внутренность. При перегенерации нужен ровный вид с камеры на уровне борта; запасной путь — выравнивание крена в env_kit."
+    },
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Корпус коренастый: около 37 uu по планширям при 70,5 uu длины (L/B около 1,9) против примерно 2,9 у заказа 1,4×4×0,8 м и у стройного корпуса на листе."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Волнистый наружный борт: вмятины внизу слева и посередине; видно в глине, в цвете маскируется."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Тёмная щель у внутреннего планширя возле транца. По build.json: 4 трещины нулевой ширины, 2 non-manifold рёбра, 1 вывернутая грань; вёсла, средняя банка и уключины отделены зазором около 0,9 uu."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Уключины гранёные и комковатые на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "На крупном плане фактура борта мыльная и смазанная, на древке весла узор в виде строчки."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "На внешнем борту не читаются доски клинкерной обшивки, фактура сплошная волокнистая. Низ борта затемнён во всех ракурсах (окклюзия или потемнение в цвете)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-THAMES-ROWBOAT-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп thames-rowboat (r2) не принят: крен около 19° и коренастый корпус против листа, нужна перегенерация в Tripo по ровному виду. Промпта r2 в каталоге не было, константы карточки восстановлены по шаблону."
+}

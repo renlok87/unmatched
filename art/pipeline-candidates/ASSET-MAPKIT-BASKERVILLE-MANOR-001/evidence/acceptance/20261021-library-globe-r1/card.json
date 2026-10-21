@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleLibraryGlobe.fbx",
+      "sha256": "389ad17d78c2be754bb9c4adbe4d77a8bef428af4c619621cd682f83052af432"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryGlobe_BC.png",
+      "sha256": "94f1f0019f4edefdccc41f9cc099af9b2eea25b8e1633289850532399b92a1cb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryGlobe_N.png",
+      "sha256": "35755dda2d0a4891190b8bc5666dcd0bf97a4e7e8fad613bd257b250764c1105"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleLibraryGlobe_ORM.png",
+      "sha256": "2ae6e1e6356453fd58788cbe0c9b540ab0d0978148b6177c937476bd54577890"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-library-globe-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleLibraryGlobe.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+      "note": "5353 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+      "note": "UV0 islands 1123, used 0.5818, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+      "note": "T_Env_BaskervilleLibraryGlobe_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleLibraryGlobe.build.json",
+      "note": "SM_Env_BaskervilleLibraryGlobe, M_Env_BaskervilleLibraryGlobe",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с листом: бумажный глобус, латунный меридианный круг со шпилем, деревянный горизонтальный круг, готическая подставка с горгульями на четырёх углах, стрельчатые арки, X-образная царга и ножки-лапы. Лишних и пропавших частей нет, предмет узнаётся со всех 8 ракурсов. Одно второстепенное отличие: предмет приземистее заказанного (заказ ≈0,6×0,6×1 м, bounds 0,26×0,26×0,30 м, ширина ≈0,87 высоты). Эта приземистость уже есть в листе, поэтому главная часть против видов не сбита.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, рваных краёв, вывернутых частей и мусорной геометрии. Тонкие элементы целы: меридианный круг, шпиль, колонки арок. Горгульи читаются, сетка на wire-* следует форме. На крупных планах сфера глобуса заметно гранёная: угловатый контур, приплюснутый полюс под шпилем. Горизонтальный круг двенадцатигранный, грани видны на close-base и wire-34. Ажурные трилистники подставки сделаны мелкими глухими углублениями, а не сквозными окнами. На полном росте гранёность сферы лишь слегка заметна на контуре (turn-090), поэтому дефекты в основном крупного плана.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как в заказе: красное дерево с волокном, латунь с металлическим отблеском, пергаментная карта с континентами и розами ветров. Детализация не беднее кита Sarpedon. Зернистость нижней полусферы — тень от горизонтального круга при рендере (она же видна на глине wire-front), а не текстура. Дефект на полном росте в одной зоне: трилистники и четырёхлистники ажура подставки залиты белым и светло-серым (чужой цвет, по всей видимости фон исходного вида, запечённый в BC). Эти яркие пятна видны на всех четырёх сторонах во всех поворотах. Кроме того, на крупном плане рисунок карты мыльный, есть лёгкие тёмные мазки на дереве у ажура.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score = round((1.5+1.5+1.0)/6×10, 1) = 6.7 < 8.0. Гейты PASS/n/a. S = 1.5 ≥ 1.5, поэтому не перегенерация, а доработка: белые заливки ажура подставки (T 1.0, полный рост) и гранёная сфера глобуса (F 1.5, крупный план).",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "fix": "Убрать белые и светло-серые заливки трилистников и четырёхлистников ажура на всех четырёх сторонах подставки: перекрасить эти пиксели BC в тон тёмного дерева или тени углубления (при необходимости поправить ORM), либо взять текстуру исходника без запечённого фона в прорезях. На поворотах не должно остаться ярких пятен.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Сгладить гранёный контур сферы глобуса и приплюснутый полюс: оставить на сфере больше полигонов при децимации (бюджет env_kit 12000, сейчас 5353) и/или включить сглаживание нормалей по сфере. Проверить контур на close-head, close-weapon и turn-090.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Подставка приземистее заказанного ≈0,6×0,6×1 м: ширина ≈0,87 высоты, bounds 0,26×0,26×0,30 м. Пропорция взята из листа, против видов главная часть не сбита; на чтение фонового пропа в библиотеке не влияет."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Горизонтальный круг двенадцатигранный, а ажурные трилистники — глухие углубления, не сквозные окна. Это стилизация, видна только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-LIBRARY-GLOBE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп library-globe (Глобус) отправлен на доработку в Blender (6.7): закрасить белые заливки ажура подставки и сгладить гранёную сферу глобуса. Силуэт и материалы соответствуют листу."
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPoliceRattleBox.fbx",
+      "sha256": "2074acaeacdea3b5f6ecfbf5e55c6df34e4e0285b76c41fb02020003ad41806f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_BC.png",
+      "sha256": "361a5b903c94c674b9e87d75663d75425ab42df2b6b7024bdb304df0b6441ffe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_N.png",
+      "sha256": "8b101d68115fc347d4915b509901ecb367c28da11e5a1c0faebc5d872af56be2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_ORM.png",
+      "sha256": "ac816ecbfdfa1ed20e2cd4dc65c0d1930bf32f358e3f404d99a2858809f332ec"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-police-rattle-box-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoPoliceRattleBox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "4559 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "UV0 islands 165, used 0.4947, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "T_Env_SohoPoliceRattleBox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "SM_Env_SohoPoliceRattleBox, M_Env_SohoPoliceRattleBox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: деревянная будка-сторожка с двускатной гонтовой крышей, арочным проёмом спереди, вертикальной доской стен, рамой по низу и фонарём на кронштейне на боковой стене у переднего угла; пропорции высоты/ширины и вынос крыши совпадают с видом (turn-315 почти повторяет ракурс листа). Лишних и пропавших частей нет, фантомов на turn-090/270 и wire-34 нет, узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: без дыр, просветов и мусорной геометрии, тонкие элементы (кронштейн, фонарь, гонт) целы, внутренняя полость и пол на месте, сетка на wire-34 следует форме. На крупных планах слегка оплывший конёк крыши и бесформенная капля-навершие на кронштейне фонаря, местами размытые торцы гонта — только крупный план.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Дерево читается как дерево (доска, гонт с волокнами), стекло фонаря тёплое, запечённых бликов и теней в цвете нет, детализация на уровне кита. Минусы: у низа боковой и задней стен пятна «копоти» с мелким штриховым муаром (turn-090, turn-180, turn-270, turn-315, close-base) — на игровой дистанции читаются как грязь у основания, но штрих виден вблизи; тон дерева светлее и бежевее серо-оливкового листа (то же семейство).",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "sheet.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0/6 -> 8.3 >= 8.0, ни одно измерение < 1.0, гейты PASS/n/a; остаточные дефекты только крупного плана, для фонового пропа диорамы приемлемы.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "Пятна копоти у основания боковой и задней стен со штриховым муаром (также turn-180, turn-270, turn-315, close-base); на игровой дистанции читаются как грязь."
+    },
+    {
+      "item": "T",
+      "frame": "sheet.png",
+      "note": "Тон дерева светлее и розовато-бежевее серо-оливкового дерева листа; семейство цвета то же."
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Навершие кронштейна фонаря — оплывшая капля, конёк крыши слегка неровный (close-head); видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-SOHO-POLICE-RATTLE-BOX-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп police-rattle-box (Soho) принят по делегированию, 8.3: силуэт совпадает с листом; известны пятна копоти с муаром у низа стен и мягкие мелкие детали на крупном плане."
+}

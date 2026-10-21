@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleSecretBookcaseDoor.fbx",
+      "sha256": "930192631668673e7efbccac8a7b72d7f729cdf7a73ea4e47646e63969614e85"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSecretBookcaseDoor_BC.png",
+      "sha256": "1b7ca4e121482bb2bcbb6e2a6377152f5ee0c92c6bd325245bc52eab1dcee535"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSecretBookcaseDoor_N.png",
+      "sha256": "9adacfdc7c31dc969fe4599e46b3e05b6f575ef39448cc7b7475e4f37c721e14"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleSecretBookcaseDoor_ORM.png",
+      "sha256": "b24e3f62cb419371ad16d509eb5fefcf363f48bc2b23c0fa5c12653f4dad09d4"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-secret-bookcase-door-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleSecretBookcaseDoor.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+      "note": "4669 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+      "note": "UV0 islands 1259, used 0.6148, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+      "note": "T_Env_BaskervilleSecretBookcaseDoor_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleSecretBookcaseDoor.build.json",
+      "note": "SM_Env_BaskervilleSecretBookcaseDoor, M_Env_BaskervilleSecretBookcaseDoor",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png. Есть шкаф с карнизом. Верхняя левая створка распахнута на петле, на ней полки с книгами. За ней тёмный каменный арочный проход. Ниже нижняя секция с полками, книгами и ручкой, справа каменный пилон. Пропорции в допуске: ширина корпуса ≈1,19 м и глубина ≈0,74 м при высоте 2,3 м (заказано 1,2×0,8×2,3); с карнизом ширина 1,31 м. Одно второстепенное отличие: у створки нет задней стенки. Это открытая рама-стеллаж, сквозь полки на turn-090/270 видно фон, на turn-315 видно проход, книги видны с обеих сторон. У потайной двери ожидается сплошное полотно. Сзади на turn-135/180/225 добавлена глухая арочная ниша, которой нет на виде. Сзади предмет читается как стена с проходом, это допустимо для установки к стене.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Целое: на полном росте нет дыр, оплывших масс и вывернутых частей. Рама, карниз, полки и нижняя секция ровные, низ на close-base чистый, сетка на wire-front и wire-34 в целом следует форме. Мусорная геометрия заметна в основном на wire и крупных планах. Над аркой справа лишняя изогнутая лента-«рог» вне клинчатых камней (wire-front, wire-34). Из-за неё вершина арки на turn-045 выглядит перекрученной, на close-head видны смятые полосы слева от арки. Левой пяты у арки нет, арка асимметрична. Книги на створке собраны из тонких пластин со ступенчатыми краями (close-weapon). В отчёте сборки 12 оторванных оболочек (ручка, часть книг) с зазором 0,5–1,1 uu, в кадрах это не видно.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "turn-045.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются верно: тёплый дуб с рисунком волокон, корешки книг, серый гранит. Запечённого света нет, детализация богатая и не беднее уровня кита. Дефект на полном росте в одной зоне, на книгах распахнутой створки. Боковые и задние грани книг, не покрытые исходными видами, получили бледную вытянутую текстуру-«мыло». На turn-315 и turn-225 книги выглядят белёсыми ступенчатыми призраками, на turn-045 такие же блоки видны справа на створке, крупно на close-weapon. Только на крупном плане: камень покрыт рисунком «вязки/холста» (close-head), внутренность задней ниши тёмная размытая (turn-180).",
+      "frames": [
+        "turn-315.jpg",
+        "turn-225.jpg",
+        "turn-045.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "turn-180.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 6.7 < 8.0 (S 1.5, F 1.5, T 1.0). T 1.0: бледная вытянутая текстура на книгах распахнутой створки видна на полном росте (turn-315/225/045). S = 1.5, поэтому перегенерация с этапа 2 не нужна, достаточно доработки по пунктам. Все гейты PASS или n/a.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "fix": "Перетекстурировать книги на распахнутой створке. Боковые и задние грани книг сейчас бледные растянутые (turn-315, turn-225, turn-045, close-weapon). Повторить текстуру Tripo с дополнительным видом на створку сбоку или сзади. Другой путь: закрыть створку сзади сплошной панелью, чтобы невидимые в исходнике грани не попадали в кадр. Заодно проверить рисунок «холста» на камне (close-head).",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "fix": "Убрать лишнюю изогнутую ленту над правой частью арки (wire-front, wire-34), из-за неё вершина арки на turn-045 перекручена. Привести арку к цельной форме и по возможности добавить левую пяту. Перегенерировать в Tripo или исправить в исходнике формы: env_kit по политике ничего не чинит. Проверить, что книги на створке стоят на полках, без оторванных пластин (close-weapon; 12 оторванных оболочек в build.json).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-270.jpg",
+      "note": "У створки нет задней стенки, это открытый стеллаж. Сквозь полки виден фон (turn-090/270) или проход (turn-315), книги видны с обеих сторон. При доработке T можно закрыть створку панелью."
+    },
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Сзади придумана глухая арочная ниша, на виде её нет. Для установки к стене не мешает."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Камень покрыт мелким рисунком «вязки/холста», это артефакт текстуры Tripo. Виден только на крупном плане, на игровой дистанции читается как зерно камня."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Внутренность задней ниши тёмная и размытая, со светлыми царапинами. Сторона, скорее всего, в игре не видна."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-SECRET-BOOKCASE-DOOR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп secret-bookcase-door (Baskerville Manor) не принят, 6.7: силуэт верный. Доработать: перетекстурировать бледные растянутые книги на распахнутой створке и убрать лишнюю ленту над аркой."
+}

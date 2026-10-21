@@ -1,0 +1,182 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTallBookcase.fbx",
+      "sha256": "2d12694b3803b0cab0e669dd4adbf7854a492e6f98d639501eb83ecb37facdf2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTallBookcase_BC.png",
+      "sha256": "f92dc4abbb3a5f129f2b00f5a51997b565ccacddc50dc79e587878067ab193c5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTallBookcase_N.png",
+      "sha256": "ffce36a626e0ddd0c4c6d8934fe0abbbee468c64b79f0af8effcfa5f998986cb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTallBookcase_ORM.png",
+      "sha256": "e8ff80988a4d5cb39ccd08db6325ddfd7d5a27e8aa6611d9bb727b30bf951dc4"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-tall-bookcase-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleTallBookcase.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+      "note": "4153 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+      "note": "UV0 islands 769, used 0.7868, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+      "note": "T_Env_BaskervilleTallBookcase_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTallBookcase.build.json",
+      "note": "SM_Env_BaskervilleTallBookcase, M_Env_BaskervilleTallBookcase",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: высокий резной книжный шкаф с карнизом (crown moulding), стрельчатой готической аркой с резными консолями, пилястрами, пятью полками с книгами в кожаных переплётах, тумбой с двумя дверцами и цоколем. Все главные части листа на месте, фантомных выступов на turn-090/270 и wire-* нет, предмет узнаётся со всех 8 ракурсов (сзади и с боков гладкий корпус, как и положено шкафу). Пропорция фронта В/Ш ≈ 1,9 против 2,0 по заказу. Одно второстепенное отличие: корпус глубже заказанного, 18,8 uu при высоте 72 uu, то есть ≈0,63 м на 2,4 м против 0,4 м (turn-090, turn-270). Тон дерева светлее и серее тёмного махагона листа, но семейство цвета то же (коричневое дерево).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка на wire-* следует форме. Полки, карниз, консоли, пилястры, ручки и цоколь целы, оплывших масс нет. Есть дефект на полном росте в одной зоне: в арочной филёнке правой дверцы тумбы треугольная дыра насквозь, через неё видна внутренность тумбы, а левая дверца глухая (turn-000, turn-045, turn-315, close-base; тот же треугольник на wire-front и wire-34). Остальные открытые кромки исходника (84 петли по отчёту) на кадрах не видны.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 0.5,
+      "rationale": "Спереди материалы читаются: дерево с волокном, корешки кожаных книг с золотыми бинтами; запечённого света нет, детализация не беднее кита Sarpedon. На полном росте видны дефекты в двух зонах. (1) Книги на ракурсах 3/4: полупрозрачные «призрачные» пластины со смазанной проекцией корешков на боковые грани, книги будто просвечивают друг сквозь друга (turn-045: верхняя, 3-я, 4-я и нижняя полки; turn-315, close-weapon). (2) Чужой зелёный цвет и пёстрые красно-зелёные полосы на боковинах и задней стенке, сильнее всего внизу тумбы (turn-090/135/180/225/270/315); на turn-270 растянута передняя кромка боковины. Только на крупном плане: белёсые пятна на полках и верхней доске тумбы (close-base, close-head), смазанный верх карниза (close-head).",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 5,0 < 8,0; F = 1,0 (дыра в правой дверце тумбы на полном росте) и T = 0,5 (призрачные книги на 3/4, чужой зелёный цвет на боковинах и задней стенке). S = 1,5 не ниже порога, поэтому по рубрике это доработка, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "fix": "Закрыть треугольную дыру в арочной филёнке правой дверцы тумбы, чтобы она стала глухой, как левая. Сейчас через неё видна внутренность тумбы (turn-000, turn-045, turn-315, close-base, wire-front).",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "fix": "Убрать полупрозрачные «призрачные» пластины книг со смазанной проекцией корешков на боковых гранях на ракурсах 3/4: верхняя, 3-я, 4-я и нижняя полки (turn-045, turn-315, close-weapon).",
+      "tool": "исходник Tripo: текстура"
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "fix": "Убрать зелёные пятна чужого цвета и пёстрые цветные полосы с боковин и задней стенки (особенно внизу тумбы) и растяжку на передней кромке боковины (turn-090, turn-135, turn-180, turn-225, turn-270, turn-315).",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Корпус глубже заказанного: 18,8 uu при высоте 72 uu, то есть ≈0,63 м на 2,4 м против 0,4 м по описанию; у стены шкаф выступает сильнее."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Тон дерева серо-коричневый, светлее и холоднее тёмного махагона листа; семейство цвета то же."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Белёсые пятна на верхней доске тумбы и на полках под книгами, видны только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Верх карниза — смазанная растянутая текстура, видна только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-TALL-BOOKCASE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tall-bookcase не принят (5,0): нужно закрыть дыру в правой дверце тумбы, убрать призрачные книги на ракурсах 3/4 и зелёные пятна на боковинах — доработка по исходнику Tripo."
+}

@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SOHO-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/SM_Env_SohoPoliceRattleBox.fbx",
+      "sha256": "2074acaeacdea3b5f6ecfbf5e55c6df34e4e0285b76c41fb02020003ad41806f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_BC.png",
+      "sha256": "361a5b903c94c674b9e87d75663d75425ab42df2b6b7024bdb304df0b6441ffe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_N.png",
+      "sha256": "8b101d68115fc347d4915b509901ecb367c28da11e5a1c0faebc5d872af56be2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/export/T_Env_SohoPoliceRattleBox_ORM.png",
+      "sha256": "ac816ecbfdfa1ed20e2cd4dc65c0d1930bf32f358e3f404d99a2858809f332ec"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/evidence/acceptance/20261021-police-rattle-box-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SohoPoliceRattleBox.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "4559 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "UV0 islands 165, used 0.4947, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "T_Env_SohoPoliceRattleBox_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SOHO-001/20261021-smartmesh/reports/assets/SM_Env_SohoPoliceRattleBox.build.json",
+      "note": "SM_Env_SohoPoliceRattleBox, M_Env_SohoPoliceRattleBox",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: деревянная будка квадратного плана с двускатной гонтовой крышей и выносом на фронтоне, высокий арочный проём спереди, стены из вертикальных досок в рамах, нижняя обвязка, фонарь со светящимся стеклом на кронштейне на левой боковой стене у переднего края (turn-000/turn-270/turn-315 согласуются с листом). Пропорция высота/ширина ~2.2 совпадает с оценкой по виду листа; лишних и пропавших частей нет, фантомных выступов на turn-090/270 и wire-* нет. Узнаётся со всех ракурсов (боковые и задний виды читаются как будка с крышей). Цвет — то же семейство выветренного дерева, чуть светлее листа.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка чистая и следует форме (wire-34, wire-front, wire-back): нет дыр, просветов, вывернутых частей и мусорной геометрии, фонарь и кронштейн целы, проём и пол внутри собраны корректно. Дефекты только крупного плана: края гонта на close-head местами мягкие, оплывшие и волнистые; небольшой смятый участок треугольников на правой задней стойке (wire-34, заметный надрыв на turn-045); нижняя обвязка чуть выгнута (turn-090, turn-135) — в стилизации настольной миниатюры на игровой дистанции не читается.",
+      "frames": [
+        "close-head.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: выветренное дерево с прорисованными досками и волокном, гонт с фактурой, латунно-тёмный фонарь со светящимся стеклом; запечённого света и теней в цвете не видно (ORM без AO, затемнение внутри проёма — от освещения), швов и растяжек на полном росте нет, детализация на уровне китовых пропов. Дефекты крупного плана: тёмные пятна «грязи» внизу каждой стеновой панели (turn-045, turn-090, turn-135, turn-270, turn-315) на close-base видны как зигзагообразный муаровый шум генерации Tripo, а не мазок; на полном росте читаются как копоть/выветривание; волокно на боковых стенах местами размыто.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0 (S 2.0, F 1.5, T 1.5), все гейты PASS или n/a; замечания F и T только крупного плана, для фонового пропа диорамы на игровой дистанции не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Тёмные пятна грязи внизу всех стеновых панелей имеют зигзагообразный муаровый шум генерации (видно на close-base, слабее на turn-045/turn-135/turn-270/turn-315); на полном росте читаются как копоть. Волокно досок на боковых стенах местами размыто."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Края гонта местами мягкие и волнистые (оплывшие кромки); на правой задней стойке небольшой смятый участок сетки (wire-34); нижняя обвязка слегка выгнута (turn-090, turn-135). Только крупный план."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SOHO-POLICE-RATTLE-BOX-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп police-rattle-box (полицейская будка, Soho) принят по делегированию, 8.3: силуэт совпадает с листом; мелкие замечания крупного плана — муаровый шум пятен грязи внизу стен и мягкие края гонта."
+}
