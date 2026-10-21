@@ -1,0 +1,1379 @@
+{
+  "schema": "unmatched.env-kit.asset-build/1",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "asset_id": "MK-HEO-WARP-LOOM",
+  "ue_mesh": "SM_Env_HeorotWarpLoom",
+  "board": "Heorot",
+  "blender_version": "5.2.2 LTS",
+  "scripts_sha256_lf": {
+    "tools/art/env_kit/env_kit_build.py": "cf9b65c6706f2313674a6a29855ee13a8c4bbeb2e0e025cd57407dead242173f",
+    "tools/tripo-pipeline/blender/static_prop_candidate.py": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/source/MK-HEO-WARP-LOOM.glb",
+    "sha256": "412d57d860ea16c95478d89aeb57cea82315d01d27b8c9b9cf021d0280401e78",
+    "bytes": 22026476,
+    "sha256_matches_tripo_run": true,
+    "tripo_task": "9161ee5a-40a1-419e-bea1-6ddeff2d9967",
+    "gltf_generator": "Tripo",
+    "gltf_extensions_used": [
+      "KHR_materials_volume",
+      "FB_ngon_encoding"
+    ]
+  },
+  "no_render_policy": "no Eevee/Cycles/Workbench render, no bake, no viewport: GPU measurements in progress",
+  "import": {
+    "mesh_objects": 1,
+    "faces": 4413,
+    "triangles": 4413,
+    "materials": [
+      "tripo_node_ba6fac32-be0e-4b8f-8778-8907e023c05c_material"
+    ],
+    "images": [
+      {
+        "name": "weaving+loom+3d+model_basecolor.jpg",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "sRGB"
+      },
+      {
+        "name": "weaving+loom+3d+model_normal.jpg",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color"
+      },
+      {
+        "name": "weaving+loom+3d+model_rm.png",
+        "size": [
+          4096,
+          4096
+        ],
+        "colorspace": "Non-Color"
+      }
+    ],
+    "bounds_min_m": [
+      -0.349854,
+      -0.155518,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.349854,
+      0.155518,
+      0.999512
+    ],
+    "dimensions_m": [
+      0.699707,
+      0.311035,
+      0.999512
+    ]
+  },
+  "geometry": {
+    "policy": "measured only; no clean-up, repair or winding change (task rule: fix orientation/scale/pivot only)",
+    "stats_welded_1e-6m_prescale": {
+      "vertices_as_stored": 6601,
+      "vertices_welded_1e-6m": 2625,
+      "faces": 4413,
+      "triangles": 4413,
+      "welded_boundary_edges": 680,
+      "welded_non_manifold_edges": 28,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 180,
+      "connected_shells": 84,
+      "signed_volume_m3": 0.023329542,
+      "raw_vertex_count_before_weld": 6601
+    },
+    "corner_normals": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 78,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        30.21,
+        84.21,
+        160.27
+      ]
+    },
+    "inconsistent_winding_face_centres_uu_prescale_frame": [
+      [
+        -15.58,
+        -7.59,
+        1.91
+      ],
+      [
+        -15.6,
+        -7.44,
+        2.05
+      ],
+      [
+        -15.59,
+        -7.45,
+        1.76
+      ],
+      [
+        -15.61,
+        -7.3,
+        1.9
+      ],
+      [
+        -16.1,
+        -0.49,
+        1.63
+      ],
+      [
+        -16.12,
+        -0.34,
+        1.78
+      ],
+      [
+        -16.12,
+        -0.36,
+        1.49
+      ],
+      [
+        -16.14,
+        -0.2,
+        1.63
+      ],
+      [
+        -9.36,
+        -1.26,
+        14.07
+      ],
+      [
+        -7.96,
+        -1.7,
+        13.67
+      ]
+    ],
+    "shells_and_holes": {
+      "weld_m_prescale": 1e-06,
+      "shells": 84,
+      "shells_isolated_gap_gt_uu": 0.5,
+      "shells_isolated": 35,
+      "shells_isolated_off_ground": 33,
+      "shells_inverted_closed": 0,
+      "shell_list_top20_by_faces": [
+        {
+          "shell": 0,
+          "faces": 189,
+          "triangles": 189,
+          "area_uu2": 67.88,
+          "signed_volume_uu3": -3.47,
+          "open_edges": 4,
+          "bounds_min_uu_prescale_frame": [
+            -10.98,
+            -2.59,
+            12.37
+          ],
+          "bounds_max_uu_prescale_frame": [
+            10.89,
+            2.13,
+            14.51
+          ],
+          "gap_to_nearest_other_shell_uu": 0.267,
+          "isolated": false,
+          "off_ground_uu": 12.37,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 1,
+          "faces": 178,
+          "triangles": 178,
+          "area_uu2": 79.47,
+          "signed_volume_uu3": 52.95,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -5.26,
+            -4.26,
+            3.66
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -1.07,
+            -0.07,
+            12.46
+          ],
+          "gap_to_nearest_other_shell_uu": 0.134,
+          "isolated": false,
+          "off_ground_uu": 3.66,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 2,
+          "faces": 178,
+          "triangles": 178,
+          "area_uu2": 91.72,
+          "signed_volume_uu3": 69.57,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            2.95,
+            -4.29,
+            3.31
+          ],
+          "bounds_max_uu_prescale_frame": [
+            7.99,
+            -0.04,
+            11.81
+          ],
+          "gap_to_nearest_other_shell_uu": 0.072,
+          "isolated": false,
+          "off_ground_uu": 3.31,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 3,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 90.82,
+          "signed_volume_uu3": 66.65,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -5.26,
+            -0.51,
+            3.75
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -0.92,
+            3.59,
+            12.46
+          ],
+          "gap_to_nearest_other_shell_uu": 0.097,
+          "isolated": false,
+          "off_ground_uu": 3.75,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 4,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 88.73,
+          "signed_volume_uu3": 60.75,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -8.95,
+            -0.45,
+            3.75
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -5.0,
+            3.18,
+            13.45
+          ],
+          "gap_to_nearest_other_shell_uu": 0.117,
+          "isolated": false,
+          "off_ground_uu": 3.75,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 5,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 109.94,
+          "signed_volume_uu3": 89.2,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            2.95,
+            -0.4,
+            3.43
+          ],
+          "bounds_max_uu_prescale_frame": [
+            7.93,
+            3.85,
+            13.25
+          ],
+          "gap_to_nearest_other_shell_uu": 0.229,
+          "isolated": false,
+          "off_ground_uu": 3.43,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 6,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 108.19,
+          "signed_volume_uu3": 88.73,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            7.81,
+            -0.4,
+            3.63
+          ],
+          "bounds_max_uu_prescale_frame": [
+            12.85,
+            3.74,
+            12.93
+          ],
+          "gap_to_nearest_other_shell_uu": 0.188,
+          "isolated": false,
+          "off_ground_uu": 3.63,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 7,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 79.52,
+          "signed_volume_uu3": 54.62,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -1.25,
+            -4.26,
+            3.75
+          ],
+          "bounds_max_uu_prescale_frame": [
+            3.0,
+            -0.25,
+            12.46
+          ],
+          "gap_to_nearest_other_shell_uu": 0.072,
+          "isolated": false,
+          "off_ground_uu": 3.75,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 8,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 101.44,
+          "signed_volume_uu3": 79.49,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -1.39,
+            -0.31,
+            3.75
+          ],
+          "bounds_max_uu_prescale_frame": [
+            3.09,
+            3.77,
+            12.81
+          ],
+          "gap_to_nearest_other_shell_uu": 0.188,
+          "isolated": false,
+          "off_ground_uu": 3.75,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 9,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 105.88,
+          "signed_volume_uu3": 84.59,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -13.03,
+            -2.83,
+            3.9
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -8.31,
+            1.86,
+            13.45
+          ],
+          "gap_to_nearest_other_shell_uu": 0.171,
+          "isolated": false,
+          "off_ground_uu": 3.9,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 10,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 69.63,
+          "signed_volume_uu3": 41.03,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            8.28,
+            -3.5,
+            3.52
+          ],
+          "bounds_max_uu_prescale_frame": [
+            12.3,
+            -0.51,
+            12.19
+          ],
+          "gap_to_nearest_other_shell_uu": 0.284,
+          "isolated": false,
+          "off_ground_uu": 3.52,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 11,
+          "faces": 162,
+          "triangles": 162,
+          "area_uu2": 77.7,
+          "signed_volume_uu3": 50.96,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -8.9,
+            -4.09,
+            3.75
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -5.03,
+            -0.22,
+            12.46
+          ],
+          "gap_to_nearest_other_shell_uu": 0.117,
+          "isolated": false,
+          "off_ground_uu": 3.75,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 12,
+          "faces": 146,
+          "triangles": 146,
+          "area_uu2": 377.79,
+          "signed_volume_uu3": 226.08,
+          "open_edges": 8,
+          "bounds_min_uu_prescale_frame": [
+            -20.65,
+            -9.34,
+            0.0
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -15.67,
+            9.34,
+            15.15
+          ],
+          "gap_to_nearest_other_shell_uu": 0.955,
+          "isolated": true,
+          "off_ground_uu": 0.0,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 13,
+          "faces": 146,
+          "triangles": 146,
+          "area_uu2": 377.82,
+          "signed_volume_uu3": 227.06,
+          "open_edges": 8,
+          "bounds_min_uu_prescale_frame": [
+            15.67,
+            -9.34,
+            0.0
+          ],
+          "bounds_max_uu_prescale_frame": [
+            20.65,
+            9.34,
+            15.15
+          ],
+          "gap_to_nearest_other_shell_uu": 0.955,
+          "isolated": true,
+          "off_ground_uu": 0.0,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 14,
+          "faces": 96,
+          "triangles": 96,
+          "area_uu2": 21.79,
+          "signed_volume_uu3": 7.93,
+          "open_edges": 16,
+          "bounds_min_uu_prescale_frame": [
+            12.03,
+            -2.07,
+            17.32
+          ],
+          "bounds_max_uu_prescale_frame": [
+            13.44,
+            1.54,
+            20.93
+          ],
+          "gap_to_nearest_other_shell_uu": 0.106,
+          "isolated": false,
+          "off_ground_uu": 17.32,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 15,
+          "faces": 96,
+          "triangles": 96,
+          "area_uu2": 24.02,
+          "signed_volume_uu3": 9.74,
+          "open_edges": 16,
+          "bounds_min_uu_prescale_frame": [
+            -13.88,
+            -2.07,
+            17.32
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -12.15,
+            1.54,
+            20.93
+          ],
+          "gap_to_nearest_other_shell_uu": 0.059,
+          "isolated": false,
+          "off_ground_uu": 17.32,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 16,
+          "faces": 90,
+          "triangles": 90,
+          "area_uu2": 332.96,
+          "signed_volume_uu3": 161.74,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -20.68,
+            -2.51,
+            53.9
+          ],
+          "bounds_max_uu_prescale_frame": [
+            20.33,
+            -0.34,
+            56.81
+          ],
+          "gap_to_nearest_other_shell_uu": 0.277,
+          "isolated": false,
+          "off_ground_uu": 53.9,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 17,
+          "faces": 84,
+          "triangles": 84,
+          "area_uu2": 82.45,
+          "signed_volume_uu3": 27.99,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -6.02,
+            -3.91,
+            33.65
+          ],
+          "bounds_max_uu_prescale_frame": [
+            14.08,
+            -2.24,
+            35.29
+          ],
+          "gap_to_nearest_other_shell_uu": 1.332,
+          "isolated": true,
+          "off_ground_uu": 33.65,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 18,
+          "faces": 84,
+          "triangles": 84,
+          "area_uu2": 3.32,
+          "signed_volume_uu3": 0.36,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -11.65,
+            -1.33,
+            50.83
+          ],
+          "bounds_max_uu_prescale_frame": [
+            -10.45,
+            -0.34,
+            52.44
+          ],
+          "gap_to_nearest_other_shell_uu": 0.181,
+          "isolated": false,
+          "off_ground_uu": 50.83,
+          "inverted_if_closed": false
+        },
+        {
+          "shell": 19,
+          "faces": 84,
+          "triangles": 84,
+          "area_uu2": 3.12,
+          "signed_volume_uu3": 0.34,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            11.3,
+            -0.95,
+            51.0
+          ],
+          "bounds_max_uu_prescale_frame": [
+            12.33,
+            -0.25,
+            52.5
+          ],
+          "gap_to_nearest_other_shell_uu": 0.121,
+          "isolated": false,
+          "off_ground_uu": 51.0,
+          "inverted_if_closed": false
+        }
+      ],
+      "open_edge_loops": 51,
+      "open_edges": 680,
+      "open_edge_loops_by_kind": {
+        "crack (zero-width T-junction/sliver)": 26,
+        "hole": 25
+      },
+      "crack_rule": "mean width 2A/P <= 0.10 uu (A = Newell area of the directed loop, P = rim length)",
+      "open_edge_loops_top10_by_length": [
+        {
+          "edges": 122,
+          "length_uu": 1403.36,
+          "shell": 42,
+          "area_uu2": 189.587,
+          "mean_width_2A_over_P_uu": 0.2702,
+          "compactness_4piA_over_P2": 0.0012,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -7.56,
+            -0.34,
+            43.01
+          ]
+        },
+        {
+          "edges": 86,
+          "length_uu": 1061.16,
+          "shell": 20,
+          "area_uu2": 9.291,
+          "mean_width_2A_over_P_uu": 0.0175,
+          "compactness_4piA_over_P2": 0.0001,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            -0.33,
+            -0.49,
+            39.8
+          ]
+        },
+        {
+          "edges": 66,
+          "length_uu": 775.92,
+          "shell": 26,
+          "area_uu2": 7.34,
+          "mean_width_2A_over_P_uu": 0.0189,
+          "compactness_4piA_over_P2": 0.0002,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            5.65,
+            -0.47,
+            37.65
+          ]
+        },
+        {
+          "edges": 34,
+          "length_uu": 345.58,
+          "shell": 35,
+          "area_uu2": 2.385,
+          "mean_width_2A_over_P_uu": 0.0138,
+          "compactness_4piA_over_P2": 0.0003,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            10.77,
+            -0.47,
+            39.69
+          ]
+        },
+        {
+          "edges": 26,
+          "length_uu": 309.58,
+          "shell": 51,
+          "area_uu2": 2.808,
+          "mean_width_2A_over_P_uu": 0.0181,
+          "compactness_4piA_over_P2": 0.0004,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            8.27,
+            -0.48,
+            39.48
+          ]
+        },
+        {
+          "edges": 26,
+          "length_uu": 309.51,
+          "shell": 49,
+          "area_uu2": 2.912,
+          "mean_width_2A_over_P_uu": 0.0188,
+          "compactness_4piA_over_P2": 0.0004,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            2.87,
+            -0.48,
+            39.5
+          ]
+        },
+        {
+          "edges": 44,
+          "length_uu": 192.92,
+          "shell": 33,
+          "area_uu2": 4.703,
+          "mean_width_2A_over_P_uu": 0.0488,
+          "compactness_4piA_over_P2": 0.0016,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            9.33,
+            -2.51,
+            25.5
+          ]
+        },
+        {
+          "edges": 14,
+          "length_uu": 155.55,
+          "shell": 53,
+          "area_uu2": 1.734,
+          "mean_width_2A_over_P_uu": 0.0223,
+          "compactness_4piA_over_P2": 0.0009,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            -7.03,
+            -0.42,
+            30.88
+          ]
+        },
+        {
+          "edges": 14,
+          "length_uu": 153.96,
+          "shell": 54,
+          "area_uu2": 1.684,
+          "mean_width_2A_over_P_uu": 0.0219,
+          "compactness_4piA_over_P2": 0.0009,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            -5.62,
+            -0.42,
+            30.99
+          ]
+        },
+        {
+          "edges": 14,
+          "length_uu": 153.27,
+          "shell": 61,
+          "area_uu2": 1.769,
+          "mean_width_2A_over_P_uu": 0.0231,
+          "compactness_4piA_over_P2": 0.0009,
+          "kind": "crack (zero-width T-junction/sliver)",
+          "centre_uu_prescale_frame": [
+            -8.65,
+            -0.41,
+            31.03
+          ]
+        }
+      ],
+      "holes_top10_by_area": [
+        {
+          "edges": 122,
+          "length_uu": 1403.36,
+          "shell": 42,
+          "area_uu2": 189.587,
+          "mean_width_2A_over_P_uu": 0.2702,
+          "compactness_4piA_over_P2": 0.0012,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -7.56,
+            -0.34,
+            43.01
+          ]
+        },
+        {
+          "edges": 5,
+          "length_uu": 27.56,
+          "shell": 22,
+          "area_uu2": 10.087,
+          "mean_width_2A_over_P_uu": 0.7321,
+          "compactness_4piA_over_P2": 0.1669,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -10.81,
+            0.9,
+            29.35
+          ]
+        },
+        {
+          "edges": 5,
+          "length_uu": 28.87,
+          "shell": 22,
+          "area_uu2": 9.618,
+          "mean_width_2A_over_P_uu": 0.6663,
+          "compactness_4piA_over_P2": 0.145,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            10.72,
+            0.93,
+            29.16
+          ]
+        },
+        {
+          "edges": 4,
+          "length_uu": 11.91,
+          "shell": 28,
+          "area_uu2": 8.506,
+          "mean_width_2A_over_P_uu": 1.4288,
+          "compactness_4piA_over_P2": 0.754,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -17.42,
+            -0.1,
+            2.93
+          ]
+        },
+        {
+          "edges": 4,
+          "length_uu": 11.91,
+          "shell": 24,
+          "area_uu2": 8.506,
+          "mean_width_2A_over_P_uu": 1.4288,
+          "compactness_4piA_over_P2": 0.754,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            17.42,
+            -0.1,
+            2.93
+          ]
+        },
+        {
+          "edges": 8,
+          "length_uu": 9.25,
+          "shell": 15,
+          "area_uu2": 6.46,
+          "mean_width_2A_over_P_uu": 1.3962,
+          "compactness_4piA_over_P2": 0.948,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -12.15,
+            -0.26,
+            19.12
+          ]
+        },
+        {
+          "edges": 8,
+          "length_uu": 9.25,
+          "shell": 14,
+          "area_uu2": 6.46,
+          "mean_width_2A_over_P_uu": 1.3962,
+          "compactness_4piA_over_P2": 0.948,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            12.03,
+            -0.26,
+            19.12
+          ]
+        },
+        {
+          "edges": 8,
+          "length_uu": 9.25,
+          "shell": 15,
+          "area_uu2": 6.46,
+          "mean_width_2A_over_P_uu": 1.3962,
+          "compactness_4piA_over_P2": 0.948,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            -13.88,
+            -0.26,
+            19.12
+          ]
+        },
+        {
+          "edges": 8,
+          "length_uu": 9.25,
+          "shell": 14,
+          "area_uu2": 6.46,
+          "mean_width_2A_over_P_uu": 1.3962,
+          "compactness_4piA_over_P2": 0.948,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            13.44,
+            -0.26,
+            19.12
+          ]
+        },
+        {
+          "edges": 4,
+          "length_uu": 10.92,
+          "shell": 13,
+          "area_uu2": 6.095,
+          "mean_width_2A_over_P_uu": 1.1159,
+          "compactness_4piA_over_P2": 0.6419,
+          "kind": "hole",
+          "centre_uu_prescale_frame": [
+            17.26,
+            1.77,
+            13.2
+          ]
+        }
+      ],
+      "hole_area_uu2_total": 277.909,
+      "non_manifold_edges": 28
+    },
+    "ray_escape_facing": {
+      "method": "7+7 ray escape per face (50 deg cone), BVH ray cast, CPU; see facing_stats docstring",
+      "faces": {
+        "outward": 3502,
+        "inward": 7,
+        "sheet": 21,
+        "enclosed": 883
+      },
+      "area_fraction": {
+        "outward": 0.7508,
+        "inward": 0.0023,
+        "sheet": 0.0208,
+        "enclosed": 0.2261
+      },
+      "inward_face_centres_uu_prescale_frame_first12": [
+        [
+          -8.98,
+          0.91,
+          13.97
+        ],
+        [
+          -9.17,
+          -1.09,
+          27.02
+        ],
+        [
+          -7.15,
+          -1.6,
+          40.1
+        ],
+        [
+          -13.99,
+          0.39,
+          31.8
+        ],
+        [
+          -14.01,
+          0.55,
+          32.18
+        ],
+        [
+          -13.67,
+          0.39,
+          31.8
+        ],
+        [
+          -13.7,
+          0.55,
+          32.18
+        ]
+      ]
+    },
+    "winding_note": "faces_with_inconsistent_winding comes from bmesh recalc_face_normals on the welded mesh; on open/non-manifold meshes (foliage, overlapping Tripo shells) it splits regions arbitrarily, so ray_escape_facing.inward is the flipped-face measure",
+    "closed_manifold_consistent": false
+  },
+  "orientation": {
+    "yaw_deg_about_plus_z_applied": 0.0,
+    "yaw_source": "params",
+    "orientation_check": null,
+    "front_convention": "Tripo 'front' reference view = glTF +Z = .blend -Y = UE +X (UM_FBX_v1). Tripo 'left' view = seen from .blend +X, 'right' = from -X, 'back' = from +Y. K1 camera looks along -Y: actor yaw +90 turns the front to the camera"
+  },
+  "scale_pivot": {
+    "target": {
+      "dimension": "height",
+      "uu": 60.0
+    },
+    "measured_source_m": 0.999512,
+    "uniform_scale_applied": 0.600293,
+    "uu_per_source_metre": 60.0293,
+    "dimensions_m_blend": [
+      0.420029,
+      0.186712,
+      0.6
+    ],
+    "bounds_min_m": [
+      -0.210015,
+      -0.093356,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.210015,
+      0.093356,
+      0.6
+    ],
+    "dimensions_uu_ue_xyz": [
+      18.671,
+      42.003,
+      60.0
+    ],
+    "ue_axes_note": "UE X = depth (front-back, .blend Y), UE Y = width (.blend X), UE Z = height",
+    "pivot": "object origin = (0,0,0) = centre of the XY bounds at min Z"
+  },
+  "textures": {
+    "source_images": {
+      "basecolor": "weaving+loom+3d+model_basecolor.jpg",
+      "metallic_roughness": "weaving+loom+3d+model_rm.png",
+      "normal": "weaving+loom+3d+model_normal.jpg",
+      "occlusion": null,
+      "factors": {
+        "metallic": 1.0,
+        "roughness": 1.0,
+        "basecolor": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "source_size_px": 4096,
+    "target_size_px": 2048,
+    "downscale": "box 2x2",
+    "normal_padding": {
+      "background_fraction_source": 0.0001,
+      "dilated_px_at_source": 32,
+      "flat_filled_fraction_source": 0.0
+    },
+    "channel_stats": {
+      "roughness_mean": 0.611,
+      "metallic_mean": 0.045,
+      "metallic_fraction_gt_0.5": 0.0,
+      "normal_mean_rgb_dx": [
+        0.5,
+        0.5,
+        0.997
+      ],
+      "bc_mean_srgb": [
+        0.481,
+        0.37,
+        0.329
+      ]
+    },
+    "outputs": {
+      "BC": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_BC.png",
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "sha256": "8c552780727447daa040e2289bfbc2cbb8079cc3512bad561db700f576502582",
+        "bytes": 6909910
+      },
+      "N": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_N.png",
+        "colorspace": "Linear (Non-Color)",
+        "convention": "DirectX (G flipped from glTF OpenGL); UE: TC_Normalmap, flip_green false",
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "0fe3445fc1844f9e367d5d34dcd862a69d93a16334c49ffc4729fee6597321ed",
+        "bytes": 2695285
+      },
+      "ORM": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWarpLoom_ORM.png",
+        "colorspace": "Linear (Non-Color)",
+        "channels": {
+          "R": "1.0 (no AO: Tripo has no occlusion map; Cycles bake not run)",
+          "G": "roughness from glTF metallicRoughness.G",
+          "B": "metallic from glTF metallicRoughness.B"
+        },
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "da209d9b38f2425805ee99e27b72d72a7560b2b1939a23d898551fce54c944ee",
+        "bytes": 4543019
+      }
+    },
+    "ao_bake": null,
+    "bc_gutters": {
+      "raster_px": 512,
+      "uncovered_fraction": 0.3455,
+      "uncovered_mean_bc_srgb": [
+        0.511,
+        0.417,
+        0.373
+      ],
+      "note": "Tripo BC gutters; the lantern/barrel pipeline pads only N, BC/ORM are written as delivered"
+    }
+  },
+  "uv0": {
+    "uv_layers": [
+      "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 1196,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+      0.001221,
+      0.000977,
+      0.999023,
+      0.995605
+    ],
+    "uv_area_used_fraction": 0.6633,
+    "raster_coverage_fraction": 0.6553,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 13149,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "zero_area_uv_triangles": 4,
+    "texel_density_px_per_m_at_raster": 966.4,
+    "stretch_area_ratio_p05_p50_p95": [
+      0.897,
+      1.02,
+      1.047
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+      1.017,
+      1.148,
+      4.117
+    ],
+    "stretch_sigma_max_norm_p95": 1.044,
+    "stretch_sigma_min_norm_p05": 0.883,
+    "min_gutter_px_estimate": 1,
+    "island_pairs_closer_than_4px": 165,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+      {
+        "raster_size_px": 1024,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 13149,
+        "raster_coverage_fraction": 0.6553,
+        "min_island_centre_distance_px": 2.0,
+        "island_pairs_centre_distance_lt_4px": 916,
+        "island_pairs_centre_distance_lt_8px": 2784,
+        "mip_where_min_distance_drops_below_1_texel": 2
+      },
+      {
+        "raster_size_px": 2048,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 52509,
+        "raster_coverage_fraction": 0.656,
+        "min_island_centre_distance_px": 3.0,
+        "island_pairs_centre_distance_lt_4px": 3,
+        "island_pairs_centre_distance_lt_8px": 1628,
+        "mip_where_min_distance_drops_below_1_texel": 2
+      }
+    ]
+  },
+  "material_slots": 1,
+  "material_names": [
+    "M_Env_HeorotWarpLoom"
+  ],
+  "export": {
+    "fbx": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWarpLoom.fbx",
+    "sha256": "857a11ea8c4129098e1028100662086c2b62c7fc2d451bbc3a3400835f6592a4",
+    "bytes": 234156,
+    "preset": "UM_FBX_v1.json",
+    "settings": {
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "export_space_rotation_z_degrees": 90.0,
+      "temporary_data_scale": 100.0,
+      "patch_fbx_unit_scale_to": 1.0,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "use_triangles": true,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "AUTO"
+    },
+    "exporter_kwargs": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bake_space_transform": false,
+      "embed_textures": false,
+      "mesh_smooth_type": "FACE",
+      "object_types": [
+        "ARMATURE",
+        "MESH"
+      ],
+      "path_mode": "AUTO",
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "use_custom_props": false,
+      "use_mesh_edges": false,
+      "use_selection": true,
+      "use_triangles": true
+    },
+    "textures_embedded": false,
+    "texture_paths": "relative to the FBX (absolute checkout path is never written)",
+    "um_fbx_v1_conformance": [
+      {
+        "setting": "Forward / Up (04 1.1)",
+        "standard": [
+          "-Y",
+          "Z"
+        ],
+        "used": [
+          "-Y",
+          "Z"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Apply Scalings (04 1.1)",
+        "standard": "FBX_SCALE_UNITS",
+        "used": "FBX_SCALE_UNITS",
+        "conforms": true
+      },
+      {
+        "setting": "Apply Unit (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Apply Transform (04 1.1)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Triangulate Faces (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Smoothing (04 1.1)",
+        "standard": "FACE",
+        "used": "FACE",
+        "conforms": true
+      },
+      {
+        "setting": "Object Types (04 1.1)",
+        "standard": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "used": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Loose Edges / Custom Properties (04 1.1)",
+        "standard": [
+          false,
+          false
+        ],
+        "used": [
+          false,
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Leaf bones / bone axes (04 1.1, preset)",
+        "standard": [
+          false,
+          "Y",
+          "X"
+        ],
+        "used": [
+          false,
+          "Y",
+          "X"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Bake Animation (04 1.1: skeletal clips only)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Path Mode, textures not embedded (04 1.1)",
+        "standard": [
+          "AUTO",
+          false
+        ],
+        "used": [
+          "AUTO",
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+        "standard": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "used": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+        "standard": [
+          "METRIC",
+          1.0
+        ],
+        "used": [
+          "METRIC",
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Transforms applied: object matrix identity (04 1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Pivot: base centre, min Z = 0 (04 1, decor: centre of base)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Front (Tripo front view) along -Y in .blend (04 1: face -Y -> +X in UE)",
+        "standard": "-Y",
+        "used": "-Y after yaw +0 deg",
+        "conforms": true,
+        "measured": "silhouette/colour check vs the four Tripo reference views, see orientation"
+      }
+    ],
+    "um_fbx_v1_conforms": true,
+    "ue_import": "legacy FBX, import_uniform_scale 1.0 (UM_FBX_v1 patches UnitScaleFactor to 1.0; the S05 'FBX_SCALE_UNITS + import 100' note is another profile without the patch, see RIG-CONTRACT.md)"
+  },
+  "work_blend_scratch": "C:\\tmp\\mapkits\\heorot\\20261021-smartmesh\\work\\SM_Env_HeorotWarpLoom.blend",
+  "roundtrip": {
+    "mesh_objects": 1,
+    "object_names": [
+      "SM_Env_HeorotWarpLoom"
+    ],
+    "triangles": 4413,
+    "expected_triangles_blend_faces": 4413,
+    "material_slots": 1,
+    "uv_layers": 1,
+    "armatures": 0,
+    "dimensions_uu": [
+      18.671,
+      42.003,
+      60.0
+    ],
+    "bounds_min_uu": [
+      -9.336,
+      -21.001,
+      0.0
+    ],
+    "bounds_max_uu": [
+      9.336,
+      21.001,
+      60.0
+    ],
+    "object_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "note": "Blender reads UnitScaleFactor 1.0 as cm and scales x0.01; readback frame: .blend -Y -> +X"
+  },
+  "checks": {
+    "source_sha256_matches_tripo_run": true,
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "triangles_le_budget": true,
+    "one_material_slot": true,
+    "uv0_present": true,
+    "uv0_inside_0_1": true,
+    "no_armature": true,
+    "target_dimension_1pct": true,
+    "base_at_zero": true,
+    "centred_xy": true,
+    "source_unchanged": true,
+    "um_fbx_v1_conforms": true
+  },
+  "checks_passed": true
+}

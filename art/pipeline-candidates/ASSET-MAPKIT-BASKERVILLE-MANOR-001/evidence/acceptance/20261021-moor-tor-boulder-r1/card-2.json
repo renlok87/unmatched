@@ -1,0 +1,148 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleMoorTorBoulder.fbx",
+      "sha256": "506328e41892ce86aa4a7622c7eea3c5dcce021e945346d36392fb3f2d42d70b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_BC.png",
+      "sha256": "9fe9095f3a3c1de29571c7d2ef9d920293662a17029657642f48cead08fcf022"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_N.png",
+      "sha256": "6b41bfed8fca81e9319f3db6aef0d2e22925f8dacf4ecb695b0329779760d7e3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_ORM.png",
+      "sha256": "6d14f07477c0d910948e01a169c2ec096ca5a6be63ce73fc2dfb35525fe8415e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-moor-tor-boulder-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleMoorTorBoulder.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "note": "4390 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "note": "UV0 islands 470, used 0.7076, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "note": "T_Env_BaskervilleMoorTorBoulder_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "note": "SM_Env_BaskervilleMoorTorBoulder, M_Env_BaskervilleMoorTorBoulder",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: стопка гранитных глыб тора с плоской плитой-шапкой (местами двухслойной, как на виде), меньшие валуны у подножия, мшистое основание и кустики вереска по краю. Пропорции и главные массы совпадают, лишних или пропавших главных частей нет, фантомных выступов на turn-090/270 и wire-34 нет; узнаётся со всех ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Каменные массы чистые, без дыр, рваных краёв и чёрных пятен; сетка на wire-34 ровная и следует форме, швы между глыбами читаются. Слабое место — кустики вереска: это грубые плоские карточки с гранёными краями, на крупном плане (close-base) они выглядят скорее как бурые щепки, чем как вереск. На игровой дистанции фонового пропа это читается как тёмные пучки у подножия, поэтому дефект засчитан как дефект крупного плана.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Гранит с пятнами белого лишайника и жёлто-зелёным мхом у основания читается как заказано и соответствует виду, рисованная стилизация в духе кита. Запечённого направленного света нет. На крупном плане верхушки (close-head) видна мелкая сетчатая штриховка-растяжка и размытые мыльные пятна; вереск темнее и бурее, чем розово-лиловый на sheet. Это дефекты крупного плана, на полном росте они не мешают.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0 → 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Кустики вереска — грубые плоские карточки с гранёными краями; вблизи читаются как бурые щепки. На игровой дистанции фона допустимо."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На верхней плите на крупном плане видна мелкая сетчатая штриховка-растяжка и размытые пятна; вереск бурее, чем розово-лиловый на sheet."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-MOOR-TOR-BOULDER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп moor-tor-boulder принят по делегированию (8.3); мелочи крупного плана (карточки вереска, штриховка на верхушке) записаны в known_issues."
+}

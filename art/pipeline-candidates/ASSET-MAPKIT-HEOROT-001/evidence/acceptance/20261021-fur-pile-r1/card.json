@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotFurPile.fbx",
+      "sha256": "8816ae16fe055b709cb363f5d6280da07a31b291b91863730464961a75cfbfbc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFurPile_BC.png",
+      "sha256": "0702bd37e1c5f02a80806c25b05012d64c953734ef1a36e52dc2912e1c42c7d8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFurPile_N.png",
+      "sha256": "757416ce460bcf0c4c4a95a1b3cdeb43075c7279d9dd6bbe1ae9edceaf3c3774"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotFurPile_ORM.png",
+      "sha256": "53ad123076f370f40063d8eef8c0167bcf299366fff33503e15fb6f6fffd6aa8"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-fur-pile-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotFurPile.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+      "note": "5291 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+      "note": "UV0 islands 1320, used 0.6179, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+      "note": "T_Env_HeorotFurPile_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotFurPile.build.json",
+      "note": "SM_Env_HeorotFurPile, M_Env_HeorotFurPile",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот же, что на листе: голова медведя по центру, по бокам два волка, сверху сложенный синий плащ с фибулой и красной каймой, по низу свисают лапы. Груда узнаётся со всех 8 ракурсов. Главные части на месте, лишних нет: дополнительные головы шкур сзади и с боков (turn-090, turn-180, turn-270) для груды шкур допустимы. Одно второстепенное отличие: голова медведя мельче относительно груды. На turn-000 она занимает около 40 % высоты, на sheet.png около 58 %. Часть разницы даёт перспектива листа, поэтому как сбитую пропорцию главной части (>10 %) не считаю. Палитра светлее листа: шкуры кремово-белые вместо буро-серых, плащ серо-голубой вместо тёмно-синего. Семейства цветов те же (бурый, серый, синий), поэтому S по цвету не снижаю, отличие записано в known_issues. Пропорции груды сверены на глаз по превью 230 px: отчёта compare-* нет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Сетка цельная: 1 оболочка, 5291 tris. На wire-front, wire-back и wire-34 треугольники ровно следуют форме, морды, уши, лапы и когти читаются. Вывернутых частей, мусорной геометрии и оплывших главных масс нет. Дефекты: по отчёту сборки в сетке две дыры (≈1,18 и ≈0,82 uu²). Нижняя видна на полном росте мелким тёмным треугольником на боку под свисающими лапами (turn-090 около x800 y745, она же на turn-135). Это примерно 0,7 uu на пропе высотой 15 uu и лежит в тени, на игровой дистанции такой дефект — микродеталь, поэтому по примечанию о фоновом пропе считаю его уровнем крупного плана. Ещё у левого нижнего края сзади торчит тонкая игла-осколок (turn-180, wire-back). На крупном плане рёбра верхних складок плаща гранёные (close-head). Задняя часть плаща — мягкие валики (turn-090, turn-180), это допустимо.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Мех читается мехом: штрихи ворса, снежная присыпка в стиле кита. Плащ читается шерстяной тканью с красной узорной каймой, фибула — металлом. Запечённого света и теней в цвете на полном росте не видно. Детализация на уровне кита Sarpedon (Tripo 2048). Дефекты крупного плана: на верхних складках плаща мыло и растяжки (close-head), в мехе под плащом тёмное пятно, похожее на контактную тень в цвете (close-weapon). На полном росте задняя сторона плаща покрыта мазаным красным узором (turn-135, turn-180), но он ещё читается как узор ткани.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 при S = 1,5 (не ниже 1,5) и всех гейтах PASS/n/a, поэтому rework_blender. F = 1,5: дыра ≈1 uu² на боку и игла сзади. T = 1,5: мыло плаща и тёмное пятно в мехе на крупном плане.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Закрыть две дыры сетки из отчёта сборки: ≈1,18 uu² с центром (8.78, 4.54, 4.40) и ≈0,82 uu² с центром (3.58, 4.34, 10.27), координаты в prescale-кадре отчёта. Первая видна тёмным треугольником на боку под лапами (turn-090, turn-135). Убрать тонкую иглу-осколок у левого нижнего края сзади (turn-180, wire-back). Если env_kit не умеет заливать дыры, исправлять в исходнике Tripo (форма).",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Перетекстурировать плащ по тому же листу: убрать мыло и растяжки на верхних складках (close-head), тёмное пятно-контактную тень в мехе под плащом (close-weapon) и мазаный красный узор на задней стороне (turn-135, turn-180). Заодно приблизить палитру к sheet.png: тёмно-синий плащ, буро-серые шкуры.",
+      "tool": "исходник Tripo: текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Палитра светлее sheet.png: шкуры кремово-белые вместо буро-серых, плащ серо-голубой вместо тёмно-синего (семейства цветов те же). Голова медведя мельче относительно груды (около 40 % высоты против 58 % на листе, с поправкой на перспективу листа)."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Гранёные рёбра верхних складок плаща (5,3k tris) видны только на крупном плане; для фонового пропа допустимо."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-FUR-PILE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп fur-pile (Heorot) не принят, 7,5: доработать — закрыть дыру сбоку и иглу сзади, перетекстурировать плащ (мыло) с палитрой ближе к листу."
+}

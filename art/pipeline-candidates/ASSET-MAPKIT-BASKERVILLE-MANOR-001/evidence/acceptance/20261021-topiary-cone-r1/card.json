@@ -1,0 +1,165 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTopiaryCone.fbx",
+      "sha256": "0f1ef83aef2a4595c115d8d7583f3b166ba717331a8fadbbaffe0fc6884a327d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_BC.png",
+      "sha256": "917a3549106bc25390e553ae6b021f17c67cfe956be0da00b016d0ed1840718c"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_N.png",
+      "sha256": "68851b9ff6d0f3bb05eb22e4e3120d26bf2c8d8867631ded5cf653e9b7bc8fcf"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_ORM.png",
+      "sha256": "6bc92c2162eadba4721109edd0d6c7dfc78b5c64dbdec8f1eb607d0b19a01fd0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-topiary-cone-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleTopiaryCone.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "note": "3699 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "note": "UV0 islands 1287, used 0.6784, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "note": "T_Env_BaskervilleTopiaryCone_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "note": "SM_Env_BaskervilleTopiaryCone, M_Env_BaskervilleTopiaryCone",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: подстриженный четырёхгранный конус тиса в квадратном каменном кашпо с готическими ажурными панелями и угловыми пилястрами, как на sheet.png. Пропорции укладываются в 5 % высоты: крона около 70 % высоты (на листе около 68 %), ширина основания кроны к верху кашпо 0,75 (на листе 0,76), высота к ширине кроны на 45° 1,73 (на листе 1,72). Лишних и пропавших частей нет, на turn-090/270 фантомов нет, проп узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: крона ступенчатая, около 8 горизонтальных ярусов с зубчатым краем и пучок-хохолок на вершине, а на листе гладкий конус с чистым острием.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Кашпо чистое: карниз, пилястры, цоколь и ажур целы, без дыр, просветов и оплывов (close-base). Крона собрана из стопки тонких плит (wire-34, wire-front). По краям ярусов и вдоль угловых рёбер торчат треугольные плавники-шипы, на вершине пучок острых лопастей, на стыках ярусов по угловым рёбрам мелкие тёмные щели (close-head, close-weapon). На полном росте это читается только как мелкая зубчатость контура и точки на ребре (turn-000, turn-135), на игровой дистанции 54 uu не видно. Дыр, чёрных пятен и вывернутых частей нет, сетка ступенчато, но следует конусу. Дефекты в основном крупного плана, поэтому 1,5.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-000.jpg",
+        "turn-135.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: крона — плотная листва тиса (светлые пучки на тёмной зелени), кашпо — светлый камень с мхом и грязью у цоколя и резным готическим ажуром. Запечённого направленного света в цвете нет, детализация не беднее эталона кита Sarpedon. На крупном плане: шов-разрыв текстуры вдоль угловых рёбер кроны (на turn-045 видна светлая вертикальная полоса), растяжки текстуры на уступах ярусов (close-weapon), верх кроны мягче и мыльнее низа (close-head), белая точка на ребре на turn-135. Дефекты крупного плана, поэтому 1,5.",
+      "frames": [
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-045.jpg",
+        "turn-135.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 (S 1,5, F 1,5, T 1,5). S не ниже 1,5, поэтому перегенерация не нужна: доработать крону (плавники-шипы, щели и швы на угловых рёбрах, растяжки на уступах), кашпо в порядке.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Убрать треугольные плавники-шипы на краях ярусов и угловых рёбрах кроны и пучок лопастей на вершине: удалить мелкие грани, выступающие за оболочку конуса, сгладить ступени ярусов. Закрыть тёмные щели на стыках ярусов по угловым рёбрам (close-weapon, turn-135). Если чистка не выходит, пересобрать Smart Mesh кроны гладким конусом.",
+      "tool": "исходник Tripo: форма"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Перепечь BC/N кроны с большим отступом (dilation): убрать шов-полосу вдоль угловых рёбер (turn-045), белые и тёмные точки на рёбрах (turn-135) и растяжки текстуры на уступах ярусов. Поднять плотность текселя верха кроны до уровня низа (close-head).",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Крона ступенчатая (около 8 ярусов) с зубчатым контуром и хохолком на вершине, на sheet.png гладкий конус с чистым острием. После доработки F проверить контур на всех 8 ракурсах."
+    },
+    {
+      "item": "G-UV",
+      "frame": "uv-layout.png",
+      "note": "Гейт PASS, но 1287 островов, много мелких треугольных островков (плавники кроны): из-за них появляются швы на рёбрах. После чистки кроны число островов должно упасть."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-TOPIARY-CONE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп topiary-cone (топиарий-конус) уходит на доработку в Blender, оценка 7,5: на кроне убрать шипы-плавники и хохолок, щели и швы на угловых рёбрах и растяжки на уступах. Кашпо и силуэт в порядке."
+}

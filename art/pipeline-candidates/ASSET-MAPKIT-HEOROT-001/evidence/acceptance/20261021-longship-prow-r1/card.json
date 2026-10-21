@@ -1,0 +1,179 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotLongshipProw.fbx",
+      "sha256": "c656b56042d077b28da7011df7d1e68bbaaeb4363582b6924fe44a4820cd8ee2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongshipProw_BC.png",
+      "sha256": "cfe370e4bef22a05adfe2afb2cc75d1b9fe0f494b46d3a31dbbdc98552ea2695"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongshipProw_N.png",
+      "sha256": "0684fcb609e7af2b93c67cfb07ee227a83042b35a4f79662ae76d3d85e1f60fc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongshipProw_ORM.png",
+      "sha256": "ea74c0b2acfe27ee6229bbba4ba01fd1961b98073c5b7b46fb826feb63537ed2"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-longship-prow-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotLongshipProw.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+      "note": "4991 tris (бюджет env_kit 12000, проп 9000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+      "note": "UV0 islands 800, used 0.6993, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+      "note": "T_Env_HeorotLongshipProw_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongshipProw.build.json",
+      "note": "SM_Env_HeorotLongshipProw, M_Env_HeorotLongshipProw",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан и что на sheet.png: нос-драккар с резной головой дракона на длинной шее с плетёным орнаментом, по ~5 расписных круглых щитов на каждом борту с верёвочными гирляндами, уключины-колышки; узнаётся со всех 8 ракурсов, пропорции шея/корпус/корма совпадают с видом листа (230 px, предупреждение инструмента о ключе листа — визуально это тот же драккар). Фантомных частей нет: диски над дальним бортом на turn-270/315 — это тыл реальных щитов противоположного борта (видно на wire-34). Одно второстепенное отличие контура: корма заканчивается двумя разведёнными стойками с плоской перегородкой между ними (turn-135, turn-180, turn-225, wire-back) вместо одной загнутой кормовой стойки листа. Спереди корпус очень пузатый (turn-000) — допустимая стилизация миниатюры. Сдвиг основного цвета корпуса в серо-серебряный отнесён к T.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, рваных краёв, вывернутых частей нет, тонкие элементы (уши дракона, зубы, верёвки, колышки) целы, сетка 4991 tris на wire-front/wire-34/wire-back следует форме, щиты с выпуклым умбоном. Дефекты только на крупном плане: настил внутри корпуса — грубые плоские грани и оплывший бугор у кормы (close-weapon, close-base), кормовая перегородка между двумя стойками — плоские блоки (turn-180, wire-back). close-head снят по верхним 22 % высоты и попал на кормовую стойку, голова дракона оценена по close-weapon и turn-* — она читается чисто.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg",
+        "turn-315.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 0.5,
+      "rationale": "Щиты читаются как расписное дерево (красно-белые, синие, жёлтые, зелёные), голова и шея — как резное тёмное дерево. Но дефекты на полном росте в двух и более зонах. (1) Весь объект: ORM.G (roughness) ≈ 0 по всему атласу (ORM.png почти чисто красный, B≈0), поэтому корпус, шея и щиты блестят как мокрое стекло или хром с зеркальными отражениями area-света. Просмолённый дуб должен быть матовым, а здесь корпус читается серо-серебряным металлом (turn-000, turn-090, turn-270). Вдобавок в BC корпуса светлые и белые штрихи вдоль досок — это запечённые блики листа, а не снег. (2) Внутренняя часть корпуса и тыл щитов — мыло: серые размытые пятна BC (на uv-layout видны серые круги тыла щитов) отражают свет и выглядят как стеклянные диски над бортом (turn-225, turn-270, turn-315) и белые треугольные засветы граней настила (close-base, close-weapon). При приподнятой игровой камере внутренность лодки видна. По детализации досок и орнамента уровень кита в остальном достаточный.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 5.8 < 8.0 и T = 0.5 < 1.0; S = 1.5, поэтому перегенерация Tripo не нужна: исправимые дефекты текстуры (roughness ORM ≈ 0, мыло внутри корпуса и на тыле щитов, белые штрихи в BC) и мелкие дефекты формы настила — доработка через env_kit / текстуру исходника.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "fix": "ORM.G (roughness) ≈ 0 по всему атласу: весь проп блестит как стекло или хром. Задать шероховатость: дерево корпуса и шеи 0.75–0.85 (просмолённый дуб), щиты 0.6–0.7, умбоны и металл ≤ 0.4. Брать roughness из исходника Tripo, если он есть, иначе константу или clamp в параметрах сборки; metallic оставить 0 вне умбонов.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "fix": "В BC корпуса светлые и белые штрихи вдоль досок (запечённые блики листа) дают серо-серебряный корпус вместо тёмного просмолённого дуба. Приглушить светлые штрихи (levels/curves, тонирование в тёмно-коричневый) на островах корпуса и шеи, сохранив краску щитов и верёвки.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "fix": "Внутренность корпуса (настил, внутренние борта) и тыльные стороны щитов — серое мыло, которое на кадрах видно как стеклянные диски и белые засветы граней (turn-225/270/315, close-base, close-weapon). Перетекстурировать эти невидимые на видах зоны: тёмный дощатый настил, тыл щитов — тёмное дерево с ремнём. Варианты — ретекстур Tripo с видом сверху и сзади или заливка по маске островов.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "fix": "Настил внутри корпуса из грубых плоских граней с оплывшим бугром у кормы, кормовая перегородка между двумя стойками блочная (turn-180, wire-back). Выровнять настил в плоскую палубу (доски дать нормалью или текстурой), убрать бугор у кормы, сгладить стык кормовых стоек с бортами.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-180.jpg",
+      "note": "Корма — две разведённые стойки с плоской перегородкой вместо одной загнутой кормовой стойки листа; второстепенное отличие контура, на игровой дистанции нос с драконом читается верно."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-LONGSHIP-PROW-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп longship-prow (Heorot) не принят, score 5.8 → rework_blender. Доработать: roughness ORM ≈ 0 (корпус блестит стеклом или хромом), мыло внутри корпуса и на тыле щитов, белые штрихи в BC корпуса, грубый настил у кормы."
+}

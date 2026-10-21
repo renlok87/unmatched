@@ -1,0 +1,166 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleGardenGasLamp.fbx",
+      "sha256": "1dd5d6f2c30896637f359ccc5ceb577f9de53a681e2c607a70abadd5684bea8d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenGasLamp_BC.png",
+      "sha256": "3052bcd68b6c5d98d522460fabdfb9f300e4ae75a6681235c09f5b2ede1fae61"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenGasLamp_N.png",
+      "sha256": "6af3ec082f4ec97635700aaea0d9356db87e71793e43a7fda0411c75b72a053b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleGardenGasLamp_ORM.png",
+      "sha256": "5083cbda38c6cfdeabdf6f61cd300bec4b86f9f141268368995b4de5e38cd575"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-garden-gas-lamp-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleGardenGasLamp.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+      "note": "5527 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+      "note": "UV0 islands 1084, used 0.6389, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+      "note": "T_Env_BaskervilleGardenGasLamp_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleGardenGasLamp.build.json",
+      "note": "SM_Env_BaskervilleGardenGasLamp, M_Env_BaskervilleGardenGasLamp",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Литой викторианский фонарный столб узнаётся со всех 8 ракурсов: квадратный фонарь симметричен, поэтому turn-090/270 совпадают с turn-000/180, а turn-045 показывает две грани. Все части с sheet.png на месте: шпиль с навершием, двухъярусная крыша с 4 угловыми навершиями, трапециевидная рама фонаря, кронштейны-завитки, чаша, капитель с акантом, колонна с муфтой, утолщение с листовым рельефом, цоколь. Доли по высоте сходятся в пределах ~2 %: голова ~30 % против ~31 %, цоколь ~14 % против ~15 %, ширина фонаря ~14 % против ~16 %. Отличие одно, зато заметное: фонарь не остеклён. Четыре проёма рамы пустые: в отчёте сборки это 4 дыры по ~54 uu² у shell 1 на z≈62 и дыра 96 uu² сверху. Внутри нет горелки или пламени (turn-045, close-weapon). На листе матовое светлое стекло с огнём — главное светлое пятно головы. Контур от этого не меняется. Тон чугуна того же семейства, что на листе: BC mean sRGB 0,24 — это чёрная краска в PBR, в кадрах он светлее из-за трёхточечного света. Лист — миниатюра 230 px. Предупреждение frames.json о ключе листа — артефакт инструмента: по содержанию на листе тот же предмет.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка на wire-front и wire-34 следует форме: у колонны ровные продольные полосы, рёбра крыши и рамы фонаря чистые, плотность умеренная (5527 tris). На полном росте и на крупных планах нет дыр в металле, рваных краёв, чёрных пятен, вывернутых частей, мусорной геометрии и оплывших масс. Тонкие элементы целы (close-head, close-weapon): шпиль, 4 навершия, стойки рам, завитки кронштейнов, газовая трубка. Пустые проёмы рам здесь не снижаю, они учтены в S. Мелочи видны только в отчёте, в кадрах их нет: 9 граней внутрь (2,2 % площади) на внутреннем ободе фонаря и на кончике шпиля, крошечная вывернутая оболочка под чашей (z≈54,4 uu). На close-base нижнее кольцо цоколя слегка гранёное — для фонового пропа это норма.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Чугун читается как крашеный тёмный металл с лёгкой патиной. Металличность в ORM ~0, для окрашенного чугуна это допустимо. Рельефы проработаны в BC и N: акант капители, листья на утолщении, кольца цоколя. На полном росте нет запечённых теней, бликов и мыла. Развёртка без растяжек (uv-layout: 1084 острова, 67 %, overlap 0, stretch p95 1,05). Дефекты есть только на крупных планах. На цоколе размытый «призрачный» герб и светлые розоватые линии по кромкам колец (close-base). На скатах крыши светлые разводы-пятна (close-head). На дальней стойке фонаря бледная голубоватая полоса: цвет стекла запечён на металл (close-weapon). Отсутствие стекла учтено в S, здесь повторно не снижаю.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png",
+        "turn-000.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 1,5 + F 2,0 + T 1,5 = 5,0 → round(5,0/6×10, 1) = 8,3 ≥ 8,0; ни одно измерение не ниже 1,0; гейты PASS, G-RIG n/a.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "close-weapon.jpg",
+      "note": "Фонарь не остеклён: 4 проёма рамы пустые, горелки и пламени нет, хотя на листе матовое светящееся стекло. Роль пропа animated: при подключении в UE свечение и мерцание нужно дать отдельным эмиссивным элементом (стекло-карты или пламя) с точечным светом, потому что у меша один материал и поверхности под свечение нет."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На цоколе размытый «призрачный» герб, светлые розоватые линии по кромкам колец. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Светлые разводы-пятна на скатах крыши фонаря. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Бледная голубоватая полоса на дальней стойке рамы: цвет стекла запечён на металл. Видно только на крупном плане."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "close-weapon.jpg",
+      "note": "По отчёту сборки 9 граней смотрят внутрь (2,2 % площади): на внутреннем ободе фонаря на z≈67 uu и на кончике шпиля. Под чашей фонаря на z≈54,4 uu есть крошечная вывернутая оболочка (shell 10). В кадрах не видно, гейт PASS."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-GARDEN-GAS-LAMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп garden-gas-lamp принят по делегированию (8,3): силуэт и детали литого столба совпадают с листом. Фонарь без стёкол и горелки, поэтому свечение для роли animated добавить отдельным эмиссивным элементом при подключении в UE."
+}

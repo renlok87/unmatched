@@ -1,0 +1,146 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotRoundShield.fbx",
+      "sha256": "38e162dc485125caef19e906e639bd3acba37e72ac49217ffd67c68bff7c32d3"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoundShield_BC.png",
+      "sha256": "d1ce63d32f67be884e7699ef2b8cacc943a2ca40974d462752bd50dede26d609"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoundShield_N.png",
+      "sha256": "09b4e653a67deb8a70dad67f12fb0cf620cf5e9c19d3909786fc8d391b29040f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoundShield_ORM.png",
+      "sha256": "7553a5eacf78120ced640044c940d3eda20005af02d9c54ba47cee53db0521b4"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-round-shield-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotRoundShield.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+      "note": "4120 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+      "note": "UV0 islands 964, used 0.418, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+      "note": "T_Env_HeorotRoundShield_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoundShield.build.json",
+      "note": "SM_Env_HeorotRoundShield, M_Env_HeorotRoundShield",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Спереди (turn-000/045) почти точная копия sheet.png: круглый щит из досок, шестилучевая красно-белая спираль, железный умбон с заклёпками на фланце, кожаный обод с перекрёстной шнуровкой; пропорции главных частей совпадают, узнаётся со всех ракурсов. Одно второстепенное отличие контура на обороте, которого нет на виде: тонкий прямой стержень хвата, свисающий от умбона почти до обода, и мелкий комок в полости умбона (turn-090/270, turn-180, wire-back). Обратная сторона расписана той же спиралью — для настенного пропа не видно.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Сетка цела: диск, обод-тор, полусфера умбона и заклёпки чистые, без дыр, просветов, рваных краёв и оплывших масс; шнуровка обода цела на крупных планах (close-head, close-base); сетка на wire-34 следует форме (веер на плоском диске, плотнее на ободе и умбоне). Торцы на turn-090/270 ровные.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 2,
+      "rationale": "Материалы читаются как заказано: крашеное дерево с досками, швами и сколами краски, кованый железный умбон с металлическим отблеском, потёртая кожа обода с бечёвкой. Запечённого света и теней в цвете нет, мыла и растяжек нет ни на полном росте, ни на крупных планах; атлас uv-layout аккуратный (лицо и оборот отдельными островами). Мелкая сетчатая фактура кожи на close-head чуть похожа на ткань — не дефект на игровой дистанции.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение < 1.0, все гейты PASS/n/a; единственное отличие — придуманный Tripo хват на обороте, невидимый у настенного пропа.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wire-back.jpg",
+      "note": "На обороте (нет на sheet.png) тонкий прямой стержень хвата свисает от умбона почти до обода, в полости умбона мелкий комок; оборот расписан той же спиралью. Для щита на стене зала не виден."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-ROUND-SHIELD-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп round-shield (Heorot) принят по делегированию: 9.2, лицевая сторона совпадает с видом; придуманный хват на обороте — известная мелочь."
+}

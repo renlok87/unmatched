@@ -1,0 +1,157 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotMeadBarrel.fbx",
+      "sha256": "455392e0df523e737da6b841318eb2fdf31e766e5cb52def26bd59b0e5b62cb2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMeadBarrel_BC.png",
+      "sha256": "3189b2ff683d3097b53d0daa6ed43d12cd23d7b835a18b43cc53267ed3684ed5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMeadBarrel_N.png",
+      "sha256": "27c1adbc07c17b5e2a2a15c59c9f2fd600b08167d390b342e097d1765fac301f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotMeadBarrel_ORM.png",
+      "sha256": "c8d8105f006a2dcb067081a2536dacb92c59438ac2025c71f89acedd8413d296"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-mead-barrel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotMeadBarrel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+      "note": "4198 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+      "note": "UV0 islands 136, used 0.6193, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+      "note": "T_Env_HeorotMeadBarrel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotMeadBarrel.build.json",
+      "note": "SM_Env_HeorotMeadBarrel, M_Env_HeorotMeadBarrel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: стоящая вертикально дубовая бочка с выпуклыми клёпками, четырьмя клёпаными железными обручами (верх ~15 %, ~27 %, ~77 %, низ ~93 % высоты, как на sheet.png), круглым резным медальоном спереди с двумя змеевидными зверями в железной оправе и деревянным краном внизу медальона (рукоять, корпус, носик вниз). Пропорции ≈0.76 ширина/высота против заказанных 0.7×0.9; медальон по высоте ~63 % против ~65 % на листе. Лишних и пропавших частей нет. Узнаётся со всех 8 ракурсов: на turn-090/270 медальон с краном выступает плоским диском. Это оправа, а не фантомная оболочка. Глубина оправы на 3/4 (turn-045/315) соответствует приподнятому медальону на листе.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни в полный рост, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии. Тонкие элементы целы: носик и рукоять крана, заклёпки. На wire-34/front/back сетка следует форме: обручи отдельными поясами, оправа медальона тором, заклёпки веерами, бочка с правильной выпуклостью. Резьба медальона — плоский диск с нормалью, что допустимо для фонового пропа. Звёздочка-полюс в центре крышки и слегка неровный край клёпок под нижним обручем (wire-front) в текстурированных кадрах не читаются.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано и как на листе: медовый дуб с рисованной продольной фактурой клёпок и тёмное кованое железо с заклёпками. Иней и потёки льда на обручах и крышке соответствуют стилю кита (snow and ice). Резьба медальона чёткая. Запечённого направленного света не видно, освещение по ракурсам ровное. Дефекты только крупного плана: (1) пикселизированное мозаичное пятно на резном диске над краном (close-base, мелко на turn-045); (2) внутренняя стенка оправы медальона — гладкая светло-серая размазанная полоса без детали железа (turn-045 слева, turn-315 справа, close-base); (3) крышка размыта, на внутренней стенке верхнего обода горизонтальные растяжки (close-head). На игровой дистанции (27 uu) не читаются.",
+      "frames": [
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; текстурные огрехи только крупного плана, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Пикселизированное мозаичное пятно на резном диске медальона прямо над краном (мелко видно и на turn-045.jpg)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-315.jpg",
+      "note": "Внутренняя стенка железной оправы медальона — гладкая светло-серая размазанная полоса без фактуры металла (также turn-045.jpg слева)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Крышка в инее размыта, на внутренней стенке верхнего обода клёпок горизонтальные растяжки текстуры."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-MEAD-BARREL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп mead-barrel (Бочка мёда, Heorot) принят по делегированию, 9,2: три текстурных огреха крупного плана (мозаика над краном, размытая внутренняя стенка оправы, размытая крышка) в known_issues."
+}

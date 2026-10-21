@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotHearthFirepit.fbx",
+      "sha256": "c8de93d9c473353167ce78260b0e9c4b95193c9aabf58921f5d9b18af771e1f7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHearthFirepit_BC.png",
+      "sha256": "b4ec5cc102ec98c6b8390b9f27464844ae5a6a1ab5e94ccf213531bde1825e0f"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHearthFirepit_N.png",
+      "sha256": "1735b40df42cf0b752ff22b06b5581d1a5d13816bb84e963198c257102b514fe"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHearthFirepit_ORM.png",
+      "sha256": "3bce29333d34df0141c5aa48ce007ffaf29ce8eb72dd1a91aa81bf1a177f79e9"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-hearth-firepit-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotHearthFirepit.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+      "note": "5240 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+      "note": "UV0 islands 1120, used 0.7516, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+      "note": "T_Env_HeorotHearthFirepit_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHearthFirepit.build.json",
+      "note": "SM_Env_HeorotHearthFirepit, M_Env_HeorotHearthFirepit",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: длинный прямоугольный каменный очаг на деревянной раме-основании со стальными оковками и кольцами, два резных столба с головами зверей на торцах, железный вертел с тремя вертикальными стойками и крючьями, тлеющие угли и поленья внутри, снежные шапки на угловых камнях. Состав и пропорции совпадают с sheet.png; на close-base.jpg, снятом под тем же углом, что и лист, расхождений нет. Фантомных выступов и оболочек на turn-090/270 и wire-34 нет: два наложенных столба на торцевых видах дают ожидаемое перекрытие. Открытого пламени, как на листе, нет, но для пропа с ролью animated это задача VFX, поэтому не снижаю. На всех 8 ракурсах предмет узнаётся; на торцевых видах силуэт естественно узкий.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-base.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном виде, ни на крупных планах нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей или мусорной геометрии. Тонкие элементы целы: вертел, стойки, крючья, кольца и скобы (close-weapon.jpg, close-head.jpg). Сетка на wire-34 следует форме: плоская кладка, чистые цилиндры вертела, угловые блоки, столбы с резьбой. Поленья и ложе углей низкополигональные, но после текстуры читаются как поленья с торцевыми кольцами (close-base.jpg). Огранка торца стойки на крупном плане при 5240 треугольниках допустима.",
+      "frames": [
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются по описанию. Кладка серая и чёткая, с рисунком камней. Брус основания с явной древесной фактурой. Оковки, кольца и вертел тёмные, металлические. Угли светятся оранжевым, на верхушках снег. Запечённых бликов и теней от света нет, швов и растяжек на полном виде нет. Мелкий дефект: торцевые и внешние грани угловых каменных блоков размыты и пятнисты («мыльный» серый без рисунка камня, заметно беднее кладки, turn-270.jpg, turn-090.jpg). На крупном плане железо стоек тоже мягковато (close-head.jpg). С игровой камеры сверху под углом эти грани почти не видны, поэтому оцениваю как дефект крупного плана, а не полного вида.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "turn-090.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a (G-RIG).",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "Торцевые и внешние грани угловых каменных блоков размыты и пятнисты, без рисунка камня, беднее основной кладки. Видно на торцевых видах; с игровой камеры не мешает."
+    },
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Открытое пламя над поленьями, как на sheet.png, геометрией не смоделировано: угли и поленья есть, огонь нужно дать VFX роли animated. Для эмиссии углей в UE может понадобиться маска."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-HEARTH-FIREPIT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hearth-firepit (Очаг зала, Heorot) принят по делегированию: 9,2 (S 2,0 / F 2,0 / T 1,5). В known_issues: мыльные грани угловых камней; пламя даст VFX."
+}

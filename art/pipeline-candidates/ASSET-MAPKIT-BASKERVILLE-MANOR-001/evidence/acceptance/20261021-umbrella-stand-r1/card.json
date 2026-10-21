@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleUmbrellaStand.fbx",
+      "sha256": "b5a075175a8edca5d85ae43e4cc2f3217150009e83c418bb69f5e50f06c66818"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleUmbrellaStand_BC.png",
+      "sha256": "50f7f3dc84ddf49b8e41496cf3567a4f64c2ca8a25a561b393d948f5642496b2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleUmbrellaStand_N.png",
+      "sha256": "860947ab60f7029268ee97f2886575068947f0bb88ebd2b82ca659d3c961f791"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleUmbrellaStand_ORM.png",
+      "sha256": "84f9dac7acc438d2dc2d01b7c34aff94d8b20b922bf9b255d68f31b10a686954"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-umbrella-stand-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleUmbrellaStand.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+      "note": "3936 tris (бюджет env_kit 12000, проп 2500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+      "note": "UV0 islands 801, used 0.6962, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+      "note": "T_Env_BaskervilleUmbrellaStand_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleUmbrellaStand.build.json",
+      "note": "SM_Env_BaskervilleUmbrellaStand, M_Env_BaskervilleUmbrellaStand",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот, что заказан: готическая чугунная подставка (4 шпиля, стрельчатый ажур, шары, лапы) с тростями и зонтом, пропорции корпуса совпадают с sheet, узнаётся со всех 8 ракурсов. Отличия от вида: (1) крюк-ручка зонта висит в воздухе отдельной оболочкой (shell 1, зазор ~1,5 uu, около 5,5 % высоты) — видно на turn-000/045/090/180, wire-34/front; купол зонта раскрыт воронкой с торчащими острыми спицами вместо сложенного чёрного зонта; (2) костяная крюк-рукоять третьей трости без собственного древка висит над тростью с набалдашником (изолированная оболочка, зазор ~1,04 uu) — turn-045/090; (3) лишний тонкий прямой стержень по диагонали у зонта, которого нет на sheet (turn-000/090/270, wire-front); (4) внизу вместо ящичка с ручкой — панель с флёр-де-лис (мелочь). Два и более отличий в пучке тростей и зонта → 1,0.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Корпус, колонны, шпили, шары, цоколь и лапы чистые, без дыр и чёрных пятен; сетка на wire-* следует форме (ажур — плоские панели с рисунком в текстуре и нормали, для фонового пропа допустимо). Дефект на полном росте в одной зоне — верхний пучок тростей и зонта: две висящие в воздухе оболочки (ручка зонта и костяная рукоять), игла-стержень, торчащие острые кончики спиц; по отчёту там же 42 грани с несогласованной намоткой (z около 22,6–23,2 uu) и 7 изолированных оболочек над землёй. → 1,0.",
+      "frames": [
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-045.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Дерево древков читается деревом, костяная рукоять — резной костью, орлиная голова — тёмным металлом; детализация (ажур, флёр-де-лис, лапы) не беднее эталона кита. Дефект на полном росте в одной зоне — заполнение за ажуром: нарисованные внутри трости мутными полосами с белыми рваными пятнами (turn-180, turn-000, turn-270). Дополнительно: чугун на кадрах читается светлым оловянно-серебристым, а не чёрным, как на sheet (BC тёмно-серый), зонт серый вместо чёрного; лёгкие запечённые блики-полосы на колоннах. → 1,0.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5: ручка зонта и костяная рукоять трости отделены и висят в воздухе, купол зонта раскрыт со спицами, лишний тонкий стержень — по рубрике перегенерация в Tripo (return_to_stage_2); score 5,0 < 8,0, F и T по 1,0.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Крюк-ручка зонта и костяная рукоять третьей трости висят отдельно (без древка); купол зонта раскрыт воронкой с острыми спицами; лишний диагональный стержень. В перегенерации: сложенный чёрный зонт цельным с ручкой на древке, у каждой трости своё древко, без отдельно висящих частей."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Верхняя зона: 7 изолированных оболочек над землёй (ручка зонта, костяная рукоять), игла-стержень, торчащие кончики спиц, 42 грани с несогласованной намоткой около z 22,6–23,2 uu."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Заполнение панелей за ажуром — мутные полосы с белыми рваными пятнами, видно на полном росте (также turn-000, turn-270)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Чугун читается светлым оловянно-серебристым вместо чёрного с sheet, зонт серый вместо чёрного; лёгкие запечённые блики на колоннах."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-UMBRELLA-STAND-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп umbrella-stand (Baskerville Manor) не принят: возврат на этап 2 — перегенерировать в Tripo (ручка зонта и костяная рукоять трости висят отдельно, лишний стержень, зонт раскрыт), score 5,0."
+}

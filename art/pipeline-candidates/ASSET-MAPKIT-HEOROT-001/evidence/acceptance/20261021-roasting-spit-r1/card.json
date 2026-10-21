@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotRoastingSpit.fbx",
+      "sha256": "1f80e61fc425efb517e54253ab6338787357caaab5eb2ba65741c702c539653a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoastingSpit_BC.png",
+      "sha256": "016f1ca043acc6c2973543e53d343331827b5c6d18583897939458b712841457"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoastingSpit_N.png",
+      "sha256": "86a951ae7d3e54a6e75fd626ddad4e7e229eaa6c2215511734af55823d381599"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotRoastingSpit_ORM.png",
+      "sha256": "f0f38c31c1da4b96a95be12032d1e31f7ea008b598c8ecaec3cbcf933664464e"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-roasting-spit-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotRoastingSpit.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+      "note": "5265 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+      "note": "UV0 islands 1572, used 0.6113, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+      "note": "T_Env_HeorotRoastingSpit_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotRoastingSpit.build.json",
+      "note": "SM_Env_HeorotRoastingSpit, M_Env_HeorotRoastingSpit",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый заказанный предмет: целый кабан на железном вертеле (вертел входит в пасть и выходит у хвоста) между двумя X-образными вилками-опорами, под ним корыто с углями в железной оковке, ворот справа, снег на бревенчатых основаниях — всё как на sheet.png. Пропорции главных частей (кабан около половины ширины, опоры выше кабана, корыто между опорами) совпадают с видом листа на глаз (checks-report нет; предупреждение frames.json о ключе листа не подтверждается — на sheet.png именно этот вертел). Лишних и пропавших частей нет, на turn-090/270 торец читается чисто: вилка X, кабан за ней, без фантомных выступов. Кабан чуть светлее и оранжевее листа — то же красно-коричневое семейство. Узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, чёрных пятен, вывернутых частей и мусорной геометрии; тонкие элементы (вертел, ворот, крючья, подвесные стержни, уши, бивни, копыта) целы. Сетка на wire-front/back/34 ровно следует форме кабана, опор и корыта; зубчатый гребень на спине — намеренная щетина, гранёная в бюджете 5265 tris. Открытые петли из отчёта сборки (днища опор и корыта, под углями) в кадрах не видны.",
+      "frames": [
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокнами и выветренными досками, кованое железо с бликами и заклёпками, запечённая корка кабана, снег у оснований; детализация не беднее кита Sarpedon. Минусы видны только на крупных планах: по гребню спины светлая размытая полоса (похожа на запечённый блик или иней на мясе) и слабый шов текстуры, мелкий чешуйчатый узор кожи; угли стекловидно-розовые с белыми верхушками, на листе — тёмный жар. На игровой дистанции всё читается верно.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "score 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a; замечания T только крупного плана",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "светлая размытая полоса по гребню спины (запечённый блик или иней на мясе) и слабый шов текстуры на боку; на полном росте почти не заметно"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "мелкий чешуйчатый узор кожи кабана: на крупном плане читается как шкура рептилии, а не корка"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "угли стекловидно-розовые с белыми верхушками, на листе тёмный жар; на игровой дистанции читаются как раскалённые"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-ROASTING-SPIT-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "проп roasting-spit (Heorot) принят по делегированию, 9.2; мелочи текстуры крупного плана (гребень спины, угли) записаны в known_issues"
+}

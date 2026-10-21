@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotLongBench.fbx",
+      "sha256": "6e2e15f787e202dfc0c7aaaf3dc848974c5ef3bb8fee623c838cf1d2ceb20ed2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_BC.png",
+      "sha256": "fcb6a3643ce4246ecd13ccf9b1f53d32933f0e1e17d8dd1f07b12f77a148e952"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_N.png",
+      "sha256": "8ce280a5fd69f09fa816fe8604169f21c98d5cd80e2beebc89720a75e5013ea5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_ORM.png",
+      "sha256": "14a208929263907f0ed3fee3be6e49dc3221d0979f8610e0531562b694815822"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-long-bench-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotLongBench.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "4839 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "UV0 islands 1137, used 0.7227, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "T_Env_HeorotLongBench_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "SM_Env_HeorotLongBench, M_Env_HeorotLongBench",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: тяжёлое сиденье из колотых брёвен (два яруса, на торцах кольца годичных колец), четыре толстых разведённых ноги с нагелями, шкура на одном конце свисает на обе стороны. Узнаётся со всех 8 ракурсов, фантомных частей на turn-090/270 и wire-* нет. Распорки между парами ног — правдоподобная мелкая деталь, не лишняя часть. Одно отличие от описания: скамья заметно короче заказанной. По build.json габариты 47.0×13.9×15 uu, длина к высоте ≈3.1, а при заказанных ≈0.4×3×0.5 м было бы ≈6 (≈90 uu при высоте 15 uu). Модель точно повторяет короткие пропорции листа, так что отклонение пришло из sheet, а не из генерации; для стилизованной настольной миниатюры это допустимо.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, чёрных пятен, вывернутых частей или оплывших масс. Тонкие элементы (нагели, распорки, бахрома шкуры) целы. Сетка Smart Mesh на wire-34/front/back следует форме, плотность сосредоточена на шкуре. Веер треугольников под сиденьем на wire-back — это передний свес шкуры, видимый снизу (совпадает с turn-000), а не мусор. Дыры и открытые рёбра из отчёта (низ шкуры, торцы распорок и нагелей у ног) скрыты в контакте и на кадрах не видны. Мелочи не тянут на дефект: V-надрез и ступенька на стыке верхних плах (turn-000/180, close-weapon) читаются как резной стык; со спины шкура заходит за верх задней ноги (turn-180), что выглядит как подоткнутая шкура.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Дерево — дерево: волокна, трещины, торцевые кольца, нагели; шкура — светло-серо-бурый мех с тёмными прядями. Запечённого света и бликов в цвете на турнтейбле не видно, полутона трещин — нормальная ручная стилизация. Детализация на полном росте высокая (BC 2048 с исходника 4096). Цвет — средний выветренный коричневый, как на листе, а не тёмный дуб из стиля кита; допустимо. Дефекты есть только на крупном плане. На close-head в канавке между плахами размытое мыльное пятно и растяжка на ступенчатой фаске. На close-weapon сильные продольные растяжки текстуры на фаске ступеньки верхней плахи. На игровой дистанции не видны.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; оставшиеся замечания видны только на крупном плане или пришли из листа (длина)",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Скамья короче заказанной: 47 uu в длину при 15 uu высоты, а по описанию (≈0.4×3×0.5 м) было бы ≈90 uu. Пропорции пришли из sheet.png. Для длинного ряда у стола в раскладке ставить две скамьи встык; иначе нужен новый лист с более длинной скамьёй."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Размытое мыльное пятно в канавке между верхними плахами и растяжка на ступенчатой фаске; видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Продольные растяжки текстуры на фаске ступеньки верхней плахи у шкуры; видно только на крупном плане."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-LONG-BENCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп long-bench (Heorot) принят по делегированию, 8.3: силуэт и материалы совпадают с листом; скамья короче заказанных 3 м, растяжки текстуры только на крупном плане."
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotKegStack.fbx",
+      "sha256": "8719c1aca5a336ff7f64ce2c445144241b6d718d3293e8268c3766eae5dca3c7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotKegStack_BC.png",
+      "sha256": "c54dd02aa5df953e07e1d8659c776a31dc385f9440a256a0d3081ea2265415af"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotKegStack_N.png",
+      "sha256": "fd3203ee6c14e9911b7236a1716fff98831b2ccdfaa98ffce89dc91ed58742ff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotKegStack_ORM.png",
+      "sha256": "f8319e7a76102b0a44b6dd7e5e1fec3784cda5171481149bf1b7f497a0d7ada3"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-keg-stack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotKegStack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+      "note": "4774 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+      "note": "UV0 islands 190, used 0.513, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+      "note": "T_Env_HeorotKegStack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotKegStack.build.json",
+      "note": "SM_Env_HeorotKegStack, M_Env_HeorotKegStack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что заказан, и совпадает с sheet.png: пирамида 3-2-1 из шести дубовых бочонков на боку, у каждого яруса ложементы, по краям два резных столба с головами зверей и плетёнкой, рама основания со стойками между нижними бочонками, краны на днищах, железные обручи, снег сверху. Габарит 1.0×0.5×0.9 м против заказанных 1×0.6×0.9. Лишних и пропавших частей нет, узнаётся со всех 8 ракурсов. Сбоку (turn-090/270) бочонки почти прямые цилиндры с плоскими снеговыми шапками, тыл столбов гладкий; это в пределах стилизации, сзади sheet не показывает ничего другого.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, вывернутых частей и мусора. Тонкие краны и стойки целы. Сетка на wire-34 и wire-back следует форме: днища утоплены за утор, головы столбов собраны веерами треугольников, плетёнка лежит в нормали. 37 открытых петель из отчёта спрятаны под шапками, ложементами и под основанием, на кадрах их не видно; внутрь смотрит 1 % площади. На крупном плане (close-head, close-weapon) снеговая шапка верхнего бочонка гранёная и смятая, утор и обручи многоугольные. Дефекты только крупного плана.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Спереди и в 3/4 (turn-000/045/315, close-base) материалы читаются: дуб с досками и волокном, тёмное железо обручей, снег, резьба столбов, запечённого света нет. Но вся задняя полусфера (turn-180, turn-135, turn-225) под серо-белой мутью: днища и утор сзади серые вместо дуба, на тыльной стороне нижних бочонков цвет железа и снега лёг поверх досок, детализация мыльная. Это дефект на полном росте в одной зоне (мыло, чужой цвет). На крупном плане (close-head) на переднем днище верхнего бочонка видны растяжки и полосы. Дуб светлый, розовато-бежевый, светлее «carved dark oak» из стиля кита.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7.5 < 8.0 (S 2.0, F 1.5, T 1.0). Силуэт и состав совпадают с sheet.png. На полном росте вся задняя полусфера текстуры под серо-белой мутью (turn-180/135/225). На крупном плане гранёные снеговые шапки и многоугольные обода. S ≥ 1.5, поэтому rework_blender, а не перегенерация формы.",
+  "rework_fix_list": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "fix": "Заново затекстурировать заднюю полусферу. Сейчас днища, утор и тыльная сторона бочонков под серо-белой мутью: цвет железа и снега лёг поверх дуба. Перезапустить текстуру исходника в Tripo с видом сзади в слотах, чтобы днища и доски сзади читались дубом, как спереди. Заодно убрать растяжку и полосы на переднем днище верхнего бочонка (close-head.jpg).",
+      "tool": "исходник Tripo: текстура"
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Снеговая шапка верхнего бочонка гранёная и смятая, утор и обручи многоугольные на крупном плане. Перегенерировать Smart Mesh с большим лимитом полигонов (в пределах бюджета кита 12000), чтобы шапки и обода читались круглыми. Можно совместить с перезапуском текстуры.",
+      "tool": "исходник Tripo: форма"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Сбоку бочонки почти прямые цилиндры с плоскими снеговыми шапками, тыльная сторона столбов без резьбы. В пределах стилизации, правки не требует."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Дуб светлый, розовато-бежевый, светлее «carved dark oak» из стиля кита и вида sheet.png. При сборке кита можно притемнить BC, отдельной правкой не считается."
+    },
+    {
+      "item": "G-TEX",
+      "frame": "uv-layout.png",
+      "note": "ORM.R=1 (AO нет). 48,7 % BC — незаполненные гаттеры Tripo, залитые средним цветом дерева. Швов на кадрах не видно."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-KEG-STACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп keg-stack (Бочонки) не принят, 7.5 < 8.0. Силуэт принят. Нужно перетекстурировать заднюю сторону (серая муть на днищах и обручах сзади) и сгладить гранёные снеговые шапки и обода."
+}

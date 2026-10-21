@@ -1,0 +1,153 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotHangingCauldron.fbx",
+      "sha256": "d391d369211bb0f10870264ab33db1c60fd4781e5e810a499d23ec6b7bdf4e9e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHangingCauldron_BC.png",
+      "sha256": "593abc2f7ccc9f881529e342b1d78659423f5e5d097b77e44fc7e2b1ad823742"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHangingCauldron_N.png",
+      "sha256": "ec79880039602cbbed23e90b50716dda19966004fc6dcb41b18ed89c2cf95c78"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHangingCauldron_ORM.png",
+      "sha256": "f4f55c28d957a10fc005a9b16778fab679443f7cc2dab5e381adb2ab8cf80855"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-hanging-cauldron-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotHangingCauldron.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+      "note": "4857 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+      "note": "UV0 islands 1073, used 0.6329, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+      "note": "T_Env_HeorotHangingCauldron_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHangingCauldron.build.json",
+      "note": "SM_Env_HeorotHangingCauldron, M_Env_HeorotHangingCauldron",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет из sheet.png и описания: треножник из трёх жердей с верёвочной обвязкой наверху, верёвочными намотками и железными обоймами внизу ног, цепь с крюком к дужке, чёрный железный котёл с орнаментальным поясом, поленья на каменном кольце. Пропорции котла к треножнику и разлёт ног совпадают с видом спереди; третья нога корректно появляется на 045/090/180/270. Лишних или пропавших частей нет, читается со всех ракурсов. Пламени как геометрии нет, только тлеющие поленья — для animated-пропа это зона VFX, не дефект силуэта.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: жерди ровные, котёл с горловиной и внутренностью, цепь и дужка целы, камни и поленья читаются, сетка на wire-34 следует форме, дыр и мусора нет. На крупном плане close-head верхняя верёвочная обвязка слегка оплывшая, концы верёвки торчат острыми лепестками; это видно только крупно.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "wire-34.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокном, тёмное кованое железо с орнаментом, серые камни, верёвка; детализация на уровне кита Sarpedon, запечённых теней на полном росте нет. Дефекты крупного плана: торцы жердей на close-head затянуты продольным волокном вместо годичных колец (растяжка), на котле редкие светлые горизонтальные мазки; оранжевое свечение поленьев запечено в цвет, но соответствует углям концепта.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 >= 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; замечания F/T только крупного плана и на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "верхняя верёвочная обвязка слегка оплывшая, концы верёвки острыми лепестками; видно только крупно"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "торцы жердей с продольным волокном вместо торцевого рисунка (растяжка текстуры), только крупный план"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "оранжевое свечение углей запечено в BaseColor; пламя отсутствует как геометрия — ожидается VFX огня при анимации пропа"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-HANGING-CAULDRON-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hanging-cauldron (котёл на треноге, Heorot) принят по делегированию: 8.3, замечания только крупного плана (верёвка наверху, торцы жердей), огонь — VFX."
+}

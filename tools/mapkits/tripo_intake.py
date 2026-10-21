@@ -172,6 +172,9 @@ def level(m: str, key: str, date: str, force: bool) -> dict:
     if not force and any(w in text for w in ("wall", "mounted", "hanging", "awning", "sign")):
         # a hanging prop has no support polygon: the search would tip it (stag-trophy 11 deg, NOTES F8)
         return {"asset": asset_id(m, key), "applied": False, "skipped": "wall / hanging prop"}
+    if not force and any(w in text for w in ("tree", "pine")):
+        # a trunk gives a tiny support polygon: the search tipped a straight pine 24.6 deg (NOTES F18)
+        return {"asset": asset_id(m, key), "applied": False, "skipped": "tree"}
     aid = asset_id(m, key)
     run = run_dir(m, date)
     src = run / "source" / f"{aid}.glb"
@@ -186,6 +189,31 @@ def level(m: str, key: str, date: str, force: bool) -> dict:
         st["props"].setdefault(key, {}).setdefault("tripo", {})["levelled"] = tr["assets"][aid]["levelled"]
         mapkit.save_status(m, st)
     return {"asset": aid, **res}
+
+
+def unlevel(m: str, key: str, date: str) -> dict:
+    """Undo `level`: drop the root rotation and the mapkitLevel note, re-hash the source in tripo-run.json."""
+    import level_glb  # noqa: E402
+    aid = asset_id(m, key)
+    run = run_dir(m, date)
+    src = run / "source" / f"{aid}.glb"
+    j, binary = level_glb.read_glb(src)
+    lv = j.get("extras", {}).pop("mapkitLevel", None)
+    if not lv:
+        return {"asset": aid, "reverted": False}
+    for i in j["scenes"][j.get("scene", 0)]["nodes"]:
+        j["nodes"][i].pop("rotation", None)
+    level_glb.write_glb(src, j, binary)
+    tr_path = run / "reports" / "tripo-run.json"
+    tr = _json(tr_path, {})
+    if aid in tr.get("assets", {}):
+        tr["assets"][aid].pop("levelled", None)
+        tr["assets"][aid].update({"sha256": sha256(src), "bytes": src.stat().st_size})
+        _write(tr_path, tr)
+    st = mapkit.load_status(m)
+    st["props"].get(key, {}).get("tripo", {}).pop("levelled", None)
+    mapkit.save_status(m, st)
+    return {"asset": aid, "reverted": True, "was": lv}
 
 
 def main() -> None:
@@ -206,7 +234,13 @@ def main() -> None:
     a = sub.add_parser("level")
     a.add_argument("map"); a.add_argument("keys", nargs="+")
     a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d")); a.add_argument("--force", action="store_true")
+    a = sub.add_parser("unlevel")
+    a.add_argument("map"); a.add_argument("keys", nargs="+"); a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d"))
     args = ap.parse_args()
+    if args.cmd == "unlevel":
+        for k in args.keys:
+            print(json.dumps(unlevel(args.map, k, args.date), ensure_ascii=False))
+        return
     if args.cmd == "level":
         for k in args.keys:
             print(json.dumps(level(args.map, k, args.date, args.force), ensure_ascii=False))

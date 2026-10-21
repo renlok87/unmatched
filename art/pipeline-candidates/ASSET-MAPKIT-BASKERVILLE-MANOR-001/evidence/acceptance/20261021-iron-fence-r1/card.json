@@ -1,0 +1,162 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleIronFence.fbx",
+      "sha256": "eef4ba931ad996e64438ccb50b847541be8ec9387a60ba51fc1873f0e90ca4e5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronFence_BC.png",
+      "sha256": "3367c72c58c8d3150190324d8fb9f135fb372bc37a0b3fbe815a67b92b116ef1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronFence_N.png",
+      "sha256": "30e3f04a2148c7e5f94d7ae2b89c82639c4abf3e7bcc408526ea4c8b1ce2f7f2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleIronFence_ORM.png",
+      "sha256": "4c28dfb8b50fddb8be2edcb55090709d73509605069cd0668447d42fcb60d1ca"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-iron-fence-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleIronFence.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+      "note": "4831 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+      "note": "UV0 islands 1649, used 0.633, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+      "note": "T_Env_BaskervilleIronFence_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleIronFence.build.json",
+      "note": "SM_Env_BaskervilleIronFence, M_Env_BaskervilleIronFence",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот же, и детали совпадают с sheet.png: два кирпичных столба с металлическими шапками и шпилями, 10 копейных прутьев, готический фриз, три поперечины, замшелый каменный цоколь. Но решётка изогнута в плане под 90°, получился угловой L-пролёт. На wire-34.jpg и close-base.jpg поперечины сходятся углом, на uv-layout.png острова поперечин V-образные, на turn-000/090/180/270 половина прутьев сжата в пучок, на turn-135/315 оба столба стоят на одной линии взгляда (двойной шпиль). Заказан прямой пролёт 2,5×0,3×1,6 м (Ш:Г:В ≈ 1,56:0,19:1), получено 40,9×42,5×48 uu (≈ 0,85:0,89:1): пропорция главной части сбита намного больше чем на 10 %, и проп нельзя поставить вдоль края сада как прямой модуль. Узнаётся как ограда со всех ракурсов, но конфигурация другая. Вероятная причина в источнике: sheet.png — миниатюра 230 px одного вида с лёгкой перспективой, и Tripo прочитал уходящую правую половину как поворот.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Сетка цельная: дыр, просветов, вывернутых частей и мусорной геометрии нет. Прутья, поперечины, фриз, шапки и шпили целы, каркас на wire-* следует форме (4831 tris). Есть дефект шейдинга на полном росте в одной зоне: на грани правого столба у стыка с решёткой светлая глянцевая полоса видна даже на глиняном wire-front.jpg, значит дело в нормалях или сглаживании, а не только в BC. В текстуре та же зона выглядит белёсой дымкой вдоль вертикального ребра столба (turn-135, turn-315, turn-045). На крупном плане: у нескольких наконечников зазубрина или раздвоение (turn-045, turn-000), концы фриза у столбов торчат рваными крючками (close-base, wire-34).",
+      "frames": [
+        "wire-front.jpg",
+        "turn-315.jpg",
+        "turn-135.jpg",
+        "turn-045.jpg",
+        "wire-34.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: красный кирпич с расшивкой, тёмное кованое железо прутьев, серый металл шапок, замшелый каменный цоколь. Запечённого света и резких теней в цвете нет, детализация кирпича и цоколя не беднее уровня кита Sarpedon, цвета совпадают с sheet.png. Мелкие дефекты видны только на крупном плане: белёсые мазки на островах кирпича в BC (они усиливают дымку у ребра столба, которая уже учтена в F) и мыльное пятно на шпиле дальнего столба (close-weapon). Чужих цветов, швов и растяжек на полном росте нет.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-225.jpg",
+        "turn-000.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5, поэтому return_to_stage_2. Tripo сгенерировал угловой L-пролёт (решётка согнута под 90° в плане) вместо прямого пролёта между двумя столбами; параметрами env_kit это не исправить. Для перегенерации в Tripo нужен ортогональный фронтальный вид прямого пролёта без перспективы (столб — решётка — столб в одной плоскости) и второй вид сбоку или сверху с тонким профилем ~0,3 м; уложиться в trisMax пропа 4000 (сейчас 4831). Примечание о входах: acceptor-prompt.md и gates.json в каталоге приёмки отсутствовали. prepare (tools/mapkits/accept.py) их не записал, потому что capture завершился с ошибкой: «close-head.jpg: кадр пуст, foreground 0.000». Промпт восстановлен по шаблону PROMPT из accept.py с данными props.json, status.json и build-отчёта; гейты посчитаны по той же логике gates() на чтении отчёта, хеши совпадают с frames.json. Кадр close-head.jpg пуст, поэтому верх (шпили, шапки) проверен по turn-* и close-weapon.jpg.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "Светлая глянцевая полоса на грани правого столба у стыка с решёткой видна и на глине, то есть это сглаживание или нормали. В текстуре та же зона — белёсая дымка вдоль вертикального ребра столба (turn-135.jpg, turn-315.jpg)."
+    },
+    {
+      "item": "F",
+      "frame": "close-base.jpg",
+      "note": "Концы фриза у столбов торчат рваными крючками; у нескольких наконечников зазубрина или раздвоение (turn-045.jpg). Видно на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Мыльное пятно на шпиле дальнего столба и белёсые мазки на островах кирпича в BC. Видно на крупном плане."
+    },
+    {
+      "item": "G-TOPO",
+      "frame": "uv-layout.png",
+      "note": "4831 tris больше trisMax пропа 4000. Гейт считается по бюджету env_kit 12000, поэтому PASS; при перегенерации уложиться в 4000."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-IRON-FENCE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп iron-fence не принят: Tripo построил угловой L-пролёт вместо прямого пролёта ограды между столбами, нужна перегенерация (этап 2). Файла acceptor-prompt.md не было, промпт восстановлен по tools/mapkits/accept.py."
+}

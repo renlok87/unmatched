@@ -1,0 +1,154 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotHighSeatThrone.fbx",
+      "sha256": "3f24449653f4e71d05b1f9cd665afc4e3dbe330ad91c3b78b6ebc8e85b92d0bd"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHighSeatThrone_BC.png",
+      "sha256": "94374981efff0111c053b476609b1b2e1aca6106efc20fc6df598bc863f87b32"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHighSeatThrone_N.png",
+      "sha256": "74d82ec02b5e2cc697c5bcaa5afc1174d30e24301b8c3a47dc8afa8e03b83f76"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotHighSeatThrone_ORM.png",
+      "sha256": "4f6adf701f707c8b2fb8ab58f7704c90d839d2641112d6318c3ed7a4fc76cc18"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-high-seat-throne-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotHighSeatThrone.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+      "note": "5058 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+      "note": "UV0 islands 139, used 0.5973, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+      "note": "T_Env_HeorotHighSeatThrone_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotHighSeatThrone.build.json",
+      "note": "SM_Env_HeorotHighSeatThrone, M_Env_HeorotHighSeatThrone",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: высокая спинка-арка с резной плетёнкой, две стойки с драконьими головами-навершиями, золотые пояса, подлокотники со шпилями-навершиями, медвежья шкура с головой, свисающей на передний резной щит. Пропорции (ширина ≈0,47 высоты) совпадают с видом, лишних и пропавших частей нет, фантомов на turn-090/270 и wire-* нет; узнаётся со всех ракурсов (turn-000/045/090/135/180/270/315). Дерево светлее и чуть серее «тёмного дуба» листа, но это то же семейство коричневого.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, вывернутых частей и мусора нет; клыки и шпили целы, сетка на wire-34/wire-front следует форме (спинка и щиты — плоские панели с резьбой в нормалях, голова медведя и драконы — плотная сетка). На крупном плане close-head гребни-грива драконов ступенчато-блочные, рваный контур зубцов; это виден только вблизи.",
+      "frames": [
+        "close-head.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Резной дуб читается как дерево, мех шкуры — как мех, золото — как светлое позолоченное/латунное, детализация плетёнки не беднее эталона кита; запечённого света нет. Дефекты крупного плана: на гриве драконов (close-head) пятнистые жёлтые растяжки, на сиденье за шкурой (turn-000) мягкое размытое пятно меха без деталей; золото бледное, ближе к кости. Тон дерева светлее заказанного тёмного дуба.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a; дефекты F/T только крупного плана, на игровой дистанции фонового пропа не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "грива-гребни драконьих наверший ступенчато-блочные, рваный контур зубцов (только крупный план)"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "пятнистые жёлтые растяжки текстуры на гриве драконов"
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "размытое пятно меха на сиденье за шкурой без детали; золото бледное, дерево светлее тёмного дуба листа"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-HIGH-SEAT-THRONE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп high-seat-throne (трон Хротгара) принят по делегированию, 8.3; мелкие дефекты гривы драконов и сиденья — в known_issues."
+}

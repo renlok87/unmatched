@@ -1,0 +1,170 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotIronBrazier.fbx",
+      "sha256": "67e8ab91d0896808b6271329d0f5bdc355d0ba489491929a1b629355d982ef3a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBrazier_BC.png",
+      "sha256": "7d6f1dc5eb7f579a741ec5429141c7f0b515ab5d1675d9229a71a9eb8491481e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBrazier_N.png",
+      "sha256": "902032ca51eac59731f5a83cb7ffdd5c9ad2812df2a4c57fd7ba09a0a1316826"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotIronBrazier_ORM.png",
+      "sha256": "91103636584e461c3a849606ace5aea7bb076646b095624c84ff3a7fbbfe55a0"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-iron-brazier-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotIronBrazier.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+      "note": "4725 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+      "note": "UV0 islands 630, used 0.7196, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+      "note": "T_Env_HeorotIronBrazier_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotIronBrazier.build.json",
+      "note": "SM_Env_HeorotIronBrazier, M_Env_HeorotIronBrazier",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Это заказанный предмет: кованая треногая жаровня. У неё чаша с клёпаным ободом и тремя кольцами, три витые квадратные ноги с хомутами и расклёпанными стопами, кольцевая связь с хомутами, поленья с огнём. Пропорции и главные части совпадают с sheet.png в пределах ~5 %, предмет узнаётся со всех 8 ракурсов. Одно второстепенное отличие: чаша наклонена на ~6–7° к фронтальной стороне. На turn-090 и turn-270 обод скошен; на turn-000 видны дно чаши и поленья, на turn-180 только кончики пламени. Наклон перешёл из перспективы фронтального вида. Мелочи без влияния на силуэт: внутри кольцевой связи лишняя прямая распорка (close-base, под чашей), над огнём мелкие летающие обрывки пламени.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Железная часть чистая: чаша, заклёпки, тонкие кольца, ноги, хомуты и кольцевая связь целы. Дыр, просветов, чёрных пятен и вывернутых частей нет; сетка на wire-* следует форме, плотность ровная (4725 tris). Дефекты есть только в зоне огня и они мелкие. Над огнём висят 5–6 оторванных плоских обрывков пламени (turn-045, turn-225, wire-34; на turn-090 они выглядят как два бежевых квадратика). Языки пламени — одиночные плоские карты с рваными полигональными краями (close-head); на 45° и 225° огонь схлопывается в тонкие полоски. Обрывки занимают ~2 % высоты пропа: на игровой дистанции это микродеталь, поэтому оценка уровня крупного плана.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кованое железо с ковочной фактурой, заклёпками и витыми гранями ног, дерево поленьев с волокнами, огонь. Запечённого света в цвете нет: светлые штрихи по граням ног — стилизованный ручной хайлайт, как на виде. Детализация при 2048 и покрытии UV 74 % не беднее эталона кита. Дефекты видны только на крупном плане. Силуэт пламени спроецирован на боковину левого полена (close-head). По краям карт пламени идут серо-голубые полосы фона. Задняя внутренняя стенка чаши мыльная (close-weapon). На поленьях у огня жёлто-зелёный оттенок (turn-000, close-weapon).",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "Score 7,5 < 8,0: F и T по 1,5 из-за мелких дефектов зоны огня, S 1,5 из-за наклона чаши. Гейты PASS или n/a. S ≥ 1,5, поэтому нужна доработка в Blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "fix": "Удалить оторванные летающие обрывки пламени над огнём: 5–6 мелких несвязанных плоских кусков, видны на turn-045, turn-090, turn-225 и wire-34. Очистка loose parts по размеру и высоте над чашей; основные языки пламени и поленья не трогать.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Исправить текстуру зоны огня. Убрать проекцию силуэта пламени с боковины левого полена. Убрать серо-голубые полосы фона по краям карт пламени (подрезать или закрасить кромку). Убрать жёлто-зелёный оттенок на поленьях. Если доступно, освежить мыльную заднюю внутреннюю стенку чаши (close-weapon).",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Чаша наклонена на ~6–7° к фронтальной стороне: обод скошен на turn-090 и turn-270, на turn-000 и turn-180 видна разная глубина чаши. Наклон перешёл из перспективы фронтального вида. При доработке желательно выровнять чашу вместе с поленьями и огнём. Если env_kit этого не умеет, для фонового пропа допустимо: при раскладке развернуть наклоном к игровой камере."
+    },
+    {
+      "item": "S",
+      "frame": "close-base.jpg",
+      "note": "Внутри кольцевой связи ног есть лишняя прямая распорка, которой нет на виде. Она скрыта под чашей и не меняет силуэт; безвредна."
+    },
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "note": "Языки пламени — одиночные плоские карты: на 45° и 225° огонь схлопывается в тонкие полоски. Роль пропа animated, поэтому в UE огонь стоит поддержать VFX: мерцание или карточный огонь, повёрнутый к камере."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-IRON-BRAZIER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп iron-brazier (Heorot) не принят, 7,5: нужна доработка в Blender. Убрать летающие обрывки пламени над огнём и поправить текстуру огня и поленьев. Наклон чаши ~6° записан в known issues."
+}

@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotWeaponRack.fbx",
+      "sha256": "115061022d318c8a293baf08dab54b1ffce391f43eb72568d7844ba205f99869"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWeaponRack_BC.png",
+      "sha256": "8734bee9a069875835684a3a9b04dc872768eb0f8ca440c1c309c095aa9e806e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWeaponRack_N.png",
+      "sha256": "f9957e45384aadf0ba62914a537ab5904ef59009ca7d1b7498d39dd9bd81f9e7"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotWeaponRack_ORM.png",
+      "sha256": "440978c1b77e511002c66005afb628f1a9a2a5640feace68b007efeec0d015fa"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-weapon-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotWeaponRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+      "note": "5034 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+      "note": "UV0 islands 207, used 0.4893, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+      "note": "T_Env_HeorotWeaponRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotWeaponRack.build.json",
+      "note": "SM_Env_HeorotWeaponRack, M_Env_HeorotWeaponRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Предмет тот, что на sheet.png и в описании: A-образная стойка из тёмного дуба со стойками с головами драконов (смотрят наружу), три копья с железными хомутами на рейках, бородовидная секира с узорчатым обухом на верхней рейке, два меча в ножнах на средней рейке, железные накладки с заклёпками на ногах, плетёнка на боковых панелях, снег на рейках. Пропорции совпадают: ширина/высота ≈ 0,75 (заказ 1,5/2), глубина ≈ 0,29 высоты (заказ 0,25), наконечники копий выше голов стоек, как на виде. Лишних и пропавших частей нет. Узнаётся со всех 8 ракурсов; на turn-090/270 головы драконов видны в анфас как ступенчатый блок морды — это ракурс, а не фантом.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, рваных краёв, вывернутых частей и мусорной геометрии. Тонкие элементы целы: древки копий, хомуты, кольцо-гарда второго меча, топорище. На wire-34/wire-back сетка следует форме: рейки и стойки чистые, плотнее только на головах драконов и снежных наплывах. Сзади (turn-180, wire-back) оружие корректно перекрыто рейками, без оболочек и фантомов. Головы драконов в сетке упрощены, но рельеф читается текстурой; оплывших масс на игровой дистанции нет.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-180.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокном и резной плетёнкой, кованое железо накладок и наконечников, кожа ножен с красной шнуровкой, красная обмотка рукоятей, снег. Освещение равномерное, явных запечённых бликов нет; детализация на 2048 богатая. Есть мелочи только крупного плана. На close-head металл наконечников шумный и слегка мыльный, на левом лезвии тёмная черта по кромке; обмотка древка среднего копья размыта. Внутренние грани стоек A-рамы заметно темнее (turn-135/045): похоже на лёгкую запечённую окклюзию, но на игровой дистанции читается как тёмное волокно. Покрытие UV 49 %: эффективная плотность текселя ниже возможной.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5 → 9.2 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a. Остаются только мелочи текстуры крупного плана, для фонового пропа диорамы это допустимо.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Металл наконечников копий на крупном плане шумный и слегка мыльный; тёмная черта по левой кромке левого наконечника, размытая обмотка древка среднего копья. На игровой дистанции не видно."
+    },
+    {
+      "item": "T",
+      "frame": "turn-135.jpg",
+      "note": "Внутренние грани стоек A-рамы заметно темнее наружных: возможна лёгкая запечённая окклюзия из исходника Tripo. На полном росте читается как тёмное волокно дерева."
+    },
+    {
+      "item": "G-UV",
+      "frame": "uv-layout.png",
+      "note": "Покрытие UV0 49 % при 207 островах, много тонких щепок: плотность текселя ниже возможной. Гейт PASS, правка не требуется."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-WEAPON-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп weapon-rack (Стойка оружия, Heorot) принят по делегированию: 9.2, гейты PASS; мелочи текстуры крупного плана записаны в known_issues."
+}

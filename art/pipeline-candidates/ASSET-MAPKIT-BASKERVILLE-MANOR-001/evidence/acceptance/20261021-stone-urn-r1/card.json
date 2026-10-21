@@ -1,0 +1,177 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleStoneUrn.fbx",
+      "sha256": "9a73d855ac71755694de3439456c7f2bb042a7bc3a9e957b05301d9f9ef32de6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStoneUrn_BC.png",
+      "sha256": "cb37c269712a6b91b6796d55265493a80503d2048bfdbc8ef6f30b0afc8fc968"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStoneUrn_N.png",
+      "sha256": "88596728599fec2c7dc013b998c090f5188aefb62a647d946f27586d9ea4718b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleStoneUrn_ORM.png",
+      "sha256": "97fd743d94a4a5321074d3a0d8800982e09b415d51df753a21184b3114dc2c13"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-stone-urn-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleStoneUrn.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+      "note": "3704 tris (бюджет env_kit 12000, проп 3500), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+      "note": "UV0 islands 1205, used 0.7455, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+      "note": "T_Env_BaskervilleStoneUrn_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleStoneUrn.build.json",
+      "note": "SM_Env_BaskervilleStoneUrn, M_Env_BaskervilleStoneUrn",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот же, что на листе: ваза-кратер с поясом плетёнки под венцом, гадрунами на чаше, каннелированной ножкой и плинтой на квадратном пьедестале с карнизом, филёнками и цоколем, плети плюща. Узнаётся со всех 8 ракурсов, фантомных выступов и оболочек нет (turn-090/270, wire-*). Деление высоты ваза/пьедестал 46/54 % против 43/57 % на листе (≤ 5 %). Второстепенные отличия: плющ реже и бледнее листа (на листе плотная шапка над устьем и густые плети по граням), устье закрыто плоским каменным диском без земли; пьедестал немного коренастее миниатюры листа (≈10 % по отношению высоты к ширине карниза, в пределах описания 0,6×0,6×1,2 м). Предупреждение frames.json о несовпадении ключа листа ложное: view-thumb.png по виду именно этот проп.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте дыр, просветов, рваных краёв, вывернутых частей и оплывших масс нет, тонкие плети плюща целы; сетка на wire-front/back/34 следует форме (филёнки и гадруны несут нормали, для 3704 tris это нормально). На крупных планах close-head и close-weapon видны чёрные треугольные изнанки листьев-карточек в шапке над устьем (отчёт ray_escape: 68 граней смотрят внутрь, 0,17 % площади; листья односторонние). Устье вазы плоский диск с полюсом веера (wire-34). Скрытая вывернутая коробка внутри пьедестала (оболочка 18, 32 tris) в кадрах не видна.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: выветренный серо-зелёный камень с мхом, плющ с прожилками и коричневыми стеблями. Резной пояс, гадруны, каннелюры и молдинги филёнок проработаны в BC и N. Запечённого направленного света нет, детализация не беднее эталона кита Sarpedon (T_Env_Balustrade_BC). Дефекты крупного плана: мыло и грязные пятна на теле вазы под поясом и на плоской крышке, размытая тёмная полоса под губой венца (close-head, close-weapon); размытые нарисованные «призраки» плюща на филёнках пьедестала (close-base, слабее на turn-090/225/270), на полном росте они читаются как мох.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0: S, F и T по 1,5. Дефекты F и T видны только на крупных планах, отличия S второстепенные. S ≥ 1,5, ни одно измерение не ниже 1,0, все гейты PASS или n/a, поэтому доработка (rework_blender), а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "fix": "Чёрные изнанки листьев-карточек в шапке над устьем и на плетях: развернуть наружу вывернутые грани листвы (ray_escape inward 68) и сделать листву двусторонней (двусторонний материал или дубль карточек с обратной нормалью), чтобы в UE изнанка не отсекалась и не чернела; переснять close-head и close-weapon.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Мыло и грязные пятна на теле вазы под поясом, на плоской крышке и под губой венца: перетекстурировать исходник в Tripo с большей детализацией камня, сохранив резной пояс и гадруны.",
+      "tool": "исходник Tripo: форма/текстура"
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "fix": "Размытые нарисованные «призраки» плюща на филёнках пьедестала (также turn-090, turn-225, turn-270): убрать при перетекстуровке исходника или перекрыть их настоящими плетями из геометрии.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "sheet.png",
+      "note": "Плющ реже и бледнее, чем на листе: нет плотной шапки над устьем и густых плетей по граням пьедестала."
+    },
+    {
+      "item": "S",
+      "frame": "close-weapon.jpg",
+      "note": "Устье вазы закрыто плоским каменным диском без земли; с высокой камеры доски читается как крышка с редкими листьями."
+    },
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Пьедестал коренастее миниатюры листа (≈10 % по отношению высоты к ширине карниза), но в пределах описания 0,6×0,6×1,2 м."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-STONE-URN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп stone-urn (каменная ваза) в r1 не принят, 7,5: в env_kit исправить изнанки листьев, в Tripo перетекстурировать мыло камня; плющ реже, чем на листе."
+}

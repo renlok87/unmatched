@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotCarvedPillar.fbx",
+      "sha256": "25c2f3ea7345bdf1d651a73957b20d4ac819d1302b583f75eb3cea3e23d4e30e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotCarvedPillar_BC.png",
+      "sha256": "7b7a7a09f7ea958017c95fb654e78998b18b397bd8a133570ada080293528865"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotCarvedPillar_N.png",
+      "sha256": "5b544ccce036f19cc647460ab9046d0c9ae135df64d0ad686ed0b14e8d97aa6e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotCarvedPillar_ORM.png",
+      "sha256": "4beb5cb40df3b2d2154362ec62c79190017cfe97f15a0ff1a7425134c7f96289"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-carved-pillar-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotCarvedPillar.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+      "note": "5121 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+      "note": "UV0 islands 176, used 0.4622, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+      "note": "T_Env_HeorotCarvedPillar_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotCarvedPillar.build.json",
+      "note": "SM_Env_HeorotCarvedPillar, M_Env_HeorotCarvedPillar",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет: высокий квадратный резной столб с капителью (кельтский узел на гранях), позолоченным поясом с заклёпками и плетёным орнаментом под капителью, длинными панелями с переплетёнными драконами и ступенчатым цоколем — порядок и доли частей совпадают с sheet.png (капитель ~15 %, пояс ~7 %, цоколь ~10 % высоты). Лишних и пропавших частей нет, со всех ракурсов узнаётся. Единственная мелочь контура: рельеф дракона передней грани слегка выступает за плоскость рамки и в профиль (turn-090/270) даёт небольшой бугор головы — это настоящая резьба, не фантомная оболочка.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Дыр, просветов, рваных краёв, чёрных пятен, вывернутых частей и мусорной геометрии нет ни на полном росте, ни на крупных планах. Тонкие элементы рельефа передней грани (рога, гребень, лапы, хвост дракона) целы и чётко сформованы; заклёпки пояса — отдельная геометрия. Сетка на wire-* следует форме: плотная на рельефе, крупные квады на плоских гранях; резьба боковых и задней граней и узлы капители — только нормаль и цвет на плоских квадах, но шейдинг читается без оплывания.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-090.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево с волокнами и стыками досок, пояс — позолоченный металл с плетёнкой; направленного запечённого света нет, тёмные впадины резьбы — стилизованная прорисовка. Детализация богатая. Минусы: на задней грани (turn-180) резьба нарисована на плоской грани и в нижней половине панели мягкая и малоконтрастная, переплетение размыто. На полном росте это заметно при пристальном осмотре, но на игровой дистанции читается как резьба. На крупном плане близ рамки передней панели (close-base) видна растянутая светлая текстура на внутренней фаске. Дерево светлее и розовее «тёмного дуба» описания, но того же семейства цвета, что на sheet.png.",
+      "frames": [
+        "turn-180.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 2.0 + T 1.5 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; остались только мягкость текстуры задней грани и растяжка на крупном плане.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Задняя грань: резьба дракона только текстурой на плоском кваде, нижняя половина панели мягкая и малоконтрастная (переплетение смазано); на игровой дистанции читается как резьба."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Внутренняя фаска рамки передней панели слева — растянутая светлая текстура, видна только на крупном плане."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Рельеф дракона передней грани выступает за плоскость рамки примерно на 1–2 % высоты, в профиль виден бугор головы; это настоящая резьба, не фантом."
+    },
+    {
+      "item": "F",
+      "frame": "wire-back.jpg",
+      "note": "Резьба боковых и задней граней и узлы капители — только нормаль/цвет на плоских квадах; на крупном плане граней (close-base, правая грань) читается плоско."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-CARVED-PILLAR-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп carved-pillar (Heorot) принят по делегированию с 9.2. Задняя грань мягковата, это записано в known_issues."
+}

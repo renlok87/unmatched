@@ -1,0 +1,164 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleMoorDeadTree.fbx",
+      "sha256": "1d163e628130859af8307d1f396c3a17110fc3a30cc44249e145aa8d0cd501e4"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_BC.png",
+      "sha256": "099a8751f1c911d5eef3304024051af1e7c343959302893ba59f519d741982cb"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_N.png",
+      "sha256": "72b02d485016469b2c1ca131926bf997545531e27687bf676ae9b2cfad0b7464"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_ORM.png",
+      "sha256": "9b861f3d8e7acd9af7dba9df7a9aa75dad1e9b384e0ef4bb9f79fbfdde7095f4"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-moor-dead-tree-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleMoorDeadTree.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "note": "5114 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "note": "UV0 islands 1880, used 0.5107, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "note": "T_Env_BaskervilleMoorDeadTree_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "note": "SM_Env_BaskervilleMoorDeadTree, M_Env_BaskervilleMoorDeadTree",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Силуэт повторяет sheet.png: перекрученный ствол с корневым раструбом, дупло-сучок внизу ствола, центральная вершина-развилка и широко раскинутые узловатые голые ветви без листьев, пропорции ствол/крона совпадают. Лишних или пропавших главных частей нет; на боковых turn-090/270 крона уже (дерево плоское по глубине, как у фронтального вида), но на всех 8 ракурсах читается то же сухое дерево. Основное пятно цвета серое, того же семейства, что на виде.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма цела: дыр, вывернутых частей и оплывших масс нет, тонкие ветви и корни не порваны, сетка на wire-* следует форме. Дефекты мелкие и видны только при разглядывании: висящие плоские щепки-веточки с тёмными обратными гранями справа от ствола (wire-34, close-base, turn-045), мелкие угловатые обрезки геометрии под корнями (turn-045, turn-270), гранёные ломаные кончики веток на close-head. На игровой дистанции фонового пропа не читаются.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "turn-045.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материал читается как сухое дерево: волокна коры, трещины, сучок, без чужих цветов и запечённых бликов. Но тон заметно светлее и холоднее вида (выбеленное серое против тёмного серо-коричневого на sheet.png), а на боковых ракурсах средняя часть ствола и верхняя развилка мыльные и чуть растянутые (turn-090, turn-270); на фронте и close-base детализация на уровне кита.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.5, все гейты PASS или n/a; фоновый проп читается на игровой дистанции, мелкие огрехи формы и тона в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "плоские висящие щепки-веточки с тёмными обратными гранями справа от ствола (также close-base.jpg, turn-045.jpg); видны только вблизи"
+    },
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "note": "мелкие угловатые обрезки геометрии под корнями (также turn-270.jpg); на игровой дистанции скрыты землёй/не читаются"
+    },
+    {
+      "item": "T",
+      "frame": "turn-090.jpg",
+      "note": "мыльная, слегка растянутая текстура средней части ствола и верхней развилки на боковых ракурсах (также turn-270.jpg)"
+    },
+    {
+      "item": "T",
+      "frame": "sheet.png",
+      "note": "BC выбеленный светло-серый против тёмного серо-коричневого вида; при желании притемнить тон в материале (env_kit params)"
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-BSK-MOOR-DEAD-TREE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп moor-dead-tree (сухое дерево вересковой пустоши) принят по делегированию, 8.3; мелкие щепки и обрезки под корнями и светлый мыльный тон на боках оставлены в known_issues."
+}

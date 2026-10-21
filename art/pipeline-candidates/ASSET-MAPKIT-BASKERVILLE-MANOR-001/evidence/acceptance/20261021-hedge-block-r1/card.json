@@ -1,0 +1,176 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-BASKERVILLE-MANOR-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleHedgeBlock.fbx",
+      "sha256": "c1a11a3cee1fdd7a6825435368b86550aec87797726490c8fbaf4c43a8bfc68e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_BC.png",
+      "sha256": "ee38b979327c72aad4861bbf31afc1c05e18f8ea3845956378f7d1bf0c520db0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_N.png",
+      "sha256": "bf4e3780111825082c3dd7553c4d4dbcfac0297ff49693b8ac7fccf58ba73949"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_ORM.png",
+      "sha256": "6c0e7aebefae07a8ebf9b96bb7ff8b570e8ceae6d0dc84368ce0767aad403971"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/evidence/acceptance/20261021-hedge-block-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleHedgeBlock.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "note": "5801 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "note": "UV0 islands 2717, used 0.3999, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "note": "T_Env_BaskervilleHedgeBlock_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "note": "SM_Env_BaskervilleHedgeBlock, M_Env_BaskervilleHedgeBlock",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Предмет тот: прямоугольный блок стриженой живой изгороди, узнаётся со всех 8 ракурсов, лишних и пропавших главных частей нет. Отличий два. (1) Пропорция главной части сбита больше чем на 10 %. Размеры 48,8×19,3×36 uu, то есть ширина/высота 1,36 и глубина/высота 0,54. Заказано 2×0,8×1,2 м, то есть 1,67 и 0,67: блок на 19–20 % уже и тоньше. Против листа он наоборот шире и ниже: на sheet.png блок в 3/4 почти кубический (габарит около 1:1), у модели на turn-045 габарит 1,26. (2) Контур: на листе ровно подстриженные чистые рёбра, а у модели по всем рёбрам и торцам рваные шипастые лоскуты из треугольников (turn-090/270 читаются «колючими»). Цвет того же зелёного семейства, но светлее и желтее тёмного холодного зелёного листа.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 0.5,
+      "rationale": "Дефекты на полном росте в нескольких зонах. (1) Лицевая и тыльная грани (turn-000/180, wire-front): тёмный треугольный разрыв слева вверху и стёганые складки, защипнутые «звёздами» вокруг вершин; поверхность читается как смятая подушка, а не подстриженный самшит. (2) У одного из торцов на длинной грани (turn-045 справа, turn-135/315 слева) зона другой тесселяции: мятые шипастые лоскуты с тёмными просветами. (3) Торцы (turn-090/270) целиком из таких лоскутов, с тёмной щелью в центре. (4) wire-34: открытые дыры в сетке на верхней и лицевой гранях; сетка не следует форме, а идёт веерами-шатрами. Отчёт сборки это подтверждает: 83 дыры, 81 трещина, 1105 non-manifold рёбер, 3 оболочки, из них 2 мелкие оторваны от земли (9 и 7 tris), 537 вывернутых граней. На крупном плане верха (close-head) — тёмные щели под загнутыми лоскутами. Низ (close-base) без отдельных поломок, тот же рваный край.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материал читается как заказано: листва из мелких листьев, равномерная зелёная BC без запечённого света и теней, металла нет (metallic≈0,01, roughness≈0,98). Детализация на уровне эталонной изгороди кита Sarpedon (T_Env_HedgeBed_BC). На полном росте пятен, швов и чужого цвета не видно. На крупных планах (close-head, close-weapon) BC мыльный, с полосами растяжки вдоль длинных треугольников; разбивка почти по треугольнику (2717 островов на 5801 tris, покрытие 0,40) — это только крупный план. Тон светлее и желтее, чем dense dark green на листе.",
+      "frames": [
+        "turn-000.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. Пропорция блока сбита больше чем на 10 % против заказа 2×0,8×1,2 м и против листа, по всем рёбрам вместо стриженых граней рваный шипастый контур. Вместе с F = 0,5 (дыры, трещины, мятые лоскуты и защипы в нескольких зонах на полном росте; это дефекты исходной сетки Tripo, которые env_kit по своей политике не чинит) это требует перегенерации в Tripo. Score 5,0 < 8,0.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пропорции 48,8×19,3×36 uu (Ш/В 1,36, Г/В 0,54) против заказанных 2×0,8×1,2 м (1,67 / 0,67, ширина и глубина на 19–20 % меньше) и против более кубического блока на sheet.png. При перегенерации дать вид спереди с нужной пропорцией и согласовать лист с описанием."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Контур: по всем рёбрам и торцам рваные шипастые лоскуты вместо ровно подстриженных рёбер листа."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "На лицевой и тыльной гранях тёмный треугольный разрыв слева вверху и стёганые складки, защипнутые звёздами вокруг вершин (wire-front): поверхность как смятая подушка."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Открытые дыры на верхней и лицевой гранях и зона другой тесселяции у одного торца с тёмными просветами (turn-045). По отчёту: 83 дыры, 81 трещина, 1105 non-manifold рёбер, 2 оторванные мелкие оболочки (9 и 7 tris), 537 вывернутых граней."
+    },
+    {
+      "item": "F",
+      "frame": "turn-090.jpg",
+      "note": "Торцы целиком из мятых шипастых лоскутов с тёмной щелью в центре."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане BC мыльный, полосы растяжки вдоль длинных треугольников (также close-weapon); на полном росте листва читается."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Тон листвы светлее и желтее тёмного холодного зелёного на sheet.png и в описании (dense dark green)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-BSK-HEDGE-BLOCK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hedge-block (живая изгородь) не принят, 5,0: нужна перегенерация в Tripo. Ширина и глубина на 19–20 % меньше заказа, вместо стриженых рёбер рваный шипастый контур, в сетке дыры, трещины и мятые лоскуты."
+}

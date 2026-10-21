@@ -1,0 +1,150 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotLongBench.fbx",
+      "sha256": "6e2e15f787e202dfc0c7aaaf3dc848974c5ef3bb8fee623c838cf1d2ceb20ed2"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_BC.png",
+      "sha256": "fcb6a3643ce4246ecd13ccf9b1f53d32933f0e1e17d8dd1f07b12f77a148e952"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_N.png",
+      "sha256": "8ce280a5fd69f09fa816fe8604169f21c98d5cd80e2beebc89720a75e5013ea5"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotLongBench_ORM.png",
+      "sha256": "14a208929263907f0ed3fee3be6e49dc3221d0979f8610e0531562b694815822"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-long-bench-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotLongBench.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "4839 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "UV0 islands 1137, used 0.7227, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "T_Env_HeorotLongBench_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotLongBench.build.json",
+      "note": "SM_Env_HeorotLongBench, M_Env_HeorotLongBench",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Заказанный предмет: тяжёлая скамья из расколотого бревна на четырёх толстых ногах, шкура переброшена через один конец, как на sheet.png. Скамья узнаётся со всех ракурсов, лишних частей и фантомов на turn-090/270 и wire-34 нет. Одно второстепенное отличие: торец сиденья на turn-090/270 читается как связка из 2×4 маленьких торцов брёвен, а не как один расколотый брус. Кроме того, у края шкуры на верху сиденья есть небольшая ступенька (close-base, wire-34). Царга между ногами — допустимое добавление.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-base.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "Ни на полном росте, ни на крупных планах нет дыр, просветов, вывернутых частей или мусорной геометрии. Ноги, царги и шкура целы. Сетка на wire-34 следует форме. Бахрома шкуры из острых треугольных прядей — допустимая стилизация.",
+      "frames": [
+        "turn-045.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дубовая древесина с волокном и трещинами, мех светло-серо-бурый. Запечённого света на полном росте не видно, уровень сопоставим с китом пропов. Дефект крупного плана: на close-head торец и верхние грани бруса размыты, текстура растянута («мыло»). На игровой дистанции это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-base.jpg",
+        "close-head.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "Score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS или n/a. Это фоновый проп: замечания S и T видны только на торце и на крупном плане, на игровой дистанции они не читаются.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Торец сиденья читается как связка из 2×4 торцов брёвен, а не как расколотый брус. У края шкуры на верху сиденья небольшая ступенька."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане торец и верхние грани бруса размыты, текстура растянута («мыло»). На полном росте не видно."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus high",
+    "session_id": "workflow:acceptor2-MK-HEO-LONG-BENCH-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп long-bench (Heorot) принят по делегированию, 8.3. Замечания только для торца и крупного плана: торец сиденья читается как связка брёвен, на close-head текстура размыта."
+}

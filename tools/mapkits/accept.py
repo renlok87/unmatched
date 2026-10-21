@@ -221,6 +221,8 @@ def finish(m: str, output: Path, second: bool) -> None:
     by_asset = {ti.asset_id(m, p["key"]): p["key"] for p in mapkit.load_props(m)["props"]}
     for r in res:
         card, ev = r.get("card"), ROOT / r["evidence"]
+        if r["asset"] not in by_asset:  # one workflow run may cover several maps
+            continue
         key = by_asset[r["asset"]]
         if not card:
             print(f"NO CARD {key}")

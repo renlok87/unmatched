@@ -1,0 +1,155 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotScopLyre.fbx",
+      "sha256": "793d52974df2d1aa7fb4410406a6beb4e1331bdc9e5168660175e7c934cba157"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotScopLyre_BC.png",
+      "sha256": "1ee81b05f0d3c837d0daf01510f896ed637529650d0edd9ae1df652a8df0b7a0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotScopLyre_N.png",
+      "sha256": "7f499cebaad4241f91eb92898caf0740d8a45da270633c798afd26b0e354712b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotScopLyre_ORM.png",
+      "sha256": "ed5760b2e154f6cf1adfc6d008a6242c3845c2249f7a872d761ee1ca404f9275"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-scop-lyre-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotScopLyre.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+      "note": "5085 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+      "note": "UV0 islands 779, used 0.6127, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+      "note": "T_Env_HeorotScopLyre_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotScopLyre.build.json",
+      "note": "SM_Env_HeorotScopLyre, M_Env_HeorotScopLyre",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан, и тот же, что на sheet.png: круглая лира с корпусом-диском, два изогнутых рукава с резными звериными навершиями, поперечина с латунными шишками на концах, две S-образные резонаторные прорези, подставка для струн и струнодержатель, A-образная подставка из двух пар резных ног с перемычкой и медальоном. Вертикальные доли совпадают с листом на глаз: рукава над корпусом ~0,28 высоты (лист ~0,29), подставка под корпусом ~0,25 (лист ~0,26). Корпус чуть шире относительно высоты (~0,46 против ~0,41 на листе 230 px), в пределах точности оценки по миниатюре. Узнаётся со всех 8 ракурсов, фантомных частей нет: на turn-090/270 за корпусом видны только задние ноги подставки, это подтверждают turn-180/135/225. Одно второстепенное отличие: струн пять (на струнодержателе четыре штифта), а в описании заказано шесть. Предупреждение frames.json о ключе листа — расхождение метаданных: на листе видна именно эта лира.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На всех восьми ракурсах полного роста нет дыр, просветов, рваных краёв, чёрных пятен, вывернутых или оплывших частей. Тонкие элементы целы: струны, петли на поперечине, латунные шишки, подставка и струнодержатель. Сетка на wire-front/wire-34/wire-back следует форме (веерная триангуляция диска нормальна для плоской деки), резьба держит контур. Дыры из отчёта (open loops на задних ногах и под струнодержателем) лежат в зонах контакта и в кадрах не видны. На крупных планах только мелочи без признаков дефекта: регулярные хвостики струн под поперечиной (close-head) и двойные линии струн у верхнего обода (close-weapon) — это тень EEVEE на деке.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 2,
+      "rationale": "Материалы читаются как в описании и на листе. Дека светлая, клён с мелкой текстурой. Рукава, обод и подставка — тёплое тёмное дерево с плетёной резьбой. Шишки — латунь с бликом, струны — кремовая жила. Запечённых бликов и теней в цвете не видно: затемнения есть только в канавках резьбы, это допустимо для hand-painted. Мыла, швов и растяжек на полном росте и крупных планах нет. Задняя стенка расписана под рельефные доски, читается как дерево. Тёплые рыжеватые акценты в резьбе правых ног (turn-270, close-base) остаются в семействе дерева. Детализация (плетёнка на ногах, перемычке, рукавах и ободе) не беднее уровня кита Sarpedon. UV без перекрытий, BC покрывает острова.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 9.2,
+  "verdict": "pass",
+  "verdict_reason": "S 1.5 + F 2.0 + T 2.0 = 5.5/6 → 9.2 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; единственное отличие — пять струн вместо заказанных шести, на игровой дистанции фонового пропа (24 uu) не читается.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пять струн (четыре штифта на струнодержателе) вместо шести из описания; на игровой дистанции не читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-SCOP-LYRE-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп scop-lyre (лира скопа, Heorot) принят по делегированию: 9.2. Струн пять вместо шести — известное отличие, доработка не нужна."
+}

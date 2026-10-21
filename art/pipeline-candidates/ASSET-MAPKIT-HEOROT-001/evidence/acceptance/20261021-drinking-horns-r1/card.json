@@ -1,0 +1,167 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotDrinkingHorns.fbx",
+      "sha256": "0204eb9f4d3c8e4f7acfb496eda86a5291cfa59c67298c2c965299732fa3ed6d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDrinkingHorns_BC.png",
+      "sha256": "64c2c2cb7d8d5bd97789fbf8e8c3c2c2a63e2ccbdf49301358bdd58a1ad81935"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDrinkingHorns_N.png",
+      "sha256": "02bbf5eabfa4bd46f9bd04f64c28e1df8b565041fec1263d8bfa6fc972f39c15"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotDrinkingHorns_ORM.png",
+      "sha256": "81acc41409cab1614bc5ed3eb11f8a311bf50ae23ee4239513455cc088b3b1db"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-drinking-horns-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotDrinkingHorns.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+      "note": "5584 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+      "note": "UV0 islands 836, used 0.6801, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+      "note": "T_Env_HeorotDrinkingHorns_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotDrinkingHorns.build.json",
+      "note": "SM_Env_HeorotDrinkingHorns, M_Env_HeorotDrinkingHorns",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1,
+      "rationale": "Спереди (turn-000 против sheet.png) совпадение хорошее: железная подставка с завитками-ножками, боковые рога с драконьими головами наружу на уровне железных обойм, центральный рог с вертикальной застёжкой, серебряные пояса с узором и наконечники с шариком; пропорции рамки ~1:1 как на листе. Но есть два отличия от заказа. (1) Лишняя главная часть: рогов четыре, а не три. Tripo зеркально повторил центральный рог вместе с драконьей застёжкой сзади: четыре устья видны на turn-045, wire-34, turn-315 и turn-135; на turn-090/270 стоят три рога в глубину. В описании и на sheet.png рогов три. (2) Подставка — плоская рама в одной плоскости XZ. На turn-090/270 она видна ребром и почти исчезает: под рогами только тонкий крюк, ножки-завитки без глубины, сбоку силуэт читается как связка рогов без подставки. Узнаётся со всех 8 ракурсов, другого предмета нет, а четвёртый рог — целая чистая деталь, а не выступ или оболочка. Поэтому 1,0 («два и более отличий»), а не 0,5.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, просветов, рваных краёв, вывернутых частей и чёрных пятен; тонкие элементы целы: завитки ножек, кольца рамы, шарики на концах рогов, челюсти драконов. Сетка на wire-front/back/34 ровная и следует форме, без мусора. close-base: ножки, перекладина и наконечники чистые, контакт с полом есть. Мелкие недочёты: центральные драконьи застёжки оплывшие (на turn-090/270 читаются как бесформенный крюк); ободки устьев гранёные на close-head. На игровой дистанции (12 uu) не читаются, поэтому 1,5.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-270.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-base.jpg",
+        "close-head.jpg"
+      ]
+    },
+    "T": {
+      "value": 1,
+      "rationale": "Материалы читаются как заказано: рог полосатый кремово-медовый и тёмный, серебряные пояса и наконечники с рельефным плетением, кованое тёмное железо обойм и рамы с заклёпками. Детализация не беднее кита Sarpedon, направленного запечённого света нет. Дефект в одной зоне виден на полном росте: на скрытых друг от друга сторонах двух центральных рогов текстура — мыло. Серебряный пояс там без узора, в размытых «кирпичных» пятнах, рог гладкий, тёмный, без полос. Это видно на turn-045, turn-315, turn-135 и turn-225 и крупно на close-head и close-weapon. Мелочь: тени углублений плетения запечены в BC (типично для Tripo, ORM.R=1). По рубрике — 1,0.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "turn-135.jpg",
+        "turn-225.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 5.8,
+  "verdict": "return_to_stage_2",
+  "verdict_reason": "S = 1,0 < 1,5. По рубрике это возврат на этап 2 (перегенерация Tripo). Tripo получил только фронтальный вид и достроил глубину зеркалом: вышло четыре рога (центральный рог с застёжкой повторён сзади) вместо заказанных трёх, а подставка — плоская рама, которая сбоку видна ребром и пропадает. При перегенерации добавить вид сбоку или сверху, где три рога в одном ряду или треугольником, а ножки-завитки подставки имеют глубину. Тогда исчезнет и мыло на скрытых сторонах центральных рогов (T). Гейты PASS/n/a, score = round((1,0+1,5+1,0)/6×10, 1) = 5,8.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Четыре рога вместо трёх: центральный рог с драконьей застёжкой зеркально повторён сзади (также turn-315, turn-135, wire-34; на turn-090/270 три рога в глубину). В заказе и на sheet.png рогов три."
+    },
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "Подставка — плоская рама в одной плоскости: на turn-090/270 видна ребром, под рогами только тонкий крюк, у ножек-завитков нет глубины."
+    },
+    {
+      "item": "F",
+      "frame": "turn-270.jpg",
+      "note": "Центральные драконьи застёжки оплывшие (сбоку бесформенный крюк); ободки устьев гранёные на close-head. На игровой дистанции не читается."
+    },
+    {
+      "item": "T",
+      "frame": "turn-045.jpg",
+      "note": "Мыло на скрытых друг от друга сторонах двух центральных рогов: серебряный пояс без узора (размытые пятна), рог гладкий и тёмный. Видно на turn-045/135/225/315, крупно на close-head и close-weapon."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-DRINKING-HORNS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп drinking-horns (кит Heorot) не принят, 5,8: вернуть на этап 2 — перегенерировать в Tripo с видом сбоку или сверху, где три рога (сейчас четыре) и у подставки есть глубина."
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-HEOROT-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/SM_Env_HeorotGrendelArmTrophy.fbx",
+      "sha256": "9f00e377be35e7c29c92074d0ec76ae118cd1ec1f34da7f5570f9962224ff150"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrendelArmTrophy_BC.png",
+      "sha256": "c210ecb73049a7fbed34d09d147164337e9d03ee3a583fbec06f166e5f85a14d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrendelArmTrophy_N.png",
+      "sha256": "5714b61ff7aab46d8b484b7f5ad2fe8905c8631b69ccb09c708dd0328b958c4d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/export/T_Env_HeorotGrendelArmTrophy_ORM.png",
+      "sha256": "3dc6105fbf898560b3749cf3590bf4cbe0f48b195e130df45bf3e89d07ddf079"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/evidence/acceptance/20261021-grendel-arm-trophy-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/fbx-readback/SM_Env_HeorotGrendelArmTrophy.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+      "note": "5038 tris (бюджет env_kit 12000, проп 6000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+      "note": "UV0 islands 82, used 0.6149, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+      "note": "T_Env_HeorotGrendelArmTrophy_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-HEOROT-001/20261021-smartmesh/reports/assets/SM_Env_HeorotGrendelArmTrophy.build.json",
+      "note": "SM_Env_HeorotGrendelArmTrophy, M_Env_HeorotGrendelArmTrophy",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот же, что на sheet.png: две заострённые стойки с резной плетёнкой и двумя железными бандажами, перекладина с выступающими концами, железная скоба с кольцом и крюком, оторванная чешуйчатая лапа (три когтя, большой коготь сбоку, два шипа на запястье), снег у оснований. Лишних и пропавших частей нет, лапа читается на 000/045/135/180/225/315; пропорции самой лапы совпадают с листом (ширина ≈0,27 ширины рамы, когти почти до снега). Одно второстепенное отличие контура рамы: острия стоек поднимаются над перекладиной примерно на 12 % высоты против ~5–6 % на листе, рама относительно шире (ширина/высота ≈0,57 против ≈0,50). На 090/270 предмет плоский (глубина 9,6 uu) и читается как столб с выглядывающей лапой — следствие плоской рамы с листа, не фантомная часть.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 2,
+      "rationale": "На полном росте и крупных планах нет дыр, просветов, вывернутых частей, чёрных пятен и мусорной геометрии; тонкие элементы (кольцо, крюк, когти, шипы, острия стоек) целы; сетка на wire-34/wire-front/wire-back ровная и следует форме, оболочка лапы замкнута (по отчёту 0 открытых рёбер). Верх культи — вогнутая рана с рваной кожей по краю (turn-225, close-weapon): поверхность замкнута и читается как плоть, рваный край задуман описанием «torn off». Открытые донья снежных оснований и торцы трубок бандажей скрыты постом и полом; зубчатые кочки снега на wire — форма снега.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-225.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: дерево с волокнами и резной плетёнкой, кованое железо с заклёпками, снег, чешуйчатая кожа с рельефом в нормали, костяные когти с кровавыми основаниями; запечённого направленного света нет (светлые верхушки чешуи одинаковы со всех ракурсов — драйбраш миниатюры, стилизация). Дефекты только крупного плана: торцы перекладины — растянутые полосы волокон вместо торцевого среза, снег на её верху и волокна передней грани мягкие (close-head, close-weapon); на железных скобах и бандажах ромбическая насечка, похожая на чешую лапы; белая полоса на правой стойке (turn-315, close-weapon). Кожа светлее заказанной dark — средне-серая с белёсыми бликами, семейство цвета то же, на игровой дистанции читается.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение < 1.0, гейты PASS/n/a; замечания S/T второстепенные и крупного плана, на игровой дистанции проп читается.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Острия стоек выше над перекладиной (~12 % высоты против ~5–6 % на sheet.png), рама относительно шире (≈0,57 против ≈0,50); лапа в пропорциях листа."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Торцы перекладины — растянутые полосы волокон вместо торцевого среза; ромбическая насечка «чешуи» на железных скобах и бандажах; белая полоса на правой стойке (видна и на turn-315)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Снег на верху перекладины и волокна её передней грани мягкие (мыло) на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Кожа лапы средне-серая с белёсым драйбрашем, светлее заказанной dark scaly skin; семейство цвета то же, на игровой дистанции читается."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-HEO-GRENDEL-ARM-TROPHY-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп grendel-arm-trophy (Лапа Гренделя) кита Heorot принят по делегированию: 8.3, замечания по пропорциям рамы и текстурам крупного плана записаны в known_issues."
+}

@@ -37,10 +37,10 @@
     "memory_rule_note": "'FBX_SCALE_UNITS + import 100' (S05 memory) belongs to a profile without the UnitScaleFactor patch; with UM_FBX_v1 (lantern/barrel, RIG-CONTRACT.md) UE imports at import_uniform_scale 1.0"
   },
   "totals": {
-    "assets_built": 38,
-    "triangles": 189625,
-    "triangles_max": 5622,
-    "export_bytes": 400260874,
+    "assets_built": 42,
+    "triangles": 208629,
+    "triangles_max": 5801,
+    "export_bytes": 448113462,
     "checks_passed": true
   },
   "findings": [
@@ -176,7 +176,28 @@
     "MK-BSK-IRON-FENCE: non-manifold edges 115",
     "MK-BSK-IRON-FENCE: faces facing inward by ray escape 5 (0.0 % of area; one-sided material culls them from outside)",
     "MK-BSK-IRON-FENCE: recalc winding disagreements 199 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
-    "MK-BSK-IRON-FENCE: isolated shells (gap > 0.5 uu) 12, off ground 10"
+    "MK-BSK-IRON-FENCE: isolated shells (gap > 0.5 uu) 12, off ground 10",
+    "MK-BSK-MOOR-TOR-BOULDER: open edges 806 in 35 loop(s): 0 zero-width crack(s), 35 hole(s) totalling 3970.1 uu2 (largest 2094.4 uu2, rim 169.2 uu, mean width 24.76 uu, at z 0 uu)",
+    "MK-BSK-MOOR-TOR-BOULDER: non-manifold edges 47",
+    "MK-BSK-MOOR-TOR-BOULDER: faces facing inward by ray escape 337 (9.8 % of area; one-sided material culls them from outside)",
+    "MK-BSK-MOOR-TOR-BOULDER: open sheet faces seen from both sides 645 (13.0 % of area)",
+    "MK-BSK-MOOR-TOR-BOULDER: recalc winding disagreements 204 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-BSK-MOOR-TOR-BOULDER: isolated shells (gap > 0.5 uu) 54, off ground 54",
+    "MK-BSK-TOPIARY-CONE: open edges 683 in 150 loop(s): 45 zero-width crack(s), 105 hole(s) totalling 1197.6 uu2 (largest 377.2 uu2, rim 82.8 uu, mean width 9.11 uu, at z 0 uu)",
+    "MK-BSK-TOPIARY-CONE: non-manifold edges 47",
+    "MK-BSK-TOPIARY-CONE: faces facing inward by ray escape 83 (1.2 % of area; one-sided material culls them from outside)",
+    "MK-BSK-TOPIARY-CONE: recalc winding disagreements 126 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-BSK-TOPIARY-CONE: closed shells with negative volume (inside-out) 2",
+    "MK-BSK-HEDGE-BLOCK: open edges 536 in 164 loop(s): 81 zero-width crack(s), 83 hole(s) totalling 113.3 uu2 (largest 8.3 uu2, rim 25.3 uu, mean width 0.66 uu, at z 31 uu)",
+    "MK-BSK-HEDGE-BLOCK: non-manifold edges 1105",
+    "MK-BSK-HEDGE-BLOCK: faces facing inward by ray escape 537 (2.0 % of area; one-sided material culls them from outside)",
+    "MK-BSK-HEDGE-BLOCK: recalc winding disagreements 4383 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-BSK-HEDGE-BLOCK: isolated shells (gap > 0.5 uu) 3, off ground 2",
+    "MK-BSK-MOOR-DEAD-TREE: open edges 752 in 69 loop(s): 3 zero-width crack(s), 66 hole(s) totalling 971.7 uu2 (largest 803.1 uu2, rim 214.4 uu, mean width 7.49 uu, at z 7 uu)",
+    "MK-BSK-MOOR-DEAD-TREE: non-manifold edges 54",
+    "MK-BSK-MOOR-DEAD-TREE: faces facing inward by ray escape 18 (0.3 % of area; one-sided material culls them from outside)",
+    "MK-BSK-MOOR-DEAD-TREE: recalc winding disagreements 150 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "MK-BSK-MOOR-DEAD-TREE: isolated shells (gap > 0.5 uu) 26, off ground 25"
   ],
   "assets": {
     "MK-BSK-BOOK-STACK": {
@@ -2599,6 +2620,180 @@
         "isolated shells (gap > 0.5 uu) 14, off ground 14"
       ]
     },
+    "MK-BSK-HEDGE-BLOCK": {
+      "ue": {
+        "mesh": "SM_Env_BaskervilleHedgeBlock",
+        "textures": [
+          "T_Env_BaskervilleHedgeBlock_BC",
+          "T_Env_BaskervilleHedgeBlock_N",
+          "T_Env_BaskervilleHedgeBlock_ORM"
+        ],
+        "material_instance": "MI_Env_BaskervilleHedgeBlock",
+        "fbx_material_slot": [
+          "M_Env_BaskervilleHedgeBlock"
+        ],
+        "folder": "/Game/EnvKit/Baskerville/"
+      },
+      "board": "Baskerville",
+      "target": {
+        "dimension": "height",
+        "uu": 36.0
+      },
+      "scale_factor_source_to_final": 0.487942,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleHedgeBlock.fbx",
+        "sha256": "c1a11a3cee1fdd7a6825435368b86550aec87797726490c8fbaf4c43a8bfc68e",
+        "bytes": 373180
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_BC.png",
+          "sha256": "ee38b979327c72aad4861bbf31afc1c05e18f8ea3845956378f7d1bf0c520db0",
+          "bytes": 4501809,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_N.png",
+          "sha256": "bf4e3780111825082c3dd7553c4d4dbcfac0297ff49693b8ac7fccf58ba73949",
+          "bytes": 2175502,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleHedgeBlock_ORM.png",
+          "sha256": "6c0e7aebefae07a8ebf9b96bb7ff8b570e8ceae6d0dc84368ce0767aad403971",
+          "bytes": 2959765,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleHedgeBlock.json",
+        "mesh_objects": [
+          "SM_Env_BaskervilleHedgeBlock"
+        ],
+        "triangles": 5801,
+        "materials": [
+          "M_Env_BaskervilleHedgeBlock"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -9.661,
+          -24.385,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          9.661,
+          24.385,
+          36.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          19.322,
+          48.77,
+          36.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 19.322,
+          "Y_width": 48.77,
+          "Z_height": 36.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 536,
+          "non_manifold_edges": 1105,
+          "faces_with_inconsistent_winding": 4381
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 2717,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001709,
+          0.001709,
+          0.994873,
+          0.998291
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 15946,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 2,
+        "uv_area_used_fraction": 0.3999,
+        "texel_density_px_per_m_at_raster": 685.2,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 536,
+        "open_edge_loops": 164,
+        "non_manifold_edges": 1105,
+        "faces_with_inconsistent_winding": 4383,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 81,
+          "hole": 83
+        },
+        "hole_area_uu2_total": 113.314,
+        "shells": 3,
+        "shells_isolated": 3,
+        "shells_isolated_off_ground": 2,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": -0.153655985,
+        "corners_pointing_into_surface": 2168,
+        "ray_escape_faces": {
+          "outward": 4560,
+          "inward": 537,
+          "sheet": 114,
+          "enclosed": 590
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8935,
+          "inward": 0.02,
+          "sheet": 0.002,
+          "enclosed": 0.0845
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleHedgeBlock.build.json",
+      "findings": [
+        "open edges 536 in 164 loop(s): 81 zero-width crack(s), 83 hole(s) totalling 113.3 uu2 (largest 8.3 uu2, rim 25.3 uu, mean width 0.66 uu, at z 31 uu)",
+        "non-manifold edges 1105",
+        "faces facing inward by ray escape 537 (2.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 4383 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 3, off ground 2"
+      ]
+    },
     "MK-BSK-HOUND-STATUE": {
       "ue": {
         "mesh": "SM_Env_BaskervilleHoundStatue",
@@ -3797,6 +3992,355 @@
       },
       "build_report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMarbleBust.build.json",
       "findings": []
+    },
+    "MK-BSK-MOOR-DEAD-TREE": {
+      "ue": {
+        "mesh": "SM_Env_BaskervilleMoorDeadTree",
+        "textures": [
+          "T_Env_BaskervilleMoorDeadTree_BC",
+          "T_Env_BaskervilleMoorDeadTree_N",
+          "T_Env_BaskervilleMoorDeadTree_ORM"
+        ],
+        "material_instance": "MI_Env_BaskervilleMoorDeadTree",
+        "fbx_material_slot": [
+          "M_Env_BaskervilleMoorDeadTree"
+        ],
+        "folder": "/Game/EnvKit/Baskerville/"
+      },
+      "board": "Baskerville",
+      "target": {
+        "dimension": "height",
+        "uu": 135.0
+      },
+      "scale_factor_source_to_final": 1.35066,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleMoorDeadTree.fbx",
+        "sha256": "1d163e628130859af8307d1f396c3a17110fc3a30cc44249e145aa8d0cd501e4",
+        "bytes": 303676
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_BC.png",
+          "sha256": "099a8751f1c911d5eef3304024051af1e7c343959302893ba59f519d741982cb",
+          "bytes": 4287318,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_N.png",
+          "sha256": "72b02d485016469b2c1ca131926bf997545531e27687bf676ae9b2cfad0b7464",
+          "bytes": 3647812,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorDeadTree_ORM.png",
+          "sha256": "9b861f3d8e7acd9af7dba9df7a9aa75dad1e9b384e0ef4bb9f79fbfdde7095f4",
+          "bytes": 3377693,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleMoorDeadTree.json",
+        "mesh_objects": [
+          "SM_Env_BaskervilleMoorDeadTree"
+        ],
+        "triangles": 5114,
+        "materials": [
+          "M_Env_BaskervilleMoorDeadTree"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -39.735,
+          -50.881,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          39.735,
+          50.881,
+          135.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          79.47,
+          101.761,
+          135.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 79.47,
+          "Y_width": 101.761,
+          "Z_height": 135.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 752,
+          "non_manifold_edges": 54,
+          "faces_with_inconsistent_winding": 146
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1880,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001465,
+          0.001465,
+          0.998535,
+          0.994629
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 286,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5107,
+        "texel_density_px_per_m_at_raster": 595.5,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 752,
+        "open_edge_loops": 69,
+        "non_manifold_edges": 54,
+        "faces_with_inconsistent_winding": 150,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 3,
+          "hole": 66
+        },
+        "hole_area_uu2_total": 971.748,
+        "shells": 30,
+        "shells_isolated": 26,
+        "shells_isolated_off_ground": 25,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.01731852,
+        "corners_pointing_into_surface": 204,
+        "ray_escape_faces": {
+          "outward": 4530,
+          "inward": 18,
+          "sheet": 533,
+          "enclosed": 33
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9783,
+          "inward": 0.0034,
+          "sheet": 0.0123,
+          "enclosed": 0.0061
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorDeadTree.build.json",
+      "findings": [
+        "open edges 752 in 69 loop(s): 3 zero-width crack(s), 66 hole(s) totalling 971.7 uu2 (largest 803.1 uu2, rim 214.4 uu, mean width 7.49 uu, at z 7 uu)",
+        "non-manifold edges 54",
+        "faces facing inward by ray escape 18 (0.3 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 150 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 26, off ground 25"
+      ]
+    },
+    "MK-BSK-MOOR-TOR-BOULDER": {
+      "ue": {
+        "mesh": "SM_Env_BaskervilleMoorTorBoulder",
+        "textures": [
+          "T_Env_BaskervilleMoorTorBoulder_BC",
+          "T_Env_BaskervilleMoorTorBoulder_N",
+          "T_Env_BaskervilleMoorTorBoulder_ORM"
+        ],
+        "material_instance": "MI_Env_BaskervilleMoorTorBoulder",
+        "fbx_material_slot": [
+          "M_Env_BaskervilleMoorTorBoulder"
+        ],
+        "folder": "/Game/EnvKit/Baskerville/"
+      },
+      "board": "Baskerville",
+      "target": {
+        "dimension": "height",
+        "uu": 36.0
+      },
+      "scale_factor_source_to_final": 0.533102,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleMoorTorBoulder.fbx",
+        "sha256": "506328e41892ce86aa4a7622c7eea3c5dcce021e945346d36392fb3f2d42d70b",
+        "bytes": 198444
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_BC.png",
+          "sha256": "9fe9095f3a3c1de29571c7d2ef9d920293662a17029657642f48cead08fcf022",
+          "bytes": 4933506,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_N.png",
+          "sha256": "6b41bfed8fca81e9319f3db6aef0d2e22925f8dacf4ecb695b0329779760d7e3",
+          "bytes": 4294049,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleMoorTorBoulder_ORM.png",
+          "sha256": "6d14f07477c0d910948e01a169c2ec096ca5a6be63ce73fc2dfb35525fe8415e",
+          "bytes": 2938834,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleMoorTorBoulder.json",
+        "mesh_objects": [
+          "SM_Env_BaskervilleMoorTorBoulder"
+        ],
+        "triangles": 4390,
+        "materials": [
+          "M_Env_BaskervilleMoorTorBoulder"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -26.642,
+          -25.653,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          26.642,
+          25.653,
+          36.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          53.284,
+          51.306,
+          36.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 53.284,
+          "Y_width": 51.306,
+          "Z_height": 36.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 806,
+          "non_manifold_edges": 47,
+          "faces_with_inconsistent_winding": 206
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 470,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000732,
+          0.000732,
+          0.993652,
+          0.999268
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 8767,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 1,
+        "uv_area_used_fraction": 0.7076,
+        "texel_density_px_per_m_at_raster": 1011.8,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 806,
+        "open_edge_loops": 35,
+        "non_manifold_edges": 47,
+        "faces_with_inconsistent_winding": 204,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 35
+        },
+        "hole_area_uu2_total": 3970.129,
+        "shells": 92,
+        "shells_isolated": 54,
+        "shells_isolated_off_ground": 54,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.278764571,
+        "corners_pointing_into_surface": 69,
+        "ray_escape_faces": {
+          "outward": 3017,
+          "inward": 337,
+          "sheet": 645,
+          "enclosed": 391
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.6661,
+          "inward": 0.0979,
+          "sheet": 0.1299,
+          "enclosed": 0.1061
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleMoorTorBoulder.build.json",
+      "findings": [
+        "open edges 806 in 35 loop(s): 0 zero-width crack(s), 35 hole(s) totalling 3970.1 uu2 (largest 2094.4 uu2, rim 169.2 uu, mean width 24.76 uu, at z 0 uu)",
+        "non-manifold edges 47",
+        "faces facing inward by ray escape 337 (9.8 % of area; one-sided material culls them from outside)",
+        "open sheet faces seen from both sides 645 (13.0 % of area)",
+        "recalc winding disagreements 204 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "isolated shells (gap > 0.5 uu) 54, off ground 54"
+      ]
     },
     "MK-BSK-NEWEL-POST-LAMP": {
       "ue": {
@@ -6039,6 +6583,180 @@
         "recalc winding disagreements 249 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
         "isolated shells (gap > 0.5 uu) 11, off ground 11",
         "degenerate faces 10 (UE drops them at build)"
+      ]
+    },
+    "MK-BSK-TOPIARY-CONE": {
+      "ue": {
+        "mesh": "SM_Env_BaskervilleTopiaryCone",
+        "textures": [
+          "T_Env_BaskervilleTopiaryCone_BC",
+          "T_Env_BaskervilleTopiaryCone_N",
+          "T_Env_BaskervilleTopiaryCone_ORM"
+        ],
+        "material_instance": "MI_Env_BaskervilleTopiaryCone",
+        "fbx_material_slot": [
+          "M_Env_BaskervilleTopiaryCone"
+        ],
+        "folder": "/Game/EnvKit/Baskerville/"
+      },
+      "board": "Baskerville",
+      "target": {
+        "dimension": "height",
+        "uu": 54.0
+      },
+      "scale_factor_source_to_final": 0.540264,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": null,
+          "mean_iou_0deg": null,
+          "best_silhouette_turn_deg": null,
+          "silhouette_margin_0_vs_180": null,
+          "colour_margin_0_vs_180": null
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/SM_Env_BaskervilleTopiaryCone.fbx",
+        "sha256": "0f1ef83aef2a4595c115d8d7583f3b166ba717331a8fadbbaffe0fc6884a327d",
+        "bytes": 214108
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_BC.png",
+          "sha256": "917a3549106bc25390e553ae6b021f17c67cfe956be0da00b016d0ed1840718c",
+          "bytes": 6038617,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_N.png",
+          "sha256": "68851b9ff6d0f3bb05eb22e4e3120d26bf2c8d8867631ded5cf653e9b7bc8fcf",
+          "bytes": 4138502,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/export/T_Env_BaskervilleTopiaryCone_ORM.png",
+          "sha256": "6bc92c2162eadba4721109edd0d6c7dfc78b5c64dbdec8f1eb607d0b19a01fd0",
+          "bytes": 3469773,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/fbx-readback/SM_Env_BaskervilleTopiaryCone.json",
+        "mesh_objects": [
+          "SM_Env_BaskervilleTopiaryCone"
+        ],
+        "triangles": 3699,
+        "materials": [
+          "M_Env_BaskervilleTopiaryCone"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -10.565,
+          -10.433,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          10.565,
+          10.433,
+          54.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          21.13,
+          20.867,
+          54.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 21.13,
+          "Y_width": 20.867,
+          "Z_height": 54.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 683,
+          "non_manifold_edges": 47,
+          "faces_with_inconsistent_winding": 127
+        },
+        "protrusion_axis_readback": "-X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1287,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.000977,
+          0.000977,
+          0.99707,
+          0.999023
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 9705,
+        "flipped_uv_triangles_vs_island_majority": 0,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6784,
+        "texel_density_px_per_m_at_raster": 1470.2,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 683,
+        "open_edge_loops": 150,
+        "non_manifold_edges": 47,
+        "faces_with_inconsistent_winding": 126,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 45,
+          "hole": 105
+        },
+        "hole_area_uu2_total": 1197.569,
+        "shells": 217,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 2,
+        "signed_volume_m3_prescale": 0.06468447,
+        "corners_pointing_into_surface": 169,
+        "ray_escape_faces": {
+          "outward": 3218,
+          "inward": 83,
+          "sheet": 78,
+          "enclosed": 320
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9083,
+          "inward": 0.0125,
+          "sheet": 0.0165,
+          "enclosed": 0.0627
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-MAPKIT-BASKERVILLE-MANOR-001/20261021-smartmesh/reports/assets/SM_Env_BaskervilleTopiaryCone.build.json",
+      "findings": [
+        "open edges 683 in 150 loop(s): 45 zero-width crack(s), 105 hole(s) totalling 1197.6 uu2 (largest 377.2 uu2, rim 82.8 uu, mean width 9.11 uu, at z 0 uu)",
+        "non-manifold edges 47",
+        "faces facing inward by ray escape 83 (1.2 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 126 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "closed shells with negative volume (inside-out) 2"
       ]
     },
     "MK-BSK-TRAVEL-TRUNK": {
