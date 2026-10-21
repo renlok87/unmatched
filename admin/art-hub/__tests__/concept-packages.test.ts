@@ -135,3 +135,21 @@ describe('concept packages (3d-model-pipeline stage 1) on a fixture repo', () =>
     expect(isAllowedRelPath(`${PKG}/../../../.env`)).toBe(false);
   });
 });
+
+describe('art/ walk cap', () => {
+  it('warns when the shared art/ walk hits its cap and still finds packages under the default cap', () => {
+    const repo = makeFixtureRepo();
+    try {
+      for (let i = 0; i < 30; i++) repo.write(`art/pipeline-candidates/ASSET-FILLER-001/run/reports/f${i}.json`, '{}');
+      repo.write(`${PKG}/palette.json`, JSON.stringify({ main: [{ name: 'bronze', hex: '#A9773A' }] }));
+      repo.write(`art/pipeline-candidates/${HERO}/asset-card.yaml`, `ASSET_ID: ${HERO}\nCONTENT_KEY: hero\n`);
+      const capped = aggregate(repo.root, { artWalkMax: 10 });
+      expect(capped.warnings.some((w) => w.includes('обход art/ остановлен'))).toBe(true);
+      const normal = aggregate(repo.root);
+      expect(normal.warnings.some((w) => w.includes('обход art/ остановлен'))).toBe(false);
+      expect(normal.lookdev.heroes.find((h) => h.key === 'hero')?.conceptPackage?.dir).toBe(PKG);
+    } finally {
+      repo.cleanup();
+    }
+  });
+});

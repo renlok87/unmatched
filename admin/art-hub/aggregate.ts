@@ -235,6 +235,8 @@ export interface AggregateOptions {
   shaMaxBytes?: number;
   /** Extra roots for the sound scan (tests). */
   soundScanRoots?: string[];
+  /** Cap of the shared `art/` walk (tests); default ART_WALK_MAX. */
+  artWalkMax?: number;
 }
 
 interface Ctx {
@@ -617,9 +619,16 @@ function parseRun(ctx: Ctx, assetDir: string, runId: string, files: WalkEntry[],
 
 // ---------------------------------------------------------------- main
 
+/**
+ * Cap of the shared `art/` walk. 20 000 was reached on 2026-10-21 (pipeline-candidates alone ~30 000 files after the
+ * smart-mesh map kits and new figures): concept packages art/imagegen/concept-* were dropped silently.
+ */
+const ART_WALK_MAX = 150_000;
+
 export class ArtHubAggregator {
   private cache = new FileCache();
   private last?: { fingerprint: string; data: ArtHubData };
+  private artWalkTruncated = false;
 
   constructor(
     private readonly repoRoot: string,
@@ -649,6 +658,9 @@ export class ArtHubAggregator {
       return { ...this.last.data, checkedAt: new Date().toISOString() } as ArtHubData;
     }
     const data = build(this.repoRoot, this.cache, watched, audioFiles, mapKitFiles, sounds, this.opts, fingerprint, started);
+    if (this.artWalkTruncated) {
+      data.warnings.push(`обход art/ остановлен на лимите файлов (${this.opts.artWalkMax ?? ART_WALK_MAX}): новые папки могут не попасть в хаб — поднять ART_WALK_MAX в aggregate.ts`);
+    }
     this.last = { fingerprint, data };
     return data;
   }
@@ -656,7 +668,10 @@ export class ArtHubAggregator {
   private walkWatched(): WalkEntry[] {
     const root = this.repoRoot;
     const out: WalkEntry[] = [];
-    out.push(...walkFiles(root, 'art'));
+    const artMax = this.opts.artWalkMax ?? ART_WALK_MAX;
+    const art = walkFiles(root, 'art', artMax);
+    this.artWalkTruncated = art.length >= artMax;
+    out.push(...art);
     out.push(...walkFiles(root, SOURCES.artPipelineDocs).filter((f) => f.rel !== SNAPSHOT_REL));
     for (const d of listDirs(root, SOURCES.evidence)) {
       if (/^(ART|GD)-/.test(d)) out.push(...walkFiles(root, `${SOURCES.evidence}/${d}`));
