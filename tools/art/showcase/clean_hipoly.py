@@ -27,8 +27,9 @@ JOBS = {
     "Medusa": ("art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb", {2}),
     "BruceLee": ("art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2-tripo/source/bruce-lee-h2-tripo-14235c8d-tex8k-pbr.glb",
                  "auto-base"),
-    "SherlockHolmes": ("art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261015-h2-tripo/source/"
-                       "sherlock-holmes-h2-tripo-734b9954-tex8k-pbr.glb", "auto-base"),
+    # 2026-10-21: the regenerated H2 a5faa31f (pipe restored) replaced 734b9954
+    "SherlockHolmes": ("art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/source/"
+                       "sherlock-holmes-h2-tripo-a5faa31f-tex8k-pbr.glb", "auto-base"),
     "DrWatson": ("art/pipeline-candidates/ASSET-DR-WATSON-001/20261020-h2-tripo/source/dr-watson-h2-tripo-5458aaff-tex8k-pbr.glb",
                  "auto-base"),
 }
