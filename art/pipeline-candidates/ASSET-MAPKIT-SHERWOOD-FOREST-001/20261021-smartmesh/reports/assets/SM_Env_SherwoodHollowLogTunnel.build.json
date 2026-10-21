@@ -16,8 +16,8 @@
   },
   "source": {
     "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/source/MK-SHW-HOLLOW-LOG-TUNNEL.glb",
-    "sha256": "2721035574f20aea245ba9248a8401cc6ed85fb75de82424109ebbe4e2c8e5df",
-    "bytes": 17971628,
+    "sha256": "78179b3ef07058e6dc26ec3a10bcbeb50a2a36918711e08f465290a09a4084e7",
+    "bytes": 17972008,
     "sha256_matches_tripo_run": true,
     "tripo_task": "c71ad1a8-e739-4831-840e-e9a68767d5ea",
     "gltf_generator": "Tripo",
@@ -29,8 +29,8 @@
   "no_render_policy": "no Eevee/Cycles/Workbench render, no bake, no viewport: GPU measurements in progress",
   "import": {
     "mesh_objects": 1,
-    "faces": 5150,
-    "triangles": 5150,
+    "faces": 5145,
+    "triangles": 5145,
     "materials": [
       "tripo_node_38bd3f12-d743-4035-b2a4-0bce9b2637ed_material"
     ],
@@ -79,25 +79,25 @@
   "geometry": {
     "policy": "measured only; no clean-up, repair or winding change (task rule: fix orientation/scale/pivot only)",
     "stats_welded_1e-6m_prescale": {
-      "vertices_as_stored": 3529,
-      "vertices_welded_1e-6m": 2609,
-      "faces": 5150,
-      "triangles": 5150,
-      "welded_boundary_edges": 50,
+      "vertices_as_stored": 3522,
+      "vertices_welded_1e-6m": 2602,
+      "faces": 5145,
+      "triangles": 5145,
+      "welded_boundary_edges": 43,
       "welded_non_manifold_edges": 0,
       "wire_edges": 0,
       "loose_vertices": 0,
       "degenerate_faces_area_lt_1e-12": 0,
       "faces_with_inconsistent_winding": 8,
-      "connected_shells": 10,
-      "signed_volume_m3": 0.065930321,
-      "raw_vertex_count_before_weld": 3529
+      "connected_shells": 9,
+      "signed_volume_m3": 0.065930256,
+      "raw_vertex_count_before_weld": 3522
     },
     "corner_normals": {
       "has_custom_normals": true,
       "corners_pointing_into_surface": 10,
       "corner_vs_face_normal_angle_deg_p50_p99_max": [
-        24.7,
+        24.73,
         73.51,
         105.43
       ]
@@ -146,10 +146,10 @@
     ],
     "shells_and_holes": {
       "weld_m_prescale": 1e-06,
-      "shells": 10,
+      "shells": 9,
       "shells_isolated_gap_gt_uu": 0.5,
-      "shells_isolated": 4,
-      "shells_isolated_off_ground": 4,
+      "shells_isolated": 3,
+      "shells_isolated_off_ground": 3,
       "shells_inverted_closed": 0,
       "shell_list_top20_by_faces": [
         {
@@ -349,35 +349,13 @@
           "isolated": false,
           "off_ground_uu": 0.1,
           "inverted_if_closed": false
-        },
-        {
-          "shell": 9,
-          "faces": 5,
-          "triangles": 5,
-          "area_uu2": 0.14,
-          "signed_volume_uu3": 0.02,
-          "open_edges": 7,
-          "bounds_min_uu_prescale_frame": [
-            18.31,
-            25.98,
-            34.7
-          ],
-          "bounds_max_uu_prescale_frame": [
-            18.66,
-            26.52,
-            35.12
-          ],
-          "gap_to_nearest_other_shell_uu": 5.943,
-          "isolated": true,
-          "off_ground_uu": 34.48,
-          "inverted_if_closed": false
         }
       ],
-      "open_edge_loops": 9,
-      "open_edges": 50,
+      "open_edge_loops": 8,
+      "open_edges": 43,
       "open_edge_loops_by_kind": {
         "crack (zero-width T-junction/sliver)": 0,
-        "hole": 9
+        "hole": 8
       },
       "crack_rule": "mean width 2A/P <= 0.10 uu (A = Newell area of the directed loop, P = rim length)",
       "open_edge_loops_top10_by_length": [
@@ -463,20 +441,6 @@
             -22.25,
             -11.68,
             6.35
-          ]
-        },
-        {
-          "edges": 7,
-          "length_uu": 1.6,
-          "shell": 9,
-          "area_uu2": 0.137,
-          "mean_width_2A_over_P_uu": 0.172,
-          "compactness_4piA_over_P2": 0.6768,
-          "kind": "hole",
-          "centre_uu_prescale_frame": [
-            18.5,
-            26.27,
-            34.94
           ]
         },
         {
@@ -620,23 +584,9 @@
             -19.69,
             6.27
           ]
-        },
-        {
-          "edges": 7,
-          "length_uu": 1.6,
-          "shell": 9,
-          "area_uu2": 0.137,
-          "mean_width_2A_over_P_uu": 0.172,
-          "compactness_4piA_over_P2": 0.6768,
-          "kind": "hole",
-          "centre_uu_prescale_frame": [
-            18.5,
-            26.27,
-            34.94
-          ]
         }
       ],
-      "hole_area_uu2_total": 2.978,
+      "hole_area_uu2_total": 2.841,
       "non_manifold_edges": 0
     },
     "ray_escape_facing": {
@@ -644,11 +594,11 @@
       "faces": {
         "outward": 4541,
         "inward": 8,
-        "sheet": 5,
+        "sheet": 0,
         "enclosed": 596
       },
       "area_fraction": {
-        "outward": 0.7775,
+        "outward": 0.7776,
         "inward": 0.0,
         "sheet": 0.0,
         "enclosed": 0.2224
@@ -816,7 +766,7 @@
       "raster_px": 512,
       "uncovered_fraction": 0.417,
       "uncovered_mean_bc_srgb": [
-        0.434,
+        0.435,
         0.37,
         0.157
       ],
@@ -828,7 +778,7 @@
       "UVMap"
     ],
     "raster_size_px": 1024,
-    "islands": 100,
+    "islands": 99,
     "triangles_out_of_0_1": 0,
     "uv_bounds": [
       0.0,
@@ -837,7 +787,7 @@
       1.0
     ],
     "uv_area_used_fraction": 0.5824,
-    "raster_coverage_fraction": 0.5827,
+    "raster_coverage_fraction": 0.5826,
     "overlap_pixels_between_islands": 0,
     "overlap_fraction_of_covered": 0.0,
     "overlap_pixels_inside_islands_strict": 0,
@@ -864,17 +814,17 @@
         "raster_size_px": 1024,
         "overlap_pixels_between_islands": 0,
         "overlap_pixels_inside_islands_strict": 0,
-        "raster_coverage_fraction": 0.5827,
+        "raster_coverage_fraction": 0.5826,
         "min_island_centre_distance_px": 5.0,
         "island_pairs_centre_distance_lt_4px": 0,
-        "island_pairs_centre_distance_lt_8px": 121,
+        "island_pairs_centre_distance_lt_8px": 119,
         "mip_where_min_distance_drops_below_1_texel": 3
       },
       {
         "raster_size_px": 2048,
         "overlap_pixels_between_islands": 0,
         "overlap_pixels_inside_islands_strict": 0,
-        "raster_coverage_fraction": 0.5827,
+        "raster_coverage_fraction": 0.5826,
         "min_island_centre_distance_px": ">8",
         "island_pairs_centre_distance_lt_4px": 0,
         "island_pairs_centre_distance_lt_8px": 0,
@@ -888,8 +838,8 @@
   ],
   "export": {
     "fbx": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowLogTunnel.fbx",
-    "sha256": "77253b0967585411374d1e5e98fa54cc93835b07f30adc136829933487a180fa",
-    "bytes": 188476,
+    "sha256": "e7d6bc3df588710e2392c44d9ee440abeb7d4694fc7499b7f08407396ea0068c",
+    "bytes": 188204,
     "preset": "UM_FBX_v1.json",
     "settings": {
       "axis_forward": "-Y",
@@ -1080,8 +1030,8 @@
     "object_names": [
       "SM_Env_SherwoodHollowLogTunnel"
     ],
-    "triangles": 5150,
-    "expected_triangles_blend_faces": 5150,
+    "triangles": 5145,
+    "expected_triangles_blend_faces": 5145,
     "material_slots": 1,
     "uv_layers": 1,
     "armatures": 0,

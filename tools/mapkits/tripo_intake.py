@@ -7,6 +7,9 @@
         # GLB -> <run>/source/<ID>.glb, sha256 into reports/tripo-run.json, target into scripts/env-kit-params.json
     python tools/mapkits/tripo_intake.py level <map> <key>... [--force]
         # stand a tilted prop level (tools/mapkits/level_glb.py: root node rotation), re-hash it in tripo-run.json
+    python tools/mapkits/tripo_intake.py clean <map> <key>... [--normals] [--vs-main] [--drop 9,12] [--orient 8] [--renormal 8] [--double 8] [--drop-below 0.04] [--dry-run] [--restore]
+        # drop small detached shells / turn inverted faces outward (tools/mapkits/clean_glb.py), raw GLB kept as
+        # source/<ID>.pre-clean.glb, re-hash in tripo-run.json, what was removed into status.json tripo.cleaned
 
 Run folder: art/pipeline-candidates/ASSET-MAPKIT-<MAP>-001/<date>-smartmesh (one per map and day), the layout
 tools/art/env_kit/run_env_kit.py reads (source/<ID>.glb, reports/tripo-run.json, scripts/env-kit-params.json). Card of
@@ -216,6 +219,60 @@ def unlevel(m: str, key: str, date: str) -> dict:
     return {"asset": aid, "reverted": True, "was": lv}
 
 
+def clean(m: str, key: str, date: str, normals: bool, dry: bool, restore: bool, **rule) -> dict:
+    """Credit-free geometry clean-up of the run source (clean_glb.py); the raw GLB stays as source/<ID>.pre-clean.glb."""
+    import clean_glb  # noqa: E402
+    aid = asset_id(m, key)
+    run = run_dir(m, date)
+    src = run / "source" / f"{aid}.glb"
+    raw = src.with_name(f"{aid}.pre-clean.glb")
+    if restore:
+        if not raw.is_file():
+            return {"asset": aid, "restored": False, "note": f"no {raw.name}"}
+        shutil.copy2(raw, src)
+    elif dry:
+        return {"asset": aid, **clean_glb.clean(src, apply=False, normals=normals, **rule)}
+    else:
+        if not raw.is_file():
+            shutil.copy2(src, raw)
+        res = clean_glb.clean(src, apply=True, normals=normals, **res_rule(rule))
+        if not res.get("applied"):
+            return {"asset": aid, **res}
+    tr_path = run / "reports" / "tripo-run.json"
+    tr = _json(tr_path, {})
+    st = mapkit.load_status(m)
+    tri = st["props"].setdefault(key, {}).setdefault("tripo", {})
+    if restore:
+        note = None
+    else:
+        note = {k: res[k] for k in ("rule", "dropped_triangles", "dropped_area_frac", "faces_flipped_inward_to_outward",
+                                     "faces_corner_normals_negated_to_match_winding", "triangles_before", "triangles_after",
+                                     "doubled_shells", "doubled_triangles", "drop_below_rel_height", "dropped_triangles_below",
+                                     "cut_vertices_lifted", "faces_flipped_to_consistent_winding", "faces_renormalled")
+                if k in res}
+        note["dropped_shells"] = [{k: s[k] for k in ("shell", "triangles", "area_frac", "gap_rel", "centre")}
+                                  for s in res["dropped_shells"]]
+        note["raw"] = f"source/{raw.name}"
+        note["rawSha256"] = sha256(raw)
+    if aid in tr.get("assets", {}):
+        tr["assets"][aid].update({"sha256": sha256(src), "bytes": src.stat().st_size})
+        if note:
+            tr["assets"][aid]["cleaned"] = note
+        else:
+            tr["assets"][aid].pop("cleaned", None)
+        _write(tr_path, tr)
+    if note:
+        tri["cleaned"] = note
+    else:
+        tri.pop("cleaned", None)
+    mapkit.save_status(m, st)
+    return {"asset": aid, "restored": True} if restore else {"asset": aid, **note, "applied": True}
+
+
+def res_rule(rule: dict) -> dict:
+    return {k: v for k, v in rule.items() if v is not None}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -234,9 +291,31 @@ def main() -> None:
     a = sub.add_parser("level")
     a.add_argument("map"); a.add_argument("keys", nargs="+")
     a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d")); a.add_argument("--force", action="store_true")
+    a = sub.add_parser("clean")
+    a.add_argument("map"); a.add_argument("keys", nargs="+")
+    a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d"))
+    a.add_argument("--normals", action="store_true"); a.add_argument("--dry-run", action="store_true")
+    a.add_argument("--restore", action="store_true")
+    a.add_argument("--max-area-frac", type=float); a.add_argument("--min-gap", type=float)
+    a.add_argument("--tiny-tris", type=int); a.add_argument("--vs-main", action="store_true")
+    a.add_argument("--double"); a.add_argument("--orient"); a.add_argument("--renormal")
+    a.add_argument("--drop-below", type=float, default=0.0)
+    a.add_argument("--drop"); a.add_argument("--keep")
     a = sub.add_parser("unlevel")
     a.add_argument("map"); a.add_argument("keys", nargs="+"); a.add_argument("--date", default=dt.date.today().strftime("%Y%m%d"))
     args = ap.parse_args()
+    if args.cmd == "clean":
+        import clean_glb  # noqa: E402
+        for k in args.keys:
+            rule = res_rule({"max_area_frac": args.max_area_frac, "min_gap": args.min_gap, "tiny_tris": args.tiny_tris})
+            rule.update(drop=clean_glb._ids(args.drop), keep=clean_glb._ids(args.keep), vs_main=args.vs_main,
+                        double=clean_glb._ids(args.double), drop_below=args.drop_below,
+                        orient=clean_glb._ids(args.orient), renormal=clean_glb._ids(args.renormal))
+            r = clean(args.map, k, args.date, args.normals, args.dry_run, args.restore, **rule)
+            if not args.dry_run:
+                r.pop("shells", None)
+            print(json.dumps(r, ensure_ascii=False))
+        return
     if args.cmd == "unlevel":
         for k in args.keys:
             print(json.dumps(unlevel(args.map, k, args.date), ensure_ascii=False))

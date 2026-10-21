@@ -1,0 +1,180 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r3",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tax-cart-r2/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTaxCart.fbx",
+      "sha256": "438e2affe827544d05609c5e51646dedcc5ab8ebfffa8b5322612ec1a06010d8"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_BC.png",
+      "sha256": "b5ba3dbb736a04e9fad4c294654417429f19b46a38a99683389f3f393bc0b052"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_N.png",
+      "sha256": "f21219234e629c16171bef535066da34d06733c7d3c42de3edc9b289581af821"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_ORM.png",
+      "sha256": "2c6f34ec2c66a2a38d8e4069f1d1600b446ffba4c2ebead67294366b7e61edce"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tax-cart-r3/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodTaxCart.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "4456 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "UV0 islands 1377, used 0.6831, overlap 0.00834",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "T_Env_SherwoodTaxCart_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "SM_Env_SherwoodTaxCart, M_Env_SherwoodTaxCart",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это заказанный предмет, он совпадает с sheet.png. Есть двухколёсная деревянная телега: 12-спицевые колёса с железными ободами, две оглобли с железными наконечниками и кольцами, борта с коваными накладками. Спереди слева стоит окованный сундук с замком и цепями. Сзади шест с копейным навершием и перекладиной, на нём красное знамя с короной и оленем на щите, нижний край рваный. Также есть мешки, ящик у основания шеста, бухты верёвки на переднем брусе и цепь на заднем борту. На turn-000 (тот же ракурс 3/4, что и в листе) относительные высоты совпадают с листом в пределах ~5 % высоты: перекладина, концы знамени, верх сундука, низ колёс. Отношение ширины к длине самой телеги ≈0,58 (по описанию 1,6/2,8 = 0,57). Лишних и пропавших частей нет. На turn-090/270 и wire-* фантомных оболочек нет. Предмет узнаётся со всех 8 ракурсов, со стороны тоже. Отклонение от габаритов описания (высокий шест по листу и мелкий масштаб к героям) вынесено в known_issues как параметр раскладки: виды оно не нарушает.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Форма чистая и читаемая. На полном росте нет дыр, просветов, чёрных пятен и вывернутых частей. Тонкие элементы целы: спицы, шест, перекладина, цепи, кольца оглобель, верёвки. Сетка на wire-34/front/back следует форме: колёса и ступицы разбиты плотнее, сундук и борта крупными треугольниками с деталью из нормали. Остались мелочи крупного плана. Из заднего борта под правым крюком цепи торчит треугольная щепка-лоскут (turn-135, turn-180, wire-back). Хомут перекладины на шесте немного комковатый (close-head). По отчёту 30 изолированных оболочек: мешки и колпаки ступиц стоят с зазором 0,6–0,76 uu. Есть и открытые края, в том числе под дном кузова. В кадрах это не видно, на игровой дистанции не читается.",
+      "frames": [
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-34.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано. Дерево с волокном, гвоздями и сколами. Железо тёмное, с заклёпками и гравировкой на сундуке. Мешки из мешковины с бечёвкой, верёвка витая. Знамя — ровная красная ткань с чистым золотым гербом. Запечённого света и теней в цвете нет, растяжек и швов на крупных площадях нет. Детализация не беднее эталона кита Sarpedon (T_Env_Barrel_BC). Дефекты только крупного плана. На рваном нижнем крае знамени светлые крапины, они видны с обеих сторон (close-weapon, turn-000, turn-135). Герб чуть мягкий на close-weapon. На нижнем правом углу сундука гладкое светлое пятно-блик (close-base). BC не допадан: минимальный зазор 1 px, 127 пар островов ближе 4 px. На дальних мипах возможна кайма по границам островов.",
+      "frames": [
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 → 8,3 ≥ 8,0. Ни одно измерение не ниже 1,0, гейты PASS/n/a. Мелочи крупного плана вынесены в known_issues.",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Масштаб к героям мельче описания. Цель «высота 54 uu» включает высокий шест из листа. Поэтому длина телеги ≈53 uu, верх бортов ≈22–23 uu, колесо Ø≈18 uu (≈⅓ фигуры 55 uu). По габаритам описания (2,8 м при 1,8 м = 54 uu) длина была бы ≈84 uu. Решить в раскладке масштабом или целью по длине в env_kit params. Форму это не меняет."
+    },
+    {
+      "item": "S",
+      "frame": "turn-315.jpg",
+      "note": "Фронт ассета — это ракурс 3/4 листа. Длинная ось телеги повёрнута к нему примерно на 45°: строго спереди телега видна на turn-315, строго сзади на turn-135. Габариты XY завышены (51,8×44 uu). Yaw учесть при раскладке."
+    },
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Из заднего борта под правым крюком цепи торчит треугольная щепка-лоскут доски (также turn-135, wire-back). Читается как сломанная планка, на игровой дистанции не видна."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "Хомут перекладины знамени на шесте немного комковатый. По отчёту 30 изолированных оболочек: мешки и колпаки ступиц с зазором 0,6–0,76 uu. В кадрах не видно."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Светлые крапины на рваном нижнем крае знамени, видны с обеих сторон (turn-000, turn-135, turn-180, turn-315). Герб слегка мягкий."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Гладкое светлое пятно-блик на нижнем правом углу сундука."
+    },
+    {
+      "item": "T",
+      "frame": "uv-layout.png",
+      "note": "BC без паддинга швов: min gutter 1 px, 127 пар островов ближе 4 px. Проверить в UE на игровой дистанции, нет ли каймы на границах островов (особенно у красного знамени рядом с деревом)."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-TAX-CART-r3"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tax-cart (Обоз шерифа) принят по делегированию с оценкой 8,3. Мелочи крупного плана в known_issues: щепка на заднем борту, крапины на знамени. Масштаб к героям и yaw 45° задать в раскладке."
+}

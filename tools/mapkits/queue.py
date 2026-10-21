@@ -5,7 +5,10 @@
 Every prop that is not accepted gets one line. The route comes from the stage and the card's rework_fix_list tools:
 regen (rejected, a never generated prop, or a fix on the Tripo source shape) = 100 generation + 20 texture 4K + 5 PBR;
 retexture (only texture fixes on the Tripo source) = 20 + 5; blender (only env_kit / Blender fixes) = 0 credits.
-Props whose acceptance is still running (stage built) are listed without a route.
+Props whose acceptance is still running (stage built) are listed without a route. A `queue` block in status.json
+(`mapkit.py set <map> <key> queue.route=retexture "queue.why=..."`) overrides the card route: the cards tag repaints
+of BC/ORM as "env_kit params", and the credit-free clean-up (`tripo_intake.py clean`) can only drop shells and turn
+faces, so a prop it could not fix gets the Tripo route it really needs.
 """
 from __future__ import annotations
 
@@ -29,6 +32,9 @@ def load(p: Path):
 def route(entry: dict) -> tuple[str, str]:
     stage = entry.get("stage")
     acc = entry.get("acceptance") or {}
+    q = entry.get("queue") or {}
+    if q.get("route") in COST and stage not in ("accepted", "built"):
+        return q["route"], f"доработка {acc.get('finalScore', acc.get('score'))}, {q.get('why', 'маршрут задан вручную')}"
     if stage in (None, "views", "tripo"):
         if stage == "views":
             return "regen", "не сгенерирован, вид готов в истории Tripo Image"
@@ -79,11 +85,12 @@ def main() -> None:
         "",
         "Маршруты и цена: **regen** — заново: картинка Tripo Image (бесплатно) → Smart Mesh 100 → текстура 4K 20 → PBR 5 = 125;",
         "**retexture** — только текстура на том же меше: 4K 20 + PBR 5 = 25; **blender** — правка без кредитов",
-        "(env_kit геометрию не чинит — нужен отдельный шаг очистки GLB/Blender); **pending** — ждёт второго приёмщика.",
+        "(`tripo_intake.py clean`: висящие оболочки и вывернутые грани, затем env_kit); **pending** — ждёт второго приёмщика.",
         "regen с «правкой формы исходника» — верхняя оценка: часть таких правок может закрыть Blender без кредитов.",
         "Порядок 27.10: P0 → P1 → P2 по таблице. У строк «вид готов» картинка уже в истории Tripo Image (F21: искать колесом",
-        "мыши), остальным её делают заново бесплатно. Строки blender ждут шага очистки GLB (висящие осколки, нормали) — его в",
-        "`tools/mapkits` пока нет, env_kit по политике геометрию не правит.",
+        "мыши), остальным её делают заново бесплатно. Шаг очистки GLB (`tools/mapkits/clean_glb.py`) прогнан 21.10 по 12",
+        "строкам blender: что он не закрыл (перекраска BC/ORM, правки формы внутри оболочки), переведено в retexture/regen",
+        "с пометкой в столбце «Почему» (NOTES F25).",
         "Листва (F20) идёт в конец: Smart Mesh 5 000 её не держит, для неё нужен другой маршрут (HD Model, бюджет 12 000).",
         "",
         f"Итого без листвы: **{total}** кредитов; листва: {total_f}.",

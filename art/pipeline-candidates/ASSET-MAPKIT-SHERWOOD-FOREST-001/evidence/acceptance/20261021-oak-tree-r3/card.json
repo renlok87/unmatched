@@ -1,0 +1,159 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r3",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-oak-tree-r2/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodOakTree.fbx",
+      "sha256": "72e1270e5706306e375f8ab1e4895c4011ed572508077b810870a3c81d7e019e"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_BC.png",
+      "sha256": "c6cfeba5c14a55c6295ee51a10db62c3c2ef231ff1c1742aff4b5fd5d7c9fc31"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_N.png",
+      "sha256": "387d8bff69679440379483355888475df3be5b34cc6d080abdd73741847d1fa6"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodOakTree_ORM.png",
+      "sha256": "a740d60e6be2a70661df9f1d18cadf8767d32aa7b1173edfc3874a1246febfb7"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-oak-tree-r3/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodOakTree.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "4754 tris (бюджет env_kit 12000, проп 8000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "UV0 islands 1468, used 0.4638, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "T_Env_SherwoodOakTree_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodOakTree.build.json",
+      "note": "SM_Env_SherwoodOakTree, M_Env_SherwoodOakTree",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот: дуб с толстым скрученным стволом, корневым раструбом и мхом у комля, круглая крона; отношение ширины кроны к высоте ~1,0 как на sheet.png, открытая часть ствола ~21-23 % высоты на обоих, лишних/пропавших главных частей нет, узнаётся со всех 8 ракурсов. Одно второстепенное отличие контура: вместо плотной сплошной кроны листа крона собрана из ~50 отдельных гранёных подушек с крупными сквозными просветами (turn-000 (520-620,300-370), (240-380,600-700); turn-045 центр; turn-180 (440-560,330-400)) — читается как «облачная» бонсай-крона, а не «round dense crown»; листва светлее и лаймовее, чем тёмно-зелёная на листе (то же семейство цвета).",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, чёрных пятен, вывернутых частей и мусорной геометрии; ствол и корни плотной сеткой по форме (wire-34, close-base), тонкие ветви и сучки целы. Дефекты крупного плана/сетки: подушки кроны низкополигональные с плоскими срезами и террасными ступенями на верхах (wire-34 (470-600,250-330), (700-850,500-560); wire-back (430-660,210-330)), внутренний восьмиугольный уступ на передней подушке close-head (520-1100,560-1000), тонкая тёмная щель на левой подушке turn-270 (~225,690); по отчёту 33 оторванные оболочки-подушки с зазором 1,2-2,2 uu, 72 грани с несогласованной обмоткой и 221 угловая нормаль внутрь — на кадрах не дают чёрных пятен, на игровой дистанции не видны.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Кора читается как кора: рисованные волокна, мох по низу ствола, раструб корней (close-base) — стиль кита; листва читается как листва, запечённого света и бликов в цвете не видно, детализация не беднее эталона кита Sarpedon (T_Env_HedgeBed_BC того же уровня). Дефекты крупного плана: вертикальные растяжки-полосы текстуры на боковых стенках подушек кроны (close-head (500-610,380-600), (620-700,420-560), (850-960,320-450)) и шов по уступу подушки; на полном росте они дают лишь слабое «мыло» на боках отдельных подушек (turn-000 (830-900,340-470), turn-090 (880-1020,600-700), turn-315 (870-950,360-460)), не ломая чтение. UV без перекрытий, 1468 островов.",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-090.jpg",
+        "turn-315.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0 (S 1,5, F 1,5, T 1,5), все гейты PASS/n/a; S ≥ 1,5, поэтому не перегенерация, а доработка F и T: гранёные/террасные подушки кроны и растяжки текстуры листвы на их боковых стенках.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "fix": "Смягчить фасетку подушек кроны: пересчитать нормали кроны (weighted / auto-smooth по углу), исправить 221 угловую нормаль, смотрящую внутрь, и 72 грани с несогласованной обмоткой в зоне ветвей; если террасные ступени и плоские срезы на верхах подушек остаются заметными — перегенерировать Smart Mesh с большим лимитом граней (бюджет пропа 8000 позволяет).",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Убрать вертикальные растяжки текстуры листвы на боковых стенках подушек кроны (полосы на close-head, мыло на боках подушек в turn-000/090/315): перетекстурировать/перепечь листву в Tripo с проекцией без растяжек на вертикальных гранях.",
+      "tool": "исходник Tripo: форма/текстура"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Крона реже, чем на листе: отдельные гранёные подушки со сквозными просветами вместо плотной круглой кроны; листва светлее (лайм) тёмно-зелёной листа. Контур кроны круглый, на игровой дистанции дуб узнаётся."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-OAK-TREE-r3"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп oak-tree не принят (7,5): доработать — смягчить гранёные подушки кроны (нормали/плотность сетки) и убрать растяжки листвы на их боках; крона реже листа — в known_issues."
+}

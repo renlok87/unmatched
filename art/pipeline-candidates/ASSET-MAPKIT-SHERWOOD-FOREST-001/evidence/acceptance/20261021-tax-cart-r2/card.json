@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r2",
+  "date": "2026-10-21",
+  "previous_card": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tax-cart-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTaxCart.fbx",
+      "sha256": "87696b133dfd4a9b155acaf4a9d3d0158b123b68a48910f881d017f53f171a86"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_BC.png",
+      "sha256": "b5ba3dbb736a04e9fad4c294654417429f19b46a38a99683389f3f393bc0b052"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_N.png",
+      "sha256": "f21219234e629c16171bef535066da34d06733c7d3c42de3edc9b289581af821"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTaxCart_ORM.png",
+      "sha256": "2c6f34ec2c66a2a38d8e4069f1d1600b446ffba4c2ebead67294366b7e61edce"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tax-cart-r2/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodTaxCart.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "4456 tris (бюджет env_kit 12000, проп 7000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "UV0 islands 1305, used 0.6831, overlap 0.0079",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "T_Env_SherwoodTaxCart_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTaxCart.build.json",
+      "note": "SM_Env_SherwoodTaxCart, M_Env_SherwoodTaxCart",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: двухколёсная телега с двумя оглоблями (железные наконечники с кольцами), окованный сундук спереди слева, древко с наконечником и перекладиной сзади справа, красное знамя с короной и оленем справа от древка, мешки и ящик у основания древка, верёвочные бухты на переднем брусе. turn-000 почти совпадает с видом; пропорции главных частей (высота древка, размер сундука, колёса) в пределах нескольких процентов. Лишних и пропавших частей нет, фантомных выступов на turn-090/270 и wire-* нет; телега узнаётся со всех 8 ракурсов.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Корпус, колёса со спицами, оглобли, сундук и мешки цельные, тонкие элементы (древко, спицы, кольца, цепи) на месте, сетка на wire-* следует форме. Но оборот знамени шейдится неверно: на turn-090, turn-135 и turn-180 поверх герба видны два больших тёмных V-клина от верхних углов к центру, при этом лицевая сторона (turn-000, turn-315, wire-front) ровная. Те же клинья видны и на глине wire-back, так что это нормали или геометрия листа, а не текстура (в отчёте 66 corners_pointing_into_surface, у листа знамени shell 8 104 открытых ребра). Это дефект на полном росте в одной зоне. На close-weapon по рваному нижнему краю знамени ещё есть мелкие осколки-волоски, но только на крупном плане.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы на полном росте читаются как заказано: дерево с волокнами и сколами, тёмное железо с заклёпками и коваными петлями, мешковина, красная ткань с золотым гербом. Сильного запечённого света или растяжек нет, детализация на уровне кита. Дефекты видны только на крупном плане. Наконечник и концы перекладины на close-head мыльные. На close-weapon край герба мягкий, а по рваному низу знамени светлые крапины: в отчёте плотная упаковка UV (min gutter 1 px, 106 пар островов ближе 4 px), гаттеры BC не паддятся. Светлый блик в нижнем правом углу сундука на close-base читается как отражение металла.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 7.5,
+  "verdict": "rework_blender",
+  "verdict_reason": "score 7,5 < 8,0. F = 1,0: тёмные V-клинья шейдинга на обороте знамени видны на полном росте (turn-090/135/180, wire-back). T = 1,5: дефекты только крупного плана. S = 2,0 и все гейты PASS/n/a, поэтому доработка в Blender, а не перегенерация.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Оборот листа знамени (shell 8 в отчёте, z 26–47 uu prescale, 104 открытых ребра) шейдится тёмными V-клиньями. Для этой оболочки сбросить кастомные split-нормали и пересчитать нормали; либо продублировать лист с развёрнутыми нормалями, либо дать материалу двусторонний шейдинг, чтобы оборот был освещён как лицо. Проверить на turn-090/135/180 и wire-back.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "fix": "Убрать светлые крапины по рваному нижнему краю знамени: допаддить гаттеры BC/ORM, как сейчас паддится N (dilate 32 px на исходнике; сейчас BC uncovered 0,32, min gutter 1 px), и проверить на мипах. Если крапины — отдельные осколки сетки по краю, удалить их вместе с правкой F. Мыльный наконечник древка на close-head на игровой дистанции допустим, после правки только перепроверить.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "В отчёте 30 изолированных оболочек над опорой (зазор > 0,5 uu, по всей видимости содержимое кузова) и 86 открытых контуров; крупнейший — штатно открытый верх кузова. В кадрах просветов и висящих частей не видно, на игровой дистанции не читается; в этом раунде как дефект не засчитано."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-TAX-CART-r2"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tax-cart (Обоз шерифа) не принят, доработка в Blender: исправить шейдинг оборота знамени (тёмные клинья) и светлые крапины по его рваному краю; силуэт совпадает с видом."
+}
