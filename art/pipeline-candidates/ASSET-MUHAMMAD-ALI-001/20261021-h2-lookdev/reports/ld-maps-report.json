@@ -1,0 +1,767 @@
+{
+  "checks": {
+    "dielectric_bc_in_class_luminance_range": {
+      "expected": "<= 5 % of a class outside the preset luminance range (the v2 shader clamps the rest)",
+      "measured": {
+        "leather_smooth": {
+          "Y_p5_p95": [
+            0.0254,
+            0.04
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "leather_worn": {
+          "Y_p5_p95": [
+            0.1515,
+            0.4519
+          ],
+          "range": [
+            0.02,
+            0.45
+          ],
+          "share_outside": 0.0
+        },
+        "silk": {
+          "Y_p5_p95": [
+            0.5256,
+            0.8385
+          ],
+          "range": [
+            0.02,
+            0.85
+          ],
+          "share_outside": 0.0
+        },
+        "skin": {
+          "Y_p5_p95": [
+            0.0385,
+            0.0776
+          ],
+          "range": [
+            0.03,
+            0.6
+          ],
+          "share_outside": 0.0
+        },
+        "stone_base": {
+          "Y_p5_p95": [
+            0.0207,
+            0.0743
+          ],
+          "range": [
+            0.02,
+            0.12
+          ],
+          "share_outside": 0.0
+        },
+        "wool_coarse": {
+          "Y_p5_p95": [
+            0.0203,
+            0.1094
+          ],
+          "range": [
+            0.02,
+            0.8
+          ],
+          "share_outside": 0.0
+        }
+      },
+      "passed": true
+    },
+    "lut_dds_read_back": {
+      "measured": {
+        "dds_sha256": "c83cbbc41fa64cce31c9967b0b6b3a5638ffa587506d3efd54a7ff0777ca2696"
+      },
+      "passed": true
+    },
+    "lut_metal_f0_plausible": {
+      "expected": "metal classes used by the hero: Y(F0) >= 0.45, channels <= 1 (library rule; oxide films excepted)",
+      "measured": {},
+      "passed": true
+    },
+    "matid_decodes_to_labels_4k": {
+      "expected": "floor(v / 16) == class index on every island texel",
+      "passed": true
+    },
+    "matid_values_valid": {
+      "expected": "index * 16 + 8",
+      "measured": [
+        8,
+        120,
+        136,
+        152,
+        184,
+        216,
+        232
+      ],
+      "passed": true
+    },
+    "orm_metallic_binary_per_class_4k": {
+      "expected": "ORM.B = 0 in dielectric classes, 255 in metal classes (4K; 2K = box average)",
+      "passed": true
+    },
+    "team_mask_only_on_cloth_classes": {
+      "measured": 0,
+      "passed": true
+    }
+  },
+  "classes": {
+    "leather_smooth": {
+      "Y_p5_p50_p95": [
+        0.0254,
+        0.0331,
+        0.04
+      ],
+      "bc_linear_median": [
+        0.1529,
+        0.0003,
+        0.0015
+      ],
+      "bc_linear_median_before_grade": [
+        0.2664,
+        0.0048,
+        0.0097
+      ],
+      "edge_mask_mean": 0.1014,
+      "share_of_islands": 0.1631,
+      "team_r_mean": 0.0,
+      "texels_4k": 1481297,
+      "ymedClassHero": 0.03308
+    },
+    "leather_worn": {
+      "Y_p5_p50_p95": [
+        0.1515,
+        0.4493,
+        0.4519
+      ],
+      "bc_linear_median": [
+        0.5149,
+        0.4397,
+        0.3515
+      ],
+      "bc_linear_median_before_grade": [
+        0.6795,
+        0.5841,
+        0.4851
+      ],
+      "edge_mask_mean": 0.1616,
+      "share_of_islands": 0.1076,
+      "team_r_mean": 0.0,
+      "texels_4k": 977289,
+      "ymedClassHero": 0.4493
+    },
+    "silk": {
+      "Y_p5_p50_p95": [
+        0.5256,
+        0.8312,
+        0.8385
+      ],
+      "bc_linear_median": [
+        0.8963,
+        0.8308,
+        0.6445
+      ],
+      "bc_linear_median_before_grade": [
+        0.7157,
+        0.6172,
+        0.5029
+      ],
+      "edge_mask_mean": 0.1199,
+      "share_of_islands": 0.1476,
+      "team_r_mean": 0.0,
+      "texels_4k": 1340512,
+      "ymedClassHero": 0.83125
+    },
+    "skin": {
+      "Y_p5_p50_p95": [
+        0.0385,
+        0.0572,
+        0.0776
+      ],
+      "bc_linear_median": [
+        0.1195,
+        0.0423,
+        0.0152
+      ],
+      "bc_linear_median_before_grade": [
+        0.159,
+        0.0612,
+        0.0222
+      ],
+      "edge_mask_mean": 0.0221,
+      "share_of_islands": 0.3909,
+      "team_r_mean": 0.0,
+      "texels_4k": 3549469,
+      "ymedClassHero": 0.05725
+    },
+    "stone_base": {
+      "Y_p5_p50_p95": [
+        0.0207,
+        0.0266,
+        0.0743
+      ],
+      "bc_linear_median": [
+        0.0307,
+        0.0262,
+        0.0252
+      ],
+      "bc_linear_median_before_grade": [
+        0.0395,
+        0.0343,
+        0.0343
+      ],
+      "edge_mask_mean": 0.01,
+      "share_of_islands": 0.1359,
+      "team_r_mean": 0.0,
+      "texels_4k": 1234075,
+      "ymedClassHero": 0.02661
+    },
+    "wool_coarse": {
+      "Y_p5_p50_p95": [
+        0.0203,
+        0.0257,
+        0.1094
+      ],
+      "bc_linear_median": [
+        0.0319,
+        0.0242,
+        0.0222
+      ],
+      "bc_linear_median_before_grade": [
+        0.0103,
+        0.007,
+        0.0056
+      ],
+      "edge_mask_mean": 0.1182,
+      "share_of_islands": 0.0547,
+      "team_r_mean": 0.0,
+      "texels_4k": 496740,
+      "ymedClassHero": 0.02566
+    }
+  },
+  "classify_steps": [
+    "part_default",
+    {
+      "rule": "stripes_black",
+      "texels": 186949
+    },
+    {
+      "rule": "hair_dark",
+      "texels": 257190
+    },
+    {
+      "rule": "hair_top",
+      "texels": 101196
+    },
+    {
+      "rule": "hair_back",
+      "texels": 115632
+    },
+    {
+      "rule": "glove_trim_white",
+      "texels": 96119
+    }
+  ],
+  "edge_mask": {
+    "config": {
+      "curvature_per_m": [
+        150,
+        600
+      ],
+      "smooth_px": 3
+    },
+    "curvature_p50_p90_p99_per_m": [
+      2.5,
+      233.7,
+      975.2
+    ],
+    "edge_share_ge_0.5": 0.0645,
+    "metres_per_texel_4k_median": 0.0001768
+  },
+  "edge_texture": "T_MuhammadAli_H2LD_{,2K_}Edge.png: R8 (L), маска рёбер для EdgeMaskTexture v2 (линейная, sRGB выкл.)",
+  "grade": {
+    "blur_px": 2,
+    "gains": {
+      "leather_smooth": {
+        "note": "итерация разведки ld1–ld3 (см. gains_note)",
+        "rgb": [
+          0.567,
+          0.0864,
+          0.1576
+        ],
+        "scout_iter1": [
+          0.8889,
+          0.2989,
+          0.3715
+        ]
+      },
+      "leather_worn": {
+        "note": "итерация разведки ld1–ld3 (см. gains_note)",
+        "rgb": [
+          1.6763,
+          1.6524,
+          1.5886
+        ],
+        "scout_iter1": [
+          1.6763,
+          1.6524,
+          1.5886
+        ]
+      },
+      "silk": {
+        "note": "итерация разведки ld1–ld3 (см. gains_note)",
+        "rgb": [
+          1.4932,
+          1.4665,
+          1.407
+        ],
+        "scout_iter1": [
+          1.4932,
+          1.4665,
+          1.407
+        ]
+      },
+      "skin": {
+        "note": "кожа Tripo светлее концепта: усиление ×0,75/0,70/0,70 (ld3, оттенок сохранён, dHue −0,4°)",
+        "rgb": [
+          0.75,
+          0.7,
+          0.7
+        ]
+      },
+      "stone_base": {
+        "note": "итерация разведки ld1–ld3 (см. gains_note)",
+        "rgb": [
+          0.6507,
+          0.6233,
+          0.6012
+        ],
+        "scout_iter1": [
+          0.6507,
+          0.6233,
+          0.6012
+        ]
+      },
+      "wool_coarse": {
+        "note": "итерация разведки ld1–ld3 (см. gains_note)",
+        "rgb": [
+          0.4527,
+          0.5547,
+          0.586
+        ],
+        "scout_iter1": [
+          0.4527,
+          0.5547,
+          0.586
+        ]
+      }
+    },
+    "gains_note": "итерации ld_measure разведки C:/tmp/muhammad-ali-stage3-scout (якорь экспозиции — skin, largest_class): ld1 без усилений — t_cap 1,0 (белые классы 0,61–0,68, перчатки 1,37); ld2 с полной подсказкой — 1,0 (белые упёрлись в клип альбедо: silk 0,75, leather_worn 0,61); ld3 — кожа приглушена ×0,70–0,75 (кожа Tripo v 0,43 светлее концепта #5A3B2A v 0,35), перчатки ×0,72 — t_cap 1,5 (перчатки 1,27); итог — подсказка ld3 для перчаток. Тёмные классы (волосы и лампасы wool_coarse, камень) — на полу альбедо grade.median_floor; металла нет",
+    "luminance_clamp": {
+      "leather_smooth": {
+        "in_toe_below_2lo": 0.9334,
+        "lowered_above_max": 0.0,
+        "raised_below_min": 0.0491
+      },
+      "leather_worn": {
+        "in_toe_below_2lo": 0.0193,
+        "lowered_above_max": 0.8805,
+        "raised_below_min": 0.0115
+      },
+      "silk": {
+        "in_toe_below_2lo": 0.0008,
+        "lowered_above_max": 0.6973,
+        "raised_below_min": 0.0001
+      },
+      "skin": {
+        "in_toe_below_2lo": 0.6119,
+        "lowered_above_max": 0.0002,
+        "raised_below_min": 0.0471
+      },
+      "stone_base": {
+        "in_toe_below_2lo": 0.7777,
+        "lowered_above_max": 0.0462,
+        "raised_below_min": 0.3715
+      },
+      "wool_coarse": {
+        "in_toe_below_2lo": 0.6715,
+        "lowered_above_max": 0.0002,
+        "raised_below_min": 0.4494
+      }
+    },
+    "median_floor": 1.2,
+    "median_floor_applied": {
+      "stone_base": {
+        "gain_used": [
+          0.6725,
+          0.6442,
+          0.6214
+        ],
+        "median_Y_with_profile_gain": 0.02322,
+        "raised_to": 0.024
+      },
+      "wool_coarse": {
+        "gain_used": [
+          2.4289,
+          2.9762,
+          3.1441
+        ],
+        "median_Y_with_profile_gain": 0.00447,
+        "raised_to": 0.024
+      }
+    }
+  },
+  "lut": {
+    "applied": [
+      {
+        "class": "leather_smooth",
+        "field": "bc",
+        "value": [
+          0.1529,
+          0.0003,
+          0.0015
+        ]
+      },
+      {
+        "class": "leather_smooth",
+        "field": "ymedClassHero",
+        "value": 0.03308
+      },
+      {
+        "class": "leather_worn",
+        "field": "bc",
+        "value": [
+          0.5149,
+          0.4397,
+          0.3515
+        ]
+      },
+      {
+        "class": "leather_worn",
+        "field": "ymedClassHero",
+        "value": 0.4493
+      },
+      {
+        "class": "silk",
+        "field": "bc",
+        "value": [
+          0.8963,
+          0.8308,
+          0.6445
+        ]
+      },
+      {
+        "class": "silk",
+        "field": "ymedClassHero",
+        "value": 0.83125
+      },
+      {
+        "class": "skin",
+        "field": "bc",
+        "value": [
+          0.1195,
+          0.0423,
+          0.0152
+        ]
+      },
+      {
+        "class": "skin",
+        "field": "ymedClassHero",
+        "value": 0.05725
+      },
+      {
+        "class": "stone_base",
+        "field": "bc",
+        "value": [
+          0.0307,
+          0.0262,
+          0.0252
+        ]
+      },
+      {
+        "class": "stone_base",
+        "field": "ymedClassHero",
+        "value": 0.02661
+      },
+      {
+        "class": "wool_coarse",
+        "field": "bc",
+        "value": [
+          0.0319,
+          0.0242,
+          0.0222
+        ]
+      },
+      {
+        "class": "wool_coarse",
+        "field": "roughTypical",
+        "value": 0.85
+      },
+      {
+        "class": "wool_coarse",
+        "field": "sheenIntensity",
+        "value": 0.0
+      },
+      {
+        "class": "wool_coarse",
+        "field": "specular",
+        "value": 0.1
+      },
+      {
+        "class": "wool_coarse",
+        "field": "ymedClassHero",
+        "value": 0.02566
+      }
+    ],
+    "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
+    "dds": "T_UM_MatLUT_MuhammadAli.dds",
+    "dds_sha256": "c83cbbc41fa64cce31c9967b0b6b3a5638ffa587506d3efd54a7ff0777ca2696",
+    "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index",
+    "overrides_json": "T_UM_MatLUT_MuhammadAli.overrides.json",
+    "overrides_sha256": "78678e6350e8124c391d9d3ece7bc74da5268d271165e227a35765f2cb0079c8",
+    "read_back_equals_half": true
+  },
+  "lut_start_values": {
+    "applied": {
+      "wool_coarse": {
+        "roughTypical": 0.85,
+        "sheenIntensity": 0.0,
+        "specular": 0.1
+      }
+    },
+    "mode": "f139",
+    "rule": "F139 / Beowulf UE r3: cloth classes start with sheenIntensity 0, specular 0.1, roughTypical 0.85 (the library sheen 0.35 washed the fur out in UE); a lut_overrides field wins; lut_start_values \"library\" keeps the presets"
+  },
+  "matid": {
+    "downsample": "2x2 majority",
+    "encoding": "R8 unorm, index * 16 + 8, decode floor(v * 255 / 16)",
+    "gutter_px_4k": 16,
+    "master_px": 4096,
+    "runtime_px": 2048
+  },
+  "outputs": {
+    "T_MuhammadAli_H2LD_2K_BC.png": {
+      "bytes": 3598205,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "226a6ac6952297f48893c8a71ad1bf9ca1bc684b61f9eea97450852f9c6c06be"
+    },
+    "T_MuhammadAli_H2LD_2K_Edge.png": {
+      "bytes": 591964,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "aec510ee22df0b7dc25fc360ebeacc8755f1ca6004675c84de3aa83e3219add3"
+    },
+    "T_MuhammadAli_H2LD_2K_MatID.png": {
+      "bytes": 82285,
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "26f5e83a9d83d48e185960184618f3d097ab6d059d28c6251d187c76a3d924df"
+    },
+    "T_MuhammadAli_H2LD_2K_N.png": {
+      "bytes": 3545272,
+      "copied_from": "T_MuhammadAli_H2_2K_N.png",
+      "sha256": "39ab75fbdb8b662aa804492dfaf227469ac98b09496d30e5dbb3121824973d7e"
+    },
+    "T_MuhammadAli_H2LD_2K_N_OpenGL.png": {
+      "bytes": 3545441,
+      "copied_from": "T_MuhammadAli_H2_2K_N_OpenGL.png",
+      "sha256": "daec03e5854c822ec195e7cd63edc1b8aabd128e228b1cb902c312d727b85bda"
+    },
+    "T_MuhammadAli_H2LD_2K_ORM.png": {
+      "bytes": 2552830,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "592c1b4c82dc4c3a19db936aa27a2be110e708a6d6fff21dbfaa17eae1c52ab7"
+    },
+    "T_MuhammadAli_H2LD_2K_TeamMask.png": {
+      "bytes": 28979,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "0a0dc71042911f928e2f6f58f721d40d5770e12ad7d07c5bfa10b0a3b0b56d64"
+    },
+    "T_MuhammadAli_H2LD_BC.png": {
+      "bytes": 11863758,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "959a45243009b78ce2ad106a3bd7d844bb6e193aa93c186f3d5f0c04b80a55be"
+    },
+    "T_MuhammadAli_H2LD_Edge.png": {
+      "bytes": 1576349,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "194ee06d81ecad547ce2784827871a72af2d5ea0d98aac575ad999db93e1501d"
+    },
+    "T_MuhammadAli_H2LD_MatID.png": {
+      "bytes": 190672,
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "2bbc6f59ddc39ac1ab41c05b4f34d28247688e67f6c52dd573dea5c588f3d4b5"
+    },
+    "T_MuhammadAli_H2LD_N.png": {
+      "bytes": 10324583,
+      "copied_from": "T_MuhammadAli_H2_N.png",
+      "sha256": "224f9ea403b4c27ef308f24c560ffa09aaa0de23f3dafd55d9d37d778cd331a0"
+    },
+    "T_MuhammadAli_H2LD_N_OpenGL.png": {
+      "bytes": 10325960,
+      "copied_from": "T_MuhammadAli_H2_N_OpenGL.png",
+      "sha256": "bfa8794e32a21c82fba4f90bdcc97f3b3dcaed509344fb6007f039b8013cc273"
+    },
+    "T_MuhammadAli_H2LD_ORM.png": {
+      "bytes": 8321326,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "435b9bcb63154005d30b38d5a087d48159bcbe0fff666bfa3b8969d8c7ca91d1"
+    },
+    "T_MuhammadAli_H2LD_TeamMask.png": {
+      "bytes": 85176,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "56ebe8e80ccc10a80bd8aa092b2046cf7df5789b8e9b68d12aa9e1835e0fd3b9"
+    },
+    "T_UM_MatLUT_MuhammadAli.dds": {
+      "bytes": 2196,
+      "sha256": "c83cbbc41fa64cce31c9967b0b6b3a5638ffa587506d3efd54a7ff0777ca2696"
+    },
+    "T_UM_MatLUT_MuhammadAli.overrides.json": {
+      "bytes": 1250,
+      "sha256": "78678e6350e8124c391d9d3ece7bc74da5268d271165e227a35765f2cb0079c8"
+    }
+  },
+  "passed": true,
+  "pins": {
+    "2K_N": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_2K_N.png",
+      "pinned": true,
+      "sha256": "39ab75fbdb8b662aa804492dfaf227469ac98b09496d30e5dbb3121824973d7e"
+    },
+    "2K_N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_2K_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "daec03e5854c822ec195e7cd63edc1b8aabd128e228b1cb902c312d727b85bda"
+    },
+    "BC": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_BC.png",
+      "pinned": true,
+      "sha256": "83bff820527befced098617338e82b02197bf53f996e57db749fa7bcae58f6e8"
+    },
+    "N": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_N.png",
+      "pinned": true,
+      "sha256": "224f9ea403b4c27ef308f24c560ffa09aaa0de23f3dafd55d9d37d778cd331a0"
+    },
+    "N_OpenGL": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_N_OpenGL.png",
+      "pinned": true,
+      "sha256": "bfa8794e32a21c82fba4f90bdcc97f3b3dcaed509344fb6007f039b8013cc273"
+    },
+    "ORM": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_ORM.png",
+      "pinned": true,
+      "sha256": "5453c972738b77379a9bdef12cd1c53e1daea3e22df7c12051defd0820d47e3e"
+    },
+    "TeamMask": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_TeamMask.png",
+      "pinned": true,
+      "sha256": "56ebe8e80ccc10a80bd8aa092b2046cf7df5789b8e9b68d12aa9e1835e0fd3b9"
+    },
+    "base_fbx": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/export/SM_MuhammadAli_H2_Base.fbx",
+      "pinned": true,
+      "sha256": "1bd87e3f385ea25daa2b16f772c5dba70e677e92e8f748802078c4e8e401c860"
+    },
+    "baseline_BC": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_BC.png",
+      "pinned": true,
+      "sha256": "83bff820527befced098617338e82b02197bf53f996e57db749fa7bcae58f6e8"
+    },
+    "baseline_ORM": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/textures/T_MuhammadAli_H2_ORM.png",
+      "pinned": true,
+      "sha256": "5453c972738b77379a9bdef12cd1c53e1daea3e22df7c12051defd0820d47e3e"
+    },
+    "island_ids": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/work/uv/island_ids.npy",
+      "pinned": true,
+      "sha256": "ed2a7d3e6a3d5d7411d072b96e176bdaa47b7f36f5d003d83b317011af79e2b8"
+    },
+    "metal_mask": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/work/uv/metal_mask.npy",
+      "pinned": true,
+      "sha256": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39"
+    },
+    "part_ids": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/work/uv/part_ids.npy",
+      "pinned": true,
+      "sha256": "c9da027999a0a0dac7c4f87dea860515ae2bfcba54404c4513fab58077b1c677"
+    },
+    "position": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/work/uv/position.npy",
+      "pinned": true,
+      "sha256": "0a47c44b451e3a8491ae252d09e694a8fd23035b14d61d90694d8ebe7967ea4e"
+    },
+    "sk_authored": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/work/sk_authored.blend",
+      "pinned": true,
+      "sha256": "35e5b1efccaa2f7fb2d812c6c4895f46ddb11b24852b9958e4b0f9aaeed24fdb"
+    },
+    "skeletal_fbx": {
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3/export/SK_MuhammadAli_H2.fbx",
+      "pinned": true,
+      "sha256": "3dbdac4c443e30e0fc9aa277bd7c628f8ab8bbbcebc646b3bc228ca144108655"
+    }
+  },
+  "prefix": "T_MuhammadAli_H2LD",
+  "reclass_from_baseline_texels": 0,
+  "small_components_relabelled": {
+    "leather_smooth": 118,
+    "leather_worn": 219,
+    "silk": 641,
+    "skin": 15443,
+    "stone_base": 0,
+    "wool_coarse": 4514
+  },
+  "stage": "ld_maps",
+  "status": "измерено",
+  "team_mask": {
+    "A": 255,
+    "B": "0 (без изменений)",
+    "G": "полоса подставки (без изменений)",
+    "R": "одежда (TeamColor) только в классах []"
+  }
+}

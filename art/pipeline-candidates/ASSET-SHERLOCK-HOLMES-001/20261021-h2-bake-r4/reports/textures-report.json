@@ -1,0 +1,2023 @@
+{
+  "bc_mean_srgb_in_islands": [
+    89.73,
+    79.07,
+    72.29
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 41622,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 928,
+        "cap_vertices": 858,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 41622,
+        "rim_samples": 2001
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "h21_metal_basecolor_plausible": {
+      "expected": "metal BaseColor = reflectance: linear max channel median >= 0.5 (cavities darker by the Tripo detail)",
+      "measured": {
+        "linear_max_channel_p5_p50_p95": [
+          0.2423,
+          0.5972,
+          0.8148
+        ],
+        "srgb_mean": [
+          197.5,
+          159.1,
+          72.6
+        ]
+      },
+      "passed": true
+    },
+    "h21_metal_core_metallic": {
+      "expected": "metal core (mask >= 0.99): metallic p1 >= 0.89",
+      "measured": {
+        "median": 0.9686,
+        "p1": 0.902,
+        "texels": 74746
+      },
+      "passed": true
+    },
+    "h21_metal_core_roughness": {
+      "expected": "metal core roughness p1..p99 within 0.3..0.46 (varied, not a constant)",
+      "measured": {
+        "p1": 0.3216,
+        "p50": 0.3608,
+        "p99": 0.4431
+      },
+      "passed": true
+    },
+    "h21_non_metal_metallic_zero": {
+      "expected": "cloth, skin, leather, wood, snakes, base (mask 0): metallic <= 1/255",
+      "measured": {
+        "max_8bit": 0,
+        "texels": 7394565
+      },
+      "passed": true
+    },
+    "h21_rim_filters_applied": {
+      "expected": "every filtered contact cap found, with kept rim samples",
+      "measured": [],
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.000723,
+        "BC": 0.000723,
+        "NORMAL": 0.000723,
+        "RM": 0.000723
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0051
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0006,
+        "p99.9_abs_dev": 0.005
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.8177,
+        "p1": 4.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.9625,
+      "passed": true
+    }
+  },
+  "clone_repaint": {
+    "config": [
+      {
+        "feather_m": 0.0015,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.1005,
+              -0.0975,
+              0.4171
+            ],
+            "min_m": [
+              -0.106,
+              -0.103,
+              0.4133
+            ]
+          }
+        ],
+        "keys": [
+          "BC"
+        ],
+        "max_dist_m": 0.006,
+        "name": "hand_r_knuckle",
+        "note": "светло-серая отметина на костяшке указательного пальца правой кисти (приёмка r3 T): кожа той же кисти на 5 мм выше (копия без усреднения сохраняет поры)",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            0.0,
+            0.005
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.066,
+              0.046,
+              0.0615
+            ],
+            "min_m": [
+              0.026,
+              -0.062,
+              0.0525
+            ]
+          }
+        ],
+        "keys": [
+          "BC",
+          "RM",
+          "AO"
+        ],
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_in",
+        "note": "крышки дыр верха подставки под подошвой левого ботинка и кромка вокруг неё (внутренняя половина рамки, до 6 мм за крышками): камень верха на 4 см в сторону (не под другой стопой), BC + RM + AO, вторым проходом и тексели крышек (заливка кромкой давала веерные пятна шероховатости, светлый обод у подошв и контур выреза под поднятой стопой в pose-04b — приёмка r2 F) r4: рамки внутренней и внешней половины перекрываются на 12 мм (в r3 они сходились на x = ±0,06, перо 4 мм обеих рамок оставляло там исходный тёмный отпечаток подошвы — полоса под ботинком, видна под поднятой стопой); внешняя половина берёт камень на 3 см в сторону",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "source": {
+          "offset_m": [
+            -0.04,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.094,
+              0.046,
+              0.0615
+            ],
+            "min_m": [
+              0.054,
+              -0.062,
+              0.0525
+            ]
+          }
+        ],
+        "keys": [
+          "BC",
+          "RM",
+          "AO"
+        ],
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_out",
+        "note": "крышки дыр верха подставки под подошвой левого ботинка и кромка вокруг неё (внешняя половина рамки, до 6 мм за крышками): камень верха на 4 см в сторону (не под другой стопой), BC + RM + AO, вторым проходом и тексели крышек (заливка кромкой давала веерные пятна шероховатости, светлый обод у подошв и контур выреза под поднятой стопой в pose-04b — приёмка r2 F) r4: рамки внутренней и внешней половины перекрываются на 12 мм (в r3 они сходились на x = ±0,06, перо 4 мм обеих рамок оставляло там исходный тёмный отпечаток подошвы — полоса под ботинком, видна под поднятой стопой); внешняя половина берёт камень на 3 см в сторону",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "source": {
+          "offset_m": [
+            0.03,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.022,
+              0.046,
+              0.0615
+            ],
+            "min_m": [
+              -0.066,
+              -0.062,
+              0.0525
+            ]
+          }
+        ],
+        "keys": [
+          "BC",
+          "RM",
+          "AO"
+        ],
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_in",
+        "note": "крышки дыр верха подставки под подошвой правого ботинка и кромка вокруг неё (внутренняя половина рамки, до 6 мм за крышками): камень верха на 4 см в сторону (не под другой стопой), BC + RM + AO, вторым проходом и тексели крышек (заливка кромкой давала веерные пятна шероховатости, светлый обод у подошв и контур выреза под поднятой стопой в pose-04b — приёмка r2 F) r4: рамки внутренней и внешней половины перекрываются на 12 мм (в r3 они сходились на x = ±0,06, перо 4 мм обеих рамок оставляло там исходный тёмный отпечаток подошвы — полоса под ботинком, видна под поднятой стопой); внешняя половина берёт камень на 3 см в сторону",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "source": {
+          "offset_m": [
+            0.04,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.054,
+              0.046,
+              0.0615
+            ],
+            "min_m": [
+              -0.096,
+              -0.062,
+              0.0525
+            ]
+          }
+        ],
+        "keys": [
+          "BC",
+          "RM",
+          "AO"
+        ],
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_out",
+        "note": "крышки дыр верха подставки под подошвой правого ботинка и кромка вокруг неё (внешняя половина рамки, до 6 мм за крышками): камень верха на 4 см в сторону (не под другой стопой), BC + RM + AO, вторым проходом и тексели крышек (заливка кромкой давала веерные пятна шероховатости, светлый обод у подошв и контур выреза под поднятой стопой в pose-04b — приёмка r2 F) r4: рамки внутренней и внешней половины перекрываются на 12 мм (в r3 они сходились на x = ±0,06, перо 4 мм обеих рамок оставляло там исходный тёмный отпечаток подошвы — полоса под ботинком, видна под поднятой стопой); внешняя половина берёт камень на 3 см в сторону",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "source": {
+          "offset_m": [
+            -0.03,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    ],
+    "rows": [
+      {
+        "box_texels": 1256,
+        "distance_mm_p50_max": [
+          1.77,
+          3.63
+        ],
+        "feathered_texels": 1082,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0402
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "hand_r_knuckle",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "pass": "main",
+        "repainted_texels": 1256,
+        "selected_texels": 1256,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.0,
+            0.005
+          ]
+        },
+        "source_texels": 530526,
+        "without_source": 0
+      },
+      {
+        "box_texels": 9472,
+        "distance_mm_p50_max": [
+          0.24,
+          0.78
+        ],
+        "feathered_texels": 9472,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0177
+          },
+          "BC": {
+            "mean_abs_change": 0.0077
+          },
+          "RM": {
+            "mean_abs_change": 0.014
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_in",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "main",
+        "repainted_texels": 9472,
+        "selected_texels": 9472,
+        "source": {
+          "offset_m": [
+            -0.04,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 550282,
+        "without_source": 0
+      },
+      {
+        "box_texels": 9245,
+        "distance_mm_p50_max": [
+          0.41,
+          8.0
+        ],
+        "feathered_texels": 9065,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0135
+          },
+          "BC": {
+            "mean_abs_change": 0.0081
+          },
+          "RM": {
+            "mean_abs_change": 0.0107
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_out",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "main",
+        "repainted_texels": 9065,
+        "selected_texels": 9245,
+        "source": {
+          "offset_m": [
+            0.03,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 550488,
+        "without_source": 180
+      },
+      {
+        "box_texels": 11048,
+        "distance_mm_p50_max": [
+          0.26,
+          4.4
+        ],
+        "feathered_texels": 11034,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0148
+          },
+          "BC": {
+            "mean_abs_change": 0.008
+          },
+          "RM": {
+            "mean_abs_change": 0.0105
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_in",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "main",
+        "repainted_texels": 11048,
+        "selected_texels": 11048,
+        "source": {
+          "offset_m": [
+            0.04,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 548644,
+        "without_source": 0
+      },
+      {
+        "box_texels": 10285,
+        "distance_mm_p50_max": [
+          0.41,
+          7.99
+        ],
+        "feathered_texels": 9866,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0056
+          },
+          "BC": {
+            "mean_abs_change": 0.0077
+          },
+          "RM": {
+            "mean_abs_change": 0.0063
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_out",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "main",
+        "repainted_texels": 9867,
+        "selected_texels": 10285,
+        "source": {
+          "offset_m": [
+            -0.03,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 549388,
+        "without_source": 418
+      },
+      {
+        "box_texels": 4354,
+        "distance_mm_p50_max": [
+          0.27,
+          0.84
+        ],
+        "feathered_texels": 4354,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.1286
+          },
+          "BC": {
+            "mean_abs_change": 0.0233
+          },
+          "RM": {
+            "mean_abs_change": 0.0676
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_in",
+        "part_texels": 13585,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "caps",
+        "repainted_texels": 4354,
+        "selected_texels": 4354,
+        "source": {
+          "offset_m": [
+            -0.04,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 550282,
+        "without_source": 0
+      },
+      {
+        "box_texels": 4741,
+        "distance_mm_p50_max": [
+          0.34,
+          8.0
+        ],
+        "feathered_texels": 4297,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0819
+          },
+          "BC": {
+            "mean_abs_change": 0.0146
+          },
+          "RM": {
+            "mean_abs_change": 0.0384
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_l_out",
+        "part_texels": 13585,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "caps",
+        "repainted_texels": 4297,
+        "selected_texels": 4741,
+        "source": {
+          "offset_m": [
+            0.03,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 550488,
+        "without_source": 444
+      },
+      {
+        "box_texels": 4448,
+        "distance_mm_p50_max": [
+          0.37,
+          4.35
+        ],
+        "feathered_texels": 4387,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0209
+          },
+          "BC": {
+            "mean_abs_change": 0.0066
+          },
+          "RM": {
+            "mean_abs_change": 0.0048
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_in",
+        "part_texels": 13585,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "caps",
+        "repainted_texels": 4448,
+        "selected_texels": 4448,
+        "source": {
+          "offset_m": [
+            0.04,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 548644,
+        "without_source": 0
+      },
+      {
+        "box_texels": 4886,
+        "distance_mm_p50_max": [
+          0.39,
+          8.0
+        ],
+        "feathered_texels": 3987,
+        "maps": {
+          "AO": {
+            "mean_abs_change": 0.0136
+          },
+          "BC": {
+            "mean_abs_change": 0.0074
+          },
+          "RM": {
+            "mean_abs_change": 0.0036
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "base_top_foot_r_out",
+        "part_texels": 13585,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "pass": "caps",
+        "repainted_texels": 3992,
+        "selected_texels": 4886,
+        "source": {
+          "offset_m": [
+            -0.03,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 549388,
+        "without_source": 894
+      }
+    ]
+  },
+  "color_repaint": {
+    "config": [
+      {
+        "exclude_boxes_m": [
+          {
+            "max_m": [
+              0.0135,
+              0.0105,
+              0.47
+            ],
+            "min_m": [
+              -0.0135,
+              -0.0045,
+              0.44
+            ]
+          },
+          {
+            "max_m": [
+              0.0075,
+              0.0165,
+              0.47
+            ],
+            "min_m": [
+              -0.0075,
+              -0.0105,
+              0.44
+            ]
+          }
+        ],
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.03,
+              0.03,
+              0.462
+            ],
+            "min_m": [
+              -0.03,
+              -0.028,
+              0.44
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            26,
+            45
+          ],
+          "s_max": 0.24,
+          "v_min": 0.6
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            3,
+            28
+          ],
+          "s_max": 0.5,
+          "s_min": 0.18,
+          "v_min": 0.45
+        },
+        "name": "collar_skin_smear",
+        "note": "розовый мазок кожи на верхней кромке воротника рубашки (приёмка r1, close-head / close-torso): в части 7 воротник и шея — одна поверхность; тексели тона кожи (h 3–28°, s 0,18–0,5, v ≥ 0,45) в поясе воротника z 0,44–0,462 (подбородок начинается с 0,465) вне шеи (исключены два бокса, вписанные в цилиндр шеи r ≈ 0,015 вокруг оси (0; 0,003)) берут цвет ближайшей кремовой ткани (h 26–45°, s ≤ 0,24, v ≥ 0,6) в 6 мм; замер BC run2: ~150 таких текселей в кольце r 0,015–0,019 на z 0,445–0,462, ткань рубашки h 29–36°, s 0,15–0,23, v 0,64–0,89",
+        "parts": [
+          "tripo_part_7"
+        ],
+        "radius_m": 0.006
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.09,
+              0.05,
+              0.0615
+            ],
+            "min_m": [
+              0.02,
+              -0.08,
+              0.053
+            ]
+          },
+          {
+            "max_m": [
+              -0.02,
+              0.05,
+              0.0615
+            ],
+            "min_m": [
+              -0.09,
+              -0.08,
+              0.053
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "v_max": 0.232,
+          "v_min": 0.178
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_max": 0.172
+        },
+        "name": "base_top_shoe_imprint",
+        "note": "тёмная рваная кромка дыр верха подставки у подошв (приёмка r1, close-base / close-legs): тёмные тексели верха у ботинков (v ≤ 0,172; верх подставки a5faa31f на z ≈ 0,055 — коробки с 0,053) берут цвет камня v 0,178–0,232 в 3 см; крышки дыр заливаются от перекрашенной кромки",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.03
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.09,
+              0.05,
+              0.0615
+            ],
+            "min_m": [
+              0.02,
+              -0.08,
+              0.053
+            ]
+          },
+          {
+            "max_m": [
+              -0.02,
+              0.05,
+              0.0615
+            ],
+            "min_m": [
+              -0.09,
+              -0.08,
+              0.053
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "v_max": 0.232,
+          "v_min": 0.178
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_min": 0.236
+        },
+        "name": "base_top_shoe_halo_light",
+        "note": "светлый ореол кромки дыр у подошв (сдача модели r2, close-base: крышки дыр, которые шире подошв, светлее камня — заливка от светлой кромки Tripo): светлые тексели верха у ботинков (v ≥ 0,236; верх подставки p50 0,192) берут цвет камня v 0,178–0,232 в 3 см",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.03
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.13,
+              0.01,
+              0.3
+            ],
+            "min_m": [
+              0.075,
+              -0.075,
+              0.235
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            5,
+            35
+          ],
+          "s_min": 0.12,
+          "v_min": 0.4
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            170,
+            320
+          ],
+          "s_min": 0.05
+        },
+        "name": "hand_l_blue_tips",
+        "note": "голубоватые кончики большого пальца и ногтей левой кисти (приёмка r2 close-hands): тексели голубого тона (h 170–320°, s ≥ 0,05) в кисти ниже 0,30 м берут цвет ближайшей кожи в 8 мм",
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.008
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.116,
+              -0.025,
+              0.282
+            ],
+            "min_m": [
+              0.095,
+              -0.058,
+              0.264
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            5,
+            35
+          ],
+          "s_min": 0.12,
+          "v_min": 0.45
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "s_max": 0.25,
+          "v_max": 0.55
+        },
+        "name": "hand_l_knuckle_marks",
+        "note": "серые пятна на нижних костяшках и кончике большого пальца левой кисти (s ≤ 0,25, v ≤ 0,55; замер: кластеры у z 0,268–0,278, s 0,13–0,17, v 0,35–0,41) — из кожи в 6 мм",
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.006
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.101,
+              -0.098,
+              0.4166
+            ],
+            "min_m": [
+              -0.1055,
+              -0.1025,
+              0.4138
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            5,
+            32
+          ],
+          "s_max": 0.6,
+          "s_min": 0.14,
+          "v_min": 0.68
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_max": 0.62
+        },
+        "name": "hand_r_knuckle_mark",
+        "note": "тёмное пятно на костяшке указательного пальца правой кисти (приёмка r2 close-weapon; замер: 392 текселя v 0,45–0,59 у (−0,103; −0,100; 0,415)) — из светлой кожи (v ≥ 0,68) в 5 мм",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.005
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.0968,
+              -0.096,
+              0.4
+            ],
+            "min_m": [
+              -0.104,
+              -0.116,
+              0.389
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            5,
+            32
+          ],
+          "s_max": 0.6,
+          "s_min": 0.14,
+          "v_min": 0.5
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "s_max": 0.38,
+          "v_max": 0.55
+        },
+        "name": "hand_r_palm_smear",
+        "note": "серо-тёмный мазок у основания ладони слева от ручки лупы (кластер v 0,38, s 0,29 у (−0,097; −0,102; 0,394)); рамка до x −0,0968 — дерево ручки (x ≥ −0,0965 на этой высоте) не входит",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.12,
+              -0.01,
+              0.312
+            ],
+            "min_m": [
+              0.1075,
+              -0.04,
+              0.286
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            25,
+            48
+          ],
+          "s_max": 0.25,
+          "v_min": 0.6
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            3,
+            30
+          ],
+          "s_min": 0.15
+        },
+        "name": "hand_l_cuff_flap",
+        "note": "клапан манжеты на внешней стороне левого запястья (приёмка r2 close-hands: телесная полоса на клапане): в текстуре Tripo клапан телесный, белая только его кромка; тексели тона кожи в рамке клапана (x ≥ 0,1075, z 0,286–0,312; рамка шире уходила на тыл кисти — разведка) берут кремовый цвет кромки и манжеты в 12 мм; в look-dev — правило cuff_flap_l (linen)",
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.067,
+              -0.074,
+              0.47
+            ],
+            "min_m": [
+              -0.108,
+              -0.099,
+              0.432
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            40,
+            140
+          ],
+          "s_max": 0.08,
+          "v_max": 0.52,
+          "v_min": 0.4
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            150,
+            300
+          ],
+          "s_min": 0.03
+        },
+        "name": "lens_blue_tint",
+        "note": "голубоватый серп по внутренней кромке стекла линзы (h 150–210°, s ≈ 0,05; стекло h 60–120°) — из нейтрального стекла в 8 мм",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.008
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.067,
+              -0.074,
+              0.47
+            ],
+            "min_m": [
+              -0.108,
+              -0.099,
+              0.432
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            40,
+            140
+          ],
+          "s_max": 0.08,
+          "v_max": 0.52,
+          "v_min": 0.4
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            0,
+            60
+          ],
+          "s_max": 0.35,
+          "v_min": 0.5
+        },
+        "name": "lens_light_fringe",
+        "note": "светлая рваная кайма между стеклом и латунью (s ≤ 0,35, v ≥ 0,5, h ≤ 60°; в ORM r2 — шершавая неметаллическая полоса; приёмка r2: зубчатая голубовато-белая кромка) — цвет нейтрального стекла из 4 мм, затем roughness_remap стекла; перекраска в латунь давала выступ оправы в стекло (разведка)",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.0855,
+              -0.1,
+              0.3895
+            ],
+            "min_m": [
+              -0.0975,
+              -0.1145,
+              0.3815
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            25,
+            45
+          ],
+          "s_min": 0.35,
+          "v_min": 0.5
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_max": 0.55
+        },
+        "name": "handle_tip_gold",
+        "note": "торец ручки лупы внизу (приёмка r2: светлый пятнистый торец; на листе — латунный наконечник): тёмные тексели наконечника (z 0,3815–0,3895 вокруг оси ручки) берут цвет золотого кольца, затем маска металла (коробка handle_tip) — латунь",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.088,
+              -0.08,
+              0.401
+            ],
+            "min_m": [
+              -0.108,
+              -0.118,
+              0.381
+            ]
+          }
+        ],
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            5,
+            32
+          ],
+          "s_max": 0.6,
+          "s_min": 0.14,
+          "v_min": 0.6
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "hue_deg": [
+            0,
+            40
+          ],
+          "s_max": 0.6,
+          "v_max": 0.62
+        },
+        "name": "hand_r_cuff_band",
+        "note": "полоса стыка правой кисти и манжеты у основания ладони (приёмка r3 T, close-hands / close-weapon: тёмный мазок): тексели не тона светлой кожи (h 0–40°, s ≤ 0,6, v ≤ 0,62) в рамке x −0,108…−0,088, z 0,381–0,401, y < −0,08 берут цвет кожи (v ≥ 0,6) в 6 мм. Остаток мазка на кадре — карта нормалей (рендер без N его не показывает), её ключом не перекрасить",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.15,
+              0.15,
+              0.0615
+            ],
+            "min_m": [
+              -0.15,
+              -0.15,
+              0.0525
+            ]
+          }
+        ],
+        "k": 16,
+        "keep_hsv": {
+          "v_max": 0.21,
+          "v_min": 0.175
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_min": 0.215
+        },
+        "name": "base_top_light",
+        "note": "верх подставки ровным тёмным камнем (приёмка r3 F/T, close-base: белёсые разводы в центре, между стопами и перед ними): светлые тексели верха (v ≥ 0,215; полоса камня обода 0,175–0,21 — замер p50 0,19–0,20) берут цвет камня этой полосы в 1 см",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.01
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.15,
+              0.15,
+              0.0615
+            ],
+            "min_m": [
+              -0.15,
+              -0.15,
+              0.0525
+            ]
+          }
+        ],
+        "k": 16,
+        "keep_hsv": {
+          "v_max": 0.21,
+          "v_min": 0.175
+        },
+        "keys": [
+          "BC"
+        ],
+        "match_hsv": {
+          "v_max": 0.17
+        },
+        "name": "base_top_dark",
+        "note": "то же для тёмных текселей верха (v ≤ 0,17: остатки тени и отпечатка)",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.01
+      }
+    ],
+    "rows": [
+      {
+        "distance_mm_p50_max": [
+          0.99,
+          5.99
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.2181
+          }
+        },
+        "matched_texels": 294,
+        "name": "collar_skin_smear",
+        "part_texels": 260933,
+        "parts": [
+          "tripo_part_7"
+        ],
+        "radius_m": 0.006,
+        "repainted_texels": 292,
+        "source_texels": 16321,
+        "without_source": 2
+      },
+      {
+        "distance_mm_p50_max": [
+          1.14,
+          4.85
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0401
+          }
+        },
+        "matched_texels": 4102,
+        "name": "base_top_shoe_imprint",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.03,
+        "repainted_texels": 4102,
+        "source_texels": 200567,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.84,
+          3.35
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0549
+          }
+        },
+        "matched_texels": 3178,
+        "name": "base_top_shoe_halo_light",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.03,
+        "repainted_texels": 3178,
+        "source_texels": 204344,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.72,
+          1.46
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1335
+          }
+        },
+        "matched_texels": 294,
+        "name": "hand_l_blue_tips",
+        "part_texels": 372876,
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.008,
+        "repainted_texels": 294,
+        "source_texels": 201969,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.61,
+          1.93
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1009
+          }
+        },
+        "matched_texels": 1347,
+        "name": "hand_l_knuckle_marks",
+        "part_texels": 372876,
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.006,
+        "repainted_texels": 1347,
+        "source_texels": 183666,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.84,
+          1.76
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.2068
+          }
+        },
+        "matched_texels": 430,
+        "name": "hand_r_knuckle_mark",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.005,
+        "repainted_texels": 430,
+        "source_texels": 158915,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          1.22,
+          3.63
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1865
+          }
+        },
+        "matched_texels": 2333,
+        "name": "hand_r_palm_smear",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006,
+        "repainted_texels": 2333,
+        "source_texels": 217511,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          3.81,
+          12.0
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1684
+          }
+        },
+        "matched_texels": 15549,
+        "name": "hand_l_cuff_flap",
+        "part_texels": 372876,
+        "parts": [
+          "tripo_part_6"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 14846,
+        "source_texels": 38694,
+        "without_source": 703
+      },
+      {
+        "distance_mm_p50_max": [
+          1.1,
+          3.45
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0184
+          }
+        },
+        "matched_texels": 8779,
+        "name": "lens_blue_tint",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.008,
+        "repainted_texels": 8779,
+        "source_texels": 44733,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.87,
+          3.97
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0756
+          }
+        },
+        "matched_texels": 3386,
+        "name": "lens_light_fringe",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004,
+        "repainted_texels": 3277,
+        "source_texels": 53468,
+        "without_source": 109
+      },
+      {
+        "distance_mm_p50_max": [
+          1.52,
+          4.61
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.181
+          }
+        },
+        "matched_texels": 4662,
+        "name": "handle_tip_gold",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006,
+        "repainted_texels": 4662,
+        "source_texels": 77584,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          1.5,
+          5.02
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1551
+          }
+        },
+        "matched_texels": 18781,
+        "name": "hand_r_cuff_band",
+        "part_texels": 532018,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.006,
+        "repainted_texels": 18781,
+        "source_texels": 191147,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          1.59,
+          5.45
+        ],
+        "k": 16,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0538
+          }
+        },
+        "matched_texels": 49443,
+        "name": "base_top_light",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.01,
+        "repainted_texels": 49443,
+        "source_texels": 162250,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          1.26,
+          2.81
+        ],
+        "k": 16,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0272
+          }
+        },
+        "matched_texels": 15412,
+        "name": "base_top_dark",
+        "part_texels": 559951,
+        "parts": [
+          "tripo_part_1"
+        ],
+        "radius_m": 0.01,
+        "repainted_texels": 15412,
+        "source_texels": 211689,
+        "without_source": 0
+      }
+    ]
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "materials": {
+    "config": {
+      "ao_exclusions": [
+        "tripo_part_1"
+      ],
+      "checks": {
+        "metal_core_bc_linear_max_channel_p50_min": 0.5,
+        "metal_core_metallic_min": 0.89,
+        "metal_core_roughness": [
+          0.3,
+          0.46
+        ],
+        "non_metal_metallic_max_8bit": 1
+      },
+      "cloth_roughness": {
+        "apply": false,
+        "hi": 0.9,
+        "lo": 0.8,
+        "note": "не применяется (как Medusa)"
+      },
+      "metal": {
+        "basecolor": {
+          "detail_clip": [
+            0.25,
+            1.4
+          ],
+          "detail_gamma": 1.0,
+          "note": "латунь (акцент палитры brass lens #C9A24A)",
+          "target_srgb": "#C9A24A"
+        },
+        "blur": 1,
+        "close_px": 2,
+        "hue_deg": [
+          20,
+          65
+        ],
+        "hue_ramp_deg": 1,
+        "local_radius_px": 3,
+        "metallic": {
+          "max": 1.0,
+          "min": 0.9
+        },
+        "parts": {
+          "tripo_part_5": {
+            "boxes": [
+              {
+                "max_m": [
+                  -0.05,
+                  -0.05,
+                  0.48
+                ],
+                "min_m": [
+                  -0.12,
+                  -0.13,
+                  0.428
+                ],
+                "name": "magnifier"
+              },
+              {
+                "max_m": [
+                  -0.0855,
+                  -0.1,
+                  0.3895
+                ],
+                "min_m": [
+                  -0.0975,
+                  -0.1145,
+                  0.3815
+                ],
+                "name": "handle_tip"
+              }
+            ],
+            "min_component_px": 60,
+            "note": "латунная оправа и горлышко ручки лупы выше кулака (коробка magnifier) и латунный наконечник ручки внизу (коробка handle_tip, r3); стекло и кожа — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  25,
+                  60
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "lens_rim_brass",
+                "radius_px": 3,
+                "s_min": 0.28,
+                "v_min": 0.28
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.15
+            }
+          },
+          "tripo_part_8": {
+            "min_component_px": 20,
+            "note": "цепочка часов на жилете",
+            "terms": [
+              {
+                "hue_deg": [
+                  25,
+                  60
+                ],
+                "hue_ramp_deg": 2,
+                "kind": "local",
+                "name": "watch_chain",
+                "radius_px": 3,
+                "s_min": 0.4,
+                "v_min": 0.4
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.15
+            }
+          }
+        },
+        "parts_note": "цветовое правило + 3D-коробка шлема; кольчуга и золото — классы look-dev",
+        "ramp": 0.04,
+        "roughness": {
+          "detail_weight": 0.6,
+          "max": 0.45,
+          "min": 0.32,
+          "note": "как металл Medusa/Angel"
+        }
+      },
+      "note": "проход металла H2.1 (HANDBOOK §2.4): маска металла для look-dev — латунь оправы и горлышка ручки лупы (часть 5 выше кулака: z ≥ 0,428 м), наконечник ручки (часть 5, r3) и цепочка часов на жилете (часть 8); стекло, кожа, пуговицы — не металл; BC металла → латунь #C9A24A. ao_exclusions (r3): AO подставки без ботинков",
+      "rim_filters": []
+    },
+    "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, художественно не принято",
+    "stats": {
+      "ao_exclusions": [
+        {
+          "delta_max": 0.9922,
+          "delta_mean": 0.02083,
+          "delta_p99": 0.4609,
+          "part": "tripo_part_1",
+          "texels": 559778,
+          "texels_lighter_gt_16_255": 43096
+        }
+      ],
+      "metal_mask": {
+        "tripo_part_5": {
+          "gate": {
+            "texels_kept": 78288,
+            "texels_tested": 146093
+          },
+          "mask_mean": 0.1449,
+          "metal_share": 0.1468,
+          "small_component_texels_removed": 126,
+          "term_texels": [
+            142724
+          ]
+        },
+        "tripo_part_8": {
+          "gate": null,
+          "mask_mean": 0.0512,
+          "metal_share": 0.0506,
+          "small_component_texels_removed": 853,
+          "term_texels": [
+            6805
+          ]
+        }
+      },
+      "remap": {
+        "after": {
+          "cloth": {
+            "bc_srgb_mean": [
+              79.3,
+              74.1,
+              71.3
+            ],
+            "metallic_mean": 0.0,
+            "metallic_p5_p95": [
+              0.0,
+              0.0
+            ],
+            "roughness_mean": 0.9514,
+            "roughness_p5_p95": [
+              0.8833,
+              0.9804
+            ],
+            "texels": 4318580
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              193.7,
+              155.9,
+              72.0
+            ],
+            "metallic_mean": 0.9339,
+            "metallic_p5_p95": [
+              0.6475,
+              1.0
+            ],
+            "roughness_mean": 0.3772,
+            "roughness_p5_p95": [
+              0.3241,
+              0.485
+            ],
+            "texels": 84173
+          },
+          "metal_core_m_ge_0.99": {
+            "bc_srgb_mean": [
+              197.6,
+              159.2,
+              72.6
+            ],
+            "metallic_mean": 0.965,
+            "metallic_p5_p95": [
+              0.9145,
+              1.0
+            ],
+            "roughness_mean": 0.3666,
+            "roughness_p5_p95": [
+              0.325,
+              0.4296
+            ],
+            "texels": 74717
+          },
+          "non_metal_metallic_max": 0.0
+        },
+        "before": {
+          "cloth": {
+            "bc_srgb_mean": [
+              79.3,
+              74.1,
+              71.3
+            ],
+            "metallic_mean": 0.0234,
+            "roughness_mean": 0.9514,
+            "texels": 4318580
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              188.1,
+              142.7,
+              93.6
+            ],
+            "metallic_mean": 0.4402,
+            "roughness_mean": 0.4506,
+            "texels": 84173
+          }
+        },
+        "luminance_reference_linear": 0.33238,
+        "metal_bc_linear_max_channel_p5_p50_p95": [
+          0.1794,
+          0.5834,
+          0.8177
+        ],
+        "target_linear": [
+          0.5841,
+          0.3613,
+          0.0685
+        ],
+        "target_srgb": "#C9A24A",
+        "tripo_roughness_rank_q5_q95": {
+          "cloth": null,
+          "metal": [
+            0.198,
+            0.8207
+          ]
+        }
+      }
+    }
+  },
+  "outputs": {
+    "T_SherlockHolmes_H2_2K_BC.png": {
+      "bytes": 5271173,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "e357fe187ca5672c738619f4f7c6baf3feed5db90e3de1604d870b7fde3e5897"
+    },
+    "T_SherlockHolmes_H2_2K_N.png": {
+      "bytes": 3966238,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "24f2f2ed13f93397f408220a1283067e96f9b20e23e54f7a7cd2c6963129c17a"
+    },
+    "T_SherlockHolmes_H2_2K_N_OpenGL.png": {
+      "bytes": 3966686,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "c663d320d3feae0914803bdeff263c159c07755027a3810ef03bb762095b0913"
+    },
+    "T_SherlockHolmes_H2_2K_ORM.png": {
+      "bytes": 3064897,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "07b8958c386f75346f70845bb6b275b120ed9ff690c07c591e914f2c3cdf31ce"
+    },
+    "T_SherlockHolmes_H2_2K_TeamMask.png": {
+      "bytes": 1104764,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "595846e3573c2249c599bafe963248dd4b898fadffed6e5621ab5798058dbaa8"
+    },
+    "T_SherlockHolmes_H2_BC.png": {
+      "bytes": 17107292,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "2103027d54862a11367967eab0cd08331ff1a79076048e6a51b99797ee9b26d3"
+    },
+    "T_SherlockHolmes_H2_N.png": {
+      "bytes": 11509105,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a78c4b11bec2095e4d08c71d2a7b914b84f5f24f97e2aadb7a0d283b712fdb00"
+    },
+    "T_SherlockHolmes_H2_N_OpenGL.png": {
+      "bytes": 11509386,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "5db3d9bb818823adb0c02647164ce3f4e8de74fc962edf5463d4ea2810bdd2a5"
+    },
+    "T_SherlockHolmes_H2_ORM.png": {
+      "bytes": 9700359,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "cd4117f3bcb7ba7c812fb8c5e01f6f7b604dad194c0a76c01f55c1ecacc5e15d"
+    },
+    "T_SherlockHolmes_H2_TeamMask.png": {
+      "bytes": 3062565,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "d7bc590ce12eabb31648c895ba2e06b61cda68543f1048e524dffc8c89618325"
+    }
+  },
+  "passed": true,
+  "prefix": "T_SherlockHolmes_H2",
+  "roughness_remap": {
+    "config": [
+      {
+        "hi": 0.18,
+        "hsv": {
+          "hue_deg": [
+            40,
+            200
+          ],
+          "s_max": 0.15,
+          "v_max": 0.56,
+          "v_min": 0.38
+        },
+        "lo": 0.06,
+        "name": "lens_glass",
+        "note": "стекло линзы лупы (приёмка r1: матово-серый диск): тексели части 5 серо-зелёного стекла (замер BC: h 42–180°, s ≤ 0,12, v 0,44–0,48, roughness Tripo p50 0,77; ткань рукава h 22–32°, s ≈ 0,3; манжета v > 0,6) — roughness 0,06–0,18 по рангу Tripo (класс legacy_bake look-dev берёт ORM.G)",
+        "parts": [
+          "tripo_part_5"
+        ]
+      },
+      {
+        "hi": 0.92,
+        "lo": 0.82,
+        "name": "base_matte",
+        "note": "подставка — матовый камень (приёмка r3: светлые блики-разводы верха на close-base): шероховатость по рангу Tripo в 0,82–0,92 (было 0,55–0,75)",
+        "parts": [
+          "tripo_part_1"
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "hi": 0.18,
+        "lo": 0.06,
+        "metal_excluded_texels": 0,
+        "name": "lens_glass",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "roughness_after_p5_p50_p95": [
+          0.06,
+          0.1288,
+          0.18
+        ],
+        "roughness_before_p5_p50_p95": [
+          0.6731,
+          0.7713,
+          0.8444
+        ],
+        "texels": 62155,
+        "tripo_roughness_q5_q95": [
+          0.6731,
+          0.8444
+        ]
+      },
+      {
+        "hi": 0.92,
+        "lo": 0.82,
+        "metal_excluded_texels": 0,
+        "name": "base_matte",
+        "parts": [
+          "tripo_part_1"
+        ],
+        "roughness_after_p5_p50_p95": [
+          0.82,
+          0.867,
+          0.92
+        ],
+        "roughness_before_p5_p50_p95": [
+          0.6275,
+          0.6588,
+          0.6942
+        ],
+        "texels": 573206,
+        "tripo_roughness_q5_q95": [
+          0.6275,
+          0.6942
+        ]
+      }
+    ]
+  },
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7443924,
+      "BC": 7443924,
+      "HIT": 7443924,
+      "NORMAL": 7443924,
+      "RM": 7443924
+    },
+    "caps": {
+      "cap_texels": 41622,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 928,
+      "cap_vertices": 858,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 41622,
+      "rim_samples": 2001
+    },
+    "footprints": null,
+    "in_island_unbaked_texels": {
+      "AO": 46272,
+      "BC": 46272,
+      "HIT": 46272,
+      "NORMAL": 46272,
+      "RM": 46272
+    },
+    "size": 4096,
+    "uv_texels": 7490196
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 76027,
+    "cloth_parts": [
+      "tripo_part_0"
+    ],
+    "cloth_share_of_cloth_texels": 0.9625,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "серое пальто Инвернесс (часть 1): доля 0,976 при v_max 0,62 / s_max 0,4 (разведка run1–run2); TeamMask устарел, проверка стадии осталась",
+      "ramp": 0.04,
+      "s_max": 0.4,
+      "v_max": 0.62
+    }
+  }
+}

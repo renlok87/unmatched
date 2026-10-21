@@ -1,0 +1,1274 @@
+{
+ "schema": "unmatched.h2-bake-profile/1",
+ "profile_id": "muhammad-ali-h2-bake/1",
+ "profile_version": 2,
+ "asset_id": "ASSET-MUHAMMAD-ALI-001",
+ "status": "предложено",
+ "status_note": "Этап 3 скилла 3d-model-pipeline (волна B ростера по наборам, 2026-10-21): первый профиль Muhammad Ali по разведке C:/tmp/muhammad-ali-stage3-scout (рамки частей prepare, сечения lp, инвентарь петель close). Части Tripo H2 a26d04a3 (12): голова, торс с шеей, трусы, две руки (плечо+предплечье), две перчатки (отдельные части 7, 8), две ноги (бедро+голень), два ботинка, двухъярусная подставка (нижний ярус r 0,150 z 0–0,031, верхний r 0,141 до 0,06) — кольцо команды по высоте base_band.height_m [0,003; 0,0285]. Оружия нет (контракт MuhammadAli weapon_bone null, сокет Weapon на hand.R). Не художественная приёмка и не бюджет.",
+ "expected_part_count": 12,
+ "sources": {
+  "source_spec": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/source-specs/tripo-a26d04a3-h2.json",
+  "parts_glb": {
+   "role": "h2-parts-glb",
+   "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-parts12.glb",
+   "sha256": "a278717cc7ffb5cecffafc98b48979ef7a283e1355eeb2f906620b8fb457a0fe",
+   "bytes": 46472448
+  },
+  "tex_glb": {
+   "role": "h2-tex8k-pbr-glb",
+   "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-tripo/source/muhammad-ali-h2-tripo-a26d04a3-tex8k-pbr.glb",
+   "sha256": "dff2e9ad72f421a7f40955fcfdb02ea9f6d6c85b244958f44760552b63fab36b",
+   "bytes": 79920684
+  }
+ },
+ "parts": {
+  "tripo_part_0": {
+   "mesh": "base",
+   "role": "подставка (двухъярусный тёмный камень)"
+  },
+  "tripo_part_1": {
+   "mesh": "body",
+   "role": "белые атласные трусы с чёрными лампасами и резинкой пояса",
+   "cloth": true
+  },
+  "tripo_part_2": {
+   "mesh": "body",
+   "role": "голова: лицо, короткие курчавые волосы"
+  },
+  "tripo_part_3": {
+   "mesh": "body",
+   "role": "правая нога: бедро и голень (−X)"
+  },
+  "tripo_part_4": {
+   "mesh": "body",
+   "role": "торс: грудь, спина, шея"
+  },
+  "tripo_part_5": {
+   "mesh": "body",
+   "role": "правый ботинок (−X)"
+  },
+  "tripo_part_6": {
+   "mesh": "body",
+   "role": "левый ботинок (+X)"
+  },
+  "tripo_part_7": {
+   "mesh": "body",
+   "role": "левая перчатка (+X, красная)"
+  },
+  "tripo_part_8": {
+   "mesh": "body",
+   "role": "правая перчатка (−X, красная)"
+  },
+  "tripo_part_9": {
+   "mesh": "body",
+   "role": "правая рука: плечо и предплечье (−X)"
+  },
+  "tripo_part_10": {
+   "mesh": "body",
+   "role": "левая рука: плечо и предплечье (+X)"
+  },
+  "tripo_part_11": {
+   "mesh": "body",
+   "role": "левая нога: бедро и голень (+X)"
+  }
+ },
+ "scale": {
+  "figure_top_m": 0.55,
+  "base_diameter_m": 0.3,
+  "base_height_m": 0.06,
+  "note": "верх фигуры — волосы (tripo_part_2); перчатки ниже головы, figure_top_part не нужен"
+ },
+ "orientation": {
+  "method": "ray-escape",
+  "samples_per_part": 4000,
+  "seed": 0,
+  "flip_below_score": -0.5,
+  "expected_inside_out_parts": [],
+  "min_score_after_fix": 0.5
+ },
+ "retopo": {
+  "method": "decimate-collapse",
+  "seed": 0,
+  "deviation_samples": 40000,
+  "target_tris": {
+   "tripo_part_0": 1200,
+   "tripo_part_1": 4500,
+   "tripo_part_2": 6500,
+   "tripo_part_3": 3000,
+   "tripo_part_4": 6500,
+   "tripo_part_5": 1800,
+   "tripo_part_6": 1800,
+   "tripo_part_7": 2200,
+   "tripo_part_8": 2200,
+   "tripo_part_9": 3200,
+   "tripo_part_10": 3200,
+   "tripo_part_11": 3000
+  },
+  "dense_regions": [
+   {
+    "part": "tripo_part_2",
+    "name": "face",
+    "box_m": [
+     [
+      -0.03,
+      -0.042,
+      0.468
+     ],
+     [
+      0.018,
+      -0.012,
+      0.535
+     ]
+    ],
+    "target_tris": 1800,
+    "note": "лицо (глаза, нос, губы, подбородок); голова смещена на −X 0,6 см (разведка: x −0,034…0,022, перед лица y −0,041)"
+   }
+  ],
+  "cleanup": {
+   "merge_distance_m": 1e-06,
+   "degenerate_distance_m": 1e-07,
+   "tiny_island_area_m2": 2e-07,
+   "degenerate_area_m2": 1e-10
+  },
+  "target_tris_note": "торс 6500 и голова 6500 (лицо 1800 плотной зоной), трусы 4500, руки по 3200, бёдра+голени по 3000, перчатки по 2200, ботинки по 1800, подставка 1200 — итог тела ≈ 37,7k с крышками подошв под POLY_BUDGET 45 000 с запасом (разведка retopo: 36 394 тела)",
+  "caps": [
+   {
+    "part": "tripo_part_0",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "note": "верх подставки Tripo вырезан гнёздами под носком и каблуком ботинок (петли z ≈ 0,057–0,059 м, инвентарь close разведки): плоские крышки, затем rebuild_retopo_caps"
+   }
+  ]
+ },
+ "closure": {
+  "note": "контактные крышки по инвентарю петель разведки close (C:/tmp/muhammad-ali-stage3-scout): части Tripo — открытые трубки, стыки совпадают (0,01–0,11 мм). Подошвы ботинок (по две петли на ботинок — носок 15,5–16,5 см и каблук 9,5–10 см, 0,17–0,53 мм до верха подставки) открываются в thigh_*_flex — крышки. Шея (16,6 см), плечи (23,9–24,5 см), пояс (25–26 см), кромки штанин (19–21 см), запястья (7,8–8,1 см) — стыки весов rig.junctions; щиколотки (9,6–10,3 см) — одна цепочка весов ноги и ботинка, не открываются",
+  "spacing_m": 0.006,
+  "bulge_m": -0.001,
+  "ring_m": 0.008,
+  "min_perimeter_cm": 3.0,
+  "max_median_mm": 1.0,
+  "inventory_min_perimeter_cm": 1.0,
+  "degenerate_area_m2": 1e-10,
+  "texel_priority": 0.7,
+  "rest_visibility": {
+   "pitch_m": 0.001,
+   "max_covers_front_share": 0.0001,
+   "max_covers_front_blob_px": 9
+  },
+  "contact_caps": [
+   {
+    "name": "sole_r",
+    "part": "tripo_part_5",
+    "covered_by": "tripo_part_0",
+    "note": "подошва правого ботинка: носок и каблук (2 петли, 0,17–0,53 мм до верха подставки)",
+    "expect": 2,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   },
+   {
+    "name": "sole_l",
+    "part": "tripo_part_6",
+    "covered_by": "tripo_part_0",
+    "note": "подошва левого ботинка: носок и каблук (2 петли, 0,37–0,5 мм)",
+    "expect": 2,
+    "max_median_mm": 2.0,
+    "bulge_m": 0.0,
+    "rim_ring_m": [
+     0.004,
+     0.009,
+     4
+    ]
+   }
+  ],
+  "rim_sample_fraction": 0.35,
+  "rebuild_retopo_caps_note": "щель в канавке между ярусами спереди (петля 1,6 см, 3 вершины, площадь 0,009 см² = 0,009 uu², разведка run2) и ещё 6 щелей < 0,5 см там же — трещины retopo в канавке, просвет ниже порога base_seethrough 0,1 uu²; крышка по кромке такой петли не строится (контур пересекает себя) — не закрываются",
+  "rebuild_retopo_caps": [
+   {
+    "name": "base_hole",
+    "part": "tripo_part_0",
+    "z_band_m": [
+     0.054,
+     0.0605
+    ],
+    "shape": "harmonic",
+    "bulge_m": 0.0,
+    "min_perimeter_cm": 1.0,
+    "spacing_m": 0.012,
+    "note": "гнёзда верха подставки под носком и каблуком каждого ботинка (4 петли 8,9–15,1 см после удаления вееров retopo; 3 щели < 0,1 см в стороне — трещины retopo, просвет ниже порога base_seethrough, min_perimeter_cm 1,0 их пропускает): веера retopo заменены крышками по точной кромке, как у Medusa/Beowulf/Bruce",
+    "expect": 4
+   }
+  ]
+ },
+ "uv": {
+  "atlas_px": 4096,
+  "runtime_px": 2048,
+  "min_gap_px": 8,
+  "pack_margin_fraction": 0.0013,
+  "max_overlap_px": 0,
+  "density_reference_part": "tripo_part_4",
+  "charts": {
+   "unwrap_method": "MINIMUM_STRETCH",
+   "normal_penalty": 3.0,
+   "max_rounds": 6,
+   "max_overlap_share": 0.0,
+   "max_stretch_log_p95": 0.5,
+   "chart_area_cm2": {
+    "default": 18,
+    "tripo_part_0": 180,
+    "tripo_part_1": 25,
+    "tripo_part_2": 9,
+    "tripo_part_4": 25,
+    "tripo_part_7": 10,
+    "tripo_part_8": 10
+   },
+   "regions": [
+    {
+     "part": "tripo_part_2",
+     "name": "face",
+     "box_m": [
+      [
+       -0.03,
+       -0.042,
+       0.468
+      ],
+      [
+       0.018,
+       -0.012,
+       0.535
+      ]
+     ],
+     "chart_area_cm2": 40
+    }
+   ],
+   "stretch_min_faces": 12,
+   "smooth_iterations": 4
+  },
+  "texel_priority": {
+   "default": 1.0,
+   "parts": {
+    "tripo_part_7": 1.5,
+    "tripo_part_8": 1.5,
+    "tripo_part_0": 0.45
+   },
+   "regions": [
+    {
+     "part": "tripo_part_2",
+     "name": "face",
+     "box_m": [
+      [
+       -0.03,
+       -0.042,
+       0.468
+      ],
+      [
+       0.018,
+       -0.012,
+       0.535
+      ]
+     ],
+     "factor": 2.0
+    }
+   ]
+  }
+ },
+ "bake": {
+  "device": "GPU",
+  "resolution": 4096,
+  "ao": {
+   "samples": 128,
+   "distance_m": 0.044,
+   "seed": 0,
+   "note": "0,08 × рост 0,55 м, как Medusa"
+  },
+  "normal": {
+   "space": "TANGENT",
+   "include_tripo_normal_map": true,
+   "samples": 1
+  },
+  "emission": {
+   "samples": 1
+  },
+  "cage": {
+   "extrusion_from": "retopo lo_to_hi p99 и hi_to_lo p99 части",
+   "factor": 1.5,
+   "min_m": 0.0006,
+   "max_m": 0.004,
+   "max_ray_factor": 2.5
+  },
+  "hit_check": {
+   "max_miss_share_warn": 0.01
+  },
+  "ao_exclusions": []
+ },
+ "textures": {
+  "prefix": "T_MuhammadAli_H2",
+  "pad_fill": "8-neighbour dilation edge_extend_px, then pull-push pyramid",
+  "maps": {
+   "BC": "sRGB RGB 8 бит (BaseColor Tripo, освещение удалено Tripo)",
+   "N": "DirectX (G инвертирован) для UE",
+   "N_OpenGL": "OpenGL для Blender",
+   "ORM": "R = AO (Cycles), G = Roughness, B = Metallic (из PBR Tripo; металла у героя нет)",
+   "TeamMask": "RGBA: R = 0 (ткани для старой маски нет: белые трусы — главный цвет, не красятся; deprecated W4-B), G = подставка, B = 0, A = 255"
+  },
+  "ao_gate": {
+   "min_range_p1_p99": 32,
+   "min_occluded_fraction": 0.02,
+   "occluded_below": 250
+  },
+  "team_mask": {
+   "cloth_parts": [],
+   "base_band": {
+    "part": "tripo_part_0",
+    "normal_z_abs_max": 0.35,
+    "height_m": [
+     0.003,
+     0.0285
+    ],
+    "note": "height_m — боковина нижнего яруса двухъярусной подставки (W2-c): нижний ярус z 0–0,031 м (r 0,150), верхний с 0,033 (r 0,141) (сечения lp разведки)"
+   },
+   "blur": 3,
+   "note": "cloth_parts []: белые трусы — главный цвет концепта, не красятся (HANDBOOK §2.9); TeamMask устарел, проверка доли ткани не применима (F52)"
+  },
+  "edge_extend_px": 16,
+  "materials_note": "прохода металла H2.1 нет: у героя нет металла (кожа, атлас трусов, кожа перчаток, ботинки, камень подставки); ключ textures.materials не задан — стадия textures пишет нулевую metal_mask (F51)",
+  "roughness_remap": [
+   {
+    "name": "skin_satin",
+    "parts": [
+     "tripo_part_2",
+     "tripo_part_3",
+     "tripo_part_4",
+     "tripo_part_9",
+     "tripo_part_10",
+     "tripo_part_11"
+    ],
+    "lo": 0.5,
+    "hi": 0.68,
+    "note": "кожа и волосы после PBR Tripo блестят «маслом» (этап 2 F-B2-14, бриф волны B): шероховатость в [0,5; 0,68] по рангу Tripo — атласная кожа, как на листе"
+   }
+  ]
+ },
+ "rig": {
+  "skeleton": "UM_HUMANOID_17_v2",
+  "armature_object": "SKEL_UM_Humanoid",
+  "character": "MuhammadAli",
+  "max_influences": 4,
+  "clean_below": 0.01,
+  "bones": [
+   [
+    "root",
+    null,
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0.045
+    ]
+   ],
+   [
+    "hips",
+    "root",
+    [
+     -0.007,
+     0.003,
+     0.29
+    ],
+    [
+     -0.007,
+     0.003,
+     0.33
+    ]
+   ],
+   [
+    "spine",
+    "hips",
+    [
+     -0.007,
+     0.003,
+     0.33
+    ],
+    [
+     -0.007,
+     0.012,
+     0.475
+    ]
+   ],
+   [
+    "head",
+    "spine",
+    [
+     -0.007,
+     0.0,
+     0.48
+    ],
+    [
+     -0.006,
+     0.0,
+     0.545
+    ]
+   ],
+   [
+    "arm_upper.L",
+    "spine",
+    [
+     0.049,
+     0.018,
+     0.445
+    ],
+    [
+     0.062,
+     0.0,
+     0.386
+    ]
+   ],
+   [
+    "arm_lower.L",
+    "arm_upper.L",
+    [
+     0.062,
+     0.0,
+     0.386
+    ],
+    [
+     0.051,
+     -0.04,
+     0.407
+    ]
+   ],
+   [
+    "hand.L",
+    "arm_lower.L",
+    [
+     0.051,
+     -0.04,
+     0.407
+    ],
+    [
+     0.03,
+     -0.07,
+     0.44
+    ]
+   ],
+   [
+    "arm_upper.R",
+    "spine",
+    [
+     -0.064,
+     0.018,
+     0.445
+    ],
+    [
+     -0.078,
+     0.0,
+     0.386
+    ]
+   ],
+   [
+    "arm_lower.R",
+    "arm_upper.R",
+    [
+     -0.078,
+     0.0,
+     0.386
+    ],
+    [
+     -0.068,
+     -0.041,
+     0.407
+    ]
+   ],
+   [
+    "hand.R",
+    "arm_lower.R",
+    [
+     -0.068,
+     -0.041,
+     0.407
+    ],
+    [
+     -0.046,
+     -0.07,
+     0.44
+    ]
+   ],
+   [
+    "leg_upper.L",
+    "hips",
+    [
+     0.03,
+     0.003,
+     0.29
+    ],
+    [
+     0.047,
+     -0.002,
+     0.205
+    ]
+   ],
+   [
+    "leg_lower.L",
+    "leg_upper.L",
+    [
+     0.047,
+     -0.002,
+     0.205
+    ],
+    [
+     0.073,
+     0.006,
+     0.098
+    ]
+   ],
+   [
+    "foot.L",
+    "leg_lower.L",
+    [
+     0.073,
+     0.006,
+     0.098
+    ],
+    [
+     0.082,
+     -0.035,
+     0.062
+    ]
+   ],
+   [
+    "leg_upper.R",
+    "hips",
+    [
+     -0.045,
+     0.003,
+     0.29
+    ],
+    [
+     -0.054,
+     -0.002,
+     0.205
+    ]
+   ],
+   [
+    "leg_lower.R",
+    "leg_upper.R",
+    [
+     -0.054,
+     -0.002,
+     0.205
+    ],
+    [
+     -0.077,
+     0.006,
+     0.098
+    ]
+   ],
+   [
+    "foot.R",
+    "leg_lower.R",
+    [
+     -0.077,
+     0.006,
+     0.098
+    ],
+    [
+     -0.088,
+     -0.035,
+     0.062
+    ]
+   ]
+  ],
+  "weights": {
+   "tripo_part_1": {
+    "kind": "cloth",
+    "base_bone": "hips",
+    "top_bone": "spine",
+    "top_blend_z": [
+     0.37,
+     0.4
+    ],
+    "legs": {
+     "L": "leg_upper.L",
+     "R": "leg_upper.R"
+    },
+    "leg_start_z": 0.29,
+    "leg_full_z": 0.255,
+    "leg_max": 1.0,
+    "side_band_m": 0.02,
+    "note": "трусы (одна часть, пояс z 0,366 у торса, штанины до кромки z 0,25 у бёдер): hips; выше 0,37–0,40 — spine (как низ торса); штанины ниже 0,29 м — на бедро своей стороны, у кромки целиком (0,255); кромку ведут стыки rig.junctions с ногами"
+   },
+   "tripo_part_2": {
+    "kind": "zblend",
+    "stops": [
+     [
+      "spine",
+      0.468
+     ],
+     [
+      "head",
+      0.485
+     ]
+    ],
+    "note": "голова: петля шеи наклонная (спереди горло z ≈ 0,47, сзади ≈ 0,50, центр 0,489) — низ горла spine, подбородок и выше (0,485) — head"
+   },
+   "tripo_part_4": {
+    "kind": "zblend",
+    "stops": [
+     [
+      "hips",
+      0.37
+     ],
+     [
+      "spine",
+      0.4
+     ]
+    ],
+    "note": "торс (талия z 0,365 под поясом трусов, шея сзади до 0,50): у пояса hips, выше 0,40 — spine; плечи и шею ведут стыки с руками и головой"
+   },
+   "tripo_part_9": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.R",
+     "arm_lower.R",
+     "hand.R"
+    ],
+    "bands_m": [
+     0.012,
+     0.03,
+     0.008
+    ],
+    "note": "локоть: сгиб 61° внутреннего угла (стойка с защитой) — голова arm_lower сдвинута на 1,5 см внутрь сгиба по биссектрисе (урок Bruce t2: прыжок параметра цепочки на биссектрисе сгиба), полоса локтя 3 см"
+   },
+   "tripo_part_10": {
+    "kind": "chain",
+    "chain": [
+     "spine",
+     "arm_upper.L",
+     "arm_lower.L",
+     "hand.L"
+    ],
+    "bands_m": [
+     0.012,
+     0.03,
+     0.008
+    ],
+    "note": "локоть: сгиб 61° внутреннего угла (стойка с защитой) — голова arm_lower сдвинута на 1,5 см внутрь сгиба по биссектрисе (урок Bruce t2: прыжок параметра цепочки на биссектрисе сгиба), полоса локтя 3 см"
+   },
+   "tripo_part_8": {
+    "kind": "rigid",
+    "bone": "hand.R",
+    "note": "правая перчатка — жёсткая на кисти (кулак в перчатке не гнётся)"
+   },
+   "tripo_part_7": {
+    "kind": "rigid",
+    "bone": "hand.L",
+    "note": "левая перчатка — жёсткая на кисти"
+   },
+   "tripo_part_3": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.02
+    ],
+    "note": "нога: цепочка ноги; голова foot сдвинута на 1,2 см вперёд-вверх внутрь сгиба голень/стопа (урок Bruce t2), колено — центр сечения z 0,205; нога и ботинок — одна цепочка, стык щиколотки (z 0,135) не открывается"
+   },
+   "tripo_part_11": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.L",
+     "leg_lower.L",
+     "foot.L"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.02
+    ],
+    "note": "нога: цепочка ноги; голова foot сдвинута на 1,2 см вперёд-вверх внутрь сгиба голень/стопа (урок Bruce t2), колено — центр сечения z 0,205; нога и ботинок — одна цепочка, стык щиколотки (z 0,135) не открывается"
+   },
+   "tripo_part_5": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.R",
+     "leg_lower.R",
+     "foot.R"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.02
+    ],
+    "note": "ботинок: цепочка ноги; голова foot сдвинута на 1,2 см вперёд-вверх внутрь сгиба голень/стопа (урок Bruce t2), колено — центр сечения z 0,205; нога и ботинок — одна цепочка, стык щиколотки (z 0,135) не открывается"
+   },
+   "tripo_part_6": {
+    "kind": "chain",
+    "chain": [
+     "hips",
+     "leg_upper.L",
+     "leg_lower.L",
+     "foot.L"
+    ],
+    "bands_m": [
+     0.015,
+     0.012,
+     0.02
+    ],
+    "note": "ботинок: цепочка ноги; голова foot сдвинута на 1,2 см вперёд-вверх внутрь сгиба голень/стопа (урок Bruce t2), колено — центр сечения z 0,205; нога и ботинок — одна цепочка, стык щиколотки (z 0,135) не открывается"
+   }
+  },
+  "seam_radius_m": 0.001,
+  "seam_pairs": [
+   [
+    "tripo_part_4",
+    "tripo_part_2"
+   ],
+   [
+    "tripo_part_4",
+    "tripo_part_9"
+   ],
+   [
+    "tripo_part_4",
+    "tripo_part_10"
+   ],
+   [
+    "tripo_part_4",
+    "tripo_part_1"
+   ],
+   [
+    "tripo_part_9",
+    "tripo_part_8"
+   ],
+   [
+    "tripo_part_10",
+    "tripo_part_7"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_3"
+   ],
+   [
+    "tripo_part_1",
+    "tripo_part_11"
+   ],
+   [
+    "tripo_part_3",
+    "tripo_part_5"
+   ],
+   [
+    "tripo_part_11",
+    "tripo_part_6"
+   ]
+  ],
+  "continuity_radius_m": 0.0015,
+  "junctions": [
+   {
+    "part": "tripo_part_4",
+    "with": "tripo_part_2",
+    "band_m": 0.012,
+    "max_distance_mm": 1.0,
+    "note": "шея: полоса торса 1,2 см у петли шеи берёт веса головы — шея не открывается при повороте головы"
+   },
+   {
+    "part": "tripo_part_4",
+    "with": "tripo_part_9",
+    "band_m": 0.025,
+    "max_distance_mm": 1.0,
+    "note": "правое плечо: полоса торса 2,5 см берёт веса цепочки правой руки (как плечи Leshen/Bruce)"
+   },
+   {
+    "part": "tripo_part_4",
+    "with": "tripo_part_10",
+    "band_m": 0.025,
+    "max_distance_mm": 1.0,
+    "note": "левое плечо: то же для левой руки"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_4",
+    "band_m": 0.012,
+    "max_distance_mm": 1.0,
+    "note": "пояс трусов у талии торса: одинаковые веса по петле"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_3",
+    "band_m": 0.02,
+    "max_distance_mm": 1.0,
+    "note": "кромка правой штанины трусов берёт веса правого бедра"
+   },
+   {
+    "part": "tripo_part_1",
+    "with": "tripo_part_11",
+    "band_m": 0.02,
+    "max_distance_mm": 1.0,
+    "note": "кромка левой штанины трусов берёт веса левого бедра"
+   },
+   {
+    "part": "tripo_part_9",
+    "with": "tripo_part_8",
+    "band_m": 0.012,
+    "max_distance_mm": 1.0,
+    "note": "правое запястье: конец предплечья у манжеты перчатки берёт жёсткий вес кисти"
+   },
+   {
+    "part": "tripo_part_10",
+    "with": "tripo_part_7",
+    "band_m": 0.012,
+    "max_distance_mm": 1.0,
+    "note": "левое запястье: то же"
+   }
+  ]
+ },
+ "seams": {
+  "note": "пробы seams по позам st_seams.TESTS; кадры — стыки Muhammad Ali (плечи, подмышки сзади, кромки трусов и промежность, шея, левый локоть, талия, щиколотка у ботинка, подошва)",
+  "exposure_threshold_mm": 1.5,
+  "max_open_share": 0.05,
+  "loop_min_perimeter_cm": 1.0,
+  "raycast": {
+   "pitch_m": 0.0015,
+   "margin_m": 0.1,
+   "posed_clearance_m": 0.005
+  },
+  "frames_label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+  "frames": [
+   {
+    "name": "shoulder_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.064,
+     0.018,
+     0.445
+    ],
+    "dir": [
+     -1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "shoulder_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.049,
+     0.018,
+     0.445
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.3
+    ],
+    "ortho_m": 0.13
+   },
+   {
+    "name": "armpit_back_l",
+    "pose": "arm_l_raise",
+    "target_m": [
+     0.045,
+     0.035,
+     0.42
+    ],
+    "dir": [
+     0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.15
+   },
+   {
+    "name": "armpit_back_r",
+    "pose": "arm_r_raise",
+    "target_m": [
+     -0.06,
+     0.035,
+     0.42
+    ],
+    "dir": [
+     -0.5,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.15
+   },
+   {
+    "name": "thigh_r",
+    "pose": "thigh_r_flex",
+    "target_m": [
+     -0.046,
+     -0.01,
+     0.25
+    ],
+    "dir": [
+     -0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "thigh_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.032,
+     -0.01,
+     0.25
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.1
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "crotch_back",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     -0.007,
+     0.03,
+     0.26
+    ],
+    "dir": [
+     0,
+     1,
+     -0.2
+    ],
+    "ortho_m": 0.2
+   },
+   {
+    "name": "collar_back",
+    "pose": "head_turn",
+    "target_m": [
+     -0.007,
+     0.02,
+     0.49
+    ],
+    "dir": [
+     0.2,
+     1,
+     0.5
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "collar_front",
+    "pose": "head_turn",
+    "target_m": [
+     -0.007,
+     -0.02,
+     0.475
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.4
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "forearm_l",
+    "pose": "forearm_l_bend",
+    "target_m": [
+     0.06,
+     -0.01,
+     0.39
+    ],
+    "dir": [
+     0.6,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.18
+   },
+   {
+    "name": "waist_side",
+    "pose": "spine_bend_fwd",
+    "target_m": [
+     -0.007,
+     0.0,
+     0.33
+    ],
+    "dir": [
+     1,
+     -0.3,
+     0.2
+    ],
+    "ortho_m": 0.62
+   },
+   {
+    "name": "sole_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.08,
+     -0.01,
+     0.065
+    ],
+    "dir": [
+     0.3,
+     -1,
+     -0.3
+    ],
+    "ortho_m": 0.12
+   },
+   {
+    "name": "ankle_l",
+    "pose": "thigh_l_flex",
+    "target_m": [
+     0.073,
+     0.01,
+     0.135
+    ],
+    "dir": [
+     0.5,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.1
+   }
+  ],
+  "k2_frames": [
+   "arm_r_raise",
+   "arm_l_raise",
+   "head_turn",
+   "thigh_r_flex",
+   "thigh_l_flex",
+   "spine_bend_fwd"
+  ],
+  "max_new_blob_px": 8
+ },
+ "sockets": [
+  {
+   "name": "Weapon",
+   "bone": "hand.R",
+   "target_m": [
+    -0.043,
+    -0.092,
+    0.437
+   ],
+   "location_uu": null,
+   "note": "оружия нет (WEAPON_HAND none, контракт MuhammadAli weapon_bone null): точка удара — костяшки правой перчатки (таблица Д-1, строка none; WEAPON_SOCKET_BONE hand.R), как BruceLee"
+  },
+  {
+   "name": "Head",
+   "bone": "head",
+   "target_m": [
+    -0.006,
+    -0.005,
+    0.51
+   ],
+   "location_uu": null,
+   "note": "центр головы; смещение — прогноз в UE bone space (x, −y, z), живой замер — задача UE-этапа"
+  }
+ ],
+ "exports": {
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "skeletal_fbx": "SK_MuhammadAli_H2.fbx",
+  "base_fbx": "SM_MuhammadAli_H2_Base.fbx"
+ },
+ "meshes": {
+  "body": "SK_MuhammadAli_H2_Body",
+  "base": "SM_MuhammadAli_H2_Base"
+ },
+ "materials": {
+  "atlas": "M_MuhammadAli_H2_Atlas",
+  "slots_note": "один слот на фигуре (тело, без оружия) и один на подставке — тот же атлас; ≤ 2 слота"
+ },
+ "axes": {
+  "blender_front": "-Y",
+  "blender_bow_side": null,
+  "expected_ue_front": "+X",
+  "expected_ue_bow_side": null,
+  "note": "оружия нет (WEAPON_HAND none, контракт MuhammadAli weapon_bone null): сторона оружия не проверяется"
+ },
+ "preview": {
+  "concepts": {
+   "front": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+   "side": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+   "back": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png"
+  },
+  "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+  "k2": {
+   "fov_deg_horizontal": 35,
+   "pitch_deg": -55,
+   "distances_uu": {
+    "k2-5x": 386.0,
+    "k2-1p6": 1207.0
+   },
+   "focus_z_m": 0.28,
+   "resolution": [
+    1920,
+    1080
+   ],
+   "source": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/frames/p17-k2-5x-medusa-ue-editor.evidence.json, p17-k2-1p6-medusa-ue-editor.evidence.json"
+  },
+  "samples": 64,
+  "label": "blender (Cycles), не игровой свет; у H2 задние грани отсечены (как UE one-sided)",
+  "closeups": [
+   {
+    "name": "face_front",
+    "target_m": [
+     -0.006,
+     -0.03,
+     0.505
+    ],
+    "dir": [
+     0,
+     -1,
+     0.05
+    ],
+    "ortho_m": 0.08
+   },
+   {
+    "name": "face_3q",
+    "target_m": [
+     -0.006,
+     -0.025,
+     0.505
+    ],
+    "dir": [
+     -0.6,
+     -0.8,
+     0.1
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "hair_back",
+    "target_m": [
+     -0.006,
+     0.0,
+     0.53
+    ],
+    "dir": [
+     0.3,
+     1,
+     0.4
+    ],
+    "ortho_m": 0.11
+   },
+   {
+    "name": "glove_r",
+    "target_m": [
+     -0.05,
+     -0.06,
+     0.43
+    ],
+    "dir": [
+     -0.3,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "glove_l",
+    "target_m": [
+     0.035,
+     -0.06,
+     0.43
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.2
+    ],
+    "ortho_m": 0.09
+   },
+   {
+    "name": "trunks_stripe_l",
+    "target_m": [
+     0.055,
+     0.0,
+     0.31
+    ],
+    "dir": [
+     1,
+     -0.2,
+     0.1
+    ],
+    "ortho_m": 0.16
+   },
+   {
+    "name": "boot_l",
+    "target_m": [
+     0.08,
+     -0.01,
+     0.1
+    ],
+    "dir": [
+     0.3,
+     -1,
+     0.3
+    ],
+    "ortho_m": 0.1
+   },
+   {
+    "name": "back",
+    "target_m": [
+     -0.007,
+     0.05,
+     0.32
+    ],
+    "dir": [
+     0,
+     1,
+     0.1
+    ],
+    "ortho_m": 0.45
+   }
+  ],
+  "backface_culling": true,
+  "pose_closeups": [],
+  "channel_views": [
+   {
+    "name": "metallic",
+    "channel": "Blue",
+    "view": "front"
+   },
+   {
+    "name": "roughness",
+    "channel": "Green",
+    "view": "front"
+   }
+  ],
+  "frame": {
+   "checks_report": "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+   "side": "left"
+  }
+ },
+ "proposed_budget": {
+  "status": "предложено",
+  "hero_triangles": [
+   30000,
+   45000
+  ],
+  "atlas_master_px": 4096,
+  "atlas_runtime_px": 2048,
+  "material_slots_max": 2,
+  "source": "asset-card.yaml POLY_BUDGET (figure ≤ 45 000, base ≤ 2 500), HANDBOOK §2.10"
+ },
+ "history": {
+  "previous_profiles": [],
+  "note": "первый профиль героя; разведка — scratch C:/tmp/muhammad-ali-stage3-scout (удаляется после отчёта)"
+ }
+}

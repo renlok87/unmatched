@@ -1,0 +1,376 @@
+{
+ "source": "<run>/work/sk_authored.blend",
+ "label": "muhammad-ali-h2-blend",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.49279,
+ "bbox_min": [
+  -0.1108,
+  -0.0929,
+  0.0573
+ ],
+ "bbox_max": [
+  0.1052,
+  0.0573,
+  0.55
+ ],
+ "frame": {
+  "kind": "body_without_weapon",
+  "body_meshes": [
+   "SK_MuhammadAli_H2_Body"
+  ],
+  "weapon_meshes": [],
+  "weapon_bones": [],
+  "weapon_vertices": 0,
+  "height_all": 0.49279,
+  "bbox_all_min": [
+   -0.1108,
+   -0.0929,
+   0.0573
+  ],
+  "bbox_all_max": [
+   0.1052,
+   0.0573,
+   0.55
+  ],
+  "note": "z_norm/x_norm и порог сдвига 1 % — по телу без оружия (F59); камера — по всей фигуре"
+ },
+ "weapon_sides": [],
+ "weapon_side_source": "none",
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 2832,
+   "centroid_z_norm": 0.924,
+   "centroid_x_norm": -0.042,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.1371
+    ]
+   ],
+   "centroid_z_norm_all": 0.924,
+   "own_moved": 2808,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 11870,
+   "centroid_z_norm": 0.786,
+   "centroid_x_norm": -0.05,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.5748
+    ]
+   ],
+   "centroid_z_norm_all": 0.786,
+   "own_moved": 2973,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 3003,
+   "centroid_z_norm": 0.722,
+   "centroid_x_norm": 0.455,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.1454
+    ]
+   ],
+   "centroid_z_norm_all": 0.722,
+   "own_moved": 942,
+   "foreign_moved": 7,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 3007,
+   "centroid_z_norm": 0.721,
+   "centroid_x_norm": -0.563,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.1456
+    ]
+   ],
+   "centroid_z_norm_all": 0.721,
+   "own_moved": 941,
+   "foreign_moved": 4,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 1916,
+   "centroid_z_norm": 0.721,
+   "centroid_x_norm": 0.441,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0928
+    ]
+   ],
+   "centroid_z_norm_all": 0.721,
+   "own_moved": 588,
+   "foreign_moved": 12,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3263,
+   "centroid_z_norm": 0.217,
+   "centroid_x_norm": 0.564,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.158
+    ]
+   ],
+   "centroid_z_norm_all": 0.217,
+   "own_moved": 1180,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3293,
+   "centroid_z_norm": 0.221,
+   "centroid_x_norm": -0.566,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.1595
+    ]
+   ],
+   "centroid_z_norm_all": 0.221,
+   "own_moved": 1209,
+   "foreign_moved": 27,
+   "bleed_vertices": 27,
+   "bleed_share": 0.0082,
+   "bleed_bones": {
+    "leg_upper.L": 27
+   }
+  }
+ ],
+ "extended_tests": [
+  {
+   "test": "forearm_r_bend",
+   "bone": "arm_lower.R",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 1915,
+   "centroid_z_norm": 0.719,
+   "centroid_x_norm": -0.546,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_max": -0.2,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0927
+    ]
+   ],
+   "centroid_z_norm_all": 0.719,
+   "own_moved": 600,
+   "foreign_moved": 5,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "shin_l_bend",
+   "bone": "leg_lower.L",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 2025,
+   "centroid_z_norm": 0.123,
+   "centroid_x_norm": 0.673,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_min": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0981
+    ]
+   ],
+   "centroid_z_norm_all": 0.123,
+   "own_moved": 1166,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "shin_r_bend",
+   "bone": "leg_lower.R",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 1996,
+   "centroid_z_norm": 0.124,
+   "centroid_x_norm": -0.672,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_max": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0967
+    ]
+   ],
+   "centroid_z_norm_all": 0.124,
+   "own_moved": 1155,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_l_flex",
+   "bone": "foot.L",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 782,
+   "centroid_z_norm": 0.021,
+   "centroid_x_norm": 0.769,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_min": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0379
+    ]
+   ],
+   "centroid_z_norm_all": 0.021,
+   "own_moved": 777,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_r_flex",
+   "bone": "foot.R",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 770,
+   "centroid_z_norm": 0.021,
+   "centroid_x_norm": -0.766,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_max": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_MuhammadAli_H2_Body",
+     0.0373
+    ]
+   ],
+   "centroid_z_norm_all": 0.021,
+   "own_moved": 764,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  }
+ ],
+ "probes": {
+  "plausible": 12,
+  "total": 12,
+  "summary": "12/12",
+  "legacy": "7/7",
+  "extended": "5/5",
+  "skipped": [],
+  "passed": true
+ }
+}

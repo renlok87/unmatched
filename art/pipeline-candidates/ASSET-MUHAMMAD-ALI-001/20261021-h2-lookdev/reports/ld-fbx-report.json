@@ -1,0 +1,574 @@
+{
+  "checks": {
+    "bone_heads_tails_as_h21": {
+      "expected": "equal (5 decimals, export frame)",
+      "measured": "equal",
+      "passed": true
+    },
+    "bones_and_parents_as_h21": {
+      "expected": 16,
+      "measured": 16,
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front_ue_plus_x": {
+      "expected": "dot > 0.5, front = +X",
+      "measured": {
+        "face_normal": [
+          0.6485,
+          -0.0281,
+          -0.118
+        ],
+        "face_polygons": 1354,
+        "rotated_front": [
+          1.0,
+          -0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "positions_and_uv0_per_loop_as_h21": {
+      "expected": "<= 1e-6 m / 1e-7 UV",
+      "measured": {
+        "SK_MuhammadAli_H2_Body": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SM_MuhammadAli_H2_Base": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        }
+      },
+      "passed": true
+    },
+    "triangles_as_h21": {
+      "expected": {
+        "SK_MuhammadAli_H2_Body": 37064,
+        "SM_MuhammadAli_H2_Base": 1390
+      },
+      "measured": {
+        "SK_MuhammadAli_H2_Body": 37064,
+        "SM_MuhammadAli_H2_Base": 1390
+      },
+      "passed": true
+    },
+    "uv1_metres_density_readback": {
+      "expected": "area(UV1) / area3D = 1 +- 0.02 (p1..p99 of islands)",
+      "measured": {
+        "SK_MuhammadAli_H2_Body": {
+          "islands": 207,
+          "ratio_p1_p50_p99": [
+            0.99998,
+            1.0,
+            1.00002
+          ]
+        },
+        "SM_MuhammadAli_H2_Base": {
+          "islands": 102,
+          "ratio_p1_p50_p99": [
+            0.99998,
+            1.0,
+            1.00006
+          ]
+        }
+      },
+      "passed": true
+    },
+    "uv_layers_order": {
+      "expected": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "measured": {
+        "SK_MuhammadAli_H2_Body": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SM_MuhammadAli_H2_Base": [
+          "UVMap",
+          "UV1_m"
+        ]
+      },
+      "passed": true
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 90268,
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-lookdev/export/SM_MuhammadAli_H2LD_Base.fbx",
+      "sha256": "8b4450842430201c4177e652d6fe3c7d56a513361ed78db29989a3b797c0d1ff"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 1802300,
+      "path": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-lookdev/export/SK_MuhammadAli_H2LD.fbx",
+      "sha256": "74c887d95d272056dfb322b9a482513e6e06fa3127aeb94ae1aa0e8cdb24926c"
+    }
+  },
+  "failed": [],
+  "meshes_pre_export": {
+    "SK_MuhammadAli_H2_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_MuhammadAli_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 5,
+      "polygons": 37064,
+      "triangles": 37064,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 20650
+    },
+    "SM_MuhammadAli_H2_Base": {
+      "color_attributes": [
+        "UM_Mask"
+      ],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_MuhammadAli_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 1,
+      "polygons": 1390,
+      "triangles": 1390,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 870
+    }
+  },
+  "passed": true,
+  "roundtrip": {
+    "ld": {
+      "base": {
+        "armature_objects": [],
+        "armatures": 0,
+        "bones": {},
+        "meshes": {
+          "SM_MuhammadAli_H2_Base": {
+            "bounds_m": {
+              "max": [
+                0.15008,
+                0.15008,
+                0.05992
+              ],
+              "min": [
+                -0.15003,
+                -0.15001,
+                -1e-05
+              ]
+            },
+            "color_attributes": [
+              "UM_Mask"
+            ],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_MuhammadAli_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 1,
+            "polygons": 1390,
+            "triangles": 1390,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 870,
+            "weights": null
+          }
+        }
+      },
+      "skeletal": {
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "armatures": 1,
+        "bones": {
+          "arm_lower.L": {
+            "head_m": [
+              0.0055,
+              0.0587,
+              0.3991
+            ],
+            "parent": "arm_upper.L",
+            "tail_m": [
+              0.04,
+              0.051,
+              0.407
+            ]
+          },
+          "arm_lower.R": {
+            "head_m": [
+              0.0055,
+              -0.0747,
+              0.3991
+            ],
+            "parent": "arm_upper.R",
+            "tail_m": [
+              0.041,
+              -0.068,
+              0.407
+            ]
+          },
+          "arm_upper.L": {
+            "head_m": [
+              -0.018,
+              0.049,
+              0.445
+            ],
+            "parent": "spine",
+            "tail_m": [
+              0.0055,
+              0.0587,
+              0.3991
+            ]
+          },
+          "arm_upper.R": {
+            "head_m": [
+              -0.018,
+              -0.064,
+              0.445
+            ],
+            "parent": "spine",
+            "tail_m": [
+              0.0055,
+              -0.0747,
+              0.3991
+            ]
+          },
+          "foot.L": {
+            "head_m": [
+              -0.006,
+              0.073,
+              0.098
+            ],
+            "parent": "leg_lower.L",
+            "tail_m": [
+              0.07586,
+              0.09097,
+              0.02613
+            ]
+          },
+          "foot.R": {
+            "head_m": [
+              -0.006,
+              -0.077,
+              0.098
+            ],
+            "parent": "leg_lower.R",
+            "tail_m": [
+              0.07483,
+              -0.09869,
+              0.02702
+            ]
+          },
+          "hand.L": {
+            "head_m": [
+              0.04,
+              0.051,
+              0.407
+            ],
+            "parent": "arm_lower.L",
+            "tail_m": [
+              0.06204,
+              0.03557,
+              0.43125
+            ]
+          },
+          "hand.R": {
+            "head_m": [
+              0.041,
+              -0.068,
+              0.407
+            ],
+            "parent": "arm_lower.R",
+            "tail_m": [
+              0.06283,
+              -0.05144,
+              0.43184
+            ]
+          },
+          "head": {
+            "head_m": [
+              0.0,
+              -0.007,
+              0.48
+            ],
+            "parent": "spine",
+            "tail_m": [
+              0.0,
+              -0.00491,
+              0.616
+            ]
+          },
+          "hips": {
+            "head_m": [
+              -0.003,
+              -0.007,
+              0.29
+            ],
+            "parent": "root",
+            "tail_m": [
+              -0.003,
+              -0.007,
+              0.32833
+            ]
+          },
+          "leg_lower.L": {
+            "head_m": [
+              0.002,
+              0.047,
+              0.205
+            ],
+            "parent": "leg_upper.L",
+            "tail_m": [
+              -0.006,
+              0.073,
+              0.098
+            ]
+          },
+          "leg_lower.R": {
+            "head_m": [
+              0.002,
+              -0.054,
+              0.205
+            ],
+            "parent": "leg_upper.R",
+            "tail_m": [
+              -0.006,
+              -0.077,
+              0.098
+            ]
+          },
+          "leg_upper.L": {
+            "head_m": [
+              -0.003,
+              0.03,
+              0.29
+            ],
+            "parent": "hips",
+            "tail_m": [
+              0.002,
+              0.047,
+              0.205
+            ]
+          },
+          "leg_upper.R": {
+            "head_m": [
+              -0.003,
+              -0.045,
+              0.29
+            ],
+            "parent": "hips",
+            "tail_m": [
+              0.002,
+              -0.054,
+              0.205
+            ]
+          },
+          "root": {
+            "head_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "parent": null,
+            "tail_m": [
+              0.0,
+              0.0,
+              0.2901
+            ]
+          },
+          "spine": {
+            "head_m": [
+              -0.003,
+              -0.007,
+              0.33
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.01143,
+              -0.007,
+              0.46575
+            ]
+          }
+        },
+        "meshes": {
+          "SK_MuhammadAli_H2_Body": {
+            "bounds_m": {
+              "max": [
+                0.09291,
+                0.10524,
+                0.55004
+              ],
+              "min": [
+                -0.05726,
+                -0.11084,
+                0.05725
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_MuhammadAli_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 5,
+            "polygons": 37064,
+            "triangles": 37064,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 20650,
+            "weights": {
+              "bones_used": {
+                "arm_lower.L": 1649,
+                "arm_lower.R": 1678,
+                "arm_upper.L": 2291,
+                "arm_upper.R": 2323,
+                "foot.L": 995,
+                "foot.R": 973,
+                "hand.L": 1388,
+                "hand.R": 1364,
+                "head": 3057,
+                "hips": 2946,
+                "leg_lower.L": 1727,
+                "leg_lower.R": 1684,
+                "leg_upper.L": 1476,
+                "leg_upper.R": 1552,
+                "spine": 4144
+              },
+              "max_influences": 4,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 20650,
+              "weight_share": {
+                "arm_lower.L": 0.029,
+                "arm_lower.R": 0.0292,
+                "arm_upper.L": 0.0533,
+                "arm_upper.R": 0.0541,
+                "foot.L": 0.0377,
+                "foot.R": 0.0373,
+                "hand.L": 0.0637,
+                "hand.R": 0.0632,
+                "head": 0.1382,
+                "hips": 0.1168,
+                "leg_lower.L": 0.0624,
+                "leg_lower.R": 0.0614,
+                "leg_upper.L": 0.0566,
+                "leg_upper.R": 0.0592,
+                "spine": 0.1381
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "stage": "ld_fbx",
+  "status": "измерено",
+  "ue_import_notes": [
+    "UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs или DstLightmapIndex >= 2, иначе UE перезапишет UV1 картой освещения",
+    "материальный слот тот же (M_MuhammadAli_H2_Atlas), назначается MI v2"
+  ],
+  "uv1": {
+    "density_tolerance": 0.02,
+    "layer_name": "UV1_m",
+    "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+    "per_mesh": {
+      "SK_MuhammadAli_H2_Body": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.0305,
+        "islands": 207,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.48199,
+          0.72299,
+          0.723
+        ],
+        "uv1_abs_max_m": 0.0558,
+        "uv1_extent": [
+          [
+            -0.0547,
+            -0.0558
+          ],
+          [
+            0.0547,
+            0.0558
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SM_MuhammadAli_H2_Base": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.1221,
+        "islands": 102,
+        "metres_per_uv_unit_p5_p50_p95": [
+          1.60639,
+          1.60664,
+          1.60688
+        ],
+        "uv1_abs_max_m": 0.1412,
+        "uv1_extent": [
+          [
+            -0.1412,
+            -0.1408
+          ],
+          [
+            0.1412,
+            0.1408
+          ]
+        ],
+        "zero_area_islands": 0
+      }
+    }
+  }
+}

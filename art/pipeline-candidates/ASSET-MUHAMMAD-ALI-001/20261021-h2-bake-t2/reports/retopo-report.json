@@ -1,0 +1,754 @@
+{
+  "checks": {
+    "all_parts_outward_low_poly": {
+      "expected": ">= 0.5",
+      "measured": {
+        "tripo_part_0": 0.9999,
+        "tripo_part_1": 0.9998,
+        "tripo_part_10": 1.0,
+        "tripo_part_11": 1.0,
+        "tripo_part_2": 1.0,
+        "tripo_part_3": 1.0,
+        "tripo_part_4": 1.0,
+        "tripo_part_5": 0.9997,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 0.9999,
+        "tripo_part_8": 1.0,
+        "tripo_part_9": 1.0
+      },
+      "passed": true
+    },
+    "flipped_low_poly_parts": {
+      "expected": [],
+      "measured": [],
+      "note": "decimation keeps the high-poly winding; a flip here would mean a collapse error",
+      "passed": true
+    },
+    "near_degenerate_faces": {
+      "expected": 0,
+      "measured": {
+        "tripo_part_0": 0,
+        "tripo_part_1": 0,
+        "tripo_part_10": 0,
+        "tripo_part_11": 0,
+        "tripo_part_2": 0,
+        "tripo_part_3": 0,
+        "tripo_part_4": 0,
+        "tripo_part_5": 0,
+        "tripo_part_6": 0,
+        "tripo_part_7": 0,
+        "tripo_part_8": 0,
+        "tripo_part_9": 0
+      },
+      "passed": true
+    }
+  },
+  "method": "decimate-collapse",
+  "parts": {
+    "tripo_part_0": {
+      "area_cm2": 1898.603,
+      "caps": {
+        "cap_area_cm2": 37.33,
+        "faces_added": 120,
+        "loops_capped": 9,
+        "loops_in_band": 9,
+        "method": "separate convex-hull fan per loop, below the rim (topology of the top untouched)",
+        "sink_m": 0.0003,
+        "z_band_m": [
+          0.054,
+          0.0605
+        ]
+      },
+      "cleanup": {
+        "loose_removed": 28,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 1.5338,
+          "p50": 0.0491,
+          "p95": 0.2634,
+          "p99": 0.4057
+        },
+        "lo_samples": 2131,
+        "lo_to_hi_mm": {
+          "max": 17.2038,
+          "p50": 0.1539,
+          "p95": 1.1423,
+          "p99": 6.0483
+        }
+      },
+      "hi_triangles": 582591,
+      "orientation": {
+        "after": {
+          "in_area_m2": 6.99e-06,
+          "out_area_m2": 0.166928333,
+          "sampled_polygons": 1319,
+          "score": 0.9999
+        },
+        "before": {
+          "in_area_m2": 6.99e-06,
+          "out_area_m2": 0.166928333,
+          "sampled_polygons": 1319,
+          "score": 0.9999
+        }
+      },
+      "target_triangles": 1200,
+      "topology": {
+        "boundary_edges": 313,
+        "islands": 10,
+        "non_manifold_edges": 313
+      },
+      "topology_hi": {
+        "boundary_edges": 979,
+        "islands": 2,
+        "non_manifold_edges": 979
+      },
+      "triangles": 1319,
+      "vertices": 812
+    },
+    "tripo_part_1": {
+      "area_cm2": 475.865,
+      "cleanup": {
+        "loose_removed": 9,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 1.0886,
+          "p50": 0.078,
+          "p95": 0.2599,
+          "p99": 0.3673
+        },
+        "lo_samples": 6955,
+        "lo_to_hi_mm": {
+          "max": 0.579,
+          "p50": 0.1105,
+          "p95": 0.2895,
+          "p99": 0.3843
+        }
+      },
+      "hi_triangles": 337847,
+      "orientation": {
+        "after": {
+          "in_area_m2": 4.152e-06,
+          "out_area_m2": 0.034188734,
+          "sampled_polygons": 4000,
+          "score": 0.9998
+        },
+        "before": {
+          "in_area_m2": 4.152e-06,
+          "out_area_m2": 0.034188734,
+          "sampled_polygons": 4000,
+          "score": 0.9998
+        }
+      },
+      "target_triangles": 4500,
+      "topology": {
+        "boundary_edges": 417,
+        "islands": 1,
+        "non_manifold_edges": 417
+      },
+      "topology_hi": {
+        "boundary_edges": 1089,
+        "islands": 2,
+        "non_manifold_edges": 1089
+      },
+      "triangles": 4499,
+      "vertices": 2456
+    },
+    "tripo_part_10": {
+      "area_cm2": 142.594,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 39203,
+        "hi_to_lo_mm": {
+          "max": 0.2124,
+          "p50": 0.0219,
+          "p95": 0.0628,
+          "p99": 0.0816
+        },
+        "lo_samples": 5013,
+        "lo_to_hi_mm": {
+          "max": 0.2012,
+          "p50": 0.0282,
+          "p95": 0.0676,
+          "p99": 0.0829
+        }
+      },
+      "hi_triangles": 77821,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.010833219,
+          "sampled_polygons": 3200,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.010833219,
+          "sampled_polygons": 3200,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 3200,
+      "topology": {
+        "boundary_edges": 426,
+        "islands": 1,
+        "non_manifold_edges": 426
+      },
+      "topology_hi": {
+        "boundary_edges": 585,
+        "islands": 1,
+        "non_manifold_edges": 585
+      },
+      "triangles": 3200,
+      "vertices": 1813
+    },
+    "tripo_part_11": {
+      "area_cm2": 155.071,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 36922,
+        "hi_to_lo_mm": {
+          "max": 0.2021,
+          "p50": 0.0195,
+          "p95": 0.0581,
+          "p99": 0.078
+        },
+        "lo_samples": 4692,
+        "lo_to_hi_mm": {
+          "max": 0.2091,
+          "p50": 0.0231,
+          "p95": 0.0621,
+          "p99": 0.0777
+        }
+      },
+      "hi_triangles": 73346,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.014339476,
+          "sampled_polygons": 3000,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.014339476,
+          "sampled_polygons": 3000,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 3000,
+      "topology": {
+        "boundary_edges": 384,
+        "islands": 1,
+        "non_manifold_edges": 384
+      },
+      "topology_hi": {
+        "boundary_edges": 498,
+        "islands": 1,
+        "non_manifold_edges": 498
+      },
+      "triangles": 3000,
+      "vertices": 1692
+    },
+    "tripo_part_2": {
+      "area_cm2": 135.781,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "dense_region": {
+        "after_step1_triangles": 1663,
+        "box_m": [
+          [
+            -0.03,
+            -0.042,
+            0.468
+          ],
+          [
+            0.018,
+            -0.012,
+            0.535
+          ]
+        ],
+        "final_triangles": 1663,
+        "hi_triangles": 48890,
+        "name": "face",
+        "target_triangles": 1800
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 0.3432,
+          "p50": 0.0319,
+          "p95": 0.1039,
+          "p99": 0.1448
+        },
+        "lo_samples": 7869,
+        "lo_to_hi_mm": {
+          "max": 0.3669,
+          "p50": 0.0348,
+          "p95": 0.1095,
+          "p99": 0.1465
+        }
+      },
+      "hi_triangles": 140668,
+      "orientation": {
+        "after": {
+          "in_area_m2": 1.5e-07,
+          "out_area_m2": 0.009597277,
+          "sampled_polygons": 4000,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 1.5e-07,
+          "out_area_m2": 0.009597277,
+          "sampled_polygons": 4000,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 6500,
+      "topology": {
+        "boundary_edges": 206,
+        "islands": 1,
+        "non_manifold_edges": 206
+      },
+      "topology_hi": {
+        "boundary_edges": 302,
+        "islands": 1,
+        "non_manifold_edges": 302
+      },
+      "triangles": 5178,
+      "vertices": 2691
+    },
+    "tripo_part_3": {
+      "area_cm2": 154.6,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 37038,
+        "hi_to_lo_mm": {
+          "max": 0.1372,
+          "p50": 0.0202,
+          "p95": 0.0601,
+          "p99": 0.0797
+        },
+        "lo_samples": 4701,
+        "lo_to_hi_mm": {
+          "max": 0.1575,
+          "p50": 0.0241,
+          "p95": 0.063,
+          "p99": 0.0791
+        }
+      },
+      "hi_triangles": 73568,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.014302101,
+          "sampled_polygons": 3000,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.014302101,
+          "sampled_polygons": 3000,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 3000,
+      "topology": {
+        "boundary_edges": 402,
+        "islands": 1,
+        "non_manifold_edges": 402
+      },
+      "topology_hi": {
+        "boundary_edges": 508,
+        "islands": 1,
+        "non_manifold_edges": 508
+      },
+      "triangles": 3000,
+      "vertices": 1701
+    },
+    "tripo_part_4": {
+      "area_cm2": 318.709,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 0.1792,
+          "p50": 0.0232,
+          "p95": 0.0677,
+          "p99": 0.091
+        },
+        "lo_samples": 10300,
+        "lo_to_hi_mm": {
+          "max": 0.2389,
+          "p50": 0.0268,
+          "p95": 0.0716,
+          "p99": 0.0927
+        }
+      },
+      "hi_triangles": 166157,
+      "orientation": {
+        "after": {
+          "in_area_m2": 1.27e-07,
+          "out_area_m2": 0.016133761,
+          "sampled_polygons": 4000,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 1.27e-07,
+          "out_area_m2": 0.016133761,
+          "sampled_polygons": 4000,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 6500,
+      "topology": {
+        "boundary_edges": 1104,
+        "islands": 1,
+        "non_manifold_edges": 1104
+      },
+      "topology_hi": {
+        "boundary_edges": 1611,
+        "islands": 1,
+        "non_manifold_edges": 1611
+      },
+      "triangles": 6500,
+      "vertices": 3800
+    },
+    "tripo_part_5": {
+      "area_cm2": 128.186,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 1.0348,
+          "p50": 0.0843,
+          "p95": 0.2771,
+          "p99": 0.3868
+        },
+        "lo_samples": 2800,
+        "lo_to_hi_mm": {
+          "max": 0.9147,
+          "p50": 0.0995,
+          "p95": 0.2844,
+          "p99": 0.3837
+        }
+      },
+      "hi_triangles": 113163,
+      "orientation": {
+        "after": {
+          "in_area_m2": 1.578e-06,
+          "out_area_m2": 0.009211224,
+          "sampled_polygons": 1800,
+          "score": 0.9997
+        },
+        "before": {
+          "in_area_m2": 1.578e-06,
+          "out_area_m2": 0.009211224,
+          "sampled_polygons": 1800,
+          "score": 0.9997
+        }
+      },
+      "target_triangles": 1800,
+      "topology": {
+        "boundary_edges": 206,
+        "islands": 1,
+        "non_manifold_edges": 206
+      },
+      "topology_hi": {
+        "boundary_edges": 649,
+        "islands": 1,
+        "non_manifold_edges": 649
+      },
+      "triangles": 1800,
+      "vertices": 1000
+    },
+    "tripo_part_6": {
+      "area_cm2": 125.909,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 0.8444,
+          "p50": 0.0848,
+          "p95": 0.2677,
+          "p99": 0.3698
+        },
+        "lo_samples": 2807,
+        "lo_to_hi_mm": {
+          "max": 0.6419,
+          "p50": 0.0999,
+          "p95": 0.2766,
+          "p99": 0.3666
+        }
+      },
+      "hi_triangles": 110580,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.009083768,
+          "sampled_polygons": 1800,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.009083768,
+          "sampled_polygons": 1800,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 1800,
+      "topology": {
+        "boundary_edges": 220,
+        "islands": 1,
+        "non_manifold_edges": 220
+      },
+      "topology_hi": {
+        "boundary_edges": 670,
+        "islands": 1,
+        "non_manifold_edges": 670
+      },
+      "triangles": 1800,
+      "vertices": 1007
+    },
+    "tripo_part_7": {
+      "area_cm2": 109.341,
+      "cleanup": {
+        "loose_removed": 5,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 0.7744,
+          "p50": 0.0547,
+          "p95": 0.1533,
+          "p99": 0.2044
+        },
+        "lo_samples": 3337,
+        "lo_to_hi_mm": {
+          "max": 0.3068,
+          "p50": 0.0748,
+          "p95": 0.1651,
+          "p99": 0.2088
+        }
+      },
+      "hi_triangles": 89349,
+      "orientation": {
+        "after": {
+          "in_area_m2": 4.44e-07,
+          "out_area_m2": 0.007393888,
+          "sampled_polygons": 2199,
+          "score": 0.9999
+        },
+        "before": {
+          "in_area_m2": 4.44e-07,
+          "out_area_m2": 0.007393888,
+          "sampled_polygons": 2199,
+          "score": 0.9999
+        }
+      },
+      "target_triangles": 2200,
+      "topology": {
+        "boundary_edges": 77,
+        "islands": 1,
+        "non_manifold_edges": 77
+      },
+      "topology_hi": {
+        "boundary_edges": 155,
+        "islands": 2,
+        "non_manifold_edges": 155
+      },
+      "triangles": 2199,
+      "vertices": 1138
+    },
+    "tripo_part_8": {
+      "area_cm2": 109.066,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 40000,
+        "hi_to_lo_mm": {
+          "max": 0.5574,
+          "p50": 0.0529,
+          "p95": 0.1506,
+          "p99": 0.2039
+        },
+        "lo_samples": 3338,
+        "lo_to_hi_mm": {
+          "max": 0.5185,
+          "p50": 0.0739,
+          "p95": 0.1592,
+          "p99": 0.2051
+        }
+      },
+      "hi_triangles": 88563,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.00752688,
+          "sampled_polygons": 2199,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.00752688,
+          "sampled_polygons": 2199,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 2200,
+      "topology": {
+        "boundary_edges": 77,
+        "islands": 1,
+        "non_manifold_edges": 77
+      },
+      "topology_hi": {
+        "boundary_edges": 141,
+        "islands": 1,
+        "non_manifold_edges": 141
+      },
+      "triangles": 2199,
+      "vertices": 1139
+    },
+    "tripo_part_9": {
+      "area_cm2": 143.235,
+      "cleanup": {
+        "loose_removed": 0,
+        "merged_vertices": 0,
+        "near_degenerate_faces_left": 0,
+        "tiny_island_faces_removed": 0,
+        "tiny_islands_removed": 0,
+        "triangulated_ngons": 0
+      },
+      "deviation": {
+        "hi_samples": 39471,
+        "hi_to_lo_mm": {
+          "max": 0.1438,
+          "p50": 0.0223,
+          "p95": 0.0638,
+          "p99": 0.0845
+        },
+        "lo_samples": 5003,
+        "lo_to_hi_mm": {
+          "max": 0.1672,
+          "p50": 0.0276,
+          "p95": 0.0685,
+          "p99": 0.0845
+        }
+      },
+      "hi_triangles": 78407,
+      "orientation": {
+        "after": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.010946586,
+          "sampled_polygons": 3199,
+          "score": 1.0
+        },
+        "before": {
+          "in_area_m2": 0.0,
+          "out_area_m2": 0.010946586,
+          "sampled_polygons": 3199,
+          "score": 1.0
+        }
+      },
+      "target_triangles": 3200,
+      "topology": {
+        "boundary_edges": 409,
+        "islands": 1,
+        "non_manifold_edges": 409
+      },
+      "topology_hi": {
+        "boundary_edges": 535,
+        "islands": 1,
+        "non_manifold_edges": 535
+      },
+      "triangles": 3199,
+      "vertices": 1804
+    }
+  },
+  "passed": true,
+  "stage": "retopo",
+  "status": "измерено",
+  "triangles_by_mesh": {
+    "base": 1319,
+    "body": 36574
+  },
+  "triangles_figure": 36574,
+  "triangles_total": 37893,
+  "reused_from": {
+    "run": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake",
+    "stage": "retopo",
+    "sha256": "87fbbb028feeb47ad08cac4998a1246a7ea789f625b74b596ac9af73d6b2cf33"
+  }
+}

@@ -1,0 +1,702 @@
+{
+  "atlas_px": 4096,
+  "base_band": {
+    "area_cm2": 263.787,
+    "centroid_z_mm": [
+      3.04,
+      28.2
+    ],
+    "faces": 164,
+    "faces_total": 1390,
+    "height_m": [
+      0.003,
+      0.0285
+    ],
+    "rule": "base faces with centroid z in height_m and n_z >= -0.5",
+    "team_mask_g": "the same faces (work/uv/base_band.npy)",
+    "texels_4k": 169641,
+    "vertex_mask": {
+      "attribute": "UM_Mask",
+      "band": [
+        1,
+        0,
+        0,
+        1
+      ],
+      "domain": "CORNER",
+      "elsewhere": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "type": "BYTE_COLOR",
+      "ue": "M_UM_BaseMarker: band = VertexColor.R x VertexMaskWeight + SideBand x SideBandWeight"
+    }
+  },
+  "caps": {
+    "count": 8,
+    "note": "cap texels are filled by the textures stage from their rim (caps.npz), not baked",
+    "per_cap": [
+      {
+        "boundary_vertices": 52,
+        "cap": 1,
+        "faces": 60,
+        "label": 1,
+        "part": "tripo_part_0",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 57
+      },
+      {
+        "boundary_vertices": 48,
+        "cap": 2,
+        "faces": 56,
+        "label": 2,
+        "part": "tripo_part_0",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 53
+      },
+      {
+        "boundary_vertices": 44,
+        "cap": 3,
+        "faces": 46,
+        "label": 3,
+        "part": "tripo_part_0",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 46
+      },
+      {
+        "boundary_vertices": 31,
+        "cap": 4,
+        "faces": 29,
+        "label": 4,
+        "part": "tripo_part_0",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 31
+      },
+      {
+        "boundary_vertices": 93,
+        "cap": 1,
+        "faces": 155,
+        "label": 5001,
+        "part": "tripo_part_5",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 125
+      },
+      {
+        "boundary_vertices": 61,
+        "cap": 2,
+        "faces": 79,
+        "label": 5002,
+        "part": "tripo_part_5",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 71
+      },
+      {
+        "boundary_vertices": 87,
+        "cap": 1,
+        "faces": 155,
+        "label": 6001,
+        "part": "tripo_part_6",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 122
+      },
+      {
+        "boundary_vertices": 79,
+        "cap": 2,
+        "faces": 101,
+        "label": 6002,
+        "part": "tripo_part_6",
+        "rim_match_max_mm": 0.0,
+        "rim_ring_m": null,
+        "vertices": 91
+      }
+    ],
+    "rim_samples": 1324,
+    "texel_priority": 0.7,
+    "texels_4k": 89941
+  },
+  "checks": {
+    "island_gap_px_at_4k": {
+      "expected": ">= 8",
+      "measured": 8,
+      "note": "raster at pixel centres; None = no two islands closer than the BFS horizon",
+      "passed": true
+    },
+    "no_folded_uv_triangles": {
+      "expected": 0,
+      "measured": {
+        "tripo_part_0": 0,
+        "tripo_part_1": 0,
+        "tripo_part_10": 0,
+        "tripo_part_11": 0,
+        "tripo_part_2": 0,
+        "tripo_part_3": 0,
+        "tripo_part_4": 0,
+        "tripo_part_5": 0,
+        "tripo_part_6": 0,
+        "tripo_part_7": 0,
+        "tripo_part_8": 0,
+        "tripo_part_9": 0
+      },
+      "passed": true
+    },
+    "priority_face_denser_than_body": {
+      "expected": "face >= 1.5 x dress",
+      "measured": {
+        "dress": 56.654,
+        "face": 113.308,
+        "reference_part": "tripo_part_4"
+      },
+      "passed": true
+    },
+    "raster_overlap_px": {
+      "expected": "<= 0",
+      "measured": 0,
+      "note": "pixel centres strictly inside two or more UV triangles (any islands, any parts)",
+      "passed": true
+    },
+    "uv_inside_0_1": {
+      "expected": "[0, 1]",
+      "measured": [
+        [
+          0.0013,
+          0.0013
+        ],
+        [
+          0.989688,
+          0.993307
+        ]
+      ],
+      "passed": true
+    }
+  },
+  "coverage_share": 0.5412,
+  "footprints": {
+    "note": "BC/RM/AO of faces hidden at rest under the covering part, from the visible surface around them (footprints.npz); their normal map stays baked",
+    "per_contact": [],
+    "texels_4k": 0
+  },
+  "islands_total": 309,
+  "min_gap_px": 8,
+  "pack": {
+    "margin": 0.0013,
+    "margin_method": "FRACTION",
+    "rotate": "ANY",
+    "shape_method": "CONCAVE"
+  },
+  "parts": {
+    "tripo_part_0": {
+      "area_cm2": 1861.273,
+      "caps": {
+        "area_cm2": 37.295,
+        "texel_density_px_per_cm_4k": 25.494,
+        "uv_area_px": 24240.4
+      },
+      "islands": 102,
+      "priority_factor_default": 0.45,
+      "raster_px": 1234075,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 12.747,
+      "texel_density_px_per_cm_4k": 25.494,
+      "uv_area_px": 1209748.0
+    },
+    "tripo_part_1": {
+      "area_cm2": 475.865,
+      "caps": null,
+      "islands": 59,
+      "priority_factor_default": 1.0,
+      "raster_px": 1527369,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 1527367.4
+    },
+    "tripo_part_10": {
+      "area_cm2": 142.594,
+      "caps": null,
+      "islands": 9,
+      "priority_factor_default": 1.0,
+      "raster_px": 457643,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 457680.5
+    },
+    "tripo_part_11": {
+      "area_cm2": 155.071,
+      "caps": null,
+      "islands": 9,
+      "priority_factor_default": 1.0,
+      "raster_px": 497681,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 497725.2
+    },
+    "tripo_part_2": {
+      "area_cm2": 135.781,
+      "caps": null,
+      "islands": 21,
+      "priority_factor_default": 1.0,
+      "raster_px": 924998,
+      "regions": [
+        "face"
+      ],
+      "texel_density_px_per_cm_2k": 41.269,
+      "texel_density_px_per_cm_4k": 82.539,
+      "uv_area_px": 925030.6
+    },
+    "tripo_part_3": {
+      "area_cm2": 154.6,
+      "caps": null,
+      "islands": 9,
+      "priority_factor_default": 1.0,
+      "raster_px": 496253,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 496215.3
+    },
+    "tripo_part_4": {
+      "area_cm2": 318.709,
+      "caps": null,
+      "islands": 14,
+      "priority_factor_default": 1.0,
+      "raster_px": 1022990,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 1022951.0
+    },
+    "tripo_part_5": {
+      "area_cm2": 128.186,
+      "caps": {
+        "area_cm2": 20.378,
+        "texel_density_px_per_cm_4k": 39.658,
+        "uv_area_px": 32048.9
+      },
+      "islands": 34,
+      "priority_factor_default": 1.0,
+      "raster_px": 443473,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 411433.4
+    },
+    "tripo_part_6": {
+      "area_cm2": 125.909,
+      "caps": {
+        "area_cm2": 21.394,
+        "texel_density_px_per_cm_4k": 39.658,
+        "uv_area_px": 33646.4
+      },
+      "islands": 14,
+      "priority_factor_default": 1.0,
+      "raster_px": 437798,
+      "regions": [
+        "cap"
+      ],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 404126.7
+    },
+    "tripo_part_7": {
+      "area_cm2": 109.341,
+      "caps": null,
+      "islands": 17,
+      "priority_factor_default": 1.5,
+      "raster_px": 789701,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 42.49,
+      "texel_density_px_per_cm_4k": 84.981,
+      "uv_area_px": 789630.1
+    },
+    "tripo_part_8": {
+      "area_cm2": 109.066,
+      "caps": null,
+      "islands": 12,
+      "priority_factor_default": 1.5,
+      "raster_px": 787614,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 42.49,
+      "texel_density_px_per_cm_4k": 84.981,
+      "uv_area_px": 787649.6
+    },
+    "tripo_part_9": {
+      "area_cm2": 143.235,
+      "caps": null,
+      "islands": 9,
+      "priority_factor_default": 1.0,
+      "raster_px": 459787,
+      "regions": [],
+      "texel_density_px_per_cm_2k": 28.327,
+      "texel_density_px_per_cm_4k": 56.654,
+      "uv_area_px": 459735.3
+    }
+  },
+  "passed": true,
+  "region_density_px_per_cm_4k": {
+    "face": 113.308
+  },
+  "stage": "uv",
+  "status": "измерено",
+  "unwrap": {
+    "charts": {
+      "tripo_part_0": {
+        "charts": 101,
+        "fallback_charts": 4,
+        "fallback_faces": 72,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 2,
+            "charts_unwrapped": 15,
+            "round": 0
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 4,
+            "round": 1
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 4,
+            "round": 2
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 4,
+            "round": 3
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 6,
+            "round": 4
+          },
+          {
+            "bad": 5,
+            "charts_unwrapped": 8,
+            "round": 5
+          },
+          {
+            "bad": 4,
+            "charts_unwrapped": 10,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.9314,
+        "stretch_log_p95_median": 0.0
+      },
+      "tripo_part_1": {
+        "charts": 47,
+        "fallback_charts": 1,
+        "fallback_faces": 19,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 2,
+            "charts_unwrapped": 20,
+            "round": 0
+          },
+          {
+            "bad": 3,
+            "charts_unwrapped": 4,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 6,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 5
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 1.2711,
+        "stretch_log_p95_median": 0.123
+      },
+      "tripo_part_10": {
+        "charts": 9,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 8,
+            "round": 0
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 1
+          }
+        ],
+        "stretch_log_p95_max": 0.3733,
+        "stretch_log_p95_median": 0.2648
+      },
+      "tripo_part_11": {
+        "charts": 9,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 9,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.28,
+        "stretch_log_p95_median": 0.1551
+      },
+      "tripo_part_2": {
+        "charts": 19,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 13,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 2,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 4,
+            "round": 5
+          }
+        ],
+        "stretch_log_p95_max": 1.5141,
+        "stretch_log_p95_median": 0.1482
+      },
+      "tripo_part_3": {
+        "charts": 9,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 9,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.3428,
+        "stretch_log_p95_median": 0.1878
+      },
+      "tripo_part_4": {
+        "charts": 14,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 13,
+            "round": 0
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 1
+          }
+        ],
+        "stretch_log_p95_max": 0.4638,
+        "stretch_log_p95_median": 0.3423
+      },
+      "tripo_part_5": {
+        "charts": 33,
+        "fallback_charts": 1,
+        "fallback_faces": 16,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 3,
+            "charts_unwrapped": 10,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 6,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 5
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 6
+          }
+        ],
+        "stretch_log_p95_max": 0.488,
+        "stretch_log_p95_median": 0.0018
+      },
+      "tripo_part_6": {
+        "charts": 14,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 1,
+            "charts_unwrapped": 9,
+            "round": 0
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 1
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 2
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 3
+          },
+          {
+            "bad": 1,
+            "charts_unwrapped": 2,
+            "round": 4
+          },
+          {
+            "bad": 0,
+            "charts_unwrapped": 2,
+            "round": 5
+          }
+        ],
+        "stretch_log_p95_max": 1.1352,
+        "stretch_log_p95_median": 0.2156
+      },
+      "tripo_part_7": {
+        "charts": 11,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 11,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.3115,
+        "stretch_log_p95_median": 0.2212
+      },
+      "tripo_part_8": {
+        "charts": 11,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 11,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.4083,
+        "stretch_log_p95_median": 0.1571
+      },
+      "tripo_part_9": {
+        "charts": 8,
+        "fallback_charts": 0,
+        "fallback_faces": 0,
+        "folded_triangles": 0,
+        "max_overlap_share": 0.0,
+        "rounds": [
+          {
+            "bad": 0,
+            "charts_unwrapped": 8,
+            "round": 0
+          }
+        ],
+        "stretch_log_p95_max": 0.4838,
+        "stretch_log_p95_median": 0.1822
+      }
+    },
+    "method": "voronoi charts + MINIMUM_STRETCH (fallback: one island per face)"
+  }
+}

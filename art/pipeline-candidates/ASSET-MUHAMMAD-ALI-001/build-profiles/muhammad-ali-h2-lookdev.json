@@ -1,0 +1,355 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "muhammad-ali-h2-lookdev/1",
+ "asset_id": "ASSET-MUHAMMAD-ALI-001",
+ "status": "предложено",
+ "status_note": "Look-dev этапа 3 Muhammad Ali (волна B, 2026-10-21) на bake-прогоне art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3 (риг t3: локти по дымовому прогону; prepare…textures — из 20261021-h2-bake). Не художественная приёмка.",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/build-profiles/muhammad-ali-h2-bake-h2-t3.json",
+  "run": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake-t3",
+  "prefix": "T_MuhammadAli_H2",
+  "files": {
+   "BC": "textures/T_MuhammadAli_H2_BC.png",
+   "ORM": "textures/T_MuhammadAli_H2_ORM.png",
+   "TeamMask": "textures/T_MuhammadAli_H2_TeamMask.png",
+   "N": "textures/T_MuhammadAli_H2_N.png",
+   "N_OpenGL": "textures/T_MuhammadAli_H2_N_OpenGL.png",
+   "2K_N": "textures/T_MuhammadAli_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_MuhammadAli_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_MuhammadAli_H2_BC.png",
+   "baseline_ORM": "textures/T_MuhammadAli_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_MuhammadAli_H2.fbx",
+   "base_fbx": "export/SM_MuhammadAli_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "83bff820527befced098617338e82b02197bf53f996e57db749fa7bcae58f6e8",
+   "ORM": "5453c972738b77379a9bdef12cd1c53e1daea3e22df7c12051defd0820d47e3e",
+   "TeamMask": "56ebe8e80ccc10a80bd8aa092b2046cf7df5789b8e9b68d12aa9e1835e0fd3b9",
+   "N": "224f9ea403b4c27ef308f24c560ffa09aaa0de23f3dafd55d9d37d778cd331a0",
+   "N_OpenGL": "bfa8794e32a21c82fba4f90bdcc97f3b3dcaed509344fb6007f039b8013cc273",
+   "2K_N": "39ab75fbdb8b662aa804492dfaf227469ac98b09496d30e5dbb3121824973d7e",
+   "2K_N_OpenGL": "daec03e5854c822ec195e7cd63edc1b8aabd128e228b1cb902c312d727b85bda",
+   "baseline_BC": "83bff820527befced098617338e82b02197bf53f996e57db749fa7bcae58f6e8",
+   "baseline_ORM": "5453c972738b77379a9bdef12cd1c53e1daea3e22df7c12051defd0820d47e3e",
+   "part_ids": "c9da027999a0a0dac7c4f87dea860515ae2bfcba54404c4513fab58077b1c677",
+   "metal_mask": "5a6a67f19027030987f964ea0e00b669286a7cc23867653135cd14ce297c5f39",
+   "position": "0a47c44b451e3a8491ae252d09e694a8fd23035b14d61d90694d8ebe7967ea4e",
+   "island_ids": "ed2a7d3e6a3d5d7411d072b96e176bdaa47b7f36f5d003d83b317011af79e2b8",
+   "sk_authored": "35e5b1efccaa2f7fb2d812c6c4895f46ddb11b24852b9958e4b0f9aaeed24fdb",
+   "skeletal_fbx": "3dbdac4c443e30e0fc9aa277bd7c628f8ab8bbbcebc646b3bc228ca144108655",
+   "base_fbx": "1bd87e3f385ea25daa2b16f772c5dba70e677e92e8f748802078c4e8e401c860"
+  }
+ },
+ "prefix": "T_MuhammadAli_H2LD",
+ "lut_name": "T_UM_MatLUT_MuhammadAli",
+ "lut_hero": "MuhammadAli",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_MuhammadAli_H2LD.fbx",
+  "base_fbx": "SM_MuhammadAli_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [],
+ "team_dye_note": "TeamMask.R пуст (cloth_parts [] H2-профиля: белые трусы — главный цвет, не красятся); цвет команды героя — TeamAccent (профиль muhammad-ali-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1 по частям H2 (роли — цветной рендер частей и сечения разведки) + HSV запечённого BC (замер C:/tmp/muhammad-ali-stage3-scout/bcstats.py): белые атласные трусы — silk (атлас, Cloth 0,6); чёрные лампасы трусов — wool_coarse (матовая тесьма; контраст с атласом и класс акцента TeamAccent); кожа головы, торса, рук и ног — skin; волосы, брови и глаза — wool_coarse (класса волос в v1 нет; чёрный матовый диэлектрик, тот же тон, что лампасы, — одно усиление; TeamAccent берёт только часть трусов); красные перчатки — leather_smooth (глянцевая кожа); белые ботинки и белые канты перчаток — leather_worn (другой класс, чем красная кожа: усиление красного не трогает белое); подставка — stone_base; металла нет",
+  "part_default": {
+   "0": "stone_base",
+   "1": "silk",
+   "2": "skin",
+   "3": "skin",
+   "4": "skin",
+   "5": "leather_worn",
+   "6": "leather_worn",
+   "7": "leather_smooth",
+   "8": "leather_smooth",
+   "9": "skin",
+   "10": "skin",
+   "11": "skin"
+  },
+  "rules": [
+   {
+    "name": "stripes_black",
+    "parts": [
+     1
+    ],
+    "hsv": {
+     "v_max": 0.3
+    },
+    "class": "wool_coarse",
+    "note": "чёрные лампасы по бокам трусов (концепт #141414); белый атлас v ≥ 0,7 даже в складках (замер BC: трусы p50 v 0,855)"
+   },
+   {
+    "name": "hair_dark",
+    "parts": [
+     2
+    ],
+    "hsv": {
+     "v_max": 0.2,
+     "s_max": 0.5
+    },
+    "class": "wool_coarse",
+    "note": "чёрные курчавые волосы, брови, зрачки (BC v p50 0,10, s 0,35); тени кожи лица (s ≥ 0,5) остаются skin. Не legacy_bake: у MatID 0 нет пола альбедо (урок Bruce)"
+   },
+   {
+    "name": "hair_top",
+    "parts": [
+     2
+    ],
+    "hsv": {
+     "v_max": 0.32
+    },
+    "class": "wool_coarse",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.535
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "шапка волос выше линии лба (z ≥ 0,535 м): светлые кончики завитков (v 0,2–0,32) — тоже волосы, без крапа кожи (карта классов ld2)"
+   },
+   {
+    "name": "hair_back",
+    "parts": [
+     2
+    ],
+    "hsv": {
+     "v_max": 0.32
+    },
+    "class": "wool_coarse",
+    "half_spaces": [
+     {
+      "point_m": [
+       0.0,
+       0.005,
+       0.0
+      ],
+      "normal": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "min_m": 0.0
+     },
+     {
+      "point_m": [
+       0.0,
+       0.0,
+       0.497
+      ],
+      "normal": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "min_m": 0.0
+     }
+    ],
+    "note": "волосы затылка и висков сзади (y ≥ 0,005, z ≥ 0,497 м), тот же порог"
+   },
+   {
+    "name": "glove_trim_white",
+    "parts": [
+     7,
+     8
+    ],
+    "hsv": {
+     "s_max": 0.3,
+     "v_min": 0.6
+    },
+    "class": "leather_worn",
+    "note": "белые канты и шнуровка манжет перчаток (BC v p50 0,89, s 0,10) — класс белых ботинок"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "leather_smooth": {
+    "rgb": [
+     0.567,
+     0.0864,
+     0.1576
+    ],
+    "scout_iter1": [
+     0.8889,
+     0.2989,
+     0.3715
+    ],
+    "note": "итерация разведки ld1–ld3 (см. gains_note)"
+   },
+   "leather_worn": {
+    "rgb": [
+     1.6763,
+     1.6524,
+     1.5886
+    ],
+    "scout_iter1": [
+     1.6763,
+     1.6524,
+     1.5886
+    ],
+    "note": "итерация разведки ld1–ld3 (см. gains_note)"
+   },
+   "silk": {
+    "rgb": [
+     1.4932,
+     1.4665,
+     1.407
+    ],
+    "scout_iter1": [
+     1.4932,
+     1.4665,
+     1.407
+    ],
+    "note": "итерация разведки ld1–ld3 (см. gains_note)"
+   },
+   "stone_base": {
+    "rgb": [
+     0.6507,
+     0.6233,
+     0.6012
+    ],
+    "scout_iter1": [
+     0.6507,
+     0.6233,
+     0.6012
+    ],
+    "note": "итерация разведки ld1–ld3 (см. gains_note)"
+   },
+   "wool_coarse": {
+    "rgb": [
+     0.4527,
+     0.5547,
+     0.586
+    ],
+    "scout_iter1": [
+     0.4527,
+     0.5547,
+     0.586
+    ],
+    "note": "итерация разведки ld1–ld3 (см. gains_note)"
+   },
+   "skin": {
+    "rgb": [
+     0.75,
+     0.7,
+     0.7
+    ],
+    "note": "кожа Tripo светлее концепта: усиление ×0,75/0,70/0,70 (ld3, оттенок сохранён, dHue −0,4°)"
+   }
+  },
+  "gains_note": "итерации ld_measure разведки C:/tmp/muhammad-ali-stage3-scout (якорь экспозиции — skin, largest_class): ld1 без усилений — t_cap 1,0 (белые классы 0,61–0,68, перчатки 1,37); ld2 с полной подсказкой — 1,0 (белые упёрлись в клип альбедо: silk 0,75, leather_worn 0,61); ld3 — кожа приглушена ×0,70–0,75 (кожа Tripo v 0,43 светлее концепта #5A3B2A v 0,35), перчатки ×0,72 — t_cap 1,5 (перчатки 1,27); итог — подсказка ld3 для перчаток. Тёмные классы (волосы и лампасы wool_coarse, камень) — на полу альбедо grade.median_floor; металла нет"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-front.png",
+  "side": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-side.png",
+  "back": "art/imagegen/concept-muhammad-ali-codex/muhammad-ali-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по палитре листа: трусы #ECEAE4, перчатки #B3202A (h 356, s 0,82, v 0,70), кожа #5A3B2A (h 21, s 0,53, v 0,35), лампасы #141414, белые ботинки, камень подставки",
+   "silk": {
+    "mask_px": -4,
+    "s_max": 0.18,
+    "v_min": 0.55
+   },
+   "wool_coarse": {
+    "mask_px": -2,
+    "v_max": 0.18
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      5,
+      40
+     ]
+    ],
+    "s_min": 0.25,
+    "s_max": 0.8,
+    "v_min": 0.12,
+    "v_max": 0.75
+   },
+   "leather_smooth": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      335,
+      360
+     ],
+     [
+      0,
+      15
+     ]
+    ],
+    "s_min": 0.45,
+    "v_min": 0.2
+   },
+   "leather_worn": {
+    "mask_px": -2,
+    "s_max": 0.2,
+    "v_min": 0.55
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.5
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "face_3q",
+   "glove_r",
+   "glove_l",
+   "trunks_stripe_l",
+   "boot_l",
+   "back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-muhammad-ali-codex/checks-report.json",
+  "side": "left"
+ },
+ "history": {
+  "previous_profiles": [],
+  "note": "первый look-dev профиль героя; усиления — по трём итерациям разведки ld1–ld3"
+ }
+}

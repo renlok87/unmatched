@@ -1,0 +1,101 @@
+{
+ "asset_id": "ASSET-SINBAD-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.1904,
+    0.0977,
+    0.0386
+   ],
+   "wornBC": [
+    0.4855,
+    0.2419,
+    0.0903
+   ],
+   "ymedClassHero": 0.48025
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0648,
+    0.0307,
+    0.016
+   ],
+   "ymedClassHero": 0.03702
+  },
+  "leather_worn": {
+   "bc": [
+    0.0612,
+    0.0252,
+    0.013
+   ],
+   "ymedClassHero": 0.03231
+  },
+  "linen": {
+   "bc": [
+    0.6654,
+    0.4621,
+    0.2918
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.49215
+  },
+  "metal_forged": {
+   "bc": [
+    0.1745,
+    0.1413,
+    0.1343
+   ],
+   "wornBC": [
+    0.4391,
+    0.3526,
+    0.3343
+   ],
+   "ymedClassHero": 0.51003
+  },
+  "silk": {
+   "bc": [
+    0.0319,
+    0.0423,
+    0.0742
+   ],
+   "ymedClassHero": 0.04249
+  },
+  "skin": {
+   "bc": [
+    0.3231,
+    0.1329,
+    0.0595
+   ],
+   "ymedClassHero": 0.16902
+  },
+  "stone_base": {
+   "bc": [
+    0.0369,
+    0.0242,
+    0.0242
+   ],
+   "ymedClassHero": 0.02687
+  },
+  "wool_coarse": {
+   "bc": [
+    0.0452,
+    0.0529,
+    0.0865
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.05382
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Sinbad",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Sinbad --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

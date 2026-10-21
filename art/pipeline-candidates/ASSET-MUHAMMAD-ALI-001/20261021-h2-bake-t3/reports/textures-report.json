@@ -1,0 +1,274 @@
+{
+  "bc_mean_srgb_in_islands": [
+    127.97,
+    88.04,
+    73.88
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 89941,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 681,
+        "cap_vertices": 596,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 89941,
+        "rim_samples": 1324
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.000768,
+        "BC": 0.000768,
+        "NORMAL": 0.000768,
+        "RM": 0.000768
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0052
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.005
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.6523,
+        "p1": 20.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "not applicable: team_mask.cloth_parts is empty (a hero without cloth; TeamMask is deprecated, TeamAccent carries the team colour)",
+      "measured": null,
+      "not_applicable": true,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "metal_mask": {
+    "note": "no metal pass (textures.materials.metal absent or without parts): all-zero mask for look-dev; BC and ORM keep the Tripo values",
+    "path": "work/uv/metal_mask.npy",
+    "value": 0.0
+  },
+  "outputs": {
+    "T_MuhammadAli_H2_2K_BC.png": {
+      "bytes": 3880996,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "70d55eec18f08bb2dbf9d6dce9e641cb6beeec269706f2d97689418583e87abb"
+    },
+    "T_MuhammadAli_H2_2K_N.png": {
+      "bytes": 3545272,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "39ab75fbdb8b662aa804492dfaf227469ac98b09496d30e5dbb3121824973d7e"
+    },
+    "T_MuhammadAli_H2_2K_N_OpenGL.png": {
+      "bytes": 3545441,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "daec03e5854c822ec195e7cd63edc1b8aabd128e228b1cb902c312d727b85bda"
+    },
+    "T_MuhammadAli_H2_2K_ORM.png": {
+      "bytes": 2977890,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "bd554be0dfc5b5e1745b217375ba2d1bccd60ee4b167f22f53a5f01f2abc46f3"
+    },
+    "T_MuhammadAli_H2_2K_TeamMask.png": {
+      "bytes": 28979,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "0a0dc71042911f928e2f6f58f721d40d5770e12ad7d07c5bfa10b0a3b0b56d64"
+    },
+    "T_MuhammadAli_H2_BC.png": {
+      "bytes": 12738023,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "83bff820527befced098617338e82b02197bf53f996e57db749fa7bcae58f6e8"
+    },
+    "T_MuhammadAli_H2_N.png": {
+      "bytes": 10324583,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "224f9ea403b4c27ef308f24c560ffa09aaa0de23f3dafd55d9d37d778cd331a0"
+    },
+    "T_MuhammadAli_H2_N_OpenGL.png": {
+      "bytes": 10325960,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "bfa8794e32a21c82fba4f90bdcc97f3b3dcaed509344fb6007f039b8013cc273"
+    },
+    "T_MuhammadAli_H2_ORM.png": {
+      "bytes": 9826077,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "5453c972738b77379a9bdef12cd1c53e1daea3e22df7c12051defd0820d47e3e"
+    },
+    "T_MuhammadAli_H2_TeamMask.png": {
+      "bytes": 85176,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "56ebe8e80ccc10a80bd8aa092b2046cf7df5789b8e9b68d12aa9e1835e0fd3b9"
+    }
+  },
+  "passed": true,
+  "prefix": "T_MuhammadAli_H2",
+  "roughness_remap": {
+    "config": [
+      {
+        "hi": 0.68,
+        "lo": 0.5,
+        "name": "skin_satin",
+        "note": "кожа и волосы после PBR Tripo блестят «маслом» (этап 2 F-B2-14, бриф волны B): шероховатость в [0,5; 0,68] по рангу Tripo — атласная кожа, как на листе",
+        "parts": [
+          "tripo_part_2",
+          "tripo_part_3",
+          "tripo_part_4",
+          "tripo_part_9",
+          "tripo_part_10",
+          "tripo_part_11"
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "hi": 0.68,
+        "lo": 0.5,
+        "metal_excluded_texels": 0,
+        "name": "skin_satin",
+        "parts": [
+          "tripo_part_2",
+          "tripo_part_3",
+          "tripo_part_4",
+          "tripo_part_9",
+          "tripo_part_10",
+          "tripo_part_11"
+        ],
+        "roughness_after_p5_p50_p95": [
+          0.5,
+          0.5106,
+          0.68
+        ],
+        "roughness_before_p5_p50_p95": [
+          0.349,
+          0.3686,
+          0.6824
+        ],
+        "texels": 3858761,
+        "tripo_roughness_q5_q95": [
+          0.349,
+          0.6824
+        ]
+      }
+    ]
+  },
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 8984523,
+      "BC": 8984523,
+      "HIT": 8984523,
+      "NORMAL": 8984523,
+      "RM": 8984523
+    },
+    "caps": {
+      "cap_texels": 89941,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 681,
+      "cap_vertices": 596,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 89941,
+      "rim_samples": 1324
+    },
+    "footprints": null,
+    "in_island_unbaked_texels": {
+      "AO": 94859,
+      "BC": 94859,
+      "HIT": 94859,
+      "NORMAL": 94859,
+      "RM": 94859
+    },
+    "size": 4096,
+    "uv_texels": 9079382
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 169641,
+    "cloth_parts": [],
+    "cloth_share_of_cloth_texels": 0.0,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": null
+  },
+  "reused_from": {
+    "run": "art/pipeline-candidates/ASSET-MUHAMMAD-ALI-001/20261021-h2-bake",
+    "stage": "textures",
+    "sha256": "0f5aed418d82de6bc5e81c259f2ff1328104036fcd533673cd45c2d7954c93da"
+  }
+}
