@@ -1,0 +1,109 @@
+{
+ "asset_id": "ASSET-DR-WATSON-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.26,
+    0.116,
+    0.033
+   ],
+   "wornBC": [
+    0.6632,
+    0.2867,
+    0.0755
+   ],
+   "ymedClassHero": 0.47719
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0497,
+    0.0232,
+    0.011
+   ],
+   "ymedClassHero": 0.02742
+  },
+  "leather_worn": {
+   "bc": [
+    0.0467,
+    0.0222,
+    0.0123
+   ],
+   "ymedClassHero": 0.02632
+  },
+  "linen": {
+   "bc": [
+    0.0382,
+    0.0319,
+    0.0284
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.03311
+  },
+  "silk": {
+   "bc": [
+    0.1274,
+    0.063,
+    0.0296
+   ],
+   "ymedClassHero": 0.07429
+  },
+  "skin": {
+   "bc": [
+    0.6172,
+    0.2582,
+    0.1248
+   ],
+   "ymedClassHero": 0.32367
+  },
+  "steel_blued": {
+   "bc": [
+    0.0771,
+    0.06,
+    0.0515
+   ],
+   "wornBC": [
+    0.195,
+    0.1494,
+    0.1271
+   ],
+   "ymedClassHero": 0.23057
+  },
+  "stone_base": {
+   "bc": [
+    0.0423,
+    0.0307,
+    0.0262
+   ],
+   "ymedClassHero": 0.03299
+  },
+  "wood": {
+   "bc": [
+    0.1529,
+    0.0802,
+    0.0437
+   ],
+   "ymedClassHero": 0.09287
+  },
+  "wool_coarse": {
+   "bc": [
+    0.0908,
+    0.0467,
+    0.0296
+   ],
+   "roughTypical": 0.85,
+   "sheenIntensity": 0.0,
+   "specular": 0.1,
+   "ymedClassHero": 0.05461
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Watson",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Watson --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

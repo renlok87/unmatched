@@ -1,0 +1,1268 @@
+{
+  "ao_distance_m": 0.036,
+  "checks": {
+    "cage_miss_share": {
+      "expected": "<= 0.01 per part",
+      "measured": {
+        "tripo_part_0": 0.000458,
+        "tripo_part_1": 0.001906,
+        "tripo_part_10": 0.005769,
+        "tripo_part_11": 0.001906,
+        "tripo_part_12": 0.000275,
+        "tripo_part_13": 0.001226,
+        "tripo_part_14": 0.001753,
+        "tripo_part_15": 0.002068,
+        "tripo_part_16": 0.00557,
+        "tripo_part_17": 0.003873,
+        "tripo_part_18": 0.008139,
+        "tripo_part_19": 0.002799,
+        "tripo_part_2": 0.001244,
+        "tripo_part_3": 0.005971,
+        "tripo_part_4": 0.002778,
+        "tripo_part_5": 0.001515,
+        "tripo_part_6": 0.001966,
+        "tripo_part_7": 0.002208,
+        "tripo_part_8": 0.000615,
+        "tripo_part_9": 0.000729
+      },
+      "note": "non-cap UV texels whose cage ray found no high-poly (filled by dilation from neighbours); cap texels (parts.<part>.HIT.cap_texels) are filled from their rim by the textures stage",
+      "passed": true
+    },
+    "texels_outside_own_islands_share": {
+      "expected": "<= 0.1 % of the part's baked texels",
+      "measured": {
+        "tripo_part_0": 29,
+        "tripo_part_1": 26,
+        "tripo_part_10": 11,
+        "tripo_part_11": 3,
+        "tripo_part_12": 12,
+        "tripo_part_13": 5,
+        "tripo_part_14": 0,
+        "tripo_part_15": 5,
+        "tripo_part_16": 1,
+        "tripo_part_17": 0,
+        "tripo_part_18": 0,
+        "tripo_part_19": 0,
+        "tripo_part_2": 32,
+        "tripo_part_3": 20,
+        "tripo_part_4": 9,
+        "tripo_part_5": 8,
+        "tripo_part_6": 6,
+        "tripo_part_7": 7,
+        "tripo_part_8": 4,
+        "tripo_part_9": 4
+      },
+      "note": "edge texels Cycles covered but the UV raster (pixel centres) did not; dropped from the composite, refilled by the textures stage dilation",
+      "passed": true
+    }
+  },
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "normal": {
+    "includes_tripo_normal_map": true,
+    "space": "TANGENT",
+    "swizzle": "POS_X POS_Y POS_Z (OpenGL)"
+  },
+  "note": "per-part bakes, margin 0; high-poly = the textured Tripo twin (identical geometry, prepare stage)",
+  "parts": {
+    "tripo_part_0": {
+      "AO": {
+        "baked_texels": 753467,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 29
+      },
+      "BC": {
+        "baked_texels": 753467,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 29
+      },
+      "HIT": {
+        "baked_texels": 753467,
+        "cage_extrusion_m": 0.004,
+        "cap_texels": 15302,
+        "hit_texels": 753007,
+        "max_ray_distance_m": 0.01,
+        "miss_share_of_uv_texels": 0.000458,
+        "outside_own_islands": 29,
+        "uv_texels": 753352
+      },
+      "NORMAL": {
+        "baked_texels": 753467,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 29
+      },
+      "RM": {
+        "baked_texels": 753467,
+        "cage_extrusion_m": 0.004,
+        "max_ray_distance_m": 0.01,
+        "outside_own_islands": 29
+      }
+    },
+    "tripo_part_1": {
+      "AO": {
+        "baked_texels": 1510387,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 26
+      },
+      "BC": {
+        "baked_texels": 1510387,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 26
+      },
+      "HIT": {
+        "baked_texels": 1510387,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 12308,
+        "hit_texels": 1510288,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001906,
+        "outside_own_islands": 26,
+        "uv_texels": 1513172
+      },
+      "NORMAL": {
+        "baked_texels": 1510387,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 26
+      },
+      "RM": {
+        "baked_texels": 1510387,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 26
+      }
+    },
+    "tripo_part_10": {
+      "AO": {
+        "baked_texels": 199733,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 11
+      },
+      "BC": {
+        "baked_texels": 199733,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 11
+      },
+      "HIT": {
+        "baked_texels": 199733,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 199733,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.005769,
+        "outside_own_islands": 11,
+        "uv_texels": 200892
+      },
+      "NORMAL": {
+        "baked_texels": 199733,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 11
+      },
+      "RM": {
+        "baked_texels": 199733,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 11
+      }
+    },
+    "tripo_part_11": {
+      "AO": {
+        "baked_texels": 137258,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 3
+      },
+      "BC": {
+        "baked_texels": 137258,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 3
+      },
+      "HIT": {
+        "baked_texels": 137258,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 20244,
+        "hit_texels": 137164,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001906,
+        "outside_own_islands": 3,
+        "uv_texels": 137426
+      },
+      "NORMAL": {
+        "baked_texels": 137258,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 3
+      },
+      "RM": {
+        "baked_texels": 137258,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 3
+      }
+    },
+    "tripo_part_12": {
+      "AO": {
+        "baked_texels": 185091,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 12
+      },
+      "BC": {
+        "baked_texels": 185091,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 12
+      },
+      "HIT": {
+        "baked_texels": 185091,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 185091,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.000275,
+        "outside_own_islands": 12,
+        "uv_texels": 185142
+      },
+      "NORMAL": {
+        "baked_texels": 185091,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 12
+      },
+      "RM": {
+        "baked_texels": 185091,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 12
+      }
+    },
+    "tripo_part_13": {
+      "AO": {
+        "baked_texels": 192998,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "BC": {
+        "baked_texels": 192998,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "HIT": {
+        "baked_texels": 192998,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 192998,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001226,
+        "outside_own_islands": 5,
+        "uv_texels": 193235
+      },
+      "NORMAL": {
+        "baked_texels": 192998,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "RM": {
+        "baked_texels": 192998,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      }
+    },
+    "tripo_part_14": {
+      "AO": {
+        "baked_texels": 203273,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "BC": {
+        "baked_texels": 203273,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "HIT": {
+        "baked_texels": 203273,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 203273,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001753,
+        "outside_own_islands": 0,
+        "uv_texels": 203630
+      },
+      "NORMAL": {
+        "baked_texels": 203273,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "RM": {
+        "baked_texels": 203273,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      }
+    },
+    "tripo_part_15": {
+      "AO": {
+        "baked_texels": 188431,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "BC": {
+        "baked_texels": 188431,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "HIT": {
+        "baked_texels": 188431,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 20303,
+        "hit_texels": 188193,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.002068,
+        "outside_own_islands": 5,
+        "uv_texels": 188583
+      },
+      "NORMAL": {
+        "baked_texels": 188431,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      },
+      "RM": {
+        "baked_texels": 188431,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 5
+      }
+    },
+    "tripo_part_16": {
+      "AO": {
+        "baked_texels": 31242,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 1
+      },
+      "BC": {
+        "baked_texels": 31242,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 1
+      },
+      "HIT": {
+        "baked_texels": 31242,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 31242,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.00557,
+        "outside_own_islands": 1,
+        "uv_texels": 31417
+      },
+      "NORMAL": {
+        "baked_texels": 31242,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 1
+      },
+      "RM": {
+        "baked_texels": 31242,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 1
+      }
+    },
+    "tripo_part_17": {
+      "AO": {
+        "baked_texels": 19034,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "BC": {
+        "baked_texels": 19034,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "HIT": {
+        "baked_texels": 19034,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 19034,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.003873,
+        "outside_own_islands": 0,
+        "uv_texels": 19108
+      },
+      "NORMAL": {
+        "baked_texels": 19034,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "RM": {
+        "baked_texels": 19034,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      }
+    },
+    "tripo_part_18": {
+      "AO": {
+        "baked_texels": 9262,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "BC": {
+        "baked_texels": 9262,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "HIT": {
+        "baked_texels": 9262,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 9262,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.008139,
+        "outside_own_islands": 0,
+        "uv_texels": 9338
+      },
+      "NORMAL": {
+        "baked_texels": 9262,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "RM": {
+        "baked_texels": 9262,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      }
+    },
+    "tripo_part_19": {
+      "AO": {
+        "baked_texels": 23159,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "BC": {
+        "baked_texels": 23159,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "HIT": {
+        "baked_texels": 23159,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 23159,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.002799,
+        "outside_own_islands": 0,
+        "uv_texels": 23224
+      },
+      "NORMAL": {
+        "baked_texels": 23159,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      },
+      "RM": {
+        "baked_texels": 23159,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 0
+      }
+    },
+    "tripo_part_2": {
+      "AO": {
+        "baked_texels": 1583406,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 32
+      },
+      "BC": {
+        "baked_texels": 1583406,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 32
+      },
+      "HIT": {
+        "baked_texels": 1583406,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 1583406,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001244,
+        "outside_own_islands": 32,
+        "uv_texels": 1585379
+      },
+      "NORMAL": {
+        "baked_texels": 1583406,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 32
+      },
+      "RM": {
+        "baked_texels": 1583406,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 32
+      }
+    },
+    "tripo_part_3": {
+      "AO": {
+        "baked_texels": 502568,
+        "cage_extrusion_m": 0.000676,
+        "max_ray_distance_m": 0.00169,
+        "outside_own_islands": 20
+      },
+      "BC": {
+        "baked_texels": 502568,
+        "cage_extrusion_m": 0.000676,
+        "max_ray_distance_m": 0.00169,
+        "outside_own_islands": 20
+      },
+      "HIT": {
+        "baked_texels": 502568,
+        "cage_extrusion_m": 0.000676,
+        "cap_texels": 12338,
+        "hit_texels": 502300,
+        "max_ray_distance_m": 0.00169,
+        "miss_share_of_uv_texels": 0.005971,
+        "outside_own_islands": 20,
+        "uv_texels": 505317
+      },
+      "NORMAL": {
+        "baked_texels": 502568,
+        "cage_extrusion_m": 0.000676,
+        "max_ray_distance_m": 0.00169,
+        "outside_own_islands": 20
+      },
+      "RM": {
+        "baked_texels": 502568,
+        "cage_extrusion_m": 0.000676,
+        "max_ray_distance_m": 0.00169,
+        "outside_own_islands": 20
+      }
+    },
+    "tripo_part_4": {
+      "AO": {
+        "baked_texels": 558492,
+        "cage_extrusion_m": 0.000635,
+        "max_ray_distance_m": 0.001588,
+        "outside_own_islands": 9
+      },
+      "BC": {
+        "baked_texels": 558492,
+        "cage_extrusion_m": 0.000635,
+        "max_ray_distance_m": 0.001588,
+        "outside_own_islands": 9
+      },
+      "HIT": {
+        "baked_texels": 558492,
+        "cage_extrusion_m": 0.000635,
+        "cap_texels": 0,
+        "hit_texels": 558492,
+        "max_ray_distance_m": 0.001588,
+        "miss_share_of_uv_texels": 0.002778,
+        "outside_own_islands": 9,
+        "uv_texels": 560048
+      },
+      "NORMAL": {
+        "baked_texels": 558492,
+        "cage_extrusion_m": 0.000635,
+        "max_ray_distance_m": 0.001588,
+        "outside_own_islands": 9
+      },
+      "RM": {
+        "baked_texels": 558492,
+        "cage_extrusion_m": 0.000635,
+        "max_ray_distance_m": 0.001588,
+        "outside_own_islands": 9
+      }
+    },
+    "tripo_part_5": {
+      "AO": {
+        "baked_texels": 359784,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "BC": {
+        "baked_texels": 359784,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "HIT": {
+        "baked_texels": 359784,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 27755,
+        "hit_texels": 359275,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001515,
+        "outside_own_islands": 8,
+        "uv_texels": 359820
+      },
+      "NORMAL": {
+        "baked_texels": 359784,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      },
+      "RM": {
+        "baked_texels": 359784,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 8
+      }
+    },
+    "tripo_part_6": {
+      "AO": {
+        "baked_texels": 517829,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 6
+      },
+      "BC": {
+        "baked_texels": 517829,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 6
+      },
+      "HIT": {
+        "baked_texels": 517829,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 517829,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.001966,
+        "outside_own_islands": 6,
+        "uv_texels": 518849
+      },
+      "NORMAL": {
+        "baked_texels": 517829,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 6
+      },
+      "RM": {
+        "baked_texels": 517829,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 6
+      }
+    },
+    "tripo_part_7": {
+      "AO": {
+        "baked_texels": 386098,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "BC": {
+        "baked_texels": 386098,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "HIT": {
+        "baked_texels": 386098,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 33122,
+        "hit_texels": 385902,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.002208,
+        "outside_own_islands": 7,
+        "uv_texels": 386756
+      },
+      "NORMAL": {
+        "baked_texels": 386098,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      },
+      "RM": {
+        "baked_texels": 386098,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 7
+      }
+    },
+    "tripo_part_8": {
+      "AO": {
+        "baked_texels": 301320,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "BC": {
+        "baked_texels": 301320,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "HIT": {
+        "baked_texels": 301320,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 14312,
+        "hit_texels": 300583,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.000615,
+        "outside_own_islands": 4,
+        "uv_texels": 300768
+      },
+      "NORMAL": {
+        "baked_texels": 301320,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "RM": {
+        "baked_texels": 301320,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      }
+    },
+    "tripo_part_9": {
+      "AO": {
+        "baked_texels": 264646,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "BC": {
+        "baked_texels": 264646,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "HIT": {
+        "baked_texels": 264646,
+        "cage_extrusion_m": 0.0006,
+        "cap_texels": 0,
+        "hit_texels": 264646,
+        "max_ray_distance_m": 0.0015,
+        "miss_share_of_uv_texels": 0.000729,
+        "outside_own_islands": 4,
+        "uv_texels": 264839
+      },
+      "NORMAL": {
+        "baked_texels": 264646,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      },
+      "RM": {
+        "baked_texels": 264646,
+        "cage_extrusion_m": 0.0006,
+        "max_ray_distance_m": 0.0015,
+        "outside_own_islands": 4
+      }
+    }
+  },
+  "passed": true,
+  "passes": [
+    "NORMAL",
+    "AO",
+    "BC",
+    "RM",
+    "HIT"
+  ],
+  "resolution": 4096,
+  "samples": {
+    "AO": 128,
+    "BC": 1,
+    "HIT": 1,
+    "NORMAL": 1,
+    "RM": 1
+  },
+  "source_images": {
+    "tripo_part_0": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_0_basecolor.jpg",
+        [
+          4096,
+          4096
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_0_normal.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_0_rm.png",
+        [
+          1024,
+          1024
+        ]
+      ]
+    },
+    "tripo_part_1": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_1_basecolor.jpg",
+        [
+          4096,
+          4096
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_1_normal.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_1_rm.png",
+        [
+          1024,
+          1024
+        ]
+      ]
+    },
+    "tripo_part_10": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_10_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_10_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_10_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_11": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_11_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_11_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_11_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_12": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_12_basecolor.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_12_normal.jpg",
+        [
+          128,
+          128
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_12_rm.png",
+        [
+          128,
+          128
+        ]
+      ]
+    },
+    "tripo_part_13": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_13_basecolor.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_13_normal.jpg",
+        [
+          128,
+          128
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_13_rm.png",
+        [
+          128,
+          128
+        ]
+      ]
+    },
+    "tripo_part_14": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_14_basecolor.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_14_normal.jpg",
+        [
+          128,
+          128
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_14_rm.png",
+        [
+          128,
+          128
+        ]
+      ]
+    },
+    "tripo_part_15": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_15_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_15_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_15_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_16": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_16_basecolor.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_16_normal.jpg",
+        [
+          128,
+          128
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_16_rm.png",
+        [
+          128,
+          128
+        ]
+      ]
+    },
+    "tripo_part_17": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_17_basecolor.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_17_normal.jpg",
+        [
+          64,
+          64
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_17_rm.png",
+        [
+          64,
+          64
+        ]
+      ]
+    },
+    "tripo_part_18": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_18_basecolor.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_18_normal.jpg",
+        [
+          64,
+          64
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_18_rm.png",
+        [
+          64,
+          64
+        ]
+      ]
+    },
+    "tripo_part_19": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_19_basecolor.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_19_normal.jpg",
+        [
+          64,
+          64
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_19_rm.png",
+        [
+          64,
+          64
+        ]
+      ]
+    },
+    "tripo_part_2": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_2_basecolor.jpg",
+        [
+          4096,
+          4096
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_2_normal.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_2_rm.png",
+        [
+          1024,
+          1024
+        ]
+      ]
+    },
+    "tripo_part_3": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_3_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_3_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_3_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_4": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_4_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_4_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_4_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_5": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_5_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_5_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_5_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_6": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_6_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_6_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_6_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_7": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_7_basecolor.jpg",
+        [
+          2048,
+          2048
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_7_normal.jpg",
+        [
+          512,
+          512
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_7_rm.png",
+        [
+          512,
+          512
+        ]
+      ]
+    },
+    "tripo_part_8": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_8_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_8_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_8_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    },
+    "tripo_part_9": {
+      "BC": [
+        "steampunk+detective+3d+model_tripo_part_9_basecolor.jpg",
+        [
+          1024,
+          1024
+        ]
+      ],
+      "N": [
+        "steampunk+detective+3d+model_tripo_part_9_normal.jpg",
+        [
+          256,
+          256
+        ]
+      ],
+      "RM": [
+        "steampunk+detective+3d+model_tripo_part_9_rm.png",
+        [
+          256,
+          256
+        ]
+      ]
+    }
+  },
+  "stage": "bake",
+  "status": "измерено"
+}

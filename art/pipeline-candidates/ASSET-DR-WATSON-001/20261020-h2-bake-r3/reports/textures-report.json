@@ -1,0 +1,2250 @@
+{
+  "bc_mean_srgb_in_islands": [
+    95.94,
+    70.48,
+    53.71
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 155684,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 1363,
+        "cap_vertices": 1195,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 155684,
+        "rim_samples": 13974
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "h21_metal_basecolor_plausible": {
+      "expected": "metal BaseColor = reflectance: linear max channel median >= 0.5 (cavities darker by the Tripo detail)",
+      "measured": {
+        "linear_max_channel_p5_p50_p95": [
+          0.1845,
+          0.552,
+          0.7758
+        ],
+        "srgb_mean": [
+          177.8,
+          183.6,
+          189.4
+        ]
+      },
+      "passed": true
+    },
+    "h21_metal_core_metallic": {
+      "expected": "metal core (mask >= 0.99): metallic p1 >= 0.89",
+      "measured": {
+        "median": 0.9647,
+        "p1": 0.902,
+        "texels": 118247
+      },
+      "passed": true
+    },
+    "h21_metal_core_roughness": {
+      "expected": "metal core roughness p1..p99 within 0.3..0.46 (varied, not a constant)",
+      "measured": {
+        "p1": 0.3216,
+        "p50": 0.3608,
+        "p99": 0.4314
+      },
+      "passed": true
+    },
+    "h21_non_metal_metallic_zero": {
+      "expected": "cloth, skin, leather, wood, snakes, base (mask 0): metallic <= 1/255",
+      "measured": {
+        "max_8bit": 0,
+        "texels": 7936957
+      },
+      "passed": true
+    },
+    "h21_rim_filters_applied": {
+      "expected": "every filtered contact cap found, with kept rim samples",
+      "measured": [],
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.001942,
+        "BC": 0.001942,
+        "NORMAL": 0.001942,
+        "RM": 0.001942
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0054
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0004,
+        "p99.9_abs_dev": 0.0051
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.7537,
+        "p1": 20.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.9039,
+      "passed": true
+    }
+  },
+  "clone_repaint": {
+    "config": [
+      {
+        "feather_m": 0.005,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.035,
+              0.03,
+              0.31
+            ],
+            "min_m": [
+              -0.062,
+              -0.03,
+              0.284
+            ]
+          }
+        ],
+        "max_dist_m": 0.006,
+        "name": "coat_r_armpit_low",
+        "note": "бок пальто под правой мышкой (в покое закрыт рукавом; pose-05, close-weapon — размытый прямоугольник под манжетой): смаз Tripo y −0,026…0,016, z 0,288…0,322; источник — тот же бок на 2,6 см ниже (над клапаном кармана z ≤ 0,261) и на 4 мм наружу по расширению бока (медиана до поверхности 0,8 мм против 3,5 мм без dx: меньше полос от ближайшего текселя)",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "offset_m": [
+            -0.004,
+            0.0,
+            -0.026
+          ]
+        }
+      },
+      {
+        "feather_m": 0.005,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.035,
+              0.03,
+              0.336
+            ],
+            "min_m": [
+              -0.062,
+              -0.03,
+              0.31
+            ]
+          }
+        ],
+        "max_dist_m": 0.006,
+        "name": "coat_r_armpit_high",
+        "note": "верх того же смаза до проймы: копия на 2,6 см ниже — уже склонированный низ (записи идут по порядку); dx −2 мм (медиана 1,8 мм против 2,2: у переднего угла с dx 0 шли поперечные полосы, close-weapon r3a)",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "offset_m": [
+            -0.002,
+            0.0,
+            -0.026
+          ]
+        }
+      },
+      {
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.07,
+              0.05,
+              0.335
+            ],
+            "min_m": [
+              0.035,
+              -0.012,
+              0.24
+            ]
+          }
+        ],
+        "max_dist_m": 0.006,
+        "name": "coat_l_side_armpit",
+        "note": "левый бок пальто от проймы до кармана (в покое закрыт левой рукой; pose-01): зеркально с правого бока (симметрия x ≈ −0,001 выше z 0,19), правая подмышка к этому шагу уже склонирована",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "mirror_x": -0.001
+        }
+      },
+      {
+        "caps": true,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.077,
+              0.009,
+              0.209
+            ],
+            "min_m": [
+              0.056,
+              -0.018,
+              0.159
+            ]
+          }
+        ],
+        "max_dist_m": 0.01,
+        "name": "coat_bag_cap",
+        "note": "крышка coat_bag (12 406 текселей, вмятина от саквояжа в покое): заливка кромкой даёт гладкое пятно — вторым проходом после заливки крышек клон с правой полы (x ≈ −0,005: медиана 3,3 мм, максимум 7 мм до поверхности); запись стоит до coat_l_side_mid / _low, чтобы её первый проход (не крышки в рамке) они перекрыли своим зеркалом",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "mirror_x": -0.005
+        }
+      },
+      {
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.08,
+              0.025,
+              0.24
+            ],
+            "min_m": [
+              0.045,
+              -0.038,
+              0.19
+            ]
+          }
+        ],
+        "max_dist_m": 0.006,
+        "name": "coat_l_side_mid",
+        "note": "левый бок у саквояжа (pose-03: светлое пятно без узора слева от саквояжа): зеркально с правого бока",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "mirror_x": -0.001
+        }
+      },
+      {
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.095,
+              0.03,
+              0.19
+            ],
+            "min_m": [
+              0.045,
+              -0.042,
+              0.15
+            ]
+          }
+        ],
+        "max_dist_m": 0.008,
+        "name": "coat_l_side_low",
+        "note": "низ того же пятна: ниже z 0,19 правая пола шире, плоскость симметрии x ≈ −0,003 (подбор: медиана 2,0 мм)",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "mirror_x": -0.003
+        }
+      },
+      {
+        "feather_m": 0.004,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.068,
+              -0.006,
+              0.188
+            ],
+            "min_m": [
+              0.048,
+              -0.036,
+              0.143
+            ]
+          }
+        ],
+        "max_dist_m": 0.006,
+        "name": "coat_l_hem_patch",
+        "note": "остаток пятна перед саквояжем (pose-03 r3a: тёмная размытая полоса; x 0,054…0,062, y −0,024…−0,010, z 0,15…0,18): на правой поле в зеркале — тоже гладкий низ, поэтому копия с того же левого бока на 4 см выше (уже склонированного с правой стороны), dx −6 мм по сужению полы вверх; рамка до y −0,036 (r3b: в зеркале coat_l_side_low у переднего края бока каждый источник копировался в среднем дважды — тёмные вертикальные полосы на pose-03; со сдвигом вверх — 1,25 раза)",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "source": {
+          "offset_m": [
+            -0.006,
+            -0.004,
+            0.04
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.086,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              0.062,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_outer",
+        "note": "ореол подошв на верху подставки (приёмка r2, close-base: светлый гладкий ореол — усреднение band_repaint r2; без него — оранжевый ореол Tripo, s ≥ 0,28 в 4 мм от подошв у 52–68 % текселей): тексели s ≥ 0,24 в рамке у каждой стороны каждой туфли копируют камень на 1,2–1,4 см наружу (8 записей)",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.014,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.044,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              0.02,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_inner",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            -0.012,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.064,
+              -0.028,
+              0.052
+            ],
+            "min_m": [
+              0.042,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_front",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.013,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.064,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              0.042,
+              0.012,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_back",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            0.013,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.062,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              -0.086,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_outer",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            -0.014,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.02,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              -0.044,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_inner",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.012,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.042,
+              -0.028,
+              0.052
+            ],
+            "min_m": [
+              -0.064,
+              -0.056,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_front",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.013,
+            0.0
+          ]
+        }
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.042,
+              0.044,
+              0.052
+            ],
+            "min_m": [
+              -0.064,
+              0.012,
+              0.044
+            ]
+          }
+        ],
+        "match_hsv": {
+          "s_min": 0.24
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_back",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            0.013,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.0725,
+              0.0005,
+              0.0495
+            ],
+            "min_m": [
+              0.0415,
+              -0.0395,
+              0.0475
+            ]
+          }
+        ],
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_front",
+        "note": "крышка base_hole_1 под левой подошвой (видна, когда стопа уходит с контакта: pose-04b, этап 6) — камень на 4,5 см впереди туфли вместо заливки кромкой",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.0415,
+              0.0005,
+              0.0495
+            ],
+            "min_m": [
+              -0.0725,
+              -0.0395,
+              0.0475
+            ]
+          }
+        ],
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_front",
+        "note": "крышка base_hole_2 (правая подошва)",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.0295,
+              0.0295,
+              0.0505
+            ],
+            "min_m": [
+              -0.0545,
+              0.0055,
+              0.0475
+            ]
+          }
+        ],
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_heel",
+        "note": "крышка base_hole_3 (правый каблук)",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        }
+      },
+      {
+        "caps": true,
+        "include_boxes_m": [
+          {
+            "max_m": [
+              0.0545,
+              0.0295,
+              0.0495
+            ],
+            "min_m": [
+              0.0295,
+              0.0055,
+              0.0475
+            ]
+          }
+        ],
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_heel",
+        "note": "крышка base_hole_4 (левый каблук)",
+        "parts": [
+          "tripo_part_0"
+        ],
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        }
+      }
+    ],
+    "rows": [
+      {
+        "box_texels": 57788,
+        "distance_mm_p50_max": [
+          0.78,
+          5.57
+        ],
+        "feathered_texels": 27990,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0475
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "coat_r_armpit_low",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 57788,
+        "selected_texels": 57788,
+        "source": {
+          "offset_m": [
+            -0.004,
+            0.0,
+            -0.026
+          ]
+        },
+        "source_texels": 3035906,
+        "without_source": 0
+      },
+      {
+        "box_texels": 31856,
+        "distance_mm_p50_max": [
+          1.78,
+          6.0
+        ],
+        "feathered_texels": 20532,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0444
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "coat_r_armpit_high",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 31328,
+        "selected_texels": 31856,
+        "source": {
+          "offset_m": [
+            -0.002,
+            0.0,
+            -0.026
+          ]
+        },
+        "source_texels": 3061947,
+        "without_source": 528
+      },
+      {
+        "box_texels": 167069,
+        "distance_mm_p50_max": [
+          1.01,
+          4.8
+        ],
+        "feathered_texels": 59006,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0558
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "coat_l_side_armpit",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 167069,
+        "selected_texels": 167069,
+        "source": {
+          "mirror_x": -0.001
+        },
+        "source_texels": 2926995,
+        "without_source": 0
+      },
+      {
+        "box_texels": 26771,
+        "distance_mm_p50_max": [
+          4.97,
+          7.57
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0822
+          }
+        },
+        "max_dist_m": 0.01,
+        "name": "coat_bag_cap",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 26771,
+        "selected_texels": 26771,
+        "source": {
+          "mirror_x": -0.005
+        },
+        "source_texels": 3067197,
+        "without_source": 0
+      },
+      {
+        "box_texels": 101608,
+        "distance_mm_p50_max": [
+          1.64,
+          4.8
+        ],
+        "feathered_texels": 31100,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0648
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "coat_l_side_mid",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 101608,
+        "selected_texels": 101608,
+        "source": {
+          "mirror_x": -0.001
+        },
+        "source_texels": 2992258,
+        "without_source": 0
+      },
+      {
+        "box_texels": 137019,
+        "distance_mm_p50_max": [
+          2.01,
+          8.0
+        ],
+        "feathered_texels": 68856,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0467
+          }
+        },
+        "max_dist_m": 0.008,
+        "name": "coat_l_side_low",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 136782,
+        "selected_texels": 137019,
+        "source": {
+          "mirror_x": -0.003
+        },
+        "source_texels": 2956875,
+        "without_source": 237
+      },
+      {
+        "box_texels": 59887,
+        "distance_mm_p50_max": [
+          2.02,
+          6.0
+        ],
+        "feathered_texels": 30789,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0431
+          }
+        },
+        "max_dist_m": 0.006,
+        "name": "coat_l_hem_patch",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "main",
+        "repainted_texels": 58838,
+        "selected_texels": 59887,
+        "source": {
+          "offset_m": [
+            -0.006,
+            -0.004,
+            0.04
+          ]
+        },
+        "source_texels": 3033862,
+        "without_source": 1049
+      },
+      {
+        "box_texels": 14121,
+        "distance_mm_p50_max": [
+          0.2,
+          1.24
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0614
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_outer",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 1149,
+        "selected_texels": 1149,
+        "source": {
+          "offset_m": [
+            0.014,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 751858,
+        "without_source": 0
+      },
+      {
+        "box_texels": 14729,
+        "distance_mm_p50_max": [
+          0.25,
+          2.74
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0737
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_inner",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 3416,
+        "selected_texels": 3416,
+        "source": {
+          "offset_m": [
+            -0.012,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 749591,
+        "without_source": 0
+      },
+      {
+        "box_texels": 3153,
+        "distance_mm_p50_max": [
+          0.22,
+          1.38
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0927
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_front",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 606,
+        "selected_texels": 606,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.013,
+            0.0
+          ]
+        },
+        "source_texels": 752401,
+        "without_source": 0
+      },
+      {
+        "box_texels": 3809,
+        "distance_mm_p50_max": [
+          0.35,
+          1.63
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0729
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_l_back",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 531,
+        "selected_texels": 531,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.013,
+            0.0
+          ]
+        },
+        "source_texels": 752476,
+        "without_source": 0
+      },
+      {
+        "box_texels": 14010,
+        "distance_mm_p50_max": [
+          0.26,
+          1.1
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0588
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_outer",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 1077,
+        "selected_texels": 1077,
+        "source": {
+          "offset_m": [
+            -0.014,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 751930,
+        "without_source": 0
+      },
+      {
+        "box_texels": 13725,
+        "distance_mm_p50_max": [
+          0.26,
+          2.06
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0718
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_inner",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 2689,
+        "selected_texels": 2689,
+        "source": {
+          "offset_m": [
+            0.012,
+            0.0,
+            0.0
+          ]
+        },
+        "source_texels": 750318,
+        "without_source": 0
+      },
+      {
+        "box_texels": 3052,
+        "distance_mm_p50_max": [
+          0.21,
+          0.84
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0729
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_front",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 352,
+        "selected_texels": 352,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.013,
+            0.0
+          ]
+        },
+        "source_texels": 752655,
+        "without_source": 0
+      },
+      {
+        "box_texels": 4152,
+        "distance_mm_p50_max": [
+          0.5,
+          1.3
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0708
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "sole_r_back",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 599,
+        "selected_texels": 599,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.013,
+            0.0
+          ]
+        },
+        "source_texels": 752408,
+        "without_source": 0
+      },
+      {
+        "box_texels": 3509,
+        "distance_mm_p50_max": [
+          0.26,
+          1.27
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0936
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_front",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 3509,
+        "selected_texels": 3509,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        },
+        "source_texels": 749543,
+        "without_source": 0
+      },
+      {
+        "box_texels": 3072,
+        "distance_mm_p50_max": [
+          0.34,
+          1.45
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0904
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_front",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 3072,
+        "selected_texels": 3072,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        },
+        "source_texels": 750055,
+        "without_source": 0
+      },
+      {
+        "box_texels": 1682,
+        "distance_mm_p50_max": [
+          0.32,
+          1.54
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1122
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_heel",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 1682,
+        "selected_texels": 1682,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        },
+        "source_texels": 751407,
+        "without_source": 0
+      },
+      {
+        "box_texels": 1643,
+        "distance_mm_p50_max": [
+          0.23,
+          1.24
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1061
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_heel",
+        "part_texels": 753352,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "main",
+        "repainted_texels": 1643,
+        "selected_texels": 1643,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        },
+        "source_texels": 751449,
+        "without_source": 0
+      },
+      {
+        "box_texels": 12308,
+        "distance_mm_p50_max": [
+          3.26,
+          7.05
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0761
+          }
+        },
+        "max_dist_m": 0.01,
+        "name": "coat_bag_cap",
+        "part_texels": 12308,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "pass": "caps",
+        "repainted_texels": 12308,
+        "selected_texels": 12308,
+        "source": {
+          "mirror_x": -0.005
+        },
+        "source_texels": 3067197,
+        "without_source": 0
+      },
+      {
+        "box_texels": 5218,
+        "distance_mm_p50_max": [
+          0.52,
+          1.4
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0769
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_front",
+        "part_texels": 15302,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "caps",
+        "repainted_texels": 5218,
+        "selected_texels": 5218,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        },
+        "source_texels": 749543,
+        "without_source": 0
+      },
+      {
+        "box_texels": 5097,
+        "distance_mm_p50_max": [
+          0.39,
+          1.42
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0573
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_front",
+        "part_texels": 15302,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "caps",
+        "repainted_texels": 5097,
+        "selected_texels": 5097,
+        "source": {
+          "offset_m": [
+            0.0,
+            -0.045,
+            0.0
+          ]
+        },
+        "source_texels": 750055,
+        "without_source": 0
+      },
+      {
+        "box_texels": 2495,
+        "distance_mm_p50_max": [
+          0.34,
+          1.92
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0934
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_r_heel",
+        "part_texels": 15302,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "caps",
+        "repainted_texels": 2495,
+        "selected_texels": 2495,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        },
+        "source_texels": 751407,
+        "without_source": 0
+      },
+      {
+        "box_texels": 2492,
+        "distance_mm_p50_max": [
+          0.22,
+          1.4
+        ],
+        "feathered_texels": 0,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0594
+          }
+        },
+        "max_dist_m": 0.004,
+        "name": "base_hole_l_heel",
+        "part_texels": 15302,
+        "parts": [
+          "tripo_part_0"
+        ],
+        "pass": "caps",
+        "repainted_texels": 2492,
+        "selected_texels": 2492,
+        "source": {
+          "offset_m": [
+            0.0,
+            0.04,
+            0.0
+          ]
+        },
+        "source_texels": 751449,
+        "without_source": 0
+      }
+    ]
+  },
+  "color_repaint": {
+    "config": [
+      {
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            10,
+            40
+          ],
+          "s_min": 0.35
+        },
+        "match_hsv": {
+          "hue_deg": [
+            150,
+            350
+          ]
+        },
+        "name": "coat_offhue",
+        "note": "сине-фиолетовые и пурпурные тексели сукна (желобок шва спинки, кромки лацканов): BC разведки — 7 308 текселей пол, v 0,02–0,14, в полосе шва 865; цвет — от бурого сукна рядом",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {
+          "hue_deg": [
+            10,
+            40
+          ],
+          "s_min": 0.35
+        },
+        "match_hsv": {
+          "s_max": 0.3,
+          "v_max": 0.3
+        },
+        "name": "coat_dark_neutral",
+        "note": "тёмные почти серые тексели сукна (s < 0,3, v < 0,3; в полосе шва 660): усиление look-dev класса wool_coarse [0,94; 1,03; 1,31] делает их сине-фиолетовыми",
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {},
+        "match_hsv": {
+          "hue_deg": [
+            150,
+            350
+          ]
+        },
+        "name": "sleeve_offhue",
+        "note": "грязно-синие мазки на манжетах и складках рукавов (1 854 текселя, v 0,04–0,18); источник — ближайшие не синие тексели (белая манжета у манжеты, сукно у сукна)",
+        "parts": [
+          "tripo_part_5",
+          "tripo_part_7"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {},
+        "match_hsv": {
+          "s_max": 0.3,
+          "v_max": 0.3
+        },
+        "name": "sleeve_dark_neutral",
+        "note": "тёмные почти серые мазки у манжет и в складках рукавов (синеют после усиления wool_coarse)",
+        "parts": [
+          "tripo_part_5",
+          "tripo_part_7"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {},
+        "match_hsv": {
+          "hue_deg": [
+            180,
+            300
+          ],
+          "s_min": 0.08
+        },
+        "name": "hat_bluish",
+        "note": "голубоватые кромки полей котелка (10 971 тексель, h 195–290°, s ≥ 0,08); источник — нейтральный тёмный фетр рядом",
+        "parts": [
+          "tripo_part_9"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {
+          "v_max": 0.25
+        },
+        "match_hsv": {
+          "s_min": 0.25,
+          "v_min": 0.28
+        },
+        "name": "hat_skin_tint",
+        "note": "светлые тексели цвета кожи и волос на нижней стороне полей котелка (Tripo спроецировал лицо на изнанку полей: 17 584 текселя в z < 0,4225, h 22°, s 0,37, v 0,46) — на кадрах светлая и голубоватая кромка под полями; цвет — от тёмного фетра рядом (v ≤ 0,25)",
+        "parts": [
+          "tripo_part_9"
+        ],
+        "radius_m": 0.015
+      },
+      {
+        "k": 8,
+        "keep_hsv": {
+          "s_min": 0.33
+        },
+        "match_hsv": {
+          "s_max": 0.3
+        },
+        "name": "hand_r_metal",
+        "note": "серые пятна металла на указательном и среднем пальцах правой кисти у барабана и спускового крючка (s < 0,3: 2 939 текселей после первой правки s < 0,2 — 1 265 —, кадр close-hands r2 показал остаток); цвет — от кожи рядом (s ≥ 0,33)",
+        "parts": [
+          "tripo_part_14"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "k": 8,
+        "keep_hsv": {
+          "s_min": 0.33
+        },
+        "match_hsv": {
+          "hue_deg": [
+            150,
+            300
+          ]
+        },
+        "name": "hand_r_bluish",
+        "note": "голубовато-серые тексели кисти у металла (h 150–300°, ≈ 330)",
+        "parts": [
+          "tripo_part_14"
+        ],
+        "radius_m": 0.012
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.078,
+              -0.03,
+              0.342
+            ],
+            "min_m": [
+              -0.102,
+              -0.054,
+              0.312
+            ]
+          }
+        ],
+        "k": 4,
+        "keep_hsv": {
+          "s_max": 0.32,
+          "v_min": 0.55
+        },
+        "majority": {
+          "min_source_fraction": 0.51,
+          "radius_m": 0.004
+        },
+        "match_hsv": {
+          "v_max": 0.52
+        },
+        "name": "cuff_r_strokes",
+        "note": "r3 (приёмка r2, пункт T, close-weapon / close-hands R): тёмные грязные мазки по краю белой манжеты правой руки; тёмный тексель перекрашивается белым, только если белые тексели — большинство в шаре 2,5 мм (бурое сукно обшлага рядом не белеет); два прохода (второй ловит мазки, у которых белых стало больше)",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004
+      },
+      {
+        "include_boxes_m": [
+          {
+            "max_m": [
+              -0.078,
+              -0.03,
+              0.342
+            ],
+            "min_m": [
+              -0.102,
+              -0.054,
+              0.312
+            ]
+          }
+        ],
+        "k": 4,
+        "keep_hsv": {
+          "s_max": 0.32,
+          "v_min": 0.55
+        },
+        "majority": {
+          "min_source_fraction": 0.51,
+          "radius_m": 0.004
+        },
+        "match_hsv": {
+          "v_max": 0.52
+        },
+        "name": "cuff_r_strokes_2",
+        "note": "второй проход cuff_r_strokes",
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004
+      }
+    ],
+    "rows": [
+      {
+        "distance_mm_p50_max": [
+          0.42,
+          1.84
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0861
+          }
+        },
+        "matched_texels": 9280,
+        "name": "coat_offhue",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 9280,
+        "source_texels": 3050506,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.3,
+          2.31
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1221
+          }
+        },
+        "matched_texels": 11369,
+        "name": "coat_dark_neutral",
+        "part_texels": 3098551,
+        "parts": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 11369,
+        "source_texels": 3059786,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.27,
+          0.72
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0603
+          }
+        },
+        "matched_texels": 1875,
+        "name": "sleeve_offhue",
+        "part_texels": 746576,
+        "parts": [
+          "tripo_part_5",
+          "tripo_part_7"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 1875,
+        "source_texels": 743302,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.27,
+          0.75
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1255
+          }
+        },
+        "matched_texels": 4676,
+        "name": "sleeve_dark_neutral",
+        "part_texels": 746576,
+        "parts": [
+          "tripo_part_5",
+          "tripo_part_7"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 4676,
+        "source_texels": 741900,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.53,
+          1.86
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0414
+          }
+        },
+        "matched_texels": 10839,
+        "name": "hat_bluish",
+        "part_texels": 264839,
+        "parts": [
+          "tripo_part_9"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 10839,
+        "source_texels": 253807,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          1.29,
+          6.23
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.2093
+          }
+        },
+        "matched_texels": 17496,
+        "name": "hat_skin_tint",
+        "part_texels": 264839,
+        "parts": [
+          "tripo_part_9"
+        ],
+        "radius_m": 0.015,
+        "repainted_texels": 17496,
+        "source_texels": 238366,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.38,
+          1.74
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.1207
+          }
+        },
+        "matched_texels": 4342,
+        "name": "hand_r_metal",
+        "part_texels": 203630,
+        "parts": [
+          "tripo_part_14"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 4342,
+        "source_texels": 195144,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.43,
+          1.05
+        ],
+        "k": 8,
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.0828
+          }
+        },
+        "matched_texels": 354,
+        "name": "hand_r_bluish",
+        "part_texels": 203630,
+        "parts": [
+          "tripo_part_14"
+        ],
+        "radius_m": 0.012,
+        "repainted_texels": 354,
+        "source_texels": 198707,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.59,
+          1.43
+        ],
+        "k": 4,
+        "majority": {
+          "held_texels": 19629,
+          "min_source_fraction": 0.51,
+          "passed_texels": 557,
+          "radius_m": 0.004
+        },
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.398
+          }
+        },
+        "matched_texels": 20186,
+        "name": "cuff_r_strokes",
+        "part_texels": 359820,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004,
+        "repainted_texels": 557,
+        "source_texels": 12334,
+        "without_source": 0
+      },
+      {
+        "distance_mm_p50_max": [
+          0.44,
+          1.78
+        ],
+        "k": 4,
+        "majority": {
+          "held_texels": 19306,
+          "min_source_fraction": 0.51,
+          "passed_texels": 323,
+          "radius_m": 0.004
+        },
+        "maps": {
+          "BC": {
+            "mean_abs_change": 0.2649
+          }
+        },
+        "matched_texels": 19629,
+        "name": "cuff_r_strokes_2",
+        "part_texels": 359820,
+        "parts": [
+          "tripo_part_5"
+        ],
+        "radius_m": 0.004,
+        "repainted_texels": 323,
+        "source_texels": 12849,
+        "without_source": 0
+      }
+    ]
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "materials": {
+    "config": {
+      "ao_exclusions": [
+        "tripo_part_1",
+        "tripo_part_2",
+        "tripo_part_3"
+      ],
+      "checks": {
+        "metal_core_bc_linear_max_channel_p50_min": 0.5,
+        "metal_core_metallic_min": 0.89,
+        "metal_core_roughness": [
+          0.3,
+          0.46
+        ],
+        "non_metal_metallic_max_8bit": 1
+      },
+      "cloth_roughness": {
+        "apply": false,
+        "hi": 0.9,
+        "lo": 0.8,
+        "note": "не применяется (как Medusa)"
+      },
+      "metal": {
+        "basecolor": {
+          "detail_clip": [
+            0.25,
+            1.4
+          ],
+          "detail_gamma": 1.0,
+          "note": "светлая холодная сталь концепта; #B8BEC4 как у Angel/Beowulf (гейт metal_core_bc_linear_max_channel_p50_min 0,5)",
+          "target_srgb": "#B8BEC4"
+        },
+        "blur": 1,
+        "close_px": 2,
+        "hue_deg": [
+          -10,
+          370
+        ],
+        "hue_ramp_deg": 1,
+        "local_radius_px": 3,
+        "metallic": {
+          "max": 1.0,
+          "min": 0.9
+        },
+        "parts": {
+          "tripo_part_12": {
+            "min_component_px": 60,
+            "note": "револьвер — полированная сталь; деревянная рукоять (бурая, s > 0,3) — не металл",
+            "terms": [
+              {
+                "hue_deg": [
+                  -10,
+                  370
+                ],
+                "hue_ramp_deg": 1,
+                "kind": "local",
+                "name": "revolver_steel",
+                "radius_px": 3,
+                "s_max": 0.2,
+                "s_min": -1.0,
+                "v_min": 0.18
+              }
+            ],
+            "texel_floor": {
+              "v_min": 0.1
+            }
+          }
+        },
+        "parts_note": "цветовое правило по части 12",
+        "ramp": 0.04,
+        "roughness": {
+          "detail_weight": 0.6,
+          "max": 0.45,
+          "min": 0.32,
+          "note": "как металл Medusa/Angel"
+        }
+      },
+      "note": "проход металла H2.1 (HANDBOOK §2.4, образец Beowulf): маска металла — сталь револьвера (часть 12, серые тексели s ≤ 0,2: замер BC разведки s p50 0,06, v p50 0,73; деревянная рукоять в кулаке — не металл). Латунная фурнитура саквояжа и цепочка часов в маску H2.1 не входят — класс gold_antique look-dev по цвету (как золото Beowulf)",
+      "rim_filters": []
+    },
+    "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, художественно не принято",
+    "stats": {
+      "ao_exclusions": [
+        {
+          "delta_max": 0.9141,
+          "delta_mean": 0.04652,
+          "delta_p99": 0.7109,
+          "part": "tripo_part_1",
+          "texels": 1510387,
+          "texels_lighter_gt_16_255": 218719
+        },
+        {
+          "delta_max": 0.8984,
+          "delta_mean": 0.02051,
+          "delta_p99": 0.5391,
+          "part": "tripo_part_2",
+          "texels": 1583406,
+          "texels_lighter_gt_16_255": 104751
+        },
+        {
+          "delta_max": 0.9219,
+          "delta_mean": 0.11729,
+          "delta_p99": 0.7578,
+          "part": "tripo_part_3",
+          "texels": 502568,
+          "texels_lighter_gt_16_255": 177301
+        }
+      ],
+      "metal_mask": {
+        "tripo_part_12": {
+          "gate": null,
+          "mask_mean": 0.7284,
+          "metal_share": 0.7551,
+          "small_component_texels_removed": 6584,
+          "term_texels": [
+            146894
+          ]
+        }
+      },
+      "remap": {
+        "after": {
+          "cloth": {
+            "bc_srgb_mean": [
+              87.3,
+              59.0,
+              40.8
+            ],
+            "metallic_mean": 0.0,
+            "metallic_p5_p95": [
+              0.0,
+              0.0
+            ],
+            "roughness_mean": 0.8362,
+            "roughness_p5_p95": [
+              0.8157,
+              0.8588
+            ],
+            "texels": 2856947
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              174.9,
+              180.4,
+              186.0
+            ],
+            "metallic_mean": 0.9207,
+            "metallic_p5_p95": [
+              0.6361,
+              1.0
+            ],
+            "roughness_mean": 0.3596,
+            "roughness_p5_p95": [
+              0.3032,
+              0.4151
+            ],
+            "texels": 139761
+          },
+          "metal_core_m_ge_0.99": {
+            "bc_srgb_mean": [
+              177.7,
+              183.6,
+              189.4
+            ],
+            "metallic_mean": 0.9626,
+            "metallic_p5_p95": [
+              0.9075,
+              1.0
+            ],
+            "roughness_mean": 0.3659,
+            "roughness_p5_p95": [
+              0.3262,
+              0.4161
+            ],
+            "texels": 118245
+          },
+          "non_metal_metallic_max": 0.0
+        },
+        "before": {
+          "cloth": {
+            "bc_srgb_mean": [
+              87.3,
+              59.0,
+              40.8
+            ],
+            "metallic_mean": 0.0096,
+            "roughness_mean": 0.8362,
+            "texels": 2856947
+          },
+          "metal": {
+            "bc_srgb_mean": [
+              101.8,
+              96.9,
+              95.9
+            ],
+            "metallic_mean": 0.6903,
+            "roughness_mean": 0.2214,
+            "texels": 139761
+          }
+        },
+        "luminance_reference_linear": 0.12132,
+        "metal_bc_linear_max_channel_p5_p50_p95": [
+          0.1702,
+          0.5286,
+          0.7728
+        ],
+        "target_linear": [
+          0.4793,
+          0.5149,
+          0.552
+        ],
+        "target_srgb": "#B8BEC4",
+        "tripo_roughness_rank_q5_q95": {
+          "cloth": null,
+          "metal": [
+            0.1774,
+            0.2997
+          ]
+        }
+      }
+    }
+  },
+  "outputs": {
+    "T_DrWatson_H2_2K_BC.png": {
+      "bytes": 5412828,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "2207ad8be2d3345e0ef477133f43745a41303b19ba68edc6b092c19c0236b09c"
+    },
+    "T_DrWatson_H2_2K_N.png": {
+      "bytes": 4307310,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "1f76e67f345630eb6cf7bb186a46861015de50f9e60f43f72aeafb87d453e4d7"
+    },
+    "T_DrWatson_H2_2K_N_OpenGL.png": {
+      "bytes": 4308025,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "68af4fffefc4c1a3c5420cd6e1899b9ecaaf38d485175261247f79757f0dd815"
+    },
+    "T_DrWatson_H2_2K_ORM.png": {
+      "bytes": 3076844,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "8a187d85b7b8ecd7960bd8cf2cbffd8b3898cadf8733721d674365989a963429"
+    },
+    "T_DrWatson_H2_2K_TeamMask.png": {
+      "bytes": 1000078,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "10127ef1b81fc70e4c2e20088f5ccf55213aa88bee32d0093540ae8dce578e99"
+    },
+    "T_DrWatson_H2_BC.png": {
+      "bytes": 19022463,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "437ba6c9c9cfa2a2300582943ab44f920820f75350ca3806b6d564aeb5107aae"
+    },
+    "T_DrWatson_H2_N.png": {
+      "bytes": 12652982,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "b6dbf13b3958f9f54459ed309d9a84b72b39aaa20ace292a8bd2ddf657898644"
+    },
+    "T_DrWatson_H2_N_OpenGL.png": {
+      "bytes": 12654961,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "d0ce921b0c7f85f95893ccdc517159dcb3266a1adfd44a77b0502bd5df1c8df9"
+    },
+    "T_DrWatson_H2_ORM.png": {
+      "bytes": 9672377,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "2b955beb7baa1d642c1cfda10d015cd1d554bf8d842622aa284d345f7a96dd98"
+    },
+    "T_DrWatson_H2_TeamMask.png": {
+      "bytes": 2919953,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "ae1c7ff1dad4b5fc61399929460a53a088482b99e710ffa942acbeb34574f267"
+    }
+  },
+  "passed": true,
+  "prefix": "T_DrWatson_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7927478,
+      "BC": 7927478,
+      "HIT": 7927478,
+      "NORMAL": 7927478,
+      "RM": 7927478
+    },
+    "caps": {
+      "cap_texels": 155684,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 1363,
+      "cap_vertices": 1195,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 155684,
+      "rim_samples": 13974
+    },
+    "footprints": null,
+    "in_island_unbaked_texels": {
+      "AO": 168501,
+      "BC": 168501,
+      "HIT": 168501,
+      "NORMAL": 168501,
+      "RM": 168501
+    },
+    "size": 4096,
+    "uv_texels": 8095979
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 132093,
+    "cloth_parts": [
+      "tripo_part_1",
+      "tripo_part_2"
+    ],
+    "cloth_share_of_cloth_texels": 0.9039,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "бурое пальто (части 1, 2): h p50 23°, s p5–p95 0,43–0,63, v 0,22–0,52 (замер BC разведки run3); v_max 0,75 давал долю 0,983 > 0,98",
+      "ramp": 0.04,
+      "s_max": 0.95,
+      "v_max": 0.5
+    }
+  }
+}
