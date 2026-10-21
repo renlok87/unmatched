@@ -1,0 +1,168 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodTreeLantern.fbx",
+      "sha256": "ef73ad18810f7f7c06e7f31a9fb221085a84cc3605356cd5fa7a07c9d9c81812"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_BC.png",
+      "sha256": "60fa8621aa3b42e9117f781895eff1e3327f8de7a45424eee12db66521804f64"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_N.png",
+      "sha256": "75c124b43d45718b622b6b9e60798e6a37d035444b00aa48576940898309c6ba"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodTreeLantern_ORM.png",
+      "sha256": "12710ac08ece7aea5e8352271ba3c5b4b90253522637e8217d11bbab03f8bc4a"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-tree-lantern-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodTreeLantern.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "5178 tris (бюджет env_kit 12000, проп 2000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "UV0 islands 147, used 0.5587, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "T_Env_SherwoodTreeLantern_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodTreeLantern.build.json",
+      "note": "SM_Env_SherwoodTreeLantern, M_Env_SherwoodTreeLantern",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: кол из грубого бруса с заострённым низом и косым срезом сверху, сук-кронштейн с железной обоймой на конце, цепь, четырёхгранный кованый фонарь с крестовыми переплётами, колпачком и шипами снизу; три обоймы на столбе и сучок совпадают. Фонарь занимает ≈37 % высоты против ≈40 % на виде, ширина к высоте 0,38 против ≈0,35 (в пределах 5 %). Лишних и пропавших частей нет, на turn-090/270 фантомов нет, предмет узнаётся со всех 8 ракурсов (на turn-270 фонарь за столбом, но края видны). Стекло на виде янтарное от горящей свечи, в модели бледно-кремовое матовое: это свечение, а не форма; в T не снижал.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте нет дыр, чёрных пятен, вывернутых частей, мусора и оплывших масс. Тонкие элементы (звенья цепи с кольцом, крестовины, шипы, обоймы с заклёпками) целы, сетка на wire-* следует форме. На крупном плане видна прорезь (тёмная щель) в правой пластине крыши под колпачком (close-weapon); на turn-000/090 это тонкая тёмная черта, которая читается как шов листов. По отчёту дно фонаря и полость под крышей открыты (27 петель-дыр, крупнейшие на z≈21,3 и 31,5 uu): на кадрах и с верхней игровой камеры их не видно. Острие кола слегка комковатое (close-base).",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "turn-000.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: дерево со стилизованной резной фактурой (уровень кита Sarpedon), кованое железо с заклёпками и холодным отливом, матовое стекло; запечённых теней на столбе и фонаре нет, швов на полном росте не видно. Дефекты видны только на крупном плане: мыльная фактура с низким разрешением на острие кола (close-base) и вертикальные растяжки на торце верхушки столба справа (close-head). Пламя свечи нарисовано в BC тёплым пятном за стеклом (turn-000, close-weapon): это изображение самого пламени, а не запечённый блик. UV: 147 островов без перекрытий.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "close-weapon.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8,3 ≥ 8,0 (S 2,0 / F 1,5 / T 1,5), ни одно измерение не ниже 1,0, все гейты PASS или n/a; дефекты видны только на крупном плане. Балл попадает в полосу 8,0–8,4: по §8.3/§8.5 нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Прорезь (тёмная щель) в правой пластине крыши фонаря под колпачком; на turn-000/turn-090 — тонкая тёмная черта, читается как шов листов."
+    },
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "По build.json дно фонаря и полость под крышей открыты (27 петель-дыр, крупнейшие на z≈21,3 и 31,5 uu, ось фонаря x≈4,2). С верхней игровой камеры не видно; при ракурсе снизу дно будет пустым."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "Острие кола: мыльная фактура с низким разрешением, острие слегка комковатое; заметно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Вертикальные растяжки текстуры на торце верхушки столба справа; заметно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "Стекло в BC бледно-кремовое, матовое, пламя свечи нарисовано тёплым пятном; янтарное свечение с вида (sheet.png) нужно давать эмиссией и мерцанием в UE (роль animated). ORM без канала эмиссии."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-TREE-LANTERN-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп tree-lantern (Фонарь на суку) принят по делегированию: 8,3. Силуэт совпадает с видом. Щель в крыше, мыло на острие кола и растяжка на торце столба видны только на крупном плане. Балл в полосе 8,0–8,4, поэтому нужен второй приёмщик «Opus high»."
+}

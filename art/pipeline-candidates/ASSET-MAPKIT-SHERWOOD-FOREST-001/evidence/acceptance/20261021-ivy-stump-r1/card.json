@@ -1,0 +1,156 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodIvyStump.fbx",
+      "sha256": "9012bfe6576e03b73d098501433c5ecc2998b056adf5bd787d7a3af6a0f09089"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_BC.png",
+      "sha256": "0dc59939bf56b84bc3cfded5e58a6ad3785b596cc04530f5ac43120762b5435d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_N.png",
+      "sha256": "6da76b272935a47ccfcf2a6f2338734099a9a5d762c0ff11aedd88128950c573"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodIvyStump_ORM.png",
+      "sha256": "e4e0a87a665512ade159486388d037144e46f1e7a47c6fce1bf0bf7ca44b067b"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-ivy-stump-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodIvyStump.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "2900 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "UV0 islands 742, used 0.7621, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "T_Env_SherwoodIvyStump_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodIvyStump.build.json",
+      "note": "SM_Env_SherwoodIvyStump, M_Env_SherwoodIvyStump",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот самый предмет: высокий сломанный пень с рваной короной из щеп (левая щепа выше всех, правая группа ниже, как на sheet), широкий корневой наплыв и плющ, обвивающий ствол снизу доверху. Пропорции совпадают с видом (средняя ширина ствола около 0.22–0.25 высоты, наплыв около 0.5–0.55), лишних и пропавших частей нет; на всех 8 ракурсах читается тот же пень, фантомных выступов на turn-090/270 и wire-* нет. Плющ чуть светлее и желтее, чем на sheet, но цвет того же семейства.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Дыр, просветов, рваных краёв, вывернутых частей и оплывших масс нет; щепы короны целы и остры (close-head, close-weapon), корни сидят на земле, сетка ствола на wire-* следует форме. Минус: листья плюща сделаны однослойными карточками. Стоящие ребром к камере, они дают тёмную колючую бахрому вдоль боковых силуэтов (turn-090 справа, turn-180 справа, turn-315), а у основания часть карточек торчит горизонтально за корневой наплыв (close-base справа). Контур от этого шумнее, чем на sheet, но на игровой дистанции читается как листья, а не как поломка.",
+      "frames": [
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "close-head.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: кора — дерево с продольными волокнами и трещинами, плющ — листья с прожилками и стеблями, пятна мха у основания. Резкого запечённого света и теней нет, рисованная стилизация допустима. Дефекты в основном крупного плана: щепы короны на close-head мыльные, без резкой фактуры; на левом корневом наплыве (close-base) мох смазан и растянут полосами, что слабо видно и на полном росте внизу слева (turn-000, turn-135). Детализация плюща хорошая (close-weapon).",
+      "frames": [
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2.0 + F 1.5 + T 1.5 = 5.0/6 → 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, гейты PASS/n/a. Мелкие дефекты (бахрома листовых карточек ребром, мыльные щепы, смазанный мох на одном корне) на игровой дистанции фонового пропа не мешают. Балл в полосе 8.0–8.4: по §8.3/§8.5 нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "note": "Однослойные листовые карточки плюща, стоящие ребром к камере, дают тёмную колючую бахрому вдоль боковых силуэтов (также turn-090 и turn-315). У основания часть карточек торчит горизонтально за корневой наплыв (close-base справа)."
+    },
+    {
+      "item": "T",
+      "frame": "close-base.jpg",
+      "note": "На левом корневом наплыве мох смазан и растянут полосами; слабо видно и на полном росте внизу слева (turn-000, turn-135)."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Расщеплённые щепы вершины на крупном плане мыльные, без резкой древесной фактуры."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-IVY-STUMP-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп ivy-stump (Sherwood Forest) принят по делегированию с баллом 8.3. Известные мелочи: бахрома листовых карточек ребром, мыльные щепы короны, смазанный мох на левом корне. Балл в полосе 8.0–8.4, нужен второй приёмщик «Opus high»."
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodVenisonRack.fbx",
+      "sha256": "e92014bdc1709880f01b9a622e25f62f4917c332eb07d1e32ea34e40a55b3217"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_BC.png",
+      "sha256": "b180dbf3d7da620bb12c34a9fd00086af70897334dd37e29b54e6381242c0649"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_N.png",
+      "sha256": "494d941a8b1177db02865295078c84f8a6eb324fcab9fb55cbedeeb9b06f9bdc"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodVenisonRack_ORM.png",
+      "sha256": "4b28c37391ebae417ef71e6176db47a2b1e13b0dbd6fb913ec39f2a3aabb69ae"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-venison-rack-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodVenisonRack.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "5026 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "UV0 islands 173, used 0.5643, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "T_Env_SherwoodVenisonRack_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodVenisonRack.build.json",
+      "note": "SM_Env_SherwoodVenisonRack, M_Env_SherwoodVenisonRack",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Тот же предмет, что на sheet.png: A-образная стойка из двух пар жердей, перекрещённых и обвязанных верёвкой наверху, поперечина-бревно с выступающими концами, боковые распорки на верёвочных узлах примерно на 60 % высоты, слева окорок на верёвке с петлёй и хвостом верёвки у кости, справа три полосы вяленого мяса. Пропорции совпадают с видом: в 3/4 (turn-045) низ окорока приходится примерно на 0,82 высоты, на листе около 0,78, расхождение в пределах допуска. Лишних и пропавших частей нет. В описании сказано «tripod», но генерация шла по листу, и модель повторяет его A-раму. На боковых ракурсах (turn-090/270) читается A-рама с висящим окороком, фантомных выступов и оболочек нет. Предмет узнаётся со всех восьми ракурсов. Цветовые пятна того же семейства, что на листе: светлое дерево, красное мясо, бежевая верёвка.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая: дыр, просветов, вывернутых частей и чёрных пятен нет. Тонкие элементы целы: подвесные верёвки, хвост верёвки у кости, тонкие распорки, раздвоенные концы полос. Сетка на wire-front/back/34 следует форме, жерди и окорок без мусора. Дефекты видны только на крупном плане: петли верёвки на поперечине гранёные, а под петлями, где отходят подвесы, торчат маленькие плоские пластины-язычки (close-weapon.jpg). Нижняя часть окорока слегка бугристая, на wire-34 под ней тёмная впадина. В текстурных ракурсах это не читается.",
+      "frames": [
+        "turn-000.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе. Дерево ручной росписи: волокна, сучки, торцевые кольца, зелёные мшистые подтёки, это стиль кита. Верёвка со скруткой прядей. Мясо: мраморный срез окорока, жировая кромка, вяленая корка, тёмно-красные полосы. Запечённого света и теней, швов и растяжек на полном росте нет. UV-атлас 173 острова без наложений. Мелкие дефекты крупного плана: на срезе окорока и на головке кости мелкий ромбический узор, похожий на шум (close-head.jpg, turn-270.jpg). На низе одной из жердей тёплый розоватый оттенок, возможно, цвет мяса попал на дерево при проекции (turn-270, turn-090), но на игровой дистанции он читается как вариация дерева.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-270.jpg",
+        "close-head.jpg",
+        "close-base.jpg",
+        "close-weapon.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 → round(5,0/6×10, 1) = 8,3. Порог 8,0 пройден, ни одно измерение не ниже 1,0, гейты PASS или n/a. Дефекты F и T видны только на крупном плане: язычки под петлями верёвки, ромбический шум на срезе окорока, розоватый тон на низе жерди. Для фонового пропа диорамы на игровой дистанции они не важны. Балл попадает в полосу 8,0–8,4, поэтому по §8.5 нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "close-weapon.jpg",
+      "note": "Под петлями верёвки на поперечине, в местах отхода подвесов окорока и полос, торчат маленькие плоские пластины-язычки. Сами петли гранёные. Видно только на крупном плане."
+    },
+    {
+      "item": "F",
+      "frame": "wire-34.jpg",
+      "note": "Нижняя часть окорока слегка бугристая, под ней тёмная впадина (то же на wire-front и wire-back). В текстурных ракурсах на полном росте не читается."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На головке кости окорока мелкий ромбический узор, как сетка. Тот же шум слабее виден на срезе мяса в turn-270. Уровень крупного плана."
+    },
+    {
+      "item": "T",
+      "frame": "turn-270.jpg",
+      "note": "На нижней части одной жерди тёплый розоватый оттенок, возможно, цвет мяса попал на дерево при проекции текстуры (виден и в turn-090). На игровой дистанции читается как вариация дерева."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-VENISON-RACK-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп venison-rack принят по делегированию с баллом 8,3. Мелочи крупного плана: язычки под петлями верёвки, ромбический шум на срезе окорока. Балл в полосе 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

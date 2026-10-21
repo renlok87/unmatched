@@ -1,0 +1,169 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodRockCluster.fbx",
+      "sha256": "dcbdc51c8eaca1c60357965e3e85892b0c6f49a1bf20d7e9c657813cd8259a37"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodRockCluster_BC.png",
+      "sha256": "d755367f15d297317702fe1eb78788f65dc6ba5ae528e5fe3f851853f2b6670b"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodRockCluster_N.png",
+      "sha256": "6f322db545bb9afdaeb6c07f49723f31385d2fbf26c35dd1f92b1b8da08efff1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodRockCluster_ORM.png",
+      "sha256": "bf11d32ad03a5c3695959c716f0fe65a268050dd97697dde589f10216ed4c6bb"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-rock-cluster-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodRockCluster.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+      "note": "2926 tris (бюджет env_kit 12000, проп 3000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+      "note": "UV0 islands 408, used 0.8147, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+      "note": "T_Env_SherwoodRockCluster_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodRockCluster.build.json",
+      "note": "SM_Env_SherwoodRockCluster, M_Env_SherwoodRockCluster",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Заказанный предмет: группа из четырёх серых камней (высокий задний, левый и правый средние, малый передний) с пятнами лишайника и пучками травы на дерновом основании, как на sheet.png. Вид сверху (close-base) повторяет компоновку и пропорции листа: соотношение ширины к высоте ≈1,23 против ≈1,25. Высоты боковых камней относительно заднего отличаются в пределах ~5 %. Лишних и пропавших частей нет, фантомных оболочек на turn-090/270 и wire-* нет. Группа узнаётся со всех 8 ракурсов. Цвет того же семейства (серый камень, бледно-зелёный лишайник, зелёная трава). Габарит источника 1,0×0,99×0,58 м выше заказанных ≈1×1×0,4, но силуэт совпадает с листом, по которому генерировали.",
+      "frames": [
+        "sheet.png",
+        "close-base.jpg",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "Камни цельные: гранёные, без дыр, оплывов и вывернутых частей. Травинки тонкие и целые, сетка камней на wire-* ровная и следует форме. Единственный изъян — передняя кромка дернового основания: тёмная, справа рваная, с тонкими чёрными осколками за травой (turn-000, turn-045, wire-front). По отчёту 40 углов кастомных нормалей смотрят в поверхность, и ray_escape даёт 19,2 % площади граней внутрь у переднего края основания. Изъян тонкий, на игровой дистанции читается как контактная тень, а не дыра, поэтому 1,5, а не 1,0.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-315.jpg",
+        "wire-front.jpg",
+        "wire-34.jpg",
+        "wire-back.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как заказано: серый камень с нарисованными трещинами, бледные пятна лишайника, трава с градиентом и мох на основании, в стилизованной ручной покраске листа. Рисованные блики кромок — часть стиля. Детализация лицевой стороны не беднее рок-аутcropа кита Sarpedon. Дефекты в основном видны на крупном плане: по камню и лишайнику идёт мелкая сетчатая штриховка (артефакт текстуры Tripo), в лишайнике две чёрные точки (close-head, close-weapon). Тыльные стороны (turn-135/180/225) мягче лицевых: трещины размыты, есть сине-фиолетовые разводы. Камень при этом читается, и на дистанции диорамы это не заметно.",
+      "frames": [
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "turn-000.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "S 2,0 + F 1,5 + T 1,5 = 5,0 из 6 → 8,3 ≥ 8,0. Ни одно измерение не ниже 1,0, гейты PASS/n/a. Оценка в полосе 8,0–8,4, поэтому по §8.5 нужен второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-000.jpg",
+      "note": "Передняя кромка дернового основания тёмная и рваная: справа за травой тонкие чёрные осколки (также turn-045, wire-front). Причина — кастомные нормали в поверхность (40 углов по отчёту). На игровой дистанции читается как контактная тень."
+    },
+    {
+      "item": "F",
+      "frame": "wire-front.jpg",
+      "note": "По ray_escape 19,2 % площади граней смотрят внутрь, центры у переднего левого края основания (z≈1 uu, до масштаба). Кадры Blender показывают обе стороны граней. После импорта в UE с односторонним материалом проверить, не пропадает ли кромка дёрна; если пропадает — two-sided или пересчёт нормалей основания в env_kit params."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "Мелкая сетчатая штриховка по камню и лишайнику (артефакт текстуры Tripo) и две чёрные точки в пятне лишайника. Видно только на крупных планах (close-head, close-weapon)."
+    },
+    {
+      "item": "T",
+      "frame": "turn-180.jpg",
+      "note": "Тыльные стороны камней (turn-135/180/225) мягче лицевых: трещины размыты, сине-фиолетовые разводы, лишайника меньше. Камень читается."
+    },
+    {
+      "item": "S",
+      "frame": "turn-000.jpg",
+      "note": "Пропорции источника 1,0×0,99×0,58 м против заказанных ≈1×1×0,4. При целевой высоте 12 uu основание выходит 20,6×20,8 uu вместо ~30. Учесть при размещении в раскладке."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-ROCK-CLUSTER-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп rock-cluster принят по делегированию (8,3). Известные мелочи: тёмная рваная кромка основания и штриховка текстуры на крупном плане. Оценка в полосе 8,0–8,4, нужен второй приёмщик «Opus high»."
+}

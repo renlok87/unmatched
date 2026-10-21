@@ -1,0 +1,175 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodExposedRoots.fbx",
+      "sha256": "83ee714c5e690d468d4fc40ed49a8d32b834e57c73d8827aaa55edfc65162891"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodExposedRoots_BC.png",
+      "sha256": "0fd03b021a1450b899569e7e8b9c58934bc93a4b2f31804bff9b8e86b557ba2d"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodExposedRoots_N.png",
+      "sha256": "ce4bbe0c351e1c34c03a86521813471bae3c00c25f3e1a96a64728539879591a"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodExposedRoots_ORM.png",
+      "sha256": "7c04c4372add7e4256b8b88ae06fa457a9e03422daf411b9e0fc1e3ccfc55c44"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-exposed-roots-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodExposedRoots.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+      "note": "4552 tris (бюджет env_kit 12000, проп 5000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+      "note": "UV0 islands 542, used 0.7051, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+      "note": "T_Env_SherwoodExposedRoots_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodExposedRoots.build.json",
+      "note": "SM_Env_SherwoodExposedRoots, M_Env_SherwoodExposedRoots",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "Предмет тот, что заказан: земляной вал с мхом, из вершины веером спускаются арочные корни с центральной развилкой и петлями. Фасад turn-000 и приподнятый 3/4 close-base совпадают с sheet.png по композиции и пропорции. Корни толще и их меньше, чем в узловатой сети на листе, — это допустимая стилизация. Одно второстепенное отличие: в плане пятно почти квадратное (51×49 uu), а заказан вытянутый вал ≈2×1,5 м. На turn-090 и turn-135 проп читается как моховой купол с одним корнем на фланге, корни там узнаются слабее. Фантомных оболочек и пропавших главных частей нет; мелкие листья-карточки отнесены к F.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "close-base.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-270.jpg"
+      ]
+    },
+    "F": {
+      "value": 1,
+      "rationale": "Главная оболочка цела. Сетка на wire-* равномерная и следует форме корней, просветов и рваных арок в корнях нет. Дефект виден на полном росте в одной зоне, на верхе. Там лежат десятки мелких оболочек-листьев по ≤16 tris; по отчёту 18 из них висят над поверхностью на 0,15–0,56 uu. На turn-090/135/180/225/270 они читаются как тёмные чипы и дыры во мху (тёмная изнанка карточек), на turn-000 видны как чёрный ромб на левом фланге. Нижняя кромка основания рваная, с тонкой тёмной полоской вывернутых граней (turn-000, turn-315), но заметна слабо. Тыльные корни на turn-135 и turn-180 мягкие и оплывшие, но читаются.",
+      "frames": [
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-000.jpg",
+        "turn-315.jpg",
+        "wire-back.jpg",
+        "wire-front.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются: на корнях видно волокно коры, мох — жёлто-зелёный слой, земля — бежево-бурая. В BC кора серо-бурая, мох оливковый, то есть семейство цвета совпадает с листом. Запечённого блика, швов и растяжек на полном росте нет; развёртка без перекрытий. В кадрах стенда проп заметно светлее и малоконтрастнее листа (кора почти кремовая), но в основном это свет стенда: сама BC темнее. Дефекты видны только на крупном плане: на close-head верх мыльный, мох лежит размытыми пятнами без мелкой детали; тыл и верх детализированы беднее фасада.",
+      "frames": [
+        "close-head.jpg",
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 6.7,
+  "verdict": "rework_blender",
+  "verdict_reason": "Оценка 6,7 < 8,0 (S 1,5 + F 1,0 + T 1,5): на полном росте поверх мха видны висящие листья-карточки — тёмные чипы. S ≥ 1,5, все гейты PASS или n/a, поэтому вердикт — доработка параметров env_kit, без перегенерации.",
+  "rework_fix_list": [
+    {
+      "item": "F",
+      "frame": "turn-180.jpg",
+      "fix": "Удалить в env_kit мелкие изолированные оболочки листьев-карточек (по ≤16 tris; 18 висят на 0,15–0,56 uu над поверхностью) или посадить их на поверхность. Они дают тёмные чипы на верхе на turn-090/135/180/225/270 и чёрный ромб на фланге turn-000. После этого переснять кадры turn-090, turn-180 и turn-225.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "F",
+      "frame": "turn-315.jpg",
+      "fix": "Нижняя кромка основания: обрезать или притопить рваную юбку с вывернутыми гранями (inward-грани у кромки, z≈1–2 uu) либо исправить нормали только на кромке, чтобы убрать тёмную полоску у земли на turn-000 и turn-315.",
+      "tool": "env_kit params"
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "fix": "Мыльный верх (мох) на крупном плане: небольшая резкость и контраст BC в env_kit, значение кожуры и земли немного темнее, ближе к sheet.png. Для фонового пропа этого достаточно; ретекстур в Tripo не нужен.",
+      "tool": "env_kit params"
+    }
+  ],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "turn-090.jpg",
+      "note": "В плане пятно ≈1:1 (51×49 uu) вместо заказанного вала ≈2×1,5 м, сбоку проп читается как купол. Для дрессинга краёв тропы это допустимо, перегенерация не требуется."
+    },
+    {
+      "item": "T",
+      "frame": "turn-000.jpg",
+      "note": "В кадрах стенда проп светлее и бледнее листа, кора почти кремовая; сама BC темнее. Проверить в живом свете доски Sherwood."
+    },
+    {
+      "item": "G-TEX",
+      "frame": "uv-layout.png",
+      "note": "AO не запечён (ORM.R=1), поэтому тёмные пазухи между корнями держатся только на освещении сцены."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-EXPOSED-ROOTS-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп exposed-roots (Sherwood Forest) возвращён на доработку в env_kit с оценкой 6,7. Нужно убрать висящие листья-карточки (тёмные чипы на верхе), подчистить кромку основания и слегка поднять резкость BC; силуэт соответствует листу."
+}

@@ -1,0 +1,178 @@
+{
+  "schema": "unmatched.asset-acceptance/2",
+  "kind": "model",
+  "asset_id": "ASSET-MAPKIT-SHERWOOD-FOREST-001",
+  "clip": null,
+  "cycle": "r1",
+  "date": "2026-10-21",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/SM_Env_SherwoodHollowLogTunnel.fbx",
+      "sha256": "77253b0967585411374d1e5e98fa54cc93835b07f30adc136829933487a180fa"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_BC.png",
+      "sha256": "c6677f2e2d34e458f85f687489b177581707866cb06c8fdd38852b77004b5ee1"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_N.png",
+      "sha256": "80d67d2baff96b12b72043ee62fb90fe73b6c3b488301507e634d1d151363fff"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/export/T_Env_SherwoodHollowLogTunnel_ORM.png",
+      "sha256": "a2bcaa71fe700fe5d42ea153b3a54360e7e1dd4cf897bff45739f8cdbe7dddfc"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/evidence/acceptance/20261021-hollow-log-tunnel-r1/frames",
+    "files": [
+      "close-base.jpg",
+      "close-head.jpg",
+      "close-weapon.jpg",
+      "frames.json",
+      "sheet.png",
+      "turn-000.jpg",
+      "turn-045.jpg",
+      "turn-090.jpg",
+      "turn-135.jpg",
+      "turn-180.jpg",
+      "turn-225.jpg",
+      "turn-270.jpg",
+      "turn-315.jpg",
+      "uv-layout.png",
+      "wire-34.jpg",
+      "wire-back.jpg",
+      "wire-front.jpg"
+    ]
+  },
+  "reports": [
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+    "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/fbx-readback/SM_Env_SherwoodHollowLogTunnel.json"
+  ],
+  "gates": {
+    "G-TOPO": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "5150 tris (бюджет env_kit 12000, проп 4000), single_mesh=True",
+      "source_defect": null
+    },
+    "G-UV": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "UV0 islands 100, used 0.5824, overlap 0.0",
+      "source_defect": null
+    },
+    "G-TEX": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "T_Env_SherwoodHollowLogTunnel_{BC,N,ORM}.png 2048, N DirectX, ORM.R=1 (без AO)",
+      "source_defect": null
+    },
+    "G-RIG": {
+      "status": "n/a",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "статический проп без рига",
+      "source_defect": null
+    },
+    "G-NAMES": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-MAPKIT-SHERWOOD-FOREST-001/20261021-smartmesh/reports/assets/SM_Env_SherwoodHollowLogTunnel.build.json",
+      "note": "SM_Env_SherwoodHollowLogTunnel, M_Env_SherwoodHollowLogTunnel",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 2,
+      "rationale": "Это тот предмет, что заказан: полое упавшее бревно-тоннель, открытое с обоих концов (на turn-135/315 видно насквозь). Мох лежит на верхе, оранжевые грибы растут внутри у входа. turn-000 почти совпадает с sheet.png: вход слева, рваный слоистый край, высокий обломанный сучок и мелкие сучки справа сверху, мох стекает по бокам. Габарит и пропорция совпадают с листом. Бревно узнаётся со всех 8 ракурсов, фантомных оболочек на turn-090/270 и wire-* нет. Второстепенное: на обороте, которого лист не показывает (turn-180/225/270), к боку прижат дугой обломанный сучок; читается как ветка. Длина около 2 диаметров при заказанных ≈1,2×3 м (2,5 диаметра), как на листе. Ось бревна лежит под ≈45° к фронту, потому что лист нарисован в 3/4.",
+      "frames": [
+        "sheet.png",
+        "turn-000.jpg",
+        "turn-045.jpg",
+        "turn-090.jpg",
+        "turn-135.jpg",
+        "turn-180.jpg",
+        "turn-225.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg"
+      ]
+    },
+    "F": {
+      "value": 1.5,
+      "rationale": "На полном росте форма чистая. Основная оболочка закрыта (open_edges 0, non-manifold 0), дыр, просветов, вывернутых частей и оплывших масс нет. Сетка на wire-34/front/back ровная и следует форме: кольца края, сучки, грибы. Мелкие дефекты: (1) отдельная крошка из 5 треугольников (shell 9 отчёта, ≈0,4 uu) висит над бревном на высоте ≈34,5 uu, в ≈6 uu от сучка. На кадрах полного роста это точка в несколько пикселей, на игровой дистанции её не видно. (2) На крупном плане (close-head, close-weapon) кончики сучков низкополигональные, с плоскими гранёными срезами. (3) 8 вывернутых граней крошки под днищем (shell 8) не видны. Оценка 1,5: дефекты различимы только при пристальном или крупном взгляде.",
+      "frames": [
+        "turn-045.jpg",
+        "turn-270.jpg",
+        "wire-34.jpg",
+        "wire-front.jpg",
+        "wire-back.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg"
+      ]
+    },
+    "T": {
+      "value": 1.5,
+      "rationale": "Материалы читаются как в описании и на листе: стилизованная кора, ручная роспись слоистыми досками, жёлто-зелёный ковёр мха, кольцевые волокна внутри тоннеля, рыже-красные грибы. Запечённых бликов и чужих цветов на полном росте нет. Тёмные щели коры нарисованы в стиле и в норму укладываются. Детализация на полном росте богатая, не беднее уровня кита. Дефекты только на крупном плане: на close-head кончики сучков в мыле и растяжках, срезы однотонные. На close-weapon волокна внутренней стенки у края входа растянуты, мох на верхе мягкий и размытый. UV: 100 островов, без перекрытий.",
+      "frames": [
+        "turn-000.jpg",
+        "turn-180.jpg",
+        "turn-270.jpg",
+        "turn-315.jpg",
+        "close-head.jpg",
+        "close-weapon.jpg",
+        "close-base.jpg",
+        "uv-layout.png"
+      ]
+    },
+    "D": {
+      "value": null,
+      "rationale": "статический проп без рига",
+      "frames": []
+    }
+  },
+  "score": 8.3,
+  "verdict": "pass",
+  "verdict_reason": "score 8.3 ≥ 8.0, ни одно измерение не ниже 1.0, все гейты PASS/n/a; балл в полосе 8.0–8.4 — нужен независимый второй приёмщик «Opus high».",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "F",
+      "frame": "turn-045.jpg",
+      "note": "Отдельная крошка из 5 треугольников (shell 9 build.json, ≈0,4 uu, open edges 7) висит над бревном на высоте ≈34,5 uu, в ≈6 uu от сучка. Видна точкой на turn-045/090/135/225/270/315 и wire-34. При ближайшей доводке убрать эту отдельную оболочку."
+    },
+    {
+      "item": "F",
+      "frame": "close-head.jpg",
+      "note": "На крупном плане кончики сучков сверху низкополигональные: плоские гранёные срезы."
+    },
+    {
+      "item": "T",
+      "frame": "close-head.jpg",
+      "note": "На кончиках сучков текстура размыта и растянута, срезы однотонные. Видно только на крупном плане."
+    },
+    {
+      "item": "T",
+      "frame": "close-weapon.jpg",
+      "note": "Растяжка волокон на внутренней стенке у края входа и мягкий размытый мох на верхе. Видно только на крупном плане."
+    },
+    {
+      "item": "S",
+      "frame": "turn-045.jpg",
+      "note": "Ось бревна лежит под ≈45° к фронту, потому что лист нарисован в 3/4. Габарит 62,8×62,1×36 uu, квадратный. При раскладке учесть yaw. Длина около 2 диаметров при заказанных ≈1,2×3 м, как на листе."
+    },
+    {
+      "item": "S",
+      "frame": "turn-225.jpg",
+      "note": "На обороте, которого лист не показывает, к боку прижат дугой обломанный сучок сверху вниз. Это придуманная деталь, читается как ветка, сборку не блокирует."
+    }
+  ],
+  "acceptor": {
+    "profile": "Opus xhigh",
+    "session_id": "workflow:acceptor-MK-SHW-HOLLOW-LOG-TUNNEL-r1"
+  },
+  "executor_session_id": "claude-code:mapkits-session/env_kit",
+  "decided_by": "delegated: «Я даю тебе абсолютно все разрешения» (пользователь, 2026-10-21, задание map kits)",
+  "status_note": "Проп hollow-log-tunnel (полое бревно-тоннель) принят по делегированию: 8.3 (S 2 / F 1.5 / T 1.5), совпадает с листом. Мелочи: висящая крошка из 5 треугольников над бревном, мыло и гранёные кончики сучков на крупном плане. Балл в полосе 8.0–8.4, нужен второй приёмщик «Opus high»."
+}
