@@ -1,0 +1,450 @@
+{
+ "source": "<run>/work/probe-fbx-authored.blend",
+ "label": "sherlock-holmes-h2-fbx",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.4945,
+ "bbox_min": [
+  -0.125,
+  -0.1137,
+  0.0553
+ ],
+ "bbox_max": [
+  0.1309,
+  0.0698,
+  0.5498
+ ],
+ "frame": {
+  "kind": "body_without_weapon",
+  "body_meshes": [
+   "SK_SherlockHolmes_H2_Body"
+  ],
+  "weapon_meshes": [],
+  "weapon_bones": [
+   "weapon.R"
+  ],
+  "weapon_vertices": 358,
+  "height_all": 0.4945,
+  "bbox_all_min": [
+   -0.125,
+   -0.1137,
+   0.0553
+  ],
+  "bbox_all_max": [
+   0.1309,
+   0.0698,
+   0.5498
+  ],
+  "note": "z_norm/x_norm и порог сдвига 1 % — по телу без оружия (F59); камера — по всей фигуре"
+ },
+ "weapon_sides": [
+  "R"
+ ],
+ "weapon_side_source": "weapon_bone",
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 4279,
+   "centroid_z_norm": 0.888,
+   "centroid_x_norm": 0.003,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.2109
+    ]
+   ],
+   "centroid_z_norm_all": 0.888,
+   "own_moved": 4252,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 12373,
+   "centroid_z_norm": 0.727,
+   "centroid_x_norm": -0.039,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.6098
+    ]
+   ],
+   "centroid_z_norm_all": 0.727,
+   "own_moved": 2706,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {}
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 2788,
+   "centroid_z_norm": 0.529,
+   "centroid_x_norm": 0.64,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1374
+    ]
+   ],
+   "centroid_z_norm_all": 0.529,
+   "own_moved": 441,
+   "foreign_moved": 260,
+   "bleed_vertices": 223,
+   "bleed_share": 0.08,
+   "bleed_bones": {
+    "hips": 220,
+    "leg_upper.L": 3
+   }
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 3152,
+   "centroid_z_norm": 0.67,
+   "centroid_x_norm": -0.689,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1553
+    ]
+   ],
+   "centroid_z_norm_all": 0.67,
+   "own_moved": 329,
+   "foreign_moved": 155,
+   "bleed_vertices": 154,
+   "bleed_share": 0.0489,
+   "bleed_bones": {
+    "hips": 154
+   }
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2205,
+   "centroid_z_norm": 0.504,
+   "centroid_x_norm": 0.697,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1087
+    ]
+   ],
+   "centroid_z_norm_all": 0.504,
+   "own_moved": 1122,
+   "foreign_moved": 234,
+   "bleed_vertices": 208,
+   "bleed_share": 0.0943,
+   "bleed_bones": {
+    "hips": 184,
+    "spine": 24
+   }
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3067,
+   "centroid_z_norm": 0.128,
+   "centroid_x_norm": 0.361,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1512
+    ]
+   ],
+   "centroid_z_norm_all": 0.128,
+   "own_moved": 875,
+   "foreign_moved": 22,
+   "bleed_vertices": 22,
+   "bleed_share": 0.0072,
+   "bleed_bones": {
+    "leg_upper.R": 22
+   }
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3171,
+   "centroid_z_norm": 0.135,
+   "centroid_x_norm": -0.422,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1563
+    ]
+   ],
+   "centroid_z_norm_all": 0.135,
+   "own_moved": 958,
+   "foreign_moved": 20,
+   "bleed_vertices": 20,
+   "bleed_share": 0.0063,
+   "bleed_bones": {
+    "leg_upper.L": 20
+   }
+  }
+ ],
+ "extended_tests": [
+  {
+   "test": "forearm_r_bend",
+   "bone": "arm_lower.R",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2567,
+   "centroid_z_norm": 0.687,
+   "centroid_x_norm": -0.709,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_max": -0.2,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.1265
+    ]
+   ],
+   "centroid_z_norm_all": 0.687,
+   "own_moved": 1277,
+   "foreign_moved": 140,
+   "bleed_vertices": 123,
+   "bleed_share": 0.0479,
+   "bleed_bones": {
+    "spine": 87,
+    "hips": 36
+   },
+   "weapon_moved_share": 0.1395
+  },
+  {
+   "test": "shin_l_bend",
+   "bone": "leg_lower.L",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 1934,
+   "centroid_z_norm": 0.05,
+   "centroid_x_norm": 0.372,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_min": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.0953
+    ]
+   ],
+   "centroid_z_norm_all": 0.05,
+   "own_moved": 830,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "shin_r_bend",
+   "bone": "leg_lower.R",
+   "axis": "X",
+   "deg": 40,
+   "moved_vertices": 1902,
+   "centroid_z_norm": 0.05,
+   "centroid_x_norm": -0.421,
+   "expect": {
+    "z_norm_max": 0.35,
+    "x_norm_max": 0.0,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.0937
+    ]
+   ],
+   "centroid_z_norm_all": 0.05,
+   "own_moved": 866,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_l_flex",
+   "bone": "foot.L",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 1217,
+   "centroid_z_norm": 0.016,
+   "centroid_x_norm": 0.396,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_min": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.06
+    ]
+   ],
+   "centroid_z_norm_all": 0.016,
+   "own_moved": 1007,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "foot_r_flex",
+   "bone": "foot.R",
+   "axis": "X",
+   "deg": -30,
+   "moved_vertices": 1175,
+   "centroid_z_norm": 0.016,
+   "centroid_x_norm": -0.442,
+   "expect": {
+    "z_norm_max": 0.2,
+    "x_norm_max": 0.0,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.0579
+    ]
+   ],
+   "centroid_z_norm_all": 0.016,
+   "own_moved": 952,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.0
+  },
+  {
+   "test": "hand_r_twist",
+   "bone": "hand.R",
+   "axis": "BONE",
+   "deg": 35,
+   "moved_vertices": 905,
+   "centroid_z_norm": 0.738,
+   "centroid_x_norm": -0.731,
+   "expect": {
+    "z_norm_min": 0.15,
+    "x_norm_max": -0.1,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.0446
+    ]
+   ],
+   "centroid_z_norm_all": 0.738,
+   "own_moved": 599,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 0.3381
+  },
+  {
+   "test": "weapon_turn_weapon.R",
+   "bone": "weapon.R",
+   "axis": "PERP",
+   "deg": 30,
+   "moved_vertices": 299,
+   "centroid_z_norm": 0.801,
+   "centroid_x_norm": -0.705,
+   "expect": {
+    "weapon_share_min": 0.9,
+    "own_moved_min": 1,
+    "bleed_share_max": 0.05
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_SherlockHolmes_H2_Body",
+     0.0147
+    ]
+   ],
+   "centroid_z_norm_all": 0.801,
+   "own_moved": 299,
+   "foreign_moved": 0,
+   "bleed_vertices": 0,
+   "bleed_share": 0.0,
+   "bleed_bones": {},
+   "weapon_moved_share": 1.0
+  }
+ ],
+ "probes": {
+  "plausible": 14,
+  "total": 14,
+  "summary": "14/14",
+  "legacy": "7/7",
+  "extended": "7/7",
+  "skipped": [],
+  "passed": true
+ }
+}

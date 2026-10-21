@@ -1,0 +1,74 @@
+{
+ "schema": "unmatched.sherlock-stage3.hpg-derivation/1",
+ "asset_id": "ASSET-SHERLOCK-HOLMES-001",
+ "date": "2026-10-21",
+ "purpose": "геометрический двойник HPG_ для run_h2_bake.py (retopo ждёт сваренную сетку без швов UV, st_retopo.py docstring): повторная выгрузка parts11.glb (tripo-a5faa31f-h2b, 51818ae5) — текстурный меш, вершины разрезаны по швам UV (у пальто 414 188 вершин на 393 469 позиций, высокий полигон 311 островов, 43 370 открытых рёбер; после retopo 282 острова и трещины по швам). Сваренный двойник: 1 остров на часть, позиции побайтно = позиции tex8k-pbr GLB (prepare: geometry_identical_parts_vs_textured PASS)",
+ "input": {
+  "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/source/sherlock-holmes-h2-tripo-a5faa31f-tex8k-pbr.glb",
+  "sha256": "c2ebadadbe3d998f7bfde0b4654420033401d3901bc71f1a9dafe3f672cfaf4b",
+  "bytes": 84177076,
+  "source_spec": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/source-specs/tripo-a5faa31f-h2b.json"
+ },
+ "output": {
+  "path": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-tripo/source/sherlock-holmes-h2-tripo-a5faa31f-hpg-welded.glb",
+  "sha256": "061b5d8de990823f69b50a3451b5a586f2db63186a530c29c0f2e57cc2dce204",
+  "bytes": 32516744,
+  "in_git": false,
+  "deterministic": "два запуска дают одинаковый sha256"
+ },
+ "blender": "5.2.2 LTS (headless, --factory-startup)",
+ "recipe": [
+  "импорт tex8k-pbr GLB, трансформы узлов запекаются в меш (как bl_util.import_glb_parts)",
+  "bmesh.ops.remove_doubles dist 1e-9 по каждой части (сливаются только точные дубли шва UV): треугольники без изменений, вершины = уникальные позиции",
+  "UV, материалы, нормали и касательные не выгружаются; узлы tripo_part_0..10",
+  "export_scene.gltf GLB, export_yup True"
+ ],
+ "per_part_vertices": {
+  "tripo_part_0": [
+   414188,
+   393469
+  ],
+  "tripo_part_1": [
+   156133,
+   153546
+  ],
+  "tripo_part_2": [
+   90436,
+   87945
+  ],
+  "tripo_part_3": [
+   88811,
+   86468
+  ],
+  "tripo_part_4": [
+   71053,
+   69615
+  ],
+  "tripo_part_5": [
+   47242,
+   46021
+  ],
+  "tripo_part_6": [
+   32327,
+   31257
+  ],
+  "tripo_part_7": [
+   30104,
+   28596
+  ],
+  "tripo_part_8": [
+   27668,
+   26845
+  ],
+  "tripo_part_9": [
+   20490,
+   19834
+  ],
+  "tripo_part_10": [
+   20190,
+   19492
+  ]
+ },
+ "decision": "исполнитель этапа 3 (разбор §5 п.6 без правки инструмента): альтернатива — опция prepare.weld_parts_m в st_prepare.py или выгрузка из Studio геометрии без текстуры и без Pack UV; решение остаётся за оркестратором",
+ "script": "# Derive a welded, untextured geometry twin (HPG) from the Tripo tex8k-pbr GLB: node transforms baked into the meshes\n# exactly as bl_util.import_glb_parts does, exact duplicate positions (UV-seam splits) merged (dist 1e-9 m), UVs,\n# materials and normals dropped; nodes keep the names tripo_part_N. argv: <tex glb> <out glb>\nimport bpy, sys, bmesh\nfrom mathutils import Matrix\n\nargv = sys.argv[sys.argv.index(\"--\") + 1:]\nsrc, dst = argv[0], argv[1]\nbpy.ops.wm.read_factory_settings(use_empty=True)\nbpy.ops.import_scene.gltf(filepath=src)\nobjs = [o for o in bpy.context.scene.objects]\nparts = [o for o in objs if o.type == \"MESH\"]\nfor o in parts:\n    w = o.matrix_world.copy()\n    o.parent = None\n    o.data.transform(w)\n    o.matrix_world = Matrix.Identity(4)\nfor o in objs:\n    if o.type != \"MESH\":\n        bpy.data.objects.remove(o)\nfor o in parts:\n    name = o.name.split(\".\")[0]\n    me = o.data\n    bm = bmesh.new()\n    bm.from_mesh(me)\n    nf, nv = len(bm.faces), len(bm.verts)\n    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-9)\n    bm.to_mesh(me)\n    bm.free()\n    while me.uv_layers:\n        me.uv_layers.remove(me.uv_layers[0])\n    me.materials.clear()\n    o.name = name\n    me.name = name\n    print(\"DERIVE\", name, \"faces\", nf, \"->\", len(me.polygons), \"verts\", nv, \"->\", len(me.vertices))\nbpy.ops.export_scene.gltf(filepath=dst, export_format=\"GLB\", export_materials=\"NONE\", export_texcoords=False, export_tangents=False, export_vertex_color=\"NONE\",\n                          export_normals=False, export_apply=False, export_yup=True)\nprint(\"DERIVE_OK\", dst)\n"
+}
