@@ -16,6 +16,11 @@ public:
   using FErrorHandler = TFunction<void(const FS08GraphQLError&)>;
 
   FS08GraphqlWs(FString InUrl, FString InAccessToken);
+  /** Closes a socket that is still open or connecting: the WebSockets manager keeps the socket alive until its final
+   *  close event, so an open one dropped here would live on as a zombie connection (2026-10-21 recheck). */
+  ~FS08GraphqlWs();
+  FS08GraphqlWs(const FS08GraphqlWs&) = delete;
+  FS08GraphqlWs& operator=(const FS08GraphqlWs&) = delete;
 
   /** Fired once the server accepts connection_init (auth passed). */
   DECLARE_MULTICAST_DELEGATE(FOnAcked);
@@ -23,8 +28,9 @@ public:
 
   /** Fired when the transport dies (server close, network error, local Close).
    *  The owner decides what to do: this class never reconnects on its own.
-   *  Delivery happens on the game thread; it is safe to destroy this object
-   *  from a deferred (timer/tick) context, but NOT from inside the delegate. */
+   *  Delivery happens on the game thread. Destroy this object from a deferred
+   *  (timer/tick) context; a listener of this delegate may destroy it too (the
+   *  listeners run on a copy, 2026-10-21 recheck), the other delegates not. */
   DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWsClosed, int32, const FString&);
   FOnWsClosed OnClosedTransport;
 
@@ -66,11 +72,20 @@ public:
   /** Every outgoing frame (subscribe/complete/pong), including the ones a
    *  socket-less harness produces - proves client->server traffic. */
   const TArray<FString>& GetSentFramesForTest() const { return SentFramesForTest; }
+  /** The exact callable the socket's OnClosed / OnConnectionError bindings
+   *  run (it may outlive this object, as a socket callback does). */
+  TFunction<void(int32, const FString&)> TransportEndedHandlerForTest() { return MakeTransportEndedHandler(); }
 #endif
 
 private:
   void SendMessage(const TSharedRef<FJsonObject>& Message);
   void HandleMessage(const FString& Raw);
+  /** connection_init with the JWT (the socket's OnConnected). */
+  void SendConnectionInit();
+  /** The socket closed or failed: drop the ack and the operations, tell the owner (OnClosedTransport). */
+  void HandleTransportEnded(int32 StatusCode, const FString& Reason);
+  /** The socket's close / error callback: HandleTransportEnded on the game thread while this object lives. */
+  TFunction<void(int32, const FString&)> MakeTransportEndedHandler();
   /** Best-effort graphql-transport-ws "complete" for an operation id. */
   void SendComplete(const FString& OperationId);
   /** "message" fields from a GraphQL errors[] array, joined with '; '.
@@ -87,6 +102,13 @@ private:
   TMap<FString, FPending> Pending;
   int32 NextOperationId = 0;
   bool bAcked = false;
+  /** The socket reported its end (closed / failed) or Close() asked for it: the destructor does not close it again. */
+  bool bSocketEnded = false;
+  /** 2026-10-21 recheck (dev client: MTAccessDetector ensure in the close lambda of Connect, then an access violation,
+   *  on a backend restart): the socket outlives this object - the WebSockets manager holds it until its final close
+   *  event - so its callbacks hold this token weakly and do nothing once it is gone, and they reach this object only
+   *  on the game thread (queued there when a callback ever comes from another thread). */
+  TSharedRef<bool, ESPMode::ThreadSafe> AliveToken = MakeShared<bool, ESPMode::ThreadSafe>(true);
 #if WITH_AUTOMATION_TESTS
   TArray<FString> SentFramesForTest;
 #endif

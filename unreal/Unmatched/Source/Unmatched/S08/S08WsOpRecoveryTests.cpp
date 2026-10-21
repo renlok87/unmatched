@@ -71,6 +71,58 @@ FString MakeNextFrame(const FString& OpId, const TSharedPtr<FJsonObject>& Event)
 
 } // namespace
 
+// ---- WS layer: socket callbacks and the owner's lifetime (2026-10-21 recheck) -
+// The dev client hit an MTAccessDetector ensure in the close lambda of Connect, then an access violation, when the
+// backend restarted: a socket left open by Ws.Reset() outlived its FS08GraphqlWs and closed into freed memory. The
+// close / error callable the socket holds must be a no-op once the owner is gone, and a listener may destroy the owner.
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08WsTransportLifetimeTest,
+    "Unmatched.S08.WsOp.transport close after the owner is gone is a no-op; a listener may destroy the owner",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08WsTransportLifetimeTest::RunTest(const FString&) {
+  // alive: the close reaches the listener and drops the ack
+  {
+    TUniquePtr<FS08GraphqlWs> Ws = MakeUnique<FS08GraphqlWs>(TEXT("ws://test.invalid"), FString());
+    Ws->ForceAckedForTest();
+    int32 Calls = 0;
+    int32 Code = 0;
+    Ws->OnClosedTransport.AddLambda([&Calls, &Code](int32 InCode, const FString&) {
+      ++Calls;
+      Code = InCode;
+    });
+    const TFunction<void(int32, const FString&)> Ended = Ws->TransportEndedHandlerForTest();
+    Ended(1006, TEXT("abnormal"));
+    TestEqual(TEXT("alive: the listener runs once"), Calls, 1);
+    TestEqual(TEXT("alive: the code passes"), Code, 1006);
+    TestFalse(TEXT("alive: the ack drops"), Ws->IsAcked());
+  }
+  // the owner gone: the socket's callable does nothing (it used to broadcast through freed memory)
+  {
+    TUniquePtr<FS08GraphqlWs> Ws = MakeUnique<FS08GraphqlWs>(TEXT("ws://test.invalid"), FString());
+    int32 Calls = 0;
+    Ws->OnClosedTransport.AddLambda([&Calls](int32, const FString&) { ++Calls; });
+    const TFunction<void(int32, const FString&)> Ended = Ws->TransportEndedHandlerForTest();
+    Ws.Reset();
+    Ended(1006, TEXT("abnormal"));
+    Ended(-1, TEXT("connection failed"));
+    TestEqual(TEXT("gone: no listener runs"), Calls, 0);
+  }
+  // a listener destroys the owner (a 4403 close with no refresh path -> EnterSessionExpired): the rest still run
+  {
+    TUniquePtr<FS08GraphqlWs> Ws = MakeUnique<FS08GraphqlWs>(TEXT("ws://test.invalid"), FString());
+    int32 After = 0;
+    Ws->OnClosedTransport.AddLambda([&Ws](int32, const FString&) { Ws.Reset(); });
+    Ws->OnClosedTransport.AddLambda([&After](int32, const FString&) { ++After; });
+    const TFunction<void(int32, const FString&)> Ended = Ws->TransportEndedHandlerForTest();
+    Ended(4403, TEXT("forbidden"));
+    TestFalse(TEXT("the listener destroyed the owner"), Ws.IsValid());
+    TestEqual(TEXT("the other listener still ran once"), After, 1);
+    Ended(1006, TEXT("late"));
+    TestEqual(TEXT("a late close after that is a no-op"), After, 1);
+  }
+  return true;
+}
+
 // ---- WS layer: 'error' frame ------------------------------------------------
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08WsErrorFrameTest,

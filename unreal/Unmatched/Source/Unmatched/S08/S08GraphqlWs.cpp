@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "S08Contracts.h"
 #include "WebSocketsModule.h"
+#include "Async/Async.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -12,8 +13,38 @@ static const TCHAR* GQLWsQuery =
     TEXT(" gameId sequenceNumber phase turnCount currentTurnPlayerId")
     TEXT(" players fighters handZones discardPiles boardState metadata } }");
 
+namespace {
+using FS08WsAlive = TWeakPtr<bool, ESPMode::ThreadSafe>;
+
+/** A socket callback's body: on the game thread at once (where the WebSockets manager delivers its events), else
+ *  queued to it; either way only while the owner lives - after the owner is gone the socket's callbacks are no-ops. */
+void S08WsOnGameThread(const FS08WsAlive& Alive, TFunction<void()> Body) {
+  if (IsInGameThread()) {
+    if (Alive.Pin().IsValid()) Body();
+    return;
+  }
+  AsyncTask(ENamedThreads::GameThread, [Alive, Body = MoveTemp(Body)]() {
+    if (Alive.Pin().IsValid()) Body();
+  });
+}
+}  // namespace
+
 FS08GraphqlWs::FS08GraphqlWs(FString InUrl, FString InAccessToken)
     : Url(MoveTemp(InUrl)), AccessToken(MoveTemp(InAccessToken)) {}
+
+FS08GraphqlWs::~FS08GraphqlWs() {
+  // 2026-10-21 recheck: Ws.Reset() of a live socket (leave, token rotation, session expiry) used to leave the
+  // connection open in the WebSockets manager; the next backend restart closed it and its close lambda broadcast
+  // through this destroyed object. AliveToken dies with this object (the callbacks check it); the open or connecting
+  // transport is closed here so no zombie connection stays behind.
+  if (Socket.IsValid() && !bSocketEnded) Socket->Close();
+}
+
+TFunction<void(int32, const FString&)> FS08GraphqlWs::MakeTransportEndedHandler() {
+  return [this, Alive = FS08WsAlive(AliveToken)](int32 StatusCode, const FString& Reason) {
+    S08WsOnGameThread(Alive, [this, StatusCode, Reason]() { HandleTransportEnded(StatusCode, Reason); });
+  };
+}
 
 void FS08GraphqlWs::Connect() {
   // A dead socket object (closed transport) is replaced here, on the game
@@ -21,29 +52,41 @@ void FS08GraphqlWs::Connect() {
   if (Socket.IsValid() && Socket->IsConnected()) return;
   Socket = FWebSocketsModule::Get().CreateWebSocket(Url, TEXT("graphql-transport-ws"));
   if (!Socket.IsValid()) return;
+  bSocketEnded = false;
 
-  Socket->OnConnected().AddLambda([this]() {
-    // Auth happens at connection level: the backend reads
-    // connectionParams.authorization before the GqlAuthGuard runs.
-    TSharedRef<FJsonObject> Init = MakeShared<FJsonObject>();
-    Init->SetStringField(TEXT("type"), TEXT("connection_init"));
-    TSharedRef<FJsonObject> Params = MakeShared<FJsonObject>();
-    Params->SetStringField(TEXT("authorization"), TEXT("Bearer ") + AccessToken);
-    Init->SetObjectField(TEXT("payload"), Params);
-    SendMessage(Init);
+  // Every binding holds AliveToken weakly: the socket (and these callbacks) may outlive this object.
+  const FS08WsAlive Alive(AliveToken);
+  Socket->OnConnected().AddLambda([this, Alive]() { S08WsOnGameThread(Alive, [this]() { SendConnectionInit(); }); });
+  Socket->OnMessage().AddLambda([this, Alive](const FString& Message) {
+    S08WsOnGameThread(Alive, [this, Message]() { HandleMessage(Message); });
   });
-  Socket->OnMessage().AddLambda([this](const FString& Message) { HandleMessage(Message); });
-  Socket->OnConnectionError().AddLambda([this](const FString& Error) {
-    bAcked = false;
-    Pending.Reset();
-    OnClosedTransport.Broadcast(-1, Error);
-  });
-  Socket->OnClosed().AddLambda([this](int32 StatusCode, const FString& Reason, bool) {
-    bAcked = false;
-    Pending.Reset();
-    OnClosedTransport.Broadcast(StatusCode, Reason);
-  });
+  Socket->OnConnectionError().AddLambda(
+      [Ended = MakeTransportEndedHandler()](const FString& Error) { Ended(-1, Error); });
+  Socket->OnClosed().AddLambda(
+      [Ended = MakeTransportEndedHandler()](int32 StatusCode, const FString& Reason, bool) { Ended(StatusCode, Reason); });
   Socket->Connect();
+}
+
+void FS08GraphqlWs::SendConnectionInit() {
+  // Auth happens at connection level: the backend reads
+  // connectionParams.authorization before the GqlAuthGuard runs.
+  TSharedRef<FJsonObject> Init = MakeShared<FJsonObject>();
+  Init->SetStringField(TEXT("type"), TEXT("connection_init"));
+  TSharedRef<FJsonObject> Params = MakeShared<FJsonObject>();
+  Params->SetStringField(TEXT("authorization"), TEXT("Bearer ") + AccessToken);
+  Init->SetObjectField(TEXT("payload"), Params);
+  SendMessage(Init);
+}
+
+void FS08GraphqlWs::HandleTransportEnded(int32 StatusCode, const FString& Reason) {
+  bAcked = false;
+  bSocketEnded = true;
+  Pending.Reset();
+  // The listeners run on a copy: the owner may destroy this object from its handler (a 4403 close with no refresh
+  // path -> EnterSessionExpired -> Ws.Reset()), and the delegate being broadcast must not die mid-broadcast.
+  // Nothing below touches this object.
+  const FOnWsClosed Listeners = OnClosedTransport;
+  Listeners.Broadcast(StatusCode, Reason);
 }
 
 void FS08GraphqlWs::Close() {
@@ -57,6 +100,7 @@ void FS08GraphqlWs::Close() {
   // cancels it. Gating on IsConnected() lets a dropped socket complete its
   // handshake afterwards and ack as a zombie - its OnAcked would subscribe
   // through an object that is about to be destroyed.
+  bSocketEnded = true;
   Socket->Close();
 }
 
