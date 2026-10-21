@@ -171,7 +171,9 @@ Run formatters/linters explicitly when a change needs them instead.
 Keep only the sessions needed for the current task. Do not launch a large pool of
 parallel subagents, terminals, Unreal clients, or build processes. Prefer one GLM
 development session at a time; use another session only when independent parallel
-work has a clear benefit, and close it as soon as its task ends. Run background
+work has a clear benefit, and close it as soon as its task ends. The 3D pipeline's
+editor slots (up to 3) and the two board clients of one AN-18 run are not such a pool
+(section "3D pipeline parallelism" below). Run background
 commands without opening visible console windows when possible.
 
 At the end of each task or test run, check for processes it started and stop any
@@ -242,6 +244,35 @@ GPT Astra (`gpt-6-astra`) in skills, docs, tools and memory, until those are rew
   Gemini services are new to the pipeline. `tools/art/visual/ledger.py` knows them as subscriptions: a `terms` row
   before the first use of a model, then `add --service Gemini|stiva.ai --generations N` (templates T-GEMINI-IMG,
   T-GEMINI-AUDIO, T-STIVA-AUDIO); `add --service Codex` is refused.
+
+## 3D pipeline parallelism (user complaint 2026-10-21, binding)
+
+The user's words on 2026-10-21: «Мне кажется, ты меня обманываешь по поводу времени и по поводу возможности
+параллелизации процессов. … А сборка на 1,5 часа пакета в Unreal, то есть 73 минуты на фигуру, это вообще бред.» and
+«И про сборку C++ тоже ответить. Это тоже полный бред. Там же есть лайф режим.» The serial steps were project rules,
+not hardware limits. Decision record: `docs/game-design/decisions/2026-10-21-parallel-7a-editor-slots.md` (ДС-3a…ДС-3f);
+measurements: `docs/art-pipeline/evidence/parallel-pipeline-2026-10-21/README.md`.
+- **7a: one hidden editor per hero.** The rule «7a строго по одному герою» (ДС-3) is lifted. The orchestrator starts a
+  slot per hero with `python tools/tripo-pipeline/ue7a/editor_slot.py start <N> --hero <Key> --workdir <W>` and closes it
+  with `editor_slot.py stop <N>`. Slot N has MCP port 8123+N, its own lock `C:/tmp/ue-editor-slot<N>.lock`, its own drop
+  and PID. The hero's agent works only in its slot (`eval "$(editor_slot.py env <N>)"`). At most 3 slots; slot 0 is the
+  old single editor (8123, `C:/tmp/ue-editor.lock`), and without `UE_EDITOR_SLOT` every tool behaves as before.
+- **Shared writes stay single.** `um_masters build` and `control_scene.py` refuse while the project has more than one
+  editor. The shared registration files of 7a item 4 and `git add -f` go in one registrar step after all slots close.
+  Editor captures in slot mode take the GPU token.
+- **AN-18:** `clip_review_sheet.py run` shoots both boards at once (`--parallel-maps`, default) without the ProfileGPU
+  wait (`--shot-delay 0`, default); a new hero's K1 covers only its own card poses.
+- **Packaging:** `package-client.ps1` waits for UAT itself, not its process tree (the ~14 min tail after UAT is gone).
+  UAT takes about 3–3.5 min; the "73 min per figure" is 7a editor work (import, look-dev, clip frames), not packaging.
+- **C++ and Live Coding:** C++ enters a hero only in 7b, once per batch window (`Specs()` row, tests, audio keys). An
+  incremental UnmatchedEditor build takes 16–31 s. Live Coding compiles the same file just as long; it saves the
+  restart, not the build. It cannot register a hero: `Specs()` is a function-local static table, the acceptance frames
+  come from the packaged `-Bench`, and a live `-LiveCoding` session blocks UnmatchedEditor builds in every checkout.
+  For game-code fixes Live Coding stays the default (section "Live Coding dev loop" below). Next step after wave A: the
+  hero table in a JSON config, so that registering a hero needs no C++ at all.
+- Blender stays at most 2 headless runs until a measurement after wave A (`run_h2_bake.py` is part of the `reuse.py`
+  code fingerprint, so editing it mid-wave would force recomputation). Tripo API instead of Studio clicks needs the user's
+  key, credits and decision (`references/tripo3d-stages.md` §10).
 
 ## Unreal GPU load
 

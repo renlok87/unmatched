@@ -12,7 +12,7 @@
 | Вход | принятый H2LD-набор этапа 3 (карточка этапа 4 с вердиктом `pass`), 4 клипа этапа 6 авторены и прошли валидаторы (`validate_clip`, `clip_contact_check`, `clip_manifest.py check`), звуки и FX этапа 6. Карточки клипов `pass` — не вход, а выход 7a: приёмке клипа нужен UE-импорт (ДС-1, §4.5) |
 | Выход | ассеты в `/Game/PipelineCandidates/<Key>/{<Stage>,Rig,H2Anim}`, 4 карточки клипов `pass` (7a), правки C++ и конфигов из регистрации, кадры `-Bench` обеих досок, строки реестров, evidence |
 | Критерий выхода | `ue-import-report.json` → `technically_imported` и все checks passed; 4 карточки клипов `pass` (§4.5); `registration_check.py` PASS; автотесты `Unmatched.S08` PASS (в том числе `HeroesV2.Contact` и `HeroesV2.Dissolve`); кадры `-Bench` Marmoreal и Sarpedon открыты и осмотрены; трассы без отката; реестры обновлены |
-| Исполнитель | запускающий агент; редактор 7a поднимает и закрывает оркестратор (§1 п.1, ДС-3) |
+| Исполнитель | запускающий агент; слоты редакторов 7a поднимает и закрывает оркестратор, свой слот на героя (§1 п.1, ДС-3a) |
 
 Решения по итогам пилота 2026-10-13/14 — `docs/game-design/decisions/2026-10-14-skill-refinement-delegated-decisions.md`
 (ДС-1…ДС-8), находки F — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`. Два класса стопа (ДС-2):
@@ -37,6 +37,7 @@ README evidence их не записывать. Отступлениями от 
 | В `03-asset-registry.csv` ставится «художественно принято, по делегированию» (§7.1) | §0 п.3: «Исполнитель ставит максимум „технически импортировано“» | делегированная приёмка по листу K1/K2 — решение пользователя ВР-17 (`docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`) и правило ВР-RG07 (`docs/game-design/visual/02-visual-design.md`); в `asset-registry.json` статус остаётся «технически импортировано» |
 | Notify `Contact` ставится шагом `de010.py apply` (§5 п.3) | §4.6–4.7 этого шага нет | автотест `Unmatched.S08.HeroesV2.Contact` требует ровно один notify на LungeAttack (`S08HeroesV2Tests.cpp:537-540`) |
 | `init` получает `--export-basename SK_<Key>_<Stage>` (§4.1 шаг 4) | §4.6 п.4 флаг не указан | так инициализированы все четыре принятых импорта (§4.1) |
+| 7a — свой скрытый редактор-слот на героя, герои пачки параллельно (§1 п.1, ДС-3a) | §0.2, §8, ловушки: «7a — один герой за раз, редактор пачки поднимает и закрывает оркестратор (ДС-3)» | ДС-3a 2026-10-21 (`docs/game-design/decisions/2026-10-21-parallel-7a-editor-slots.md`): последовательность была правилом одного порта :8123 и одного файла блокировки; у слота свой порт 8123+N, своя блокировка и свой PID, дым двух редакторов прошёл. Хендбук правит сессия волны A (файл у неё незакоммичен) |
 
 Порядок этапа. Шаги 7.0–7.4a — подэтап 7a SKILL.md (агентский скрытый редактор, MCP; §1 п.1), шаги 7.5–7.8 —
 подэтап 7b (без GUI-редактора на этом checkout и без живой сессии Live Coding, §1 п.4):
@@ -63,7 +64,10 @@ README evidence их не записывать. Отступлениями от 
 ```bash
 export MSYS_NO_PATHCONV=1        # иначе /Game/... станет C:/Program Files/Git/Game/...
 export PYTHONIOENCODING=utf-8    # для прочих скриптов; точки входа этапа сами пишут UTF-8 (70905fa2, 76168867; F47)
-export UE_CONSOLE_DROP=C:/tmp/<ASSET_ID>-stage7/drop   # консоль скрытого редактора через файлы (§1 п.1; F121, F125)
+eval "$(python tools/tripo-pipeline/ue7a/editor_slot.py env <N> --workdir C:/tmp/<ASSET_ID>-stage7 --hero <Key>)"
+                                 # слот героя (§1 п.1, ДС-3a): UE_MCP_URL (порт 8123+N), UE_EDITOR_LOCK, UE_CONSOLE_DROP,
+                                 # UE_LOCK_OWNER, UE_EDITOR_SLOT; слот 0 = прежний одиночный режим — вместо eval только
+# export UE_CONSOLE_DROP=C:/tmp/<ASSET_ID>-stage7/drop   # консоль скрытого редактора через файлы (§1 п.1; F121, F125)
 ROOT="$(pwd -W)"                                                    # корень текущего checkout в виде C:/...
 T="python tools/tripo-pipeline/tripo_pipeline.py"                 # CLI 0.8.0 (tripo_pipeline.py:81)
 L="python tools/art/material_library/ue_lock.py"                   # блокировка редактора
@@ -74,7 +78,7 @@ V=art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ldc-ue       # look-dev с�
 E7=art/pipeline-candidates/<ASSET_ID>/evidence/stage7a-<YYYYMMDD>  # evidence 7a: снимки, um-masters, discard-master (F94)
 E=docs/art-pipeline/evidence/<content-key>-<YYYYMMDD>             # evidence 7b и README этапа (HANDBOOK §9)
 W=C:/tmp/<ASSET_ID>-stage7                                         # логи, сырые PNG, листы, бенч, drop/ и editor.pid — вне git
-netstat -ano | grep ':8123 .*LISTEN'                               # MCP редактора должен слушать
+netstat -ano | grep ":$((8123 + <N>)) .*LISTEN"                    # MCP редактора слота должен слушать (слот 0: :8123)
 ```
 
 `<content-key>` — CONTENT_KEY заявки (`king-arthur`), `<Key>` — KEY (`KingArthur`), `<Stage>` — стадия из UE_NAMES
@@ -86,10 +90,19 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
 
 1. **Редактор 7a — агентский (ДС-3; RA-07, RC-05).** Пользователь UE сам не открывает (2026-10-14: «я ничего сам
    вручную не открывал и не запускал»), поэтому гейт «редактор пользователя» стоит только при интерактивном запуске.
-   - **Один 7a за раз.** 7a идёт строго по одному герою. Редактор пачки поднимает и закрывает оркестратор; агенты
-     героев свой редактор не запускают и чужой не закрывают, а только выполняют шаги под `ue_lock`. Причина: второй
-     агент 7a взял бы чужой редактор на :8123 и потерял бы его, когда первый закроет свой PID (пилот спасла ручная
-     сериализация).
+   - **Свой редактор на героя (ДС-3a, 2026-10-21; правило «один 7a за раз» ДС-3 снято).** Слот N — отдельный
+     скрытый редактор проекта: MCP `127.0.0.1:<8123+N>/mcp`, блокировка `C:/tmp/ue-editor-slot<N>.lock`, консоль
+     `$W/drop`, лог `$W/editor.log`, PID в `$W/editor.pid` и в реестре `C:/tmp/ue7a-slots.json`. Слот 0 — прежний
+     одиночный режим (`:8123`, `C:/tmp/ue-editor.lock`). Слоты поднимает и закрывает оркестратор:
+     `python tools/tripo-pipeline/ue7a/editor_slot.py start <N> --hero <Key> --workdir $W` (ждёт порт и
+     `$W/drop/ready.json`, печатает окружение), `editor_slot.py list`, `editor_slot.py stop <N>`. Агент героя
+     работает только в своём слоте (`eval "$(editor_slot.py env <N> --workdir $W --hero <Key>)"`), свой редактор не
+     запускает и чужой не закрывает. `start` отказывает (код 3), если слот занят живым редактором, порт уже слушает,
+     свободной ОЗУ меньше 8 ГБ или открыт интерактивный редактор проекта; между стартами — не меньше 60 с
+     (`--stagger`, всплеск компиляции шейдеров). Не больше 3 слотов: пиковый рабочий набор редактора с героем не
+     замерен (без героя ≈ 3,8 ГБ, дым 2026-10-21) — первый прогон пишет его в README evidence. Закрывать по одному:
+     кэш AssetRegistry пишется при выходе. Общие записи — только при одном редакторе проекта: `um_masters build` и
+     `review/control_scene.py` при втором отказывают (`editor_slot.py check-shared-write "<действие>"`, ДС-3b).
    - **Запуск — скрытый редактор.** Видимый или свёрнутый редактор не берёт фокус консоли, и `py_file` падает по
      таймауту (F121). Рецепт пилота (командная строка из `C:/tmp/ASSET-ACHILLES-001-stage7/editor.log`):
 
@@ -100,13 +113,19 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
          -RenderOffScreen -ForceRes -ResX=2033 -ResY=1216 -unattended -nosplash -NoSound -abslog=$W/editor.log
      ```
 
+     `editor_slot.py start` собирает эту строку для слота: порт 8123+N в `-ModelContextProtocolPort` и `StartServer`,
+     плюс `-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False`
+     (сервер из ini на своём порту не стартует; тот же ключ `package-client.ps1` передаёт кукеру).
      Без `-LiveCoding`: сессия Live Coding заблокировала бы сборку `UnmatchedEditor` во всех checkout (§1 п.4).
-     `-unattended` гасит модальные диалоги. Запуск — PowerShell `Start-Process -PassThru`, его `.Id` (PID Windows, а не
-     PID Git Bash) пишется в `$W/editor.pid`. Готовность: порт `:8123` слушает (`netstat` из блока выше) и есть
+     `-unattended` гасит модальные диалоги. Запуск — `editor_slot.py start` (отсоединённый процесс, PID Windows в
+     `$W/editor.pid`); вручную — PowerShell `Start-Process -PassThru`, его `.Id` (PID Windows, а не PID Git Bash)
+     пишется в `$W/editor.pid`. Готовность: порт `:8123` слушает (`netstat` из блока выше) и есть
      `$W/drop/ready.json`. Дальше в каждой оболочке `export UE_CONSOLE_DROP=$W/drop`: консольные команды
      (`ue_live.Ue.console`, `editor_python` CLI — F125, 3ed2d354) идут файлами, а не набором текста.
    - **Закрытие** — после коммита результата 7a и при 0 dirty-пакетов (грязный `M_UM_Figure_v2` — `discard_master.py`,
-     §4.3): команда `quit-editor` через drop (`python -c "import sys; sys.path.insert(0, 'tools/tripo-pipeline/review');
+     §4.3): `editor_slot.py stop <N>` (сверяет PID по `-abslog` и порту, отказывает при занятой блокировке слота и
+     грязных пакетах, `--force-dirty` — без сохранения; `quit-editor` через drop, затем `taskkill /PID` без `/F`);
+     вручную — команда `quit-editor` через drop (`python -c "import sys; sys.path.insert(0, 'tools/tripo-pipeline/review');
      from ue_live import Ue; Ue().console('quit-editor')"` с `UE_CONSOLE_DROP`) или `taskkill /PID <editor.pid>` без `/F`.
      Процесс проверить по PID: он завершился.
    - **Чужой редактор.** До запуска — список `UnrealEditor.exe` с командной строкой
@@ -117,8 +136,10 @@ netstat -ano | grep ':8123 .*LISTEN'                               # MCP ред�
      флагов, из Epic Launcher или с `-LiveCoding`) — гейт SKILL.md §5 п.7: стоп и вопрос пользователю; такой редактор
      агент не закрывает (AGENTS.md «Agent and process lifecycle»).
 2. **Блокировка.** Каждая команда, которая ходит в редактор по MCP, запускается так:
-   `$L --step "<шаг>" -- <команда>`. `ue_lock.py` держит `C:/tmp/ue-editor.lock`, ждёт чужую блокировку (опрос 20 с) и
-   возвращает код команды. В файле блокировки — владелец, время и шаг (первая строка), `pid`, `host`, `since`,
+   `$L --step "<шаг>" -- <команда>`. `ue_lock.py` держит блокировку редактора своего слота (`--slot N` или
+   `UE_EDITOR_SLOT=N` → `C:/tmp/ue-editor-slot<N>.lock`; `--lock <файл>` или `UE_EDITOR_LOCK` — явный файл; слот 0 и
+   без переменных — `C:/tmp/ue-editor.lock`), ждёт чужую блокировку (опрос 20 с, `UE_LOCK_POLL_S`) и возвращает код
+   команды. Шаги разных слотов друг друга не ждут (дым 2026-10-21). В файле блокировки — владелец, время и шаг (первая строка), `pid`, `host`, `since`,
    `max_hold_s` и у CLI `cmd` (командная строка). Пока шаг жив, поток heartbeat обновляет время файла (70905fa2, RB-21):
    шаг дольше 25 мин не перехватывается. Устаревшей (ждущий её перехватывает и пишет причину) блокировка становится:
    сразу, если её PID на этой машине мёртв (`dead_pid`); после предела удержания `--max-hold` (по умолчанию 2 ч,
@@ -692,6 +713,8 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
   # пачка: каждый герой со своей фикстурой одним вызовом (F159)
   python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key1>,<Key2> \
       --fixture "<Key1>:marmoreal=S08BenchMarmoreal-<Key1>.json,sarpedon=S08BenchSarpedon-<Key1>.json;<Key2>:marmoreal=…,sarpedon=…"
+  # обе доски идут одновременно (--parallel-maps по умолчанию; --no-parallel-maps — по очереди), 0 с ожидания
+  # ProfileGPU после окна замера (--shot-delay 0 по умолчанию; --shot-delay 3 — прежний тайминг) — ДС-3d
   # только K2, K1 — из готовых запусков (например, после доработки клипа на той же сборке)
   python tools/art/anim/clip_review_sheet.py run --packaged --heroes <Key> --fixture … --k1-from <каталог кадров>
   python tools/art/anim/clip_review_sheet.py sheet --heroes <Key> [--k1-from <тот же каталог>]
@@ -702,6 +725,15 @@ python tools/art/render/live_tune.py bench --map sarpedon  --fixture S08BenchSar
   `--k1-from` K1 не снимает: берёт готовый запуск, который покрывает позы героя, снят на его же фикстуре и (packaged)
   на той же сборке, иначе отказ. У вариантов Д-2 по одному новому бойцу на фикстуру, поэтому в пачке K1 снимается на
   каждого героя, а `--k1-from` экономит повторные съёмки. Пилот: 591 с на доску на героя, 66 % времени 7b.
+  С 2026-10-21 (ДС-3d, `docs/game-design/decisions/2026-10-21-parallel-7a-editor-slots.md`): группа без MVP-героя
+  снимает K1 только по позам своих карточек, без объединения AN-17 (Beowulf: 23 позы вместо 37, 46 PNG вместо 74 на
+  доску); доски — одновременно, по клиенту на доску (кап `-BenchFps=60` каждый, кадр ≈ 2,2 мс GPU; запуск держит
+  `C:/tmp/unmatched-gpu.lock`, клиенты — `C:/tmp/unmatched-gpu-<map>.lock`); `-BenchShotDelay=0` вместо 3 с ожидания
+  кадра ProfileGPU, которого `-BenchNoProfileGPU` не снимает. Проверка (editor `-game`, 3 позы × 2 вида, 2026-10-21):
+  `--shot-delay 0` и доска рядом со второй дают отличие от эталона в пределах шума двух одинаковых прогонов (meanAbs
+  0,30–0,44 против 0,35–0,42, 0 px > 24 вне маски шума), оба клиента держали 60 fps; 8,0 → 4,7 с на PNG
+  (`docs/art-pipeline/evidence/parallel-pipeline-2026-10-21/README.md`). Сборка без флага (до 2026-10-21) флаг
+  игнорирует и снимает с прежними 3 с.
   `sheet` не пишет карточку с пустой клеткой (код 1, пропуски названы) — переснять кадры (`--allow-missing` — только
   черновики вне `docs/`). Лист доказывает, что клип играет в пакете, но плохо показывает, как он читается (F163:
   DeathSettle Achilles к.0 и к.21 почти одинаковы сверху): читаемость решает приёмка клипа §4.5.
@@ -974,7 +1006,8 @@ Run импорта: art/pipeline-candidates/<ASSET_ID>/<YYYYMMDD>-h2ld-ue-import
 | Образец `build_tripo_medusa.py` | `SKEL_Medusa`, кость `weapon`, фигура смотрит в +Y | не в git, запрещён как образец (HANDBOOK §1); образцы — `tools/tripo-pipeline/blender/candidate_build/*`, `h2_bake/*` |
 | Байты из живого Blender | невоспроизводимый FBX/PNG | только headless; MCP Blender — осмотр (HANDBOOK §0.1, §6) |
 | Видимый или свёрнутый редактор 7a | консоль не берёт фокус, `py_file` и `editor_python` падают по таймауту (F121) | скрытый редактор + `console_drop.py`, `UE_CONSOLE_DROP` (§1 п.1; F125) |
-| Два агента 7a на одном :8123 | второй потеряет редактор, когда первый закроет свой PID | один 7a за раз, редактор пачки — у оркестратора (§1 п.1, ДС-3) |
+| Два агента 7a в одном редакторе | второй потеряет редактор, когда первый закроет свой PID | свой слот на героя (`editor_slot.py`, §1 п.1, ДС-3a): агент работает только в своём слоте, слоты закрывает оркестратор |
+| Общая запись при двух слотах | `um_masters build` или контрольный уровень, записанные одним редактором, другой держит старой копией в памяти | `um_masters build` и `control_scene.py` отказывают при > 1 редакторе проекта (ДС-3b); в 7a только `um_masters verify` (ДС-4) |
 | `um_masters.py build` в импорте | отказ по дрейфу RimColor, бывшему до прогона (F91) | только `verify`; пересборка — при смене графа, отдельно (§4.1, ДС-4) |
 | Поднятое оружие или рога выше головы | FAIL `figure_height_as_profile` (F80) | `candidate.figure_top_part` (§3.1) |
 | Фигура, симметричная по глубине | FAIL `skeletal_bounds_match_build_front_unambiguous` (F124) | `axes.front_from_best_bound_fit: true` (§3.1) |

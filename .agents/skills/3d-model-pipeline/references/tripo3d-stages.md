@@ -593,6 +593,11 @@ art/pipeline-candidates/<ASSET_ID>/
 Нормой не является (§2). Нужен только если пользователь даст API-ключ. Тогда кредиты — `api-credits`, отдельно от
 Studio (`tripo_pipeline.py:312` `SERVICES`), строка журнала та же, модель — `"Tripo API <model>"`.
 
+Что нужно от пользователя для перехода этапа 2 на API (2026-10-21, `docs/game-design/decisions/2026-10-21-parallel-7a-editor-slots.md`,
+раздел «Tripo API»): аккаунт developers.tripo3d.ai и ключ в `TRIPO_API_KEY` (кладёт сам, агент ключ не вводит);
+API-кредиты (отдельный кошелёк, H2 ≈ 70–90 кредитов на героя); решение «API вместо Studio» и лимит в
+`credits-ledger.json`. Выигрыш — три героя ≈ 10–15 мин параллельно вместо ≈ 36 мин по очереди и без рабочего стола.
+
 - База: `https://openapi.tripo3d.ai/v3` (зеркало `openapi.tripo3d.com/v3`); заголовок `Authorization: Bearer <key>`.
   Ключ создаётся в консоли developers.tripo3d.ai (migration-гайд:
   https://developers.tripo3d.com/assets/developer/tripo-v2-to-v3-migration/SKILL.md). Переменной ключа в репо нет.
