@@ -51,10 +51,14 @@ bool FS08AudioBankTest::RunTest(const FString&) {
   TestEqual("ancient leshen key", S08AudioBank::CharacterKey(TEXT("Ancient Leshen")), FString(TEXT("ANCIENTLESHEN")));
   TestEqual("achilles key", S08AudioBank::CharacterKey(TEXT("Achilles")), FString(TEXT("ACHILLES")));
   TestEqual("beowulf key", S08AudioBank::CharacterKey(TEXT("Beowulf")), FString(TEXT("BEOWULF")));
+  TestEqual("bruce key", S08AudioBank::CharacterKey(TEXT("Bruce Lee")), FString(TEXT("BRUCELEE")));
+  TestEqual("watson key", S08AudioBank::CharacterKey(TEXT("Dr. Watson")), FString(TEXT("WATSON")));
   TestEqual("angel cuts", S08AudioBank::HitType(TEXT("ANGEL")), FString(TEXT("BLADE")));
   TestEqual("ancient leshen casts", S08AudioBank::HitType(TEXT("ANCIENTLESHEN")), FString(TEXT("MAGIC")));
   TestEqual("achilles cuts", S08AudioBank::HitType(TEXT("ACHILLES")), FString(TEXT("BLADE")));
   TestEqual("beowulf cuts", S08AudioBank::HitType(TEXT("BEOWULF")), FString(TEXT("BLADE")));
+  TestEqual("bruce hit", S08AudioBank::HitType(TEXT("BRUCELEE")), FString(TEXT("CLAW")));
+  TestEqual("watson hit", S08AudioBank::HitType(TEXT("WATSON")), FString(TEXT("ARROW")));
   TestEqual("medusa shoots", S08AudioBank::HitType(TEXT("MEDUSA")), FString(TEXT("ARROW")));
   TestEqual("unknown blunt", S08AudioBank::HitType(FString()), FString(TEXT("BLUNT")));
   // the bag: all variants once per round, no repeat across rounds

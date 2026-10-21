@@ -56,7 +56,10 @@ HEROES = [("KingArthur", "H2LD", "ASSET-KING-ARTHUR-001/build-profiles/king-arth
           ("AncientLeshen", "H2LD", "ASSET-ANCIENT-LESHEN-001/build-profiles/ancient-leshen-h2anim-r3.json", 8),
           ("Achilles", "H2LD", "ASSET-ACHILLES-001/build-profiles/achilles-h2anim-r3.json", 7),
           # skill check figure 2026-10-14, stage 7b (registration R7-1)
-          ("Beowulf", "H2LD", "ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json", 7)]
+          ("Beowulf", "H2LD", "ASSET-BEOWULF-001/build-profiles/beowulf-h2anim.json", 7),
+          # wave A 2026-10-21, stage 7b (registration R7-1)
+          ("BruceLee", "H2LD", "ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json", 7),
+          ("DrWatson", "H2LD", "ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json", 8)]
 
 
 def now() -> str:

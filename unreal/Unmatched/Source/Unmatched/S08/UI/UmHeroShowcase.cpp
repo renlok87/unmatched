@@ -77,6 +77,10 @@ FString HiPolyPath(const TCHAR* Key) {
   if (K == TEXT("KingArthur")) {
     return TEXT("/Game/PipelineCandidates/KingArthur/HP2/king-arthur-h2-tripo-4f059621-tex8k-pbr-clean.king-arthur-h2-tripo-4f059621-tex8k-pbr-clean");
   }
+  // Bruce Lee (wave A 2026-10-21, stage 7b): the cleaned H2 Tripo 14235c8d source with its own Tripo 8K materials (HP2)
+  if (K == TEXT("BruceLee")) {
+    return TEXT("/Game/PipelineCandidates/BruceLee/HP2/bruce-lee-h2-tripo-14235c8d-tex8k-pbr-clean.bruce-lee-h2-tripo-14235c8d-tex8k-pbr-clean");
+  }
   if (K != TEXT("Medusa")) return FString();
   return FString::Printf(TEXT("/Game/PipelineCandidates/%s/HPLD/SM_%s_HP_Showcase.SM_%s_HP_Showcase"), Key, Key, Key);
 }

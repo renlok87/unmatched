@@ -61,6 +61,9 @@ FString S08AudioBank::CharacterKey(const FString& Name) {
   if (Name.Contains(TEXT("leshen"), ESearchCase::IgnoreCase)) return TEXT("ANCIENTLESHEN");
   if (Name.Contains(TEXT("achilles"), ESearchCase::IgnoreCase)) return TEXT("ACHILLES");
   if (Name.Contains(TEXT("beowulf"), ESearchCase::IgnoreCase)) return TEXT("BEOWULF");  // skill check figure 2026-10-14
+  // wave A 2026-10-21 (stage 7b, registration R7-5)
+  if (Name.Contains(TEXT("bruce"), ESearchCase::IgnoreCase)) return TEXT("BRUCELEE");
+  if (Name.Contains(TEXT("watson"), ESearchCase::IgnoreCase)) return TEXT("WATSON");
   return FString();
 }
 
@@ -73,6 +76,8 @@ FString S08AudioBank::HitType(const FString& Key) {
   if (Key == TEXT("ANCIENTLESHEN")) return TEXT("MAGIC");
   if (Key == TEXT("ACHILLES")) return TEXT("BLADE");
   if (Key == TEXT("BEOWULF")) return TEXT("BLADE");
+  if (Key == TEXT("BRUCELEE")) return TEXT("CLAW");
+  if (Key == TEXT("WATSON")) return TEXT("ARROW");
   return TEXT("BLUNT");
 }
 

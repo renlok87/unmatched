@@ -116,6 +116,11 @@ const TArray<FHeroSpec>& Specs() {
       // Skill check figure 2026-10-14 (stage 7b): Beowulf, ue-import-report.json of 20261014-h2ld-ue-import
       // (helmet dome 55.0 / skeletal top 55.0149), Idle 2.5 s and contact k.7 from beowulf-h2anim.json.
       {TEXT("Beowulf"), TEXT("Beowulf"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 55.0149f, 2.5f, 7},
+      // Wave A 2026-10-21 (stage 7b, REGISTRATION-7.md): ue-import-report.json of 20261021-h2ld-ue-import.
+      // Bruce Lee: head with hair 55.0 / skeletal top 54.9994, Idle 2.5 s, contact k.7 (bruce-lee-h2anim.json).
+      // Dr. Watson (sidekick of Sherlock Holmes): bowler top 45.0 / skeletal top 45.0007, Idle 56/24 s, contact k.8.
+      {TEXT("Bruce Lee"), TEXT("BruceLee"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 54.9994f, 2.5f, 7},
+      {TEXT("Dr. Watson"), TEXT("DrWatson"), TEXT("H2LD"), false, 45.0f, 40.0f, 48.0f, 45.0f, 45.0007f, 56.0f / 24.0f, 8},
   };
   return Table;
 }

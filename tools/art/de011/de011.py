@@ -54,7 +54,9 @@ CAPTURE_LOOKS = {"KingArthur": "P1", "Merlin": "P2", "Medusa": "P1", "Harpy": "P
                  # skill pilot 2026-10-14, stage 7b (registration R7-2)
                  "Angel": "P1", "AncientLeshen": "P2", "Achilles": "P1",
                  # skill check figure 2026-10-14, stage 7b (registration R7-2)
-                 "Beowulf": "P2"}
+                 "Beowulf": "P2",
+                 # wave A 2026-10-21, stage 7b (registration R7-2)
+                 "BruceLee": "P2", "DrWatson": "P1"}
 
 
 LOG_EXIT = "LogExit: Exiting."

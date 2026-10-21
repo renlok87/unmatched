@@ -3832,31 +3832,56 @@
     },
     {
       "id": "ASSET-DR-WATSON-001",
-      "name": "DrWatson (помощник), новая фигура скилла 3d-model-pipeline",
+      "name": "Dr. Watson (помощник Sherlock Holmes), новая фигура скилла 3d-model-pipeline (волна A)",
       "category": "sidekick",
       "contentKey": null,
       "manifest06Row": null,
       "backlog": [],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "planned",
+      "status": "технически импортировано",
+      "stage": "ue-editor-frames",
       "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "pipeline"},
       "sourceImages": {"recommended": []},
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "ue-editor-frames H2LD 20261021-h2ld-ue-import + de010/de011 (этапы 7a–7b волны A скилла 3d-model-pipeline, до упаковки)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/20261021-h2ld-ue-import/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported (этап 7a)", "sha256": "a8e690ec20c0c45ca956f7f4a748571ca140b14aaaa16e977f03dfe8719f8ef4"},
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2ld-lookdev-ue-import-r3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "живой профиль импорта и look-dev UE r3 (apply-mi)", "sha256": "60f2f268636c94591b356edd14386c5d6537af3d2f051e31b933e84784060d73"},
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/build-profiles/dr-watson-h2anim.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спека клипов H2Anim, импортированных в UE: кадр контакта LungeAttack 8", "sha256": "2fc8549daf37c6becd2aeeb1cb137437bfd2d25ae49e3cfaf7968209d7231194"},
+            {"path": "/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SK_DrWatson_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "SkeletalMesh H2LD (Specs(): бюджет 45 uu) (LOD0 44 169 tris с револьвером, подставка 1 384)", "sha256": "4b58eeb1bcd7fb4231b4719816b5aead73dac4a3365e0a5e441586a6f9d8f955"},
+            {"path": "/Game/PipelineCandidates/DrWatson/H2LD/Meshes/SM_DrWatson_H2LD_Base", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "подставка (двухъярусная, vertex-mask кольца команды)", "sha256": "599e9700b587c67224cecfdea8335b889da4ea834be1f514c90ec0bb6edbd12f"},
+            {"path": "/Game/PipelineCandidates/DrWatson/Rig/SK_DrWatson_Skeleton", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "канонический скелет", "sha256": "7534d7f83649fe30f2e24779fcd4be34b5205393621677f38bca92c5aad9a4d9"},
+            {"path": "/Game/PipelineCandidates/DrWatson/H2Anim/AM_DrWatson_LungeAttack", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "LungeAttack с notify Contact (de010.py apply, этап 7b)", "sha256": "8ff085557709f455ac3b379be5bdfb4d1c53f444721e4721eed7a18b69abe218"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_P1_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P1 (de011.py apply, этап 7b)", "sha256": "7d81852b20e1d2c5100ad23ed6ed146ecaad6d0c8d4bdfdf192323b454fe158e"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_DrWatson_H2LD_P2_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P2 (de011.py apply, этап 7b)", "sha256": "3e6a6d4ab1d56b4b20a08232b27bac36c7e15f085380b0cb13577449ff1626a0"},
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/stage7b-20261021/de010-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de010 apply --only BruceLee,DrWatson: один Contact на LungeAttack, длина и кадры до/после равны", "sha256": "30bb0ef11435883c03b2c50a1da43b1bd5827dda04fa58e4672710e9ea0398d6"},
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/stage7b-20261021/de011-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de011 apply --only BruceLee,DrWatson: MIC Masked, родитель — MI тела", "sha256": "e2de91881a019110bb4ec7e27322d64aab19d61106f3c98436e63d395e72da95"},
+            {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/stage7b-20261021/ue-tests-s08.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "Unmatched.S08 401/401, EXIT CODE 0 (выписка)", "sha256": "70c5cce6a1c80a158280b844262218787623ceab77dddad1c8106e20f2fc5727"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchMarmoreal-DrWatson.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Marmoreal (Р7-11)", "sha256": "bd266a2cc6d4def15cf8e0a793f4df0e559c5f0f20fe2ffbaed000b4a8e20621"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchSarpedon-DrWatson.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Sarpedon (Р7-11)", "sha256": "91b285b2d5fdbe1459cda0ff38069cde8e86f7ed326d98fcf732947252047c34"}
+          ],
+          "note": "Этап 7a (dd9114fd): импорт 20261021-h2ld-ue-import (skeletal-adopt), look-dev UE r1→r3 через apply-mi (20261021-h2ld-ldc-ue), клипы 20261021-h2anim, UE-кадры и приёмка клипов. Этап 7b 2026-10-21 без GUI-редактора: de010/de011 apply --only BruceLee,DrWatson, строка Specs(), тесты HeroesV2/Audio, CharacterKey/HitType, cue-table CUE-011/013, DirectoriesToAlwaysCook, S08FighterNames, варианты фикстуры. этап 4 r3 pass 8.8 (Opus xhigh); клипы r1 pass: Idle 8.8, LungeAttack 8.8, HitReact 8.8, DeathSettle 8.8 — по делегированию. Упаковка и кадры -Bench — следующий шаг окна 7b."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": null, "drift": null, "proposedChange": null},
-      "nextStep": "Этап 1a скилла 3d-model-pipeline: концепт в работе (Codex, art/imagegen/concept-dr-watson-codex/); затем 1b/1c — виды front/side/back и лист.",
-      "blocker": "Нет: заявка этапа 0 заполнена (asset-card.yaml), гейты стопа не сработали. Этапы 2+ отложены пользователем 2026-10-13.",
+      "nextStep": "Окно 7b волны A: одна упаковка на волну (после прохода Шерлока), затем -Bench на Marmoreal и Sarpedon original с S08Bench<Map>-DrWatson.json и -BenchFocusFighter=DrWatson, осмотр кадров, лист AN-18, live-packaged-probe; строки 03 (Р7-9).",
+      "blocker": "Нет. Открыто (не блокер): владелец Sherlock Holmes ещё на этапе 3: строка Specs() Шерлока — следующий проход регистратора; до неё на f-1-hero варианта фикстуры DrWatson стоит заглушка.",
       "doneCriteria": "Этапы 0–7 скилла 3d-model-pipeline: ue-import-report passed, автотесты S08 PASS, кадры -Bench обеих досок осмотрены.",
       "acceptanceEvidence": [],
       "evidence": [
-        {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"}
+        {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"},
+        {"path": "art/imagegen/concept-dr-watson-codex", "root": "repo", "kind": "file", "expect": "exists", "role": "концепт-лист этапа 1"},
+        {"path": "/Game/PipelineCandidates/DrWatson/H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "импорт этапа 7"},
+        {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/acceptance/20261021-r3/card.json", "root": "repo", "kind": "file", "expect": "exists", "role": "приёмка модели: этап 4 r3 pass 8.8"},
+        {"path": "art/pipeline-candidates/ASSET-DR-WATSON-001/evidence/stage7a-20261021/REGISTRATION-7.md", "root": "repo", "kind": "file", "expect": "exists", "role": "строки регистрации этапа 7"}
       ],
-      "plannedPaths": [
-        {"path": "art/imagegen/concept-dr-watson-codex", "root": "repo", "kind": "file", "expect": "planned", "role": "концепт-лист этапа 1"},
-        {"path": "/Game/PipelineCandidates/DrWatson/H2LD", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "импорт этапа 7"}
-      ]
+      "plannedPaths": []
     },
     {
       "id": "ASSET-DRACULA-001",
@@ -5652,31 +5677,57 @@
     },
     {
       "id": "ASSET-BRUCE-LEE-001",
-      "name": "BruceLee (герой), новая фигура скилла 3d-model-pipeline",
+      "name": "Bruce Lee (герой), новая фигура скилла 3d-model-pipeline (волна A)",
       "category": "hero",
       "contentKey": null,
       "manifest06Row": null,
       "backlog": [],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "planned",
+      "status": "технически импортировано",
+      "stage": "ue-editor-frames",
       "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "pipeline"},
       "sourceImages": {"recommended": []},
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "ue-editor-frames H2LD 20261021-h2ld-ue-import + de010/de011 (этапы 7a–7b волны A скилла 3d-model-pipeline, до упаковки)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/20261021-h2ld-ue-import/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported (этап 7a)", "sha256": "581778ba1f1a6685955a554f6dddff9bd33b29af4b156b57735e3fc116c8a541"},
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2ld-lookdev-ue-import-r3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "живой профиль импорта и look-dev UE r3 (apply-mi)", "sha256": "eed30b78aaca0e4d739cc8ee46d4701f8954ebbc1943fc2098d6deb9c8b91583"},
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/build-profiles/bruce-lee-h2anim.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спека клипов H2Anim, импортированных в UE: кадр контакта LungeAttack 7", "sha256": "f569f090b7d07a782756408e764ff97a03cb50e75c665a8661851985d35997f1"},
+            {"path": "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SK_BruceLee_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "SkeletalMesh H2LD (Specs(): бюджет 55 uu) (тело 39 659 tris, подставка 1 413)", "sha256": "f89eb57149b11fa4f776beaf16ab4dec396fa64555bd85aebe14d1283f83ab53"},
+            {"path": "/Game/PipelineCandidates/BruceLee/H2LD/Meshes/SM_BruceLee_H2LD_Base", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "подставка (двухъярусная, vertex-mask кольца команды)", "sha256": "3b2b2f24d19c84a767a14e38556f95383e34184513c78be00ada5605e5d8d8fc"},
+            {"path": "/Game/PipelineCandidates/BruceLee/Rig/SK_BruceLee_Skeleton", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "канонический скелет", "sha256": "59552408681b005ba6eea83814857b32eeddadbe6b5a2009197e934f165f8331"},
+            {"path": "/Game/PipelineCandidates/BruceLee/H2Anim/AM_BruceLee_LungeAttack", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "LungeAttack с notify Contact (de010.py apply, этап 7b)", "sha256": "a0846dd4af1fc663600de9831e88b3898a9579e4f4086ef98a47714bfac01387"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_P1_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P1 (de011.py apply, этап 7b)", "sha256": "2e16e58ffab2f759738c0d77b53b74b49f43ef4469a626780da9c407da58b1a4"},
+            {"path": "/Game/UM/Materials/v2/Dissolve/MI_BruceLee_H2LD_P2_Dissolve", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MIC растворения P2 (de011.py apply, этап 7b)", "sha256": "1ef5b940778cf0b61925069587eae84c6e8a8fd877c8fa4dbbe18bd226d02dc3"},
+            {"path": "/Game/PipelineCandidates/BruceLee/HP2/bruce-lee-h2-tripo-14235c8d-tex8k-pbr-clean", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "витринная хайполи HP2 (clean_hipoly без подставки Tripo, свои материалы Tripo 8K; UmShowcase::HiPolyPath)", "sha256": "f7b8b03012a87756d42efac0ebce21d2096f96b0df112785e572967c3436ae39"},
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/stage7b-20261021/de010-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de010 apply --only BruceLee,DrWatson: один Contact на LungeAttack, длина и кадры до/после равны", "sha256": "30bb0ef11435883c03b2c50a1da43b1bd5827dda04fa58e4672710e9ea0398d6"},
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/stage7b-20261021/de011-apply.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт de011 apply --only BruceLee,DrWatson: MIC Masked, родитель — MI тела", "sha256": "e2de91881a019110bb4ec7e27322d64aab19d61106f3c98436e63d395e72da95"},
+            {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/stage7b-20261021/ue-tests-s08.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "Unmatched.S08 401/401, EXIT CODE 0 (выписка)", "sha256": "70c5cce6a1c80a158280b844262218787623ceab77dddad1c8106e20f2fc5727"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchMarmoreal-BruceLee.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Marmoreal (Р7-11)", "sha256": "b5012088e9ead4849d4ba65bafd1e6983aaa5f7048c734f163996bcbbd4ebfdb"},
+            {"path": "unreal/Unmatched/Config/Bench/S08BenchSarpedon-BruceLee.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант bench-фикстуры Sarpedon (Р7-11)", "sha256": "b0d0c8ad3c3efd30e153b37da2a34f9c461e42b5035230d64496758fd9899489"}
+          ],
+          "note": "Этап 7a (2b3d0c06): импорт 20261021-h2ld-ue-import (skeletal-adopt), look-dev UE r1→r3 через apply-mi (20261021-h2ld-ldc-ue), клипы 20261021-h2anim, UE-кадры и приёмка клипов. Этап 7b 2026-10-21 без GUI-редактора: de010/de011 apply --only BruceLee,DrWatson, строка Specs(), тесты HeroesV2/Audio, CharacterKey/HitType, cue-table CUE-011/013, DirectoriesToAlwaysCook, S08FighterNames, варианты фикстуры. этап 4 r3 pass 8.8 (Opus xhigh); клипы r1 pass: Idle 9.4, LungeAttack 8.1, HitReact 8.1, DeathSettle 8.8 — по делегированию. Упаковка и кадры -Bench — следующий шаг окна 7b."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": null, "drift": null, "proposedChange": null},
-      "nextStep": "Этап 1a скилла 3d-model-pipeline: концепт в работе (Codex, art/imagegen/concept-bruce-lee-codex/); затем 1b/1c — виды front/side/back и лист.",
-      "blocker": "Нет: заявка этапа 0 заполнена (asset-card.yaml), гейты стопа не сработали. Этапы 2+ отложены пользователем 2026-10-13.",
+      "nextStep": "Окно 7b волны A: одна упаковка на волну (после прохода Шерлока), затем -Bench на Marmoreal и Sarpedon original с S08Bench<Map>-BruceLee.json и -BenchFocusFighter=BruceLee, осмотр кадров, лист AN-18, live-packaged-probe; строки 03 (Р7-9).",
+      "blocker": "Нет. Открыто (не блокер): витрина HP2 подключена (UmShowcase::HiPolyPath), слепой раунд витрины и решение по yaw — открыты; в HP2 лежит неиспользуемый материал подставки Tripo (≈ 61 МБ, как у KingArthur/HP2).",
       "doneCriteria": "Этапы 0–7 скилла 3d-model-pipeline: ue-import-report passed, автотесты S08 PASS, кадры -Bench обеих досок осмотрены.",
       "acceptanceEvidence": [],
       "evidence": [
-        {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"}
+        {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/asset-card.yaml", "root": "repo", "kind": "file", "expect": "exists", "role": "заявка этапа 0"},
+        {"path": "art/imagegen/concept-bruce-lee-codex", "root": "repo", "kind": "file", "expect": "exists", "role": "концепт-лист этапа 1"},
+        {"path": "/Game/PipelineCandidates/BruceLee/H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "импорт этапа 7"},
+        {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/acceptance/20261021-r3/card.json", "root": "repo", "kind": "file", "expect": "exists", "role": "приёмка модели: этап 4 r3 pass 8.8"},
+        {"path": "art/pipeline-candidates/ASSET-BRUCE-LEE-001/evidence/stage7a-20261021/REGISTRATION-7.md", "root": "repo", "kind": "file", "expect": "exists", "role": "строки регистрации этапа 7"}
       ],
-      "plannedPaths": [
-        {"path": "art/imagegen/concept-bruce-lee-codex", "root": "repo", "kind": "file", "expect": "planned", "role": "концепт-лист этапа 1"},
-        {"path": "/Game/PipelineCandidates/BruceLee/H2LD", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "импорт этапа 7"}
-      ]
+      "plannedPaths": []
     },
     {
       "id": "ASSET-DR-SATTLER-001",
