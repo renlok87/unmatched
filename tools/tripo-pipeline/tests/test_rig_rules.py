@@ -94,6 +94,9 @@ class ContractTests(unittest.TestCase):
         self.assertIsNone(chars["BruceLee"]["weapon_bone"])
         self.assertEqual(chars["SherlockHolmes"]["weapon_bone"], "weapon.R")
         self.assertEqual(chars["Watson"]["weapon_bone"], "weapon.R")
+        self.assertEqual(chars["Sinbad"]["weapon_bone"], "weapon.R")
+        self.assertEqual(chars["ThePorter"]["weapon_bone"], "weapon.R")
+        self.assertIsNone(chars["MuhammadAli"]["weapon_bone"])
         for c in chars.values():
             self.assertTrue(c["weapon_bone"] is None or c["weapon_bone"] in V2["weapon_bones"])
 
