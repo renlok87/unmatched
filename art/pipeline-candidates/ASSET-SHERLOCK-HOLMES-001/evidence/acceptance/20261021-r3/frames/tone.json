@@ -1,0 +1,182 @@
+{
+  "schema": "unmatched.acceptance-tone/1",
+  "rule": {
+    "main_share_min": 0.1,
+    "y_ratio_ok": [
+      0.8,
+      1.25
+    ],
+    "hue_abs_max_deg": 15.0,
+    "hue_checked": "|dHue| проверяется, только когда обе медианы хроматические (sat >= 0.15); оттенок почти серого цвета — шум (RB-06)",
+    "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по построению, его яркость проверяет только y_ratio_loo",
+    "family": "same | changed: обе медианы хроматические (sat >= 0.15) и |dHue| > 30 deg, либо переход нейтральный <-> хроматический с |dSat| >= 0.20 — смена семейства (S); светлота и насыщенность внутри семейства — тон (T)",
+    "cap": "1.0 — основной класс вне допуска; 1.5 — только второстепенные; 2.0 — все в допуске; status floor (ld-maps-report grade.median_floor_applied) T не снижает"
+  },
+  "framing": "concept",
+  "exposure_k_concept_over_ld": 1.0617,
+  "exposure": {
+    "candidates_pixels_ld": {
+      "leather_smooth": 27511,
+      "linen": 5924,
+      "silk": 1152,
+      "skin": 33997,
+      "wood": 5860,
+      "wool_coarse": 904093
+    },
+    "class": "wool_coarse",
+    "excluded": [
+      "brass",
+      "legacy_bake",
+      "stone_base"
+    ],
+    "mode": "anchor_class",
+    "rule": "the dielectric figure class with the most render pixels (no metal, legacy_bake, base class); h2-bake 0.9.0, skill check C20",
+    "selected_by": "largest_class",
+    "share_of_class_pixels": 0.7227
+  },
+  "anchor_class": "wool_coarse",
+  "classes": [
+    {
+      "class": "brass",
+      "pixels_ld": 4381,
+      "y_ratio": 1.06,
+      "d_hue_deg": 3.0,
+      "d_sat": -0.041,
+      "share": 0.0035,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "leather_smooth",
+      "pixels_ld": 27511,
+      "y_ratio": 1.313,
+      "d_hue_deg": -2.4,
+      "d_sat": -0.003,
+      "share": 0.0217,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "legacy_bake",
+      "pixels_ld": 17573,
+      "y_ratio": 1.154,
+      "d_hue_deg": 0.0,
+      "d_sat": -0.005,
+      "share": 0.0139,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "linen",
+      "pixels_ld": 5924,
+      "y_ratio": 0.85,
+      "d_hue_deg": -2.0,
+      "d_sat": -0.009,
+      "share": 0.0047,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "silk",
+      "pixels_ld": 1152,
+      "y_ratio": 1.347,
+      "d_hue_deg": -3.0,
+      "d_sat": -0.025,
+      "share": 0.0009,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "skin",
+      "pixels_ld": 33997,
+      "y_ratio": 0.995,
+      "d_hue_deg": -3.0,
+      "d_sat": -0.01,
+      "share": 0.0268,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "stone_base",
+      "pixels_ld": 268154,
+      "y_ratio": 1.327,
+      "d_hue_deg": -12.0,
+      "d_sat": -0.009,
+      "share": 0.2114,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": false,
+      "y_ratio_loo": 1.328,
+      "status": "floor"
+    },
+    {
+      "class": "wood",
+      "pixels_ld": 5860,
+      "y_ratio": 1.656,
+      "d_hue_deg": -3.1,
+      "d_sat": -0.056,
+      "share": 0.0046,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "wool_coarse",
+      "pixels_ld": 904093,
+      "y_ratio": 1.0,
+      "d_hue_deg": -3.4,
+      "d_sat": 0.004,
+      "share": 0.7126,
+      "role": "main",
+      "anchor": true,
+      "family": "same",
+      "hue_checked": true,
+      "y_ratio_loo": null,
+      "status": "ok"
+    }
+  ],
+  "t_cap": 2.0,
+  "out_of_tolerance": [],
+  "floor_limited": [
+    "leather_smooth",
+    "silk",
+    "stone_base",
+    "wood"
+  ],
+  "family_changed_main": [],
+  "warnings": [
+    "loo_unavailable: wool_coarse — у остальных классов вне пола меньше 10 % пикселей, яркость класса относительно фигуры не проверена"
+  ],
+  "sources": {
+    "measure_report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-r3/reports/measure-report.json",
+    "maps_report": "art/pipeline-candidates/ASSET-SHERLOCK-HOLMES-001/20261021-h2-lookdev-r3/reports/ld-maps-report.json"
+  }
+}
