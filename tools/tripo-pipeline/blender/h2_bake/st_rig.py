@@ -8,6 +8,16 @@ the meshes (measured by weight continuity at the junctions and by the probe pose
 neck axis above z0..z1 (snakes, diadem) rigid on head. Dress/cloak: hips, spine above the waist, towards the hem
 up to leg_max on the thigh of its side.
 
+Cloth leg chains (optional cloth-rule key leg_chains = {"L": [thigh, shin, foot], "R": [...], "bands_m": [3 x m]}, F11
+of the 2026-10-20 batch, Bruce Lee): a cloth part that carries whole trouser legs (Bruce's jumpsuit: torso and both legs
+in one Tripo part) put the leg share on the thigh only, so the trouser shin stayed with the thigh and stretched like
+rubber on a knee bend over ~40 deg. With the key the leg share of each side is distributed along
+Chain([base_bone] + leg_chains[side], bands_m) (thigh -> shin -> foot, the chain rule of the shoe parts), so the trouser
+hem and the shoe get the same weights. The key is checked before any weight (leg_chains_problems: three rig bones per
+side, the first is legs.<side>, three positive bands). Without the key the rule returns exactly the old four weights
+and nothing else runs: the profiles written before it give byte-identical FBX (tests/test_cloth_leg_chains.py). Only
+this module carries the option, so only the rig stage fingerprint moved (profile.py is in every stage's, reuse.py).
+
 Weapon side and presence (D-1): the weapon bone comes from profile.weapon_bone (rig.weapon_bone, else the rig contract
 characters.<rig.character>.weapon_bone, else rig.bones): weapon.L under hand.L (Medusa: check names and values of the
 report unchanged), weapon.R under hand.R (the side check flips its sign), none (no weapon part: body + base only, the
@@ -118,9 +128,46 @@ def rule_weights(rule, p, arm, cache):
         legs = rule["leg_max"] * smoothstep((rule["leg_start_z"] - p.z) / (rule["leg_start_z"] - rule["leg_full_z"]))
         side_l = smoothstep((p.x + rule["side_band_m"]) / (2 * rule["side_band_m"]))
         rest = 1.0 - legs
-        return {rule["top_bone"]: rest * top, rule["base_bone"]: rest * (1.0 - top),
-                rule["legs"]["L"]: legs * side_l, rule["legs"]["R"]: legs * (1.0 - side_l)}
+        lc = rule.get("leg_chains")
+        if not lc:
+            return {rule["top_bone"]: rest * top, rule["base_bone"]: rest * (1.0 - top),
+                    rule["legs"]["L"]: legs * side_l, rule["legs"]["R"]: legs * (1.0 - side_l)}
+        out = {rule["top_bone"]: rest * top}
+        out[rule["base_bone"]] = out.get(rule["base_bone"], 0.0) + rest * (1.0 - top)
+        for side, share in (("L", legs * side_l), ("R", legs * (1.0 - side_l))):
+            chain = [rule["base_bone"]] + list(lc[side])
+            key = tuple(chain) + tuple(lc["bands_m"])
+            if key not in cache:
+                cache[key] = Chain(arm, chain, lc["bands_m"])
+            for bone, w in cache[key].weights(p).items():
+                out[bone] = out.get(bone, 0.0) + share * w
+        return out
     raise ValueError(kind)
+
+
+def leg_chains_problems(name, rule, bone_names):
+    """Problems of the optional cloth-rule key leg_chains of part `name` ([] without the key)."""
+    lc = rule.get("leg_chains") if rule.get("kind") == "cloth" else None
+    if lc is None:
+        return []
+    if not isinstance(lc, dict):
+        return ["weights %s: leg_chains must be an object" % name]
+    problems = []
+    for side in ("L", "R"):
+        chain = lc.get(side)
+        if not isinstance(chain, list) or len(chain) != 3:
+            problems.append("weights %s: leg_chains.%s must list 3 bones (thigh, shin, foot)" % (name, side))
+            continue
+        if chain[0] != rule["legs"].get(side):
+            problems.append("weights %s: leg_chains.%s must start with legs.%s (%s)" % (name, side, side,
+                                                                                     rule["legs"].get(side)))
+        problems.extend("weights %s: leg_chains.%s: unknown bone %s" % (name, side, b) for b in chain
+                        if b not in bone_names)
+    bands = lc.get("bands_m")
+    if (not isinstance(bands, list) or len(bands) != 3
+            or not all(isinstance(b, (int, float)) and not isinstance(b, bool) and b > 0 for b in bands)):
+        problems.append("weights %s: leg_chains.bands_m must be 3 positive numbers (got %r)" % (name, bands))
+    return problems
 
 
 def clean(ws, max_inf, clean_below):
@@ -336,6 +383,10 @@ def run(params, profile):
     lp = {n: bpy.data.objects["LP_" + n] for n in names}
     arm = make_armature(scene, rig)
     bone_names = [b[0] for b in rig["bones"]]
+    lc_problems = [s for n in names if n in rig["weights"]
+                   for s in leg_chains_problems(n, rig["weights"][n], bone_names)]
+    if lc_problems:
+        raise RuntimeError("rig.weights: " + "; ".join(lc_problems))
     cache = {}
     weights = {}
     junction_report = []
