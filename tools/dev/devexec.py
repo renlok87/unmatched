@@ -27,7 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 UPROJECT = ROOT / "unreal" / "Unmatched" / "Unmatched.uproject"
-UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9"))
 EDITOR = UE_ROOT / "Engine" / "Binaries" / "Win64" / "UnrealEditor.exe"
 PACKAGED = ROOT / "unreal" / "Unmatched" / "Saved" / "StagedBuilds" / "Windows" / "Unmatched" / "Binaries" / "Win64" / "Unmatched.exe"
 DIR = Path(os.environ.get("DEVEXEC_DIR", r"C:\tmp\devexec"))

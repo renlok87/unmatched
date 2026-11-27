@@ -5,8 +5,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageFilter
 REPO = sys.argv[1]
 OUT = sys.argv[2]
 ICONS = REPO + "/art/imagegen/hud-icons-v3/sizes/"
-ROBOTO = "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf"
-ROBOTO_R = "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-Regular.ttf"
+ROBOTO = "C:/Program Files/Epic Games/UE_5.9/Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf"
+ROBOTO_R = "C:/Program Files/Epic Games/UE_5.9/Engine/Content/Slate/Fonts/Roboto-Regular.ttf"
 DISPLAY = REPO + "/unreal/Unmatched/Content/UM/Fonts/TTF/Philosopher-Bold.ttf"
 
 NAVY = (11, 22, 38, 236)

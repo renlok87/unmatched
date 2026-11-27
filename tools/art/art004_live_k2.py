@@ -58,7 +58,7 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9"))
 PROJECT_DIR = REPO / "unreal" / "Unmatched"
 UPROJECT = PROJECT_DIR / "Unmatched.uproject"
 BIN_EXE = PROJECT_DIR / "Binaries" / "Win64" / "Unmatched.exe"
@@ -256,7 +256,7 @@ def cmd_package(a) -> int:
         uat = UE_ROOT / "Engine" / "Build" / "BatchFiles" / "RunUAT.bat"
         args = ["BuildCookRun", f"-project={UPROJECT}", "-noP4", "-platform=Win64", "-clientconfig=Development",
                 "-cook", "-stage", "-pak", "-package", "-compressed", "-skipbuild", "-unattended", "-nosplash",
-                "-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine."
+                "-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocol."
                 "ModelContextProtocolSettings]:bAutoStartServer=False"]
         arglist = ",".join(ps_quote(x) for x in args)
         r = ps(f"$p = Start-Process -FilePath {ps_quote(uat)} -ArgumentList @({arglist}) -WindowStyle Hidden "

@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $Uproject = Join-Path $RepoRoot 'unreal\Unmatched\Unmatched.uproject'
-$ueRoot = if ($env:UE_ROOT) { $env:UE_ROOT } else { 'C:\Program Files\Epic Games\UE_5.8' }
+$ueRoot = if ($env:UE_ROOT) { $env:UE_ROOT } else { 'C:\Program Files\Epic Games\UE_5.9' }
 $Uat = Join-Path $ueRoot 'Engine\Build\BatchFiles\RunUAT.bat'
 if (-not (Test-Path $Uat)) { throw "RunUAT.bat not found: $Uat" }
 $logDir = Split-Path -Parent $Log
@@ -62,7 +62,7 @@ $argList = @(
   '-cook', '-stage', '-pak', '-package', '-compressed',
   $(if ($SkipBuild) { '-skipbuild' } else { '-build' }),
   '-unattended', '-nosplash',
-  '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False'
+  '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocol.ModelContextProtocolSettings]:bAutoStartServer=False'
 )
 if (-not $SkipBuild -and -not $AllowXGE) { $argList += '-ubtargs=-NoXGE' }
 # Wait for RunUAT itself, not for its whole process tree: `Start-Process -Wait` (PowerShell 5.1) also waits for every

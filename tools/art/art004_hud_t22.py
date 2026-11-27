@@ -35,7 +35,7 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+UE_ROOT = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9"))
 PROJECT_DIR = REPO / "unreal" / "Unmatched"
 UPROJECT = PROJECT_DIR / "Unmatched.uproject"
 EDITOR_DLL = PROJECT_DIR / "Binaries" / "Win64" / "UnrealEditor-Unmatched.dll"
@@ -44,7 +44,7 @@ EDITOR_CMD = UE_ROOT / "Engine" / "Binaries" / "Win64" / "UnrealEditor-Cmd.exe"
 BUILD_BAT = UE_ROOT / "Engine" / "Build" / "BatchFiles" / "Build.bat"
 ICON_SOURCE = REPO / "art" / "imagegen" / "mvp-v1" / "ui" / "actions" / "ui-action-attack-normal.png"
 ICON_DIR = REPO / "art" / "imagegen" / "mvp-v1" / "ui" / "actions" / "sized"
-MCP_OFF = ("-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine."
+MCP_OFF = ("-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocol."
            "ModelContextProtocolSettings]:bAutoStartServer=False")
 NO_WINDOW = 0x08000000
 

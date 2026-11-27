@@ -61,7 +61,7 @@ LABEL_FG = (224, 224, 224)
 SMALL = 128
 PAD = 12
 FONT_CANDIDATES = (
-    "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-Regular.ttf",
+    "C:/Program Files/Epic Games/UE_5.9/Engine/Content/Slate/Fonts/Roboto-Regular.ttf",
     "C:/Windows/Fonts/arial.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
 )

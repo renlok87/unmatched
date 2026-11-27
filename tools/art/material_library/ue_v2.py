@@ -91,7 +91,7 @@ class HeadlessUe:
             json.dump(payload, handle, indent=1)
         if os.path.exists(out_json):
             os.remove(out_json)
-        engine = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+        engine = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9"))
         cmd = [str(engine / "Engine" / "Binaries" / "Win64" / "UnrealEditor-Cmd.exe"),
                str(REPO / "unreal" / "Unmatched" / "Unmatched.uproject"),
                '-ExecutePythonScript=%s %s' % (here.as_posix(), args_path.replace("\\", "/")),

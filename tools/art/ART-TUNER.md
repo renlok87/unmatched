@@ -21,7 +21,7 @@
 упаковка (`powershell -File tools\s08\package-client.ps1`). Без упаковки, из редактора (после пересборки UnmatchedEditor):
 
 ```
-"C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe" C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Unmatched.uproject /Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -game -ArtView=sarpedon -ArtTuner -ArtTunerFile=C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Config\ArtBoards\S08ArtTuner.overrides.json -ArtPreview -ArtPreviewDiorama -ArtPreviewHeroesV2 -windowed -ResX=1920 -ResY=1080
+"C:\Program Files\Epic Games\UE_5.9\Engine\Binaries\Win64\UnrealEditor.exe" C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Unmatched.uproject /Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -game -ArtView=sarpedon -ArtTuner -ArtTunerFile=C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Config\ArtBoards\S08ArtTuner.overrides.json -ArtPreview -ArtPreviewDiorama -ArtPreviewHeroesV2 -windowed -ResX=1920 -ResY=1080
 ```
 
 ## Клавиши

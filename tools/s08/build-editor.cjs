@@ -1,7 +1,7 @@
 // Temp helper: run UBT Build.bat hidden, print tail + real exit status.
 const { spawnSync } = require('child_process');
 const path = require('path');
-const ueRoot = process.env.UE_ROOT || 'C:\\Program Files\\Epic Games\\UE_5.8';
+const ueRoot = process.env.UE_ROOT || 'C:\\Program Files\\Epic Games\\UE_5.9';
 const bat = path.join(ueRoot, 'Engine', 'Build', 'BatchFiles', 'Build.bat');
 const cmdLine = `"${bat}" ${process.argv.slice(2).join(' ')}`;
 const r = spawnSync('cmd.exe', ['/d', '/c', cmdLine], {

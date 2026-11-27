@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '../..');
 const uproject = path.join(root, 'unreal', 'Unmatched', 'Unmatched.uproject');
 const fixtures = path.join(root, 'docs', 'game-design', 'evidence', 'S08', 'fixtures');
 const s09Fixtures = path.join(root, 'docs', 'game-design', 'evidence', 'S09', 'fixtures');
-const ueRoot = process.env.UE_ROOT || 'C:\\Program Files\\Epic Games\\UE_5.8';
+const ueRoot = process.env.UE_ROOT || 'C:\\Program Files\\Epic Games\\UE_5.9';
 const exe = path.join(ueRoot, 'Engine', 'Binaries', 'Win64', 'UnrealEditor-Cmd.exe');
 for (let run = 1; run <= repeat; run++) {
   const args = [

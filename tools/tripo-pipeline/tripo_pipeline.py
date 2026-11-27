@@ -276,7 +276,7 @@ FBX_PRESET_KEYS = ("name", "axis_forward", "axis_up", "export_space_rotation_z_d
                    "patch_fbx_unit_scale_to", "apply_unit_scale", "apply_scale_options", "use_triangles",
                    "mesh_smooth_type", "add_leaf_bones", "primary_bone_axis", "secondary_bone_axis", "path_mode")
 DEFAULT_BLENDER = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
-DEFAULT_UE_ROOT = "C:/Program Files/Epic Games/UE_5.8"
+DEFAULT_UE_ROOT = "C:/Program Files/Epic Games/UE_5.9"
 DEFAULT_MCP_CLIENTS = Path("C:/Users/ren/.claude/mcp-servers/clients")
 BACKENDS = ("headless", "mcp")
 PASSTHROUGH = "passthrough"

@@ -1,5 +1,5 @@
 param(
- [string]$Engine = 'C:/Program Files/Epic Games/UE_5.8',
+ [string]$Engine = 'C:/Program Files/Epic Games/UE_5.9',
  [string]$Blender = 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe'
 )
 $ErrorActionPreference = 'Stop'

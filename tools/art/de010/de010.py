@@ -39,7 +39,7 @@ sys.path.insert(0, str(REPO / "tools" / "art" / "material_library"))
 import ue_v2_master as vm  # noqa: E402
 
 UPROJECT = REPO / "unreal" / "Unmatched" / "Unmatched.uproject"
-ENGINE = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+ENGINE = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9"))
 EDITOR = ENGINE / "Engine" / "Binaries" / "Win64" / "UnrealEditor-Cmd.exe"
 EVIDENCE = REPO / "docs" / "art-pipeline" / "evidence" / "de010-2026-10-04"
 PROFILES = REPO / "art" / "pipeline-candidates"

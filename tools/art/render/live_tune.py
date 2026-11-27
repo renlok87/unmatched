@@ -46,7 +46,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 UPROJECT = REPO / "unreal/Unmatched/Unmatched.uproject"
-UE_EDITOR = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8")) / "Engine/Binaries/Win64/UnrealEditor.exe"
+UE_EDITOR = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.9")) / "Engine/Binaries/Win64/UnrealEditor.exe"
 STAGED_EXE = REPO / "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched.exe"
 PROFILES = REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
 ENV_DIR = REPO / "unreal/Unmatched/Config/ArtBoards/EnvLayouts"
