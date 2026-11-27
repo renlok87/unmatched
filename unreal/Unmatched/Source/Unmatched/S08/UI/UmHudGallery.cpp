@@ -193,7 +193,7 @@ TArray<FString> UUmButtonGalleryWidget::Build(const FVector2D& CanvasSu, int32 O
     }
   }
   Lines.Insert(FString::Printf(TEXT("UMGALLERY buttons variants=%d states=%d perLine=%d canvas=%.0fx%.0f page=%d"),
-                               Shown, UE_ARRAY_COUNT(States), PerLine, CanvasSu.X, CanvasSu.Y, OnlyVariant),
+                               Shown, States_, PerLine, CanvasSu.X, CanvasSu.Y, OnlyVariant),
                0);
   return Lines;
 }

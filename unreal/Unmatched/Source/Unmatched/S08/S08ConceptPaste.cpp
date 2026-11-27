@@ -1225,7 +1225,7 @@ void PreloadTextures(std::initializer_list<UTexture*> Textures, const TCHAR* Wha
   }
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW texture-preload what=%s profile=%s textures=%d resident=%s ms=%d"),
                                    What, *ProfileId, Plates.Num(), *Resident,
-                                   FMath::RoundToInt((FPlatformTime::Seconds() - T0) * 1000.0)));
+                                   FMath::RoundToInt32((FPlatformTime::Seconds() - T0) * 1000.0)));
 }
 
 FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec, ES08ConceptKind Kind) {

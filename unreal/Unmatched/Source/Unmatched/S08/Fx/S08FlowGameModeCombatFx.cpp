@@ -57,7 +57,7 @@ void AS08FlowGameMode::S08FxHit(const FString& TargetId, int32 Seq, bool bStaged
                                                                                                   : nullptr;
   FS08Trace::Write(FString::Printf(TEXT("FX star plan fighter=%s seq=%d staged=%d attacker=%s at=+%d%s%s"), *TargetId,
                                    Seq, bStaged ? 1 : 0, Attacker.IsEmpty() ? TEXT("-") : *Attacker,
-                                   FMath::RoundToInt(S08CombatFx::StarDelayMs), Skip ? TEXT(" skip=") : TEXT(""),
+                                   FMath::RoundToInt32(S08CombatFx::StarDelayMs), Skip ? TEXT(" skip=") : TEXT(""),
                                    Skip ? Skip : TEXT("")));
   if (bStaged && S08CombatFx::FxShotsRequested() && !S09ShotDir.IsEmpty()) {
     // the capture hook: a staged hit holds the flash (C+20) while it is not taken, a later one its star frame 4 (C+137,
@@ -90,7 +90,7 @@ void AS08FlowGameMode::S08FxBlock(const FString& TargetId, int32 Seq) {
   Pulse.DelayMs = 0.0;
   Actor->PlayRimPulse(Pulse);
   FS08Trace::Write(FString::Printf(TEXT("FX block-rim fighter=%s seq=%d ms=%d"), *TargetId, Seq,
-                                   FMath::RoundToInt(Pulse.TotalMs)));
+                                   FMath::RoundToInt32(Pulse.TotalMs)));
 }
 
 void AS08FlowGameMode::S08FxHealCue(const FString& FighterId, int32 Amount, int32 Seq) {
@@ -235,13 +235,13 @@ void AS08FlowGameMode::S08FxCombatTick() {
     }
     if (D == S08CombatFx::EShotDecision::Skip) {
       FS08Trace::Write(FString::Printf(TEXT("FXSHOT skip %s late=%d age=%.3f target=%.3f ch=%.2f"), *Shot.Leaf,
-                                       FMath::RoundToInt(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
+                                       FMath::RoundToInt32(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
       CombatFx.ShotsTaken.Remove(Shot.Leaf);
       CombatFx.Shots.RemoveAt(I);
       continue;
     }
     FS08Trace::Write(FString::Printf(TEXT("FXSHOT due %s late=%d age=%.3f target=%.3f ch=%.2f"), *Shot.Leaf,
-                                     FMath::RoundToInt(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
+                                     FMath::RoundToInt32(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
     CombatFx.Holding = CombatFx.Shots[I];
     CombatFx.Shots.RemoveAt(I);
     AS08FighterActor* F = BoardActor->FindFighterActor(CombatFx.Holding.FighterId);

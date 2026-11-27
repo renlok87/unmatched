@@ -1087,7 +1087,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
     }
     FS08Trace::Write(FString::Printf(TEXT("MS-ANIM play seq=%d moves=%d animated=%d speed=%s reduced=%d end=%d"),
                                      Plans[0].Seq, Plans.Num(), Animated, S08Motion::SpeedName(MoveMotion.Speed),
-                                     MoveMotion.bReducedMotion ? 1 : 0, FMath::RoundToInt(EndMs)));
+                                     MoveMotion.bReducedMotion ? 1 : 0, FMath::RoundToInt32(EndMs)));
     // MS-T-17: the last-move highlight of this seq appears when its animation ends (MS-P-01 / MS-P-02 -> MS-P-03)
     if (Animated > 0) LastMoveTracker.OnMoveAnimation(Plans[0].Seq, static_cast<double>(NowMs()) + EndMs);
     // Run D G-LIVE (MS-AT-30): one opponent-client frame of the first opponent move in flight, at its mid point
@@ -1097,7 +1097,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
         const double MidMs = 0.5 * (Plans[0].StartMs + Plans[0].ArriveMs());
         ShotOppMoveAtElapsed = Elapsed + static_cast<float>(MidMs / 1000.0);
         FS08Trace::Write(FString::Printf(TEXT("S09AUTO opponent-move shot scheduled seq=%d fighter=%s atMs=%d"),
-                                         Plans[0].Seq, *Plans[0].FighterId, FMath::RoundToInt(MidMs)));
+                                         Plans[0].Seq, *Plans[0].FighterId, FMath::RoundToInt32(MidMs)));
       }
     }
   }
@@ -1133,7 +1133,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
         // MS-E-48 cascade: the hit plays when the moving target arrives (a skip makes it due at once).
         DeferredDamage.Add({Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
                             NowMs() + static_cast<int64>(FMath::CeilToDouble(*Arrive))});
-        Line += FString::Printf(TEXT(" after=move ms=%d"), FMath::RoundToInt(*Arrive));
+        Line += FString::Printf(TEXT(" after=move ms=%d"), FMath::RoundToInt32(*Arrive));
       } else if (BoardActor) {
         PresentDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
                             FS09CombatStage::MinusLifeMsAt(CombatSpeedMul()) / 1000.0f);

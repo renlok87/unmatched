@@ -123,7 +123,7 @@ TArray<FString> FS09LastMoveTracker::OnApplied(int32 Seq, const FS09LastMovement
     } else {
       State = ES09LastMoveState::Fading;
       FadeStartMs = NowMs;
-      Lines.Add(FString::Printf(TEXT("MS-LAST fade seq=%d at=%d ms=%d"), Trail.Seq, Seq, FMath::RoundToInt(FadeMs)));
+      Lines.Add(FString::Printf(TEXT("MS-LAST fade seq=%d at=%d ms=%d"), Trail.Seq, Seq, FMath::RoundToInt32(FadeMs)));
     }
     ++Revision;
   }
@@ -182,13 +182,13 @@ TArray<FString> FS09LastMoveTracker::Tick(double NowMs, bool bAnyFigureMoving) {
     } else {
       State = ES09LastMoveState::Fading;
       FadeStartMs = NowMs;
-      Lines.Add(FString::Printf(TEXT("MS-LAST fade seq=%d at=hold ms=%d"), Trail.Seq, FMath::RoundToInt(FadeMs)));
+      Lines.Add(FString::Printf(TEXT("MS-LAST fade seq=%d at=hold ms=%d"), Trail.Seq, FMath::RoundToInt32(FadeMs)));
     }
   }
   if (State == ES09LastMoveState::Fading && NowMs - FadeStartMs >= FadeMs) {
     State = ES09LastMoveState::None;
     ++Revision;
-    Lines.Add(FString::Printf(TEXT("MS-LAST off seq=%d fade=%d"), Trail.Seq, FMath::RoundToInt(FadeMs)));
+    Lines.Add(FString::Printf(TEXT("MS-LAST off seq=%d fade=%d"), Trail.Seq, FMath::RoundToInt32(FadeMs)));
   }
   return Lines;
 }

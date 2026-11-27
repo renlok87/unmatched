@@ -137,15 +137,15 @@ void FS08FigureFxChannels::PlayFlash(double Ms) {
   StartFlash(Now(), Ms, S08IconMotion::IsReducedMotion());
   Kick();
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=flash ms=%d peak=%.2f"), *TraceId,
-                                   FMath::RoundToInt(GetFlashMs()), bFlashOn ? 1.0f : 0.0f));
+                                   FMath::RoundToInt32(GetFlashMs()), bFlashOn ? 1.0f : 0.0f));
 }
 
 void FS08FigureFxChannels::PlayRim(const S08FigureFx::FRimPulse& Pulse) {
   StartRim(Now(), Pulse, S08IconMotion::IsReducedMotion());
   Kick();
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=rim ms=%d delay=%d in=%d out=%d peak=%.2f width=%.2f hold=%d"),
-                                   *TraceId, FMath::RoundToInt(Rim.TotalMs), FMath::RoundToInt(Rim.DelayMs),
-                                   FMath::RoundToInt(Rim.InMs), FMath::RoundToInt(Rim.OutMs), Rim.Peak, Rim.Width,
+                                   *TraceId, FMath::RoundToInt32(Rim.TotalMs), FMath::RoundToInt32(Rim.DelayMs),
+                                   FMath::RoundToInt32(Rim.InMs), FMath::RoundToInt32(Rim.OutMs), Rim.Peak, Rim.Width,
                                    Rim.bHold ? 1 : 0));
 }
 
@@ -154,7 +154,7 @@ void FS08FigureFxChannels::StopRim(double OutMs) {
   LeaveRim(Now(), OutMs, S08IconMotion::IsReducedMotion());
   Kick();
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=rim ms=%d peak=%.2f leave=1"), *TraceId,
-                                   bRimOn ? FMath::RoundToInt(Rim.TotalMs) : 0, bRimOn ? Rim.Peak : 0.0f));
+                                   bRimOn ? FMath::RoundToInt32(Rim.TotalMs) : 0, bRimOn ? Rim.Peak : 0.0f));
 }
 
 void FS08FigureFxChannels::PlayHit(bool bDamage) {
@@ -162,8 +162,8 @@ void FS08FigureFxChannels::PlayHit(bool bDamage) {
   Kick();
   // the honest values of this hit (the review: no constants): flash window, rim length / start / peak
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-fx fighter=%s flash=%d rim=%d rimAt=%d peak=%.2f legacy=0"),
-                                   *TraceId, FMath::RoundToInt(GetFlashMs()), FMath::RoundToInt(Rim.TotalMs),
-                                   FMath::RoundToInt(Rim.DelayMs), Rim.Peak));
+                                   *TraceId, FMath::RoundToInt32(GetFlashMs()), FMath::RoundToInt32(Rim.TotalMs),
+                                   FMath::RoundToInt32(Rim.DelayMs), Rim.Peak));
 }
 
 double FS08FigureFxChannels::Now() const {

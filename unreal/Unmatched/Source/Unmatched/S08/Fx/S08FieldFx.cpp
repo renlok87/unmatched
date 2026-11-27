@@ -145,7 +145,7 @@ int32 DustCount(uint32 Seed) { return 3 + static_cast<int32>(Seed % 3u); }
 
 FTransform DustTransform(const FVector& At) {
   const uint32 Seed =
-      FCrc::StrCrc32(*FString::Printf(TEXT("%d,%d"), FMath::RoundToInt(At.X), FMath::RoundToInt(At.Y))) & 0x7FFFFFFF;
+      FCrc::StrCrc32(*FString::Printf(TEXT("%d,%d"), FMath::RoundToInt32(At.X), FMath::RoundToInt32(At.Y))) & 0x7FFFFFFF;
   const float S = 1.0f + 0.04f * static_cast<float>(DustCount(Seed) - 3);
   const float Yaw = static_cast<float>((Seed >> 4) % 360u);
   return FTransform(FRotator(0.0f, Yaw, 0.0f), At, FVector(S, S, 1.0f));

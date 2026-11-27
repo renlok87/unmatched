@@ -1386,7 +1386,7 @@ void AS08FlowGameMode::BuildUmPanels() {
   OpponentPortrait = UmHud->Panels.GetOpp()->Portrait;
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d panels=umg"),
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
-                                          FMath::RoundToInt(FS09TurnCue::BannerMs)));
+                                          FMath::RoundToInt32(FS09TurnCue::BannerMs)));
 }
 
 void AS08FlowGameMode::TickUmPanels() {

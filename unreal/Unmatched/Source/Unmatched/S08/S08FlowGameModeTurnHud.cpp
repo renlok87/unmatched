@@ -101,7 +101,7 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
   if (bUmgPanels) return;
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d"),
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
-                                          FMath::RoundToInt(FS09TurnCue::BannerMs)));
+                                          FMath::RoundToInt32(FS09TurnCue::BannerMs)));
 }
 
 void AS08FlowGameMode::BuildTurnPortraitFallback(const TCHAR* Reason) {
@@ -118,7 +118,7 @@ void AS08FlowGameMode::BuildTurnPortraitFallback(const TCHAR* Reason) {
   TurnPortraitColumn = Column.Column;
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 reason=%s %s ringIcon=%d banner=%d"), Reason,
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
-                                          FMath::RoundToInt(FS09TurnCue::BannerMs)));
+                                          FMath::RoundToInt32(FS09TurnCue::BannerMs)));
 }
 
 float AS08FlowGameMode::HandObstacleRightSu() const {
@@ -161,9 +161,9 @@ void AS08FlowGameMode::FeedTurnHud(const FS08Snapshot& Snapshot) {
       Event.bGameOver ? TEXT("over") : (Event.bOwn ? TEXT("own") : TEXT("opp")), Event.bInitial ? 1 : 0,
       OwnPortrait->HasRingIcon() ? *TurnHudLook.RingIcon.ToString() : TEXT("none"),
       (Active && OwnPortrait->HasRingIcon() && !Event.bInitial && !MoveMotion.bReducedMotion)
-          ? FMath::RoundToInt(FS09TurnCue::RingFlashMs)
+          ? FMath::RoundToInt32(FS09TurnCue::RingFlashMs)
           : 0,
-      FMath::RoundToInt(TurnCue.BannerLengthMs()), MoveMotion.bReducedMotion ? 1 : 0));
+      FMath::RoundToInt32(TurnCue.BannerLengthMs()), MoveMotion.bReducedMotion ? 1 : 0));
   // Run E G-LIVE: one frame of the first own-turn banner, mid-way through its 600 ms
   if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotBannerAtElapsed < 0.0f && Event.bOwn && !Event.bInitial &&
       !Event.bGameOver && TurnCue.BannerLengthMs() > 0.0) {

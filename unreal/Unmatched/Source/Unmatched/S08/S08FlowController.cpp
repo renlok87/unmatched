@@ -1678,8 +1678,8 @@ void FS08FlowController::MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS
         TEXT("MS-CUE move seq=%d fighter=%s order=%d of=%d kind=%s steps=%d source=%s start=%d ms=%d snapped=%d path=%s%s"),
         Cue.SequenceNumber, *Cue.FighterId, Cue.OrderInSeq, Moves.Num(),
         Cue.Kind == ES08MoveKind::Place ? TEXT("place") : TEXT("move"), Cue.Steps(),
-        S08MoveCue::SourceName(Cue.PathSource), FMath::RoundToInt(Timing[I].StartMs),
-        FMath::RoundToInt(Timing[I].DurationMs), Timing[I].bSnapped ? 1 : 0, *FString::Join(Cells, TEXT(">")),
+        S08MoveCue::SourceName(Cue.PathSource), FMath::RoundToInt32(Timing[I].StartMs),
+        FMath::RoundToInt32(Timing[I].DurationMs), Timing[I].bSnapped ? 1 : 0, *FString::Join(Cells, TEXT(">")),
         Cue.bTrailMismatch ? TEXT(" trail=mismatch") : TEXT("")) + MotionTail);
   }
 }

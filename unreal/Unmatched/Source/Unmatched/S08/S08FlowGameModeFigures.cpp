@@ -116,7 +116,7 @@ int32 AS08FlowGameMode::BenchHoldClipPoses(const S08HeroesV2::FBenchClipPoseSpec
       ++Posed;
       FS08Trace::Write(FString::Printf(
           TEXT("ARTPREVIEW clippose fighter=%s clip=%s frame=%d t=%.3f len=%.3f rootDeltaUU=%.2f"), *F.Id,
-          S08HeroesV2::ClipName(Spec.Clip), FMath::RoundToInt(T * S08HeroesV2::ClipFps), T, Len, RootDeltaUU));
+          S08HeroesV2::ClipName(Spec.Clip), FMath::RoundToInt32(T * S08HeroesV2::ClipFps), T, Len, RootDeltaUU));
     }
   }
   FS08Trace::Write(FString::Printf(TEXT("BENCH clip-pose pose=%d/%d clip=%s posed=%d"), PoseNumber, PoseCount,
@@ -157,7 +157,7 @@ void AS08FlowGameMode::BenchTraceFigRects(const FString& View) {
     if (!bAny) continue;
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW figrect fighter=%s view=%s x=%d y=%d w=%d h=%d"), *F.Id, *View,
-        FMath::RoundToInt(Min.X), FMath::RoundToInt(Min.Y), FMath::RoundToInt(Max.X - Min.X),
-        FMath::RoundToInt(Max.Y - Min.Y)));
+        FMath::RoundToInt32(Min.X), FMath::RoundToInt32(Min.Y), FMath::RoundToInt32(Max.X - Min.X),
+        FMath::RoundToInt32(Max.Y - Min.Y)));
   }
 }

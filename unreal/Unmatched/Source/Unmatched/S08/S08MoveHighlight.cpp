@@ -844,7 +844,7 @@ void US08MoveHighlightComponent::PlayConfirmPulse(int32 X, int32 Y, bool bTarget
   PulseStartS = NowS();
   FS08Trace::Write(FString::Printf(TEXT("MS-HL pulse cell=%s kind=%s ms=%d reduced=%d"), *Board.CellLabel(X, Y),
                                    bTarget ? TEXT("target") : TEXT("move"),
-                                   FMath::RoundToInt(S08FieldFx::ConfirmPulseMs),
+                                   FMath::RoundToInt32(S08FieldFx::ConfirmPulseMs),
                                    S08IconMotion::IsReducedMotion() ? 1 : 0));
   KickFx();
 }

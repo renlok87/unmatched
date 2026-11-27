@@ -5,7 +5,7 @@ FString FS08OldPathFade::Observe(bool bDrawn, int32 TrailSeq, const FS08MoveDraf
                                  double NowMs) {
   FString Line;
   if (IsFading() && (bDrawn || NowMs - StartMs >= FadeMs)) {
-    Line = FString::Printf(TEXT("MS-LAST old-fade end seq=%d ms=%d reason=%s"), OldSeq, FMath::RoundToInt(NowMs - StartMs),
+    Line = FString::Printf(TEXT("MS-LAST old-fade end seq=%d ms=%d reason=%s"), OldSeq, FMath::RoundToInt32(NowMs - StartMs),
                            bDrawn ? TEXT("shown") : TEXT("done"));
     StartMs = -1.0;
     Old = FS08MoveDraftInput::FLastMove();
@@ -25,7 +25,7 @@ FString FS08OldPathFade::Observe(bool bDrawn, int32 TrailSeq, const FS08MoveDraf
     StartMs = NowMs;
     ++Revision;
     Line = FString::Printf(TEXT("MS-LAST old-fade start seq=%d by=%d from=%.2f ms=%d"), OldSeq, TrailSeq, OldFrom,
-                           FMath::RoundToInt(FadeMs));
+                           FMath::RoundToInt32(FadeMs));
   }
   Last = FS08MoveDraftInput::FLastMove();
   LastSeq = -1;

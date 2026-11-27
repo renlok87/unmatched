@@ -184,7 +184,7 @@ void AS08FlowGameMode::TickOpponentView() {
       Now - YoursCalloutSinceMs >= GYoursCalloutMinMs) {
     bYoursCallout = false;
     FS08Trace::Write(FString::Printf(TEXT("MS-OPP yours off seq=%d ms=%d"), EffectTrailSeq,
-                                     FMath::RoundToInt(Now - YoursCalloutSinceMs)));
+                                     FMath::RoundToInt32(Now - YoursCalloutSinceMs)));
     RefreshHud();
   }
 

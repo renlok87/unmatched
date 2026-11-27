@@ -377,7 +377,7 @@ void AS08FlowGameMode::S08FxCueLines(const TArray<FString>& Lines) {
         FieldFx.CutAtMs = static_cast<double>(NowMs());
         FS08Trace::Write(FString::Printf(TEXT("FX cut id=CUE-008 subject=%s seq=%d vfx=NS_FX_AttackChevrons cut=interrupt fade=%d"),
                                          *FieldFx.LiveChevronsAttacker, FieldFx.LiveChevronsSeq,
-                                         FMath::RoundToInt(S08FieldFx::ChevronCutMs)));
+                                         FMath::RoundToInt32(S08FieldFx::ChevronCutMs)));
       }
     }
     FieldFx.LiveChevrons = nullptr;
