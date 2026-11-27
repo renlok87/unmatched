@@ -698,8 +698,7 @@ def run(args) -> int:
     backend = args.backend or os.environ.get("TRIPO_PIPELINE_BACKEND") or "headless"
     if backend != "mcp":
         raise tp.PipelineError("um_masters build/verify needs --backend mcp (live UnrealEditor)", tp.EXIT_USAGE)
-    ue = tp.McpUnreal(tp.client_command("TRIPO_PIPELINE_UNREAL_MCP_CMD", args.unreal_mcp_client,
-                                        tp.DEFAULT_MCP_CLIENTS / "unreal_mcp.py"))
+    ue = tp.McpUnreal(tp.unreal_client_override(args.unreal_mcp_client))
     b = MasterBuilder(ue, spec)
     report_path = Path(args.report)
     previous = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}

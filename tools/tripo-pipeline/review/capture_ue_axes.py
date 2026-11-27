@@ -29,11 +29,7 @@ import json
 import time
 from pathlib import Path
 
-import capture_ue_review as cur
-from capture_ue_review import call, look, xf
-
-cur.TS.update({"instance": "editor_toolset.toolsets.material_instance.MaterialInstanceTools",
-               "object": "editor_toolset.toolsets.object.ObjectTools"})
+from capture_ue_review import NOANN, call, look, xf
 
 try:
     from PIL import Image
@@ -41,7 +37,6 @@ try:
 except ImportError as exc:  # pragma: no cover
     raise SystemExit("Pillow and numpy are required: %s" % exc)
 
-NOANN = cur.NOANN
 DIRECTIONS = {"+X": (1, 0), "-X": (-1, 0), "+Y": (0, 1), "-Y": (0, -1)}
 FILE_TAG = {"+X": "plus-x", "-X": "minus-x", "+Y": "plus-y", "-Y": "minus-y"}
 DARKEN_THRESHOLD = 40  # 0..255, mean-RGB drop of a pixel when the face slot turns black

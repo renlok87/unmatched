@@ -6,6 +6,9 @@
     ue.console("Interchange.FeatureFlags.Import.FBX 0")      # typed into the editor "Cmd" box
     data = ue.py_file("C:/tmp/x.py", "C:/tmp/x.json")        # `py "<file>"` in the editor, waits for JSON
 
+The client selects the toolset dialect from the editor's initialize response. UE_MCP_EXPECT_PROJECT
+optionally pins the connection to the exact .uproject reported by the editor.
+
 Why the console: the MCP toolsets of UE 5.8 have no console-command or Python tool (the
 ProgrammaticToolset sandbox only allows json/math/re/...); FBX animation import options,
 console variables and AnimSequence queries need the editor's own Python. The console text box
@@ -14,13 +17,14 @@ with SlateInspectorToolset.Type (submit=True), as in tools/art/art004_head_tilt_
 The UE-side script writes its result JSON itself; py_file() deletes a stale file first and
 polls for the new one, so a failed script is a timeout with the tail of LogPython attached.
 
-Never used with UnrealEditor-Cmd; only the one GUI editor that owns :8123.
+The endpoint is configurable with UE_MCP_URL.
 """
 
 import json
 import os
 import re
 import time
+import urllib.error
 import urllib.request
 
 URL = os.environ.get("UE_MCP_URL", "http://127.0.0.1:8123/mcp")  # second editor: set UE_MCP_URL
@@ -44,22 +48,81 @@ class UeError(RuntimeError):
     pass
 
 
+TOOLSETS_59 = {
+    "asset": "EditorToolset.AssetToolset", "static": "EditorToolset.StaticMeshToolset",
+    "skeletal": "EditorToolset.SkeletalMeshToolset", "texture": "EditorToolset.TextureToolset",
+    "material": "EditorToolset.MaterialToolset", "instance": "EditorToolset.MaterialInstanceToolset",
+    "object": "EditorToolset.ObjectToolset", "scene": "EditorToolset.LevelToolset",
+    "actor": "EditorToolset.ActorToolset", "app": TOOLSETS["app"], "slate": TOOLSETS["slate"],
+    "logs": "ConsoleToolset.LogsToolset", "console": "ConsoleToolset.ConsoleToolset",
+}
+
+
+def _key(name):
+    return name.replace("_", "").casefold()
+
+
+def _native_args(args, schema):
+    """Match the project's Python argument names to the reflected MCP names."""
+    properties = schema.get("properties", {})
+    names = {_key(name): name for name in properties}
+    for name, prop in properties.items():
+        if prop.get("type") == "boolean" and name.startswith("b") and name[1:2].isupper():
+            names.setdefault(_key(name[1:]), name)
+    result = {}
+    for name, val in args.items():
+        field = names.get(_key(name))
+        if field is None or field in result:
+            raise UeError(f"Unexpected or duplicate argument {name!r}; schema fields: {list(properties)}")
+        result[field] = val
+    return result
+
+
+def _transform(fields, *, scale_key):
+    names = {"location": "translation", "scale": scale_key}
+    return {names.get(key, key): val for key, val in fields.items()}
+
+
 class Ue:
-    def __init__(self, url=URL):
-        self.url, self.session, self.next_id = url, None, 0
+    def __init__(self, url=None, expected_project=None):
+        self.url = url or os.environ.get("UE_MCP_URL", URL)
+        self.session, self.next_id, self.protocol = None, 0, None
         self.calls = []
-        self._rpc("initialize", {"protocolVersion": "2025-03-26", "capabilities": {},
-                                 "clientInfo": {"name": "tripo-pipeline-ue-live", "version": "1"}})
+        self._schemas = {}
+        reply = self._rpc("initialize", {"protocolVersion": "2025-03-26", "capabilities": {},
+                                        "clientInfo": {"name": "tripo-pipeline-ue-live", "version": "2"}})
+        info = self._result(reply)
+        self.protocol = info["protocolVersion"]
+        self.instance = info.get("_meta", {}).get("com.epicgames.unrealengine/instance", {})
+        self.engine_version = self.instance.get("engineVersion") or info.get("serverInfo", {}).get("version", "")
+        version = re.match(r"(\d+)\.(\d+)\b", self.engine_version)
+        self.native_toolsets = bool(version and tuple(map(int, version.groups())) >= (5, 9))
+        expected = expected_project or os.environ.get("UE_MCP_EXPECT_PROJECT")
+        if expected:
+            actual = self.instance.get("projectFile")
+            if not actual or os.path.normcase(os.path.realpath(actual)) != os.path.normcase(os.path.realpath(expected)):
+                raise UeError(f"MCP project mismatch: expected {expected!s}, got {actual!r}")
         self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
+
+    @staticmethod
+    def _result(reply):
+        if not reply or "result" not in reply:
+            raise UeError(f"MCP request failed: {reply}")
+        return reply["result"]
 
     def _post(self, body, timeout=900):
         headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
         if self.session:
             headers["Mcp-Session-Id"] = self.session
+        if self.protocol:
+            headers["MCP-Protocol-Version"] = self.protocol
         req = urllib.request.Request(self.url, data=json.dumps(body).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            self.session = resp.headers.get("Mcp-Session-Id") or self.session
-            raw = resp.read().decode("utf-8")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                self.session = resp.headers.get("Mcp-Session-Id") or self.session
+                raw = resp.read().decode("utf-8")
+        except (urllib.error.URLError, TimeoutError) as exc:
+            raise UeError(f"MCP {self.url}: {exc}") from exc
         if not raw.strip():
             return None
         if raw.lstrip().startswith("{"):
@@ -71,8 +134,54 @@ class Ue:
         self.next_id += 1
         return self._post({"jsonrpc": "2.0", "id": self.next_id, "method": method, "params": params})
 
+    def _tool_schemas(self, ts):
+        if ts not in self._schemas:
+            reply = self._rpc("tools/call", {"name": "describe_toolsets",
+                                             "arguments": {"toolset_names": [ts], "include_schemas": True}})
+            result = self._result(reply)
+            if result.get("isError"):
+                raise UeError(f"Cannot describe {ts}: {result.get('content')}")
+            data = result.get("structuredContent") or json.loads(result["content"][0]["text"])
+            if ts not in data.get("toolsets", {}):
+                raise UeError(f"Unknown toolset {ts}: {str(data.get('errors', {}))[:300]}")
+            self._schemas[ts] = {_key(t["name"].rsplit(".", 1)[-1]): t for t in data["toolsets"][ts]["tools"]}
+        return self._schemas[ts]
+
     def call(self, toolset, tool, args=None, record=True):
         ts = TOOLSETS.get(toolset, toolset)
+        args = dict(args or {})
+        if self.native_toolsets:
+            ts = TOOLSETS_59.get(toolset, toolset)
+            if (toolset, tool) == ("asset", "save_assets"):
+                paths = args.get("asset_paths")
+                if not isinstance(paths, list):
+                    raise UeError("save_assets expects an asset_paths list")
+                for path in paths:
+                    self.call("asset", "SaveAsset", {"assetPath": path}, record=record)
+                return True
+            if (toolset, tool) == ("app", "CaptureViewport"):
+                ts, tool = "SceneCaptureToolset.SceneCaptureToolset", "CaptureEditorViewport"
+            elif (toolset, tool) == ("app", "SearchCVars"):
+                ts = TOOLSETS_59["console"]
+            elif (toolset, tool) == ("static", "is_nanite_enabled"):
+                tool = "IsNaniteMesh"
+            elif toolset == "logs" and "category" in args:
+                args["logCategory"] = args.pop("category")
+            schema = self._tool_schemas(ts).get(_key(tool))
+            if not schema:
+                raise UeError(f"Tool {tool!r} is not registered in {ts}")
+            tool = schema["name"].rsplit(".", 1)[-1]
+            input_schema = schema["inputSchema"]
+            for operation, field in (("SetActorTransform", "xform"), ("SetSocketTransform", "transform")):
+                if tool == operation and field in args:
+                    args.update(_transform(args.pop(field), scale_key="scale"))
+            for field in ("captureTransform", "xform"):
+                if isinstance(args.get(field), dict):
+                    args[field] = _transform(args[field], scale_key="scale3D")
+            if (ts, tool) == (TOOLSETS_59["asset"], "FindAssets") and "filter" not in args:
+                # The 5.8 listing was exhaustive. 5.9 otherwise truncates it to 100.
+                args = {"filter": {"maxResults": 0, **_native_args(args, input_schema["properties"]["filter"])}}
+            args = _native_args(args, input_schema)
         res = self._rpc("tools/call", {"name": "call_tool",
                                        "arguments": {"toolset_name": ts, "tool_name": tool, "arguments": args or {}}})
         if res is None:
@@ -93,6 +202,9 @@ class Ue:
             except ValueError:
                 payload = {"returnValue": texts[0]}
         value = payload.get("returnValue") if isinstance(payload, dict) and "returnValue" in payload else payload
+        if self.native_toolsets and tool in ("GetSocketTransform", "GetActorTransform") and isinstance(value, dict):
+            fields = {"translation": "location", "scale3D": "scale"}
+            value = {fields.get(k, k): v for k, v in value.items()}
         if isinstance(value, str) and value[:1] in "[{":
             try:
                 value = json.loads(value)

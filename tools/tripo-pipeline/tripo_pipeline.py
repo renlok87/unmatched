@@ -514,8 +514,7 @@ class Context:
             self.blender_cmd = [blender or os.environ.get("TRIPO_PIPELINE_BLENDER") or DEFAULT_BLENDER]
         self.blender_mcp_cmd = client_command("TRIPO_PIPELINE_BLENDER_MCP_CMD", blender_mcp_client,
                                               DEFAULT_MCP_CLIENTS / "blender_mcp.py")
-        self.unreal_mcp_cmd = client_command("TRIPO_PIPELINE_UNREAL_MCP_CMD", unreal_mcp_client,
-                                             DEFAULT_MCP_CLIENTS / "unreal_mcp.py")
+        self.unreal_mcp_cmd = unreal_client_override(unreal_mcp_client)
         if self.backend == "mcp":
             self.blender = McpBlender(self.blender_mcp_cmd)
         else:
@@ -617,6 +616,13 @@ def client_command(env_name: str, override: str | None, default: Path) -> list:
     if env_cmd:
         return json.loads(env_cmd)
     return [sys.executable, str(Path(override) if override else default)]
+
+
+def unreal_client_override(path: str | None):
+    """Explicit CLI clients keep their existing protocol, including test doubles."""
+    if path or os.environ.get("TRIPO_PIPELINE_UNREAL_MCP_CMD"):
+        return client_command("TRIPO_PIPELINE_UNREAL_MCP_CMD", path, DEFAULT_MCP_CLIENTS / "unreal_mcp.py")
+    return None
 
 
 def client_script(cmd: list) -> Path:
@@ -733,16 +739,18 @@ class McpBlender:
 
 
 class McpUnreal:
-    """Running UnrealEditor through unreal_mcp.py (ModelContextProtocol plugin, call_tool)."""
+    """One editor MCP session, or the explicitly configured CLI transport."""
 
-    def __init__(self, cmd: list):
+    def __init__(self, cmd: list | None = None):
         self.cmd = cmd
+        self._live = None
         self.calls = []
         self.tool_name_style = None  # "short" or "qualified", detected on first call
 
     def describe(self) -> dict:
         url = os.environ.get("UE_MCP_URL", "http://127.0.0.1:8123/mcp")  # the client's own default (slot 0)
-        return {"backend": "mcp", "client": client_script(self.cmd).name, "endpoint": url.split("://", 1)[-1]}
+        return {"backend": "mcp", "client": client_script(self.cmd).name if self.cmd else "ue_live.py",
+                "endpoint": url.split("://", 1)[-1]}
 
     def _once(self, toolset: str, tool: str, args: dict):
         call = run_client(self.cmd, ["call", toolset, tool, json.dumps(args, ensure_ascii=False)], 900,
@@ -847,6 +855,16 @@ class McpUnreal:
         raise PipelineError("editor python %s wrote no %s within %ss" % (script.name, out.name, timeout))
 
     def call(self, toolset_key: str, tool: str, args: dict):
+        if self.cmd is None:
+            from review.ue_live import Ue, UeError
+            try:
+                if self._live is None:
+                    self._live = Ue()
+                    self._live.calls = self.calls
+                    self.tool_name_style = "short"
+                return self._live.call(toolset_key, tool, args)
+            except UeError as exc:
+                raise PipelineError(str(exc)) from exc
         toolset = UE_TOOLSETS[toolset_key]
         styles = [self.tool_name_style] if self.tool_name_style else ["short", "qualified"]
         error = None
@@ -1193,8 +1211,8 @@ def exec_preflight(ctx: Context, staging: Path) -> StageResult:
         check("ue_folder_is_pipeline_candidate", ue_cfg["folder"].startswith(UE_ALLOWED_ROOT),
               measured=ue_cfg["folder"])
         if ctx.backend == "mcp":
-            check("unreal_mcp_client_present", client_script(ctx.unreal_mcp_cmd).is_file(),
-                  measured=client_script(ctx.unreal_mcp_cmd).name)
+            client = client_script(ctx.unreal_mcp_cmd) if ctx.unreal_mcp_cmd else TOOL_DIR / "review" / "ue_live.py"
+            check("unreal_mcp_client_present", client.is_file(), measured=client.name)
     checks["profile"] = {"passed": True, "required": False, "measured": run_profile(m)}
     if run_profile(m) == CANDIDATE:
         try:

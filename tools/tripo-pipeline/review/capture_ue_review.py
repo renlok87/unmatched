@@ -26,57 +26,11 @@ import json
 import math
 import sys
 import time
-import urllib.request
 from pathlib import Path
 
-URL = "http://127.0.0.1:8123/mcp"
-TS = {"asset": "editor_toolset.toolsets.asset.AssetTools", "scene": "editor_toolset.toolsets.scene.SceneTools",
-      "actor": "editor_toolset.toolsets.actor.ActorTools", "app": "EditorToolset.EditorAppToolset"}
+from ue_live import Ue
+
 NOANN = {"gridSpacing": 0, "gridExtent": 0, "gridHeight": 0, "maxLabelDistance": 0, "classFilter": None, "maxLabels": 0}
-
-
-class Mcp:
-    """Minimal MCP HTTP client (same protocol as unreal_mcp.py, which truncates stdout at 200k chars and
-    therefore cannot carry CaptureViewport images). One session for the whole review."""
-
-    def __init__(self):
-        self.session, self.next_id = None, 0
-        self._rpc("initialize", {"protocolVersion": "2025-03-26", "capabilities": {},
-                                 "clientInfo": {"name": "tripo-pipeline-review", "version": "1"}})
-        self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
-
-    def _post(self, body):
-        headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
-        if self.session:
-            headers["Mcp-Session-Id"] = self.session
-        req = urllib.request.Request(URL, data=json.dumps(body).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=900) as resp:
-            self.session = resp.headers.get("Mcp-Session-Id") or self.session
-            raw = resp.read().decode("utf-8")
-        if not raw.strip():
-            return None
-        if raw.lstrip().startswith("{"):
-            return json.loads(raw)
-        data = [line[5:].strip() for line in raw.splitlines() if line.startswith("data:")]
-        return json.loads(data[-1]) if data else None
-
-    def _rpc(self, method, params):
-        self.next_id += 1
-        return self._post({"jsonrpc": "2.0", "id": self.next_id, "method": method, "params": params})
-
-    def call(self, toolset, tool, args=None):
-        res = self._rpc("tools/call", {"name": "call_tool", "arguments": {
-            "toolset_name": TS[toolset], "tool_name": tool, "arguments": args or {}}}) or {}
-        if res.get("error"):
-            raise RuntimeError("%s.%s: %s" % (toolset, tool, res["error"]))
-        result = res.get("result") or {}
-        texts = [c.get("text", "") for c in result.get("content", [])]
-        if result.get("isError"):
-            raise RuntimeError("%s.%s: %s" % (toolset, tool, " ".join(texts)[:800]))
-        payload = result.get("structuredContent")
-        if payload is None:
-            payload = json.loads(texts[0]) if texts and texts[0].strip().startswith("{") else {"returnValue": None}
-        return payload.get("returnValue") if isinstance(payload, dict) else payload
 
 
 _MCP = None
@@ -85,8 +39,14 @@ _MCP = None
 def call(toolset, tool, args=None):
     global _MCP
     if _MCP is None:
-        _MCP = Mcp()
-    return _MCP.call(toolset, tool, args)
+        _MCP = Ue()
+    result = _MCP.call(toolset, tool, args)
+    if isinstance(result, dict) and "images" in result:
+        value = result["value"]
+        if isinstance(value, dict) and "image" not in value:
+            value = dict(value, image=result["images"][0])
+        return value
+    return result
 
 
 def xf(x, y, z, yaw=0.0):
