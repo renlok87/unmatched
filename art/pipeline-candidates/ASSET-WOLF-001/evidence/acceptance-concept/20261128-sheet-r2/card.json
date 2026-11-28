@@ -1,0 +1,111 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WOLF-001",
+  "cycle": "r2",
+  "date": "2026-11-28",
+  "previous_card": "art/pipeline-candidates/ASSET-WOLF-001/evidence/acceptance-concept/20261128-sheet-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-front.png",
+      "sha256": "ee31b2861f129ea3fa7c65173ed3ea03163aa74a78aa25fcb949e6aa05962a20"
+    },
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-side.png",
+      "sha256": "b7ae8204b4cfc7d66af93774d6b4ca1492ba45d889f46f6e1bff6ad7159e4233"
+    },
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-back.png",
+      "sha256": "83bb765e17c0749f68bdf8f50ce1437b2025c121bf38e1b220474d86d80c5af3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wolf-codex-r4",
+    "files": [
+      "sheet-wolf.png",
+      "wolf-front.png",
+      "wolf-side.png",
+      "wolf-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wolf-codex-r4/checks-report.json",
+    "art/imagegen/concept-wolf-codex-r4/generation-records.json",
+    "art/imagegen/concept-wolf-codex-r4/verification.json"
+  ],
+  "acceptor": {
+    "profile": "Codex independent",
+    "session_id": "codex:/root/wolf_h2_review_1"
+  },
+  "executor_session_id": "codex:/root",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wolf-codex-r4/checks-report.json",
+      "note": "checks-report.json#summary даёт 34 PASS, 0 WARN и 0 FAIL. Для ortho_left.png прямой IoU 0,9774, зеркальный 0,5973."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "В wolf-front.png сразу видны заострённые уши, собранная морда и клин густой гривы. В wolf-side.png ясно отделены нос, линия спины и свободная нижняя часть хвоста. В wolf-front.png и wolf-back.png все четыре зоны опоры стоят на плоскости подставки, границы соседних групп пальцев читаются местами только по неглубоким бороздкам.",
+      "frames": [
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На sheet-wolf.png рост отличается максимум на 0,299%, посадка подставки по высоте — на 0,069 процентного пункта. В wolf-side.png хвост опущен вдоль задней лапы и повторяет ход исправленной левой ортопроекции. В wolf-front.png видимый конец хвоста на 16–21 пиксель выше, чем в wolf-back.png и wolf-side.png. Это небольшое расхождение рельефа хвоста при сохранённой стойке.",
+      "frames": [
+        "sheet-wolf.png",
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "В wolf-front.png читаются объём век, ноздри, углубления на морде и переход от плотной гривы к шерсти на лапах. В wolf-side.png крупные пряди плеча переходят в более мелкую резьбу корпуса. В wolf-back.png рельеф держит объём крупа, выражены скакательные суставы и группы шерсти на хвосте. По глубине и разрешению рельефа эти формы сопоставимы с мелкой скульптурой эталона Medusa.",
+      "frames": [
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На sheet-wolf.png свотч #B7B6B3 согласуется с нейтральным сатиновым литьём во всех трёх видах. В wolf-side.png свободный конец цельного хвоста проходит примерно на 19 пикселей внутри задней кромки подставки. Несколько прядей на переходе крупа в корень ещё доходят до касательной кромки и местами выступают примерно на 2 пикселя при пороге яркости 85.",
+      "frames": [
+        "sheet-wolf.png",
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wolf-front.png",
+      "note": "Границы соседних передних и задних пальцев местами разделены только тонкой бороздкой. Четыре площадки контакта читаются по двум противоположным видам."
+    },
+    {
+      "item": "C",
+      "frame": "wolf-front.png",
+      "note": "Видимая нижняя точка хвоста находится около y=1174 против y=1190 на виде сзади и y=1195 в левом профиле. Основная диагональ хвоста исправлена."
+    },
+    {
+      "item": "P",
+      "frame": "wolf-side.png",
+      "note": "У перехода крупа в корень хвоста осталось касание проекции задней кромки с локальным выступом около двух пикселей. Свободный кончик находится внутри кромки. Посадочный габарит проверяется на скульпте."
+    }
+  ],
+  "status_note": "Лист 1c художественно принят, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)."
+}

@@ -1,0 +1,116 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-WOLF-001",
+  "cycle": "r2",
+  "date": "2026-11-28",
+  "previous_card": "art/pipeline-candidates/ASSET-WOLF-001/evidence/acceptance-concept/20261128-sheet-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-front.png",
+      "sha256": "ee31b2861f129ea3fa7c65173ed3ea03163aa74a78aa25fcb949e6aa05962a20"
+    },
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-side.png",
+      "sha256": "b7ae8204b4cfc7d66af93774d6b4ca1492ba45d889f46f6e1bff6ad7159e4233"
+    },
+    {
+      "path": "art/imagegen/concept-wolf-codex-r4/wolf-back.png",
+      "sha256": "83bb765e17c0749f68bdf8f50ce1437b2025c121bf38e1b220474d86d80c5af3"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-wolf-codex-r4",
+    "files": [
+      "sheet-wolf.png",
+      "wolf-front.png",
+      "wolf-side.png",
+      "wolf-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-wolf-codex-r4/checks-report.json",
+    "art/imagegen/concept-wolf-codex-r4/generation-records.json",
+    "art/imagegen/concept-wolf-codex-r4/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-wolf-codex-r4/checks-report.json",
+      "note": "summary.PASS = 34, summary.WARN = 0, summary.FAIL = 0. IoU левого профиля с ортопроекцией 0,9774, зеркального 0,5973."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На wolf-front.png читаются оба уха, морда и крупные пряди воротника. На wolf-side.png видны линия спины, сгиб задней лапы и свободная нижняя часть хвоста. На wolf-back.png различимы четыре опоры. Пальцы ближних друг к другу лап в анфасе и сзади местами касаются в проекции, поэтому замечание r1 закрыто частично.",
+      "frames": [
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На sheet-wolf.png совпадают высота ушей, линия подошв и положение центра подставки. На wolf-side.png хвост опущен рядом с задней лапой и согласуется с исправленной левой ортопроекцией, устраняя расхождение r1. Кончик хвоста в анфасе примерно на 21 пиксель выше, чем в профиль. Толщина прядей на переходе спины в хвост немного меняется между видами.",
+      "frames": [
+        "sheet-wolf.png",
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "На wolf-front.png отдельно видны веки, ноздри и насечка на морде. Wolf-side.png сохраняет объём крупных прядей и мелкий рельеф короткой шерсти, а wolf-back.png прорабатывает корень хвоста и форму скакательных суставов. Разный масштаб рельефа сохраняет скульптурную детализацию на уровне эталона Медузы.",
+      "frames": [
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На sheet-wolf.png свотч #B7B6B3 соответствует единой серебряной отливке. Видны посадка лап, широкая шерсть на шее и низкий хвост. На wolf-side.png свободный кончик хвоста находится примерно на 19 пикселей внутри задней кромки подставки, поэтому замечание r1 о выносе кончика закрыто. Средние тона шерсти сзади слегка светлее и теплее, чем в анфасе и профиле.",
+      "frames": [
+        "sheet-wolf.png",
+        "wolf-front.png",
+        "wolf-side.png",
+        "wolf-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "wolf-front.png",
+      "note": "В ортографии местами соприкасаются соседние группы пальцев. При проверке 3D убедиться, что четыре лапы раздельны выше подставки."
+    },
+    {
+      "item": "C",
+      "frame": "sheet-wolf.png",
+      "note": "Кончик хвоста в анфасе примерно на 21 пиксель выше, чем в профиль. Для геометрии исходным остаётся опущенный хвост исправленного черновика."
+    },
+    {
+      "item": "P",
+      "frame": "wolf-side.png",
+      "note": "Проверить зазор верхнего перехода между крупом и хвостом по 3D-мешу. Свободный кончик хвоста в профиле внутри задней кромки примерно на 19 пикселей."
+    },
+    {
+      "item": "P",
+      "frame": "wolf-back.png",
+      "note": "Средние тона шерсти на спине немного светлее и теплее, чем на двух остальных видах."
+    }
+  ],
+  "acceptor": {
+    "profile": "Codex independent",
+    "session_id": "codex:/root/wolf_h2_review_2"
+  },
+  "executor_session_id": "codex:/root",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}
