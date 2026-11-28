@@ -1,0 +1,679 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-11-28T09:13:50+00:00",
+  "set": "art/imagegen/concept-the-jabberwock-codex-1c-r1",
+  "key": "the-jabberwock",
+  "role": "creature",
+  "views": [
+    "front",
+    "side",
+    "back"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r1/the-jabberwock-front.jpeg",
+      "sha256": "490804224123f9bf73dfbd82febceb20c79194e10824202c0e065c70346f9ca6",
+      "format": "JPEG",
+      "mode": "RGB",
+      "size": [
+        1752,
+        2336
+      ]
+    },
+    {
+      "view": "side",
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r1/the-jabberwock-side.jpeg",
+      "sha256": "32202f9341a096dcf258073ced53b2550cd637ef3ebbec131e4eafcb59b7e14e",
+      "format": "JPEG",
+      "mode": "RGB",
+      "size": [
+        1752,
+        2336
+      ]
+    },
+    {
+      "view": "back",
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r1/the-jabberwock-back.jpeg",
+      "sha256": "665bdf988370898e78e60ca76f329c247b903c4468f96f917bee2e31babf91cb",
+      "format": "JPEG",
+      "mode": "RGB",
+      "size": [
+        1752,
+        2336
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "facing": {
+    "verdict": "OK",
+    "iou_direct": 0.9761,
+    "iou_mirror": 0.4433,
+    "ortho_size": [
+      1152,
+      1536
+    ],
+    "margin": 0.05,
+    "view": "side",
+    "ortho": "docs/art-pipeline/evidence/tabletop-metal-miniatures-2026-11-27/wolf-jabberwock/jabberwock-orthos/ortho_left.png",
+    "ortho_sha256": "c3ae15a01ddb00fa1baba965c12d52a73b7a908ad27d76594e4b28cac9a48c35"
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1752,
+        2336
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 35,
+        "median_rgb": [
+          45.0,
+          45.0,
+          45.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 4.0,
+        "neutral_delta": 0.0,
+        "luma": 45.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.06,
+          1.07,
+          1.33
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 50.772,
+        "filled_area_pct": 50.772,
+        "components_kept": 2,
+        "main_component_pct": 50.752,
+        "other_components_pct": [
+          0.02,
+          0.001
+        ],
+        "bbox_px": [
+          170,
+          93,
+          1583,
+          2199
+        ],
+        "top_pct": 3.981,
+        "bottom_pct": 94.135,
+        "left_pct": 9.703,
+        "right_pct": 90.354,
+        "height_pct": 90.154,
+        "base_center_x_pct": 50.029,
+        "base_width_pct": 80.651,
+        "base_top_pct_est": 84.461
+      }
+    },
+    "side": {
+      "size": [
+        1752,
+        2336
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 35,
+        "median_rgb": [
+          44.0,
+          44.0,
+          44.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 4.0,
+        "neutral_delta": 0.0,
+        "luma": 44.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.1,
+          1.12,
+          1.43
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 33.443,
+        "filled_area_pct": 33.443,
+        "components_kept": 2,
+        "main_component_pct": 33.412,
+        "other_components_pct": [
+          0.032,
+          0.019,
+          0.013,
+          0.012,
+          0.008,
+          0.006,
+          0.006,
+          0.005,
+          0.005,
+          0.004
+        ],
+        "bbox_px": [
+          93,
+          93,
+          1591,
+          2197
+        ],
+        "top_pct": 3.981,
+        "bottom_pct": 94.05,
+        "left_pct": 5.308,
+        "right_pct": 90.811,
+        "height_pct": 90.068,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 77.511,
+        "base_top_pct_est": 87.628
+      }
+    },
+    "back": {
+      "size": [
+        1752,
+        2336
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 35,
+        "median_rgb": [
+          44.0,
+          45.0,
+          44.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 4.0,
+        "neutral_delta": 1.0,
+        "luma": 44.7
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          1.09,
+          1.1,
+          1.35
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 50.698,
+        "filled_area_pct": 50.698,
+        "components_kept": 2,
+        "main_component_pct": 50.647,
+        "other_components_pct": [
+          0.051,
+          0.004,
+          0.003,
+          0.003,
+          0.002,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001
+        ],
+        "bbox_px": [
+          169,
+          94,
+          1582,
+          2197
+        ],
+        "top_pct": 4.024,
+        "bottom_pct": 94.05,
+        "left_pct": 9.646,
+        "right_pct": 90.297,
+        "height_pct": 90.026,
+        "base_center_x_pct": 49.971,
+        "base_width_pct": 80.651,
+        "base_top_pct_est": 84.418
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1752,
+            2336
+          ],
+          "side": [
+            1752,
+            2336
+          ],
+          "back": [
+            1752,
+            2336
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1752,
+          2336
+        ],
+        "side": [
+          1752,
+          2336
+        ],
+        "back": [
+          1752,
+          2336
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 4.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        45.0,
+        45.0,
+        45.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 45.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 50.772,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 3.981,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 94.135,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 9.646,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        0.02,
+        0.001
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 4.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        44.0,
+        44.0,
+        44.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 44.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 33.443,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 3.981,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 94.05,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 5.308,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        0.032,
+        0.019,
+        0.013,
+        0.012,
+        0.008,
+        0.006,
+        0.006,
+        0.005,
+        0.005,
+        0.004
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 4.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "back",
+      "result": "PASS",
+      "value": [
+        44.0,
+        45.0,
+        44.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "back",
+      "result": "PASS",
+      "value": 44.7,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "back",
+      "result": "PASS",
+      "value": 50.698,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 4.024,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 94.05,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 9.646,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "back",
+      "result": "PASS",
+      "value": [
+        0.051,
+        0.004,
+        0.003,
+        0.003,
+        0.002,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 1.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    },
+    {
+      "id": "set.base_bottom",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.085,
+      "limit": "<= 3.5 % высоты (WARN > 1.5)",
+      "message": "низ подставки на одной линии земли"
+    },
+    {
+      "id": "set.base_center",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.058,
+      "limit": "<= 6.5 % ширины (WARN > 2.0)",
+      "message": "центр подставки на одной вертикали"
+    },
+    {
+      "id": "set.height",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.142,
+      "limit": "<= 5.0 % от наибольшего (WARN > 3.0)",
+      "message": "рост фигуры одинаков во всех видах"
+    },
+    {
+      "id": "view.facing",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "verdict": "OK",
+        "iou_direct": 0.9761,
+        "iou_mirror": 0.4433,
+        "ortho": "docs/art-pipeline/evidence/tabletop-metal-miniatures-2026-11-27/wolf-jabberwock/jabberwock-orthos/ortho_left.png"
+      },
+      "limit": "IoU прямо > зеркало + 0.05 (WARN: оба < 0.5)",
+      "message": "боковой вид смотрит в ту же сторону, что ортопроекция SIDE_VIEW черновика (F8)"
+    }
+  ],
+  "summary": {
+    "PASS": 34,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-the-jabberwock-codex/checks/design-front-g4/palette.json",
+    "asset_id": "ASSET-THE-JABBERWOCK-001",
+    "swatches": [
+      {
+        "name": "satin silver",
+        "hex": "#ABB1B6",
+        "role": "main",
+        "figure_share_within_40_pct": 16.34
+      },
+      {
+        "name": "silver relief shadow",
+        "hex": "#757D84",
+        "role": "main",
+        "figure_share_within_40_pct": 28.91
+      },
+      {
+        "name": "silver edge highlight",
+        "hex": "#D2D7DC",
+        "role": "accent",
+        "figure_share_within_40_pct": 5.7
+      }
+    ]
+  },
+  "sheet": "art/imagegen/concept-the-jabberwock-codex-1c-r1/sheet-the-jabberwock.png",
+  "input_name_note": "The checker expects .png filenames. The run used temporary byte-identical aliases and decoded the original JPEGs. The report points to the archived native JPEGs."
+}

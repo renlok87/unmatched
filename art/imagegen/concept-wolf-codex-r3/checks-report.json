@@ -1,0 +1,620 @@
+{
+  "schema": "unmatched.concept-checks/1",
+  "tool": "tools/art/concept/check_concept_views.py",
+  "generated_at": "2026-11-28T09:14:14+00:00",
+  "set": "art/imagegen/concept-wolf-codex-r3",
+  "key": "wolf",
+  "role": "creature",
+  "views": [
+    "front",
+    "side",
+    "back"
+  ],
+  "inputs": [
+    {
+      "view": "front",
+      "path": "art/imagegen/concept-wolf-codex-r3/wolf-front.png",
+      "sha256": "a55b172d3bb9a81c908d527e11df1235b30940bc093c9c69482823b98cfcffae",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    },
+    {
+      "view": "side",
+      "path": "art/imagegen/concept-wolf-codex-r3/wolf-side.png",
+      "sha256": "b7ae8204b4cfc7d66af93774d6b4ca1492ba45d889f46f6e1bff6ad7159e4233",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    },
+    {
+      "view": "back",
+      "path": "art/imagegen/concept-wolf-codex-r3/wolf-back.png",
+      "sha256": "83bb765e17c0749f68bdf8f50ce1437b2025c121bf38e1b220474d86d80c5af3",
+      "format": "PNG",
+      "mode": "RGB",
+      "size": [
+        1086,
+        1448
+      ]
+    }
+  ],
+  "raw_files_modified": false,
+  "tolerances": {
+    "size_rel_pct": 0.5,
+    "border_band_pct": 2.0,
+    "border_share_min": 0.99,
+    "border_tone_warn": 12,
+    "border_tone_fail": 20,
+    "bg_neutral_max": 6,
+    "bg_between_views_max": 12,
+    "bg_dark_luma_warn": 96,
+    "top_min_pct": 1.0,
+    "bottom_max_pct": 99.0,
+    "side_min_pct": 1.0,
+    "base_bottom_spread_warn_pct": 1.5,
+    "base_bottom_spread_fail_pct": 3.5,
+    "base_center_spread_warn_pct": 2.0,
+    "base_center_spread_fail_pct": 6.5,
+    "height_spread_warn_pct": 3.0,
+    "height_spread_fail_pct": 5.0,
+    "extra_component_warn_pct": 0.5,
+    "mask_area_min_pct": 2.0,
+    "mask_area_max_pct": 90.0,
+    "segment_tone": 14,
+    "segment_min_component_pct": 0.02,
+    "facing_margin": 0.05,
+    "facing_iou_warn": 0.5
+  },
+  "tolerances_note": "решение скилла (DECISIONS Р-9), калибровка на art/imagegen/hero-quality-v1 — tools/art/concept/README.md",
+  "frame": {
+    "min_top_pct": null
+  },
+  "facing": {
+    "verdict": "OK",
+    "iou_direct": 0.9774,
+    "iou_mirror": 0.5973,
+    "ortho_size": [
+      1152,
+      1536
+    ],
+    "margin": 0.05,
+    "view": "side",
+    "ortho": "art/pipeline-candidates/ASSET-WOLF-001/20261128-draft-tail-repair/orthos/ortho_left.png",
+    "ortho_sha256": "2ac215617467324cba590cd7909041faa8f815c2684a77b5316ea89450be7be0"
+  },
+  "measurements": {
+    "front": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          46.0,
+          46.0,
+          46.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 3.0,
+        "neutral_delta": 0.0,
+        "luma": 46.0
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.79,
+          0.79,
+          0.78
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 21.407,
+        "filled_area_pct": 21.407,
+        "components_kept": 1,
+        "main_component_pct": 21.407,
+        "other_components_pct": [],
+        "bbox_px": [
+          207,
+          378,
+          879,
+          1361
+        ],
+        "top_pct": 26.105,
+        "bottom_pct": 93.992,
+        "left_pct": 19.061,
+        "right_pct": 80.939,
+        "height_pct": 67.887,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 61.878,
+        "base_top_pct_est": 91.16
+      }
+    },
+    "side": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          46.0,
+          46.0,
+          45.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 1.0,
+        "luma": 45.9
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.85,
+          0.85,
+          0.84
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 29.624,
+        "filled_area_pct": 29.624,
+        "components_kept": 1,
+        "main_component_pct": 29.624,
+        "other_components_pct": [
+          0.002
+        ],
+        "bbox_px": [
+          44,
+          361,
+          879,
+          1361
+        ],
+        "top_pct": 24.931,
+        "bottom_pct": 93.992,
+        "left_pct": 4.052,
+        "right_pct": 80.939,
+        "height_pct": 69.061,
+        "base_center_x_pct": 49.954,
+        "base_width_pct": 61.418,
+        "base_top_pct_est": 91.091
+      }
+    },
+    "back": {
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGB",
+      "alpha": {
+        "present": false,
+        "min": 255
+      },
+      "border": {
+        "band_px": 22,
+        "median_rgb": [
+          46.0,
+          46.0,
+          45.0
+        ],
+        "share_within_tone_warn": 1.0,
+        "share_within_tone_fail": 1.0,
+        "p99_deviation": 2.0,
+        "neutral_delta": 1.0,
+        "luma": 45.9
+      },
+      "background_model": {
+        "fit": "quadratic per channel",
+        "residual_std": [
+          0.79,
+          0.79,
+          0.78
+        ],
+        "segment_tone": 14
+      },
+      "mask": {
+        "area_pct": 22.204,
+        "filled_area_pct": 22.204,
+        "components_kept": 1,
+        "main_component_pct": 22.204,
+        "other_components_pct": [],
+        "bbox_px": [
+          199,
+          359,
+          887,
+          1361
+        ],
+        "top_pct": 24.793,
+        "bottom_pct": 93.992,
+        "left_pct": 18.324,
+        "right_pct": 81.676,
+        "height_pct": 69.199,
+        "base_center_x_pct": 50.0,
+        "base_width_pct": 63.352,
+        "base_top_pct_est": 91.16
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "set.size",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "sizes": {
+          "front": [
+            1086,
+            1448
+          ],
+          "side": [
+            1086,
+            1448
+          ],
+          "back": [
+            1086,
+            1448
+          ]
+        },
+        "max_delta_pct": 0.0
+      },
+      "limit": "<= 0.5 %",
+      "message": "все виды одного размера и аспекта"
+    },
+    {
+      "id": "set.size_exact",
+      "scope": "set",
+      "result": "PASS",
+      "value": {
+        "front": [
+          1086,
+          1448
+        ],
+        "side": [
+          1086,
+          1448
+        ],
+        "back": [
+          1086,
+          1448
+        ]
+      },
+      "limit": "равны до пикселя",
+      "message": "размеры отличаются на пиксели: сравнение идёт в % кадра"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "front",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 3.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "front",
+      "result": "PASS",
+      "value": [
+        46.0,
+        46.0,
+        46.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "front",
+      "result": "PASS",
+      "value": 46.0,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "front",
+      "result": "PASS",
+      "value": 21.407,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 26.105,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 93.992,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "front",
+      "result": "PASS",
+      "value": 19.061,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "front",
+      "result": "PASS",
+      "value": [],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        46.0,
+        46.0,
+        45.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "side",
+      "result": "PASS",
+      "value": 45.9,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "side",
+      "result": "PASS",
+      "value": 29.624,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 24.931,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 93.992,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "side",
+      "result": "PASS",
+      "value": 4.052,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "side",
+      "result": "PASS",
+      "value": [
+        0.002
+      ],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "view.alpha",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "present": false,
+        "min": 255
+      },
+      "limit": "без прозрачности",
+      "message": "альфа-канал с прозрачностью: Tripo и image_gen ждут RGB"
+    },
+    {
+      "id": "view.border_uniform",
+      "scope": "back",
+      "result": "PASS",
+      "value": {
+        "share_warn_tone": 1.0,
+        "share_fail_tone": 1.0,
+        "p99_deviation": 2.0
+      },
+      "limit": ">= 0.99 при ±20 (WARN при ±12)",
+      "message": "рамка 2 % кадра — ровный фон без объектов"
+    },
+    {
+      "id": "view.bg_neutral",
+      "scope": "back",
+      "result": "PASS",
+      "value": [
+        46.0,
+        46.0,
+        45.0
+      ],
+      "limit": "|R-G|,|G-B| <= 6",
+      "message": "фон нейтрально-серый"
+    },
+    {
+      "id": "view.bg_dark",
+      "scope": "back",
+      "result": "PASS",
+      "value": 45.9,
+      "limit": "<= 96",
+      "message": "фон тёмно-серый (норма hero-quality-v1)"
+    },
+    {
+      "id": "view.mask",
+      "scope": "back",
+      "result": "PASS",
+      "value": 22.204,
+      "limit": "2.0..90.0 %",
+      "message": "маска фигуры правдоподобна"
+    },
+    {
+      "id": "view.top_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 24.793,
+      "limit": ">= 1.0 %",
+      "message": "верх фигуры не касается края"
+    },
+    {
+      "id": "view.bottom_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 93.992,
+      "limit": "<= 99.0 %",
+      "message": "низ подставки в кадре"
+    },
+    {
+      "id": "view.side_margin",
+      "scope": "back",
+      "result": "PASS",
+      "value": 18.324,
+      "limit": ">= 1.0 %",
+      "message": "фигура не обрезана по бокам"
+    },
+    {
+      "id": "view.single_component",
+      "scope": "back",
+      "result": "PASS",
+      "value": [],
+      "limit": "прочие < 0.5 %",
+      "message": "одна крупная связная фигура"
+    },
+    {
+      "id": "set.bg_same",
+      "scope": "set",
+      "result": "PASS",
+      "value": 1.0,
+      "limit": "<= 12",
+      "message": "один фон на набор"
+    },
+    {
+      "id": "set.base_bottom",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.0,
+      "limit": "<= 3.5 % высоты (WARN > 1.5)",
+      "message": "низ подставки на одной линии земли"
+    },
+    {
+      "id": "set.base_center",
+      "scope": "set",
+      "result": "PASS",
+      "value": 0.046,
+      "limit": "<= 6.5 % ширины (WARN > 2.0)",
+      "message": "центр подставки на одной вертикали"
+    },
+    {
+      "id": "set.height",
+      "scope": "set",
+      "result": "PASS",
+      "value": 1.896,
+      "limit": "<= 5.0 % от наибольшего (WARN > 3.0)",
+      "message": "рост фигуры одинаков во всех видах"
+    },
+    {
+      "id": "view.facing",
+      "scope": "side",
+      "result": "PASS",
+      "value": {
+        "verdict": "OK",
+        "iou_direct": 0.9774,
+        "iou_mirror": 0.5973,
+        "ortho": "art/pipeline-candidates/ASSET-WOLF-001/20261128-draft-tail-repair/orthos/ortho_left.png"
+      },
+      "limit": "IoU прямо > зеркало + 0.05 (WARN: оба < 0.5)",
+      "message": "боковой вид смотрит в ту же сторону, что ортопроекция SIDE_VIEW черновика (F8)"
+    }
+  ],
+  "summary": {
+    "PASS": 34,
+    "WARN": 0,
+    "FAIL": 0
+  },
+  "verdict": "PASS",
+  "palette": {
+    "path": "art/imagegen/concept-wolf-codex-r3/palette.json",
+    "asset_id": null,
+    "swatches": [
+      {
+        "name": "satin silver",
+        "hex": "#B7B6B3",
+        "role": "main",
+        "figure_share_within_40_pct": 30.72
+      }
+    ]
+  },
+  "sheet": "art/imagegen/concept-wolf-codex-r3/sheet-wolf.png"
+}
