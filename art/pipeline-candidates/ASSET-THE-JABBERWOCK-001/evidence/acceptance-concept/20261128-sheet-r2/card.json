@@ -1,0 +1,112 @@
+{
+  "schema": "unmatched.concept-acceptance/1",
+  "kind": "concept",
+  "asset_id": "ASSET-THE-JABBERWOCK-001",
+  "cycle": "r2",
+  "date": "2026-11-28",
+  "previous_card": "art/pipeline-candidates/ASSET-THE-JABBERWOCK-001/evidence/acceptance-concept/20261128-sheet-r1/card.json",
+  "accepted_object": [
+    {
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r3/the-jabberwock-front.png",
+      "sha256": "c5cdb23512f03127370a7106bb792c74227385c7cbaea2d495bf83b8259d3ef4"
+    },
+    {
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r3/the-jabberwock-side.png",
+      "sha256": "0fe0316c44a826b6c386fe747998a379bd1c959d2e295ea58f9f53a5b3627a64"
+    },
+    {
+      "path": "art/imagegen/concept-the-jabberwock-codex-1c-r3/the-jabberwock-back.png",
+      "sha256": "60a8f2f928f4f10b0da01a0abe08fecd669e67f570f7558eac1de1f31d365e5d"
+    }
+  ],
+  "frames": {
+    "dir": "art/imagegen/concept-the-jabberwock-codex-1c-r3",
+    "files": [
+      "sheet-the-jabberwock.png",
+      "the-jabberwock-front.png",
+      "the-jabberwock-side.png",
+      "the-jabberwock-back.png",
+      "checks-report.json"
+    ]
+  },
+  "reports": [
+    "art/imagegen/concept-the-jabberwock-codex-1c-r3/checks-report.json",
+    "art/imagegen/concept-the-jabberwock-codex-1c-r3/generation-records.json",
+    "art/imagegen/concept-the-jabberwock-codex-1c-r3/verification.json"
+  ],
+  "gates": {
+    "G-CHECKS": {
+      "status": "PASS",
+      "source": "art/imagegen/concept-the-jabberwock-codex-1c-r3/checks-report.json",
+      "note": "summary.PASS = 33, summary.WARN = 1, summary.FAIL = 0. Предупреждение set.base_bottom учтено в C."
+    }
+  },
+  "scores": {
+    "S": {
+      "value": 1.5,
+      "rationale": "На the-jabberwock-front.png широкий присед, обе опорные стопы, короткие лапы и два сложенных крыла читаются. Передние когти частично перекрывают бёдра. На the-jabberwock-side.png отдельно читаются клиновидная голова, S-образная шея и загиб хвоста. На the-jabberwock-back.png кончик хвоста снова перекрывает нижнюю часть крыла справа в кадре. Такое же перекрытие есть в задней ортопроекции.",
+      "frames": [
+        "the-jabberwock-front.png",
+        "the-jabberwock-side.png",
+        "the-jabberwock-back.png"
+      ]
+    },
+    "C": {
+      "value": 1.5,
+      "rationale": "На sheet-the-jabberwock.png фронт, левый профиль и вид сзади удерживают один присед, положение крыльев и ход хвоста по ортопроекциям. На the-jabberwock-front.png ширина подставки и фаски теперь совпадают с остальными видами. Ширина составляет 91,44–91,53% кадра. Передний вид всё ещё поднят относительно двух остальных. WARN set.base_bottom фиксирует разброс 2,141% высоты кадра при разбросе высоты фигуры 0,898%.",
+      "frames": [
+        "sheet-the-jabberwock.png",
+        "the-jabberwock-front.png",
+        "the-jabberwock-side.png",
+        "the-jabberwock-back.png",
+        "checks-report.json"
+      ]
+    },
+    "Q": {
+      "value": 2,
+      "rationale": "Чёткие кромки чешуи, отдельные зубы и когти, суставы пальцев крыла и рельеф перепонок дают скульптурную детализацию коллекционной миниатюры на уровне эталона Медузы. На the-jabberwock-front.png открытый участок хвоста под животом теперь покрыт непрерывным выпуклым рельефом. На the-jabberwock-side.png и the-jabberwock-back.png размер и глубина чешуек плавно меняются к кончику хвоста.",
+      "frames": [
+        "the-jabberwock-front.png",
+        "the-jabberwock-side.png",
+        "the-jabberwock-back.png"
+      ]
+    },
+    "P": {
+      "value": 1.5,
+      "rationale": "На sheet-the-jabberwock.png присутствуют все анатомические якоря и три точных свотча. На трёх видах читаются сатиновая отливка, тень в рельефе и светлые кромки. У the-jabberwock-front.png полутона теперь немного холоднее, чем у профиля и вида сзади. В выборке светлых пикселей фигуры медианная разность B−R составляет 6, 4 и 3 соответственно, у свотча светлой кромки разность равна 10.",
+      "frames": [
+        "sheet-the-jabberwock.png",
+        "the-jabberwock-front.png",
+        "the-jabberwock-side.png",
+        "the-jabberwock-back.png"
+      ]
+    }
+  },
+  "score": 8.1,
+  "verdict": "pass",
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "S",
+      "frame": "the-jabberwock-back.png",
+      "note": "В задней ортопроекции и на листе кончик хвоста перекрывает нижнюю часть крыла справа в кадре. При работе с геометрией стоит проверить зазор в этом месте."
+    },
+    {
+      "item": "C",
+      "frame": "the-jabberwock-front.png",
+      "note": "Ширина и фаски подставки совпадают с другими видами. Линия низа во фронте на 2,141% высоты кадра выше линии профиля."
+    },
+    {
+      "item": "P",
+      "frame": "sheet-the-jabberwock.png",
+      "note": "Сатиновое серебро читается во всех видах. Светлые кромки и полутона ближе к нейтрально-серому, чем соответствующие свотчи, особенно в профиле и сзади."
+    }
+  ],
+  "acceptor": {
+    "profile": "Codex independent",
+    "session_id": "codex:/root/jabber_redock_1c_b"
+  },
+  "executor_session_id": "codex:creature-continuation-01a21c5d-86ad-71c3-9d7b-43311bb6adb4",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "Лист 1c художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md). Итог при 8,1 требует второй карточки."
+}
